@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.settings
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
@@ -77,6 +78,7 @@ import com.v2ray.ang.ui.logcat.LogFileActivity
 import com.v2ray.ang.ui.logcat.LogcatActivity
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -93,6 +95,23 @@ class SettingsActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Системный слайд уводил бы вместе со страницей и нижнюю капсулу, а она
+        // одинакова на обоих экранах: кроссфейд оставляет её визуально на месте
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, R.anim.screen_fade_in, R.anim.screen_fade_out)
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, R.anim.screen_fade_in, R.anim.screen_fade_out)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(R.anim.screen_fade_in, R.anim.screen_fade_out)
+        }
     }
 
     @Composable
@@ -167,7 +186,11 @@ fun SettingsScreen(
     // Та же капсула, что на главной: пузырёк въезжает на шестерёнку при открытии экрана
     val backdrop = rememberGraphicsLayer()
     var barItem by remember { mutableStateOf(GlassBarItem.HOME) }
-    LaunchedEffect(Unit) { barItem = GlassBarItem.SETTINGS }
+    LaunchedEffect(Unit) {
+        // Даём кроссфейду улечься, чтобы переезд пузырька было видно целиком
+        delay(140)
+        barItem = GlassBarItem.SETTINGS
+    }
 
     // Hoisted so the category list keeps its scroll position while a category is open
     val categoryListScrollState = rememberScrollState()
