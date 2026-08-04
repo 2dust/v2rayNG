@@ -69,6 +69,7 @@ import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
+import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import android.util.Size as TargetSize
@@ -410,15 +411,14 @@ private fun processImageProxy(
         return
     }
     try {
-        val buffer = imageProxy.planes[0].buffer
-        val bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
         val width = imageProxy.width
         val height = imageProxy.height
-        val source = PlanarYUVLuminanceSource(
-            bytes, width, height,
-            0, 0, width, height,
-            false
+        val yPlane = imageProxy.planes[0]
+        val source = createYPlaneLuminanceSource(
+            buffer = yPlane.buffer,
+            width = width,
+            height = height,
+            rowStride = yPlane.rowStride,
         )
         val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
         val hints = mapOf(
@@ -436,4 +436,27 @@ private fun processImageProxy(
     } finally {
         imageProxy.close()
     }
+}
+
+internal fun createYPlaneLuminanceSource(
+    buffer: ByteBuffer,
+    width: Int,
+    height: Int,
+    rowStride: Int,
+): PlanarYUVLuminanceSource {
+    val bufferCopy = buffer.duplicate()
+    val bytes = ByteArray(bufferCopy.remaining())
+    bufferCopy.get(bytes)
+    // Camera HALs may pad each Y row. ZXing advances rows by dataWidth, so the
+    // reported row stride must be used instead of the visible image width.
+    return PlanarYUVLuminanceSource(
+        bytes,
+        rowStride,
+        height,
+        0,
+        0,
+        width,
+        height,
+        false,
+    )
 }
