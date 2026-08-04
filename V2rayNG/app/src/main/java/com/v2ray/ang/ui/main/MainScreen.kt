@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -350,13 +351,17 @@ private fun PowerButton(
         label = "pulse"
     )
 
-    val glowAlpha by animateFloatAsState(
-        targetValue = if (isConnected) 0.22f else 0f,
+    // Насколько ярко подкрашивать кнопку: на светлой теме мягкое свечение
+    // расплывается в серое пятно, поэтому там оно почти не нужно
+    val isLightTheme = scheme.background.luminance() > 0.5f
+
+    val ringAlpha by animateFloatAsState(
+        targetValue = if (isConnected) 1f else 0.45f,
         animationSpec = tween(500),
-        label = "glow"
+        label = "ringAlpha"
     )
     val ringColor by animateColorAsState(
-        targetValue = if (isConnected) scheme.primary.copy(alpha = 0.35f) else scheme.outlineVariant,
+        targetValue = if (isConnected) scheme.primary else scheme.outlineVariant,
         animationSpec = tween(500),
         label = "ring"
     )
@@ -367,22 +372,25 @@ private fun PowerButton(
             .padding(top = 4.dp, bottom = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Свечение вокруг кнопки
+        // Внешнее тонкое кольцо
         Box(
             modifier = Modifier
-                .size(230.dp)
+                .size(206.dp)
                 .scale(if (isConnecting) pulse else 1f)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(scheme.primary.copy(alpha = glowAlpha), Color.Transparent)
-                    ),
+                .border(
+                    width = 1.dp,
+                    color = ringColor.copy(alpha = 0.15f * ringAlpha),
                     shape = CircleShape
                 )
         )
 
-        // Внешнее кольцо, по нему же бежит дуга подключения
-        Canvas(modifier = Modifier.size(190.dp)) {
-            drawCircle(color = ringColor, style = Stroke(width = 2f))
+        // Среднее кольцо, по нему бежит дуга подключения
+        Canvas(
+            modifier = Modifier
+                .size(182.dp)
+                .scale(if (isConnecting) pulse else 1f)
+        ) {
+            drawCircle(color = ringColor.copy(alpha = 0.35f * ringAlpha), style = Stroke(width = 3f))
             if (isConnecting) {
                 rotate(sweepAngle) {
                     drawArc(
@@ -390,32 +398,33 @@ private fun PowerButton(
                         startAngle = 0f,
                         sweepAngle = 90f,
                         useCenter = false,
-                        style = Stroke(width = 6f, cap = StrokeCap.Round)
+                        style = Stroke(width = 7f, cap = StrokeCap.Round)
                     )
                 }
             }
         }
 
-        // Заливка смешивается с фоном темы заранее: сквозь полупрозрачные цвета
-        // просвечивала бы тень кнопки, а система рисует её многоугольником
+        // Заливка непрозрачная: сквозь полупрозрачную просвечивала бы тень кнопки,
+        // а система рисует её многоугольником
+        val tint = if (isLightTheme) 0.10f else 0.28f
         val fillCenter = if (isConnected) {
-            lerp(scheme.surface, scheme.primary, 0.45f)
+            lerp(scheme.surface, scheme.primary, tint)
         } else {
             scheme.surfaceContainerHigh
         }
-        val fillEdge = if (isConnected) {
-            lerp(scheme.surface, scheme.primary, 0.12f)
-        } else {
-            scheme.surface
-        }
+        val fillEdge = scheme.surface
 
         Box(
             modifier = Modifier
                 .size(150.dp)
-                .shadow(elevation = if (isConnected) 10.dp else 4.dp, shape = CircleShape)
+                .shadow(elevation = 6.dp, shape = CircleShape)
                 .clip(CircleShape)
                 .background(brush = Brush.radialGradient(colors = listOf(fillCenter, fillEdge)))
-                .border(width = 1.dp, color = accent.copy(alpha = 0.45f), shape = CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = if (isConnected) scheme.primary else scheme.outlineVariant,
+                    shape = CircleShape
+                )
                 .clickable { onClick() },
             contentAlignment = Alignment.Center
         ) {
