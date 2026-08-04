@@ -3,6 +3,7 @@ package com.v2ray.ang.core
 import android.content.Context
 import android.text.TextUtils
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
@@ -82,11 +83,30 @@ object CoreConfigManager {
         val raw = MmkvManager.decodeServerRaw(configContext.guid)
             ?: return ConfigResult(status = false, guid = configContext.guid, errorMessage = "Custom config is empty")
         val result = ConfigResult(true, configContext.guid, raw)
-        if (!needTun()) {
-            return result
-        }
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
+
+        // Inject or remove traffic statistics configuration based on user preference
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true) {
+            if (!json.has("stats")) {
+                json.add("stats", JsonObject())
+            }
+            if (!json.has("policy")) {
+                val policyObj = JsonObject()
+                val systemObj = JsonObject()
+                systemObj.addProperty("statsOutboundUplink", true)
+                systemObj.addProperty("statsOutboundDownlink", true)
+                policyObj.add("system", systemObj)
+                json.add("policy", policyObj)
+            }
+        } else {
+            json.remove("stats")
+            json.remove("policy")
+        }
+
+        if (!needTun()) {
+            return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, configContext.guid, it) } ?: result
+        }
 
         // Check whether package names need to be replaced with UIDs
         if (SettingsManager.canUseProcessRouting()) {

@@ -24,10 +24,9 @@ object AppManagerUtil {
                 val applicationInfo = pkg.applicationInfo ?: continue
 
                 val appName = applicationInfo.loadLabel(packageManager).toString()
-                val appIcon = applicationInfo.loadIcon(packageManager) ?: continue
                 val isSystemApp = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM > 0
 
-                val appInfo = AppInfo(appName, pkg.packageName, appIcon, isSystemApp, 0)
+                val appInfo = AppInfo(appName, pkg.packageName, isSystemApp, 0)
                 apps.add(appInfo)
             }
 
