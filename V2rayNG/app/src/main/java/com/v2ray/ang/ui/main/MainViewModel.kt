@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import android.app.Application
-import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -19,7 +18,7 @@ import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.CustomConfigUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -37,8 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
@@ -185,82 +182,15 @@ class MainViewModel(
         }
 
         try {
-            var rawData = ""
-            val context = getApplication<Application>()
-            val possibleFiles = listOf(
-                File(context.filesDir, "$guid.json"),
-                File(context.filesDir, "$guid.txt"),
-                File(context.filesDir, guid)
-            )
-
-            for (file in possibleFiles) {
-                if (file.exists()) {
-                    rawData = file.readText()
-                    break
-                }
-            }
-
-            if (rawData.isEmpty() && !profile.server.isNullOrBlank()) {
-                rawData = profile.server!!
-            }
-
-            if (rawData.isNotEmpty()) {
-                var jsonStr = rawData.trim()
-                if (!jsonStr.startsWith("{")) {
-                    try {
-                        val decodedBytes = Base64.decode(jsonStr, Base64.DEFAULT)
-                        jsonStr = String(decodedBytes, Charset.forName("UTF-8")).trim()
-                    } catch (e: Exception) {}
-                }
-
-                val root = JsonUtil.parseString(jsonStr)
-                val outbounds = root?.getAsJsonArray("outbounds")
-                
-                if (outbounds != null && outbounds.size() > 0) {
-                    val outbound = outbounds.get(0).asJsonObject
-                    val protocol = outbound.get("protocol")?.asString?.lowercase() ?: ""
-                    val settings = outbound.getAsJsonObject("settings")
-
-                    if (settings != null) {
-                        var host = ""
-                        var port = 0
-
-                        when (protocol) {
-                            "vless", "vmess", "trojan" -> {
-                                val vnext = settings.getAsJsonArray("vnext")
-                                if (vnext != null && vnext.size() > 0) {
-                                    val srv = vnext.get(0).asJsonObject
-                                    host = srv.get("address")?.asString ?: ""
-                                    port = srv.get("port")?.asInt ?: 0
-                                }
-                            }
-                            "shadowsocks" -> {
-                                val servers = settings.getAsJsonArray("servers")
-                                if (servers != null && servers.size() > 0) {
-                                    val srv = servers.get(0).asJsonObject
-                                    host = srv.get("address")?.asString ?: ""
-                                    port = srv.get("port")?.asInt ?: 0
-                                }
-                            }
-                            "hysteria", "hysteria2" -> {
-                                val serverStr = settings.get("server")?.asString ?: ""
-                                if (serverStr.contains(":")) {
-                                    val parts = serverStr.split(":")
-                                    host = parts[0]
-                                    port = parts[1].toIntOrNull() ?: 0
-                                } else {
-                                    host = serverStr
-                                }
-                            }
-                        }
-                        if (host.isNotBlank() && port > 0) {
-                            return Pair(host, port)
-                        }
-                    }
-                }
+            // The raw JSON is the only reliable source here: profile.server/serverPort stay
+            // empty for every outbound shape the typed model cannot read (vnext, servers, ...).
+            val rawConfig = CustomConfigUtil.getRawConfig(getApplication<Application>(), guid, profile.server)
+            val outbound = CustomConfigUtil.getProxyOutbound(CustomConfigUtil.parseConfig(rawConfig))
+            if (outbound != null) {
+                CustomConfigUtil.extractHostAndPort(outbound)?.let { return it }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            LogUtil.e(AppConfig.TAG, "Failed to extract host and port from custom config", e)
         }
 
         val fallbackHost = profile.server

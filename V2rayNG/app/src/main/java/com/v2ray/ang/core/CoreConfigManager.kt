@@ -15,6 +15,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.util.CustomConfigUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -61,78 +62,54 @@ object CoreConfigManager {
             if (configContext.isCustom) {
                 val rawConfigResult = buildV2rayCustomConfig(configContext)
                 if (!rawConfigResult.status) return rawConfigResult
-                
+
                 try {
-                    val jsonObject = com.google.gson.JsonParser.parseString(rawConfigResult.content).asJsonObject
-                    
-                    // 1. Полностью удаляем inbounds (избегаем конфликта портов)
+                    val jsonObject = JsonUtil.parseString(rawConfigResult.content) ?: return rawConfigResult
+
+                    // No listeners are needed for a latency test (avoids port conflicts with a running core)
                     jsonObject.remove("inbounds")
-                    
-                    // 2. Очищаем модули, вызывающие таймаут или краш при микро-тесте
+
+                    // Sections that only add startup cost or time out during a one-shot test
                     jsonObject.remove("dns")
                     jsonObject.remove("fakedns")
                     jsonObject.remove("stats")
                     jsonObject.remove("policy")
                     jsonObject.remove("observatory")
-                    
-                    // 3. Умная обработка роутинга (поддержка балансеров)
-                    val routing = jsonObject.getAsJsonObject("routing")
-                    var hasBalancer = false
-                    
-                    if (routing != null && routing.has("rules")) {
-                        val rules = routing.getAsJsonArray("rules")
-                        val newRules = com.google.gson.JsonArray()
-                        
-                        for (i in 0 until rules.size()) {
-                            val rule = rules.get(i).asJsonObject
-                            // Оставляем ТОЛЬКО правила балансера
-                            if (rule.has("balancerTag")) {
-                                // Внутренний HTTP-пинг ядра не имеет входящего тега. 
-                                // Удаляем это ограничение, чтобы тест точно пошел в балансер.
-                                rule.remove("inboundTag")
-                                newRules.add(rule)
-                                hasBalancer = true
-                            }
-                        }
-                        
-                        // Если балансер есть - оставляем его адаптированные правила. 
-                        // Иначе массив rules будет пустым (как и задумывалось для одиночных профилей).
-                        routing.add("rules", newRules)
-                    }
+                    jsonObject.remove("burstObservatory")
+                    jsonObject.remove("reverse")
+                    jsonObject.remove("api")
+                    jsonObject.remove("metrics")
 
-                    // 4. Обработка outbounds
-                    val outbounds = jsonObject.getAsJsonArray("outbounds")
+                    // measureOutboundDelay() keeps only the log/dispatcher/outbound apps, so the
+                    // router - and with it every rule and balancer - is dropped and the test
+                    // connection always goes to outbounds[0]. Make sure that entry is the outbound
+                    // that actually reaches the server: JSON profiles commonly start with
+                    // "direct"/"block", which is why they used to report no ping at all.
+                    jsonObject.remove("routing")
+
+                    val outbounds = jsonObject.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray
                     if (outbounds != null) {
-                        // Если работает балансер, он сам выберет нужный outbound через сохраненный роутинг.
-                        // Если балансера нет, гарантируем, что "боевой" outbound стоит на 0 позиции.
-                        if (!hasBalancer && outbounds.size() > 1) {
-                            val realIndex = (0 until outbounds.size()).firstOrNull { i ->
-                                val protocol = outbounds.get(i).asJsonObject.get("protocol")?.asString?.lowercase()
-                                protocol != null && protocol != AppConfig.PROTOCOL_FREEDOM && protocol != "blackhole"
-                            }
-                            if (realIndex != null && realIndex != 0) {
-                                val real = outbounds.get(realIndex)
-                                val first = outbounds.get(0)
-                                outbounds.set(realIndex, first)
-                                outbounds.set(0, real)
-                            }
+                        val proxyIndex = CustomConfigUtil.getProxyOutboundIndex(outbounds)
+                        if (proxyIndex > 0) {
+                            val proxy = outbounds.get(proxyIndex)
+                            outbounds.set(proxyIndex, outbounds.get(0))
+                            outbounds.set(0, proxy)
                         }
 
-                        // 5. Убираем mux из outbounds (как в оригинальном коде)
-                        for (i in 0 until outbounds.size()) {
-                            val outbound = outbounds.get(i).asJsonObject
-                            outbound.remove("mux")
+                        // Mux only slows the test down
+                        for (element in outbounds) {
+                            element.takeIf { it.isJsonObject }?.asJsonObject?.remove("mux")
                         }
                     }
-                    
+
                     return ConfigResult(true, guid, jsonObject.toString())
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    // В случае ошибки парсинга возвращаем как есть
-                    return rawConfigResult 
+                    LogUtil.e(AppConfig.TAG, "Failed to prepare custom config for speedtest", e)
+                    // Fall back to the untouched config
+                    return rawConfigResult
                 }
             }
-            
+
             // Логика для обычных профилей остается без изменений
             val v2rayConfig = buildUnifiedConfig(configContext)
             postProcessForSpeedtest(v2rayConfig)

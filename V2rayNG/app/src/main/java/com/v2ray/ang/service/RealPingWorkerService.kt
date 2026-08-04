@@ -10,6 +10,7 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.util.CustomConfigUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -110,6 +111,19 @@ class RealPingWorkerService(
         val retFailure = -1L
 
         val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
+
+        // Raw JSON profiles keep their server address inside the config itself
+        if (config.configType == EConfigType.CUSTOM) {
+            val rawConfig = CustomConfigUtil.getRawConfig(context, guid, config.server)
+            val hostAndPort = CustomConfigUtil.getProxyOutbound(CustomConfigUtil.parseConfig(rawConfig))
+                ?.let { CustomConfigUtil.extractHostAndPort(it) }
+                ?: config.server?.takeIf { it.isNotBlank() && !it.contains("{") }
+                    ?.let { server -> config.serverPort?.toIntOrNull()?.let { Pair(server, it) } }
+                ?: return retFailure
+
+            return SpeedtestManager.socketConnectTime(hostAndPort.first, hostAndPort.second, 1000)
+        }
+
         if (!config.configType.isComplexType()
             && config.configType != EConfigType.HYSTERIA2
             && config.configType != EConfigType.WIREGUARD

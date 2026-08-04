@@ -35,14 +35,11 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.ui.subscription.SubEditActivity
+import com.v2ray.ang.util.CustomConfigUtil
 import org.json.JSONObject
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.v2ray.ang.util.JsonUtil
-import android.util.Base64
-import java.nio.charset.Charset
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -107,44 +104,10 @@ fun getProtocolDescription(context: Context, profile: ProfileItem, guid: String)
 
     // 2. Парсинг CUSTOM (JSON) профилей
     return try {
-        var rawData = ""
-        
-        // Сначала ищем файл (на всякий случай оставляем логику v2rayNG)
-        val possibleFiles = listOf(
-            File(context.filesDir, "$guid.json"),
-            File(context.filesDir, "$guid.txt"),
-            File(context.filesDir, guid)
-        )
+        // Сырой конфиг лежит в MMKV (файлы — устаревший путь), см. CustomConfigUtil
+        val rawData = CustomConfigUtil.getRawConfig(context, guid, profile.server) ?: return "CUSTOM"
 
-        for (file in possibleFiles) {
-            if (file.exists()) {
-                rawData = file.readText()
-                break
-            }
-        }
-
-        // Если файла нет, берем данные из поля server
-        if (rawData.isEmpty() && !profile.server.isNullOrBlank()) {
-            rawData = profile.server!!
-        }
-
-        if (rawData.isEmpty()) return "CUSTOM"
-
-        // --- МАГИЯ BASE64 ---
-        // Если строка не начинается с фигурной скобки, пытаемся ее декодировать
-        var jsonStr = rawData.trim()
-        if (!jsonStr.startsWith("{")) {
-            try {
-                // Флаг Base64.NO_WRAP или DEFAULT обычно подходит
-                val decodedBytes = Base64.decode(jsonStr, Base64.DEFAULT)
-                jsonStr = String(decodedBytes, Charset.forName("UTF-8")).trim()
-            } catch (e: Exception) {
-                // Не смогли декодировать — игнорируем, парсер сам отвалится дальше
-            }
-        }
-
-        // --- ПАРСИНГ ---
-        val root = JsonUtil.parseString(jsonStr) ?: return "CUSTOM"
+        val root = CustomConfigUtil.parseConfig(rawData) ?: return "CUSTOM"
         val outbounds = root.getAsJsonArray("outbounds") ?: return "CUSTOM"
 
         for (i in 0 until outbounds.size()) {
