@@ -18,6 +18,8 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import libv2ray.CoreCallbackHandler
@@ -55,6 +57,16 @@ object PingManager {
     private const val PROXY_TIMEOUT_MS = 10_000
     private const val ICMP_TIMEOUT_MS = 4_000L
     private const val TEST_INBOUND_TAG = "ping-in"
+
+    /**
+     * Every test spins up its own core instance, and core.New() re-points Xray's system
+     * dialer - a process wide singleton holding the DNS client and the outbound manager -
+     * at the instance being created. Two instances at once therefore dial through each
+     * other's (often already closed) plumbing, which surfaces as
+     * `io: read/write on closed pipe` on all but one profile. Core based tests run one at
+     * a time; the TCP pre-check and the TCP/ICMP types stay fully parallel.
+     */
+    private val coreTestMutex = Mutex()
 
     /**
      * Measures a profile with the configured ping type.
@@ -110,8 +122,10 @@ object PingManager {
         }
 
         val url = SettingsManager.getDelayTestUrl()
-        val (delay, error) = withContext(Dispatchers.IO) {
-            CoreNativeManager.measureOutboundDelayDetailed(configResult.content, url)
+        val (delay, error) = coreTestMutex.withLock {
+            withContext(Dispatchers.IO) {
+                CoreNativeManager.measureOutboundDelayDetailed(configResult.content, url)
+            }
         }
         if (delay <= FAILURE) {
             return fail(profile, error ?: "no answer from $url")
@@ -133,24 +147,26 @@ object PingManager {
             return fail(profile, configResult.errorMessage)
         }
 
-        return withContext(Dispatchers.IO) {
-            val port = Utils.findRandomFreePort()
-            val config = withSocksInbound(configResult.content, port)
-                ?: return@withContext fail(profile, "test config is not valid json")
+        return coreTestMutex.withLock {
+            withContext(Dispatchers.IO) {
+                val port = Utils.findRandomFreePort()
+                val config = withSocksInbound(configResult.content, port)
+                    ?: return@withContext fail(profile, "test config is not valid json")
 
-            CoreNativeManager.initCoreEnv(context.applicationContext)
-            val controller = CoreNativeManager.newCoreController(PingCallback)
-            try {
-                controller.startLoop(config, 0)
-                val (delay, error) = requestThroughSocks(port, SettingsManager.getDelayTestUrl(), head = true)
-                if (delay <= FAILURE) fail(profile, error) else delay
-            } catch (e: Exception) {
-                fail(profile, e.message ?: e.javaClass.simpleName)
-            } finally {
+                CoreNativeManager.initCoreEnv(context.applicationContext)
+                val controller = CoreNativeManager.newCoreController(PingCallback)
                 try {
-                    controller.stopLoop()
+                    controller.startLoop(config, 0)
+                    val (delay, error) = requestThroughSocks(port, SettingsManager.getDelayTestUrl(), head = true)
+                    if (delay <= FAILURE) fail(profile, error) else delay
                 } catch (e: Exception) {
-                    LogUtil.w(AppConfig.TAG, "Failed to stop ping core instance: ${e.message}")
+                    fail(profile, e.message ?: e.javaClass.simpleName)
+                } finally {
+                    try {
+                        controller.stopLoop()
+                    } catch (e: Exception) {
+                        LogUtil.w(AppConfig.TAG, "Failed to stop ping core instance: ${e.message}")
+                    }
                 }
             }
         }

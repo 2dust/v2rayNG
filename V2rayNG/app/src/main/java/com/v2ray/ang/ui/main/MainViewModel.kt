@@ -195,7 +195,11 @@ class MainViewModel(
                 val failed = AtomicInteger(0)
                 PingManager.consumeLastError()
 
-                LogUtil.i(AppConfig.TAG, "Ping: testing ${guids.size} profiles, type=$pingType, concurrency=$concurrency")
+                // Proxy types serialize inside PingManager, the core cannot test two at once
+                LogUtil.i(
+                    AppConfig.TAG,
+                    "Ping: testing ${guids.size} profiles, type=$pingType, concurrency=$concurrency"
+                )
 
                 coroutineScope {
                     // Results land in the list while the run is still going
