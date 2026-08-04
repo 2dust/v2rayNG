@@ -176,6 +176,13 @@
     <string name="summary_settings_fragment">Фрагментация TLS-пакетов</string>
     <string name="summary_settings_observatory">Интервалы проверки соединений</string>
     <string name="summary_settings_advanced">Пинг, автозапуск, адреса API</string>
+    <string name="summary_settings_logs">Уровень логов, просмотр, файлы логов</string>
+    <string name="title_log_settings">Настройки логов</string>
+    <string name="title_log_files">Файлы логов</string>
+    <string name="title_view_logs">Посмотреть логи</string>
+    <string name="log_files_empty">Файлов логов пока нет</string>
+    <string name="title_pref_core_log_to_file">Записывать логи ядра в файл</string>
+    <string name="summary_pref_core_log_to_file">Ядро пишет логи доступа и ошибок в файлы, они появятся ниже. Применяется при переподключении</string>
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_core_settings">Настройки ядра</string>
     <string name="title_vpn_settings">Настройки VPN</string>

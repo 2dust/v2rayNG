@@ -122,6 +122,45 @@ private fun SettingsItemRow(
     }
 }
 
+/**
+ * Row for a file: name, timestamp and size, opening the file on click.
+ */
+@Composable
+fun SettingsFileItem(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    trailingText: String? = null
+) {
+    SettingsItemRow(
+        icon = null,
+        title = title,
+        description = subtitle,
+        enabled = true,
+        onClick = onClick,
+        modifier = modifier,
+        trailing = {
+            if (!trailingText.isNullOrEmpty()) {
+                Text(
+                    text = trailingText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_expand_more_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(-90f)
+            )
+        }
+    )
+}
+
 @Composable
 fun SettingsEditItem(
     icon: Painter? = null,

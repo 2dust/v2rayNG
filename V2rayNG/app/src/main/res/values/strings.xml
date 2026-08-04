@@ -177,6 +177,13 @@
     <string name="summary_settings_fragment">TLS packet fragmentation</string>
     <string name="summary_settings_observatory">Connection probing intervals</string>
     <string name="summary_settings_advanced">Ping, auto connect, API urls</string>
+    <string name="summary_settings_logs">Log level, log viewer, log files</string>
+    <string name="title_log_settings">Log settings</string>
+    <string name="title_log_files">Log files</string>
+    <string name="title_view_logs">View logs</string>
+    <string name="log_files_empty">No log files yet</string>
+    <string name="title_pref_core_log_to_file">Write core logs to file</string>
+    <string name="summary_pref_core_log_to_file">The core writes its access and error logs to files, listed below. Reconnect to apply</string>
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_core_settings">Core Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>

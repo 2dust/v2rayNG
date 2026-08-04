@@ -13,6 +13,7 @@ import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.CoreResolvedType
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.handler.LogFileManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.CustomConfigUtil
@@ -190,6 +191,7 @@ object CoreConfigManager {
 
         val v2rayConfig = initV2rayConfig(configContext)
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        LogFileManager.applyFileLogging(v2rayConfig.log, configContext.context)
         v2rayConfig.remarks = primaryResolvedOutbound.profile.remarks
 
         configureInbounds(v2rayConfig)
@@ -453,6 +455,9 @@ object CoreConfigManager {
      */
     private fun postProcessForSpeedtest(v2rayConfig: V2rayConfig) {
         v2rayConfig.log.loglevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        // Test instances run in parallel and must not write into the log files
+        v2rayConfig.log.access = null
+        v2rayConfig.log.error = null
         v2rayConfig.inbounds.clear()
         v2rayConfig.routing.rules.clear()
         v2rayConfig.dns = null

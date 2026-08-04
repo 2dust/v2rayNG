@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
@@ -21,21 +22,34 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.LogFileInfo
+import com.v2ray.ang.extension.toTrafficString
+import com.v2ray.ang.handler.LogFileManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -45,12 +59,20 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
 import com.v2ray.ang.ui.compose.SettingsCategoryItem
 import com.v2ray.ang.ui.compose.SettingsEditItem
+import com.v2ray.ang.ui.compose.SettingsFileItem
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.ui.compose.verticalScrollbar
+import com.v2ray.ang.ui.logcat.LogFileActivity
+import com.v2ray.ang.ui.logcat.LogcatActivity
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SettingsActivity : BaseComponentActivity() {
 
@@ -87,6 +109,7 @@ enum class SettingsCategory(
     MUX(R.string.title_mux_settings, R.string.summary_settings_mux),
     FRAGMENT(R.string.title_fragment_settings, R.string.summary_settings_fragment),
     OBSERVATORY(R.string.title_observatory_settings, R.string.summary_settings_observatory),
+    LOGS(R.string.title_log_settings, R.string.summary_settings_logs),
     ADVANCED(R.string.title_advanced, R.string.summary_settings_advanced)
 }
 
@@ -110,7 +133,7 @@ private val settingsSections = listOf(
     ),
     SettingsSection(
         R.string.title_settings_section_other,
-        listOf(SettingsCategory.ADVANCED)
+        listOf(SettingsCategory.LOGS, SettingsCategory.ADVANCED)
     )
 )
 
@@ -178,6 +201,7 @@ fun SettingsScreen(
                 SettingsCategory.MUX -> MuxSettings(modifier)
                 SettingsCategory.FRAGMENT -> FragmentSettings(modifier)
                 SettingsCategory.OBSERVATORY -> ObservatorySettings(modifier, viewModel)
+                SettingsCategory.LOGS -> LogSettings(modifier)
                 SettingsCategory.ADVANCED -> AdvancedSettings(modifier)
             }
         }
@@ -481,7 +505,6 @@ private fun CoreSettings(modifier: Modifier) {
     var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
     var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
     var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
-    var coreLogLevel by rememberMmkvString(AppConfig.PREF_LOGLEVEL, "warning")
     var outboundResolveMethod by rememberMmkvString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "0")
 
     val mode by rememberMmkvString(AppConfig.PREF_MODE, VPN)
@@ -490,8 +513,6 @@ private fun CoreSettings(modifier: Modifier) {
     val localProxyForced = mode == VPN && useHevTun
     val effectiveLocalProxy = enableLocalProxy || localProxyForced
 
-    val coreLogLevelEntries = stringArrayResource(R.array.core_loglevel).toList()
-    val coreLogLevelValues = stringArrayResource(R.array.core_loglevel).toList()
     val outboundResolveEntries = stringArrayResource(R.array.outbound_domain_resolve_method).toList()
     val outboundResolveValues = stringArrayResource(R.array.outbound_domain_resolve_method_value).toList()
 
@@ -577,13 +598,6 @@ private fun CoreSettings(modifier: Modifier) {
             title = stringResource(R.string.title_pref_dns_hosts),
             value = dnsHosts,
             onValueChanged = { dnsHosts = it }
-        )
-        SettingsListItem(
-            title = stringResource(R.string.title_core_loglevel),
-            entries = coreLogLevelEntries,
-            values = coreLogLevelValues,
-            selectedValue = coreLogLevel,
-            onSelected = { coreLogLevel = it }
         )
         SettingsListItem(
             title = stringResource(R.string.title_outbound_domain_resolve_method),
@@ -743,6 +757,81 @@ private fun ObservatorySettings(modifier: Modifier, viewModel: SettingsViewModel
         )
     }
 }
+
+@Composable
+private fun LogSettings(modifier: Modifier) {
+    val context = LocalContext.current
+    var coreLogLevel by rememberMmkvString(AppConfig.PREF_LOGLEVEL, "warning")
+    var logToFile by rememberMmkvBool(AppConfig.PREF_CORE_LOG_TO_FILE, false)
+
+    val coreLogLevelEntries = stringArrayResource(R.array.core_loglevel).toList()
+    val coreLogLevelValues = stringArrayResource(R.array.core_loglevel).toList()
+
+    // Files grow while the core runs, so the list is rebuilt every time the screen is shown
+    var refreshTick by remember { mutableIntStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) refreshTick++
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val logFiles by produceState(emptyList<LogFileInfo>(), refreshTick, logToFile) {
+        value = withContext(Dispatchers.IO) { LogFileManager.listLogFiles(context) }
+    }
+
+    SettingsColumn(modifier) {
+        PreferenceGroupHeader(title = stringResource(R.string.title_log_settings))
+        SettingsListItem(
+            title = stringResource(R.string.title_core_loglevel),
+            entries = coreLogLevelEntries,
+            values = coreLogLevelValues,
+            selectedValue = coreLogLevel,
+            onSelected = { coreLogLevel = it }
+        )
+        SettingsSwitchItem(
+            title = stringResource(R.string.title_pref_core_log_to_file),
+            summary = stringResource(R.string.summary_pref_core_log_to_file),
+            checked = logToFile,
+            onCheckedChange = { logToFile = it }
+        )
+        SettingsMenuItem(
+            title = stringResource(R.string.title_view_logs),
+            onClick = { context.startActivity(Intent(context, LogcatActivity::class.java)) }
+        )
+
+        PreferenceGroupHeader(title = stringResource(R.string.title_log_files))
+        if (logFiles.isEmpty()) {
+            Text(
+                text = stringResource(R.string.log_files_empty),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        } else {
+            logFiles.forEach { logFile ->
+                SettingsFileItem(
+                    title = logFile.name,
+                    subtitle = formatLogTimestamp(logFile.lastModified),
+                    trailingText = logFile.sizeBytes.toTrafficString(),
+                    onClick = {
+                        context.startActivity(
+                            Intent(context, LogFileActivity::class.java).apply {
+                                putExtra(LogFileActivity.EXTRA_PATH, logFile.path)
+                                putExtra(LogFileActivity.EXTRA_NAME, logFile.name)
+                            }
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+private fun formatLogTimestamp(millis: Long): String =
+    SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date(millis))
 
 @Composable
 private fun AdvancedSettings(modifier: Modifier) {

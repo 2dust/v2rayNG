@@ -130,6 +130,9 @@
             android:name=".ui.logcat.LogcatActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.logcat.LogFileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.routing.RoutingSettingActivity"
             android:exported="false" />
         <activity

@@ -72,6 +72,7 @@ object AppConfig {
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_IP_API_URL = "pref_ip_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
+    const val PREF_CORE_LOG_TO_FILE = "pref_core_log_to_file"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
     const val PREF_MODE = "pref_mode"
     const val PREF_ROOT_MODE_ENABLE = "pref_root_mode_enabled"
@@ -213,6 +214,9 @@ object AppConfig {
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
     const val VPN_MTU = 1500
+
+    /** Directory (inside filesDir) holding the core log files. */
+    const val LOG_DIR = "logs"
 
     /** Root (system-wide) mode runtime constants. */
     const val ROOT_RUNTIME_DIR = "sys_cache"
