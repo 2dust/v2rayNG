@@ -176,7 +176,7 @@
 
     <string name="subscription_updater_job_tips">The task will run in the background, and progress information will be displayed in the notification.</string>
     <string name="title_pref_auto_test_after_update_subscription">Auto test after updating subscription</string>
-    <string name="summary_pref_auto_test_after_update_subscription">Automated testing takes a relatively long time, please be patient.</string>
+    <string name="summary_pref_auto_test_after_update_subscription">Automated testing takes a long time. If enabled, the task will run in the background; otherwise, it will run on the current page.</string>
     <string name="title_pref_auto_remove_invalid_after_test">Auto delete invalid config after testing</string>
     <string name="summary_pref_auto_remove_invalid_after_test">Test results may not be accurate; deleted config cannot be recovered.</string>
     <string name="title_pref_auto_sort_after_test">Auto sort after testing</string>

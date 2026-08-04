@@ -39,16 +39,16 @@
     <string name="menu_item_import_config_manually_trojan">Добавить Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Добавить WireGuard</string>
     <string name="menu_item_import_config_manually_hysteria2">Добавить Hysteria2</string>
-    <string name="confirm_delete_visible_profiles">Вы уверены, что хотите удалить все отображаемые профили?</string>
-    <string name="confirm_delete_duplicate_profiles">Вы уверены, что хотите удалить все отображаемые дубликаты профилей?</string>
-    <string name="confirm_delete_invalid_profiles">Сначала проверьте профили. Вы уверены, что хотите удалить все отображаемые недействительные профили?</string>
-    <string name="confirm_delete_profile">Вы уверены, что хотите удалить этот профиль?</string>
-    <string name="confirm_delete_policy_group">Вы уверены, что хотите удалить эту группу политик?</string>
-    <string name="confirm_delete_proxy_chain_member">Вы уверены, что хотите удалить этот элемент цепочки прокси?</string>
-    <string name="confirm_delete_routing_rule">Вы уверены, что хотите удалить это правило маршрутизации?</string>
-    <string name="confirm_delete_subscription_group">Вы уверены, что хотите удалить эту группу подписки?</string>
-    <string name="confirm_delete_asset_file">Вы уверены, что хотите удалить файл ресурсов \"%1$s\"?</string>
-    <string name="confirm_delete_asset_source">Вы уверены, что хотите удалить этот источник ресурсов?</string>
+    <string name="confirm_delete_visible_profiles">Удалить все отображаемые профили?</string>
+    <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
+    <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
+    <string name="confirm_delete_profile">Удалить этот профиль?</string>
+    <string name="confirm_delete_policy_group">Удалить эту политику группы?</string>
+    <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
+    <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>
+    <string name="confirm_delete_subscription_group">Удалить эту подписку?</string>
+    <string name="confirm_delete_asset_file">Удалить файл ресурсов «%1$s»?</string>
+    <string name="confirm_delete_asset_source">Удалить этот источник ресурсов?</string>
     <string name="server_lab_remarks">Название</string>
     <string name="server_lab_address">Адрес</string>
     <string name="server_lab_port">Порт</string>
@@ -129,7 +129,7 @@
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
-    <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются в Xray core версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своем сервере или используйте Certificate Pinning (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуем сменить его на более безопасный.\nПодробнее: https://github.com/2dust/v2rayN/discussions/9460</string>
+    <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются ядром Xray версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своём сервере или используйте отпечаток сертификата (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуется сменить его на более безопасный.\nПодробнее: https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">Получить и заполнить отпечаток сертификата</string>
     <string name="toast_fetch_cert_sha256_success">Отпечаток сертификата успешно получен</string>
     <string name="toast_fetch_cert_sha256_failed">Отпечаток сертификата не получен</string>
@@ -172,8 +172,12 @@
     <string name="title_pref_is_booted">Автоподключение при запуске</string>
     <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу при запуске приложения (может оказаться неудачным)</string>
 
-    <string name="title_pref_auto_remove_invalid_after_test">Автоудаление нерабочих профилей</string>
-    <string name="summary_pref_auto_remove_invalid_after_test">Автоматическое удаление нерабочих профилей после проверки (результаты проверки могут быть неточными; восстановить удалённые профили невозможно)</string>
+
+    <string name="subscription_updater_job_tips">Задача будет выполняться в фоновом режиме, информация о ходе выполнения будет отображаться в уведомлении.</string>
+    <string name="title_pref_auto_test_after_update_subscription">Автопроверка после обновления подписки</string>
+    <string name="summary_pref_auto_test_after_update_subscription">Автоматическая проверка занимает значительное время</string>
+    <string name="title_pref_auto_remove_invalid_after_test">Автоудаление нерабочих профилей после проверки</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">Результаты проверки могут быть неточными, восстановление удалённых профилей невозможно</string>
     <string name="title_pref_auto_sort_after_test">Автосортировка профилей</string>
     <string name="summary_pref_auto_sort_after_test">Автоматическая сортировка профилей после проверки (результаты проверки могут быть неточными)</string>
 
@@ -261,7 +265,7 @@
     <string name="summary_pref_append_http_proxy">HTTP-прокси будет использоваться напрямую (из браузера и других поддерживающих приложений), минуя виртуальный сетевой адаптер (Android 10+)</string>
 
     <string name="title_pref_double_column_display">Профили в два столбца</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
+    <string name="summary_pref_double_column_display">Список профилей отображается двумя столбцами, что позволяет показать больше информации на экране.</string>
 
     <string name="title_pref_group_all_display">Общая вкладка групп</string>
     <string name="summary_pref_group_all_display">Показывать дополнительную вкладку со всеми профилями групп</string>
@@ -315,6 +319,7 @@
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
     <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_request_headers">Заголовки запроса (формат JSON)</string>
     <string name="sub_setting_filter">Название фильтра</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
@@ -330,8 +335,8 @@
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
     <string name="filter_config_all">Все</string>
+    <string name="summary_scan_qrcode">Нажмите на экран, чтобы открыть камеру для сканирования</string>
     <string name="title_del_duplicate_config_count">Удалено дубликатов профилей: %d</string>
-    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
@@ -362,6 +367,7 @@
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
     <string name="routing_settings_process">Процесс (название пакета; поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации» и ОС Android 10+)</string>
+    <string name="routing_settings_process_select">Выбор названия пакета</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
@@ -370,7 +376,7 @@
 
     <string name="connection_test_pending">Проверить соединение</string>
     <string name="connection_test_testing">Проверка…</string>
-    <string name="connection_test_testing_count">Проверка профилей (%d)</string>
+    <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Успешно: соединение заняло %d мс</string>
     <string name="connection_test_error">Сбой проверки интернет-соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
@@ -392,9 +398,9 @@
     <string name="title_pref_observatory_least_load_interval">Интервал leastLoad</string>
     <string name="title_pref_observatory_least_load_method">HTTP-метод leastLoad</string>
     <string name="title_pref_observatory_least_load_sampling">Выборка leastLoad</string>
-    <string name="title_pref_observatory_least_load_timeout">Тайм-аут leastLoad</string>
-    <string name="toast_invalid_observatory_duration">Недопустимая длительность. Используйте значение вроде 3m или 30s.</string>
-    <string name="toast_invalid_observatory_sampling">Недопустимая выборка. Используйте положительное число.</string>
+    <string name="title_pref_observatory_least_load_timeout">Время ожидания leastLoad</string>
+    <string name="toast_invalid_observatory_duration">Неправильное время. Используйте значение вроде 3m или 30s.</string>
+    <string name="toast_invalid_observatory_sampling">Неправильная выборка. Используйте положительное число.</string>
 
     <string name="update_check_for_update">Проверить обновление</string>
     <string name="update_already_latest_version">Установлена последняя версия</string>

@@ -120,13 +120,9 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     }
 
     private fun createSpecialItemUnidentified(context: Context): AppInfo {
-        val icon = context.getDrawable(android.R.drawable.ic_menu_help)
-            ?: context.getDrawable(android.R.drawable.sym_def_app_icon)
-            ?: error("No fallback drawable available")
         return AppInfo(
             appName = context.getString(R.string.app_picker_unknown_app),
             packageName = AppConfig.UNIDENTIFIED_PACKAGE,
-            appIcon = icon,
             isSystemApp = false,
             isSelected = 0
         )

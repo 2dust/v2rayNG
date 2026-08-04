@@ -77,15 +77,18 @@ object NotificationHelper {
      * @param channelType The notification channel type
      * @param title The notification title
      * @param content The notification content text
+     * @param action An optional action retained when the notification is updated
      */
     fun startForeground(
         service: Service,
         channelType: NotificationChannelType,
         title: String,
-        content: String
+        content: String,
+        action: NotificationCompat.Action? = null
     ) {
         ensureChannelCreated(channelType, service)
-        val builder = buildNotificationBuilder(channelType, service, title, content)
+        val builder = buildNotificationBuilder(channelType, service, title, content, action)
+        builderCache[channelType.notificationId] = builder
         service.startForeground(channelType.notificationId, builder.build())
     }
 
@@ -141,7 +144,8 @@ object NotificationHelper {
         channelType: NotificationChannelType,
         context: Context,
         title: String,
-        content: String
+        content: String,
+        action: NotificationCompat.Action? = null
     ): NotificationCompat.Builder {
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channelType.channelId
@@ -158,5 +162,6 @@ object NotificationHelper {
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .apply { action?.let(::addAction) }
     }
 }

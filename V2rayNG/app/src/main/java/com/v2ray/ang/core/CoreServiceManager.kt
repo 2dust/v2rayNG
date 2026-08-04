@@ -265,7 +265,7 @@ object CoreServiceManager {
         if (!isRunning()) return false
 
         return try {
-            val tunFd = tunFdForCore()
+            val tunFd = currentVpnInterface
 
             isReloading = true
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
@@ -284,23 +284,6 @@ object CoreServiceManager {
             false
         } finally {
             isReloading = false
-        }
-    }
-
-    /**
-     * Returns the tun descriptor to hand to the core on a reload.
-     *
-     * With hev-socks5-tunnel the core is started without a tun and never touches the descriptor.
-     * Otherwise it closes the one it was given when it stops, which would take the VPN interface
-     * down, so it gets a duplicate to close instead.
-     */
-    private fun tunFdForCore(): ParcelFileDescriptor? {
-        val vpnInterface = currentVpnInterface ?: return null
-        return try {
-            if (SettingsManager.isUsingHevTun()) vpnInterface else vpnInterface.dup()
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to duplicate VPN interface", e)
-            throw e
         }
     }
 
