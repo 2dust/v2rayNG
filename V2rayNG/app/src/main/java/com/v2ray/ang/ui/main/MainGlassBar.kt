@@ -1,7 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import android.os.Build
-
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -10,7 +8,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -29,39 +26,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.graphics.layer.GraphicsLayer
-import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.GlassBackdrop
+import com.v2ray.ang.ui.compose.GlassSurface
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 
 /** Пункты нижней капсулы. */
 enum class GlassBarItem { HOME, SETTINGS, ADD }
 
-private val CapsuleShape = RoundedCornerShape(50)
+/** Форма стеклянных таблеток: и капсулы снизу, и кнопок на карточках. */
+val GlassCapsuleShape = RoundedCornerShape(50)
+
 private val ItemSize = 68.dp
 private val BarHeight = 72.dp
 private val BarPadding = 14.dp
-private const val BLUR_RADIUS_DP = 26
 
 /**
  * Нижняя капсула в духе жидкого стекла: под ней размывается то, что нарисовано на экране,
@@ -73,17 +62,13 @@ private const val BLUR_RADIUS_DP = 26
  */
 @Composable
 fun LiquidGlassBar(
-    backdrop: GraphicsLayer,
+    backdrop: GlassBackdrop,
     selected: GlassBarItem,
     onSelect: (GlassBarItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scheme = MaterialTheme.colorScheme
     val isDark = LocalDarkTheme.current
-
-    // Куда капсула попала на экране: по этому смещению из общего слоя
-    // вырезается ровно тот кусок фона, который под ней
-    var barOffset by remember { mutableStateOf(Offset.Zero) }
 
     val items = listOf(GlassBarItem.HOME, GlassBarItem.SETTINGS, GlassBarItem.ADD)
     val selectedIndex = items.indexOf(selected).coerceAtLeast(0)
@@ -95,67 +80,15 @@ fun LiquidGlassBar(
         label = "glassHighlight"
     )
 
-    Box(
+    GlassSurface(
         modifier = modifier
             .height(BarHeight)
-            .width(ItemSize * items.size + BarPadding * 2)
-            .onGloballyPositioned { barOffset = it.positionInRoot() }
-            .clip(CapsuleShape)
+            .width(ItemSize * items.size + BarPadding * 2),
+        shape = GlassCapsuleShape,
+        backdrop = backdrop,
+        fallbackColor = scheme.surfaceContainerHigh.copy(alpha = 0.96f)
     ) {
-        // 1. Размытая копия того, что под капсулой.
-        // Настоящее размытие умеет только Android 12+, ниже вместо него плотная подложка,
-        // иначе под капсулой была бы видна чёткая копия экрана
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(BLUR_RADIUS_DP.dp, edgeTreatment = BlurredEdgeTreatment(CapsuleShape))
-                    .drawBehind {
-                        translate(left = -barOffset.x, top = -barOffset.y) {
-                            drawLayer(backdrop)
-                        }
-                    }
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(scheme.surfaceContainerHigh.copy(alpha = 0.96f))
-            )
-        }
-
-        // 2. Тонировка стекла + блик сверху
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = if (isDark) {
-                            listOf(
-                                Color.White.copy(alpha = 0.07f),
-                                scheme.surface.copy(alpha = 0.26f)
-                            )
-                        } else {
-                            listOf(
-                                Color.White.copy(alpha = 0.28f),
-                                scheme.surface.copy(alpha = 0.12f)
-                            )
-                        }
-                    )
-                )
-                .border(
-                    width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color.White.copy(alpha = if (isDark) 0.22f else 0.7f),
-                            Color.White.copy(alpha = 0.04f)
-                        )
-                    ),
-                    shape = CapsuleShape
-                )
-        )
-
-        // 3. Подсветка активного пункта, отцентрованная по иконке
+        // Подсветка активного пункта, отцентрованная по иконке
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -163,11 +96,10 @@ fun LiquidGlassBar(
                 .offset(x = highlightOffset)
                 .size(ItemSize)
                 .padding(7.dp)
-                .clip(CapsuleShape)
+                .clip(GlassCapsuleShape)
                 .background(scheme.primary.copy(alpha = if (isDark) 0.30f else 0.18f))
         )
 
-        // 4. Сами кнопки
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -210,7 +142,7 @@ private fun GlassBarButton(
         modifier = Modifier
             .size(ItemSize)
             .scale(scale)
-            .clip(CapsuleShape)
+            .clip(GlassCapsuleShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(bounded = false),

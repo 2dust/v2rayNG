@@ -42,12 +42,18 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.ui.compose.GlassBackdrop
+import com.v2ray.ang.ui.compose.GlassSurface
+import com.v2ray.ang.ui.compose.glassBackground
 import com.v2ray.ang.ui.subscription.SubEditActivity
 import com.v2ray.ang.util.CustomConfigUtil
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+/** Форма выпадающего меню карточки: под стекло нужны заметно скруглённые углы. */
+private val MenuShape = RoundedCornerShape(20.dp)
 
 @Composable
 fun ChevronDown(color: Color, modifier: Modifier = Modifier) {
@@ -162,6 +168,7 @@ fun ProfileCard(
     subscription: SubscriptionCache,
     servers: List<ServersCache>,
     selectedGuid: String?,
+    backdrop: GlassBackdrop? = null,
     onAction: (MainAction) -> Unit,
     onPingProfile: (String) -> Unit,
     onUpdateSubscription: (String) -> Unit,
@@ -230,36 +237,60 @@ fun ProfileCard(
                         )
                     }
                     
-                    IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
-                        Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = MaterialTheme.colorScheme.primary)
+                    // Обновление и пинг живут в общей стеклянной таблетке.
+                    // Слой сюда передавать нельзя: карточка сама пишется в него
+                    GlassSurface(
+                        shape = GlassCapsuleShape,
+                        opaqueness = 0.85f,
+                        fallbackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                        ) {
+                            IconButton(onClick = { onUpdateSubscription(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                                Icon(painterResource(id = R.drawable.ic_restore_24dp), contentDescription = "Обновить", tint = MaterialTheme.colorScheme.primary)
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
+                                ClockIcon(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                            }
+                        }
                     }
-                    Spacer(Modifier.width(4.dp))
-                    IconButton(onClick = { onPingProfile(subscription.guid) }, modifier = Modifier.size(28.dp)) {
-                        ClockIcon(color = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                    }
-                    Spacer(Modifier.width(4.dp))
-                    
+
+                    Spacer(Modifier.width(6.dp))
+
                     Box {
                         IconButton(onClick = { showMenu = true }, modifier = Modifier.size(28.dp)) {
                             Icon(painterResource(id = R.drawable.ic_more_vert_24dp), contentDescription = "Меню", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
+                        // Меню - отдельное окно, оно уже вне записи слоя, поэтому размытие настоящее
                         DropdownMenu(
-                            expanded = showMenu, 
+                            expanded = showMenu,
                             onDismissRequest = { showMenu = false },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                            shape = MenuShape,
+                            containerColor = Color.Transparent,
+                            shadowElevation = 0.dp,
+                            modifier = Modifier.glassBackground(
+                                shape = MenuShape,
+                                backdrop = backdrop,
+                                blurRadius = 30.dp,
+                                opaqueness = 1.15f,
+                                fallbackColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.96f)
+                            )
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Редактировать", color = MaterialTheme.colorScheme.onSurface) }, 
-                                onClick = { 
+                                text = { Text("Редактировать", color = MaterialTheme.colorScheme.onSurface) },
+                                onClick = {
                                     showMenu = false
-                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid)) 
+                                    context.startActivity(Intent(context, SubEditActivity::class.java).putExtra("subId", subscription.guid))
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Удалить", color = MaterialTheme.colorScheme.error) }, 
-                                onClick = { 
+                                text = { Text("Удалить", color = MaterialTheme.colorScheme.error) },
+                                onClick = {
                                     showMenu = false
-                                    onDeleteSubscription(subscription.guid) 
+                                    onDeleteSubscription(subscription.guid)
                                 }
                             )
                         }

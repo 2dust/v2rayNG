@@ -26,7 +26,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -35,8 +34,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
@@ -47,6 +44,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.GlassBackdrop
+import com.v2ray.ang.ui.compose.GlassSurface
+import com.v2ray.ang.ui.compose.glassBackdropSource
+import com.v2ray.ang.ui.compose.rememberGlassBackdrop
 
 @Composable
 fun PowerIcon(color: Color, modifier: Modifier = Modifier) {
@@ -116,17 +117,14 @@ fun MainScreen(
     val hours = (uptime / (1000 * 60 * 60))
     val timeString = "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 
-    // Капсула снизу размывает именно то, что под ней, поэтому экран пишется в слой
-    val backdrop = rememberGraphicsLayer()
+    // Стекло размывает именно то, что под ним, поэтому экран пишется в слой
+    val backdrop = rememberGlassBackdrop()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             // ДИНАМИЧЕСКИЙ ФОН: Подстраивается под тему (белый, серый или черный AMOLED)
             containerColor = MaterialTheme.colorScheme.background,
-            modifier = Modifier.drawWithContent {
-                backdrop.record { this@drawWithContent.drawContent() }
-                drawLayer(backdrop)
-            }
+            modifier = Modifier.glassBackdropSource(backdrop)
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -229,6 +227,7 @@ fun MainScreen(
                                 subscription = subCache,
                                 servers = servers,
                                 selectedGuid = uiState.selectedGuid,
+                                backdrop = backdrop,
                                 onAction = onAction,
                                 onPingProfile = { guid -> 
                                     onAction(MainAction.SelectGroup(guid))
@@ -272,6 +271,7 @@ fun MainScreen(
 
         if (showImportMenu) {
             ImportSheet(
+                backdrop = backdrop,
                 onDismiss = { mainViewModel.showImportSheet.value = false },
                 onAction = { action ->
                     mainViewModel.showImportSheet.value = false
@@ -547,30 +547,62 @@ private fun ActionChip(
 }
 
 /**
- * Шторка импорта, которую открывает «+» в нижней капсуле.
+ * Шторка импорта, которую открывает «+» в нижней капсуле. Стекло здесь настоящее:
+ * шторка живёт в отдельном окне, поэтому ей можно отдать слой с содержимым экрана.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ImportSheet(
+    backdrop: GlassBackdrop,
     onDismiss: () -> Unit,
     onAction: (MainAction) -> Unit
 ) {
+    val sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f),
+        shape = sheetShape,
+        dragHandle = null,
+        // Стекло должно доходить до самого низа экрана, отступ под навигацию делаем сами
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
     ) {
-        Column(modifier = Modifier.padding(bottom = 28.dp)) {
-            Text(
-                text = "Добавить серверы",
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-            )
-            ImportSheetItem("Импорт из буфера", R.drawable.ic_copy) { onAction(MainAction.ImportClipboard) }
-            ImportSheetItem("Сканировать QR", R.drawable.ic_qu_scan_24dp) { onAction(MainAction.ImportQRcode) }
-            ImportSheetItem("Импорт из файла", R.drawable.ic_file_24dp) { onAction(MainAction.ImportConfigLocal) }
+        GlassSurface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = sheetShape,
+            backdrop = backdrop,
+            blurRadius = 34.dp,
+            opaqueness = 1.15f,
+            fallbackColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.96f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(top = 12.dp, bottom = 28.dp)
+            ) {
+                // Свой хват вместо системного: он должен лежать на стекле, а не над ним
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 14.dp)
+                        .size(width = 34.dp, height = 4.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+                )
+                Text(
+                    text = "Добавить серверы",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+                )
+                ImportSheetItem("Импорт из буфера", R.drawable.ic_copy) { onAction(MainAction.ImportClipboard) }
+                ImportSheetItem("Сканировать QR", R.drawable.ic_qu_scan_24dp) { onAction(MainAction.ImportQRcode) }
+                ImportSheetItem("Импорт из файла", R.drawable.ic_file_24dp) { onAction(MainAction.ImportConfigLocal) }
+            }
         }
     }
 }

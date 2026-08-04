@@ -40,9 +40,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +59,8 @@ import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
+import com.v2ray.ang.ui.compose.glassBackdropSource
+import com.v2ray.ang.ui.compose.rememberGlassBackdrop
 import com.v2ray.ang.ui.compose.ResumePauseEffect
 import com.v2ray.ang.ui.compose.SettingsCategoryItem
 import com.v2ray.ang.ui.compose.SettingsEditItem
@@ -184,7 +183,7 @@ fun SettingsScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     // Та же капсула, что на главной: пузырёк въезжает на шестерёнку при открытии экрана
-    val backdrop = rememberGraphicsLayer()
+    val backdrop = rememberGlassBackdrop()
     var barItem by remember { mutableStateOf(GlassBarItem.HOME) }
     LaunchedEffect(Unit) {
         // Даём кроссфейду улечься, чтобы переезд пузырька было видно целиком
@@ -206,10 +205,7 @@ fun SettingsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
-        modifier = Modifier.drawWithContent {
-            backdrop.record { this@drawWithContent.drawContent() }
-            drawLayer(backdrop)
-        },
+        modifier = Modifier.glassBackdropSource(backdrop),
         topBar = {
             AppTopBar(
                 title = stringResource(openCategory?.titleRes ?: R.string.title_settings),
