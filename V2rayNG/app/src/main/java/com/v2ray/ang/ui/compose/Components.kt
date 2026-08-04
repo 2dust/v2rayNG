@@ -42,9 +42,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -60,6 +62,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.R
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
@@ -341,5 +346,31 @@ fun ReorderableGridItem(
         shadowElevation = elevation
     ) {
         content()
+    }
+}
+
+/**
+ * Runs [onResume] every time the screen becomes visible and [onPause] when it stops being
+ * visible, so screens can hold a live subscription only while the user is looking at them.
+ */
+@Composable
+fun ResumePauseEffect(key: Any? = Unit, onResume: () -> Unit, onPause: () -> Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentOnResume by rememberUpdatedState(onResume)
+    val currentOnPause by rememberUpdatedState(onPause)
+
+    DisposableEffect(lifecycleOwner, key) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> currentOnResume()
+                Lifecycle.Event.ON_PAUSE -> currentOnPause()
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            currentOnPause()
+        }
     }
 }

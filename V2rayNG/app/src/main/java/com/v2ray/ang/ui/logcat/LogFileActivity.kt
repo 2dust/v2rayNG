@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +34,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.ResumePauseEffect
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -128,7 +128,12 @@ fun LogFileScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
-    LaunchedEffect(path) { viewModel.load(path) }
+    // Poll the file while the screen is visible so a growing log updates itself
+    ResumePauseEffect(
+        key = path,
+        onResume = { viewModel.startWatching(path) },
+        onPause = { viewModel.stopWatching() }
+    )
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,

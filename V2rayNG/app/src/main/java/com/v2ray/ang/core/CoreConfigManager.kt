@@ -3,6 +3,7 @@ package com.v2ray.ang.core
 import android.content.Context
 import android.text.TextUtils
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
@@ -70,6 +71,12 @@ object CoreConfigManager {
                     // No listeners are needed for a latency test (avoids port conflicts with a running core)
                     jsonObject.remove("inbounds")
 
+                    // Test instances run in parallel and must not write into the log files
+                    jsonObject.get("log")?.takeIf { it.isJsonObject }?.asJsonObject?.apply {
+                        remove("access")
+                        remove("error")
+                    }
+
                     // Sections that only add startup cost or time out during a one-shot test
                     jsonObject.remove("dns")
                     jsonObject.remove("fakedns")
@@ -134,49 +141,70 @@ object CoreConfigManager {
         val raw = MmkvManager.decodeServerRaw(configContext.guid)
             ?: return ConfigResult(status = false, guid = configContext.guid, errorMessage = "Custom config is empty")
         val result = ConfigResult(true, configContext.guid, raw)
-        if (!needTun()) {
-            return result
-        }
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
 
-        // Check whether package names need to be replaced with UIDs
-        if (SettingsManager.canUseProcessRouting()) {
-            val rulesJson = json.get("routing")?.takeIf { it.isJsonObject }?.asJsonObject
-                ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
-                ?: JsonArray()
+        // The log level and the log files are app settings, so they win over the raw config
+        applyLogSettings(json, context)
 
-            for (elem in rulesJson) {
-                val rule = elem.takeIf { it.isJsonObject }?.asJsonObject ?: continue
-                val process = rule.get("process")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
-                val packages = process.mapNotNull {
-                    it.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
-                }.takeIf { it.isNotEmpty() } ?: continue
-                val uids = PackageUidResolver.packageNamesToUids(context, packages).takeIf { it.isNotEmpty() } ?: continue
+        if (needTun()) {
+            // Check whether package names need to be replaced with UIDs
+            if (SettingsManager.canUseProcessRouting()) {
+                val rulesJson = json.get("routing")?.takeIf { it.isJsonObject }?.asJsonObject
+                    ?.get("rules")?.takeIf { it.isJsonArray }?.asJsonArray
+                    ?: JsonArray()
 
-                rule.add("process", JsonArray().apply { uids.forEach { add(it) } })
+                for (elem in rulesJson) {
+                    val rule = elem.takeIf { it.isJsonObject }?.asJsonObject ?: continue
+                    val process = rule.get("process")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
+                    val packages = process.mapNotNull {
+                        it.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
+                    }.takeIf { it.isNotEmpty() } ?: continue
+                    val uids = PackageUidResolver.packageNamesToUids(context, packages).takeIf { it.isNotEmpty() } ?: continue
+
+                    rule.add("process", JsonArray().apply { uids.forEach { add(it) } })
+                }
             }
-        }
 
-        // check if tun inbound exists
-        val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray
-            ?: JsonArray().also { json.add("inbounds", it) }
-        val tunNotExists = inboundsJson.none { elem ->
-            elem.isJsonObject && elem.asJsonObject.get("protocol")
-                ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }
-                ?.asString == "tun"
-        }
+            // check if tun inbound exists
+            val inboundsJson = json.get("inbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+                ?: JsonArray().also { json.add("inbounds", it) }
+            val tunNotExists = inboundsJson.none { elem ->
+                elem.isJsonObject && elem.asJsonObject.get("protocol")
+                    ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }
+                    ?.asString == "tun"
+            }
 
-        if (tunNotExists) {
-            // add tun inbound from template
-            val templateConfig = initV2rayConfig(configContext)
-            templateConfig.inbounds.firstOrNull { it.tag == "tun" }?.let { inboundTun ->
-                inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
-                inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
+            if (tunNotExists) {
+                // add tun inbound from template
+                val templateConfig = initV2rayConfig(configContext)
+                templateConfig.inbounds.firstOrNull { it.tag == "tun" }?.let { inboundTun ->
+                    inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
+                    inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
+                }
             }
         }
 
         return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, configContext.guid, it) } ?: result
+    }
+
+    /**
+     * Applies the log level and, when file logging is on, the log file paths to a raw config.
+     *
+     * Without this a JSON profile keeps whatever the provider shipped, so the log settings
+     * would have no effect at all for it.
+     */
+    private fun applyLogSettings(json: JsonObject, context: Context) {
+        val log = json.get("log")?.takeIf { it.isJsonObject }?.asJsonObject
+            ?: JsonObject().also { json.add("log", it) }
+
+        log.addProperty("loglevel", MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning")
+
+        // When file logging is off the raw config keeps its own access/error entries
+        LogFileManager.logFilePaths(context)?.let { (access, error) ->
+            log.addProperty("access", access)
+            log.addProperty("error", error)
+        }
     }
 
     /**

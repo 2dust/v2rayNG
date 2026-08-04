@@ -1,43 +1,153 @@
 package com.v2ray.ang.ui.logcat
 
 import android.app.Application
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class LogcatViewModel(application: Application) : BaseViewModel(application) {
+
+    companion object {
+        private const val TAGS = "GoLog,${AppConfig.ANG_PACKAGE},AndroidRuntime,System.err"
+
+        /** Lines kept in memory; the oldest ones are dropped past this. */
+        private const val MAX_LINES = 3000
+
+        /** History shown when the stream starts, before new lines arrive. */
+        private const val HISTORY_LINES = "500"
+
+        /** New lines are published in batches so a burst cannot flood recomposition. */
+        private const val FLUSH_INTERVAL_MS = 300L
+        private const val FLUSH_BATCH = 200
+    }
+
+    // Newest first, matching the order the list is drawn in
     private val logsetsAll: MutableList<String> = mutableListOf()
     private var currentFilter: String = ""
 
     private val _filteredLogs = MutableStateFlow<List<String>>(emptyList())
     val filteredLogs: StateFlow<List<String>> = _filteredLogs.asStateFlow()
 
-    fun loadLogcat() {
-        launchLoading {
-            try {
-                val lst = LinkedHashSet<String>()
-                lst.add("logcat")
-                lst.add("-d")
-                lst.add("-v")
-                lst.add("time")
-                lst.add("-s")
-                lst.add("GoLog,${AppConfig.ANG_PACKAGE},AndroidRuntime,System.err")
-                val process = Runtime.getRuntime().exec(lst.toTypedArray())
-                val allText = process.inputStream.bufferedReader().use { it.readLines() }.reversed()
+    private val _isStreaming = MutableStateFlow(false)
+    val isStreaming: StateFlow<Boolean> = _isStreaming.asStateFlow()
 
-                logsetsAll.clear()
-                logsetsAll.addAll(allText)
-                applyFilter()
+    private var streamJob: Job? = null
+
+    @Volatile
+    private var logcatProcess: Process? = null
+
+    /** Guards against a cancelled stream reporting its state over a newer one. */
+    @Volatile
+    private var streamGeneration = 0
+
+    /** Set when the user pauses the stream, so returning to the screen does not restart it. */
+    private var pausedByUser = false
+
+    /**
+     * Starts tailing logcat unless the user paused it.
+     */
+    fun onScreenResumed() {
+        if (!pausedByUser) startStreaming()
+    }
+
+    /**
+     * Stops the logcat process while the screen is not visible.
+     */
+    fun onScreenPaused() {
+        stopStreaming()
+    }
+
+    /**
+     * Pauses a running stream, or resumes a paused one.
+     */
+    fun toggleStreaming() {
+        if (_isStreaming.value) {
+            pausedByUser = true
+            stopStreaming()
+        } else {
+            pausedByUser = false
+            startStreaming()
+        }
+    }
+
+    private fun startStreaming() {
+        if (streamJob?.isActive == true) return
+
+        _isStreaming.value = true
+        val generation = ++streamGeneration
+        streamJob = viewModelScope.launch(Dispatchers.IO) {
+            // The stream starts with its own history, so old lines would be duplicated
+            synchronized(logsetsAll) { logsetsAll.clear() }
+            applyFilter()
+
+            var process: Process? = null
+            try {
+                // No -d: logcat prints the recent history and then keeps following
+                process = Runtime.getRuntime().exec(
+                    arrayOf("logcat", "-v", "time", "-T", HISTORY_LINES, "-s", TAGS)
+                )
+                logcatProcess = process
+
+                val reader = process.inputStream.bufferedReader()
+                val pending = mutableListOf<String>()
+                var lastFlush = System.currentTimeMillis()
+
+                while (isActive) {
+                    val line = reader.readLine() ?: break
+                    pending.add(line)
+
+                    val now = System.currentTimeMillis()
+                    if (pending.size >= FLUSH_BATCH || now - lastFlush >= FLUSH_INTERVAL_MS) {
+                        publish(pending)
+                        pending.clear()
+                        lastFlush = now
+                    }
+                }
+
+                if (pending.isNotEmpty()) publish(pending)
             } catch (e: IOException) {
-                LogUtil.e(AppConfig.TAG, "Failed to get logcat", e)
+                LogUtil.e(AppConfig.TAG, "Failed to stream logcat", e)
+            } finally {
+                process?.destroy()
+                if (logcatProcess === process) logcatProcess = null
+                if (generation == streamGeneration) _isStreaming.value = false
             }
         }
+    }
+
+    private fun stopStreaming() {
+        streamGeneration++
+        streamJob?.cancel()
+        streamJob = null
+        // readLine() blocks until the process goes away, so cancelling alone is not enough
+        logcatProcess?.destroy()
+        logcatProcess = null
+        _isStreaming.value = false
+    }
+
+    /**
+     * Adds a batch of fresh lines at the head of the buffer.
+     */
+    private fun publish(lines: List<String>) {
+        if (lines.isEmpty()) return
+        synchronized(logsetsAll) {
+            logsetsAll.addAll(0, lines.asReversed())
+            if (logsetsAll.size > MAX_LINES) {
+                logsetsAll.subList(MAX_LINES, logsetsAll.size).clear()
+            }
+        }
+        applyFilter()
     }
 
     fun copyLogcat() {
@@ -48,14 +158,11 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
 
     fun clearLogcat() {
         try {
-            val lst = LinkedHashSet<String>()
-            lst.add("logcat")
-            lst.add("-c")
-            val process = Runtime.getRuntime().exec(lst.toTypedArray())
+            val process = Runtime.getRuntime().exec(arrayOf("logcat", "-c"))
             process.waitFor()
 
-            logsetsAll.clear()
-            _filteredLogs.value = emptyList()
+            synchronized(logsetsAll) { logsetsAll.clear() }
+            applyFilter()
         } catch (e: IOException) {
             LogUtil.e(AppConfig.TAG, "Failed to clear logcat", e)
         }
@@ -67,10 +174,16 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private fun applyFilter() {
+        val snapshot = synchronized(logsetsAll) { logsetsAll.toList() }
         _filteredLogs.value = if (currentFilter.isEmpty()) {
-            logsetsAll.toList()
+            snapshot
         } else {
-            logsetsAll.filter { it.contains(currentFilter) }
+            snapshot.filter { it.contains(currentFilter, ignoreCase = true) }
         }
+    }
+
+    override fun onCleared() {
+        stopStreaming()
+        super.onCleared()
     }
 }

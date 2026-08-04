@@ -27,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,9 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
@@ -57,6 +53,7 @@ import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
+import com.v2ray.ang.ui.compose.ResumePauseEffect
 import com.v2ray.ang.ui.compose.SettingsCategoryItem
 import com.v2ray.ang.ui.compose.SettingsEditItem
 import com.v2ray.ang.ui.compose.SettingsFileItem
@@ -769,14 +766,7 @@ private fun LogSettings(modifier: Modifier) {
 
     // Files grow while the core runs, so the list is rebuilt every time the screen is shown
     var refreshTick by remember { mutableIntStateOf(0) }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) refreshTick++
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
+    ResumePauseEffect(onResume = { refreshTick++ }, onPause = {})
 
     val logFiles by produceState(emptyList<LogFileInfo>(), refreshTick, logToFile) {
         value = withContext(Dispatchers.IO) { LogFileManager.listLogFiles(context) }

@@ -183,7 +183,7 @@
     <string name="title_view_logs">View logs</string>
     <string name="log_files_empty">No log files yet</string>
     <string name="title_pref_core_log_to_file">Write core logs to file</string>
-    <string name="summary_pref_core_log_to_file">The core writes its access and error logs to files, listed below. Reconnect to apply</string>
+    <string name="summary_pref_core_log_to_file">The core writes its access and error logs to the files below instead of the shared log view. Reconnect to apply</string>
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_core_settings">Core Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
@@ -331,6 +331,8 @@
     <string name="logcat_copy">Copy</string>
     <string name="logcat_clear">Clear</string>
     <string name="logcat_share">Share log</string>
+    <string name="logcat_pause">Pause</string>
+    <string name="logcat_resume">Resume</string>
     <string name="title_service_restart">Service restart</string>
     <string name="title_del_all_config">Delete config</string>
     <string name="title_del_duplicate_config">Delete duplicate config</string>

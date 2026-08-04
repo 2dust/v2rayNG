@@ -182,7 +182,7 @@
     <string name="title_view_logs">Посмотреть логи</string>
     <string name="log_files_empty">Файлов логов пока нет</string>
     <string name="title_pref_core_log_to_file">Записывать логи ядра в файл</string>
-    <string name="summary_pref_core_log_to_file">Ядро пишет логи доступа и ошибок в файлы, они появятся ниже. Применяется при переподключении</string>
+    <string name="summary_pref_core_log_to_file">Ядро пишет логи доступа и ошибок в файлы ниже, а не в общий просмотр логов. Применяется при переподключении</string>
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_core_settings">Настройки ядра</string>
     <string name="title_vpn_settings">Настройки VPN</string>
@@ -325,6 +325,8 @@
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
+    <string name="logcat_pause">Пауза</string>
+    <string name="logcat_resume">Продолжить</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить профили</string>
     <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>

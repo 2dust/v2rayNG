@@ -31,22 +31,27 @@ object LogFileManager {
      * @param context The context.
      */
     fun applyFileLogging(log: V2rayConfig.LogBean, context: Context) {
-        if (!isFileLoggingEnabled()) {
-            log.access = null
-            log.error = null
-            return
-        }
+        val paths = logFilePaths(context)
+        log.access = paths?.first
+        log.error = paths?.second
+    }
+
+    /**
+     * Access and error log paths to hand to the core, creating the directory on the way.
+     *
+     * @param context The context.
+     * @return The access and error paths, or null when file logging is off or unavailable.
+     */
+    fun logFilePaths(context: Context): Pair<String, String>? {
+        if (!isFileLoggingEnabled()) return null
 
         val dir = logDir(context)
         if (!dir.exists() && !dir.mkdirs()) {
             LogUtil.w(AppConfig.TAG, "Failed to create log directory ${dir.absolutePath}")
-            log.access = null
-            log.error = null
-            return
+            return null
         }
 
-        log.access = File(dir, ACCESS_LOG).absolutePath
-        log.error = File(dir, CORE_LOG).absolutePath
+        return File(dir, ACCESS_LOG).absolutePath to File(dir, CORE_LOG).absolutePath
     }
 
     /**

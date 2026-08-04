@@ -42,6 +42,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.ResumePauseEffect
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -129,11 +130,18 @@ fun LogcatScreen(
     val scope = rememberCoroutineScope()
     val logs by viewModel.filteredLogs.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isStreaming by viewModel.isStreaming.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
+
+    // Follow the log only while the screen is in front of the user
+    ResumePauseEffect(
+        onResume = { viewModel.onScreenResumed() },
+        onPause = { viewModel.onScreenPaused() }
+    )
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -187,12 +195,14 @@ fun LogcatScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.loadLogcat()
-            }) {
+            FloatingActionButton(onClick = { viewModel.toggleStreaming() }) {
                 Icon(
-                    painterResource(R.drawable.ic_restore_24dp),
-                    contentDescription = stringResource(R.string.pull_down_to_refresh)
+                    painterResource(
+                        if (isStreaming) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp
+                    ),
+                    contentDescription = stringResource(
+                        if (isStreaming) R.string.logcat_pause else R.string.logcat_resume
+                    )
                 )
             }
         }
