@@ -189,7 +189,11 @@
             <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
             <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل MUX</string>
     <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
-            <string-array name="mux_xudp_quic_entries"><item>رد کردن</item><item>مجاز</item><item>پریدن</item></string-array>
+    <string-array name="mux_xudp_quic_entries">
+        <item>رد کردن</item>
+        <item>مجاز</item>
+        <item>پریدن</item>
+    </string-array>
 
             <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
             <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت اعلان. \nآیکون اعلان بر اساس استفاده تغییر می‌کند.</string>
@@ -440,23 +444,59 @@
             <string name="action_delete">حذف</string>
             <string name="action_close">بستن</string>
 
-            <string-array name="share_sub_method"><item>QRcode</item><item>خروجی گرفتن در کلیپ‌ بورد</item></string-array>
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>خروجی گرفتن در کلیپ‌ بورد</item>
+    </string-array>
 
-            <string-array name="mode_entries"><item>VPN</item><item>فقط پروکسی</item></string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>فقط پروکسی</item>
+    </string-array>
 
-            <string-array name="browser_dialer_mode"><item>Disable</item><item>OkHttp</item><item>WebView</item></string-array>
+    <string-array name="browser_dialer_mode">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
-            <string-array name="ui_mode_night"><item>پیش فرض سیستم</item><item>روشن</item><item>تاریک</item></string-array>
+    <string-array name="ui_mode_night">
+        <item>پیش فرض سیستم</item>
+        <item>روشن</item>
+        <item>تاریک</item>
+    </string-array>
 
-            <string-array name="preset_rulesets"><item>لیست سفید چین ( دور زدن سرزمین اصلی )</item><item>لیست سیاه چین</item><item>جهانی(GLOBAL)</item><item>ایران</item><item>لیست سفید روسیه</item></string-array>
+    <string-array name="preset_rulesets">
+        <item>لیست سفید چین ( دور زدن سرزمین اصلی )</item>
+        <item>لیست سیاه چین</item>
+        <item>جهانی(GLOBAL)</item>
+        <item>ایران</item>
+        <item>لیست سفید روسیه</item>
+    </string-array>
 
-            <string-array name="vpn_bypass_lan"><item>پیش فرض کانفیگ</item><item>دور زده شود</item><item>دور زده نشود</item></string-array>
+    <string-array name="vpn_bypass_lan">
+        <item>پیش فرض کانفیگ</item>
+        <item>دور زده شود</item>
+        <item>دور زده نشود</item>
+    </string-array>
 
-            <string-array name="outbound_domain_resolve_method"><item>Do not resolve</item><item>Resolve and add to DNS Hosts</item><item>Resolve and replace domain</item></string-array>
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
+    </string-array>
 
     <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
-            <string-array name="policy_group_type"><item>کمترین پینگ</item><item>کمترین بار(لود)</item><item>تصادفی</item><item>گردشی</item></string-array>
+    <string-array name="policy_group_type">
+        <item>کمترین پینگ</item>
+        <item>کمترین بار(لود)</item>
+        <item>تصادفی</item>
+        <item>گردشی</item>
+    </string-array>
 
-            <string-array name="config_backup_options"><item>محلی</item><item>WebDAV</item></string-array>
+    <string-array name="config_backup_options">
+        <item>محلی</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

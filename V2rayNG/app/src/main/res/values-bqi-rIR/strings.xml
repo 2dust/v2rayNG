@@ -189,7 +189,11 @@
             <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
             <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
     <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
-            <string-array name="mux_xudp_quic_entries"><item>رڌ کردن</item><item>موجاز</item><item>گوم زیڌن</item></string-array>
+    <string-array name="mux_xudp_quic_entries">
+        <item>رڌ کردن</item>
+        <item>موجاز</item>
+        <item>گوم زیڌن</item>
+    </string-array>
 
             <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
             <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا.\nنماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
@@ -440,23 +444,59 @@
             <string name="action_delete">پاک کردن</string>
             <string name="action_close">بستن</string>
 
-            <string-array name="share_sub_method"><item>QRcode</item><item>و در کشیڌن من کلیپ بورد</item></string-array>
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>و در کشیڌن من کلیپ بورد</item>
+    </string-array>
 
-            <string-array name="mode_entries"><item>VPN</item><item>تینا پروکسی</item></string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>تینا پروکسی</item>
+    </string-array>
 
-            <string-array name="browser_dialer_mode"><item>Disable</item><item>OkHttp</item><item>WebView</item></string-array>
+    <string-array name="browser_dialer_mode">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
-            <string-array name="ui_mode_night"><item>و دین کردن سیستوم</item><item>رۊشنا</item><item>تاریک</item></string-array>
+    <string-array name="ui_mode_night">
+        <item>و دین کردن سیستوم</item>
+        <item>رۊشنا</item>
+        <item>تاریک</item>
+    </string-array>
 
-            <string-array name="preset_rulesets"><item>نومگه اسبؽڌ چین</item><item>نومگه شه چین</item><item>جهۊوی (Global)</item><item>نومگه اسبؽڌ ایران</item><item>نومگه اسبؽڌ رۊسیه</item></string-array>
+    <string-array name="preset_rulesets">
+        <item>نومگه اسبؽڌ چین</item>
+        <item>نومگه شه چین</item>
+        <item>جهۊوی (Global)</item>
+        <item>نومگه اسبؽڌ ایران</item>
+        <item>نومگه اسبؽڌ رۊسیه</item>
+    </string-array>
 
-            <string-array name="vpn_bypass_lan"><item>پؽش فرز کانفیگ</item><item>دور زیڌه بۊ</item><item>دور زیڌه نبۊ</item></string-array>
+    <string-array name="vpn_bypass_lan">
+        <item>پؽش فرز کانفیگ</item>
+        <item>دور زیڌه بۊ</item>
+        <item>دور زیڌه نبۊ</item>
+    </string-array>
 
-            <string-array name="outbound_domain_resolve_method"><item>هل وو فسل مکۊنین</item><item>هل وو ٱووردن و میزبووݩ یل دامنه DNS</item><item>هل وو جایونی دامنه</item></string-array>
+    <string-array name="outbound_domain_resolve_method">
+        <item>هل وو فسل مکۊنین</item>
+        <item>هل وو ٱووردن و میزبووݩ یل دامنه DNS</item>
+        <item>هل وو جایونی دامنه</item>
+    </string-array>
 
     <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
-            <string-array name="policy_group_type"><item>کم ترین پینگ</item><item>کم ترین بار (لود)</item><item>تساڌۊفی</item><item>گردشی</item></string-array>
+    <string-array name="policy_group_type">
+        <item>کم ترین پینگ</item>
+        <item>کم ترین بار (لود)</item>
+        <item>تساڌۊفی</item>
+        <item>گردشی</item>
+    </string-array>
 
-            <string-array name="config_backup_options"><item>مهلی</item><item>WebDAV</item></string-array>
+    <string-array name="config_backup_options">
+        <item>مهلی</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

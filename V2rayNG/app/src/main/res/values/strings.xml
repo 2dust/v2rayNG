@@ -189,7 +189,11 @@
             <string name="title_pref_mux_xudp_concurency">XUDP connections（range -1 to 1024）</string>
             <string name="title_pref_mux_xudp_quic">Handling of QUIC in mux tunnel</string>
     <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
-            <string-array name="mux_xudp_quic_entries"><item>reject</item><item>allow</item><item>skip</item></string-array>
+    <string-array name="mux_xudp_quic_entries">
+        <item>reject</item>
+        <item>allow</item>
+        <item>skip</item>
+    </string-array>
 
             <string name="title_pref_speed_enabled">Enable speed display</string>
             <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on&#10;        usage.</string>
@@ -440,23 +444,59 @@
             <string name="action_delete">Delete</string>
             <string name="action_close">Close</string>
 
-            <string-array name="share_sub_method"><item>QRcode</item><item>Export to clipboard</item></string-array>
+    <string-array name="share_sub_method">
+        <item>QRcode</item>
+        <item>Export to clipboard</item>
+    </string-array>
 
-            <string-array name="mode_entries"><item>VPN</item><item>Proxy only</item></string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Proxy only</item>
+    </string-array>
 
-            <string-array name="browser_dialer_mode"><item>Disable</item><item>OkHttp</item><item>WebView</item></string-array>
+    <string-array name="browser_dialer_mode">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
-            <string-array name="ui_mode_night"><item>Follow system</item><item>Light</item><item>Dark</item></string-array>
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
-            <string-array name="preset_rulesets"><item>China Whitelist</item><item>China Blacklist</item><item>Global</item><item>Iran Whitelist</item><item>Russia Whitelist</item></string-array>
+    <string-array name="preset_rulesets">
+        <item>China Whitelist</item>
+        <item>China Blacklist</item>
+        <item>Global</item>
+        <item>Iran Whitelist</item>
+        <item>Russia Whitelist</item>
+    </string-array>
 
-            <string-array name="vpn_bypass_lan"><item>Follow config</item><item>Bypass</item><item>Not Bypass</item></string-array>
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
+    </string-array>
 
-            <string-array name="outbound_domain_resolve_method"><item>Do not resolve</item><item>Resolve and add to DNS Hosts</item><item>Resolve and replace domain</item></string-array>
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
+    </string-array>
 
     <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
-            <string-array name="policy_group_type"><item>Least Ping</item><item>Least Load</item><item>Random</item><item>Round Robin</item></string-array>
+    <string-array name="policy_group_type">
+        <item>Least Ping</item>
+        <item>Least Load</item>
+        <item>Random</item>
+        <item>Round Robin</item>
+    </string-array>
 
-            <string-array name="config_backup_options"><item>Local</item><item>WebDAV</item></string-array>
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

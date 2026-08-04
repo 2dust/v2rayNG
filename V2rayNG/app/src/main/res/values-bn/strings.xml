@@ -189,7 +189,11 @@
             <string name="title_pref_mux_xudp_concurency">XUDP সংযোগ (পরিসর -1 থেকে 1024)</string>
             <string name="title_pref_mux_xudp_quic">Mux টানেলে QUIC পরিচালনা</string>
     <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
-            <string-array name="mux_xudp_quic_entries"><item>অস্বীকার করুন</item><item>অনুমতি দিন</item><item>এড়িয়ে যান</item></string-array>
+    <string-array name="mux_xudp_quic_entries">
+        <item>অস্বীকার করুন</item>
+        <item>অনুমতি দিন</item>
+        <item>এড়িয়ে যান</item>
+    </string-array>
 
             <string name="title_pref_speed_enabled">গতি প্রদর্শন সক্রিয় করুন</string>
             <string name="summary_pref_speed_enabled">বিজ্ঞপ্তিতে বর্তমান গতি প্রদর্শন করুন।\nব্যবহারের উপর ভিত্তি করে বিজ্ঞপ্তি আইকন পরিবর্তিত হবে।</string>
@@ -440,23 +444,59 @@
             <string name="action_delete">মুছুন</string>
             <string name="action_close">বন্ধ করুন</string>
 
-            <string-array name="share_sub_method"><item>QR কোড</item><item>ক্লিপবোর্ডে রপ্তানি করুন</item></string-array>
+    <string-array name="share_sub_method">
+        <item>QR কোড</item>
+        <item>ক্লিপবোর্ডে রপ্তানি করুন</item>
+    </string-array>
 
-            <string-array name="mode_entries"><item>VPN</item><item>শুধুমাত্র প্রোক্সি</item></string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>শুধুমাত্র প্রোক্সি</item>
+    </string-array>
 
-            <string-array name="browser_dialer_mode"><item>Disable</item><item>OkHttp</item><item>WebView</item></string-array>
+    <string-array name="browser_dialer_mode">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
-            <string-array name="ui_mode_night"><item>সিস্টেম অনুসরণ করুন</item><item>লাইট</item><item>ডার্ক</item></string-array>
+    <string-array name="ui_mode_night">
+        <item>সিস্টেম অনুসরণ করুন</item>
+        <item>লাইট</item>
+        <item>ডার্ক</item>
+    </string-array>
 
-            <string-array name="preset_rulesets"><item>চায়না হোয়াইটলিস্ট</item><item>চায়না ব্ল্যাকলিস্ট</item><item>গ্লোবাল</item><item>ইরান হোয়াইটলিস্ট</item><item>রাশিয়া হোয়াইটলিস্ট</item></string-array>
+    <string-array name="preset_rulesets">
+        <item>চায়না হোয়াইটলিস্ট</item>
+        <item>চায়না ব্ল্যাকলিস্ট</item>
+        <item>গ্লোবাল</item>
+        <item>ইরান হোয়াইটলিস্ট</item>
+        <item>রাশিয়া হোয়াইটলিস্ট</item>
+    </string-array>
 
-            <string-array name="vpn_bypass_lan"><item>Follow config</item><item>Bypass</item><item>Not Bypass</item></string-array>
+    <string-array name="vpn_bypass_lan">
+        <item>Follow config</item>
+        <item>Bypass</item>
+        <item>Not Bypass</item>
+    </string-array>
 
-            <string-array name="outbound_domain_resolve_method"><item>Do not resolve</item><item>Resolve and add to DNS Hosts</item><item>Resolve and replace domain</item></string-array>
+    <string-array name="outbound_domain_resolve_method">
+        <item>Do not resolve</item>
+        <item>Resolve and add to DNS Hosts</item>
+        <item>Resolve and replace domain</item>
+    </string-array>
 
     <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
-            <string-array name="policy_group_type"><item>Least Ping</item><item>Least Load</item><item>Random</item><item>Round Robin</item></string-array>
+    <string-array name="policy_group_type">
+        <item>Least Ping</item>
+        <item>Least Load</item>
+        <item>Random</item>
+        <item>Round Robin</item>
+    </string-array>
 
-            <string-array name="config_backup_options"><item>Local</item><item>WebDAV</item></string-array>
+    <string-array name="config_backup_options">
+        <item>Local</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>

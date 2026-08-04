@@ -189,7 +189,11 @@
             <string name="title_pref_mux_xudp_concurency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
             <string name="title_pref_mux_xudp_quic">QUIC 流量處理方式</string>
     <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
-            <string-array name="mux_xudp_quic_entries"><item>不代理</item><item>多路復用</item><item>原生</item></string-array>
+    <string-array name="mux_xudp_quic_entries">
+        <item>不代理</item>
+        <item>多路復用</item>
+        <item>原生</item>
+    </string-array>
 
             <string name="title_pref_speed_enabled">啟用速度顯示</string>
             <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送狀況</string>
@@ -440,23 +444,59 @@
             <string name="action_delete">刪除</string>
             <string name="action_close">關閉</string>
 
-            <string-array name="share_sub_method"><item>二維碼</item><item>匯出至剪貼簿</item></string-array>
+    <string-array name="share_sub_method">
+        <item>二維碼</item>
+        <item>匯出至剪貼簿</item>
+    </string-array>
 
-            <string-array name="mode_entries"><item>VPN</item><item>僅代理</item></string-array>
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>僅代理</item>
+    </string-array>
 
-            <string-array name="browser_dialer_mode"><item>Disable</item><item>OkHttp</item><item>WebView</item></string-array>
+    <string-array name="browser_dialer_mode">
+        <item>Disable</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
 
-            <string-array name="ui_mode_night"><item>跟隨系統</item><item>淺色</item><item>深色</item></string-array>
+    <string-array name="ui_mode_night">
+        <item>跟隨系統</item>
+        <item>淺色</item>
+        <item>深色</item>
+    </string-array>
 
-            <string-array name="preset_rulesets"><item>繞過大陸 (Whitelist)</item><item>黑名單 (Blacklist)</item><item>全域 (Global)</item><item>伊朗 (Iran)</item><item>俄羅斯白名單 (Russia Whitelist)</item></string-array>
+    <string-array name="preset_rulesets">
+        <item>繞過大陸 (Whitelist)</item>
+        <item>黑名單 (Blacklist)</item>
+        <item>全域 (Global)</item>
+        <item>伊朗 (Iran)</item>
+        <item>俄羅斯白名單 (Russia Whitelist)</item>
+    </string-array>
 
-            <string-array name="vpn_bypass_lan"><item>跟隨設定檔</item><item>繞過</item><item>不繞過</item></string-array>
+    <string-array name="vpn_bypass_lan">
+        <item>跟隨設定檔</item>
+        <item>繞過</item>
+        <item>不繞過</item>
+    </string-array>
 
-            <string-array name="outbound_domain_resolve_method"><item>不解析</item><item>解析後加入 DNS Hosts</item><item>解析後替換原網域名稱</item></string-array>
+    <string-array name="outbound_domain_resolve_method">
+        <item>不解析</item>
+        <item>解析後加入 DNS Hosts</item>
+        <item>解析後替換原網域名稱</item>
+    </string-array>
 
     <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
-            <string-array name="policy_group_type"><item>最低延遲</item><item>最少卡頓</item><item>隨機選擇</item><item>輪詢</item></string-array>
+    <string-array name="policy_group_type">
+        <item>最低延遲</item>
+        <item>最少卡頓</item>
+        <item>隨機選擇</item>
+        <item>輪詢</item>
+    </string-array>
 
-            <string-array name="config_backup_options"><item>本地</item><item>WebDAV</item></string-array>
+    <string-array name="config_backup_options">
+        <item>本地</item>
+        <item>WebDAV</item>
+    </string-array>
 
 </resources>
