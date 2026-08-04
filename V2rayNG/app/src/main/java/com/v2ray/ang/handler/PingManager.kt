@@ -17,9 +17,14 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import libv2ray.CoreCallbackHandler
@@ -67,6 +72,45 @@ object PingManager {
      * a time; the TCP pre-check and the TCP/ICMP types stay fully parallel.
      */
     private val coreTestMutex = Mutex()
+
+    /**
+     * Measures a whole list of profiles, reporting each result as it lands.
+     *
+     * Proxy types share one core instance with a listener per profile, so all of them are
+     * measured at the same time instead of queuing behind [coreTestMutex]. TCP and ICMP
+     * never touch the core and simply run side by side.
+     *
+     * @param context The context.
+     * @param guids The profiles to measure.
+     * @param type The ping type.
+     * @param concurrency How many measurements may be in flight at once.
+     * @param onResult Called with every profile and its delay, from any thread.
+     */
+    suspend fun pingAll(
+        context: Context,
+        guids: List<String>,
+        type: PingType = SettingsManager.getPingType(),
+        concurrency: Int = SettingsManager.getRealPingConcurrency(),
+        onResult: (String, Long) -> Unit
+    ) {
+        if (guids.isEmpty()) return
+
+        if (type == PingType.PROXY_GET || type == PingType.PROXY_HEAD) {
+            val handled = batchProxyPing(context, guids, head = type == PingType.PROXY_HEAD, onResult)
+            if (handled) return
+            // The shared instance refused to start, fall back to one profile at a time
+            LogUtil.w(AppConfig.TAG, "Ping: batch instance unavailable, measuring one by one")
+        }
+
+        val permits = Semaphore(concurrency.coerceAtLeast(1))
+        coroutineScope {
+            guids.map { guid ->
+                launch {
+                    permits.withPermit { onResult(guid, ping(context, guid, type)) }
+                }
+            }.joinAll()
+        }
+    }
 
     /**
      * Measures a profile with the configured ping type.
@@ -157,7 +201,12 @@ object PingManager {
                 val controller = CoreNativeManager.newCoreController(PingCallback)
                 try {
                     controller.startLoop(config, 0)
-                    val (delay, error) = requestThroughSocks(port, SettingsManager.getDelayTestUrl(), head = true)
+                    val (delay, error) = requestThroughSocks(
+                        singleRequestClient(),
+                        port,
+                        SettingsManager.getDelayTestUrl(),
+                        head = true
+                    )
                     if (delay <= FAILURE) fail(profile, error) else delay
                 } catch (e: Exception) {
                     fail(profile, e.message ?: e.javaClass.simpleName)
@@ -205,6 +254,197 @@ object PingManager {
         } ?: FAILURE
 
         return if (delay <= FAILURE) fail(profile, "$host is not answering ICMP") else delay
+    }
+
+    //endregion
+
+    //region batch
+
+    /** One profile inside the shared test instance. */
+    private data class BatchEntry(
+        val guid: String,
+        val profile: ProfileItem,
+        val port: Int,
+        val outbounds: JsonArray,
+        val proxyTag: String
+    )
+
+    /**
+     * Measures every profile through a single core instance.
+     *
+     * Each profile gets its own loopback SOCKS listener, routed to its own outbound, so the
+     * requests can all be in flight together - one instance means no fight over Xray's
+     * process wide system dialer.
+     *
+     * @return True when the batch ran, false when the instance could not be started and the
+     * caller should fall back.
+     */
+    private suspend fun batchProxyPing(
+        context: Context,
+        guids: List<String>,
+        head: Boolean,
+        onResult: (String, Long) -> Unit
+    ): Boolean {
+        val entries = mutableListOf<BatchEntry>()
+        val usedPorts = mutableSetOf<Int>()
+
+        for ((index, guid) in guids.withIndex()) {
+            val profile = MmkvManager.decodeServerConfig(guid)
+            if (profile == null) {
+                onResult(guid, FAILURE)
+                continue
+            }
+
+            val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
+            val outbounds = JsonUtil.parseString(configResult.content.takeIf { configResult.status })
+                ?.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+            if (outbounds == null || outbounds.size() == 0) {
+                onResult(guid, fail(profile, configResult.errorMessage.ifBlank { "test config has no outbounds" }))
+                continue
+            }
+
+            val tagged = prefixOutboundTags(outbounds, "p$index-")
+            if (tagged == null) {
+                onResult(guid, fail(profile, "no usable outbound in the test config"))
+                continue
+            }
+
+            var port = Utils.findRandomFreePort()
+            var attempts = 0
+            while (!usedPorts.add(port) && attempts++ < 5) {
+                port = Utils.findRandomFreePort()
+            }
+
+            entries.add(BatchEntry(guid, profile, port, tagged.first, tagged.second))
+        }
+
+        if (entries.isEmpty()) return true
+
+        CoreNativeManager.initCoreEnv(context.applicationContext)
+        val controller = CoreNativeManager.newCoreController(PingCallback)
+        val config = buildBatchConfig(entries)
+
+        return coreTestMutex.withLock {
+            try {
+                withContext(Dispatchers.IO) { controller.startLoop(config, 0) }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Ping: failed to start the batch instance", e)
+                return@withLock false
+            }
+
+            try {
+                val url = SettingsManager.getDelayTestUrl()
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                    .readTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                    .callTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+                    .followRedirects(false)
+                    .retryOnConnectionFailure(false)
+                    .build()
+
+                coroutineScope {
+                    entries.map { entry ->
+                        launch(Dispatchers.IO) {
+                            val (delay, error) = requestThroughSocks(client, entry.port, url, head)
+                            onResult(
+                                entry.guid,
+                                if (delay <= FAILURE) fail(entry.profile, error) else delay
+                            )
+                        }
+                    }.joinAll()
+                }
+
+                client.dispatcher.executorService.shutdown()
+                client.connectionPool.evictAll()
+            } finally {
+                try {
+                    controller.stopLoop()
+                } catch (e: Exception) {
+                    LogUtil.w(AppConfig.TAG, "Failed to stop the batch instance: ${e.message}")
+                }
+            }
+            true
+        }
+    }
+
+    /**
+     * Copies a profile's outbounds under a unique tag prefix so several profiles can live in
+     * one config, keeping any dialerProxy chain pointing at the copies.
+     *
+     * @return The prefixed outbounds and the tag of the one to test, or null when there is none.
+     */
+    private fun prefixOutboundTags(outbounds: JsonArray, prefix: String): Pair<JsonArray, String>? {
+        val proxyIndex = CustomConfigUtil.getProxyOutboundIndex(outbounds)
+        if (proxyIndex < 0) return null
+
+        val copy = JsonArray()
+        val renamed = mutableMapOf<String, String>()
+
+        for (i in 0 until outbounds.size()) {
+            val outbound = outbounds.get(i).takeIf { it.isJsonObject }?.asJsonObject?.deepCopy() ?: continue
+            val oldTag = outbound.get("tag")?.takeIf { it.isJsonPrimitive }?.asString ?: "out$i"
+            val newTag = "$prefix$oldTag"
+            renamed[oldTag] = newTag
+            outbound.addProperty("tag", newTag)
+            copy.add(outbound)
+        }
+        if (copy.size() == 0) return null
+
+        // Chains reference each other by tag, so the references move with the copies
+        for (element in copy) {
+            val sockopt = element.asJsonObject
+                .get("streamSettings")?.takeIf { it.isJsonObject }?.asJsonObject
+                ?.get("sockopt")?.takeIf { it.isJsonObject }?.asJsonObject
+                ?: continue
+            val dialer = sockopt.get("dialerProxy")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            renamed[dialer]?.let { sockopt.addProperty("dialerProxy", it) }
+        }
+
+        val proxyTag = copy.get(proxyIndex.coerceAtMost(copy.size() - 1)).asJsonObject.get("tag").asString
+        return copy to proxyTag
+    }
+
+    /**
+     * Builds the shared config: a listener per profile, every outbound, and a rule tying them.
+     */
+    private fun buildBatchConfig(entries: List<BatchEntry>): String {
+        val inbounds = JsonArray()
+        val outbounds = JsonArray()
+        val rules = JsonArray()
+
+        entries.forEachIndexed { index, entry ->
+            val inboundTag = "$TEST_INBOUND_TAG-$index"
+            inbounds.add(JsonObject().apply {
+                addProperty("tag", inboundTag)
+                addProperty("port", entry.port)
+                addProperty("listen", AppConfig.LOOPBACK)
+                addProperty("protocol", "socks")
+                add("settings", JsonObject().apply {
+                    addProperty("auth", "noauth")
+                    addProperty("udp", false)
+                })
+            })
+
+            entry.outbounds.forEach { outbounds.add(it) }
+
+            rules.add(JsonObject().apply {
+                addProperty("type", "field")
+                add("inboundTag", JsonArray().apply { add(inboundTag) })
+                addProperty("outboundTag", entry.proxyTag)
+            })
+        }
+
+        return JsonObject().apply {
+            add("log", JsonObject().apply {
+                addProperty("loglevel", MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning")
+            })
+            add("inbounds", inbounds)
+            add("outbounds", outbounds)
+            add("routing", JsonObject().apply {
+                addProperty("domainStrategy", "AsIs")
+                add("rules", rules)
+            })
+        }.toString()
     }
 
     //endregion
@@ -292,14 +532,24 @@ object PingManager {
      * @param head True to send HEAD instead of GET.
      * @return The delay in milliseconds and null, or -1 and why the request failed.
      */
-    private fun requestThroughSocks(port: Int, url: String, head: Boolean): Pair<Long, String?> {
-        val client = OkHttpClient.Builder()
+    /** Base client for a one-off measurement, timeouts included. */
+    private fun singleRequestClient(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+        .readTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+        .callTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
+        .followRedirects(false)
+        .retryOnConnectionFailure(false)
+        .build()
+
+    private fun requestThroughSocks(
+        baseClient: OkHttpClient,
+        port: Int,
+        url: String,
+        head: Boolean
+    ): Pair<Long, String?> {
+        // Derived clients share the dispatcher and the connection pool of the base one
+        val client = baseClient.newBuilder()
             .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(AppConfig.LOOPBACK, port)))
-            .connectTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
-            .readTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
-            .callTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
-            .followRedirects(false)
-            .retryOnConnectionFailure(false)
             .build()
 
         val request = Request.Builder()

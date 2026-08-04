@@ -29,7 +29,7 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
         private const val FLUSH_BATCH = 200
     }
 
-    // Newest first, matching the order the list is drawn in
+    // Oldest first, the way a log reads: fresh lines are appended at the bottom
     private val logsetsAll: MutableList<String> = mutableListOf()
     private var currentFilter: String = ""
 
@@ -137,14 +137,15 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
     }
 
     /**
-     * Adds a batch of fresh lines at the head of the buffer.
+     * Appends a batch of fresh lines, dropping the oldest ones past the cap.
      */
     private fun publish(lines: List<String>) {
         if (lines.isEmpty()) return
         synchronized(logsetsAll) {
-            logsetsAll.addAll(0, lines.asReversed())
-            if (logsetsAll.size > MAX_LINES) {
-                logsetsAll.subList(MAX_LINES, logsetsAll.size).clear()
+            logsetsAll.addAll(lines)
+            val overflow = logsetsAll.size - MAX_LINES
+            if (overflow > 0) {
+                logsetsAll.subList(0, overflow).clear()
             }
         }
         applyFilter()

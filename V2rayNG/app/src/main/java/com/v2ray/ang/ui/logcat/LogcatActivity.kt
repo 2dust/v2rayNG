@@ -24,11 +24,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -137,6 +140,24 @@ fun LogcatScreen(
     var showSearch by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
+    var autoScroll by rememberSaveable { mutableStateOf(true) }
+
+    // Пока следование включено, каждая новая пачка строк подматывает список к концу
+    LaunchedEffect(logs.size, autoScroll) {
+        if (autoScroll && logs.isNotEmpty()) {
+            listState.animateScrollToItem(logs.lastIndex)
+        }
+    }
+
+    // Ручная прокрутка вверх выключает следование, чтобы список не выдёргивало
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress to listState.layoutInfo }
+            .collect { (scrolling, info) ->
+                if (!scrolling) return@collect
+                val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: return@collect
+                if (lastVisible < info.totalItemsCount - 3) autoScroll = false
+            }
+    }
 
     // Follow the log only while the screen is in front of the user
     ResumePauseEffect(
@@ -172,6 +193,16 @@ fun LogcatScreen(
                             )
                         }
                     }
+                    IconButton(onClick = { viewModel.toggleStreaming() }) {
+                        Icon(
+                            painterResource(
+                                if (isStreaming) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp
+                            ),
+                            contentDescription = stringResource(
+                                if (isStreaming) R.string.logcat_pause else R.string.logcat_resume
+                            )
+                        )
+                    }
                     IconButton(onClick = { viewModel.copyLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_copy),
@@ -196,13 +227,24 @@ fun LogcatScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.toggleStreaming() }) {
+            // Следование за концом лога: пока включено, список сам едет вниз
+            FloatingActionButton(
+                onClick = { autoScroll = !autoScroll },
+                containerColor = if (autoScroll) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHigh
+                },
+                contentColor = if (autoScroll) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            ) {
                 Icon(
-                    painterResource(
-                        if (isStreaming) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp
-                    ),
+                    painterResource(R.drawable.ic_expand_more_24dp),
                     contentDescription = stringResource(
-                        if (isStreaming) R.string.logcat_pause else R.string.logcat_resume
+                        if (autoScroll) R.string.logcat_autoscroll_on else R.string.logcat_autoscroll_off
                     )
                 )
             }

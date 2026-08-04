@@ -50,10 +50,8 @@ class LogFileViewModel(application: Application) : BaseViewModel(application) {
                     if (size != lastSize || modified != lastModified) {
                         lastSize = size
                         lastModified = modified
-                        // Newest first, so fresh lines land where the logcat screen shows them too
-                        _lines.value = withContext(Dispatchers.IO) {
-                            LogFileManager.readLogFile(path).asReversed()
-                        }
+                        // Хронологический порядок: свежие строки внизу, как в logcat
+                        _lines.value = withContext(Dispatchers.IO) { LogFileManager.readLogFile(path) }
                     }
                     _isLoading.value = false
                     delay(POLL_INTERVAL_MS)

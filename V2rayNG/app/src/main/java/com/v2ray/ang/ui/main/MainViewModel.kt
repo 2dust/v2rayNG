@@ -30,12 +30,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -186,20 +183,14 @@ class MainViewModel(
 
                 dataSource.clearAllTestDelayResults(guids)
 
-                // Every server is measured at once, up to the configured concurrency
+                // Все серверы меряются разом: прокси-типы делят один инстанс ядра
                 val context = getApplication<Application>()
                 val pingType = SettingsManager.getPingType()
-                val concurrency = SettingsManager.getRealPingConcurrency()
-                val permits = Semaphore(concurrency)
                 val remaining = AtomicInteger(guids.size)
                 val failed = AtomicInteger(0)
                 PingManager.consumeLastError()
 
-                // Proxy types serialize inside PingManager, the core cannot test two at once
-                LogUtil.i(
-                    AppConfig.TAG,
-                    "Ping: testing ${guids.size} profiles, type=$pingType, concurrency=$concurrency"
-                )
+                LogUtil.i(AppConfig.TAG, "Ping: testing ${guids.size} profiles, type=$pingType")
 
                 coroutineScope {
                     // Results land in the list while the run is still going
@@ -211,24 +202,19 @@ class MainViewModel(
                         }
                     }
 
-                    guids.map { guid ->
-                        launch {
-                            permits.withPermit {
-                                val delay = PingManager.ping(context, guid, pingType)
-                                if (delay <= PingManager.FAILURE) failed.incrementAndGet()
-                                MmkvManager.encodeServerTestDelayMillis(guid, delay)
-                            }
-                            val left = remaining.decrementAndGet()
-                            _uiState.update {
-                                it.copy(
-                                    statusText = dataSource.getString(
-                                        R.string.connection_runing_task_left,
-                                        "$left / ${guids.size}"
-                                    )
+                    PingManager.pingAll(context, guids, pingType) { guid, delay ->
+                        if (delay <= PingManager.FAILURE) failed.incrementAndGet()
+                        MmkvManager.encodeServerTestDelayMillis(guid, delay)
+                        val left = remaining.decrementAndGet()
+                        _uiState.update {
+                            it.copy(
+                                statusText = dataSource.getString(
+                                    R.string.connection_runing_task_left,
+                                    "$left / ${guids.size}"
                                 )
-                            }
+                            )
                         }
-                    }.joinAll()
+                    }
 
                     refresher.cancel()
                 }

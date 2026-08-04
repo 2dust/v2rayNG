@@ -10,13 +10,12 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Worker that runs a batch of real-ping tests independently.
+ * Worker that runs a batch of ping tests independently.
  * Each batch owns its own CoroutineScope/dispatcher and can be cancelled separately.
  */
 class RealPingWorkerService(
@@ -30,33 +29,23 @@ class RealPingWorkerService(
     private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp) concurrency * 2 else concurrency).asCoroutineDispatcher()
     private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
 
-    private val runningCount = AtomicInteger(0)
-    private val totalCount = AtomicInteger(0)
+    private val remaining = AtomicInteger(guids.size)
 
     fun start() {
-        val jobs = guids.map { guid ->
-            totalCount.incrementAndGet()
-            scope.launch {
-                runningCount.incrementAndGet()
-                try {
-                    val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
-                    onEvent(RealPingEvent.Result(guid, result))
-                } catch (_: Throwable) {
-                    // ignore
-                } finally {
-                    val count = totalCount.decrementAndGet()
-                    val left = runningCount.decrementAndGet()
-                    onEvent(RealPingEvent.Progress("$left / $count"))
-                }
-            }
-        }
-
         scope.launch {
             try {
-                joinAll(*jobs.toTypedArray())
+                // PingManager decides how to spread the work: proxy types share one core
+                // instance and run together, TCP and ICMP go wide on their own
+                val type = if (onlyTcp) PingType.TCP else SettingsManager.getPingType()
+                PingManager.pingAll(context, guids, type, concurrency) { guid, delay ->
+                    onEvent(RealPingEvent.Result(guid, delay))
+                    onEvent(RealPingEvent.Progress("${remaining.decrementAndGet()} / ${guids.size}"))
+                }
                 onEvent(RealPingEvent.Finish("0"))
             } catch (_: CancellationException) {
                 onEvent(RealPingEvent.Finish("-1"))
+            } catch (_: Throwable) {
+                onEvent(RealPingEvent.Finish("0"))
             } finally {
                 close()
             }
@@ -74,10 +63,4 @@ class RealPingWorkerService(
             // ignore
         }
     }
-
-    /** Measures with the ping type picked in the settings. */
-    private suspend fun startRealPing(guid: String): Long = PingManager.ping(context, guid)
-
-    /** Always a plain TCP handshake, whatever the ping type setting says. */
-    private suspend fun startTcping(guid: String): Long = PingManager.ping(context, guid, PingType.TCP)
 }
