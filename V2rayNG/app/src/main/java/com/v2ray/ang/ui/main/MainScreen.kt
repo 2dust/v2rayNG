@@ -81,7 +81,7 @@ fun MainScreen(
     val isImporting by mainViewModel.isImporting.collectAsStateWithLifecycle()
     val importError by mainViewModel.importError.collectAsStateWithLifecycle()
 
-    var showImportMenu by remember { mutableStateOf(false) }
+    val showImportMenu by mainViewModel.showImportSheet.collectAsStateWithLifecycle()
 
     LaunchedEffect(importError) {
         if (importError != null) {
@@ -261,7 +261,7 @@ fun MainScreen(
                 when (item) {
                     GlassBarItem.HOME -> Unit
                     GlassBarItem.SETTINGS -> onNavigate("settings")
-                    GlassBarItem.ADD -> showImportMenu = true
+                    GlassBarItem.ADD -> mainViewModel.showImportSheet.value = true
                 }
             },
             modifier = Modifier
@@ -272,9 +272,9 @@ fun MainScreen(
 
         if (showImportMenu) {
             ImportSheet(
-                onDismiss = { showImportMenu = false },
+                onDismiss = { mainViewModel.showImportSheet.value = false },
                 onAction = { action ->
-                    showImportMenu = false
+                    mainViewModel.showImportSheet.value = false
                     onAction(action)
                 }
             )

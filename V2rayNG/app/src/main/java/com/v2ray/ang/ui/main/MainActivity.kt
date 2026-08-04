@@ -81,12 +81,16 @@ class MainActivity : HelperBaseComponentActivity() {
         }
 
     private val settingsActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val restartService = SettingsChangeManager.consumeRestartService()
             val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
             mainViewModel.refreshUiSettings()
             if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
             if (restartService && mainViewModel.uiState.value.isRunning) restartV2Ray()
+            // «+» в капсуле на экране настроек открывает шторку импорта здесь
+            if (result.data?.getBooleanExtra(SettingsActivity.EXTRA_OPEN_IMPORT, false) == true) {
+                mainViewModel.showImportSheet.value = true
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

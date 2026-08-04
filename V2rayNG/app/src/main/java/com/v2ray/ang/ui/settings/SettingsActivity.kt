@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +36,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -64,6 +70,8 @@ import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.ui.compose.verticalScrollbar
+import com.v2ray.ang.ui.main.GlassBarItem
+import com.v2ray.ang.ui.main.LiquidGlassBar
 import com.v2ray.ang.ui.logcat.LogFileActivity
 import com.v2ray.ang.ui.logcat.LogcatActivity
 import com.v2ray.ang.util.Utils
@@ -74,6 +82,11 @@ import java.util.Date
 import java.util.Locale
 
 class SettingsActivity : BaseComponentActivity() {
+
+    companion object {
+        /** Просьба главному экрану открыть шторку импорта: «+» нажали здесь. */
+        const val EXTRA_OPEN_IMPORT = "open_import"
+    }
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -86,7 +99,11 @@ class SettingsActivity : BaseComponentActivity() {
         SettingsScreen(
             viewModel = viewModel,
             onBackClick = { finish() },
-            onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) }
+            onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) },
+            onImportClick = {
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_OPEN_IMPORT, true))
+                finish()
+            }
         )
     }
 }
@@ -141,9 +158,15 @@ private val settingsSections = listOf(
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBackClick: () -> Unit,
-    onModeHelpClicked: () -> Unit
+    onModeHelpClicked: () -> Unit,
+    onImportClick: () -> Unit = {}
 ) {
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    // Та же капсула, что на главной: пузырёк въезжает на шестерёнку при открытии экрана
+    val backdrop = rememberGraphicsLayer()
+    var barItem by remember { mutableStateOf(GlassBarItem.HOME) }
+    LaunchedEffect(Unit) { barItem = GlassBarItem.SETTINGS }
 
     // Hoisted so the category list keeps its scroll position while a category is open
     val categoryListScrollState = rememberScrollState()
@@ -156,8 +179,13 @@ fun SettingsScreen(
 
     BackHandler(enabled = openCategory != null) { openCategoryName = null }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+        modifier = Modifier.drawWithContent {
+            backdrop.record { this@drawWithContent.drawContent() }
+            drawLayer(backdrop)
+        },
         topBar = {
             AppTopBar(
                 title = stringResource(openCategory?.titleRes ?: R.string.title_settings),
@@ -205,6 +233,23 @@ fun SettingsScreen(
             }
         }
     }
+
+        LiquidGlassBar(
+            backdrop = backdrop,
+            selected = barItem,
+            onSelect = { item ->
+                when (item) {
+                    GlassBarItem.HOME -> onBackClick()
+                    GlassBarItem.SETTINGS -> Unit
+                    GlassBarItem.ADD -> onImportClick()
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 18.dp)
+        )
+    }
 }
 
 /**
@@ -228,7 +273,7 @@ private fun SettingsColumn(
         } else {
             content()
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(120.dp))
     }
 }
 

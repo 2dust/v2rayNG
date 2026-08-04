@@ -58,9 +58,10 @@ import com.v2ray.ang.ui.compose.LocalDarkTheme
 enum class GlassBarItem { HOME, SETTINGS, ADD }
 
 private val CapsuleShape = RoundedCornerShape(50)
-private val ItemSize = 56.dp
-private val BarHeight = 68.dp
-private const val BLUR_RADIUS_DP = 22
+private val ItemSize = 68.dp
+private val BarHeight = 72.dp
+private val BarPadding = 14.dp
+private const val BLUR_RADIUS_DP = 26
 
 /**
  * Нижняя капсула в духе жидкого стекла: под ней размывается то, что нарисовано на экране,
@@ -97,7 +98,7 @@ fun LiquidGlassBar(
     Box(
         modifier = modifier
             .height(BarHeight)
-            .width(ItemSize * items.size + 16.dp)
+            .width(ItemSize * items.size + BarPadding * 2)
             .onGloballyPositioned { barOffset = it.positionInRoot() }
             .clip(CapsuleShape)
     ) {
@@ -131,13 +132,13 @@ fun LiquidGlassBar(
                     Brush.verticalGradient(
                         colors = if (isDark) {
                             listOf(
-                                Color.White.copy(alpha = 0.10f),
-                                scheme.surface.copy(alpha = 0.55f)
+                                Color.White.copy(alpha = 0.07f),
+                                scheme.surface.copy(alpha = 0.26f)
                             )
                         } else {
                             listOf(
-                                Color.White.copy(alpha = 0.55f),
-                                scheme.surface.copy(alpha = 0.35f)
+                                Color.White.copy(alpha = 0.28f),
+                                scheme.surface.copy(alpha = 0.12f)
                             )
                         }
                     )
@@ -146,29 +147,31 @@ fun LiquidGlassBar(
                     width = 1.dp,
                     brush = Brush.verticalGradient(
                         listOf(
-                            Color.White.copy(alpha = if (isDark) 0.25f else 0.85f),
-                            Color.White.copy(alpha = 0.05f)
+                            Color.White.copy(alpha = if (isDark) 0.22f else 0.7f),
+                            Color.White.copy(alpha = 0.04f)
                         )
                     ),
                     shape = CapsuleShape
                 )
         )
 
-        // 3. Подсветка активного пункта
+        // 3. Подсветка активного пункта, отцентрованная по иконке
         Box(
             modifier = Modifier
-                .padding(8.dp)
+                .align(Alignment.CenterStart)
+                .padding(horizontal = BarPadding)
                 .offset(x = highlightOffset)
-                .size(width = ItemSize - 16.dp, height = BarHeight - 16.dp)
+                .size(ItemSize)
+                .padding(7.dp)
                 .clip(CapsuleShape)
-                .background(scheme.primary.copy(alpha = if (isDark) 0.28f else 0.16f))
+                .background(scheme.primary.copy(alpha = if (isDark) 0.30f else 0.18f))
         )
 
         // 4. Сами кнопки
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = BarPadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -216,19 +219,19 @@ private fun GlassBarButton(
         contentAlignment = Alignment.Center
     ) {
         when (item) {
-            GlassBarItem.HOME -> HomeIcon(color = tint, modifier = Modifier.size(24.dp))
+            GlassBarItem.HOME -> HomeIcon(color = tint, modifier = Modifier.size(26.dp))
             GlassBarItem.SETTINGS -> Icon(
                 painter = painterResource(R.drawable.ic_settings_24dp),
                 contentDescription = "Настройки",
                 tint = tint,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(26.dp)
             )
 
             GlassBarItem.ADD -> Icon(
                 painter = painterResource(R.drawable.ic_add_24dp),
                 contentDescription = "Добавить",
                 tint = tint,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
     }

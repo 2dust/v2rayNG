@@ -66,6 +66,9 @@ class MainViewModel(
     val isImporting = MutableStateFlow(false)
     val importError = MutableStateFlow<String?>(null)
 
+    /** Открыта ли шторка импорта: её просит открыть и «+» с экрана настроек. */
+    val showImportSheet = MutableStateFlow(false)
+
     @Volatile
     private var keywordFilter: String = ""
 
