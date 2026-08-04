@@ -164,6 +164,18 @@
 
     <!-- Preferences -->
     <string name="title_settings">Настройки</string>
+    <string name="title_settings_section_general">Основное</string>
+    <string name="title_settings_section_connection">Соединение</string>
+    <string name="title_settings_section_bypass">Обход блокировок</string>
+    <string name="title_settings_section_other">Прочее</string>
+    <string name="summary_settings_ui">Тема, язык, отображение списка</string>
+    <string name="summary_settings_mode">VPN или прокси, root-режим</string>
+    <string name="summary_settings_vpn">DNS, MTU, TUN-интерфейс</string>
+    <string name="summary_settings_core">SOCKS, sniffing, DNS, журнал</string>
+    <string name="summary_settings_mux">Мультиплексирование и xudp</string>
+    <string name="summary_settings_fragment">Фрагментация TLS-пакетов</string>
+    <string name="summary_settings_observatory">Интервалы проверки соединений</string>
+    <string name="summary_settings_advanced">Пинг, автозапуск, адреса API</string>
     <string name="title_advanced">Расширенные настройки</string>
     <string name="title_core_settings">Настройки ядра</string>
     <string name="title_vpn_settings">Настройки VPN</string>

@@ -42,35 +42,34 @@ fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Row that opens a settings category on its own screen.
+ */
 @Composable
-fun CollapsiblePreferenceGroupHeader(
+fun SettingsCategoryItem(
     title: String,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    summary: String? = null
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onExpandedChange(!expanded) }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = colorFabActive,
-            modifier = Modifier.weight(1f)
-        )
-        Icon(
-            painter = painterResource(R.drawable.ic_expand_more_24dp),
-            contentDescription = null,
-            tint = colorFabActive,
-            modifier = Modifier
-                .size(24.dp)
-                .rotate(if (expanded) 180f else 0f)
-        )
-    }
+    SettingsItemRow(
+        icon = null,
+        title = title,
+        description = summary,
+        enabled = true,
+        onClick = onClick,
+        modifier = modifier,
+        trailing = {
+            Icon(
+                painter = painterResource(R.drawable.ic_expand_more_24dp),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(-90f)
+            )
+        }
+    )
 }
 
 @Composable

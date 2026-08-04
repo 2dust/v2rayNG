@@ -165,6 +165,18 @@
 
     <!-- Preferences -->
     <string name="title_settings">Settings</string>
+    <string name="title_settings_section_general">General</string>
+    <string name="title_settings_section_connection">Connection</string>
+    <string name="title_settings_section_bypass">Bypass</string>
+    <string name="title_settings_section_other">Other</string>
+    <string name="summary_settings_ui">Theme, language, server list display</string>
+    <string name="summary_settings_mode">VPN or proxy, root mode</string>
+    <string name="summary_settings_vpn">DNS, MTU, TUN interface</string>
+    <string name="summary_settings_core">SOCKS, sniffing, DNS, log level</string>
+    <string name="summary_settings_mux">Multiplexing and xudp</string>
+    <string name="summary_settings_fragment">TLS packet fragmentation</string>
+    <string name="summary_settings_observatory">Connection probing intervals</string>
+    <string name="summary_settings_advanced">Ping, auto connect, API urls</string>
     <string name="title_advanced">Advanced Settings</string>
     <string name="title_core_settings">Core Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
