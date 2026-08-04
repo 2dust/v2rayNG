@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -34,6 +35,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
@@ -113,10 +116,17 @@ fun MainScreen(
     val hours = (uptime / (1000 * 60 * 60))
     val timeString = "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 
+    // Капсула снизу размывает именно то, что под ней, поэтому экран пишется в слой
+    val backdrop = rememberGraphicsLayer()
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             // ДИНАМИЧЕСКИЙ ФОН: Подстраивается под тему (белый, серый или черный AMOLED)
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.background,
+            modifier = Modifier.drawWithContent {
+                backdrop.record { this@drawWithContent.drawContent() }
+                drawLayer(backdrop)
+            }
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -124,41 +134,7 @@ fun MainScreen(
                     .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { onNavigate("settings") }) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_settings_24dp), 
-                            contentDescription = "Настройки", 
-                            modifier = Modifier.size(28.dp),
-                            tint = MaterialTheme.colorScheme.onBackground // Динамический цвет иконки
-                        )
-                    }
-                    Box {
-                        IconButton(onClick = { showImportMenu = true }) {
-                            Icon(
-                                painterResource(id = R.drawable.ic_add_24dp), 
-                                contentDescription = "Добавить", 
-                                modifier = Modifier.size(28.dp),
-                                tint = MaterialTheme.colorScheme.onBackground // Динамический цвет иконки
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showImportMenu, 
-                            onDismissRequest = { showImportMenu = false },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surface) // Фон меню
-                        ) {
-                            DropdownMenuItem(text = { Text("Импорт из буфера", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportClipboard) })
-                            DropdownMenuItem(text = { Text("Сканировать QR", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportQRcode) })
-                            DropdownMenuItem(text = { Text("Импорт из файла", color = MaterialTheme.colorScheme.onSurface) }, onClick = { showImportMenu = false; onAction(MainAction.ImportConfigLocal) })
-                        }
-                    }
-                }
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Центральная кнопка
                 PowerButton(
@@ -214,7 +190,7 @@ fun MainScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(bottom = 16.dp)
+                        contentPadding = PaddingValues(bottom = 110.dp)
                     ) {
                         itemsIndexed(
                             items = subscriptions,
@@ -278,6 +254,32 @@ fun MainScreen(
             }
         }
         
+        LiquidGlassBar(
+            backdrop = backdrop,
+            selected = GlassBarItem.HOME,
+            onSelect = { item ->
+                when (item) {
+                    GlassBarItem.HOME -> Unit
+                    GlassBarItem.SETTINGS -> onNavigate("settings")
+                    GlassBarItem.ADD -> showImportMenu = true
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 18.dp)
+        )
+
+        if (showImportMenu) {
+            ImportSheet(
+                onDismiss = { showImportMenu = false },
+                onAction = { action ->
+                    showImportMenu = false
+                    onAction(action)
+                }
+            )
+        }
+
         TopProgressBanner(
             visible = isImporting,
             text = "Обновление подписки...",
@@ -540,6 +542,72 @@ private fun ActionChip(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp)
+        )
+    }
+}
+
+/**
+ * Шторка импорта, которую открывает «+» в нижней капсуле.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ImportSheet(
+    onDismiss: () -> Unit,
+    onAction: (MainAction) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+    ) {
+        Column(modifier = Modifier.padding(bottom = 28.dp)) {
+            Text(
+                text = "Добавить серверы",
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+            )
+            ImportSheetItem("Импорт из буфера", R.drawable.ic_copy) { onAction(MainAction.ImportClipboard) }
+            ImportSheetItem("Сканировать QR", R.drawable.ic_qu_scan_24dp) { onAction(MainAction.ImportQRcode) }
+            ImportSheetItem("Импорт из файла", R.drawable.ic_file_24dp) { onAction(MainAction.ImportConfigLocal) }
+        }
+    }
+}
+
+@Composable
+private fun ImportSheetItem(
+    text: String,
+    iconRes: Int,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painterResource(id = iconRes),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(Modifier.width(16.dp))
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium
         )
     }
 }
