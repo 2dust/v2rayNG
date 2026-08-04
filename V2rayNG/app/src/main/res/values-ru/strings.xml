@@ -326,6 +326,7 @@
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
+    <string name="logcat_core_goes_to_file">Логи ядра пишутся в файлы — смотрите Настройки → Логи → Файлы логов</string>
     <string name="logcat_pause">Пауза</string>
     <string name="logcat_resume">Продолжить</string>
     <string name="title_service_restart">Перезапуск службы</string>

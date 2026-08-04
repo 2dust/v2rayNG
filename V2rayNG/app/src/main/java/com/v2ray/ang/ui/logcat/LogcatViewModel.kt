@@ -24,9 +24,6 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
         /** Lines kept in memory; the oldest ones are dropped past this. */
         private const val MAX_LINES = 3000
 
-        /** History shown when the stream starts, before new lines arrive. */
-        private const val HISTORY_LINES = "500"
-
         /** New lines are published in batches so a burst cannot flood recomposition. */
         private const val FLUSH_INTERVAL_MS = 300L
         private const val FLUSH_BATCH = 200
@@ -93,9 +90,12 @@ class LogcatViewModel(application: Application) : BaseViewModel(application) {
 
             var process: Process? = null
             try {
-                // No -d: logcat prints the recent history and then keeps following
+                // Neither -d nor -T: logcat replays everything the buffer still holds for
+                // these tags and then keeps following. With -T it would count raw lines
+                // before filtering, so on a chatty device the screen opened empty and only
+                // filled once the core logged something new.
                 process = Runtime.getRuntime().exec(
-                    arrayOf("logcat", "-v", "time", "-T", HISTORY_LINES, "-s", TAGS)
+                    arrayOf("logcat", "-v", "time", "-s", TAGS)
                 )
                 logcatProcess = process
 

@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.handler.LogFileManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
@@ -212,6 +213,19 @@ fun LogcatScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // With file logging on the core writes to its files instead of here
+            if (LogFileManager.isFileLoggingEnabled()) {
+                Text(
+                    text = stringResource(R.string.logcat_core_goes_to_file),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                ItemDivider()
+            }
+
             LazyColumn(
                 state = listState,
                 modifier = Modifier

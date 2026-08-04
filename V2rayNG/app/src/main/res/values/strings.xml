@@ -332,6 +332,7 @@
     <string name="logcat_copy">Copy</string>
     <string name="logcat_clear">Clear</string>
     <string name="logcat_share">Share log</string>
+    <string name="logcat_core_goes_to_file">Core logs are being written to files — see Settings → Logs → Log files</string>
     <string name="logcat_pause">Pause</string>
     <string name="logcat_resume">Resume</string>
     <string name="title_service_restart">Service restart</string>
