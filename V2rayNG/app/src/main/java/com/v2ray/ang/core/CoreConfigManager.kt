@@ -59,28 +59,46 @@ object CoreConfigManager {
                 ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
             
             if (configContext.isCustom) {
-                // Получаем сырой кастомный конфиг
                 val rawConfigResult = buildV2rayCustomConfig(configContext)
                 if (!rawConfigResult.status) return rawConfigResult
                 
                 try {
-                    // Парсим как сырой объект, чтобы не потерять xhttpSettings и balancers
                     val jsonObject = com.google.gson.JsonParser.parseString(rawConfigResult.content).asJsonObject
                     
-                    // 1. Удаляем inbounds, чтобы избежать конфликта портов при запущенном VPN
+                    // 1. Полностью удаляем inbounds (избегаем конфликта портов)
                     jsonObject.remove("inbounds")
                     
-                    // 2. Адаптируем правила роутинга для внутреннего пинга ядра
+                    // 2. Очищаем модули, вызывающие таймаут или краш при микро-тесте (как делает V2rayNG)
+                    jsonObject.remove("dns")
+                    jsonObject.remove("fakedns")
+                    jsonObject.remove("stats")
+                    jsonObject.remove("policy")
+                    jsonObject.remove("observatory")
+                    
+                    // 3. Обрабатываем routing
                     val routing = jsonObject.getAsJsonObject("routing")
                     if (routing != null && routing.has("rules")) {
                         val rules = routing.getAsJsonArray("rules")
+                        val newRules = com.google.gson.JsonArray()
+                        
                         for (i in 0 until rules.size()) {
                             val rule = rules.get(i).asJsonObject
-                            // Внутренний тест Xray (measureOutboundDelay) не имеет входящего тега.
-                            // Если правило направляет трафик в балансер, убираем ограничение по inboundTag.
-                            if (rule.has("balancerTag") && rule.has("inboundTag")) {
+                            // Оставляем ТОЛЬКО правила балансировщика, остальные удаляем
+                            if (rule.has("balancerTag")) {
+                                // Убираем inboundTag, так как внутренний тест ядра не имеет входящего тега
                                 rule.remove("inboundTag")
+                                newRules.add(rule)
                             }
+                        }
+                        routing.add("rules", newRules)
+                    }
+                    
+                    // 4. Убираем mux из outbounds (как в оригинальном коде)
+                    val outbounds = jsonObject.getAsJsonArray("outbounds")
+                    if (outbounds != null) {
+                        for (i in 0 until outbounds.size()) {
+                            val outbound = outbounds.get(i).asJsonObject
+                            outbound.remove("mux")
                         }
                     }
                     
@@ -92,7 +110,7 @@ object CoreConfigManager {
                 }
             }
             
-            // Логика для обычных (не кастомных) профилей остается без изменений
+            // Логика для обычных профилей остается без изменений
             val v2rayConfig = buildUnifiedConfig(configContext)
             postProcessForSpeedtest(v2rayConfig)
 
