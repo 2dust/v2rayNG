@@ -3,10 +3,17 @@ package com.v2ray.ang.ui.main
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -17,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -188,12 +196,15 @@ fun ProfileCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                .padding(bottom = 8.dp),
+            shape = RoundedCornerShape(26.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.4f)
+            ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 14.dp)) {
                 
                 Row(
                     verticalAlignment = Alignment.CenterVertically, 
@@ -256,9 +267,9 @@ fun ProfileCard(
                 }
                 
                 HorizontalDivider(
-                    color = MaterialTheme.colorScheme.surfaceVariant, 
-                    thickness = 1.dp, 
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 10.dp)
                 )
 
                 Row(
@@ -278,13 +289,13 @@ fun ProfileCard(
                     
                     Spacer(Modifier.width(8.dp))
                     
-                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)) {
                         Text(
-                            text = trafficDisplay, 
-                            fontSize = 11.sp, 
-                            fontWeight = FontWeight.Bold, 
-                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            text = trafficDisplay,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
                         )
                     }
                     
@@ -335,21 +346,42 @@ fun ProfileCard(
                 }
             }
             
+            // Выбранная строка подсвечивается акцентом, нажатие даёт лёгкое проседание
+            val interactionSource = remember { MutableInteractionSource() }
+            val pressed by interactionSource.collectIsPressedAsState()
+            val cardScale by animateFloatAsState(
+                targetValue = if (pressed) 0.985f else 1f,
+                animationSpec = tween(120),
+                label = "serverScale"
+            )
+            val containerColor by animateColorAsState(
+                targetValue = if (isSelected) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.35f)
+                },
+                animationSpec = tween(300),
+                label = "serverColor"
+            )
+            val accentWidth by animateDpAsState(
+                targetValue = if (isSelected) 4.dp else 0.dp,
+                animationSpec = tween(300),
+                label = "serverAccent"
+            )
+
             Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    // Отдельная плашка на каждый сервер, выделенная чуть светлее
-                    containerColor = if (isSelected) {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
-                    } else {
-                        MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.35f)
-                    }
-                ),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = containerColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 3.dp)
-                    .clickable { onSelectServer(serverCache.guid) }
+                    .scale(cardScale)
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                        onClick = { onSelectServer(serverCache.guid) }
+                    )
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -358,27 +390,41 @@ fun ProfileCard(
                         .height(IntrinsicSize.Min)
                         .padding(vertical = 10.dp, horizontal = 8.dp)
                 ) {
-                    if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .width(4.dp)
+                            .fillMaxHeight()
+                            .padding(vertical = 2.dp)
+                    ) {
                         Box(
                             modifier = Modifier
-                                .width(4.dp)
+                                .width(accentWidth)
                                 .fillMaxHeight()
                                 .clip(RoundedCornerShape(50))
                                 .background(MaterialTheme.colorScheme.primary)
                         )
-                    } else {
-                        Spacer(Modifier.width(4.dp))
                     }
                     Spacer(Modifier.width(8.dp))
 
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest, RoundedCornerShape(12.dp)),
+                            .background(
+                                color = if (isSelected) {
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceContainerHighest
+                                },
+                                shape = RoundedCornerShape(12.dp)
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         WireframeGlobe(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
                             modifier = Modifier.size(22.dp)
                         )
                     }
@@ -406,14 +452,23 @@ fun ProfileCard(
                         )
                     }
                     
+                    // Пинг подаётся плашкой, чтобы не сливался с описанием
                     val delay = serverCache.testDelayMillis
-                    if (delay > 0L) {
-                        // Оставляем цвета пинга зеленым/оранжевым для читаемости, но чуть адаптируем
-                        val pingColor = if (delay <= 300L) Color(0xFF4CAF50) else Color(0xFFFFA500)
-                        Text(text = "${delay}ms", style = MaterialTheme.typography.bodySmall, color = pingColor, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(4.dp))
-                    } else if (delay < 0L) {
-                        Text(text = "таймаут", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    if (delay != 0L) {
+                        val pingColor = when {
+                            delay < 0L -> MaterialTheme.colorScheme.error
+                            delay <= 300L -> Color(0xFF16A34A)
+                            else -> Color(0xFFF59E0B)
+                        }
+                        Text(
+                            text = if (delay > 0L) "$delay ms" else "таймаут",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = pingColor,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .background(pingColor.copy(alpha = 0.12f), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
                         Spacer(Modifier.width(4.dp))
                     }
                     

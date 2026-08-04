@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 private val LightColor = lightColorScheme(
-    primary = Color(0xFF000000), // Black
+    primary = Color(0xFF4F46E5), // Indigo - акцент интерфейса
     onPrimary = Color(0xFFFFFFFF), // White
-    primaryContainer = Color(0xFFE0E0E0), // Light Gray
-    onPrimaryContainer = Color(0xFF000000), // Black
+    primaryContainer = Color(0xFFE6E4FF), // Pale Indigo
+    onPrimaryContainer = Color(0xFF1B1663), // Deep Indigo
     secondary = Color(0xFFf97910), // Orange
     onSecondary = Color(0xFFFFFFFF), // White
     secondaryContainer = Color(0xFFFFE8D6), // Pale Orange
@@ -50,9 +50,9 @@ private val LightColor = lightColorScheme(
     outlineVariant = Color(0xFFCAC4D0), // Light Gray
     inverseSurface = Color(0xFF313033), // Dark Gray
     inverseOnSurface = Color(0xFFF4EFF4), // Very Light Gray
-    inversePrimary = Color(0xFFC0C0C0), // Silver Gray
+    inversePrimary = Color(0xFFC2BFFF), // Light Indigo
     scrim = Color(0xFF000000), // Black
-    surfaceTint = Color(0xFF000000), // Black
+    surfaceTint = Color(0xFF4F46E5), // Indigo
     surfaceContainerLowest = Color(0xFFFFFFFF), // White
     surfaceContainerLow = Color(0xFFF7F7F7), // Very Light Gray
     surfaceContainer = Color(0xFFF1F1F1), // Light Gray
@@ -61,10 +61,10 @@ private val LightColor = lightColorScheme(
 )
 
 private val DarkColor = darkColorScheme(
-    primary = Color(0xFFC0C0C0), // Silver Gray
-    onPrimary = Color(0xFF303030), // Dark Gray
-    primaryContainer = Color(0xFF474747), // Gray
-    onPrimaryContainer = Color(0xFFE0E0E0), // Light Gray
+    primary = Color(0xFFA5A2FF), // Light Indigo - акцент интерфейса
+    onPrimary = Color(0xFF1E1B54), // Deep Indigo
+    primaryContainer = Color(0xFF322E7A), // Indigo
+    onPrimaryContainer = Color(0xFFE4E1FF), // Pale Indigo
     secondary = Color(0xFFf97910), // Orange
     onSecondary = Color(0xFF4E2600), // Dark Brown
     secondaryContainer = Color(0xFF6F3800), // Brown
@@ -89,9 +89,9 @@ private val DarkColor = darkColorScheme(
     outlineVariant = Color(0xFF49454F), // Dark Gray
     inverseSurface = Color(0xFFE6E1E5), // Light Gray
     inverseOnSurface = Color(0xFF000000), // Pure Black (вместо 0xFF1C1B1F)
-    inversePrimary = Color(0xFF000000), // Black
+    inversePrimary = Color(0xFF4F46E5), // Indigo
     scrim = Color(0xFF000000), // Black
-    surfaceTint = Color(0xFFC0C0C0), // Silver Gray
+    surfaceTint = Color(0xFFA5A2FF), // Light Indigo
     
     // Затемняем контейнеры. Можно оставить легкий серый оттенок для High/Highest, 
     // чтобы карточки не сливались в единое пятно, но Lowest, Low и базовый делаем черными.

@@ -58,6 +58,7 @@ import com.v2ray.ang.ui.compose.ResumePauseEffect
 import com.v2ray.ang.ui.compose.SettingsCategoryItem
 import com.v2ray.ang.ui.compose.SettingsEditItem
 import com.v2ray.ang.ui.compose.SettingsFileItem
+import com.v2ray.ang.ui.compose.SettingsGroupCard
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
@@ -213,6 +214,7 @@ fun SettingsScreen(
 private fun SettingsColumn(
     modifier: Modifier,
     scrollState: ScrollState = rememberScrollState(),
+    grouped: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -220,7 +222,12 @@ private fun SettingsColumn(
             .verticalScrollbar(scrollState)
             .verticalScroll(scrollState)
     ) {
-        content()
+        Spacer(modifier = Modifier.height(12.dp))
+        if (grouped) {
+            SettingsGroupCard { content() }
+        } else {
+            content()
+        }
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
@@ -231,15 +238,17 @@ private fun SettingsCategoryList(
     scrollState: ScrollState,
     onCategoryClick: (SettingsCategory) -> Unit
 ) {
-    SettingsColumn(modifier, scrollState) {
+    SettingsColumn(modifier, scrollState, grouped = false) {
         settingsSections.forEach { section ->
             PreferenceGroupHeader(title = stringResource(section.titleRes))
-            section.categories.forEach { category ->
-                SettingsCategoryItem(
-                    title = stringResource(category.titleRes),
-                    summary = stringResource(category.summaryRes),
-                    onClick = { onCategoryClick(category) }
-                )
+            SettingsGroupCard {
+                section.categories.forEach { category ->
+                    SettingsCategoryItem(
+                        title = stringResource(category.titleRes),
+                        summary = stringResource(category.summaryRes),
+                        onClick = { onCategoryClick(category) }
+                    )
+                }
             }
         }
     }
@@ -773,49 +782,53 @@ private fun LogSettings(modifier: Modifier) {
         value = withContext(Dispatchers.IO) { LogFileManager.listLogFiles(context) }
     }
 
-    SettingsColumn(modifier) {
+    SettingsColumn(modifier, grouped = false) {
         PreferenceGroupHeader(title = stringResource(R.string.title_log_settings))
-        SettingsListItem(
-            title = stringResource(R.string.title_core_loglevel),
-            entries = coreLogLevelEntries,
-            values = coreLogLevelValues,
-            selectedValue = coreLogLevel,
-            onSelected = { coreLogLevel = it }
-        )
-        SettingsSwitchItem(
-            title = stringResource(R.string.title_pref_core_log_to_file),
-            summary = stringResource(R.string.summary_pref_core_log_to_file),
-            checked = logToFile,
-            onCheckedChange = { logToFile = it }
-        )
-        SettingsMenuItem(
-            title = stringResource(R.string.title_view_logs),
-            onClick = { context.startActivity(Intent(context, LogcatActivity::class.java)) }
-        )
+        SettingsGroupCard {
+            SettingsListItem(
+                title = stringResource(R.string.title_core_loglevel),
+                entries = coreLogLevelEntries,
+                values = coreLogLevelValues,
+                selectedValue = coreLogLevel,
+                onSelected = { coreLogLevel = it }
+            )
+            SettingsSwitchItem(
+                title = stringResource(R.string.title_pref_core_log_to_file),
+                summary = stringResource(R.string.summary_pref_core_log_to_file),
+                checked = logToFile,
+                onCheckedChange = { logToFile = it }
+            )
+            SettingsMenuItem(
+                title = stringResource(R.string.title_view_logs),
+                onClick = { context.startActivity(Intent(context, LogcatActivity::class.java)) }
+            )
+        }
 
         PreferenceGroupHeader(title = stringResource(R.string.title_log_files))
-        if (logFiles.isEmpty()) {
-            Text(
-                text = stringResource(R.string.log_files_empty),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-        } else {
-            logFiles.forEach { logFile ->
-                SettingsFileItem(
-                    title = logFile.name,
-                    subtitle = formatLogTimestamp(logFile.lastModified),
-                    trailingText = logFile.sizeBytes.toTrafficString(),
-                    onClick = {
-                        context.startActivity(
-                            Intent(context, LogFileActivity::class.java).apply {
-                                putExtra(LogFileActivity.EXTRA_PATH, logFile.path)
-                                putExtra(LogFileActivity.EXTRA_NAME, logFile.name)
-                            }
-                        )
-                    }
+        SettingsGroupCard {
+            if (logFiles.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.log_files_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
                 )
+            } else {
+                logFiles.forEach { logFile ->
+                    SettingsFileItem(
+                        title = logFile.name,
+                        subtitle = formatLogTimestamp(logFile.lastModified),
+                        trailingText = logFile.sizeBytes.toTrafficString(),
+                        onClick = {
+                            context.startActivity(
+                                Intent(context, LogFileActivity::class.java).apply {
+                                    putExtra(LogFileActivity.EXTRA_PATH, logFile.path)
+                                    putExtra(LogFileActivity.EXTRA_NAME, logFile.name)
+                                }
+                            )
+                        }
+                    )
+                }
             }
         }
     }

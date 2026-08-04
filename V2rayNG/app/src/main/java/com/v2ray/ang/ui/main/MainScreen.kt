@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -12,13 +13,16 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
@@ -166,26 +171,23 @@ fun MainScreen(
                     }
                 )
 
+                // Действия под кнопкой оформлены чипами, а не голым текстом
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 0.dp, bottom = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Проверить текущее\nподключение",
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), // ДИНАМИЧЕСКИЙ СЕРЫЙ
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { onAction(MainAction.TestCurrentServer) }
+                    ActionChip(
+                        text = "Проверить подключение",
+                        modifier = Modifier.weight(1f),
+                        onClick = { onAction(MainAction.TestCurrentServer) }
                     )
-                    Text(
+                    ActionChip(
                         text = "Скрыть все",
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), // ДИНАМИЧЕСКИЙ СЕРЫЙ
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
+                        onClick = { }
                     )
                 }
 
@@ -214,10 +216,39 @@ fun MainScreen(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                         contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
-                        items(subscriptions, key = { it.guid + (it.subscription.remarks ?: "") }) { subCache ->
+                        itemsIndexed(
+                            items = subscriptions,
+                            key = { _, item -> item.guid + (item.subscription.remarks ?: "") }
+                        ) { index, subCache ->
                             val serversFlow = remember(subCache.guid) { mainViewModel.serversForGroup(subCache.guid) }
                             val servers by serversFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
+                            // Карточки въезжают снизу по очереди при первом показе
+                            var appeared by rememberSaveable(subCache.guid) { mutableStateOf(false) }
+                            LaunchedEffect(subCache.guid) {
+                                if (!appeared) {
+                                    delay(index * 60L)
+                                    appeared = true
+                                }
+                            }
+                            val itemAlpha by animateFloatAsState(
+                                targetValue = if (appeared) 1f else 0f,
+                                animationSpec = tween(360),
+                                label = "cardAlpha"
+                            )
+                            val itemOffset by animateDpAsState(
+                                targetValue = if (appeared) 0.dp else 24.dp,
+                                animationSpec = tween(360),
+                                label = "cardOffset"
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .graphicsLayer {
+                                        alpha = itemAlpha
+                                        translationY = itemOffset.toPx()
+                                    }
+                            ) {
                             ProfileCard(
                                 subscription = subCache,
                                 servers = servers,
@@ -240,6 +271,7 @@ fun MainScreen(
                                     onAction(MainAction.EditServer(guid, profile))
                                 }
                             )
+                            }
                         }
                     }
                 }
@@ -467,5 +499,47 @@ private fun PowerButton(
                 }
             }
         }
+    }
+}
+
+/**
+ * Небольшой чип-действие: мягкая подложка, отклик на нажатие.
+ */
+@Composable
+private fun ActionChip(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.96f else 1f,
+        animationSpec = tween(120),
+        label = "chipScale"
+    )
+
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f),
+        modifier = modifier
+            .scale(scale)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = onClick
+            )
+    ) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp)
+        )
     }
 }
