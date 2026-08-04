@@ -95,7 +95,7 @@
             <string name="server_lab_spider_x">SpiderX</string>
             <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
             <string name="server_lab_secret_key">SecretKey</string>
-            <string name="server_lab_reserved">Reserved (Không bắt buộc)</string>
+            <string name="server_lab_reserved">Reserved (Không bắt buộc)</string> <!-- Translators: this field accepts multiple WireGuard reserved-byte values separated by commas; keep the comma-separated instruction. -->
             <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4 / IPv6, phân cách bằng dấu phẩy)</string>
             <string name="server_lab_local_mtu">MTU (Không bắt buộc, mặc định là 1420)</string>
             <string name="server_lab_kcp_mtu">mKCP MTU (Không bắt buộc, mặc định core là 1350)</string>
@@ -118,7 +118,7 @@
             <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
             <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
             <string name="server_obfs_password">Obfs password</string>
-            <string name="server_lab_port_hop">Port Hopping</string>
+            <string name="server_lab_port_hop">Port Hopping</string> <!-- Translators: this Hysteria2 setting overrides the server port; retain that warning in the label. -->
             <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
             <string name="server_lab_bandwidth_down">Bandwidth down (Supported units: k/m/g/t)</string>
             <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
@@ -184,11 +184,10 @@
 
             <string name="title_mux_settings">Cài đặt Mux</string>
             <string name="title_pref_mux_enabled">Bật Mux</string>
-            <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn bên dưới.</string>
+            <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn bên dưới.</string> <!-- Translators: the source warns that connectivity may become unstable, but it does not recommend disabling Mux; remove the extra recommendation. -->
             <string name="title_pref_mux_concurency">Số lượng liên kết con tái sử dụng TCP (-1 đến 1024)</string>
             <string name="title_pref_mux_xudp_concurency">Số lượng liên kết con tái sử dụng XUDP (-1 đến 1024)</string>
             <string name="title_pref_mux_xudp_quic">Phương pháp xử lý lưu lượng QUIC</string>
-    <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
         <item>Cho phép</item>
@@ -486,7 +485,6 @@
         <item>Resolve and replace domain</item>
     </string-array>
 
-    <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
     <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>

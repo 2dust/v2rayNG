@@ -188,12 +188,11 @@
             <string name="title_pref_mux_concurency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
             <string name="title_pref_mux_xudp_concurency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
             <string name="title_pref_mux_xudp_quic">QUIC 流量處理方式</string>
-    <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
     <string-array name="mux_xudp_quic_entries">
         <item>不代理</item>
         <item>多路復用</item>
         <item>原生</item>
-    </string-array>
+    </string-array> <!-- Translators: the three items map to reject, allow, and skip; they are Xray QUIC-handling actions, not "no proxy", "multiplex", and "native" modes. -->
 
             <string name="title_pref_speed_enabled">啟用速度顯示</string>
             <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送狀況</string>
@@ -226,7 +225,7 @@
             <string name="title_pref_vpn_mtu">VPN MTU (預設 1500)</string>
 
 
-            <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
+            <string name="title_pref_domestic_dns">境内 DNS (可选)</string> <!-- Translators: use Traditional Chinese characters here, including 境內 and 可選. -->
             <string name="summary_pref_domestic_dns">DNS</string>
 
             <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
@@ -251,9 +250,9 @@
             <string name="summary_pref_socks_port">本地代理埠</string>
             <string name="title_pref_dynamic_socks_port">啟用動態本地代理埠</string>
             <string name="summary_pref_dynamic_socks_port">每次產生 inbound 時隨機產生一個本地代理埠</string>
-            <string name="title_pref_socks_username">本地代理使用者名稱 (選擇)</string>
+            <string name="title_pref_socks_username">本地代理使用者名稱 (選擇)</string> <!-- Translators: 選擇 means "choose"; this label needs the Traditional Chinese term for an optional field, such as 選填 or 可選. -->
             <string name="summary_pref_socks_username">使用者名稱</string>
-            <string name="title_pref_socks_password">本地代理密碼 (選擇)</string>
+            <string name="title_pref_socks_password">本地代理密碼 (選擇)</string> <!-- Translators: 選擇 means "choose"; this label needs the Traditional Chinese term for an optional field, such as 選填 or 可選. -->
             <string name="summary_pref_socks_password">密碼</string>
 
             <string name="title_pref_local_dns_port">本機 DNS 埠</string>
@@ -486,13 +485,12 @@
         <item>解析後替換原網域名稱</item>
     </string-array>
 
-    <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
     <string-array name="policy_group_type">
         <item>最低延遲</item>
         <item>最少卡頓</item>
         <item>隨機選擇</item>
         <item>輪詢</item>
-    </string-array>
+    </string-array> <!-- Translators: the second item maps to leastLoad and refers to current connection load, not "least stuttering". -->
 
     <string-array name="config_backup_options">
         <item>本地</item>

@@ -67,7 +67,7 @@
             <string name="server_lab_request_host_xhttp">xhttp হোস্ট</string>
             <string name="server_lab_request_host_h2">h2 হোস্ট</string>
             <string name="server_lab_request_host_quic">QUIC নিরাপত্তা</string>
-            <string name="server_lab_request_host_grpc">gRPC কর্তৃপক্ষ</string>
+            <string name="server_lab_request_host_grpc">gRPC কর্তৃপক্ষ</string> <!-- Translators: Authority is the literal gRPC/HTTP :authority field, not an organization or governing authority. -->
             <string name="server_lab_path">পথ</string>
             <string name="server_lab_path_ws">ws পথ</string>
             <string name="server_lab_path_httpupgrade">httpupgrade পথ</string>
@@ -95,7 +95,7 @@
             <string name="server_lab_spider_x" translatable="false">SpiderX</string>
             <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
             <string name="server_lab_secret_key" translatable="false">সিক্রেট কী</string>
-            <string name="server_lab_reserved">সংরক্ষিত (ঐচ্ছিক)</string>
+            <string name="server_lab_reserved">সংরক্ষিত (ঐচ্ছিক)</string> <!-- Translators: this field accepts multiple WireGuard reserved-byte values separated by commas; keep the comma-separated instruction. -->
             <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
             <string name="server_lab_local_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1420)</string>
             <string name="server_lab_kcp_mtu">mKCP MTU (ঐচ্ছিক, কোর ডিফল্ট 1350)</string>
@@ -118,7 +118,7 @@
             <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>
             <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
             <string name="server_obfs_password">Obfs password</string>
-            <string name="server_lab_port_hop">Port Hopping</string>
+            <string name="server_lab_port_hop">Port Hopping</string> <!-- Translators: this Hysteria2 setting overrides the server port; retain that warning in the label. -->
             <string name="server_lab_port_hop_interval">Port Hopping Interval</string>
             <string name="server_lab_bandwidth_down">Bandwidth down (Supported units: k/m/g/t)</string>
             <string name="server_lab_bandwidth_up">Bandwidth up (Supported units: k/m/g/t)</string>
@@ -188,7 +188,6 @@
             <string name="title_pref_mux_concurency">TCP সংযোগ (পরিসর -1 থেকে 1024)</string>
             <string name="title_pref_mux_xudp_concurency">XUDP সংযোগ (পরিসর -1 থেকে 1024)</string>
             <string name="title_pref_mux_xudp_quic">Mux টানেলে QUIC পরিচালনা</string>
-    <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
     <string-array name="mux_xudp_quic_entries">
         <item>অস্বীকার করুন</item>
         <item>অনুমতি দিন</item>
@@ -240,7 +239,7 @@
             <string name="summary_pref_ip_api_url">Url</string>
 
             <string name="title_pref_proxy_sharing_enabled">LAN থেকে সংযোগ অনুমোদন করুন</string>
-            <string name="summary_pref_proxy_sharing_enabled">অন্যান্য ডিভাইসগুলি আপনার আইপি ঠিকানা ব্যবহার করে প্রক্সিতে সংযুক্ত হতে পারে, শুধুমাত্র বিশ্বস্ত নেটওয়ার্কে সক্রিয় করুন যাতে অনুমোদিত সংযোগ এড়ানো যায়</string>
+            <string name="summary_pref_proxy_sharing_enabled">অন্যান্য ডিভাইসগুলি আপনার আইপি ঠিকানা ব্যবহার করে প্রক্সিতে সংযুক্ত হতে পারে, শুধুমাত্র বিশ্বস্ত নেটওয়ার্কে সক্রিয় করুন যাতে অনুমোদিত সংযোগ এড়ানো যায়</string> <!-- Translators: the warning says to avoid unauthorized connections; the current wording says to avoid authorized connections and reverses the security meaning. -->
             <string name="toast_warning_pref_proxysharing_short">LAN থেকে সংযোগ অনুমোদন করুন, নিশ্চিত করুন যে আপনি একটি বিশ্বস্ত নেটওয়ার্কে আছেন</string>
 
             <string name="title_pref_socks_port">Local প্রক্সি পোর্ট</string>
@@ -486,7 +485,6 @@
         <item>Resolve and replace domain</item>
     </string-array>
 
-    <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
     <string-array name="policy_group_type">
         <item>Least Ping</item>
         <item>Least Load</item>

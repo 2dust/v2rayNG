@@ -67,7 +67,7 @@
             <string name="server_lab_request_host_xhttp">Узел XHTTP</string>
             <string name="server_lab_request_host_h2">Узел H2</string>
             <string name="server_lab_request_host_quic">Шифрование QUIC</string>
-            <string name="server_lab_request_host_grpc">Полномочия gRPC</string>
+            <string name="server_lab_request_host_grpc">Полномочия gRPC</string> <!-- Translators: Authority is the literal gRPC/HTTP :authority field, not permissions or authorization. -->
             <string name="server_lab_path">Путь</string>
             <string name="server_lab_path_ws">Путь WS</string>
             <string name="server_lab_path_httpupgrade">Путь HTTPUpgrade</string>
@@ -185,10 +185,9 @@
             <string name="title_mux_settings">Настройки мультиплексирования</string>
             <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
             <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
-            <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string>
-            <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string>
+            <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
+            <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
             <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
-    <!-- Translators: the items map by index to reject, allow, and skip in mux_xudp_quic_value. They are Xray handling actions, not proxy, multiplexing, or native modes. -->
     <string-array name="mux_xudp_quic_entries">
         <item>Отклонять</item>
         <item>Разрешать</item>
@@ -486,7 +485,6 @@
         <item>Определять и заменять домен</item>
     </string-array>
 
-    <!-- Translators: the items map by index to leastPing, leastLoad, random, and roundRobin. leastLoad refers to connection load, not stability or stuttering. -->
     <string-array name="policy_group_type">
         <item>Наименьшая задержка</item>
         <item>Наименьшая нагрузка</item>
