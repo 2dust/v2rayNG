@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -395,25 +396,25 @@ private fun PowerButton(
             }
         }
 
-        // Сама кнопка: радиальная заливка из цветов темы, без чужого фона
+        // Заливка смешивается с фоном темы заранее: сквозь полупрозрачные цвета
+        // просвечивала бы тень кнопки, а система рисует её многоугольником
+        val fillCenter = if (isConnected) {
+            lerp(scheme.surface, scheme.primary, 0.45f)
+        } else {
+            scheme.surfaceContainerHigh
+        }
+        val fillEdge = if (isConnected) {
+            lerp(scheme.surface, scheme.primary, 0.12f)
+        } else {
+            scheme.surface
+        }
+
         Box(
             modifier = Modifier
                 .size(150.dp)
-                .shadow(elevation = if (isConnected) 12.dp else 4.dp, shape = CircleShape)
+                .shadow(elevation = if (isConnected) 10.dp else 4.dp, shape = CircleShape)
                 .clip(CircleShape)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = if (isConnected) {
-                            listOf(
-                                scheme.primary.copy(alpha = 0.35f),
-                                scheme.primary.copy(alpha = 0.10f),
-                                scheme.surface
-                            )
-                        } else {
-                            listOf(scheme.surfaceContainerHigh, scheme.surface)
-                        }
-                    )
-                )
+                .background(brush = Brush.radialGradient(colors = listOf(fillCenter, fillEdge)))
                 .border(width = 1.dp, color = accent.copy(alpha = 0.45f), shape = CircleShape)
                 .clickable { onClick() },
             contentAlignment = Alignment.Center
