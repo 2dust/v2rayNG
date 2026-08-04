@@ -68,49 +68,57 @@ object CoreConfigManager {
                     // 1. Полностью удаляем inbounds (избегаем конфликта портов)
                     jsonObject.remove("inbounds")
                     
-                    // 2. Очищаем модули, вызывающие таймаут или краш при микро-тесте (как делает V2rayNG)
+                    // 2. Очищаем модули, вызывающие таймаут или краш при микро-тесте
                     jsonObject.remove("dns")
                     jsonObject.remove("fakedns")
                     jsonObject.remove("stats")
                     jsonObject.remove("policy")
                     jsonObject.remove("observatory")
                     
-                    // 3. Роутинг тестовому ядру не нужен: нативный measureOutboundDelay
-                    // (libv2ray) сам вырезает всё, кроме outbound/dispatcher/log,
-                    // и поднимает пустой роутер по умолчанию — секция "routing" на
-                    // это никак не влияет, поэтому просто очищаем rules целиком,
-                    // как и для обычных (не-custom) профилей в postProcessForSpeedtest.
-                    jsonObject.getAsJsonObject("routing")?.add("rules", com.google.gson.JsonArray())
-
-                    val outbounds = jsonObject.getAsJsonArray("outbounds")
-
-                    // 4. Гарантируем, что тестируется РЕАЛЬНЫЙ outbound.
-                    //
-                    // Раз роутинга нет (см. выше), диспетчер xray-core при дозвоне
-                    // всегда откатывается на defaultHandler — а это ВСЕГДА первый
-                    // outbound в массиве "outbounds", а не тот, что помечен как
-                    // "proxy". Если в исходном JSON первым идёт "direct"/"block" или
-                    // любой другой outbound, тест молча пингует не тот сервер и
-                    // ping для него не проходит — именно поэтому в JSON-профилях
-                    // пинговались только те серверы, где нужный outbound случайно
-                    // оказывался первым. Двигаем на позицию 0 первый outbound с
-                    // "боевым" протоколом (не freedom/blackhole) — тем же способом,
-                    // каким уже определяет протокол CUSTOM-профиля MainServerPager.
-                    if (outbounds != null && outbounds.size() > 1) {
-                        val realIndex = (0 until outbounds.size()).firstOrNull { i ->
-                            val protocol = outbounds.get(i).asJsonObject.get("protocol")?.asString?.lowercase()
-                            protocol != null && protocol != AppConfig.PROTOCOL_FREEDOM && protocol != "blackhole"
+                    // 3. Умная обработка роутинга (поддержка балансеров)
+                    val routing = jsonObject.getAsJsonObject("routing")
+                    var hasBalancer = false
+                    
+                    if (routing != null && routing.has("rules")) {
+                        val rules = routing.getAsJsonArray("rules")
+                        val newRules = com.google.gson.JsonArray()
+                        
+                        for (i in 0 until rules.size()) {
+                            val rule = rules.get(i).asJsonObject
+                            // Оставляем ТОЛЬКО правила балансера
+                            if (rule.has("balancerTag")) {
+                                // Внутренний HTTP-пинг ядра не имеет входящего тега. 
+                                // Удаляем это ограничение, чтобы тест точно пошел в балансер.
+                                rule.remove("inboundTag")
+                                newRules.add(rule)
+                                hasBalancer = true
+                            }
                         }
-                        if (realIndex != null && realIndex != 0) {
-                            val real = outbounds.get(realIndex)
-                            val first = outbounds.get(0)
-                            outbounds.set(realIndex, first)
-                            outbounds.set(0, real)
-                        }
+                        
+                        // Если балансер есть - оставляем его адаптированные правила. 
+                        // Иначе массив rules будет пустым (как и задумывалось для одиночных профилей).
+                        routing.add("rules", newRules)
                     }
 
-                    // 5. Убираем mux из outbounds (как в оригинальном коде)
+                    // 4. Обработка outbounds
+                    val outbounds = jsonObject.getAsJsonArray("outbounds")
                     if (outbounds != null) {
+                        // Если работает балансер, он сам выберет нужный outbound через сохраненный роутинг.
+                        // Если балансера нет, гарантируем, что "боевой" outbound стоит на 0 позиции.
+                        if (!hasBalancer && outbounds.size() > 1) {
+                            val realIndex = (0 until outbounds.size()).firstOrNull { i ->
+                                val protocol = outbounds.get(i).asJsonObject.get("protocol")?.asString?.lowercase()
+                                protocol != null && protocol != AppConfig.PROTOCOL_FREEDOM && protocol != "blackhole"
+                            }
+                            if (realIndex != null && realIndex != 0) {
+                                val real = outbounds.get(realIndex)
+                                val first = outbounds.get(0)
+                                outbounds.set(realIndex, first)
+                                outbounds.set(0, real)
+                            }
+                        }
+
+                        // 5. Убираем mux из outbounds (как в оригинальном коде)
                         for (i in 0 until outbounds.size()) {
                             val outbound = outbounds.get(i).asJsonObject
                             outbound.remove("mux")
@@ -139,7 +147,6 @@ object CoreConfigManager {
             )
         }
     }
-
 
     /**
      * Build configuration for custom profiles.
