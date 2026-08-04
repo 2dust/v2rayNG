@@ -57,9 +57,42 @@ object CoreConfigManager {
         try {
             val configContext = CoreConfigContextBuilder.build(context, guid)
                 ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
+            
             if (configContext.isCustom) {
-                return buildV2rayCustomConfig(configContext)
+                // Получаем сырой кастомный конфиг
+                val rawConfigResult = buildV2rayCustomConfig(configContext)
+                if (!rawConfigResult.status) return rawConfigResult
+                
+                try {
+                    // Парсим как сырой объект, чтобы не потерять xhttpSettings и balancers
+                    val jsonObject = com.google.gson.JsonParser.parseString(rawConfigResult.content).asJsonObject
+                    
+                    // 1. Удаляем inbounds, чтобы избежать конфликта портов при запущенном VPN
+                    jsonObject.remove("inbounds")
+                    
+                    // 2. Адаптируем правила роутинга для внутреннего пинга ядра
+                    val routing = jsonObject.getAsJsonObject("routing")
+                    if (routing != null && routing.has("rules")) {
+                        val rules = routing.getAsJsonArray("rules")
+                        for (i in 0 until rules.size()) {
+                            val rule = rules.get(i).asJsonObject
+                            // Внутренний тест Xray (measureOutboundDelay) не имеет входящего тега.
+                            // Если правило направляет трафик в балансер, убираем ограничение по inboundTag.
+                            if (rule.has("balancerTag") && rule.has("inboundTag")) {
+                                rule.remove("inboundTag")
+                            }
+                        }
+                    }
+                    
+                    return ConfigResult(true, guid, jsonObject.toString())
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // В случае ошибки парсинга возвращаем как есть
+                    return rawConfigResult 
+                }
             }
+            
+            // Логика для обычных (не кастомных) профилей остается без изменений
             val v2rayConfig = buildUnifiedConfig(configContext)
             postProcessForSpeedtest(v2rayConfig)
 
@@ -73,6 +106,7 @@ object CoreConfigManager {
             )
         }
     }
+
 
     /**
      * Build configuration for custom profiles.
