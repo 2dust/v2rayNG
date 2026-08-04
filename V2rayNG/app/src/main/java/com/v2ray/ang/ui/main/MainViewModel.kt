@@ -177,29 +177,38 @@ class MainViewModel(
             try {
                 val guids = dataSource.getServerGuidList(subscriptionId)
                 if (guids.isEmpty()) return@launch
+                
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
+                // 1. Очищаем старые результаты
                 dataSource.clearAllTestDelayResults(guids)
                 
-                // Запускаем TCP-пинг для каждого сервера в подписке
+                // 2. Запускаем TCP-пинг для каждого сервера в подписке
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid)
                     val serverHost = profile?.server
                     val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
                 
                     if (!serverHost.isNullOrBlank() && serverPort > 0) {
+                        // Измеряем задержку
                         val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
-                    
-                        val affiliation = dataSource.decodeAffiliationInfo(guid) ?: ServerAffiliationInfo()
-                        affiliation.testDelayMillis = delay
-                        MmkvManager.encodeServerAffiliation(guid, affiliation)
+                        
+                        // Сохраняем результат точным методом из MmkvManager
+                        MmkvManager.encodeServerTestDelayMillis(guid, delay)
                     }
                 }
                 
+                // 3. Обновляем UI
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+                
             } finally {
-                _uiState.update { it.copy(isTesting = false, statusText = if (uiState.value.isRunning) connectedText else disconnectedText) }
+                _uiState.update { 
+                    it.copy(
+                        isTesting = false, 
+                        statusText = if (uiState.value.isRunning) connectedText else disconnectedText
+                    ) 
+                }
             }
         }
     }
