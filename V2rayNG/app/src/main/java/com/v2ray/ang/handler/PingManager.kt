@@ -36,6 +36,7 @@ object PingManager {
     const val FAILURE = -1L
 
     private const val TCP_TIMEOUT_MS = 1500
+    private const val PRECHECK_TIMEOUT_MS = 3000
     private const val PROXY_TIMEOUT_MS = 10_000
     private const val ICMP_TIMEOUT_MS = 4_000L
     private const val TEST_INBOUND_TAG = "ping-in"
@@ -84,14 +85,25 @@ object PingManager {
 
     /** The core does the GET itself, one instance per test, no listener involved. */
     private suspend fun proxyGetPing(context: Context, guid: String, profile: ProfileItem): Long {
-        if (!tcpPrecheckPasses(context, guid, profile)) return FAILURE
+        if (!tcpPrecheckPasses(context, guid, profile)) {
+            LogUtil.w(AppConfig.TAG, "Ping: ${profile.remarks} is not answering on TCP, skipping the request")
+            return FAILURE
+        }
 
         val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
-        if (!configResult.status) return FAILURE
+        if (!configResult.status) {
+            LogUtil.w(AppConfig.TAG, "Ping: no test config for ${profile.remarks}: ${configResult.errorMessage}")
+            return FAILURE
+        }
 
-        return withContext(Dispatchers.IO) {
+        val delay = withContext(Dispatchers.IO) {
             CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
         }
+        // The core logs the reason right before this, the profile name is what is missing there
+        if (delay <= FAILURE) {
+            LogUtil.w(AppConfig.TAG, "Ping: GET through ${profile.remarks} failed, see the error above")
+        }
+        return delay
     }
 
     /**
@@ -170,8 +182,11 @@ object PingManager {
     }
 
     /**
-     * A dead TCP endpoint fails in a second instead of waiting out the request timeout.
+     * A dead TCP endpoint fails fast instead of waiting out the request timeout.
      * Skipped for anything not speaking plain TCP to its server address.
+     *
+     * The timeout is deliberately generous: a working but distant server used to be reported
+     * as a timeout here without its proxy ever being tried.
      */
     private suspend fun tcpPrecheckPasses(context: Context, guid: String, profile: ProfileItem): Boolean {
         if (profile.configType.isComplexType()
@@ -186,7 +201,7 @@ object PingManager {
 
         val (host, port) = serverAddress(context, guid, profile) ?: return true
         return withContext(Dispatchers.IO) {
-            SpeedtestManager.socketConnectTime(host, port, 1000) > FAILURE
+            SpeedtestManager.socketConnectTime(host, port, PRECHECK_TIMEOUT_MS) > FAILURE
         }
     }
 

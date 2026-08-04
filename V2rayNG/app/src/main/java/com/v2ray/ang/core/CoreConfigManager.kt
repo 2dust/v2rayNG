@@ -104,9 +104,17 @@ object CoreConfigManager {
                             outbounds.set(0, proxy)
                         }
 
-                        // Mux only slows the test down
                         for (element in outbounds) {
-                            element.takeIf { it.isJsonObject }?.asJsonObject?.remove("mux")
+                            val outbound = element.takeIf { it.isJsonObject }?.asJsonObject ?: continue
+                            // Mux only slows the test down, and the resolver settings point at
+                            // a dns section that the test config no longer carries
+                            outbound.remove("mux")
+                            outbound.get("streamSettings")?.takeIf { it.isJsonObject }?.asJsonObject
+                                ?.get("sockopt")?.takeIf { it.isJsonObject }?.asJsonObject
+                                ?.apply {
+                                    remove("domainStrategy")
+                                    remove("happyEyeballs")
+                                }
                         }
                     }
 
@@ -492,7 +500,15 @@ object CoreConfigManager {
         v2rayConfig.fakedns = null
         v2rayConfig.stats = null
         v2rayConfig.policy = null
-        v2rayConfig.outbounds.forEach { key -> key.mux = null }
+        v2rayConfig.outbounds.forEach { outbound ->
+            outbound.mux = null
+            // The addresses these resolve against live in the dns section the test just dropped,
+            // so let the dialer resolve the server the plain way instead
+            outbound.streamSettings?.sockopt?.let { sockopt ->
+                sockopt.domainStrategy = null
+                sockopt.happyEyeballs = null
+            }
+        }
     }
 
     /**

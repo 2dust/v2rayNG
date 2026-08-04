@@ -376,7 +376,9 @@ object SettingsManager {
         return if (second) {
             AppConfig.DELAY_TEST_URL2
         } else {
+            // An empty preference must not reach the test, it is not a usable url
             MmkvManager.decodeSettingsString(AppConfig.PREF_DELAY_TEST_URL)
+                ?.takeIf { it.isNotBlank() }
                 ?: AppConfig.DELAY_TEST_URL
         }
     }

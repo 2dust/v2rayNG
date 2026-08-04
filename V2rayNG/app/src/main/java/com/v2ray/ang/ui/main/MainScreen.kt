@@ -284,36 +284,18 @@ fun MainScreen(
             }
         }
         
-        AnimatedVisibility(
+        TopProgressBanner(
             visible = isImporting,
-            enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
-            exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            text = "Обновление подписки...",
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 32.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerHigh, // ДИНАМИЧЕСКИЙ ФОН ПЛАШКИ
-                shadowElevation = 8.dp
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp), 
-                        strokeWidth = 2.dp, 
-                        color = MaterialTheme.colorScheme.primary // ДИНАМИЧЕСКИЙ АКЦЕНТ
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        "Обновление подписки...", 
-                        fontSize = 14.sp, 
-                        fontWeight = FontWeight.Bold, 
-                        color = MaterialTheme.colorScheme.onSurface // ДИНАМИЧЕСКИЙ ТЕКСТ
-                    )
-                }
-            }
-        }
+        )
+
+        // Same banner for the ping run, carrying the "x / y left" progress
+        TopProgressBanner(
+            visible = uiState.isTesting && !isImporting,
+            text = uiState.statusText,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 32.dp)
+        )
 
         AnimatedVisibility(
             visible = importError != null,
@@ -331,6 +313,47 @@ fun MainScreen(
                     color = MaterialTheme.colorScheme.onErrorContainer, // ДИНАМИЧЕСКИЙ ЦВЕТ ТЕКСТА ОШИБКИ
                     fontWeight = FontWeight.Bold, 
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Pill that slides in from the top while a long running task is in progress.
+ */
+@Composable
+private fun TopProgressBanner(
+    visible: Boolean,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+        modifier = modifier
+    ) {
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shadowElevation = 8.dp
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = text,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

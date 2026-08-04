@@ -91,15 +91,22 @@ object CustomConfigUtil {
      * @return The index of the proxy outbound, or -1 if there is none.
      */
     fun getProxyOutboundIndex(outbounds: JsonArray): Int {
+        var firstResolvable = -1
         var fallbackIndex = -1
+
         for (i in 0 until outbounds.size()) {
             val outbound = outbounds.get(i).takeIf { it.isJsonObject }?.asJsonObject ?: continue
             val protocol = outbound.stringOrNull("protocol")?.lowercase().orEmpty()
             if (protocol.isEmpty() || protocol in NON_PROXY_PROTOCOLS) continue
-            if (extractHostAndPort(outbound) != null) return i
+
+            val resolvable = extractHostAndPort(outbound) != null
+            // A chained config dials its front outbound first, "proxy" is the one being tested
+            if (resolvable && outbound.stringOrNull("tag") == AppConfig.TAG_PROXY) return i
+            if (resolvable && firstResolvable < 0) firstResolvable = i
             if (fallbackIndex < 0) fallbackIndex = i
         }
-        return fallbackIndex
+
+        return if (firstResolvable >= 0) firstResolvable else fallbackIndex
     }
 
     /**
