@@ -105,6 +105,20 @@
         <item>IPOnDemand</item>
     </string-array>
 
+    <string-array name="ping_type_value" translatable="false">
+        <item>proxy_get</item>
+        <item>proxy_head</item>
+        <item>tcp</item>
+        <item>icmp</item>
+    </string-array>
+
+    <string-array name="ping_type_entries">
+        <item>via Proxy GET</item>
+        <item>via Proxy HEAD</item>
+        <item>TCP</item>
+        <item>ICMP</item>
+    </string-array>
+
     <string-array name="core_loglevel" translatable="false">
         <item>debug</item>
         <item>info</item>

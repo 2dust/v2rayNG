@@ -59,5 +59,5 @@ sealed interface MainAction {
 
     data class LocateHandled(val target: LocateTarget) : MainAction
     
-    data class TestProfileTcpPing(val subscriptionId: String) : MainAction
+    data class TestProfilePing(val subscriptionId: String) : MainAction
 }

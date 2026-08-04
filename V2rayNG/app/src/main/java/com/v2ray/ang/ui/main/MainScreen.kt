@@ -263,7 +263,7 @@ fun MainScreen(
                                 onAction = onAction,
                                 onPingProfile = { guid -> 
                                     onAction(MainAction.SelectGroup(guid))
-                                    onAction(MainAction.TestProfileTcpPing(guid)) 
+                                    onAction(MainAction.TestProfilePing(guid)) 
                                 },
                                 onUpdateSubscription = { subId -> 
                                     mainViewModel.updateSubscription(subId)

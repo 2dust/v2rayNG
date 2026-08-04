@@ -17,6 +17,7 @@ import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.Language
+import com.v2ray.ang.enums.PingType
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
 import com.v2ray.ang.extension.moveItem
@@ -388,6 +389,13 @@ object SettingsManager {
         val value = MmkvManager.decodeSettingsString(AppConfig.PREF_REAL_PING_CONCURRENCY)?.toIntOrNull() ?: 16
         return value.coerceIn(1, 128)
     }
+
+    /**
+     * Get the selected ping type.
+     * @return The ping type used when testing profiles.
+     */
+    fun getPingType(): PingType =
+        PingType.from(MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE))
 
     /**
      * Get the locale.

@@ -1,16 +1,10 @@
 package com.v2ray.ang.service
 
 import android.content.Context
-import com.v2ray.ang.core.CoreConfigManager
-import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.RealPingEvent
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.enums.PingType
+import com.v2ray.ang.handler.PingManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.SpeedtestManager
-import com.v2ray.ang.util.CustomConfigUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -81,63 +75,9 @@ class RealPingWorkerService(
         }
     }
 
-    private fun startRealPing(guid: String): Long {
-        val retFailure = -1L
+    /** Measures with the ping type picked in the settings. */
+    private suspend fun startRealPing(guid: String): Long = PingManager.ping(context, guid)
 
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.startsWith("h3") != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
-        ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-            if (tcpTime <= -1L) {
-                return retFailure
-            }
-        }
-
-        val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
-        if (!configResult.status) {
-            return retFailure
-        }
-        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
-    }
-
-    private fun startTcping(guid: String): Long {
-        val retFailure = -1L
-
-        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-
-        // Raw JSON profiles keep their server address inside the config itself
-        if (config.configType == EConfigType.CUSTOM) {
-            val rawConfig = CustomConfigUtil.getRawConfig(context, guid, config.server)
-            val hostAndPort = CustomConfigUtil.getProxyOutbound(CustomConfigUtil.parseConfig(rawConfig))
-                ?.let { CustomConfigUtil.extractHostAndPort(it) }
-                ?: config.server?.takeIf { it.isNotBlank() && !it.contains("{") }
-                    ?.let { server -> config.serverPort?.toIntOrNull()?.let { Pair(server, it) } }
-                ?: return retFailure
-
-            return SpeedtestManager.socketConnectTime(hostAndPort.first, hostAndPort.second, 1000)
-        }
-
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.startsWith("h3") != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
-        ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-
-            return tcpTime
-        }
-
-        return retFailure
-    }
+    /** Always a plain TCP handshake, whatever the ping type setting says. */
+    private suspend fun startTcping(guid: String): Long = PingManager.ping(context, guid, PingType.TCP)
 }

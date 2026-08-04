@@ -44,6 +44,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.LogFileInfo
+import com.v2ray.ang.enums.PingType
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.LogFileManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -826,9 +827,13 @@ private fun formatLogTimestamp(millis: Long): String =
 @Composable
 private fun AdvancedSettings(modifier: Modifier) {
     var isBooted by rememberMmkvBool(AppConfig.PREF_IS_BOOTED, false)
+    var pingType by rememberMmkvString(AppConfig.PREF_PING_TYPE, PingType.PROXY_GET.value)
     var delayTestUrl by rememberMmkvString(AppConfig.PREF_DELAY_TEST_URL, "")
     var realPingConcurrency by rememberMmkvString(AppConfig.PREF_REAL_PING_CONCURRENCY, "16")
     var ipApiUrl by rememberMmkvString(AppConfig.PREF_IP_API_URL, "")
+
+    val pingTypeEntries = stringArrayResource(R.array.ping_type_entries).toList()
+    val pingTypeValues = stringArrayResource(R.array.ping_type_value).toList()
 
     SettingsColumn(modifier) {
         SettingsSwitchItem(
@@ -836,6 +841,13 @@ private fun AdvancedSettings(modifier: Modifier) {
             summary = stringResource(R.string.summary_pref_is_booted),
             checked = isBooted,
             onCheckedChange = { isBooted = it }
+        )
+        SettingsListItem(
+            title = stringResource(R.string.title_pref_ping_type),
+            entries = pingTypeEntries,
+            values = pingTypeValues,
+            selectedValue = pingType,
+            onSelected = { pingType = it }
         )
         SettingsEditItem(
             title = stringResource(R.string.title_pref_delay_test_url),

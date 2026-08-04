@@ -8,22 +8,20 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
-import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.handler.PingManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.CustomConfigUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -32,11 +30,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
@@ -174,65 +176,51 @@ class MainViewModel(
         }
     }
 
-    private fun extractHostAndPort(guid: String, profile: ProfileItem): Pair<String, Int>? {
-        if (profile.configType != EConfigType.CUSTOM) {
-            val port = profile.serverPort?.toString()?.toIntOrNull() ?: 0
-            if (!profile.server.isNullOrBlank() && port > 0) return Pair(profile.server!!, port)
-            return null
-        }
-
-        try {
-            // The raw JSON is the only reliable source here: profile.server/serverPort stay
-            // empty for every outbound shape the typed model cannot read (vnext, servers, ...).
-            val rawConfig = CustomConfigUtil.getRawConfig(getApplication<Application>(), guid, profile.server)
-            val outbound = CustomConfigUtil.getProxyOutbound(CustomConfigUtil.parseConfig(rawConfig))
-            if (outbound != null) {
-                CustomConfigUtil.extractHostAndPort(outbound)?.let { return it }
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to extract host and port from custom config", e)
-        }
-
-        val fallbackHost = profile.server
-        val fallbackPort = profile.serverPort?.toString()?.toIntOrNull() ?: 0
-        if (!fallbackHost.isNullOrBlank() && fallbackPort > 0 && !fallbackHost.contains("{")) {
-            return Pair(fallbackHost, fallbackPort)
-        }
-
-        return null
-    }
-
-    private fun testProfileTcpPing(subscriptionId: String) {
+    private fun testProfilePing(subscriptionId: String) {
         viewModelScope.launch(ioDispatcher) {
             try {
                 val guids = dataSource.getServerGuidList(subscriptionId)
                 if (guids.isEmpty()) return@launch
-                
+
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
-                
+
                 dataSource.clearAllTestDelayResults(guids)
-                
-                guids.forEach { guid ->
-                    val profile = dataSource.decodeServerConfig(guid)
-                    if (profile != null) {
-                        val hostAndPort = extractHostAndPort(guid, profile)
-                        if (hostAndPort != null) {
-                            val (serverHost, serverPort) = hostAndPort
-                            val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
-                            MmkvManager.encodeServerTestDelayMillis(guid, delay)
+
+                // Proxy pings are slow one by one, so run them the way the batch worker does
+                val context = getApplication<Application>()
+                val pingType = SettingsManager.getPingType()
+                val permits = Semaphore(SettingsManager.getRealPingConcurrency())
+                val remaining = AtomicInteger(guids.size)
+
+                coroutineScope {
+                    guids.map { guid ->
+                        launch {
+                            permits.withPermit {
+                                val delay = PingManager.ping(context, guid, pingType)
+                                MmkvManager.encodeServerTestDelayMillis(guid, delay)
+                            }
+                            val left = remaining.decrementAndGet()
+                            _uiState.update {
+                                it.copy(
+                                    statusText = dataSource.getString(
+                                        R.string.connection_runing_task_left,
+                                        "$left / ${guids.size}"
+                                    )
+                                )
+                            }
                         }
-                    }
+                    }.joinAll()
                 }
-                
+
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
-                
+
             } finally {
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
-                        isTesting = false, 
+                        isTesting = false,
                         statusText = if (uiState.value.isRunning) connectedText else disconnectedText
-                    ) 
+                    )
                 }
             }
         }
@@ -285,7 +273,7 @@ class MainViewModel(
 
     fun onAction(action: MainAction) {
         when (action) {
-            is MainAction.TestProfileTcpPing -> testProfileTcpPing(action.subscriptionId)
+            is MainAction.TestProfilePing -> testProfilePing(action.subscriptionId)
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)

@@ -176,6 +176,7 @@
     <string name="summary_settings_fragment">Фрагментация TLS-пакетов</string>
     <string name="summary_settings_observatory">Интервалы проверки соединений</string>
     <string name="summary_settings_advanced">Пинг, автозапуск, адреса API</string>
+    <string name="title_pref_ping_type">Тип пинга</string>
     <string name="summary_settings_logs">Уровень логов, просмотр, файлы логов</string>
     <string name="title_log_settings">Настройки логов</string>
     <string name="title_log_files">Файлы логов</string>

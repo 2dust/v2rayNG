@@ -177,6 +177,7 @@
     <string name="summary_settings_fragment">TLS packet fragmentation</string>
     <string name="summary_settings_observatory">Connection probing intervals</string>
     <string name="summary_settings_advanced">Ping, auto connect, API urls</string>
+    <string name="title_pref_ping_type">Ping type</string>
     <string name="summary_settings_logs">Log level, log viewer, log files</string>
     <string name="title_log_settings">Log settings</string>
     <string name="title_log_files">Log files</string>
