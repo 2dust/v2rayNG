@@ -180,10 +180,24 @@ class MainViewModel(
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
                 dataSource.clearAllTestDelayResults(guids)
+                
+                // Запускаем TCP-пинг для каждого сервера в подписке
+                guids.forEach { guid ->
+                    val profile = dataSource.decodeServerConfig(guid)
+                    val serverHost = profile?.server
+                    val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
+                
+                    if (!serverHost.isNullOrBlank() && serverPort > 0) {
+                        val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
+                    
+                        val affiliation = dataSource.decodeAffiliationInfo(guid) ?: ServerAffiliationInfo()
+                        affiliation.testDelayMillis = delay
+                        MmkvManager.encodeServerAffiliation(guid, affiliation)
+                    }
+                }
+                
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
-                
-                dataSource.testCurrentServerRealPing()
             } finally {
                 _uiState.update { it.copy(isTesting = false, statusText = if (uiState.value.isRunning) connectedText else disconnectedText) }
             }
@@ -525,48 +539,4 @@ class MainViewModel(
     private fun filterConfig(query: String) {}
     private fun consumeLocateTarget(target: LocateTarget) {}
     private fun onTestsFinished() {}
-    
-    private fun testProfileTcpPing(subscriptionId: String) {
-        viewModelScope.launch(ioDispatcher) {
-            try {
-                val guids = dataSource.getServerGuidList(subscriptionId)
-                if (guids.isEmpty()) return@launch
-            
-                _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
-            
-                // 1. Очищаем старые результаты
-                dataSource.clearAllTestDelayResults(guids)
-            
-                // 2. Запускаем TCP-пинг для каждого сервера из подписки
-                guids.forEach { guid ->
-                    val profile = dataSource.decodeServerConfig(guid)
-                    val serverHost = profile?.server
-                    val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
-                
-                    if (!serverHost.isNullOrBlank() && serverPort > 0) {
-                        val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
-                    
-                        // Обновляем информацию о задержке через MmkvManager корректным методом
-                        val affiliation = dataSource.decodeAffiliationInfo(guid) ?: ServerAffiliationInfo()
-                        affiliation.testDelayMillis = delay
-                        
-                        // Используем стандартный метод сохранения через MmkvManager (или обходим через encode)
-                        MmkvManager.encodeServerAffiliationInfo(guid, affiliation)
-                    }
-                }
-            
-                // 3. Сбрасываем кэш группы и обновляем UI
-                cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
-                updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
-            
-            } finally {
-                _uiState.update { 
-                    it.copy(
-                        isTesting = false, 
-                        statusText = if (uiState.value.isRunning) connectedText else disconnectedText
-                    ) 
-                }
-            }
-        }
-    }
 }
