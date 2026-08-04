@@ -151,7 +151,7 @@ fun PerAppProxyScreen(
                         IconButton(onClick = { showSearch = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_search_24dp),
-                                contentDescription = stringResource(R.string.menu_item_search)
+                                contentDescription = stringResource(R.string.acc_search)
                             )
                         }
                     }
@@ -253,7 +253,7 @@ fun PerAppProxyScreen(
                     IconButton(onClick = onInfoClick) {
                         Icon(
                             painter = painterResource(R.drawable.ic_about_24dp),
-                            contentDescription = stringResource(R.string.summary_pref_per_app_proxy),
+                            contentDescription = stringResource(R.string.acc_per_app_proxy_information),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

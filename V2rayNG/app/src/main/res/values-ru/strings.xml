@@ -9,12 +9,13 @@
             <string name="migration_success">Успешный перенос данных!</string>
             <string name="action_stop_service">Остановить службу</string>
             <string name="migration_fail">Перенос данных не выполнен!</string>
-            <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
+            <string name="acc_refresh">Refresh</string>
 
     <!-- Notifications -->
             <string name="notification_action_stop_v2ray">Остановить</string>
             <string name="toast_permission_denied">Разрешение не получено</string>
             <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
+            <string name="toast_permission_denied_for">Unable to obtain permission: %1$s</string>
             <string name="notification_action_more">Ещё…</string>
             <string name="toast_services_start">Запуск служб</string>
             <string name="toast_services_stop">Остановка служб</string>
@@ -23,10 +24,8 @@
 
     <!--ServerActivity-->
             <string name="title_server">Профиль</string>
-            <string name="menu_item_add_config">Добавить профиль</string>
+            <string name="acc_add_subscription">Add subscription</string>
             <string name="menu_item_save_config">Сохранить профиль</string>
-            <string name="menu_item_edit_config">Изменить профиль</string>
-            <string name="menu_item_del_config">Удалить профиль</string>
             <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
             <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
             <string name="menu_item_import_config_local">Импорт из файла</string>
@@ -114,7 +113,7 @@
             <string name="toast_invalid_url">Неправильный URL</string>
             <string name="toast_insecure_url_protocol">Не используйте небезопасный HTTP-протокол в адресе подписки</string>
             <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
-            <string name="toast_malformed_josn">Профиль повреждён</string>
+            <string name="toast_malformed_json_detail">Профиль повреждён: %1$s</string>
             <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
             <string name="toast_action_not_allowed">Это действие запрещено</string>
             <string name="server_obfs_password">Пароль obfs</string>
@@ -137,12 +136,12 @@
 
     <!-- UserAssetActivity -->
             <string name="toast_asset_copy_failed">Невозможно скопировать файл, используйте файловый менеджер</string>
-            <string name="menu_item_add_asset">Добавить ресурс</string>
+            <string name="acc_add_asset">Добавить ресурс</string>
             <string name="menu_item_add_file">Добавить файлы</string>
             <string name="menu_item_add_url">Добавить URL</string>
             <string name="menu_item_scan_qrcode">Сканировать QR-код</string>
             <string name="title_url">URL</string>
-            <string name="menu_item_download_file">Загрузить файлы</string>
+            <string name="acc_download_file">Загрузить файлы</string>
             <string name="title_user_asset_add_url">Добавить URL ресурса</string>
             <string name="msg_file_not_found">Файл не найден</string>
             <string name="msg_remark_is_duplicate">Название уже существует</string>
@@ -185,8 +184,8 @@
             <string name="title_mux_settings">Настройки мультиплексирования</string>
             <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
             <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
-            <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
-            <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
+            <string name="title_pref_mux_concurrency">TCP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
+            <string name="title_pref_mux_xudp_concurrency">XUDP-соединения (диапазон от 1 до 1024)</string> <!-- Translators: the valid range starts at -1, not 1; preserve the minus sign. -->
             <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Отклонять</item>
@@ -277,7 +276,7 @@
             <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
             <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
             <string name="title_privacy_policy">Политика конфиденциальности</string>
-            <string name="title_qr_code">QR-код</string>
+            <string name="acc_qr_code">QR-код</string>
             <string name="title_about">О приложении</string>
             <string name="title_source_code">Исходный код</string>
             <string name="title_oss_license">Лицензии открытого исходного кода</string>
@@ -308,8 +307,8 @@
             <string name="summary_root_lan_sharing">Маршрутизация точек доступа Wi-Fi и устройств, подключённых к USB, через VPN</string>
 
             <string name="title_logcat">Журнал</string>
-            <string name="logcat_copy">Копировать</string>
-            <string name="logcat_clear">Очистить</string>
+            <string name="acc_copy_log">Копировать</string>
+            <string name="acc_clear_log">Очистить</string>
             <string name="logcat_share">Поделиться журналом</string>
             <string name="title_service_restart">Перезапуск службы</string>
             <string name="title_del_all_config">Удалить профили</string>
@@ -358,7 +357,7 @@
             <string name="routing_settings_save">Сохранить</string>
             <string name="routing_settings_delete">Очистить</string>
             <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
-            <string name="routing_settings_add_rule">Добавить правило</string>
+            <string name="acc_add_rule">Добавить правило</string>
             <string name="routing_settings_import_predefined_rulesets">Импорт набора правил</string>
             <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>
             <string name="routing_settings_import_rulesets_from_clipboard">Импорт правил из буфера обмена</string>
@@ -385,7 +384,7 @@
             <string name="connection_test_error_status_code">Код ошибки: #%d</string>
             <string name="connection_connected">Соединено, нажмите для проверки</string>
             <string name="connection_not_connected">Нет соединения</string>
-            <string name="connection_runing_task_left">Запущено проверок: %s</string>
+            <string name="connection_running_task_left">Запущено проверок: %s</string>
 
             <string name="import_subscription_success">Подписка импортирована</string>
             <string name="import_subscription_failure">Невозможно импортировать подписку</string>
@@ -442,6 +441,48 @@
             <string name="action_edit">Изменить</string>
             <string name="action_delete">Удалить</string>
             <string name="action_close">Закрыть</string>
+
+            <string name="core_error_no_server_selected">No server selected</string>
+            <string name="core_error_decode_server_config">Failed to decode server config</string>
+            <string name="core_error_build_config_context">Failed to build config context</string>
+            <string name="core_error_get_config">Failed to get V2Ray config</string>
+            <string name="core_error_get_config_detail">Failed to get V2Ray config: %1$s</string>
+            <string name="core_error_get_speedtest_config_detail">Failed to get V2Ray config for speed test: %1$s</string>
+            <string name="core_error_custom_config_empty">Custom config is empty</string>
+            <string name="core_error_start">Core failed to start</string>
+
+            <string name="acc_start">Start</string>
+            <string name="acc_stop">Stop</string>
+            <string name="acc_back">Back</string>
+            <string name="acc_search">Поиск</string>
+            <string name="acc_add">Add</string>
+            <string name="acc_more">More</string>
+            <string name="acc_share_subscription">Share subscription</string>
+            <string name="acc_share_log">Поделиться журналом</string>
+            <string name="acc_remove">Remove</string>
+            <string name="acc_add_member">Add member</string>
+            <string name="acc_start_scanner">Start scanner</string>
+            <string name="acc_stop_scanner">Stop scanner</string>
+            <string name="acc_turn_torch_on">Turn torch on</string>
+            <string name="acc_turn_torch_off">Turn torch off</string>
+            <string name="acc_select_image">Select image</string>
+            <string name="acc_locked">Locked</string>
+            <string name="acc_open_menu">Open menu</string>
+            <string name="acc_edit">Изменить</string>
+            <string name="acc_delete">Удалить</string>
+            <string name="acc_save">Сохранить</string>
+            <string name="acc_update_subscriptions">Update subscriptions</string>
+            <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+            <string name="permission_camera">Camera</string>
+            <string name="permission_notification">Notification</string>
+            <string name="permission_local_network">Local network</string>
+            <string name="profile_protocol_insecure">%1$s insecure</string>
+            <string name="subscription_update_updating">Updating %1$s</string>
+            <string name="subscription_update_progress">%1$s in %2$s</string>
+            <string name="tasker_blurb_start">Start %1$s</string>
+            <string name="tasker_blurb_stop">Stop %1$s</string>
+            <string name="connection_test_empty_message">empty message</string>
+            <string name="value_unknown">unknown</string>
 
     <string-array name="share_sub_method">
         <item>QR-код</item>

@@ -9,12 +9,13 @@
             <string name="migration_success">انتقال داده‌ها با موفقیت انجام شد!</string>
             <string name="action_stop_service">توقف سرویس</string>
             <string name="migration_fail">انتقال داده‌ها با شکست مواجه شد!</string>
-            <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
+            <string name="acc_refresh">Refresh</string>
 
     <!-- Notifications -->
             <string name="notification_action_stop_v2ray">توقف</string>
             <string name="toast_permission_denied">امکان دریافت مجوز وجود ندارد</string>
             <string name="toast_permission_denied_notification">امکان دریافت مجوز ارسال اعلان وجود ندارد</string>
+            <string name="toast_permission_denied_for">Unable to obtain permission: %1$s</string>
             <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
             <string name="toast_services_start">شروع خدمات</string>
             <string name="toast_services_stop">توقف سرویس</string>
@@ -23,10 +24,8 @@
 
     <!--ServerActivity-->
             <string name="title_server">فایل کانفیگ</string>
-            <string name="menu_item_add_config">افزودن کانفیگ</string>
+            <string name="acc_add_subscription">Add subscription</string>
             <string name="menu_item_save_config">ذخیره کانفیگ</string>
-            <string name="menu_item_edit_config">ویرایش کردن کانفیگ</string>
-            <string name="menu_item_del_config">حذف کانفیگ</string>
             <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
             <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
             <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
@@ -114,7 +113,7 @@
             <string name="toast_invalid_url">نشانی اینترنتی نامعتبر است</string>
             <string name="toast_insecure_url_protocol">لطفاً از آدرس های اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
             <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
-            <string name="toast_malformed_josn">کانفیگ درست نیست</string>
+            <string name="toast_malformed_json_detail">کانفیگ درست نیست: %1$s</string>
             <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
             <string name="toast_action_not_allowed">این عمل ممنوع است</string>
             <string name="server_obfs_password">رمز عبور obfs</string>
@@ -137,12 +136,12 @@
 
     <!-- UserAssetActivity -->
             <string name="toast_asset_copy_failed">کپی فایل شکست خورد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
-            <string name="menu_item_add_asset">افزودن منبع</string>
+            <string name="acc_add_asset">افزودن منبع</string>
             <string name="menu_item_add_file">افزودن فایل ‌ها</string>
             <string name="menu_item_add_url">افزودن لینک</string>
             <string name="menu_item_scan_qrcode">اسکن QRcode</string>
             <string name="title_url">URL</string>
-            <string name="menu_item_download_file">دانلود فایل‌ ها</string>
+            <string name="acc_download_file">دانلود فایل‌ ها</string>
             <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
             <string name="msg_file_not_found">فایل پیدا نشد</string>
             <string name="msg_remark_is_duplicate">این نام از قبل وجود دارد</string>
@@ -185,8 +184,8 @@
             <string name="title_mux_settings">تنظیمات MUX</string>
             <string name="title_pref_mux_enabled">فعال کردن MUX</string>
             <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید.</string> <!-- Translators: the current setting no longer states a default pool of 8 TCP connections; describe only the unstable-connectivity warning and the TCP/UDP/QUIC controls below. -->
-            <string name="title_pref_mux_concurency">اتصالات TCP (محدوده -1 تا 1024)</string>
-            <string name="title_pref_mux_xudp_concurency">اتصالات XUDP (محدوده -1 تا 1024)</string>
+            <string name="title_pref_mux_concurrency">اتصالات TCP (محدوده -1 تا 1024)</string>
+            <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP (محدوده -1 تا 1024)</string>
             <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل MUX</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رد کردن</item>
@@ -277,7 +276,7 @@
             <string name="summary_pref_tg_group">عضویت در گروه تلگرام</string>
             <string name="toast_tg_app_not_found">برنامه تلگرام پیدا نشد</string>
             <string name="title_privacy_policy">حریم خصوصی</string>
-            <string name="title_qr_code">QR code</string>
+            <string name="acc_qr_code">QR code</string>
             <string name="title_about">درباره</string>
             <string name="title_source_code">کد منبع</string>
             <string name="title_oss_license">مجوز های منبع باز</string>
@@ -308,8 +307,8 @@
             <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
 
             <string name="title_logcat">گزارشات</string>
-            <string name="logcat_copy">کپی</string>
-            <string name="logcat_clear">پاک کردن</string>
+            <string name="acc_copy_log">کپی</string>
+            <string name="acc_clear_log">پاک کردن</string>
             <string name="logcat_share">اشتراک‌گذاری گزارش</string>
             <string name="title_service_restart">راه‌اندازی مجدد خدمات</string>
             <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
@@ -358,7 +357,7 @@
             <string name="routing_settings_save">ذخیره</string>
             <string name="routing_settings_delete">حذف</string>
             <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>
-            <string name="routing_settings_add_rule">اضافه کردن قانون</string>
+            <string name="acc_add_rule">اضافه کردن قانون</string>
             <string name="routing_settings_import_predefined_rulesets">وارد کردن مجموعه قوانین از پیش تعریف شده</string>
             <string name="routing_settings_import_rulesets_tip">مجموعه قوانین موجود حذف خواهند شد، آیا مطمئن هستید که ادامه می دهید؟</string>
             <string name="routing_settings_import_rulesets_from_clipboard">وارد کردن مجموعه قوانین از کلیپ بورد</string>
@@ -385,7 +384,7 @@
             <string name="connection_test_error_status_code">کد خطا: #%d</string>
             <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
             <string name="connection_not_connected">متصل نیست</string>
-            <string name="connection_runing_task_left">تعداد وظایف آزمایشی در حال اجرا: %s</string>
+            <string name="connection_running_task_left">تعداد وظایف آزمایشی در حال اجرا: %s</string>
 
             <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
             <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
@@ -442,6 +441,48 @@
             <string name="action_edit">ویرایش</string>
             <string name="action_delete">حذف</string>
             <string name="action_close">بستن</string>
+
+            <string name="core_error_no_server_selected">No server selected</string>
+            <string name="core_error_decode_server_config">Failed to decode server config</string>
+            <string name="core_error_build_config_context">Failed to build config context</string>
+            <string name="core_error_get_config">Failed to get V2Ray config</string>
+            <string name="core_error_get_config_detail">Failed to get V2Ray config: %1$s</string>
+            <string name="core_error_get_speedtest_config_detail">Failed to get V2Ray config for speed test: %1$s</string>
+            <string name="core_error_custom_config_empty">Custom config is empty</string>
+            <string name="core_error_start">Core failed to start</string>
+
+            <string name="acc_start">Start</string>
+            <string name="acc_stop">Stop</string>
+            <string name="acc_back">Back</string>
+            <string name="acc_search">جستجو</string>
+            <string name="acc_add">Add</string>
+            <string name="acc_more">More</string>
+            <string name="acc_share_subscription">Share subscription</string>
+            <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
+            <string name="acc_remove">Remove</string>
+            <string name="acc_add_member">Add member</string>
+            <string name="acc_start_scanner">Start scanner</string>
+            <string name="acc_stop_scanner">Stop scanner</string>
+            <string name="acc_turn_torch_on">Turn torch on</string>
+            <string name="acc_turn_torch_off">Turn torch off</string>
+            <string name="acc_select_image">Select image</string>
+            <string name="acc_locked">Locked</string>
+            <string name="acc_open_menu">Open menu</string>
+            <string name="acc_edit">ویرایش</string>
+            <string name="acc_delete">حذف</string>
+            <string name="acc_save">ذخیره</string>
+            <string name="acc_update_subscriptions">Update subscriptions</string>
+            <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+            <string name="permission_camera">Camera</string>
+            <string name="permission_notification">Notification</string>
+            <string name="permission_local_network">Local network</string>
+            <string name="profile_protocol_insecure">%1$s insecure</string>
+            <string name="subscription_update_updating">Updating %1$s</string>
+            <string name="subscription_update_progress">%1$s in %2$s</string>
+            <string name="tasker_blurb_start">Start %1$s</string>
+            <string name="tasker_blurb_stop">Stop %1$s</string>
+            <string name="connection_test_empty_message">empty message</string>
+            <string name="value_unknown">unknown</string>
 
     <string-array name="share_sub_method">
         <item>QRcode</item>

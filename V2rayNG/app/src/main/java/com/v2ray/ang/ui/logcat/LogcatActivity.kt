@@ -159,20 +159,20 @@ fun LogcatScreen(
                         IconButton(onClick = { showSearch = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_search_24dp),
-                                contentDescription = "filter"
+                                contentDescription = stringResource(R.string.acc_search)
                             )
                         }
                     }
                     IconButton(onClick = { viewModel.copyLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_copy),
-                            contentDescription = stringResource(R.string.logcat_copy)
+                            contentDescription = stringResource(R.string.acc_copy_log)
                         )
                     }
                     IconButton(onClick = { onShareLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
-                            contentDescription = stringResource(R.string.logcat_share)
+                            contentDescription = stringResource(R.string.acc_share_log)
                         )
                     }
                     IconButton(onClick = {
@@ -180,7 +180,7 @@ fun LogcatScreen(
                     }) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
-                            contentDescription = stringResource(R.string.logcat_clear)
+                            contentDescription = stringResource(R.string.acc_clear_log)
                         )
                     }
                 }
@@ -192,7 +192,7 @@ fun LogcatScreen(
             }) {
                 Icon(
                     painterResource(R.drawable.ic_restore_24dp),
-                    contentDescription = stringResource(R.string.pull_down_to_refresh)
+                    contentDescription = stringResource(R.string.acc_refresh)
                 )
             }
         }

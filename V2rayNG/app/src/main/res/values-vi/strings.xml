@@ -9,12 +9,13 @@
             <string name="migration_success">Đã chuyển dữ liệu!</string>
             <string name="action_stop_service">Stop service</string>
             <string name="migration_fail">Không thể chuyển dữ liệu!</string>
-            <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+            <string name="acc_refresh">Refresh</string>
 
     <!-- Notifications -->
             <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
             <string name="toast_permission_denied">Vui lòng cấp quyền cần thiết cho v2rayNG! Bạn đã từ chối các quyền cần thiết như Camera hay Bộ nhớ?</string>
             <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
+            <string name="toast_permission_denied_for">Unable to obtain permission: %1$s</string>
             <string name="notification_action_more">Nhấn để biết thêm...</string>
             <string name="toast_services_start">Đang khởi động v2rayNG...</string>
             <string name="toast_services_stop">Đã dừng v2rayNG!</string>
@@ -23,10 +24,8 @@
 
     <!--ServerActivity-->
             <string name="title_server">v2rayNG</string>
-            <string name="menu_item_add_config">Thêm cấu hình</string>
+            <string name="acc_add_subscription">Add subscription</string>
             <string name="menu_item_save_config">Lưu cấu hình</string>
-            <string name="menu_item_edit_config">Edit configuration</string>
-            <string name="menu_item_del_config">Xoá cấu hình</string>
             <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
             <string name="menu_item_import_config_clipboard">Nhập cấu hình từ Clipboard</string>
             <string name="menu_item_import_config_local">Import config from locally</string>
@@ -114,7 +113,7 @@
             <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
             <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
             <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
-            <string name="toast_malformed_josn">Cấu hình không hợp lệ!</string>
+            <string name="toast_malformed_json_detail">Cấu hình không hợp lệ!: %1$s</string>
             <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
             <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
             <string name="server_obfs_password">Obfs password</string>
@@ -137,12 +136,12 @@
 
     <!-- UserAssetActivity -->
             <string name="toast_asset_copy_failed">Không thể sao chép tệp tin, hãy dùng trình quản lý tệp!</string>
-            <string name="menu_item_add_asset">Thêm vào</string>
+            <string name="acc_add_asset">Thêm vào</string>
             <string name="menu_item_add_file">Thêm tệp</string>
             <string name="menu_item_add_url">Thêm liên kết</string>
             <string name="menu_item_scan_qrcode">Quét mã QR</string>
             <string name="title_url">URL</string>
-            <string name="menu_item_download_file">Tải xuống tệp tin</string>
+            <string name="acc_download_file">Tải xuống tệp tin</string>
             <string name="title_user_asset_add_url">Thêm URL nội dung</string>
             <string name="msg_file_not_found">Không tìm thấy tập tin!</string>
             <string name="msg_remark_is_duplicate">Nhận xét đã tồn tại!</string>
@@ -185,8 +184,8 @@
             <string name="title_mux_settings">Cài đặt Mux</string>
             <string name="title_pref_mux_enabled">Bật Mux</string>
             <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn bên dưới.</string> <!-- Translators: the source warns that connectivity may become unstable, but it does not recommend disabling Mux; remove the extra recommendation. -->
-            <string name="title_pref_mux_concurency">Số lượng liên kết con tái sử dụng TCP (-1 đến 1024)</string>
-            <string name="title_pref_mux_xudp_concurency">Số lượng liên kết con tái sử dụng XUDP (-1 đến 1024)</string>
+            <string name="title_pref_mux_concurrency">Số lượng liên kết con tái sử dụng TCP (-1 đến 1024)</string>
+            <string name="title_pref_mux_xudp_concurrency">Số lượng liên kết con tái sử dụng XUDP (-1 đến 1024)</string>
             <string name="title_pref_mux_xudp_quic">Phương pháp xử lý lưu lượng QUIC</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
@@ -277,7 +276,7 @@
             <string name="summary_pref_tg_group">Tham gia nhóm Telegram</string>
             <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram!</string>
             <string name="title_privacy_policy">Chính sách bảo mật</string>
-            <string name="title_qr_code">Mã QR</string>
+            <string name="acc_qr_code">Mã QR</string>
             <string name="title_about">Giới thiệu</string>
             <string name="title_source_code">Mã nguồn</string>
             <string name="title_oss_license">Open Source licenses</string>
@@ -308,8 +307,8 @@
             <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
 
             <string name="title_logcat">Logcat</string>
-            <string name="logcat_copy">Sao chép</string>
-            <string name="logcat_clear">Xoá</string>
+            <string name="acc_copy_log">Sao chép</string>
+            <string name="acc_clear_log">Xoá</string>
             <string name="logcat_share">Chia sẻ nhật ký</string>
             <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
             <string name="title_del_all_config">Xoá tất cả cấu hình</string>
@@ -358,7 +357,7 @@
             <string name="routing_settings_save">Lưu lại</string>
             <string name="routing_settings_delete">Xoá</string>
             <string name="routing_settings_rule_title">Routing Rule Settings</string>
-            <string name="routing_settings_add_rule">Add rule</string>
+            <string name="acc_add_rule">Add rule</string>
             <string name="routing_settings_import_predefined_rulesets">Nhập các bộ quy tắc được xác định trước</string>
             <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
             <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
@@ -385,7 +384,7 @@
             <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
             <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>
             <string name="connection_not_connected">Chưa kết nối</string>
-            <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+            <string name="connection_running_task_left">Number of running test tasks: %s</string>
 
             <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
             <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
@@ -442,6 +441,48 @@
             <string name="action_edit">Chỉnh sửa</string>
             <string name="action_delete">Xoá</string>
             <string name="action_close">Đóng</string>
+
+            <string name="core_error_no_server_selected">No server selected</string>
+            <string name="core_error_decode_server_config">Failed to decode server config</string>
+            <string name="core_error_build_config_context">Failed to build config context</string>
+            <string name="core_error_get_config">Failed to get V2Ray config</string>
+            <string name="core_error_get_config_detail">Failed to get V2Ray config: %1$s</string>
+            <string name="core_error_get_speedtest_config_detail">Failed to get V2Ray config for speed test: %1$s</string>
+            <string name="core_error_custom_config_empty">Custom config is empty</string>
+            <string name="core_error_start">Core failed to start</string>
+
+            <string name="acc_start">Start</string>
+            <string name="acc_stop">Stop</string>
+            <string name="acc_back">Back</string>
+            <string name="acc_search">Tìm kiếm</string>
+            <string name="acc_add">Add</string>
+            <string name="acc_more">More</string>
+            <string name="acc_share_subscription">Share subscription</string>
+            <string name="acc_share_log">Chia sẻ nhật ký</string>
+            <string name="acc_remove">Remove</string>
+            <string name="acc_add_member">Add member</string>
+            <string name="acc_start_scanner">Start scanner</string>
+            <string name="acc_stop_scanner">Stop scanner</string>
+            <string name="acc_turn_torch_on">Turn torch on</string>
+            <string name="acc_turn_torch_off">Turn torch off</string>
+            <string name="acc_select_image">Select image</string>
+            <string name="acc_locked">Locked</string>
+            <string name="acc_open_menu">Open menu</string>
+            <string name="acc_edit">Chỉnh sửa</string>
+            <string name="acc_delete">Xoá</string>
+            <string name="acc_save">Lưu lại</string>
+            <string name="acc_update_subscriptions">Update subscriptions</string>
+            <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+            <string name="permission_camera">Camera</string>
+            <string name="permission_notification">Notification</string>
+            <string name="permission_local_network">Local network</string>
+            <string name="profile_protocol_insecure">%1$s insecure</string>
+            <string name="subscription_update_updating">Updating %1$s</string>
+            <string name="subscription_update_progress">%1$s in %2$s</string>
+            <string name="tasker_blurb_start">Start %1$s</string>
+            <string name="tasker_blurb_stop">Stop %1$s</string>
+            <string name="connection_test_empty_message">empty message</string>
+            <string name="value_unknown">unknown</string>
 
     <string-array name="share_sub_method">
         <item>Xuất gói ra mã QR (Chụp màn hình để lưu)</item>

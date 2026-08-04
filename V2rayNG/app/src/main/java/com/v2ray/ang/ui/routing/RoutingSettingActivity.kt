@@ -212,7 +212,7 @@ fun RoutingSettingScreen(
                     IconButton(onClick = onAddRule) {
                         Icon(
                             painterResource(R.drawable.ic_add_24dp),
-                            contentDescription = stringResource(R.string.routing_settings_add_rule)
+                            contentDescription = stringResource(R.string.acc_add_rule)
                         )
                     }
                     Box {
@@ -335,7 +335,7 @@ private fun RoutingRulesetItem(
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         painter = painterResource(R.drawable.ic_lock_24dp),
-                        contentDescription = "Locked",
+                        contentDescription = stringResource(R.string.acc_locked),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -369,7 +369,7 @@ private fun RoutingRulesetItem(
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = "Edit"
+                    contentDescription = stringResource(R.string.acc_edit)
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))

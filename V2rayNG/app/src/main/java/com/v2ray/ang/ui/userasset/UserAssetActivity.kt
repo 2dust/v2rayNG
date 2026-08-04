@@ -275,7 +275,7 @@ fun UserAssetScreen(
                 actions = {
                     Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
                         IconButton(onClick = { showAddMenu = true }) {
-                            Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.menu_item_add_asset))
+                            Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_asset))
                         }
                         DropdownMenu(
                             expanded = showAddMenu,
@@ -299,7 +299,7 @@ fun UserAssetScreen(
                         }
                     }
                     IconButton(onClick = onDownloadClick) {
-                        Icon(painterResource(R.drawable.ic_cloud_download_24dp), contentDescription = stringResource(R.string.menu_item_download_file))
+                        Icon(painterResource(R.drawable.ic_cloud_download_24dp), contentDescription = stringResource(R.string.acc_download_file))
                     }
                 }
             )
@@ -399,7 +399,7 @@ private fun UserAssetItem(
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.menu_item_edit_config),
+                    contentDescription = stringResource(R.string.acc_edit),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -407,7 +407,7 @@ private fun UserAssetItem(
         IconButton(onClick = onDeleteClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = stringResource(R.string.menu_item_del_config),
+                contentDescription = stringResource(R.string.acc_delete),
                 modifier = Modifier.size(24.dp)
             )
         }

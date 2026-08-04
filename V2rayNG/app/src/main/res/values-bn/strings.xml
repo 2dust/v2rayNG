@@ -9,12 +9,13 @@
             <string name="migration_success">ডেটা স্থানান্তর সফল!</string>
             <string name="action_stop_service">Stop service</string>
             <string name="migration_fail">ডেটা স্থানান্তর ব্যর্থ!</string>
-            <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+            <string name="acc_refresh">Refresh</string>
 
     <!-- Notifications -->
             <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
             <string name="toast_permission_denied">অনুমতি পাওয়া যাচ্ছে না</string>
             <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
+            <string name="toast_permission_denied_for">Unable to obtain permission: %1$s</string>
             <string name="notification_action_more">আরও দেখতে ক্লিক করুন</string>
             <string name="toast_services_start">সার্ভিস শুরু করুন</string>
             <string name="toast_services_stop">সার্ভিস বন্ধ করুন</string>
@@ -23,10 +24,8 @@
 
     <!--ServerActivity-->
             <string name="title_server">কনফিগারেশন ফাইল</string>
-            <string name="menu_item_add_config">কনফিগারেশন যোগ করুন</string>
+            <string name="acc_add_subscription">Add subscription</string>
             <string name="menu_item_save_config">কনফিগারেশন সংরক্ষণ করুন</string>
-            <string name="menu_item_edit_config">Edit configuration</string>
-            <string name="menu_item_del_config">কনফিগারেশন মুছুন</string>
             <string name="menu_item_import_config_qrcode">QR কোড থেকে কনফিগারেশন আমদানি করুন</string>
             <string name="menu_item_import_config_clipboard">ক্লিপবোর্ড থেকে কনফিগারেশন আমদানি করুন</string>
             <string name="menu_item_import_config_local">Import config from locally</string>
@@ -77,8 +76,8 @@
             <string name="server_lab_path_kcp">kcp বীজ</string>
             <string name="server_lab_path_grpc">gRPC সেবার নাম</string>
             <string name="server_lab_stream_security">TLS</string>
-            <string name="server_lab_stream_fingerprint" translatable="false">ফিঙ্গারপ্রিন্ট</string>
-            <string name="server_lab_stream_alpn" translatable="false">Alpn</string>
+            <string name="server_lab_stream_fingerprint">ফিঙ্গারপ্রিন্ট</string>
+            <string name="server_lab_stream_alpn">Alpn</string>
             <string name="server_lab_allow_insecure">অনিরাপদ অনুমতি দিন</string>
             <string name="server_lab_sni">SNI</string>
             <string name="server_lab_address3">ঠিকানা</string>
@@ -89,12 +88,12 @@
             <string name="server_lab_security4">ব্যবহারকারী (ঐচ্ছিক)</string>
             <string name="server_lab_encryption">এনক্রিপশন</string>
             <string name="server_lab_flow">ফ্লো</string>
-            <string name="server_lab_public_key" translatable="false">পাবলিক কী</string>
+            <string name="server_lab_public_key">পাবলিক কী</string>
             <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
-            <string name="server_lab_short_id" translatable="false">শর্ট আইডি</string>
-            <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+            <string name="server_lab_short_id">শর্ট আইডি</string>
+            <string name="server_lab_spider_x">SpiderX</string>
             <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
-            <string name="server_lab_secret_key" translatable="false">সিক্রেট কী</string>
+            <string name="server_lab_secret_key">সিক্রেট কী</string>
             <string name="server_lab_reserved">সংরক্ষিত (ঐচ্ছিক)</string> <!-- Translators: this field accepts multiple WireGuard reserved-byte values separated by commas; keep the comma-separated instruction. -->
             <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
             <string name="server_lab_local_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1420)</string>
@@ -114,7 +113,7 @@
             <string name="toast_invalid_url">অবৈধ URL</string>
             <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
             <string name="server_lab_need_inbound">ইনবাউন্ড পোর্ট নিশ্চিত করুন সেটিংসের সাথে সামঞ্জস্যপূর্ণ</string>
-            <string name="toast_malformed_josn">কনফিগারেশন বিকৃত</string>
+            <string name="toast_malformed_json_detail">কনফিগারেশন বিকৃত: %1$s</string>
             <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>
             <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
             <string name="server_obfs_password">Obfs password</string>
@@ -137,12 +136,12 @@
 
     <!-- UserAssetActivity -->
             <string name="toast_asset_copy_failed">ফাইল কপি ব্যর্থ, অনুগ্রহ করে ফাইল ম্যানেজার ব্যবহার করুন</string>
-            <string name="menu_item_add_asset">অ্যাসেট যোগ করুন</string>
+            <string name="acc_add_asset">অ্যাসেট যোগ করুন</string>
             <string name="menu_item_add_file">ফাইল যোগ করুন</string>
             <string name="menu_item_add_url">URL যোগ করুন</string>
             <string name="menu_item_scan_qrcode">QR কোড স্ক্যান করুন</string>
-            <string name="title_url" translatable="false">URL</string>
-            <string name="menu_item_download_file">ফাইল ডাউনলোড করুন</string>
+            <string name="title_url">URL</string>
+            <string name="acc_download_file">ফাইল ডাউনলোড করুন</string>
             <string name="title_user_asset_add_url">অ্যাসেট URL যোগ করুন</string>
             <string name="msg_file_not_found">ফাইল খুঁজে পাওয়া যায়নি</string>
             <string name="msg_remark_is_duplicate">মন্তব্য ইতিমধ্যে বিদ্যমান</string>
@@ -185,8 +184,8 @@
             <string name="title_mux_settings">Mux সেটিংস</string>
             <string name="title_pref_mux_enabled">Mux সক্রিয় করুন</string>
             <string name="summary_pref_mux_enabled">দ্রুত, তবে এটি অস্থিতিশীল সংযোগ সৃষ্টি করতে পারে\nTCP, UDP এবং QUIC পরিচালনা কাস্টমাইজ করুন</string>
-            <string name="title_pref_mux_concurency">TCP সংযোগ (পরিসর -1 থেকে 1024)</string>
-            <string name="title_pref_mux_xudp_concurency">XUDP সংযোগ (পরিসর -1 থেকে 1024)</string>
+            <string name="title_pref_mux_concurrency">TCP সংযোগ (পরিসর -1 থেকে 1024)</string>
+            <string name="title_pref_mux_xudp_concurrency">XUDP সংযোগ (পরিসর -1 থেকে 1024)</string>
             <string name="title_pref_mux_xudp_quic">Mux টানেলে QUIC পরিচালনা</string>
     <string-array name="mux_xudp_quic_entries">
         <item>অস্বীকার করুন</item>
@@ -277,7 +276,7 @@
             <string name="summary_pref_tg_group">টেলিগ্রাম গ্রুপে যোগদান করুন</string>
             <string name="toast_tg_app_not_found">টেলিগ্রাম অ্যাপ পাওয়া যায়নি</string>
             <string name="title_privacy_policy">গোপনীয়তা নীতি</string>
-            <string name="title_qr_code">QR code</string>
+            <string name="acc_qr_code">QR code</string>
             <string name="title_about">সম্পর্কিত</string>
             <string name="title_source_code">সোর্স কোড</string>
             <string name="title_oss_license">Open Source licenses</string>
@@ -308,8 +307,8 @@
             <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
 
             <string name="title_logcat">লগক্যাট</string>
-            <string name="logcat_copy">কপি করুন</string>
-            <string name="logcat_clear">স্পষ্ট করুন</string>
+            <string name="acc_copy_log">কপি করুন</string>
+            <string name="acc_clear_log">স্পষ্ট করুন</string>
             <string name="logcat_share">লগ শেয়ার করুন</string>
             <string name="title_service_restart">সার্ভিস পুনরায় চালু করুন</string>
             <string name="title_del_all_config">সব কনফিগারেশন মুছে ফেলুন</string>
@@ -358,7 +357,7 @@
             <string name="routing_settings_save">সেভ করুন</string>
             <string name="routing_settings_delete">মুছে ফেলুন</string>
             <string name="routing_settings_rule_title">Routing Rule Settings</string>
-            <string name="routing_settings_add_rule">Add rule</string>
+            <string name="acc_add_rule">Add rule</string>
             <string name="routing_settings_import_predefined_rulesets">পূর্বনির্ধারিত নিয়মাবলী আমদানি করুন</string>
             <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
             <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
@@ -385,7 +384,7 @@
             <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
             <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
             <string name="connection_not_connected">সংযুক্ত নয়</string>
-            <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+            <string name="connection_running_task_left">Number of running test tasks: %s</string>
 
             <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
             <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>
@@ -442,6 +441,48 @@
             <string name="action_edit">সম্পাদনা</string>
             <string name="action_delete">মুছুন</string>
             <string name="action_close">বন্ধ করুন</string>
+
+            <string name="core_error_no_server_selected">No server selected</string>
+            <string name="core_error_decode_server_config">Failed to decode server config</string>
+            <string name="core_error_build_config_context">Failed to build config context</string>
+            <string name="core_error_get_config">Failed to get V2Ray config</string>
+            <string name="core_error_get_config_detail">Failed to get V2Ray config: %1$s</string>
+            <string name="core_error_get_speedtest_config_detail">Failed to get V2Ray config for speed test: %1$s</string>
+            <string name="core_error_custom_config_empty">Custom config is empty</string>
+            <string name="core_error_start">Core failed to start</string>
+
+            <string name="acc_start">Start</string>
+            <string name="acc_stop">Stop</string>
+            <string name="acc_back">Back</string>
+            <string name="acc_search">অনুসন্ধান করুন</string>
+            <string name="acc_add">Add</string>
+            <string name="acc_more">More</string>
+            <string name="acc_share_subscription">Share subscription</string>
+            <string name="acc_share_log">লগ শেয়ার করুন</string>
+            <string name="acc_remove">Remove</string>
+            <string name="acc_add_member">Add member</string>
+            <string name="acc_start_scanner">Start scanner</string>
+            <string name="acc_stop_scanner">Stop scanner</string>
+            <string name="acc_turn_torch_on">Turn torch on</string>
+            <string name="acc_turn_torch_off">Turn torch off</string>
+            <string name="acc_select_image">Select image</string>
+            <string name="acc_locked">Locked</string>
+            <string name="acc_open_menu">Open menu</string>
+            <string name="acc_edit">সম্পাদনা</string>
+            <string name="acc_delete">মুছুন</string>
+            <string name="acc_save">সেভ করুন</string>
+            <string name="acc_update_subscriptions">Update subscriptions</string>
+            <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+            <string name="permission_camera">Camera</string>
+            <string name="permission_notification">Notification</string>
+            <string name="permission_local_network">Local network</string>
+            <string name="profile_protocol_insecure">%1$s insecure</string>
+            <string name="subscription_update_updating">Updating %1$s</string>
+            <string name="subscription_update_progress">%1$s in %2$s</string>
+            <string name="tasker_blurb_start">Start %1$s</string>
+            <string name="tasker_blurb_stop">Stop %1$s</string>
+            <string name="connection_test_empty_message">empty message</string>
+            <string name="value_unknown">unknown</string>
 
     <string-array name="share_sub_method">
         <item>QR কোড</item>

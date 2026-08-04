@@ -9,12 +9,13 @@
             <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
             <string name="action_stop_service">Stop service</string>
             <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
-            <string name="pull_down_to_refresh">Please pull down to refresh!</string>
+            <string name="acc_refresh">Refresh</string>
 
     <!-- Notifications -->
             <string name="notification_action_stop_v2ray">إيقاف</string>
             <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
             <string name="toast_permission_denied_notification">Unable to obtain the notification permission</string>
+            <string name="toast_permission_denied_for">Unable to obtain permission: %1$s</string>
             <string name="notification_action_more">انقر للمزيد</string>
             <string name="toast_services_start">بدء الخدمات</string>
             <string name="toast_services_stop">إيقاف الخدمات</string>
@@ -23,10 +24,8 @@
 
     <!--ServerActivity-->
             <string name="title_server">ملف التكوين</string>
-            <string name="menu_item_add_config">إضافة تكوين</string>
+            <string name="acc_add_subscription">Add subscription</string>
             <string name="menu_item_save_config">حفظ التكوين</string>
-            <string name="menu_item_edit_config">Edit configuration</string>
-            <string name="menu_item_del_config">حذف التكوين</string>
             <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
             <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
             <string name="menu_item_import_config_local">Import config from locally</string>
@@ -77,8 +76,8 @@
             <string name="server_lab_path_kcp">kcp seed</string>
             <string name="server_lab_path_grpc">gRPC serviceName</string>
             <string name="server_lab_stream_security">TLS</string>
-            <string name="server_lab_stream_fingerprint" translatable="false">البصمة</string>
-            <string name="server_lab_stream_alpn" translatable="false">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
+            <string name="server_lab_stream_fingerprint">البصمة</string>
+            <string name="server_lab_stream_alpn">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
             <string name="server_lab_allow_insecure">السماح غير الآمن</string>
             <string name="server_lab_sni">SNI</string>
             <string name="server_lab_address3">العنوان</string>
@@ -89,12 +88,12 @@
             <string name="server_lab_security4">المستخدم (اختياري)</string>
             <string name="server_lab_encryption">التشفير</string>
             <string name="server_lab_flow">التدفق</string>
-            <string name="server_lab_public_key" translatable="false">المفتاح العام</string>
+            <string name="server_lab_public_key">المفتاح العام</string>
             <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
-            <string name="server_lab_short_id" translatable="false">المعرّف القصير</string>
-            <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+            <string name="server_lab_short_id">المعرّف القصير</string>
+            <string name="server_lab_spider_x">SpiderX</string>
             <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
-            <string name="server_lab_secret_key" translatable="false">المفتاح السري</string>
+            <string name="server_lab_secret_key">المفتاح السري</string>
             <string name="server_lab_reserved">محجوز (اختياري)</string> <!-- Translators: this field accepts multiple WireGuard reserved-byte values separated by commas; keep the comma-separated instruction. -->
             <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
             <string name="server_lab_local_mtu">Mtu (اختياري، الافتراضي 1420)</string>
@@ -114,7 +113,7 @@
             <string name="toast_invalid_url">رابط URL غير صالح</string>
             <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
             <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
-            <string name="toast_malformed_josn">تكوين مشوه</string>
+            <string name="toast_malformed_json_detail">تكوين مشوه: %1$s</string>
             <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
             <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
             <string name="server_obfs_password">Obfs password</string>
@@ -137,12 +136,12 @@
 
     <!-- UserAssetActivity -->
             <string name="toast_asset_copy_failed">فشل نسخ الملف، يرجى استخدام مدير الملفات</string>
-            <string name="menu_item_add_asset">إضافة أصل</string>
+            <string name="acc_add_asset">إضافة أصل</string>
             <string name="menu_item_add_file">إضافة ملفات</string>
             <string name="menu_item_add_url">إضافة URL</string>
             <string name="menu_item_scan_qrcode">مسح رمز الاستجابة السريعة (QRcode)</string>
-            <string name="title_url" translatable="false">URL</string>
-            <string name="menu_item_download_file">تنزيل الملفات</string>
+            <string name="title_url">URL</string>
+            <string name="acc_download_file">تنزيل الملفات</string>
             <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
             <string name="msg_file_not_found">الملف غير موجود</string>
             <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
@@ -185,8 +184,8 @@
             <string name="title_mux_settings">إعدادات Mux</string>
             <string name="title_pref_mux_enabled">تمكين Mux</string>
             <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية التعامل مع TCP و UDP و QUIC أدناه</string>
-            <string name="title_pref_mux_concurency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
-            <string name="title_pref_mux_xudp_concurency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
+            <string name="title_pref_mux_concurrency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
+            <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
             <string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق mux</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رفض</item>
@@ -277,7 +276,7 @@
             <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
             <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
             <string name="title_privacy_policy">سياسة الخصوصية</string>
-            <string name="title_qr_code">QR code</string>
+            <string name="acc_qr_code">QR code</string>
             <string name="title_about">حول\nترجمة م. ابراهيم قاسم</string>
             <string name="title_source_code">الكود المصدري</string>
             <string name="title_oss_license">Open Source licenses</string>
@@ -308,8 +307,8 @@
             <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
 
             <string name="title_logcat">Logcat</string>
-            <string name="logcat_copy">نسخ</string>
-            <string name="logcat_clear">مسح</string>
+            <string name="acc_copy_log">نسخ</string>
+            <string name="acc_clear_log">مسح</string>
             <string name="logcat_share">مشاركة السجل</string>
             <string name="title_service_restart">إعادة تشغيل الخدمة</string>
             <string name="title_del_all_config">حذف جميع الإعدادات (قبل أول خطوة)</string> <!-- Translators: this is a standalone menu action, not a numbered workflow step; remove the "before first step" instruction. -->
@@ -358,7 +357,7 @@
             <string name="routing_settings_save">حفظ</string>
             <string name="routing_settings_delete">مسح</string>
             <string name="routing_settings_rule_title">Routing Rule Settings</string>
-            <string name="routing_settings_add_rule">Add rule</string>
+            <string name="acc_add_rule">Add rule</string>
             <string name="routing_settings_import_predefined_rulesets">استيراد مجموعات قواعد محددة مسبقاً</string>
             <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted, are you sure to continue?</string>
             <string name="routing_settings_import_rulesets_from_clipboard">Import ruleset from clipboard</string>
@@ -385,7 +384,7 @@
             <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
             <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
             <string name="connection_not_connected">غير متصل</string>
-            <string name="connection_runing_task_left">Number of running test tasks: %s</string>
+            <string name="connection_running_task_left">Number of running test tasks: %s</string>
 
             <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
             <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
@@ -442,6 +441,48 @@
             <string name="action_edit">تعديل</string>
             <string name="action_delete">حذف</string>
             <string name="action_close">إغلاق</string>
+
+            <string name="core_error_no_server_selected">No server selected</string>
+            <string name="core_error_decode_server_config">Failed to decode server config</string>
+            <string name="core_error_build_config_context">Failed to build config context</string>
+            <string name="core_error_get_config">Failed to get V2Ray config</string>
+            <string name="core_error_get_config_detail">Failed to get V2Ray config: %1$s</string>
+            <string name="core_error_get_speedtest_config_detail">Failed to get V2Ray config for speed test: %1$s</string>
+            <string name="core_error_custom_config_empty">Custom config is empty</string>
+            <string name="core_error_start">Core failed to start</string>
+
+            <string name="acc_start">Start</string>
+            <string name="acc_stop">Stop</string>
+            <string name="acc_back">Back</string>
+            <string name="acc_search">بحث</string>
+            <string name="acc_add">Add</string>
+            <string name="acc_more">More</string>
+            <string name="acc_share_subscription">Share subscription</string>
+            <string name="acc_share_log">مشاركة السجل</string>
+            <string name="acc_remove">Remove</string>
+            <string name="acc_add_member">Add member</string>
+            <string name="acc_start_scanner">Start scanner</string>
+            <string name="acc_stop_scanner">Stop scanner</string>
+            <string name="acc_turn_torch_on">Turn torch on</string>
+            <string name="acc_turn_torch_off">Turn torch off</string>
+            <string name="acc_select_image">Select image</string>
+            <string name="acc_locked">Locked</string>
+            <string name="acc_open_menu">Open menu</string>
+            <string name="acc_edit">تعديل</string>
+            <string name="acc_delete">حذف</string>
+            <string name="acc_save">حفظ</string>
+            <string name="acc_update_subscriptions">Update subscriptions</string>
+            <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+            <string name="permission_camera">Camera</string>
+            <string name="permission_notification">Notification</string>
+            <string name="permission_local_network">Local network</string>
+            <string name="profile_protocol_insecure">%1$s insecure</string>
+            <string name="subscription_update_updating">Updating %1$s</string>
+            <string name="subscription_update_progress">%1$s in %2$s</string>
+            <string name="tasker_blurb_start">Start %1$s</string>
+            <string name="tasker_blurb_stop">Stop %1$s</string>
+            <string name="connection_test_empty_message">empty message</string>
+            <string name="value_unknown">unknown</string>
 
     <string-array name="share_sub_method">
         <item>رمز استجابة سريعة (QRcode)</item>

@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
@@ -75,7 +76,9 @@ fun MainBottomBar(
             Icon(
                 painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
                 else painterResource(R.drawable.ic_play_24dp),
-                contentDescription = if (isRunning) "Stop" else "Start",
+                contentDescription = stringResource(
+                    if (isRunning) R.string.acc_stop else R.string.acc_start
+                ),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )

@@ -2,6 +2,7 @@ package com.v2ray.ang.service
 
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -14,12 +15,21 @@ import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.MyContextWrapper
 import java.util.Collections
 
 class CoreTestService : Service() {
+
+    override fun attachBaseContext(newBase: Context?) {
+        val context = newBase?.let {
+            MyContextWrapper.wrap(it, SettingsManager.getLocale())
+        }
+        super.attachBaseContext(context)
+    }
 
     // manage active batch workers so each batch is independent and cancellable
     private val activeWorkers = Collections.synchronizedList(mutableListOf<RealPingWorkerService>())
@@ -134,7 +144,7 @@ class CoreTestService : Service() {
                     channelType = NotificationChannelType.CORE_TEST,
                     context = this,
                     title = getString(R.string.app_name),
-                    content = getString(R.string.connection_runing_task_left, event.text)
+                    content = getString(R.string.connection_running_task_left, event.text)
                 )
                 MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, event.text)
             }
