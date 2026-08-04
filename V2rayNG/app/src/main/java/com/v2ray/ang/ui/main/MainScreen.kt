@@ -1,6 +1,13 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,11 +22,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,6 +77,16 @@ fun MainScreen(
         if (importError != null) {
             delay(4000)
             mainViewModel.importError.value = null
+        }
+    }
+
+    // Крутится, пока служба не отчиталась о новом состоянии (или об ошибке запуска)
+    var isConnecting by remember { mutableStateOf(false) }
+    LaunchedEffect(uiState.isRunning, uiState.statusText) { isConnecting = false }
+    LaunchedEffect(isConnecting) {
+        if (isConnecting) {
+            delay(20000)
+            isConnecting = false
         }
     }
 
@@ -134,75 +153,16 @@ fun MainScreen(
                     }
                 }
 
-                // Компактная центральная кнопка
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 0.dp, bottom = 8.dp), 
-                    contentAlignment = Alignment.Center
-                ) {
-                    val isConnected = uiState.isRunning
-                    // ДИНАМИЧЕСКИЕ ЦВЕТА КНОПКИ: Primary для активности, Outline для неактивности
-                    val primaryColor = if (isConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-                    val glowColor = if (isConnected) primaryColor.copy(alpha = 0.3f) else Color.Transparent
-                    val textColor = MaterialTheme.colorScheme.onSurfaceVariant // Текст подстраивается под фон
-
-                    Box(
-                        modifier = Modifier
-                            .size(170.dp)
-                            .background(
-                                brush = Brush.radialGradient(colors = listOf(glowColor, Color.Transparent)),
-                                shape = CircleShape
-                            )
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .size(130.dp)
-                            .border(
-                                width = 1.dp,
-                                color = if (isConnected) primaryColor.copy(alpha = 0.3f) else MaterialTheme.colorScheme.outlineVariant,
-                                shape = CircleShape
-                            )
-                    )
-
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surface, // ДИНАМИЧЕСКИЙ ФОН КНОПКИ (белый или черный)
-                        shadowElevation = 8.dp,
-                        modifier = Modifier
-                            .size(110.dp)
-                            .clickable { onAction(MainAction.ToggleService) }
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            PowerIcon(
-                                color = primaryColor,
-                                modifier = Modifier.size(28.dp)
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = if (isConnected) "ПОДКЛЮЧЕН" else "ОТКЛЮЧЕН",
-                                color = textColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = 0.5.sp
-                            )
-                            if (isConnected) {
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = timeString,
-                                    color = MaterialTheme.colorScheme.onSurface, // ДИНАМИЧЕСКИЙ ЦВЕТ ТАЙМЕРА
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Black
-                                )
-                            }
-                        }
+                // Центральная кнопка
+                PowerButton(
+                    isConnected = uiState.isRunning,
+                    isConnecting = isConnecting,
+                    timeString = timeString,
+                    onClick = {
+                        isConnecting = true
+                        onAction(MainAction.ToggleService)
                     }
-                }
+                )
 
                 Row(
                     modifier = Modifier
@@ -355,6 +315,146 @@ private fun TopProgressBanner(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Крупная круглая кнопка подключения: заливка и свечение берутся из темы,
+ * при подключении по кругу бежит дуга, таймер появляется плавно.
+ */
+@Composable
+private fun PowerButton(
+    isConnected: Boolean,
+    isConnecting: Boolean,
+    timeString: String,
+    onClick: () -> Unit
+) {
+    val scheme = MaterialTheme.colorScheme
+    val accent = if (isConnected) scheme.primary else scheme.outline
+
+    // Свечение и обводка дышат при подключении и при активном соединении
+    val transition = rememberInfiniteTransition(label = "power")
+    val sweepAngle by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing)),
+        label = "sweep"
+    )
+    val pulse by transition.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(tween(1400, easing = LinearEasing), RepeatMode.Reverse),
+        label = "pulse"
+    )
+
+    val glowAlpha by animateFloatAsState(
+        targetValue = if (isConnected) 0.22f else 0f,
+        animationSpec = tween(500),
+        label = "glow"
+    )
+    val ringColor by animateColorAsState(
+        targetValue = if (isConnected) scheme.primary.copy(alpha = 0.35f) else scheme.outlineVariant,
+        animationSpec = tween(500),
+        label = "ring"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // Свечение вокруг кнопки
+        Box(
+            modifier = Modifier
+                .size(230.dp)
+                .scale(if (isConnecting) pulse else 1f)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(scheme.primary.copy(alpha = glowAlpha), Color.Transparent)
+                    ),
+                    shape = CircleShape
+                )
+        )
+
+        // Внешнее кольцо, по нему же бежит дуга подключения
+        Canvas(modifier = Modifier.size(190.dp)) {
+            drawCircle(color = ringColor, style = Stroke(width = 2f))
+            if (isConnecting) {
+                rotate(sweepAngle) {
+                    drawArc(
+                        color = accent,
+                        startAngle = 0f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        style = Stroke(width = 6f, cap = StrokeCap.Round)
+                    )
+                }
+            }
+        }
+
+        // Сама кнопка: радиальная заливка из цветов темы, без чужого фона
+        Box(
+            modifier = Modifier
+                .size(150.dp)
+                .shadow(elevation = if (isConnected) 12.dp else 4.dp, shape = CircleShape)
+                .clip(CircleShape)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = if (isConnected) {
+                            listOf(
+                                scheme.primary.copy(alpha = 0.35f),
+                                scheme.primary.copy(alpha = 0.10f),
+                                scheme.surface
+                            )
+                        } else {
+                            listOf(scheme.surfaceContainerHigh, scheme.surface)
+                        }
+                    )
+                )
+                .border(width = 1.dp, color = accent.copy(alpha = 0.45f), shape = CircleShape)
+                .clickable { onClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                PowerIcon(
+                    color = if (isConnected) scheme.primary else scheme.onSurfaceVariant,
+                    modifier = Modifier.size(34.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = when {
+                        isConnecting && !isConnected -> "ПОДКЛЮЧЕНИЕ"
+                        isConnecting && isConnected -> "ОТКЛЮЧЕНИЕ"
+                        isConnected -> "ПОДКЛЮЧЕН"
+                        else -> "ОТКЛЮЧЕН"
+                    },
+                    color = scheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 0.8.sp
+                )
+                AnimatedVisibility(
+                    visible = isConnected,
+                    enter = fadeIn(tween(400)) + expandVertically(tween(400)),
+                    exit = fadeOut(tween(200)) + shrinkVertically(tween(200))
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = timeString,
+                            color = scheme.onSurface,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 1.sp
+                        )
+                    }
+                }
             }
         }
     }

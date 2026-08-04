@@ -338,12 +338,17 @@ fun ProfileCard(
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.Transparent
+                    // Отдельная плашка на каждый сервер, выделенная чуть светлее
+                    containerColor = if (isSelected) {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.35f)
+                    }
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 1.dp)
+                    .padding(vertical = 3.dp)
                     .clickable { onSelectServer(serverCache.guid) }
             ) {
                 Row(
@@ -351,7 +356,7 @@ fun ProfileCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(IntrinsicSize.Min)
-                        .padding(vertical = 6.dp, horizontal = 8.dp)
+                        .padding(vertical = 10.dp, horizontal = 8.dp)
                 ) {
                     if (isSelected) {
                         Box(
@@ -365,35 +370,37 @@ fun ProfileCard(
                         Spacer(Modifier.width(4.dp))
                     }
                     Spacer(Modifier.width(8.dp))
-                    
+
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(10.dp)),
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest, RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         WireframeGlobe(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
-                            modifier = Modifier.size(20.dp)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
-                    
+
                     Spacer(Modifier.width(12.dp))
-                    
+
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = serverCache.profile.remarks ?: "Без названия", 
-                            fontWeight = FontWeight.ExtraBold, 
-                            fontSize = 15.sp, 
+                            text = serverCache.profile.remarks ?: "Без названия",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.height(2.dp))
                         Text(
-                            text = finalDesc, 
-                            fontSize = 9.sp, 
-                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                            text = finalDesc,
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
