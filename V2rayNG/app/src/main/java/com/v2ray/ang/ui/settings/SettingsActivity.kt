@@ -4,12 +4,20 @@ import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,6 +70,9 @@ class SettingsActivity : BaseComponentActivity() {
     }
 }
 
+/** Duration of the slide between the category list and a category screen. */
+private const val SCREEN_TRANSITION_MS = 220
+
 /**
  * A single settings category, opened as its own screen from the settings root.
  */
@@ -112,6 +123,9 @@ fun SettingsScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
+    // Hoisted so the category list keeps its scroll position while a category is open
+    val categoryListScrollState = rememberScrollState()
+
     // Saved as a name so the open category survives configuration changes
     var openCategoryName by rememberSaveable { mutableStateOf<String?>(null) }
     val openCategory = openCategoryName?.let { name ->
@@ -132,20 +146,40 @@ fun SettingsScreen(
             )
         }
     ) { innerPadding ->
-        val modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        AnimatedContent(
+            targetState = openCategory,
+            transitionSpec = {
+                // Opening a category slides forward, going back slides the other way
+                val forward = initialState == null
+                val offset = { width: Int -> if (forward) width else -width }
 
-        when (openCategory) {
-            null -> SettingsCategoryList(modifier) { openCategoryName = it.name }
-            SettingsCategory.UI -> UiSettings(modifier)
-            SettingsCategory.MODE -> ModeSettings(modifier, viewModel, onModeHelpClicked)
-            SettingsCategory.VPN_TUNNEL -> VpnSettings(modifier)
-            SettingsCategory.CORE -> CoreSettings(modifier)
-            SettingsCategory.MUX -> MuxSettings(modifier)
-            SettingsCategory.FRAGMENT -> FragmentSettings(modifier)
-            SettingsCategory.OBSERVATORY -> ObservatorySettings(modifier, viewModel)
-            SettingsCategory.ADVANCED -> AdvancedSettings(modifier)
+                (slideInHorizontally(animationSpec = tween(SCREEN_TRANSITION_MS)) { offset(it) } +
+                        fadeIn(animationSpec = tween(SCREEN_TRANSITION_MS)))
+                    .togetherWith(
+                        slideOutHorizontally(animationSpec = tween(SCREEN_TRANSITION_MS)) { -offset(it) / 4 } +
+                                fadeOut(animationSpec = tween(SCREEN_TRANSITION_MS))
+                    )
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            label = "settingsScreen"
+        ) { category ->
+            val modifier = Modifier.fillMaxSize()
+
+            when (category) {
+                null -> SettingsCategoryList(modifier, categoryListScrollState) {
+                    openCategoryName = it.name
+                }
+                SettingsCategory.UI -> UiSettings(modifier)
+                SettingsCategory.MODE -> ModeSettings(modifier, viewModel, onModeHelpClicked)
+                SettingsCategory.VPN_TUNNEL -> VpnSettings(modifier)
+                SettingsCategory.CORE -> CoreSettings(modifier)
+                SettingsCategory.MUX -> MuxSettings(modifier)
+                SettingsCategory.FRAGMENT -> FragmentSettings(modifier)
+                SettingsCategory.OBSERVATORY -> ObservatorySettings(modifier, viewModel)
+                SettingsCategory.ADVANCED -> AdvancedSettings(modifier)
+            }
         }
     }
 }
@@ -156,9 +190,9 @@ fun SettingsScreen(
 @Composable
 private fun SettingsColumn(
     modifier: Modifier,
+    scrollState: ScrollState = rememberScrollState(),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .verticalScrollbar(scrollState)
@@ -172,9 +206,10 @@ private fun SettingsColumn(
 @Composable
 private fun SettingsCategoryList(
     modifier: Modifier,
+    scrollState: ScrollState,
     onCategoryClick: (SettingsCategory) -> Unit
 ) {
-    SettingsColumn(modifier) {
+    SettingsColumn(modifier, scrollState) {
         settingsSections.forEach { section ->
             PreferenceGroupHeader(title = stringResource(section.titleRes))
             section.categories.forEach { category ->

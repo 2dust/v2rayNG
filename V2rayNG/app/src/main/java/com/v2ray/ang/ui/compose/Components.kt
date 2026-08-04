@@ -4,10 +4,15 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -82,7 +87,17 @@ fun AppTopBar(
                         placeholder = searchPlaceholder
                     )
                 } else {
-                    Text(text = title)
+                    // Fades when a screen swaps its title, stays put when it never changes
+                    AnimatedContent(
+                        targetState = title,
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(180))
+                                .togetherWith(fadeOut(animationSpec = tween(180)))
+                        },
+                        label = "topBarTitle"
+                    ) { titleText ->
+                        Text(text = titleText)
+                    }
                 }
             },
             navigationIcon = {
