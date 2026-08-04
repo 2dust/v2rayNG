@@ -35,6 +35,21 @@ object PingManager {
 
     const val FAILURE = -1L
 
+    /** Reason of the last failed measurement, for the UI to show after a run. */
+    @Volatile
+    private var lastError: String? = null
+
+    /**
+     * Takes the last failure reason, clearing it.
+     *
+     * @return The reason, or null when nothing failed since the last call.
+     */
+    fun consumeLastError(): String? {
+        val error = lastError
+        lastError = null
+        return error
+    }
+
     private const val TCP_TIMEOUT_MS = 1500
     private const val PRECHECK_TIMEOUT_MS = 3000
     private const val PROXY_TIMEOUT_MS = 10_000
@@ -86,22 +101,20 @@ object PingManager {
     /** The core does the GET itself, one instance per test, no listener involved. */
     private suspend fun proxyGetPing(context: Context, guid: String, profile: ProfileItem): Long {
         if (!tcpPrecheckPasses(context, guid, profile)) {
-            LogUtil.w(AppConfig.TAG, "Ping: ${profile.remarks} is not answering on TCP, skipping the request")
-            return FAILURE
+            return fail(profile, "no TCP answer from the server address")
         }
 
         val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
         if (!configResult.status) {
-            LogUtil.w(AppConfig.TAG, "Ping: no test config for ${profile.remarks}: ${configResult.errorMessage}")
-            return FAILURE
+            return fail(profile, configResult.errorMessage)
         }
 
-        val delay = withContext(Dispatchers.IO) {
-            CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        val url = SettingsManager.getDelayTestUrl()
+        val (delay, error) = withContext(Dispatchers.IO) {
+            CoreNativeManager.measureOutboundDelayDetailed(configResult.content, url)
         }
-        // The core logs the reason right before this, the profile name is what is missing there
         if (delay <= FAILURE) {
-            LogUtil.w(AppConfig.TAG, "Ping: GET through ${profile.remarks} failed, see the error above")
+            return fail(profile, error ?: "no answer from $url")
         }
         return delay
     }
@@ -111,23 +124,28 @@ object PingManager {
      * SOCKS listener and issues the request from here.
      */
     private suspend fun proxyHeadPing(context: Context, guid: String, profile: ProfileItem): Long {
-        if (!tcpPrecheckPasses(context, guid, profile)) return FAILURE
+        if (!tcpPrecheckPasses(context, guid, profile)) {
+            return fail(profile, "no TCP answer from the server address")
+        }
 
         val configResult = CoreConfigManager.getV2rayConfig4Speedtest(context, guid)
-        if (!configResult.status) return FAILURE
+        if (!configResult.status) {
+            return fail(profile, configResult.errorMessage)
+        }
 
         return withContext(Dispatchers.IO) {
             val port = Utils.findRandomFreePort()
-            val config = withSocksInbound(configResult.content, port) ?: return@withContext FAILURE
+            val config = withSocksInbound(configResult.content, port)
+                ?: return@withContext fail(profile, "test config is not valid json")
 
             CoreNativeManager.initCoreEnv(context.applicationContext)
             val controller = CoreNativeManager.newCoreController(PingCallback)
             try {
                 controller.startLoop(config, 0)
-                requestThroughSocks(port, SettingsManager.getDelayTestUrl(), head = true)
+                val (delay, error) = requestThroughSocks(port, SettingsManager.getDelayTestUrl(), head = true)
+                if (delay <= FAILURE) fail(profile, error) else delay
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Proxy HEAD ping failed", e)
-                FAILURE
+                fail(profile, e.message ?: e.javaClass.simpleName)
             } finally {
                 try {
                     controller.stopLoop()
@@ -139,18 +157,22 @@ object PingManager {
     }
 
     private suspend fun tcpPing(context: Context, guid: String, profile: ProfileItem): Long {
-        val (host, port) = serverAddress(context, guid, profile) ?: return FAILURE
-        return withContext(Dispatchers.IO) {
+        val (host, port) = serverAddress(context, guid, profile)
+            ?: return fail(profile, "no server address in the profile")
+
+        val delay = withContext(Dispatchers.IO) {
             SpeedtestManager.socketConnectTime(host, port, TCP_TIMEOUT_MS)
         }
+        return if (delay <= FAILURE) fail(profile, "$host:$port did not accept a connection") else delay
     }
 
     private suspend fun icmpPing(context: Context, guid: String, profile: ProfileItem): Long {
-        val (host, _) = serverAddress(context, guid, profile) ?: return FAILURE
+        val (host, _) = serverAddress(context, guid, profile)
+            ?: return fail(profile, "no server address in the profile")
         val command = if (host.contains(":")) "ping6" else "ping"
 
         // runInterruptible so the timeout can actually break the blocking read
-        return withTimeoutOrNull(ICMP_TIMEOUT_MS) {
+        val delay = withTimeoutOrNull(ICMP_TIMEOUT_MS) {
             runInterruptible(Dispatchers.IO) {
                 var process: Process? = null
                 try {
@@ -165,11 +187,27 @@ object PingManager {
                 }
             }
         } ?: FAILURE
+
+        return if (delay <= FAILURE) fail(profile, "$host is not answering ICMP") else delay
     }
 
     //endregion
 
     //region helpers
+
+    /**
+     * Records why a profile failed and reports it as a failure.
+     *
+     * @param profile The profile being measured.
+     * @param reason The reason, as reported by the core or by us.
+     * @return Always [FAILURE], so callers can `return fail(...)`.
+     */
+    private fun fail(profile: ProfileItem, reason: String?): Long {
+        val message = reason?.takeIf { it.isNotBlank() } ?: "unknown error"
+        lastError = message
+        LogUtil.w(AppConfig.TAG, "Ping failed for ${profile.remarks}: $message")
+        return FAILURE
+    }
 
     /**
      * Reads the round trip out of a `ping` report, e.g. "64 bytes from ...: time=12.3 ms".
@@ -236,9 +274,9 @@ object PingManager {
      * @param port The listener port.
      * @param url The test url.
      * @param head True to send HEAD instead of GET.
-     * @return The delay in milliseconds, or -1 when the request failed.
+     * @return The delay in milliseconds and null, or -1 and why the request failed.
      */
-    private fun requestThroughSocks(port: Int, url: String, head: Boolean): Long {
+    private fun requestThroughSocks(port: Int, url: String, head: Boolean): Pair<Long, String?> {
         val client = OkHttpClient.Builder()
             .proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(AppConfig.LOOPBACK, port)))
             .connectTimeout(PROXY_TIMEOUT_MS.toLong(), TimeUnit.MILLISECONDS)
@@ -256,13 +294,15 @@ object PingManager {
 
         return try {
             val start = SystemClock.elapsedRealtime()
-            client.newCall(request).execute().use { response ->
-                if (response.code >= 400) return FAILURE
+            var status = 0
+            client.newCall(request).execute().use { response -> status = response.code }
+            if (status >= 400) {
+                FAILURE to "$url answered with $status"
+            } else {
+                (SystemClock.elapsedRealtime() - start) to null
             }
-            SystemClock.elapsedRealtime() - start
         } catch (e: Exception) {
-            LogUtil.w(AppConfig.TAG, "Ping request failed: ${e.message}")
-            FAILURE
+            FAILURE to (e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName)
         } finally {
             client.dispatcher.executorService.shutdown()
             client.connectionPool.evictAll()

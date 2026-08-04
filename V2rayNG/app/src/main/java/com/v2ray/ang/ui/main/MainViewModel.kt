@@ -186,17 +186,32 @@ class MainViewModel(
 
                 dataSource.clearAllTestDelayResults(guids)
 
-                // Proxy pings are slow one by one, so run them the way the batch worker does
+                // Every server is measured at once, up to the configured concurrency
                 val context = getApplication<Application>()
                 val pingType = SettingsManager.getPingType()
-                val permits = Semaphore(SettingsManager.getRealPingConcurrency())
+                val concurrency = SettingsManager.getRealPingConcurrency()
+                val permits = Semaphore(concurrency)
                 val remaining = AtomicInteger(guids.size)
+                val failed = AtomicInteger(0)
+                PingManager.consumeLastError()
+
+                LogUtil.i(AppConfig.TAG, "Ping: testing ${guids.size} profiles, type=$pingType, concurrency=$concurrency")
 
                 coroutineScope {
+                    // Results land in the list while the run is still going
+                    val refresher = launch {
+                        while (true) {
+                            delay(800)
+                            cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
+                            updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+                        }
+                    }
+
                     guids.map { guid ->
                         launch {
                             permits.withPermit {
                                 val delay = PingManager.ping(context, guid, pingType)
+                                if (delay <= PingManager.FAILURE) failed.incrementAndGet()
                                 MmkvManager.encodeServerTestDelayMillis(guid, delay)
                             }
                             val left = remaining.decrementAndGet()
@@ -210,10 +225,23 @@ class MainViewModel(
                             }
                         }
                     }.joinAll()
+
+                    refresher.cancel()
                 }
 
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
+
+                // Surface why servers did not answer instead of leaving a silent timeout
+                val failedCount = failed.get()
+                if (failedCount > 0) {
+                    val reason = PingManager.consumeLastError()
+                    importError.value = if (reason != null) {
+                        "Без ответа: $failedCount из ${guids.size} — $reason"
+                    } else {
+                        "Без ответа: $failedCount из ${guids.size}"
+                    }
+                }
 
             } finally {
                 _uiState.update {

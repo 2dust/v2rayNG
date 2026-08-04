@@ -74,12 +74,22 @@ object CoreNativeManager {
      * @param testUrl The URL to test against
      * @return Delay in milliseconds, or -1 if test failed
      */
-    fun measureOutboundDelay(config: String, testUrl: String): Long {
+    fun measureOutboundDelay(config: String, testUrl: String): Long =
+        measureOutboundDelayDetailed(config, testUrl).first
+
+    /**
+     * Measure outbound connection delay, keeping the reason a failed test gives.
+     *
+     * @param config The configuration JSON string
+     * @param testUrl The URL to test against
+     * @return Delay in milliseconds and null, or -1 and the error the core reported
+     */
+    fun measureOutboundDelayDetailed(config: String, testUrl: String): Pair<Long, String?> {
         return try {
-            Libv2ray.measureOutboundDelay(config, testUrl)
+            Libv2ray.measureOutboundDelay(config, testUrl) to null
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
-            -1L
+            -1L to (e.message?.takeIf { it.isNotBlank() } ?: e.javaClass.simpleName)
         }
     }
 
