@@ -173,7 +173,7 @@ fun QRCodeDialog(
         text = {
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = stringResource(R.string.title_qr_code),
+                contentDescription = stringResource(R.string.acc_qr_code),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)

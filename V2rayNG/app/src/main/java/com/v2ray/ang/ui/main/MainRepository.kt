@@ -20,6 +20,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.MyContextWrapper
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,6 +31,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MainRepository(
     private val app: AngApplication
 ) : MainDataSource {
+
+    private val localizedContext: Context
+        get() = MyContextWrapper.wrap(app, SettingsManager.getLocale())
 
     private val closed = AtomicBoolean(false)
 
@@ -116,9 +120,10 @@ class MainRepository(
     override fun isGroupAllDisplayEnabled(): Boolean =
         MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)
 
-    override fun getString(resId: Int): String = app.getString(resId)
+    override fun getString(resId: Int): String = localizedContext.getString(resId)
 
-    override fun getString(resId: Int, vararg formatArgs: Any): String = app.getString(resId, *formatArgs)
+    override fun getString(resId: Int, vararg formatArgs: Any): String =
+        localizedContext.getString(resId, *formatArgs)
 
     override fun getSubscriptions(): List<SubscriptionCache> {
         val result = mutableListOf<SubscriptionCache>()
@@ -126,7 +131,7 @@ class MainRepository(
             result += SubscriptionCache(
                 guid = "",
                 subscription = SubscriptionItem().apply {
-                    remarks = app.getString(R.string.filter_config_all)
+                    remarks = localizedContext.getString(R.string.filter_config_all)
                 }
             )
         }

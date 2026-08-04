@@ -133,10 +133,10 @@ fun SubSettingScreen(
                 isLoading = isLoading,
                 actions = {
                     IconButton(onClick = onAddClick) {
-                        Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.menu_item_add_config))
+                        Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_subscription))
                     }
                     IconButton(onClick = { showUpdateDialog = true }) {
-                        Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.title_sub_update))
+                        Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.acc_update_subscriptions))
                     }
                 }
             )
@@ -200,14 +200,14 @@ fun SubSettingScreen(
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
-                                                contentDescription = "Share"
+                                                contentDescription = stringResource(R.string.acc_share_subscription)
                                             )
                                         }
                                     }
                                     IconButton(onClick = { onEditSub(subCache.guid) }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_edit_24dp),
-                                            contentDescription = "Edit"
+                                            contentDescription = stringResource(R.string.acc_edit)
                                         )
                                     }
                                     IconButton(onClick = {
@@ -216,7 +216,7 @@ fun SubSettingScreen(
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_delete_24dp),
-                                            contentDescription = "Delete"
+                                            contentDescription = stringResource(R.string.acc_delete)
                                         )
                                     }
                                 }

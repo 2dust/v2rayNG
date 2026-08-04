@@ -179,7 +179,9 @@ fun ScannerScreen(
                                 if (isScanning) R.drawable.ic_stop_24dp
                                 else R.drawable.ic_scan_24dp
                             ),
-                            contentDescription = if (isScanning) "stop scan" else "start scan"
+                            contentDescription = stringResource(
+                                if (isScanning) R.string.acc_stop_scanner else R.string.acc_start_scanner
+                            )
                         )
                     }
                     if (isScanning && hasTorch) {
@@ -194,14 +196,17 @@ fun ScannerScreen(
                                     if (torchEnabled) R.drawable.ic_flash_on_24dp
                                     else R.drawable.ic_flash_off_24dp
                                 ),
-                                contentDescription = "Torch"
+                                contentDescription = stringResource(
+                                    if (torchEnabled) R.string.acc_turn_torch_off
+                                    else R.string.acc_turn_torch_on
+                                )
                             )
                         }
                     }
                     IconButton(onClick = onSelectPhoto) {
                         Icon(
                             painterResource(R.drawable.ic_image_24dp),
-                            contentDescription = "select image"
+                            contentDescription = stringResource(R.string.acc_select_image)
                         )
                     }
                 }
@@ -245,7 +250,7 @@ private fun ScannerIdlePlaceholder(onStartClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 painter = painterResource(R.drawable.ic_scan_24dp),
-                contentDescription = "Start Scanner",
+                contentDescription = stringResource(R.string.acc_start_scanner),
                 modifier = Modifier.size(80.dp),
                 tint = MaterialTheme.colorScheme.primary
             )

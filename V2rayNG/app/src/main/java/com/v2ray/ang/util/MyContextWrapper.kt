@@ -19,7 +19,7 @@ open class MyContextWrapper(base: Context?) : ContextWrapper(base) {
         fun wrap(context: Context, newLocale: Locale?): ContextWrapper {
             var mContext = context
             val res: Resources = mContext.resources
-            val configuration: Configuration = res.configuration
+            val configuration = Configuration(res.configuration)
 
             val locale = newLocale ?: Locale.getDefault()
             configuration.setLocale(locale)

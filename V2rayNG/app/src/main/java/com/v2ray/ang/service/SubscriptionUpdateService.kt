@@ -14,8 +14,10 @@ import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.MyContextWrapper
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +39,13 @@ class SubscriptionUpdateService : Service() {
     private val activeWorkers = Collections.synchronizedList(mutableListOf<RealPingWorkerService>())
 
     private val updateSemaphore = Semaphore(2)
+
+    override fun attachBaseContext(newBase: Context?) {
+        val context = newBase?.let {
+            MyContextWrapper.wrap(it, SettingsManager.getLocale())
+        }
+        super.attachBaseContext(context)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -118,7 +127,7 @@ class SubscriptionUpdateService : Service() {
         showNotification(
             context = this,
             titleResId = R.string.title_pref_auto_update_subscription,
-            content = "Updating ${subItem.remarks}"
+            content = getString(R.string.subscription_update_updating, subItem.remarks)
         )
 
         if (forcedUpdate || MmkvManager.decodeSettingsBool(AppConfig.PREF_UPDATE_SUBSCRIPTION, false)) {
@@ -184,7 +193,7 @@ class SubscriptionUpdateService : Service() {
     private fun handleWorkerEvent(event: RealPingEvent, remarks: String, onWorkerDone: () -> Unit) {
         when (event) {
             is RealPingEvent.Progress -> {
-                val text = "${event.text} in $remarks"
+                val text = getString(R.string.subscription_update_progress, event.text, remarks)
                 showNotification(
                     context = this,
                     titleResId = R.string.title_real_ping_all_server,
