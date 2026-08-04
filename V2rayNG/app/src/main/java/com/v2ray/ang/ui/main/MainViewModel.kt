@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import android.app.Application
+import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,11 +10,16 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -31,11 +37,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
-import com.v2ray.ang.handler.SpeedtestManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 
 class MainViewModel(
     application: Application,
@@ -172,6 +177,101 @@ class MainViewModel(
         }
     }
 
+    private fun extractHostAndPort(guid: String, profile: ProfileItem): Pair<String, Int>? {
+        if (profile.configType != EConfigType.CUSTOM) {
+            val port = profile.serverPort?.toString()?.toIntOrNull() ?: 0
+            if (!profile.server.isNullOrBlank() && port > 0) return Pair(profile.server!!, port)
+            return null
+        }
+
+        try {
+            var rawData = ""
+            val context = getApplication<Application>()
+            val possibleFiles = listOf(
+                File(context.filesDir, "$guid.json"),
+                File(context.filesDir, "$guid.txt"),
+                File(context.filesDir, guid)
+            )
+
+            for (file in possibleFiles) {
+                if (file.exists()) {
+                    rawData = file.readText()
+                    break
+                }
+            }
+
+            if (rawData.isEmpty() && !profile.server.isNullOrBlank()) {
+                rawData = profile.server!!
+            }
+
+            if (rawData.isNotEmpty()) {
+                var jsonStr = rawData.trim()
+                if (!jsonStr.startsWith("{")) {
+                    try {
+                        val decodedBytes = Base64.decode(jsonStr, Base64.DEFAULT)
+                        jsonStr = String(decodedBytes, Charset.forName("UTF-8")).trim()
+                    } catch (e: Exception) {}
+                }
+
+                val root = JsonUtil.parseString(jsonStr)
+                val outbounds = root?.getAsJsonArray("outbounds")
+                
+                if (outbounds != null && outbounds.size() > 0) {
+                    val outbound = outbounds.get(0).asJsonObject
+                    val protocol = outbound.get("protocol")?.asString?.lowercase() ?: ""
+                    val settings = outbound.getAsJsonObject("settings")
+
+                    if (settings != null) {
+                        var host = ""
+                        var port = 0
+
+                        when (protocol) {
+                            "vless", "vmess", "trojan" -> {
+                                val vnext = settings.getAsJsonArray("vnext")
+                                if (vnext != null && vnext.size() > 0) {
+                                    val srv = vnext.get(0).asJsonObject
+                                    host = srv.get("address")?.asString ?: ""
+                                    port = srv.get("port")?.asInt ?: 0
+                                }
+                            }
+                            "shadowsocks" -> {
+                                val servers = settings.getAsJsonArray("servers")
+                                if (servers != null && servers.size() > 0) {
+                                    val srv = servers.get(0).asJsonObject
+                                    host = srv.get("address")?.asString ?: ""
+                                    port = srv.get("port")?.asInt ?: 0
+                                }
+                            }
+                            "hysteria", "hysteria2" -> {
+                                val serverStr = settings.get("server")?.asString ?: ""
+                                if (serverStr.contains(":")) {
+                                    val parts = serverStr.split(":")
+                                    host = parts[0]
+                                    port = parts[1].toIntOrNull() ?: 0
+                                } else {
+                                    host = serverStr
+                                }
+                            }
+                        }
+                        if (host.isNotBlank() && port > 0) {
+                            return Pair(host, port)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val fallbackHost = profile.server
+        val fallbackPort = profile.serverPort?.toString()?.toIntOrNull() ?: 0
+        if (!fallbackHost.isNullOrBlank() && fallbackPort > 0 && !fallbackHost.contains("{")) {
+            return Pair(fallbackHost, fallbackPort)
+        }
+
+        return null
+    }
+
     private fun testProfileTcpPing(subscriptionId: String) {
         viewModelScope.launch(ioDispatcher) {
             try {
@@ -180,25 +280,20 @@ class MainViewModel(
                 
                 _uiState.update { it.copy(isTesting = true, statusText = dataSource.getString(R.string.connection_test_testing)) }
                 
-                // 1. Очищаем старые результаты
                 dataSource.clearAllTestDelayResults(guids)
                 
-                // 2. Запускаем TCP-пинг для каждого сервера в подписке
                 guids.forEach { guid ->
                     val profile = dataSource.decodeServerConfig(guid)
-                    val serverHost = profile?.server
-                    val serverPort = profile?.serverPort?.toString()?.toIntOrNull() ?: 0
-                
-                    if (!serverHost.isNullOrBlank() && serverPort > 0) {
-                        // Измеряем задержку
-                        val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
-                        
-                        // Сохраняем результат точным методом из MmkvManager
-                        MmkvManager.encodeServerTestDelayMillis(guid, delay)
+                    if (profile != null) {
+                        val hostAndPort = extractHostAndPort(guid, profile)
+                        if (hostAndPort != null) {
+                            val (serverHost, serverPort) = hostAndPort
+                            val delay = SpeedtestManager.socketConnectTime(serverHost, serverPort)
+                            MmkvManager.encodeServerTestDelayMillis(guid, delay)
+                        }
                     }
                 }
                 
-                // 3. Обновляем UI
                 cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
                 updateGroupUi(subscriptionId, loadGroup(subscriptionId, forceRefresh = true))
                 
