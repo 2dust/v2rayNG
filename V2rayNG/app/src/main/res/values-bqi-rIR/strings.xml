@@ -266,7 +266,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موسقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
+    <string name="summary_pref_double_column_display">نومگه کانفیگا من دو ستۊݩ نشووݩ داڌه ابۊ تا مهتووا بؽتری من بلگه جا بگره.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
@@ -277,7 +277,7 @@
     <string name="summary_pref_tg_group">ٱووڌن من بونکۊ تلگرام</string>
     <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
     <string name="title_privacy_policy">هریم سیخومی</string>
-    <string name="title_qr_code">QR code</string>
+    <string name="title_qr_code">کود QR</string>
     <string name="title_about">زبار</string>
     <string name="title_source_code">کود بونچک</string>
     <string name="title_oss_license">موجوزا کود بونچک</string>
@@ -336,7 +336,7 @@
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی</string>
-    <string name="summary_scan_qrcode">Click screen open the camera scan</string>
+    <string name="summary_scan_qrcode">سی وا کردن دوربیݩ وو ٱسکووݩ، و ری بلگه بزنین</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>

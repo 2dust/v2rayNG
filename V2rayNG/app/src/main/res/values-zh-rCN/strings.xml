@@ -126,7 +126,7 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
-    <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
+    <string name="server_lab_verify_peer_cert_by_name">按名称验证对端证书</string>
     <string name="server_lab_pinned_ca256">证书指纹 (SHA-256)</string>
     <string name="server_lab_browser_dialer">启用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">仅支持 xhttp (packet-up) 和 ws。与优选域名冲突，utls, alpn, ech 等 TLS 设置将被忽略</string>
@@ -189,9 +189,9 @@
     <string name="title_pref_mux_xudp_concurrency">XUDP 复用子链接数（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
     <string-array name="mux_xudp_quic_entries">
-        <item>不代理</item>
-        <item>多路复用</item>
-        <item>原生</item>
+        <item>拒绝</item>
+        <item>允许</item>
+        <item>跳过</item>
     </string-array>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
@@ -232,7 +232,7 @@
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
     <string name="title_pref_delay_test_url">真连接延迟测试网址 </string>
-    <string name="summary_pref_delay_test_url">Url</string>
+    <string name="summary_pref_delay_test_url">URL</string>
     <string name="title_pref_real_ping_concurrency">真连接延迟测试并发数量</string>
 
     <string name="title_pref_ip_api_url">当前连接信息测试网址</string>
@@ -280,7 +280,7 @@
     <string name="title_qr_code">二维码</string>
     <string name="title_about">关于</string>
     <string name="title_source_code">源代码</string>
-    <string name="title_oss_license">Open Source licenses</string>
+    <string name="title_oss_license">开源许可证</string>
     <string name="title_tg_channel">Telegram 频道</string>
 
     <string name="title_pref_promotion">推广</string>
