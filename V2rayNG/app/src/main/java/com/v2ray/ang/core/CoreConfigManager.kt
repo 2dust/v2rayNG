@@ -5,6 +5,7 @@ import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.V2rayConfig
@@ -34,7 +35,11 @@ object CoreConfigManager {
     fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {
             val configContext = CoreConfigContextBuilder.build(context, guid)
-                ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
+                ?: return ConfigResult(
+                    status = false,
+                    guid = guid,
+                    errorMessage = context.getString(R.string.core_error_build_config_context)
+                )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
@@ -44,7 +49,10 @@ object CoreConfigManager {
             return ConfigResult(
                 status = false,
                 guid = guid,
-                errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
+                errorMessage = context.getString(
+                    R.string.core_error_get_config_detail,
+                    e.message ?: e.javaClass.simpleName
+                )
             )
         }
     }
@@ -57,7 +65,11 @@ object CoreConfigManager {
     fun getV2rayConfig4Speedtest(context: Context, guid: String): ConfigResult {
         try {
             val configContext = CoreConfigContextBuilder.build(context, guid)
-                ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
+                ?: return ConfigResult(
+                    status = false,
+                    guid = guid,
+                    errorMessage = context.getString(R.string.core_error_build_config_context)
+                )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
@@ -70,7 +82,10 @@ object CoreConfigManager {
             return ConfigResult(
                 status = false,
                 guid = guid,
-                errorMessage = "Failed to get V2ray config for speedtest: ${e.message ?: e.javaClass.simpleName}"
+                errorMessage = context.getString(
+                    R.string.core_error_get_speedtest_config_detail,
+                    e.message ?: e.javaClass.simpleName
+                )
             )
         }
     }
@@ -81,7 +96,11 @@ object CoreConfigManager {
     private fun buildV2rayCustomConfig(configContext: CoreConfigContext): ConfigResult {
         val context = configContext.context
         val raw = MmkvManager.decodeServerRaw(configContext.guid)
-            ?: return ConfigResult(status = false, guid = configContext.guid, errorMessage = "Custom config is empty")
+            ?: return ConfigResult(
+                status = false,
+                guid = configContext.guid,
+                errorMessage = context.getString(R.string.core_error_custom_config_empty)
+            )
         val result = ConfigResult(true, configContext.guid, raw)
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result

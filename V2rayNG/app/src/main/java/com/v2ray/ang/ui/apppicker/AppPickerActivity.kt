@@ -151,7 +151,7 @@ fun AppPickerScreen(
                         IconButton(onClick = { showSearch = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_search_24dp),
-                                contentDescription = stringResource(R.string.menu_item_search)
+                                contentDescription = stringResource(R.string.acc_search)
                             )
                         }
                     }

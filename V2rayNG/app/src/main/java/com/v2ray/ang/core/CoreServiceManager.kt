@@ -120,14 +120,16 @@ object CoreServiceManager {
 
     @Throws(Exception::class)
     private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
-        val guid = MmkvManager.getSelectServer() ?: error("No server selected")
-        val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
+        val guid = MmkvManager.getSelectServer()
+            ?: error(service.getString(R.string.core_error_no_server_selected))
+        val config = MmkvManager.decodeServerConfig(guid)
+            ?: error(service.getString(R.string.core_error_decode_server_config))
 
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
         val result = CoreConfigManager.getV2rayConfig(service, guid)
         LogUtil.d(AppConfig.TAG, result.content)
         if (!result.status) {
-            error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
+            error(result.errorMessage.ifBlank { service.getString(R.string.core_error_get_config) })
         }
 
         currentConfig = config
@@ -149,7 +151,7 @@ object CoreServiceManager {
         coreController.startLoop(result.content, tunFd)
 
         if (!isRunning()) {
-            error("Core failed to start")
+            error(service.getString(R.string.core_error_start))
         }
 
         if (browserDialer != null) {
@@ -321,14 +323,16 @@ object CoreServiceManager {
                 time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
-                errorStr = e.message?.substringAfter("\":") ?: "empty message"
+                errorStr = e.message?.substringAfter("\":")
+                    ?: service.getString(R.string.connection_test_empty_message)
             }
             if (time == -1L) {
                 try {
                     time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
-                    errorStr = e.message?.substringAfter("\":") ?: "empty message"
+                    errorStr = e.message?.substringAfter("\":")
+                        ?: service.getString(R.string.connection_test_empty_message)
                 }
             }
 
@@ -341,7 +345,7 @@ object CoreServiceManager {
 
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
-                SpeedtestManager.getRemoteIPInfo()?.let { ip ->
+                SpeedtestManager.getRemoteIPInfo(service.getString(R.string.value_unknown))?.let { ip ->
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, "$result\n$ip")
                 }
             }

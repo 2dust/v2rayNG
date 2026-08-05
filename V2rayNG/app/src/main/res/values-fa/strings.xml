@@ -490,4 +490,55 @@
     <string name="backup_location_local">محلی</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">تازه‌سازی گزارش</string>
+    <string name="toast_permission_denied_for">مجوز %1$s داده نشد</string>
+    <string name="acc_add_subscription">افزودن اشتراک</string>
+    <string name="toast_malformed_json_detail">قالب پیکربندی نامعتبر است: %1$s</string>
+    <string name="acc_add_asset">افزودن منبع فایل‌های جغرافیایی</string>
+    <string name="acc_download_file">دانلود فایل‌های منبع</string>
+    <string name="acc_qr_code">کد QR</string>
+    <string name="acc_copy_log">کپی گزارش</string>
+    <string name="acc_clear_log">پاک کردن گزارش</string>
+    <string name="acc_add_rule">افزودن قانون مسیریابی</string>
+    <string name="core_error_no_server_selected">هیچ پیکربندی‌ای انتخاب نشده است</string>
+    <string name="core_error_decode_server_config">خواندن پیکربندی انتخاب‌شده ناموفق بود</string>
+    <string name="core_error_build_config_context">آماده‌سازی پیکربندی انتخاب‌شده ناموفق بود</string>
+    <string name="core_error_get_config">ایجاد پیکربندی هسته ناموفق بود</string>
+    <string name="core_error_get_config_detail">ایجاد پیکربندی هسته ناموفق بود: %1$s</string>
+    <string name="core_error_get_speedtest_config_detail">ایجاد پیکربندی هسته برای آزمایش سرعت ناموفق بود: %1$s</string>
+    <string name="core_error_custom_config_empty">پیکربندی سفارشی خالی است</string>
+    <string name="core_error_start">راه‌اندازی هسته ناموفق بود</string>
+    <string name="acc_start">شروع سرویس</string>
+    <string name="acc_stop">توقف سرویس</string>
+    <string name="acc_back">بازگشت</string>
+    <string name="acc_search">جستجو</string>
+    <string name="acc_add">افزودن کانفیگ</string>
+    <string name="acc_more">گزینه‌های بیشتر</string>
+    <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
+    <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
+    <string name="acc_remove">حذف عضو زنجیره پروکسی</string>
+    <string name="acc_add_member">افزودن عضو زنجیره پروکسی</string>
+    <string name="acc_start_scanner">شروع اسکنر QR</string>
+    <string name="acc_stop_scanner">توقف اسکنر QR</string>
+    <string name="acc_turn_torch_on">روشن کردن چراغ‌قوه</string>
+    <string name="acc_turn_torch_off">خاموش کردن چراغ‌قوه</string>
+    <string name="acc_select_image">انتخاب تصویر برای اسکن</string>
+    <string name="acc_locked">این قانون هنگام وارد کردن تنظیمات از پیش تعیین‌شده حفظ می‌شود</string>
+    <string name="acc_open_menu">باز کردن منوی پیمایش</string>
+    <string name="acc_edit">ویرایش</string>
+    <string name="acc_delete">حذف</string>
+    <string name="acc_save">ذخیره</string>
+    <string name="acc_update_subscriptions">به‌روزرسانی اشتراک‌ها</string>
+    <string name="acc_per_app_proxy_information">اطلاعات پروکسی به تفکیک برنامه</string>
+    <string name="permission_camera">دوربین</string>
+    <string name="permission_notification">اعلان</string>
+    <string name="permission_local_network">شبکه محلی</string>
+    <string name="profile_protocol_insecure">%1$s (گواهی تأییدنشده)</string>
+    <string name="subscription_update_updating">در حال به‌روزرسانی اشتراک: %1$s</string>
+    <string name="subscription_update_progress">در حال آزمایش %2$s: %1$s</string>
+    <string name="tasker_blurb_start">شروع %1$s</string>
+    <string name="tasker_blurb_stop">توقف %1$s</string>
+    <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
+    <string name="value_unknown">ناشناخته</string>
+
 </resources>

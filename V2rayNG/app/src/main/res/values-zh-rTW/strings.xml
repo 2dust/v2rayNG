@@ -490,4 +490,55 @@
     <string name="backup_location_local">本地</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">重新整理日誌</string>
+    <string name="toast_permission_denied_for">未授予%1$s權限</string>
+    <string name="acc_add_subscription">新增訂閱</string>
+    <string name="toast_malformed_json_detail">設定檔格式不正確：%1$s</string>
+    <string name="acc_add_asset">新增資源來源</string>
+    <string name="acc_download_file">下載資源檔案</string>
+    <string name="acc_qr_code">QR 碼</string>
+    <string name="acc_copy_log">複製日誌</string>
+    <string name="acc_clear_log">清除日誌</string>
+    <string name="acc_add_rule">新增路由規則</string>
+    <string name="core_error_no_server_selected">未選取設定</string>
+    <string name="core_error_decode_server_config">無法讀取所選設定</string>
+    <string name="core_error_build_config_context">無法準備所選設定</string>
+    <string name="core_error_get_config">無法產生核心設定</string>
+    <string name="core_error_get_config_detail">無法產生核心設定：%1$s</string>
+    <string name="core_error_get_speedtest_config_detail">無法產生測速用核心設定：%1$s</string>
+    <string name="core_error_custom_config_empty">自訂設定為空</string>
+    <string name="core_error_start">無法啟動核心</string>
+    <string name="acc_start">啟動服務</string>
+    <string name="acc_stop">停止服務</string>
+    <string name="acc_back">返回</string>
+    <string name="acc_search">搜尋</string>
+    <string name="acc_add">新增設定</string>
+    <string name="acc_more">更多選項</string>
+    <string name="acc_share_subscription">分享訂閱連結</string>
+    <string name="acc_share_log">分享日誌</string>
+    <string name="acc_remove">移除代理鏈成員</string>
+    <string name="acc_add_member">新增代理鏈成員</string>
+    <string name="acc_start_scanner">啟動 QR 碼掃描器</string>
+    <string name="acc_stop_scanner">停止 QR 碼掃描器</string>
+    <string name="acc_turn_torch_on">開啟手電筒</string>
+    <string name="acc_turn_torch_off">關閉手電筒</string>
+    <string name="acc_select_image">選取要掃描的圖片</string>
+    <string name="acc_locked">匯入預設時保留此規則</string>
+    <string name="acc_open_menu">開啟導覽選單</string>
+    <string name="acc_edit">編輯</string>
+    <string name="acc_delete">刪除</string>
+    <string name="acc_save">儲存</string>
+    <string name="acc_update_subscriptions">更新訂閱</string>
+    <string name="acc_per_app_proxy_information">各應用程式的 Proxy 資訊</string>
+    <string name="permission_camera">相機</string>
+    <string name="permission_notification">通知</string>
+    <string name="permission_local_network">區域網路</string>
+    <string name="profile_protocol_insecure">%1$s（不驗證憑證）</string>
+    <string name="subscription_update_updating">正在更新訂閱：%1$s</string>
+    <string name="subscription_update_progress">正在測試%2$s：%1$s</string>
+    <string name="tasker_blurb_start">啟動 %1$s</string>
+    <string name="tasker_blurb_stop">停止 %1$s</string>
+    <string name="connection_test_empty_message">沒有詳細資訊</string>
+    <string name="value_unknown">未知</string>
+
 </resources>

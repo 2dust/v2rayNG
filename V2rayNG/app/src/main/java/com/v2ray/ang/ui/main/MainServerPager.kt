@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -382,6 +383,7 @@ fun ServerListItem(
     }
 }
 
+@Composable
 private fun getProtocolDescription(profile: ProfileItem): String {
     if (profile.configType.isComplexType()) return profile.configType.name
     val parts = mutableListOf(profile.configType.name)
@@ -391,7 +393,7 @@ private fun getProtocolDescription(profile: ProfileItem): String {
     profile.security?.let { sec ->
         if (sec.isNotBlank()) {
             if (profile.insecure == true && sec.equals("tls", ignoreCase = true)) {
-                parts.add("$sec insecure")
+                parts.add(stringResource(R.string.profile_protocol_insecure, sec))
             } else {
                 parts.add(sec)
             }

@@ -490,4 +490,55 @@
     <string name="backup_location_local">مهلی</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">وانۊ کردن گوزارش</string>
+    <string name="toast_permission_denied_for">گرؽڌن موجوز مومکن نؽڌ: %1$s</string>
+    <string name="acc_add_subscription">ٱووردن اشتراک</string>
+    <string name="toast_malformed_json_detail">کانفیگ نا موئتبر هڌ: %1$s</string>
+    <string name="acc_add_asset">ٱووردن بونچک فایلا جوقرافیایی</string>
+    <string name="acc_download_file">دانلود فایلا بونچک جوقرافیایی</string>
+    <string name="acc_qr_code">کود QR</string>
+    <string name="acc_copy_log">لف گیری گوزارش</string>
+    <string name="acc_clear_log">روفتن گوزارش</string>
+    <string name="acc_add_rule">ٱووردن قانووݩ</string>
+    <string name="core_error_no_server_selected">No configuration selected</string>
+    <string name="core_error_decode_server_config">Failed to read the selected configuration</string>
+    <string name="core_error_build_config_context">Failed to prepare the selected configuration</string>
+    <string name="core_error_get_config">Failed to generate the core configuration</string>
+    <string name="core_error_get_config_detail">Failed to generate the core configuration: %1$s</string>
+    <string name="core_error_get_speedtest_config_detail">Failed to generate the core configuration for the speed test: %1$s</string>
+    <string name="core_error_custom_config_empty">Custom configuration is empty</string>
+    <string name="core_error_start">Failed to start the core</string>
+    <string name="acc_start">ره وستن سرویس</string>
+    <string name="acc_stop">واڌاشتن سرویس</string>
+    <string name="acc_back">برگشت</string>
+    <string name="acc_search">پیتینیڌن</string>
+    <string name="acc_add">ٱووردن کانفیگ</string>
+    <string name="acc_more">امکووݩا بؽتر</string>
+    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
+    <string name="acc_share_log">یک رسۊوی گوزارش</string>
+    <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
+    <string name="acc_add_member">ٱووردن عوزو زنجیره پروکسی</string>
+    <string name="acc_start_scanner">ره وستن اسکنر QR</string>
+    <string name="acc_stop_scanner">واڌاشتن اسکنر QR</string>
+    <string name="acc_turn_torch_on">روشن کردن چراغ</string>
+    <string name="acc_turn_torch_off">خاموش کردن چراغ</string>
+    <string name="acc_select_image">پسند ٱکس سی اسکن</string>
+    <string name="acc_locked">ای قانووݩ مجال و من ٱووردن ز پؽش سامووا زفت ابۊ</string>
+    <string name="acc_open_menu">گۊشیڌن نومگه کشاری</string>
+    <string name="acc_edit">آلشتکاری</string>
+    <string name="acc_delete">پاک کردن</string>
+    <string name="acc_save">زفت کردن</string>
+    <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
+    <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>
+    <string name="permission_camera">دوربیݩ</string>
+    <string name="permission_notification">وارسۊوی</string>
+    <string name="permission_local_network">شبکه مهلی</string>
+    <string name="profile_protocol_insecure">%1$s (گوواهی تئیڌ نابۊ)</string>
+    <string name="subscription_update_updating">اشتراک %1$s هونی ورۊ ابۊ</string>
+    <string name="subscription_update_progress">%2$s هونی آزمایش ابۊ: %1$s</string>
+    <string name="tasker_blurb_start">ره وستن %1$s</string>
+    <string name="tasker_blurb_stop">واڌاشتن %1$s</string>
+    <string name="connection_test_empty_message">دووسمندی نؽ</string>
+    <string name="value_unknown">نا مؽخص</string>
+
 </resources>

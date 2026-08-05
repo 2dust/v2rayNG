@@ -118,7 +118,7 @@ class SubscriptionUpdateService : Service() {
         showNotification(
             context = this,
             titleResId = R.string.title_pref_auto_update_subscription,
-            content = "Updating ${subItem.remarks}"
+            content = getString(R.string.subscription_update_updating, subItem.remarks)
         )
 
         if (forcedUpdate || MmkvManager.decodeSettingsBool(AppConfig.PREF_UPDATE_SUBSCRIPTION, false)) {
@@ -184,7 +184,7 @@ class SubscriptionUpdateService : Service() {
     private fun handleWorkerEvent(event: RealPingEvent, remarks: String, onWorkerDone: () -> Unit) {
         when (event) {
             is RealPingEvent.Progress -> {
-                val text = "${event.text} in $remarks"
+                val text = getString(R.string.subscription_update_progress, event.text, remarks)
                 showNotification(
                     context = this,
                     titleResId = R.string.title_real_ping_all_server,
