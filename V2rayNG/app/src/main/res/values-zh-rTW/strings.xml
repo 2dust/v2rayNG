@@ -25,7 +25,7 @@
     <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增設定</string>
     <string name="menu_item_save_config">儲存設定</string>
-    <string name="menu_item_edit_config">編輯設定</string>
+    <string name="menu_item_edit_config">編輯設定檔</string>
     <string name="menu_item_del_config">刪除設定</string>
     <string name="menu_item_import_config_qrcode">從 QR Code 匯入設定</string>
     <string name="menu_item_import_config_clipboard">從剪貼簿匯入設定</string>
@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">URL 無效</string>
     <string name="toast_insecure_url_protocol">請不要使用不安全的 HTTP 協定訂閱位址</string>
     <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
-    <string name="toast_malformed_json">設定格式不正確</string>
+    <string name="toast_malformed_json">設定檔格式不正確。</string>
     <string name="server_lab_request_host6">Host (SNI) (可選)</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>
     <string name="server_obfs_password">混淆密碼</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">僅支援 xhttp (packet-up) 和 ws 出站；與 TLS 相關的設定可能會被忽略或發生衝突</string>
     <string name="toast_allow_insecure_deprecated">目前節點使用未加密連線，您的通訊可能會被威權政府掌控的網路中間設施直接查看\n為了安全，此類節點無法通過 26.2.6+ 版本的 Xray 核心連線\n如果是自建節點請啟用 TLS 等安全加密，或固定憑證 pinnedCA256\n如果機場節點請聯繫服務商完成技術升級，如服務商拒絕配合，建議更換更重視用戶安全的服務商\n更多的資訊，請訪問 https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">獲取並填充指紋證書</string>
+    <string name="pinned_ca256_action_fetch">取得憑證指紋</string>
     <string name="toast_fetch_cert_sha256_success">獲取指紋證書完成</string>
     <string name="toast_fetch_cert_sha256_failed">獲取證書指紋失敗</string>
 
@@ -185,8 +185,8 @@
     <string name="title_mux_settings">Mux 設定</string>
     <string name="title_pref_mux_enabled">啟用 Mux 多路復用</string>
     <string name="summary_pref_mux_enabled">減低延時 但可能會斷流\nTCP，UDP 及 QUIC 流量處理方式下方可選</string>
-    <string name="title_pref_mux_concurrency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurrency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_concurrency">TCP 多工子連線數（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP 多工子連線數（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量處理方式</string>
     <string-array name="mux_xudp_quic_entries">
         <item>拒絕</item>
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">啟用速度顯示</string>
-    <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送狀況</string>
+    <string name="summary_pref_speed_enabled">在通知中顯示目前速度。\n圖示會指出代理流量或直接連線流量何者較多。</string>
 
-    <string name="title_pref_sniffing_enabled">啟用流量監聽 (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">從流量中監聽網域 (預設啟用)</string>
+    <string name="title_pref_sniffing_enabled">啟用流量探測 (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">從流量中探測目標網域（預設啟用）。</string>
     <string name="title_pref_route_only_enabled">啟用 routeOnly</string>
     <string name="summary_pref_route_only_enabled">將嗅探得到的網域只用於路由，代理目標位址仍為 IP</string>
 
     <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模組處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
 
-    <string name="title_pref_fake_dns_enabled">啟用假 DNS (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">本機退回假解析結果 (減低延時，但個別應用可能無法使用)</string>
+    <string name="title_pref_fake_dns_enabled">啟用偽造 DNS (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS 解析網域時會傳回虛構的 IP 位址（速度較快，但可能不適用於部分應用程式）。</string>
 
     <string name="title_pref_ipv6_enabled">啟用 IPv6</string>
     <string name="summary_pref_ipv6_enabled">為 VPN 介面新增 IPv6 位址和路由</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">真連線延遲測試網址 </string>
     <string name="summary_pref_delay_test_url">URL</string>
-    <string name="title_pref_real_ping_concurrency">真連線延遲測試並發數量</string>
+    <string name="title_pref_real_ping_concurrency">同時執行的真實延遲測試數</string>
 
     <string name="title_pref_ip_api_url">目前連線資訊測試網址</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -262,14 +262,14 @@
     <string name="summary_pref_confirm_remove">刪除設定檔是否需要用戶二次確認</string>
 
 
-    <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
-    <string name="summary_pref_append_http_proxy">瀏覽器 / 一些支援的應用 將直接使用 HTTP 代理, 而不經過虛擬網卡設備 (Android 10+)</string>
+    <string name="title_pref_append_http_proxy">將 HTTP 代理加入 VPN</string>
+    <string name="summary_pref_append_http_proxy">瀏覽器和部分支援的應用程式會直接使用 HTTP 代理，而不經過虛擬網路介面（Android 10+）。</string>
 
     <string name="title_pref_double_column_display">啟用雙列顯示</string>
     <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。</string>
 
-    <string name="title_pref_group_all_display">啟用顯示所有群組</string>
-    <string name="summary_pref_group_all_display">新增一個額外的「所有選項卡」頁面</string>
+    <string name="title_pref_group_all_display">顯示「全部」群組分頁</string>
+    <string name="summary_pref_group_all_display">在一個分頁中彙整所有訂閱群組的設定檔。</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">意見回饋</string>
@@ -302,10 +302,10 @@
     <string name="title_pref_hev_tunnel_rw_timeout">HevTun 讀寫逾時(秒) (tcp,udp 預設 300,60)</string>
     <string name="title_mode_settings">模式設定</string>
     <string name="title_root_mode_enabled">啟用 Root 模式 (僅限 Root 使用者)</string>
-    <string name="summary_root_mode_enabled">透過 Root 權限啟用底層透明代理。此模式將不再透過 Android 常規系統 VPN 建立連線，而是直接接管系統底層所有網路流量。開啟後，原有的常规模式、應用分流及相關 VPN 設定將直接失效。</string>
+    <string name="summary_root_mode_enabled">使用 Root 權限實作底層透明代理。Root 模式不使用 Android 的 VPN 服務，而是直接處理網路流量。啟用期間，一般模式、個別應用程式路由及相關 VPN 設定不會生效。</string>
     <string name="toast_root_required">此功能需要 Root 權限</string>
-    <string name="title_root_lan_sharing">區域網路 / 熱點網路共享 (僅限 Root 使用者)</string>
-    <string name="summary_root_lan_sharing">允許透過 Wi-Fi 熱點和 USB 共享網路連線的裝置走 VPN 代理流量</string>
+    <string name="title_root_lan_sharing">與區域網路 / 熱點裝置共用 VPN (僅限 Root 使用者)</string>
+    <string name="summary_root_lan_sharing">將 Wi-Fi 熱點和 USB 網路共享裝置的流量透過 VPN 轉送。</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
@@ -345,8 +345,8 @@
     <string name="title_update_subscription_result">更新了 %1$d 個配置（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="toast_server_not_found_in_group">當前分組中未找到選中的伺服器</string>
-    <string name="toast_fragment_not_available">無法定位當前視圖</string>
-    <string name="title_locate_selected_config">定位所選配置</string>
+    <string name="toast_fragment_not_available">目前畫面無法使用。</string>
+    <string name="title_locate_selected_config">尋找所選設定檔</string>
 
     <string name="tasker_start_service">啟動服務</string>
     <string name="tasker_setting_confirm">確定</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">"錯誤碼：(#%d)"</string>
     <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
     <string name="connection_not_connected">"未連線"</string>
-    <string name="connection_running_task_left">運行中的測試任務數：%s</string>
+    <string name="connection_running_task_left">正在執行的測試：%s</string>
 
     <string name="import_subscription_success">匯入訂閱成功</string>
     <string name="import_subscription_failure">匯入訂閱失敗</string>
@@ -413,7 +413,7 @@
 
     <string name="title_policy_group_type">策略群組類型</string>
     <string name="title_policy_group_subscription_id">來自訂閱分組</string>
-    <string name="title_policy_group_subscription_filter">別名正規過濾</string>
+    <string name="title_policy_group_subscription_filter">備註正規表示式篩選</string>
     <string name="title_policy_group_test_outbounds">測試出站 (outbounds)</string>
     <string name="title_policy_group_fallback">備用出站 (outbound，選填)</string>
 

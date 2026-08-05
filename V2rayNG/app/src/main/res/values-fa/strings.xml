@@ -88,7 +88,7 @@
     <string name="server_lab_id4">رمز عبور (اختیاری)</string>
     <string name="server_lab_security4">نام‌ کاربری (اختیاری)</string>
     <string name="server_lab_encryption">رمزنگاری</string>
-    <string name="server_lab_flow">جریان (flow)</string>
+    <string name="server_lab_flow">حالت جریان (flow)</string>
     <string name="server_lab_public_key">کلید عمومی</string>
     <string name="server_lab_preshared_key">کلید پیش‌اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کوتاه</string>
@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">نشانی اینترنتی نامعتبر است</string>
     <string name="toast_insecure_url_protocol">لطفاً از آدرس های اشتراک پروتکل HTTP ناامن استفاده نکنید</string>
     <string name="server_lab_need_inbound">اطمینان حاصل کنید که پورت ورودی با تنظیمات مطابقت دارد</string>
-    <string name="toast_malformed_json">کانفیگ درست نیست</string>
+    <string name="toast_malformed_json">قالب پیکربندی نامعتبر است.</string>
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">رمز عبور obfs</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">فعال‌سازی Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">فقط خروجی‌های xhttp (packet-up) و ws پشتیبانی می‌شوند؛ تنظیمات مرتبط با TLS ممکن است نادیده گرفته شوند یا تداخل داشته باشند</string>
     <string name="toast_allow_insecure_deprecated">گره فعلی از اتصال رمزنگاری‌نشده استفاده می‌کند. زیرساخت‌های واسط شبکه که در کنترل حکومت‌های اقتدارگرا هستند ممکن است ارتباطات شما را مستقیماً مشاهده کنند.\nبه‌دلایل امنیتی، اتصال به چنین گره‌هایی با هسته Xray نسخه 26.2.6 و بالاتر امکان‌پذیر نیست.\nاگر گره را خودتان راه‌اندازی کرده‌اید، رمزنگاری امنی مانند TLS را فعال کنید یا اثر انگشت گواهی pinnedCA256 را پین کنید.\nاگر گره متعلق به ارائه‌دهنده خدمات است، برای ارتقای فنی با آن‌ها تماس بگیرید. اگر ارائه‌دهنده همکاری نمی‌کند، توصیه می‌شود به ارائه‌دهنده‌ای بروید که برای امنیت کاربران اهمیت بیشتری قائل است.\nبرای اطلاعات بیشتر به https://github.com/2dust/v2rayN/discussions/9460 مراجعه کنید</string>
-    <string name="pinned_ca256_action_fetch">دریافت و تکمیل اثر انگشت گواهی</string>
+    <string name="pinned_ca256_action_fetch">دریافت اثر انگشت گواهی</string>
     <string name="toast_fetch_cert_sha256_success">اثر انگشت گواهی با موفقیت دریافت شد</string>
     <string name="toast_fetch_cert_sha256_failed">دریافت اثر انگشت گواهی ناموفق بود</string>
 
@@ -174,9 +174,9 @@
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
 
-    <string name="subscription_updater_job_tips">وظیفه در پس‌زمینه اجرا می‌شود و اطلاعات پیشرفت در اعلان نمایش داده خواهد شد.</string>
+    <string name="subscription_updater_job_tips">این کار در پس‌زمینه اجرا می‌شود و پیشرفت آن در اعلان نمایش داده خواهد شد.</string>
     <string name="title_pref_auto_test_after_update_subscription">آزمایش خودکار پس از به‌روزرسانی اشتراک</string>
-    <string name="summary_pref_auto_test_after_update_subscription">آزمایش خودکار زمان زیادی می‌برد. در صورت فعال بودن، وظیفه در پس‌زمینه اجرا می‌شود؛ در غیر این صورت در صفحه فعلی اجرا خواهد شد.</string>
+    <string name="summary_pref_auto_test_after_update_subscription">آزمایش خودکار زمان زیادی می‌برد. در صورت فعال بودن، این کار در پس‌زمینه اجرا می‌شود؛ در غیر این صورت در صفحهٔ فعلی اجرا خواهد شد.</string>
     <string name="title_pref_auto_remove_invalid_after_test">حذف خودکار کانفیگ‌های نامعتبر بعد از پینگ</string>
     <string name="summary_pref_auto_remove_invalid_after_test">نتایج پینگ ممکن است همیشه دقیق نباشند؛ کانفیگ‌های حذف‌شده قابل بازیابی نیستند.</string>
     <string name="title_pref_auto_sort_after_test">مرتب‌سازی خودکار بعد از پینگ گرفتن</string>
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">فعال کردن نمایش سرعت</string>
-    <string name="summary_pref_speed_enabled">نمایش سرعت فعلی در قسمت اعلان. \nآیکون اعلان بر اساس استفاده تغییر می‌کند.</string>
+    <string name="summary_pref_speed_enabled">نمایش سرعت‌های فعلی در اعلان.\nنماد نشان می‌دهد ترافیک پروکسی بیشتر است یا ترافیک مستقیم.</string>
 
-    <string name="title_pref_sniffing_enabled">فعال کردن تجزیه و تحلیل بسته ها (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">تلاش برای استخراج نام دامنه واقعی از بسته‌های ترافیک (به‌طور پیش‌فرض روشن است)</string>
+    <string name="title_pref_sniffing_enabled">فعال‌سازی تشخیص دامنهٔ مقصد در ترافیک (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">شناسایی دامنه‌های مقصد از ترافیک (به‌طور پیش‌فرض فعال است).</string>
     <string name="title_pref_route_only_enabled">فعال‌سازی routeOnly</string>
     <string name="summary_pref_route_only_enabled">از نام دامنه (Snnifed) فقط برای مسیریابی استفاده کنید و آدرس مقصد را به عنوان IP ذخیره کنید.</string>
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
     <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
 
-    <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">دی ان اس محلی آدرس های آیپی جعلی را بر می گرداند (سریع تر می باشد و تاخیر را کاهش می دهد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
+    <string name="title_pref_fake_dns_enabled">فعال‌سازی DNS مجازی (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS برای نام‌گشایی دامنه‌ها نشانی‌های IP مجازی برمی‌گرداند (سریع‌تر است، اما ممکن است با برخی برنامه‌ها کار نکند).</string>
 
     <string name="title_pref_ipv6_enabled">فعال کردن IPv6</string>
     <string name="summary_pref_ipv6_enabled">آدرس و مسیرهای IPv6 را به رابط VPN اضافه کنید</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها </string>
     <string name="summary_pref_delay_test_url">URL</string>
-    <string name="title_pref_real_ping_concurrency">تعداد همزمانی تست تأخیر واقعی</string>
+    <string name="title_pref_real_ping_concurrency">آزمایش‌های هم‌زمان تأخیر واقعی</string>
 
     <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی url</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -263,13 +263,13 @@
 
 
     <string name="title_pref_append_http_proxy">پروکسی HTTP را به VPN اضافه کنید</string>
-    <string name="summary_pref_append_http_proxy">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده)، بدون استفاده از دستگاه NIC مجازی (Android 10+) استفاده می‌شود.</string>
+    <string name="summary_pref_append_http_proxy">مرورگر و برنامه‌های پشتیبانی‌شده می‌توانند بدون عبور از رابط شبکهٔ مجازی، مستقیماً از پروکسی HTTP استفاده کنند (Android 10+).</string>
 
     <string name="title_pref_double_column_display">فعال کردن نمایش دو ستون</string>
     <string name="summary_pref_double_column_display">فهرست پروفایل‌ها در دو ستون نمایش داده می‌شود تا محتوای بیشتری در صفحه دیده شود.</string>
 
-    <string name="title_pref_group_all_display">نمایش همه گروه‌ها</string>
-    <string name="summary_pref_group_all_display">افزودن یک صفحه «همه زبانه‌ها»</string>
+    <string name="title_pref_group_all_display">نمایش زبانهٔ «همه»</string>
+    <string name="summary_pref_group_all_display">نمایش پروفایل‌های همهٔ گروه‌های اشتراک در یک زبانه.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">بازخورد</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
 
     <string name="title_core_loglevel">سطح گزارشات</string>
-    <string name="title_outbound_domain_resolve_method">روش پیش‌تفکیک دامنه خروجی (outbound)</string>
+    <string name="title_outbound_domain_resolve_method">روش نام‌گشایی دامنهٔ خروجی (outbound)</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
@@ -302,10 +302,10 @@
     <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن Hev Tun (ثانیه) (پیش‌فرض tcp,udp 300،60)</string>
     <string name="title_mode_settings">تنظیمات حالت</string>
     <string name="title_root_mode_enabled">فعال‌سازی حالت Root (کاربران Root)</string>
-    <string name="summary_root_mode_enabled">پروکسی شفاف سطح پایین را با مجوزهای Root فعال می‌کند. این حالت VPN استاندارد سیستم Android را کنار می‌گذارد و مستقیماً همه ترافیک زیرساختی شبکه را در اختیار می‌گیرد. پس از فعال‌سازی، حالت عادی قبلی، مسیریابی جداگانه برنامه‌ها و تنظیمات مرتبط VPN کاملاً بی‌اثر می‌شوند.</string>
+    <string name="summary_root_mode_enabled">برای پروکسی شفاف سطح پایین از دسترسی Root استفاده می‌کند. حالت Root به‌جای سرویس VPN در Android، ترافیک شبکه را مستقیماً مدیریت می‌کند. هنگام فعال بودن این حالت، حالت عادی، مسیریابی جداگانهٔ برنامه‌ها و تنظیمات مرتبط با VPN اعمال نمی‌شوند.</string>
     <string name="toast_root_required">این قابلیت به دسترسی Root نیاز دارد</string>
-    <string name="title_root_lan_sharing">اشتراک‌گذاری LAN / اتصال اینترنت (کاربران Root)</string>
-    <string name="summary_root_lan_sharing">ترافیک دستگاه‌های متصل به نقطه اتصال Wi-Fi و USB را از VPN عبور می‌دهد</string>
+    <string name="title_root_lan_sharing">اشتراک VPN با شبکهٔ محلی / دستگاه‌های متصل (کاربران Root)</string>
+    <string name="summary_root_lan_sharing">ترافیک دستگاه‌های متصل به نقطهٔ اتصال Wi-Fi و USB را از VPN عبور می‌دهد.</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
@@ -345,8 +345,8 @@
     <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
     <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
     <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>
-    <string name="toast_fragment_not_available">موقعیت صفحه فعلی پیدا نشد</string>
-    <string name="title_locate_selected_config">پیدا کردن کانفیگ متصل‌شده در لیست</string>
+    <string name="toast_fragment_not_available">صفحهٔ فعلی در دسترس نیست.</string>
+    <string name="title_locate_selected_config">یافتن پیکربندی انتخاب‌شده</string>
 
     <string name="tasker_start_service">شروع خدمات</string>
     <string name="tasker_setting_confirm">تایید</string>
@@ -385,11 +385,11 @@
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
     <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
     <string name="connection_not_connected">متصل نیست</string>
-    <string name="connection_running_task_left">تعداد وظایف آزمایشی در حال اجرا: %s</string>
+    <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
-    <string name="title_fragment_settings">تنظیمات فرگمنت (Fragment)</string>
+    <string name="title_fragment_settings">تنظیمات قطعه‌بندی بسته‌ها (Fragment)</string>
     <string name="title_pref_fragment_packets">بسته های فرگمنت</string>
     <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
@@ -413,9 +413,9 @@
 
     <string name="title_policy_group_type">نوع گروه خط مشی</string>
     <string name="title_policy_group_subscription_id">از گروه اشتراک</string>
-    <string name="title_policy_group_subscription_filter">توضیحات فیلتر معمولی</string>
+    <string name="title_policy_group_subscription_filter">فیلتر توضیحات با عبارت منظم</string>
     <string name="title_policy_group_test_outbounds">آزمایش خروجی‌ها (outbounds)</string>
-    <string name="title_policy_group_fallback">خروجی جایگزین (outbound، اختیاری)</string>
+    <string name="title_policy_group_fallback">خروجی پشتیبان (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>
@@ -476,16 +476,16 @@
     </string-array>
 
     <string-array name="outbound_domain_resolve_method">
-        <item>تفکیک نشود</item>
-        <item>تفکیک و به DNS Hosts افزوده شود</item>
-        <item>تفکیک و جایگزین دامنه شود</item>
+        <item>نام‌گشایی نشود</item>
+        <item>نام‌گشایی و به DNS Hosts افزوده شود</item>
+        <item>نام‌گشایی و جایگزین دامنه شود</item>
     </string-array>
 
     <string-array name="policy_group_type">
         <item>کمترین پینگ (leastPing)</item>
-        <item>کمترین بار(لود) (leastLoad)</item>
+        <item>کمترین بار (leastLoad)</item>
         <item>تصادفی (random)</item>
-        <item>گردشی (roundRobin)</item>
+        <item>چرخشی (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">محلی</string>

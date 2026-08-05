@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">无效的网址</string>
     <string name="toast_insecure_url_protocol">请不要使用不安全的 HTTP 协议订阅地址</string>
     <string name="server_lab_need_inbound">确保 inbounds port 和设置中的一致</string>
-    <string name="toast_malformed_json">配置格式错误</string>
+    <string name="toast_malformed_json">配置格式无效。</string>
     <string name="server_lab_request_host6">Host (SNI) (可选)</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
     <string name="server_obfs_password">混淆密码</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">启用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">仅支持 xhttp (packet-up) 和 ws。与优选域名冲突，utls, alpn, ech 等 TLS 设置将被忽略</string>
     <string name="toast_allow_insecure_deprecated">当前节点使用未加密连接，您的通信可能会被威权政府掌控的网络中间设施直接查看\n为了安全，此类节点无法通过 26.2.6+ 版本的 Xray 核心连接\n如果是自建节点请启用 TLS 等安全加密，或固定证书 pinnedCA256\n如果机场节点请联系服务商完成技术升级，如服务商拒绝配合，建议更换更重视用户安全的服务商\n更多的信息，请访问 https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">获取并填充指纹证书</string>
+    <string name="pinned_ca256_action_fetch">获取证书指纹</string>
     <string name="toast_fetch_cert_sha256_success">获取指纹证书完成</string>
     <string name="toast_fetch_cert_sha256_failed">获取证书指纹失败</string>
 
@@ -185,8 +185,8 @@
     <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
     <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
-    <string name="title_pref_mux_concurrency">TCP 复用子链接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurrency">XUDP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_concurrency">TCP 复用子连接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP 复用子连接数（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
     <string-array name="mux_xudp_quic_entries">
         <item>拒绝</item>
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">启用速度显示</string>
-    <string name="summary_pref_speed_enabled">在通知中显示当前速度\n小图标显示流量的路由情况</string>
+    <string name="summary_pref_speed_enabled">在通知中显示当前速度。\n图标指示代理流量或直连流量哪一方占主导。</string>
 
     <string name="title_pref_sniffing_enabled">启用流量探测 (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">从流量中探测域名 (默认启用)</string>
+    <string name="summary_pref_sniffing_enabled">从流量中探测目标域名（默认启用）。</string>
     <string name="title_pref_route_only_enabled">启用 routeOnly</string>
     <string name="summary_pref_route_only_enabled">将嗅探得到的域名仅用于路由，代理目标地址仍为 IP</string>
 
     <string name="title_pref_local_dns_enabled">启用本地 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 请求导入 core 由 DNS 模块处理（推荐启用 如果需要路由绕过局域网及大陆地址)</string>
 
-    <string name="title_pref_fake_dns_enabled">启用虚拟 DNS (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">本地返回虚构解析结果 (减低延时 但个别应用可能无法使用)</string>
+    <string name="title_pref_fake_dns_enabled">启用伪造 DNS (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS 在解析域名时返回虚构的 IP 地址（速度更快，但可能不适用于某些应用）。</string>
 
     <string name="title_pref_ipv6_enabled">启用 IPv6</string>
     <string name="summary_pref_ipv6_enabled">为 VPN 接口添加 IPv6 地址和路由</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">真连接延迟测试网址 </string>
     <string name="summary_pref_delay_test_url">URL</string>
-    <string name="title_pref_real_ping_concurrency">真连接延迟测试并发数量</string>
+    <string name="title_pref_real_ping_concurrency">真连接延迟并发测试数</string>
 
     <string name="title_pref_ip_api_url">当前连接信息测试网址</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -262,14 +262,14 @@
     <string name="summary_pref_confirm_remove">删除配置是否需要用户二次确认</string>
 
 
-    <string name="title_pref_append_http_proxy">追加 HTTP 代理至 VPN</string>
-    <string name="summary_pref_append_http_proxy">浏览器 / 一些支持的应用 将直接使用 HTTP 代理, 而不经过虚拟网卡设备 (Android 10+)</string>
+    <string name="title_pref_append_http_proxy">将 HTTP 代理添加到 VPN</string>
+    <string name="summary_pref_append_http_proxy">浏览器和部分受支持的应用将直接使用 HTTP 代理，而不经过虚拟网卡（Android 10+）。</string>
 
     <string name="title_pref_double_column_display">启用双列显示</string>
     <string name="summary_pref_double_column_display">配置列表以双列显示，允许在屏幕上显示更多内容。</string>
 
-    <string name="title_pref_group_all_display">启用显示所有组</string>
-    <string name="summary_pref_group_all_display">添加一个额外的“所有选项卡”页面</string>
+    <string name="title_pref_group_all_display">显示“全部”组标签页</string>
+    <string name="summary_pref_group_all_display">在一个标签页中汇总所有订阅组的配置。</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">反馈</string>
@@ -302,10 +302,10 @@
     <string name="title_pref_hev_tunnel_rw_timeout">HevTun 读写超时(秒) (tcp,udp 默认 300,60)</string>
     <string name="title_mode_settings">模式设置</string>
     <string name="title_root_mode_enabled">启用 Root 模式 (仅限 Root 用户)</string>
-    <string name="summary_root_mode_enabled">通过 Root 权限启用底层透明代理。此模式将不再通过 Android 常规系统 VPN 建立连接，而是直接接管系统底层所有网络流量。开启后，原有的常规模式、应用分流及相关 VPN 设置将直接失效。</string>
+    <string name="summary_root_mode_enabled">使用 Root 权限实现底层透明代理。Root 模式不使用 Android 的 VPN 服务，而是直接处理网络流量。启用期间，常规模式、应用分流及相关 VPN 设置不会生效。</string>
     <string name="toast_root_required">此功能需要 Root 权限</string>
-    <string name="title_root_lan_sharing">局域网 / 热点网络共享 (仅限 Root 用户)</string>
-    <string name="summary_root_lan_sharing">允许通过 Wi-Fi 热点和 USB 共享网络连接的设备走 VPN 代理流量</string>
+    <string name="title_root_lan_sharing">与局域网 / 热点设备共享 VPN (仅限 Root 用户)</string>
+    <string name="summary_root_lan_sharing">将 Wi-Fi 热点和 USB 网络共享设备的流量通过 VPN 转发。</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
@@ -345,7 +345,7 @@
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
-    <string name="toast_fragment_not_available">无法定位当前视图</string>
+    <string name="toast_fragment_not_available">当前页面不可用。</string>
     <string name="title_locate_selected_config">定位所选配置</string>
 
     <string name="tasker_start_service">启动服务</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
     <string name="connection_connected">"已连接，点击测试连接"</string>
     <string name="connection_not_connected">"未连接"</string>
-    <string name="connection_running_task_left">运行中的测试任务数：%s</string>
+    <string name="connection_running_task_left">正在运行的测试：%s</string>
 
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
@@ -413,7 +413,7 @@
 
     <string name="title_policy_group_type">策略组类型</string>
     <string name="title_policy_group_subscription_id">来自订阅分组</string>
-    <string name="title_policy_group_subscription_filter">别名正则过滤</string>
+    <string name="title_policy_group_subscription_filter">备注正则筛选</string>
     <string name="title_policy_group_test_outbounds">测试出站 (outbounds)</string>
     <string name="title_policy_group_fallback">备用出站 (outbound，可选)</string>
 

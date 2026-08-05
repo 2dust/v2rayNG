@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">অবৈধ URL</string>
     <string name="toast_insecure_url_protocol">অনিরাপদ HTTP প্রোটোকলের সাবস্ক্রিপশন ঠিকানা ব্যবহার করবেন না</string>
     <string name="server_lab_need_inbound">ইনবাউন্ড পোর্ট নিশ্চিত করুন সেটিংসের সাথে সামঞ্জস্যপূর্ণ</string>
-    <string name="toast_malformed_json">কনফিগারেশন বিকৃত</string>
+    <string name="toast_malformed_json">কনফিগারেশন ফরম্যাট সঠিক নয়।</string>
     <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>
     <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
     <string name="server_obfs_password">Obfs পাসওয়ার্ড</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">Browser Dialer চালু করুন</string>
     <string name="server_lab_browser_dialer_tip">শুধু xhttp (packet-up) ও ws আউটবাউন্ড সমর্থিত; TLS-সংক্রান্ত সেটিং উপেক্ষিত হতে পারে বা পরস্পরের সঙ্গে বিরোধ করতে পারে</string>
     <string name="toast_allow_insecure_deprecated">বর্তমান নোডটি এনক্রিপশনবিহীন সংযোগ ব্যবহার করে। কর্তৃত্ববাদী সরকারের নিয়ন্ত্রণাধীন মধ্যবর্তী নেটওয়ার্ক অবকাঠামো আপনার যোগাযোগ সরাসরি দেখতে পারে।\nনিরাপত্তার কারণে Xray কোরের 26.2.6 বা পরবর্তী সংস্করণ দিয়ে এ ধরনের নোডে সংযোগ করা যায় না।\nনোডটি নিজে তৈরি করে থাকলে TLS-এর মতো নিরাপদ এনক্রিপশন চালু করুন অথবা pinnedCA256 সার্টিফিকেট ফিঙ্গারপ্রিন্ট পিন করুন।\nনোডটি কোনো সেবা প্রদানকারীর হলে প্রযুক্তিগত আপগ্রেডের জন্য তাদের সঙ্গে যোগাযোগ করুন। তারা সহযোগিতা না করলে ব্যবহারকারীর নিরাপত্তাকে বেশি গুরুত্ব দেয় এমন প্রদানকারীর কাছে যাওয়ার পরামর্শ দেওয়া হয়।\nআরও তথ্যের জন্য দেখুন https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">সার্টিফিকেট ফিঙ্গারপ্রিন্ট এনে পূরণ করুন</string>
+    <string name="pinned_ca256_action_fetch">সার্টিফিকেট ফিঙ্গারপ্রিন্ট আনুন</string>
     <string name="toast_fetch_cert_sha256_success">সার্টিফিকেট ফিঙ্গারপ্রিন্ট সফলভাবে আনা হয়েছে</string>
     <string name="toast_fetch_cert_sha256_failed">সার্টিফিকেট ফিঙ্গারপ্রিন্ট আনা ব্যর্থ হয়েছে</string>
 
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">গতি প্রদর্শন সক্রিয় করুন</string>
-    <string name="summary_pref_speed_enabled">বিজ্ঞপ্তিতে বর্তমান গতি প্রদর্শন করুন।\nব্যবহারের উপর ভিত্তি করে বিজ্ঞপ্তি আইকন পরিবর্তিত হবে।</string>
+    <string name="summary_pref_speed_enabled">বিজ্ঞপ্তিতে বর্তমান সংযোগের গতি দেখান।\nআইকনটি প্রক্সি বা সরাসরি ট্রাফিকের মধ্যে কোনটি বেশি তা দেখায়।</string>
 
-    <string name="title_pref_sniffing_enabled">প্যাকেট বিশ্লেষণ সক্রিয় করুন (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">প্যাকেট থেকে ডোমেইন স্নিফ করার চেষ্টা করুন (ডিফল্টভাবে চালু)</string>
+    <string name="title_pref_sniffing_enabled">ট্রাফিকের গন্তব্য ডোমেইন শনাক্তকরণ চালু করুন (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">ট্রাফিক থেকে গন্তব্য ডোমেইন শনাক্ত করুন (ডিফল্টভাবে চালু)।</string>
     <string name="title_pref_route_only_enabled">routeOnly সক্রিয় করুন</string>
     <string name="summary_pref_route_only_enabled">রুটিংয়ের জন্য শুধুমাত্র স্নিফড ডোমেইন নাম ব্যবহার করুন, এবং লক্ষ্য ঠিকানা হিসেবে আইপি ঠিকানা রাখুন।</string>
 
     <string name="title_pref_local_dns_enabled">স্থানীয় DNS সক্রিয় করুন</string>
     <string name="summary_pref_local_dns_enabled">DNS মূল DNS মডিউল দ্বারা প্রক্রিয়া করা হয় (প্রস্তাবিত, যদি LAN এবং মূলভূমি ঠিকানার বাইপাসিং প্রয়োজন হয়)</string>
 
-    <string name="title_pref_fake_dns_enabled">ভুয়া DNS সক্রিয় করুন (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">স্থানীয় DNS মিথ্যা আইপি ঠিকানা ফেরত দেয় (দ্রুত, তবে এটি কিছু অ্যাপের জন্য কাজ নাও করতে পারে)</string>
+    <string name="title_pref_fake_dns_enabled">কৃত্রিম DNS চালু করুন (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">ডোমেইন রেজলভের সময় FakeDNS কৃত্রিম IP ঠিকানা ফেরত দেয় (দ্রুত, তবে কিছু অ্যাপে কাজ নাও করতে পারে)।</string>
 
     <string name="title_pref_ipv6_enabled">IPv6 সক্রিয় করুন</string>
     <string name="summary_pref_ipv6_enabled">VPN ইন্টারফেসে IPv6 ঠিকানা এবং রুট যোগ করুন</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">সঠিক বিলম্ব পরীক্ষা ইউআরএল </string>
     <string name="summary_pref_delay_test_url">ইউআরএল</string>
-    <string name="title_pref_real_ping_concurrency">প্রকৃত বিলম্ব পরীক্ষার সমকালীনতা</string>
+    <string name="title_pref_real_ping_concurrency">একযোগে প্রকৃত বিলম্ব পরীক্ষা</string>
 
     <string name="title_pref_ip_api_url">বর্তমান সংযোগের তথ্য পরীক্ষার URL</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -268,8 +268,8 @@
     <string name="title_pref_double_column_display">দুই কলামে প্রদর্শন চালু করুন</string>
     <string name="summary_pref_double_column_display">প্রোফাইল তালিকা দুই কলামে দেখায়, ফলে পর্দায় আরও বিষয়বস্তু দেখা যায়।</string>
 
-    <string name="title_pref_group_all_display">সব গ্রুপ দেখানো চালু করুন</string>
-    <string name="summary_pref_group_all_display">অতিরিক্ত একটি “সব ট্যাব” পৃষ্ঠা যোগ করুন</string>
+    <string name="title_pref_group_all_display">“সব” গ্রুপ ট্যাব দেখান</string>
+    <string name="summary_pref_group_all_display">সব সাবস্ক্রিপশন গ্রুপের কনফিগ একটি ট্যাবে দেখান।</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">মতামত</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">অটো আপডেট ইন্টারভ্যাল (মিনিট, সর্বনিম্ন মান ১৫)</string>
 
     <string name="title_core_loglevel">লগ স্তর</string>
-    <string name="title_outbound_domain_resolve_method">বহির্গামী ডোমেইন আগাম রেজলভ করার পদ্ধতি (outbound)</string>
+    <string name="title_outbound_domain_resolve_method">বহির্গামী সংযোগের ডোমেইন রেজলভ পদ্ধতি (outbound)</string>
     <string name="title_mode">মোড</string>
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
@@ -304,8 +304,8 @@
     <string name="title_root_mode_enabled">Root মোড চালু (Root ব্যবহারকারীদের জন্য)</string>
     <string name="summary_root_mode_enabled">Root সুবিধা ব্যবহার করে নিম্ন-স্তরের স্বচ্ছ প্রক্সি চালু করুন। এই মোডটি Android-এর মানক সিস্টেম VPN এড়িয়ে সরাসরি অন্তর্নিহিত সব নেটওয়ার্ক ট্রাফিক নিয়ন্ত্রণ করে। চালু করার পর আগের সাধারণ মোড, অ্যাপভিত্তিক রাউটিং এবং সংশ্লিষ্ট VPN সেটিংস আর কার্যকর থাকবে না।</string>
     <string name="toast_root_required">এই সুবিধার জন্য Root অ্যাক্সেস প্রয়োজন</string>
-    <string name="title_root_lan_sharing">LAN / টেদারিং শেয়ারিং (Root ব্যবহারকারীদের জন্য)</string>
-    <string name="summary_root_lan_sharing">Wi-Fi হটস্পট ও USB-টেদার করা ডিভাইসের ট্রাফিক VPN-এর মাধ্যমে রাউট করুন</string>
+    <string name="title_root_lan_sharing">LAN / টেদার করা ডিভাইসে VPN শেয়ার করুন (Root ব্যবহারকারীদের জন্য)</string>
+    <string name="summary_root_lan_sharing">Wi-Fi হটস্পট ও USB-টেদার করা ডিভাইসের ট্রাফিক VPN-এর মাধ্যমে রাউট করুন।</string>
 
     <string name="title_logcat">লগক্যাট</string>
     <string name="logcat_copy">কপি করুন</string>
@@ -345,7 +345,7 @@
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
     <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>
-    <string name="toast_fragment_not_available">বর্তমান ভিউটি খুঁজে পাওয়া যায়নি</string>
+    <string name="toast_fragment_not_available">বর্তমান স্ক্রিনটি উপলভ্য নয়।</string>
     <string name="title_locate_selected_config">নির্বাচিত কনফিগটি খুঁজুন</string>
 
     <string name="tasker_start_service">সার্ভিস শুরু করুন</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
     <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
-    <string name="connection_running_task_left">চলমান পরীক্ষার কাজের সংখ্যা: %s</string>
+    <string name="connection_running_task_left">চলমান পরীক্ষা: %s</string>
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>
@@ -419,7 +419,7 @@
 
     <string name="server_proxy_chain_members">প্রক্সি চেইনের সদস্য</string>
     <string name="server_proxy_chain_pick_members">সদস্য বাছতে এখানে ট্যাপ করুন</string>
-    <string name="server_proxy_chain_member_unselected">একজন সদস্য নির্বাচন করুন</string>
+    <string name="server_proxy_chain_member_unselected">চেইনের সদস্য নির্বাচন করুন</string>
     <string name="server_proxy_chain_members_unselected">চেইনের প্রতিটি সারির জন্য সদস্য নির্বাচন করুন</string>
     <string name="server_proxy_chain_members_insufficient">পর্যাপ্ত সদস্য নেই</string>
     <string name="server_proxy_chain_members_invalid">অবৈধ চেইন সদস্য: %1$s</string>

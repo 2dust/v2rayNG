@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">Invalid URL</string>
     <string name="toast_insecure_url_protocol">Please do not use the insecure HTTP protocol subscription address</string>
     <string name="server_lab_need_inbound">Ensure inbounds port is consistent with the settings</string>
-    <string name="toast_malformed_json">Config malformed</string>
+    <string name="toast_malformed_json">Invalid configuration.</string>
     <string name="server_lab_request_host6">Host(SNI)(Optional)</string>
     <string name="toast_action_not_allowed">Action not allowed</string>
     <string name="server_obfs_password">Obfs password</string>
@@ -126,12 +126,12 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list">EchConfigList</string>
-    <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
+    <string name="server_lab_verify_peer_cert_by_name">Verify peer certificate by name</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
     <string name="server_lab_browser_dialer">Enable Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Only supports xhttp (packet-up) and ws outbound; TLS-related settings may be ignored or conflict</string>
     <string name="toast_allow_insecure_deprecated">Current node uses an unencrypted connection. Your communication may be directly viewed by network intermediate facilities controlled by authoritarian governments.\nFor security reasons, such nodes cannot be connected via Xray core version 26.2.6+.\nIf it is a self-built node, please enable security encryption such as TLS, or pin the certificate pinnedCA256.\nIf it is a provider node, please contact the service provider to complete the technical upgrade. If the service provider refuses to cooperate, it is recommended to switch to a provider that pays more attention to user security.\nFor more information, please visit https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">Fetch and fill certificate fingerprint</string>
+    <string name="pinned_ca256_action_fetch">Fetch certificate fingerprint</string>
     <string name="toast_fetch_cert_sha256_success">Certificate fingerprint fetched successfully</string>
     <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>
 
@@ -146,7 +146,7 @@
     <string name="title_user_asset_add_url">Add asset URL</string>
     <string name="msg_file_not_found">File not found</string>
     <string name="msg_remark_is_duplicate">The remarks already exists</string>
-    <string name="asset_geo_files_sources">Geo files source (optional)</string>
+    <string name="asset_geo_files_sources">Geo file source (optional)</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>
@@ -161,7 +161,7 @@
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
     <string name="per_app_proxy_settings">Per-app settings</string>
     <string name="per_app_proxy_settings_enable">Enable per-app</string>
-    <string name="app_picker_unknown_app">Unknown app (unidentified UID)</string>
+    <string name="app_picker_unknown_app">Unknown app (UID not recognized)</string>
 
     <!-- Preferences -->
     <string name="title_settings">Settings</string>
@@ -185,8 +185,8 @@
     <string name="title_mux_settings">Mux Settings</string>
     <string name="title_pref_mux_enabled">Enable Mux</string>
     <string name="summary_pref_mux_enabled">Faster, but it may cause unstable connectivity\nCustomize how to handle TCP, UDP and QUIC below</string>
-    <string name="title_pref_mux_concurrency">TCP connections（range -1 to 1024）</string>
-    <string name="title_pref_mux_xudp_concurrency">XUDP connections（range -1 to 1024）</string>
+    <string name="title_pref_mux_concurrency">TCP connections (range -1 to 1024)</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP connections (range -1 to 1024)</string>
     <string name="title_pref_mux_xudp_quic">Handling of QUIC in mux tunnel</string>
     <string-array name="mux_xudp_quic_entries">
         <item>reject</item>
@@ -195,10 +195,10 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Enable speed display</string>
-    <string name="summary_pref_speed_enabled">Display current speed in the notification.\nNotification icon would change based on usage.</string>
+    <string name="summary_pref_speed_enabled">Show current speeds in the notification.\nThe icon indicates whether proxy or direct traffic is dominant.</string>
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
+    <string name="summary_pref_sniffing_enabled">Detect destination domains from traffic (enabled by default).</string>
     <string name="title_pref_route_only_enabled">Enable routeOnly</string>
     <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
 
@@ -206,7 +206,7 @@
     <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended if you need routing bypassing LAN and mainland addresses)</string>
 
     <string name="title_pref_fake_dns_enabled">Enable FakeDNS</string>
-    <string name="summary_pref_fake_dns_enabled">Local DNS returns fake IP addresses (faster, but it may not work for some apps)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS returns synthetic IP addresses for domain lookups (faster, but may not work with some apps).</string>
 
     <string name="title_pref_ipv6_enabled">Enable IPv6</string>
     <string name="summary_pref_ipv6_enabled">Add IPv6 address and routes to the VPN interface</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">True delay test url </string>
     <string name="summary_pref_delay_test_url">Url</string>
-    <string name="title_pref_real_ping_concurrency">True delay test concurrency</string>
+    <string name="title_pref_real_ping_concurrency">Concurrent real-delay tests</string>
 
     <string name="title_pref_ip_api_url">Current connection info test url</string>
     <string name="summary_pref_ip_api_url">Url</string>
@@ -249,7 +249,7 @@
     <string name="summary_pref_socks_enable_udp">SOCKS5 authentication is not fully secure when using UDP.</string>
     <string name="summary_pref_socks_port">Local proxy port</string>
     <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
-    <string name="summary_pref_dynamic_socks_port">Generate a random local proxy port each time the inbound is created</string>
+    <string name="summary_pref_dynamic_socks_port">Use a random local proxy port for each inbound</string>
     <string name="title_pref_socks_username">Local proxy username (optional)</string>
     <string name="summary_pref_socks_username">Username</string>
     <string name="title_pref_socks_password">Local proxy password (optional)</string>
@@ -262,14 +262,14 @@
     <string name="summary_pref_confirm_remove">Whether deleting a config requires a second confirmation by the user</string>
 
 
-    <string name="title_pref_append_http_proxy">Append HTTP Proxy to VPN</string>
-    <string name="summary_pref_append_http_proxy">HTTP proxy will be used directly from (browser/ some supported apps), without going through the virtual NIC device (Android 10+)</string>
+    <string name="title_pref_append_http_proxy">Add HTTP proxy to VPN</string>
+    <string name="summary_pref_append_http_proxy">Allow browsers and supported apps to use the HTTP proxy directly instead of the virtual network interface (Android 10+).</string>
 
-    <string name="title_pref_double_column_display">Enable double column display</string>
-    <string name="summary_pref_double_column_display">The profile list is displayed in double columns, allowing more content to be displayed on the screen.</string>
+    <string name="title_pref_double_column_display">Use two-column layout</string>
+    <string name="summary_pref_double_column_display">Display the profile list in two columns to fit more content on screen.</string>
 
-    <string name="title_pref_group_all_display">Enable show all groups</string>
-    <string name="summary_pref_group_all_display">Add an extra "All Tabs" page</string>
+    <string name="title_pref_group_all_display">Show an "All" group tab</string>
+    <string name="summary_pref_group_all_display">Combine profiles from every subscription group in one tab.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Feedback</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">Auto Update Interval (Minutes, Min value 15)</string>
 
     <string name="title_core_loglevel">Log Level</string>
-    <string name="title_outbound_domain_resolve_method">Outbound domain pre-resolve method</string>
+    <string name="title_outbound_domain_resolve_method">Outbound domain resolution</string>
     <string name="title_mode">Mode</string>
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
@@ -301,11 +301,11 @@
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
     <string name="title_pref_hev_tunnel_rw_timeout">Hev Tun read/write timeout (seconds) (tcp,udp default 300,60)</string>
     <string name="title_mode_settings">Mode Settings</string>
-    <string name="title_root_mode_enabled">Root mode enabled (Root Users)</string>
-    <string name="summary_root_mode_enabled">Enable low-level transparent proxying via root privileges. This mode bypasses the standard Android system VPN to directly take over all underlying network traffic. Once enabled, the original regular mode, per-app routing, and related VPN settings will become completely invalid.</string>
+    <string name="title_root_mode_enabled">Enable root mode (root users)</string>
+    <string name="summary_root_mode_enabled">Use root access for low-level transparent proxying. Root mode handles network traffic directly instead of using the Android VPN service. Standard mode, per-app routing, and VPN-related settings do not apply while root mode is enabled.</string>
     <string name="toast_root_required">Root access is required for this feature</string>
-    <string name="title_root_lan_sharing">LAN / tethering sharing (Root Users)</string>
-    <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
+    <string name="title_root_lan_sharing">Share VPN with LAN / tethered devices (root users)</string>
+    <string name="summary_root_lan_sharing">Route traffic from Wi-Fi hotspot and USB-tethered devices through the VPN.</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
@@ -345,8 +345,8 @@
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
-    <string name="toast_fragment_not_available">Unable to locate current view</string>
-    <string name="title_locate_selected_config">Locate the selected config</string>
+    <string name="toast_fragment_not_available">Current screen is unavailable.</string>
+    <string name="title_locate_selected_config">Find selected configuration</string>
 
     <string name="tasker_start_service">Start Service</string>
     <string name="tasker_setting_confirm">Confirm</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">Error code: #%d</string>
     <string name="connection_connected">Connected, tap to check connection</string>
     <string name="connection_not_connected">Not connected</string>
-    <string name="connection_running_task_left">Number of running test tasks: %s</string>
+    <string name="connection_running_task_left">Tests running: %s</string>
 
     <string name="import_subscription_success">Subscription imported Successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>
@@ -413,7 +413,7 @@
 
     <string name="title_policy_group_type">Policy group type</string>
     <string name="title_policy_group_subscription_id">From subscription group</string>
-    <string name="title_policy_group_subscription_filter">Remarks regular filter</string>
+    <string name="title_policy_group_subscription_filter">Remarks regex filter</string>
     <string name="title_policy_group_test_outbounds">Test outbounds</string>
     <string name="title_policy_group_fallback">Fallback outbound (optional)</string>
 

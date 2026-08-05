@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
     <string name="toast_insecure_url_protocol">Vui lòng không dùng địa chỉ đăng ký với giao thức HTTP không an toàn</string>
     <string name="server_lab_need_inbound">Vui lòng đảm bảo cấu hình tùy chỉnh này không bị lỗi trước khi sử dụng!</string>
-    <string name="toast_malformed_json">Cấu hình không hợp lệ!</string>
+    <string name="toast_malformed_json">Cấu hình không hợp lệ.</string>
     <string name="server_lab_request_host6">Host (SNI) (Không bắt buộc)</string>
     <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
     <string name="server_obfs_password">Mật khẩu Obfs</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">Bật Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Chỉ hỗ trợ đầu ra xhttp (packet-up) và ws; các cài đặt liên quan đến TLS có thể bị bỏ qua hoặc xung đột</string>
     <string name="toast_allow_insecure_deprecated">Nút hiện tại sử dụng kết nối không mã hóa. Hạ tầng trung gian mạng do các chính phủ độc tài kiểm soát có thể xem trực tiếp nội dung liên lạc của bạn.\nVì lý do bảo mật, không thể kết nối đến các nút như vậy bằng Xray core phiên bản 26.2.6 trở lên.\nNếu đây là nút do bạn tự dựng, hãy bật mã hóa an toàn như TLS hoặc ghim dấu vân tay chứng chỉ pinnedCA256.\nNếu đây là nút của nhà cung cấp dịch vụ, hãy liên hệ với họ để hoàn tất nâng cấp kỹ thuật. Nếu nhà cung cấp từ chối hợp tác, bạn nên chuyển sang nhà cung cấp coi trọng bảo mật người dùng hơn.\nĐể biết thêm thông tin, hãy truy cập https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">Lấy và điền dấu vân tay chứng chỉ</string>
+    <string name="pinned_ca256_action_fetch">Lấy dấu vân tay chứng chỉ</string>
     <string name="toast_fetch_cert_sha256_success">Đã lấy dấu vân tay chứng chỉ thành công</string>
     <string name="toast_fetch_cert_sha256_failed">Không thể lấy dấu vân tay chứng chỉ</string>
 
@@ -185,8 +185,8 @@
     <string name="title_mux_settings">Cài đặt Mux</string>
     <string name="title_pref_mux_enabled">Bật Mux</string>
     <string name="summary_pref_mux_enabled">Giảm độ trễ nhưng có thể làm gián đoạn luồng, vì vậy không nên kích hoạt nó. \nCác phương pháp xử lý lưu lượng truy cập TCP, UDP và QUIC có sẵn bên dưới.</string>
-    <string name="title_pref_mux_concurrency">Số lượng liên kết con tái sử dụng TCP (-1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_concurrency">Số lượng liên kết con tái sử dụng XUDP (-1 đến 1024)</string>
+    <string name="title_pref_mux_concurrency">Số kết nối con TCP được ghép kênh (-1 đến 1024)</string>
+    <string name="title_pref_mux_xudp_concurrency">Số kết nối con XUDP được ghép kênh (-1 đến 1024)</string>
     <string name="title_pref_mux_xudp_quic">Phương pháp xử lý lưu lượng QUIC</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Hiển thị tốc độ mạng</string>
-    <string name="summary_pref_speed_enabled">Hiển thị tốc độ mạng hiện tại trên thanh thông báo. \nBiểu tượng trên thanh trạng thái có thể thay đổi tùy vào mức sử dụng.</string>
+    <string name="summary_pref_speed_enabled">Hiển thị tốc độ hiện tại trong thông báo.\nBiểu tượng cho biết lưu lượng proxy hay trực tiếp đang chiếm ưu thế.</string>
 
     <string name="title_pref_sniffing_enabled">Bật Sniffing</string>
-    <string name="summary_pref_sniffing_enabled">Phát hiện tên miền từ lưu lượng truy cập (Được bật theo mặc định). \nỞ Việt Nam: tắt để sử dụng Zalo.</string>
+    <string name="summary_pref_sniffing_enabled">Phát hiện tên miền đích từ lưu lượng truy cập (bật theo mặc định). \nỞ Việt Nam: tắt để sử dụng Zalo.</string>
     <string name="title_pref_route_only_enabled">Bật routeOnly</string>
     <string name="summary_pref_route_only_enabled">Chỉ sử dụng tên miền được đánh dấu để định tuyến và giữ địa chỉ đích làm địa chỉ IP.</string>
 
     <string name="title_pref_local_dns_enabled">Bật DNS cục bộ</string>
     <string name="summary_pref_local_dns_enabled">DNS được xử lý bởi module DNS của Xray-Core (Dùng nếu cần định tuyến Bypass cho mạng LAN và Địa chỉ nội địa).</string>
 
-    <string name="title_pref_fake_dns_enabled">Bật DNS giả (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">FakeDNS lấy tên miền mục tiêu bằng cách giả mạo DNS (Nhanh hơn, nhưng có thể không hoạt động cho một số ứng dụng).</string>
+    <string name="title_pref_fake_dns_enabled">Bật DNS ảo (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS trả về địa chỉ IP ảo khi phân giải tên miền (nhanh hơn nhưng có thể không hoạt động với một số ứng dụng).</string>
 
     <string name="title_pref_ipv6_enabled">Bật IPv6</string>
     <string name="summary_pref_ipv6_enabled">Thêm địa chỉ và tuyến IPv6 vào giao diện VPN</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực </string>
     <string name="summary_pref_delay_test_url">URL</string>
-    <string name="title_pref_real_ping_concurrency">Số luồng kiểm tra độ trễ thực</string>
+    <string name="title_pref_real_ping_concurrency">Số lượt kiểm tra độ trễ thực đồng thời</string>
 
     <string name="title_pref_ip_api_url">URL kiểm tra thông tin kết nối hiện tại</string>
     <string name="summary_pref_ip_api_url">URL</string>
@@ -268,8 +268,8 @@
     <string name="title_pref_double_column_display">Bật hiển thị hai cột</string>
     <string name="summary_pref_double_column_display">Danh sách hồ sơ được hiển thị thành hai cột để màn hình chứa được nhiều nội dung hơn.</string>
 
-    <string name="title_pref_group_all_display">Hiển thị tất cả nhóm</string>
-    <string name="summary_pref_group_all_display">Thêm một trang "Tất cả thẻ"</string>
+    <string name="title_pref_group_all_display">Hiển thị thẻ nhóm “Tất cả”</string>
+    <string name="summary_pref_group_all_display">Gộp cấu hình từ mọi nhóm đăng ký vào một thẻ.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Phản hồi lỗi</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">Thời gian cập nhật tự động (Phút, giá trị tối thiểu là 15)</string>
 
     <string name="title_core_loglevel">Cấp độ nhật ký</string>
-    <string name="title_outbound_domain_resolve_method">Phương thức phân giải trước tên miền đầu ra (outbound)</string>
+    <string name="title_outbound_domain_resolve_method">Phân giải tên miền cho kết nối đi (outbound)</string>
     <string name="title_mode">Chế độ kết nối</string>
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
@@ -302,10 +302,10 @@
     <string name="title_pref_hev_tunnel_rw_timeout">Thời gian chờ đọc/ghi của Hev TUN (giây) (tcp, udp mặc định 300, 60)</string>
     <string name="title_mode_settings">Cài đặt chế độ</string>
     <string name="title_root_mode_enabled">Bật chế độ Root (dành cho người dùng Root)</string>
-    <string name="summary_root_mode_enabled">Bật proxy trong suốt cấp thấp bằng quyền Root. Chế độ này bỏ qua VPN hệ thống tiêu chuẩn của Android để trực tiếp tiếp quản toàn bộ lưu lượng mạng bên dưới. Sau khi bật, chế độ thông thường trước đây, định tuyến theo ứng dụng và các cài đặt VPN liên quan sẽ hoàn toàn mất hiệu lực.</string>
+    <string name="summary_root_mode_enabled">Dùng quyền Root cho proxy trong suốt cấp thấp. Chế độ Root xử lý trực tiếp lưu lượng mạng thay vì dùng dịch vụ VPN của Android. Khi chế độ này bật, chế độ thông thường, định tuyến theo ứng dụng và các cài đặt VPN liên quan sẽ không được áp dụng.</string>
     <string name="toast_root_required">Tính năng này yêu cầu quyền truy cập Root</string>
-    <string name="title_root_lan_sharing">Chia sẻ LAN / kết nối mạng (dành cho người dùng Root)</string>
-    <string name="summary_root_lan_sharing">Định tuyến thiết bị dùng điểm phát Wi-Fi và chia sẻ kết nối USB qua VPN</string>
+    <string name="title_root_lan_sharing">Chia sẻ VPN với thiết bị LAN / chia sẻ kết nối (dành cho người dùng Root)</string>
+    <string name="summary_root_lan_sharing">Định tuyến lưu lượng từ thiết bị dùng điểm phát Wi-Fi và chia sẻ kết nối USB qua VPN.</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
@@ -345,7 +345,7 @@
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
-    <string name="toast_fragment_not_available">Không thể xác định màn hình hiện tại</string>
+    <string name="toast_fragment_not_available">Màn hình hiện tại không khả dụng.</string>
     <string name="title_locate_selected_config">Tìm cấu hình đã chọn</string>
 
     <string name="tasker_start_service">Khởi động v2rayNG</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>
     <string name="connection_not_connected">Chưa kết nối</string>
-    <string name="connection_running_task_left">Số tác vụ kiểm tra đang chạy: %s</string>
+    <string name="connection_running_task_left">Số lượt kiểm tra đang chạy: %s</string>
 
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">Loại nhóm chính sách</string>
     <string name="title_policy_group_subscription_id">Từ nhóm đăng ký</string>
     <string name="title_policy_group_subscription_filter">Bộ lọc biểu thức chính quy cho tên ghi chú</string>
-    <string name="title_policy_group_test_outbounds">Kiểm tra kết nối đi (outbounds)</string>
-    <string name="title_policy_group_fallback">Kết nối đi dự phòng (outbound, tùy chọn)</string>
+    <string name="title_policy_group_test_outbounds">Kiểm tra các kết nối đi (outbounds)</string>
+    <string name="title_policy_group_fallback">Kết nối dự phòng (outbound, tùy chọn)</string>
 
     <string name="server_proxy_chain_members">Thành viên chuỗi proxy</string>
     <string name="server_proxy_chain_pick_members">Chạm vào đây để chọn thành viên</string>
@@ -485,7 +485,7 @@
         <item>Ping thấp nhất (leastPing)</item>
         <item>Tải thấp nhất (leastLoad)</item>
         <item>Ngẫu nhiên (random)</item>
-        <item>Lần lượt (roundRobin)</item>
+        <item>Luân phiên (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">Cục bộ</string>

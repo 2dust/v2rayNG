@@ -79,7 +79,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن (allowInsecure)</string>
+    <string name="server_lab_allow_insecure">Skip certificate verification (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
     <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
     <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
-    <string name="toast_malformed_json">کانفیگ زبال نؽڌ</string>
+    <string name="toast_malformed_json">Invalid configuration.</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
@@ -195,9 +195,9 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
-    <string name="summary_pref_speed_enabled">نشووݩ داڌن سورعت هیم سکویی من وارسۊویا.\nنماڌ وارسۊوی و ری و کار گرؽڌن کانفیگ آلشت ابۊ.</string>
+    <string name="summary_pref_speed_enabled">Show current speeds in the notification.\nThe icon indicates whether proxy or direct traffic is dominant.</string>
 
-    <string name="title_pref_sniffing_enabled">ره وندن تجزیه وو تئلیل کتنا (Sniffing)</string>
+    <string name="title_pref_sniffing_enabled">Detect destination domains (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
     <string name="title_pref_route_only_enabled">ره وندن تینا تور جوستن routeOnly</string>
     <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
@@ -413,7 +413,7 @@
 
     <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
-    <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
+    <string name="title_policy_group_subscription_filter">Remarks regex filter</string>
     <string name="title_policy_group_test_outbounds">آزمایش بارتا (outbounds)</string>
     <string name="title_policy_group_fallback">بارت جایگزین (outbound، اختیاری)</string>
 
@@ -483,7 +483,7 @@
 
     <string-array name="policy_group_type">
         <item>کم ترین پینگ (leastPing)</item>
-        <item>کم ترین بار (لود) (leastLoad)</item>
+        <item>کم ترین بار (leastLoad)</item>
         <item>تساڌۊفی (random)</item>
         <item>گردشی (roundRobin)</item>
     </string-array>

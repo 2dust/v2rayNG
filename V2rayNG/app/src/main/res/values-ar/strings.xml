@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">رابط URL غير صالح</string>
     <string name="toast_insecure_url_protocol">يرجى عدم استخدام عنوان اشتراك ببروتوكول HTTP غير الآمن</string>
     <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
-    <string name="toast_malformed_json">تكوين مشوه</string>
+    <string name="toast_malformed_json">تنسيق التكوين غير صالح.</string>
     <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
     <string name="server_obfs_password">كلمة مرور Obfs</string>
@@ -131,7 +131,7 @@
     <string name="server_lab_browser_dialer">تمكين Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">يدعم فقط اتصالات xhttp (packet-up) وws الصادرة؛ قد يتم تجاهل الإعدادات المتعلقة بـ TLS أو قد تتعارض</string>
     <string name="toast_allow_insecure_deprecated">تستخدم العقدة الحالية اتصالاً غير مشفر. قد تتمكن تجهيزات الشبكة الوسيطة الخاضعة لسيطرة حكومات استبدادية من الاطلاع مباشرةً على اتصالاتك.\nلأسباب أمنية، لا يمكن الاتصال بهذه العقد عبر نواة Xray الإصدار 26.2.6 أو أحدث.\nإذا كانت العقدة من إعدادك، ففعّل تشفيراً آمناً مثل TLS أو ثبّت بصمة الشهادة pinnedCA256.\nإذا كانت العقدة تابعة لمزوّد خدمة، فتواصل معه لإكمال الترقية التقنية. إذا رفض المزوّد التعاون، فنوصي بالانتقال إلى مزوّد يهتم أكثر بأمان المستخدمين.\nلمزيد من المعلومات، تفضل بزيارة https://github.com/2dust/v2rayN/discussions/9460</string>
-    <string name="pinned_ca256_action_fetch">جلب بصمة الشهادة وتعبئتها</string>
+    <string name="pinned_ca256_action_fetch">جلب بصمة الشهادة</string>
     <string name="toast_fetch_cert_sha256_success">تم جلب بصمة الشهادة بنجاح</string>
     <string name="toast_fetch_cert_sha256_failed">فشل جلب بصمة الشهادة</string>
 
@@ -195,18 +195,18 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
-    <string name="summary_pref_speed_enabled">عرض السرعة الحالية في الإشعار.\nستتغير أيقونة الإشعار بناءً على الاستخدام.</string>
+    <string name="summary_pref_speed_enabled">عرض سرعات الاتصال الحالية في الإشعار.\nتوضح الأيقونة ما إذا كانت حركة الوكيل أم الحركة المباشرة هي الغالبة.</string>
 
-    <string name="title_pref_sniffing_enabled">تفعيل تحليل الحزم (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">محاولة استخراج النطاق من الحزمة (مفعل افتراضيًا)</string>
+    <string name="title_pref_sniffing_enabled">تفعيل اكتشاف نطاقات الوجهة (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">اكتشاف نطاقات الوجهة من حركة المرور (مفعّل افتراضيًا).</string>
     <string name="title_pref_route_only_enabled">تمكين routeOnly</string>
     <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط، واحتفظ بعنوان الوجهة كعنوان IP.</string>
 
     <string name="title_pref_local_dns_enabled">تفعيل DNS المحلي</string>
     <string name="summary_pref_local_dns_enabled">يتم معالجة DNS بواسطة وحدة DNS الأساسية (موصى به، إذا لزم تجاوز التوجيه لشبكة LAN وعنوان البر الرئيسي)</string>
 
-    <string name="title_pref_fake_dns_enabled">تفعيل DNS وهمي (FakeDNS)</string>
-    <string name="summary_pref_fake_dns_enabled">يعيد DNS المحلي عنوان IP وهمي (أسرع، ولكنه قد لا يعمل مع بعض التطبيقات)</string>
+    <string name="title_pref_fake_dns_enabled">تفعيل DNS اصطناعي (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">يعيد FakeDNS عناوين IP اصطناعية لاستعلامات النطاقات (أسرع، لكنه قد لا يعمل مع بعض التطبيقات).</string>
 
     <string name="title_pref_ipv6_enabled">تفعيل IPv6</string>
     <string name="summary_pref_ipv6_enabled">إضافة عنوان IPv6 والمسارات إلى واجهة VPN</string>
@@ -233,7 +233,7 @@
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
     <string name="summary_pref_delay_test_url">عنوان URL</string>
-    <string name="title_pref_real_ping_concurrency">تزامن اختبار التأخير الحقيقي</string>
+    <string name="title_pref_real_ping_concurrency">اختبارات تأخير حقيقي متزامنة</string>
 
     <string name="title_pref_ip_api_url">عنوان URL لاختبار معلومات الاتصال الحالي</string>
     <string name="summary_pref_ip_api_url">عنوان URL</string>
@@ -262,14 +262,14 @@
     <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من قبل المستخدم</string>
 
 
-    <string name="title_pref_append_http_proxy">إلحاق وكيل HTTP بشبكة VPN</string>
+    <string name="title_pref_append_http_proxy">إضافة وكيل HTTP إلى شبكة VPN</string>
     <string name="summary_pref_append_http_proxy">سيُستخدم وكيل HTTP مباشرةً من المتصفح وبعض التطبيقات المدعومة من دون المرور بواجهة NIC الافتراضية (Android 10+)</string>
 
     <string name="title_pref_double_column_display">تمكين العرض بعمودين</string>
-    <string name="summary_pref_double_column_display">عرض قائمة الملفات الشخصية في عمودين لإظهار محتوى أكبر على الشاشة.</string>
+    <string name="summary_pref_double_column_display">عرض قائمة التكوينات في عمودين لإظهار محتوى أكبر على الشاشة.</string>
 
-    <string name="title_pref_group_all_display">تمكين عرض كل المجموعات</string>
-    <string name="summary_pref_group_all_display">إضافة صفحة «كل علامات التبويب»</string>
+    <string name="title_pref_group_all_display">إظهار علامة تبويب «الكل»</string>
+    <string name="summary_pref_group_all_display">جمع تكوينات جميع مجموعات الاشتراك في علامة تبويب واحدة.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">ملاحظات</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
 
     <string name="title_core_loglevel">مستوى السجل</string>
-    <string name="title_outbound_domain_resolve_method">طريقة الحل المسبق لنطاق الخروج (outbound)</string>
+    <string name="title_outbound_domain_resolve_method">حل أسماء نطاقات الاتصالات الصادرة (outbound)</string>
     <string name="title_mode">الوضع</string>
     <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
@@ -302,10 +302,10 @@
     <string name="title_pref_hev_tunnel_rw_timeout">مهلة القراءة/الكتابة لـ Hev TUN بالثواني (القيم الافتراضية tcp,udp هي 300,60)</string>
     <string name="title_mode_settings">إعدادات الوضع</string>
     <string name="title_root_mode_enabled">تمكين وضع Root (لمستخدمي Root)</string>
-    <string name="summary_root_mode_enabled">تمكين وكيل شفاف منخفض المستوى باستخدام صلاحيات Root. يتجاوز هذا الوضع شبكة VPN القياسية لنظام Android ويتولى مباشرةً كل حركة مرور الشبكة الأساسية. بعد تمكينه، لن يعود للوضع العادي الأصلي أو توجيه التطبيقات أو إعدادات VPN المرتبطة بها أي تأثير.</string>
+    <string name="summary_root_mode_enabled">استخدام صلاحيات Root للوكيل الشفاف منخفض المستوى. يدير وضع Root حركة مرور الشبكة مباشرةً بدلاً من استخدام خدمة VPN في Android. أثناء تفعيله، لا يعمل الوضع العادي ولا توجيه التطبيقات ولا إعدادات VPN المرتبطة.</string>
     <string name="toast_root_required">تتطلب هذه الميزة صلاحيات Root</string>
-    <string name="title_root_lan_sharing">مشاركة LAN / الربط (لمستخدمي Root)</string>
-    <string name="summary_root_lan_sharing">توجيه أجهزة نقطة اتصال Wi-Fi والأجهزة المربوطة عبر USB من خلال VPN</string>
+    <string name="title_root_lan_sharing">مشاركة VPN مع أجهزة LAN / الأجهزة المربوطة (لمستخدمي Root)</string>
+    <string name="summary_root_lan_sharing">توجيه حركة مرور أجهزة نقطة اتصال Wi-Fi والأجهزة المربوطة عبر USB من خلال VPN.</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">نسخ</string>
@@ -345,8 +345,8 @@
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
-    <string name="toast_fragment_not_available">تعذر تحديد العرض الحالي</string>
-    <string name="title_locate_selected_config">تحديد موقع الإعداد المحدد</string>
+    <string name="toast_fragment_not_available">الشاشة الحالية غير متاحة.</string>
+    <string name="title_locate_selected_config">العثور على التكوين المحدد</string>
 
     <string name="tasker_start_service">بدء الخدمة</string>
     <string name="tasker_setting_confirm">تأكيد</string>
@@ -385,7 +385,7 @@
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
     <string name="connection_not_connected">غير متصل</string>
-    <string name="connection_running_task_left">عدد مهام الاختبار قيد التشغيل: %s</string>
+    <string name="connection_running_task_left">الاختبارات قيد التشغيل: %s</string>
 
     <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
     <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
