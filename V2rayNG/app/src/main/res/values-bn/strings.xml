@@ -79,7 +79,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">ফিঙ্গারপ্রিন্ট</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">অনিরাপদ অনুমতি দিন</string>
+    <string name="server_lab_allow_insecure">সার্টিফিকেট যাচাই এড়িয়ে যান (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">ঠিকানা</string>
     <string name="server_lab_port3">পোর্ট</string>
@@ -88,7 +88,7 @@
     <string name="server_lab_id4">পাসওয়ার্ড (ঐচ্ছিক)</string>
     <string name="server_lab_security4">ব্যবহারকারী (ঐচ্ছিক)</string>
     <string name="server_lab_encryption">এনক্রিপশন</string>
-    <string name="server_lab_flow">ফ্লো</string>
+    <string name="server_lab_flow">প্রবাহ (flow)</string>
     <string name="server_lab_public_key">পাবলিক কী</string>
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">শর্ট আইডি</string>
@@ -197,7 +197,7 @@
     <string name="title_pref_speed_enabled">গতি প্রদর্শন সক্রিয় করুন</string>
     <string name="summary_pref_speed_enabled">বিজ্ঞপ্তিতে বর্তমান গতি প্রদর্শন করুন।\nব্যবহারের উপর ভিত্তি করে বিজ্ঞপ্তি আইকন পরিবর্তিত হবে।</string>
 
-    <string name="title_pref_sniffing_enabled">স্নিফিং সক্রিয় করুন</string>
+    <string name="title_pref_sniffing_enabled">প্যাকেট বিশ্লেষণ সক্রিয় করুন (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">প্যাকেট থেকে ডোমেইন স্নিফ করার চেষ্টা করুন (ডিফল্টভাবে চালু)</string>
     <string name="title_pref_route_only_enabled">routeOnly সক্রিয় করুন</string>
     <string name="summary_pref_route_only_enabled">রুটিংয়ের জন্য শুধুমাত্র স্নিফড ডোমেইন নাম ব্যবহার করুন, এবং লক্ষ্য ঠিকানা হিসেবে আইপি ঠিকানা রাখুন।</string>
@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">স্থানীয় DNS সক্রিয় করুন</string>
     <string name="summary_pref_local_dns_enabled">DNS মূল DNS মডিউল দ্বারা প্রক্রিয়া করা হয় (প্রস্তাবিত, যদি LAN এবং মূলভূমি ঠিকানার বাইপাসিং প্রয়োজন হয়)</string>
 
-    <string name="title_pref_fake_dns_enabled">ভুয়া DNS সক্রিয় করুন</string>
+    <string name="title_pref_fake_dns_enabled">ভুয়া DNS সক্রিয় করুন (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">স্থানীয় DNS মিথ্যা আইপি ঠিকানা ফেরত দেয় (দ্রুত, তবে এটি কিছু অ্যাপের জন্য কাজ নাও করতে পারে)</string>
 
     <string name="title_pref_ipv6_enabled">IPv6 সক্রিয় করুন</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">অটো আপডেট ইন্টারভ্যাল (মিনিট, সর্বনিম্ন মান ১৫)</string>
 
     <string name="title_core_loglevel">লগ স্তর</string>
-    <string name="title_outbound_domain_resolve_method">outbound ডোমেইন আগাম রেজলভ করার পদ্ধতি</string>
+    <string name="title_outbound_domain_resolve_method">বহির্গামী ডোমেইন আগাম রেজলভ করার পদ্ধতি (outbound)</string>
     <string name="title_mode">মোড</string>
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
@@ -389,13 +389,13 @@
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>
-    <string name="title_fragment_settings">ফ্র্যাগমেন্ট সেটিংস</string>
+    <string name="title_fragment_settings">প্যাকেট বিভাজন সেটিংস (Fragment)</string>
     <string name="title_pref_fragment_packets">ফ্র্যাগমেন্ট প্যাকেটস</string>
     <string name="title_pref_fragment_length">ফ্র্যাগমেন্ট দৈর্ঘ্য (ন্যূনতম-সর্বাধিক)</string>
     <string name="title_pref_fragment_interval">ফ্র্যাগমেন্ট ইন্টারভ্যাল (ন্যূনতম-সর্বাধিক)</string>
     <string name="title_pref_fragment_enabled">ফ্র্যাগমেন্ট সক্রিয় করুন</string>
     <string name="title_pref_fragment_maxsplit">ফ্র্যাগমেন্ট ম্যাক্স স্প্লিট</string>
-    <string name="title_observatory_settings">সংযোগ পর্যবেক্ষণ সেটিংস</string>
+    <string name="title_observatory_settings">সংযোগ পর্যবেক্ষণ সেটিংস (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing ইন্টারভ্যাল</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad ইন্টারভ্যাল</string>
     <string name="title_pref_observatory_least_load_method">leastLoad HTTP পদ্ধতি</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">নীতি গ্রুপের ধরন</string>
     <string name="title_policy_group_subscription_id">সাবস্ক্রিপশন গ্রুপ থেকে</string>
     <string name="title_policy_group_subscription_filter">মন্তব্যের রেগুলার এক্সপ্রেশন ফিল্টার</string>
-    <string name="title_policy_group_test_outbounds">outbounds পরীক্ষা করুন</string>
-    <string name="title_policy_group_fallback">fallback outbound (ঐচ্ছিক)</string>
+    <string name="title_policy_group_test_outbounds">বহির্গামী সংযোগ পরীক্ষা করুন (outbounds)</string>
+    <string name="title_policy_group_fallback">বিকল্প বহির্গামী সংযোগ (outbound, ঐচ্ছিক)</string>
 
     <string name="server_proxy_chain_members">প্রক্সি চেইনের সদস্য</string>
     <string name="server_proxy_chain_pick_members">সদস্য বাছতে এখানে ট্যাপ করুন</string>
@@ -482,10 +482,10 @@
     </string-array>
 
     <string-array name="policy_group_type">
-        <item>সর্বনিম্ন পিং</item>
-        <item>সর্বনিম্ন লোড</item>
-        <item>এলোমেলো</item>
-        <item>রাউন্ড রবিন</item>
+        <item>সর্বনিম্ন পিং (leastPing)</item>
+        <item>সর্বনিম্ন লোড (leastLoad)</item>
+        <item>এলোমেলো (random)</item>
+        <item>রাউন্ড রবিন (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">স্থানীয়</string>

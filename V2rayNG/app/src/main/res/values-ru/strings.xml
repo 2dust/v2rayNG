@@ -79,7 +79,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn">ALPN</string>
-    <string name="server_lab_allow_insecure">Разрешать небезопасные соединения</string>
+    <string name="server_lab_allow_insecure">Пропускать проверку сертификата (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">Адрес</string>
     <string name="server_lab_port3">Порт</string>
@@ -88,7 +88,7 @@
     <string name="server_lab_id4">Пароль (необязательно)</string>
     <string name="server_lab_security4">Пользователь (необязательно)</string>
     <string name="server_lab_encryption">Шифрование</string>
-    <string name="server_lab_flow">Поток</string>
+    <string name="server_lab_flow">Поток (flow)</string>
     <string name="server_lab_public_key">Открытый ключ</string>
     <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
@@ -182,8 +182,8 @@
     <string name="title_pref_auto_sort_after_test">Автосортировка профилей</string>
     <string name="summary_pref_auto_sort_after_test">Автоматическая сортировка профилей после проверки (результаты проверки могут быть неточными)</string>
 
-    <string name="title_mux_settings">Настройки мультиплексирования</string>
-    <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
+    <string name="title_mux_settings">Настройки мультиплексирования (Mux)</string>
+    <string name="title_pref_mux_enabled">Использовать мультиплексирование (Mux)</string>
     <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
     <string name="title_pref_mux_concurrency">TCP-соединения (диапазон от -1 до 1024)</string>
     <string name="title_pref_mux_xudp_concurrency">XUDP-соединения (диапазон от -1 до 1024)</string>
@@ -197,7 +197,7 @@
     <string name="title_pref_speed_enabled">Показывать скорость</string>
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
-    <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
+    <string name="title_pref_sniffing_enabled">Анализировать пакеты (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">Пытаться определять доменные имена в пакетах (по умолчанию включено)</string>
     <string name="title_pref_route_only_enabled">Включить routeOnly</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
 
-    <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS</string>
+    <string name="title_pref_fake_dns_enabled">Использовать поддельную DNS (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">Локальная DNS возвращает поддельные IP-адреса (быстрее, но может не работать с некоторыми приложениями)</string>
 
     <string name="title_pref_ipv6_enabled">Включить IPv6</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">Интервал автообновления (минут, не менее 15)</string>
 
     <string name="title_core_loglevel">Подробность ведения журнала</string>
-    <string name="title_outbound_domain_resolve_method">Предопределение исходящего домена</string>
+    <string name="title_outbound_domain_resolve_method">Предварительное разрешение исходящего домена (outbound)</string>
     <string name="title_mode">Режим</string>
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
@@ -389,13 +389,13 @@
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
-    <string name="title_fragment_settings">Настройки фрагментирования</string>
+    <string name="title_fragment_settings">Настройки фрагментирования (Fragment)</string>
     <string name="title_pref_fragment_packets">Фрагментирование пакетов</string>
     <string name="title_pref_fragment_length">Длина фрагмента (от — до)</string>
     <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
     <string name="title_pref_fragment_maxsplit">Максимальное число фрагментов</string>
-    <string name="title_observatory_settings">Настройки наблюдения соединений</string>
+    <string name="title_observatory_settings">Настройки наблюдения соединений (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">Интервал leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Интервал leastLoad</string>
     <string name="title_pref_observatory_least_load_method">HTTP-метод leastLoad</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">Тип политики группы</string>
     <string name="title_policy_group_subscription_id">Из группы подписки</string>
     <string name="title_policy_group_subscription_filter">Название фильтра</string>
-    <string name="title_policy_group_test_outbounds">Проверять исходящие соединения</string>
-    <string name="title_policy_group_fallback">Резервное исходящее соединение (необязательно)</string>
+    <string name="title_policy_group_test_outbounds">Проверять исходящие соединения (outbounds)</string>
+    <string name="title_policy_group_fallback">Резервное исходящее соединение (outbound, необязательно)</string>
 
     <string name="server_proxy_chain_members">Участники цепочки прокси</string>
     <string name="server_proxy_chain_pick_members">Нажмите здесь, чтобы выбрать участника</string>
@@ -482,10 +482,10 @@
     </string-array>
 
     <string-array name="policy_group_type">
-        <item>Наименьшая задержка</item>
-        <item>Наименьшая нагрузка</item>
-        <item>Случайно</item>
-        <item>По очереди</item>
+        <item>Наименьшая задержка (leastPing)</item>
+        <item>Наименьшая нагрузка (leastLoad)</item>
+        <item>Случайно (random)</item>
+        <item>По очереди (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">Локально</string>

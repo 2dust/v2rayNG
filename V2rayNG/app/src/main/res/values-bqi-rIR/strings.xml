@@ -79,7 +79,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن</string>
+    <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
@@ -88,7 +88,7 @@
     <string name="server_lab_id4">رزم (اختیاری)</string>
     <string name="server_lab_security4">نوم منتوری (اختیاری)</string>
     <string name="server_lab_encryption">رزم نگاری</string>
-    <string name="server_lab_flow">جریان</string>
+    <string name="server_lab_flow">جریان (flow)</string>
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
     <string name="server_lab_preshared_key">کیلیت پؽش اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کۊتال</string>
@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">ره وندن DNS مهلی</string>
     <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین ره ونده بۊ)</string>
 
-    <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی</string>
+    <string name="title_pref_fake_dns_enabled">ره وندن DNS جئلی (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">دی ان اس مهلی نشۊویا آی پی جئلی ن اوورگنه (زل تر، ٱما گاشڌ من ی قرده ز برنومه یل کار نکونه)</string>
 
     <string name="title_pref_ipv6_enabled">ره وندن IPv6</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت گوزارشا</string>
-    <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری</string>
+    <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری (outbound)</string>
     <string name="title_mode">هالت</string>
     <string name="title_mode_help">سی دووسمندیا وو هیاری قلوه، ری ای هؽل بزݩ</string>
     <string name="title_language">زووݩ</string>
@@ -389,13 +389,13 @@
 
     <string name="import_subscription_success">اشتراک وا مووفقیت زفت وابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
-    <string name="title_fragment_settings">سامووا فرگمنت</string>
+    <string name="title_fragment_settings">سامووا فرگمنت (Fragment)</string>
     <string name="title_pref_fragment_packets">کتنا فرگمنت</string>
     <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
-    <string name="title_observatory_settings">سامووا واجۊری منپیز</string>
+    <string name="title_observatory_settings">سامووا واجۊری منپیز (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>
     <string name="title_pref_observatory_least_load_method">روش HTTP سی leastLoad</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
     <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
-    <string name="title_policy_group_test_outbounds">آزمایش بارتا</string>
-    <string name="title_policy_group_fallback">بارت جایگزین (اختیاری)</string>
+    <string name="title_policy_group_test_outbounds">آزمایش بارتا (outbounds)</string>
+    <string name="title_policy_group_fallback">بارت جایگزین (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
@@ -482,10 +482,10 @@
     </string-array>
 
     <string-array name="policy_group_type">
-        <item>کم ترین پینگ</item>
-        <item>کم ترین بار (لود)</item>
-        <item>تساڌۊفی</item>
-        <item>گردشی</item>
+        <item>کم ترین پینگ (leastPing)</item>
+        <item>کم ترین بار (لود) (leastLoad)</item>
+        <item>تساڌۊفی (random)</item>
+        <item>گردشی (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">مهلی</string>

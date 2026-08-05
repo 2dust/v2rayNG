@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">Enable local DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended if you need routing bypassing LAN and mainland addresses)</string>
 
-    <string name="title_pref_fake_dns_enabled">Enable fake DNS</string>
+    <string name="title_pref_fake_dns_enabled">Enable FakeDNS</string>
     <string name="summary_pref_fake_dns_enabled">Local DNS returns fake IP addresses (faster, but it may not work for some apps)</string>
 
     <string name="title_pref_ipv6_enabled">Enable IPv6</string>

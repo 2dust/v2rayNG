@@ -79,7 +79,7 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">مجوز SSL ناامن</string>
+    <string name="server_lab_allow_insecure">نادیده گرفتن تأیید گواهی (allowInsecure)</string>
     <string name="server_lab_sni">SNI</string>
     <string name="server_lab_address3">نشانی</string>
     <string name="server_lab_port3">پورت</string>
@@ -88,7 +88,7 @@
     <string name="server_lab_id4">رمز عبور (اختیاری)</string>
     <string name="server_lab_security4">نام‌ کاربری (اختیاری)</string>
     <string name="server_lab_encryption">رمزنگاری</string>
-    <string name="server_lab_flow">جریان</string>
+    <string name="server_lab_flow">جریان (flow)</string>
     <string name="server_lab_public_key">کلید عمومی</string>
     <string name="server_lab_preshared_key">کلید پیش‌اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کوتاه</string>
@@ -182,8 +182,8 @@
     <string name="title_pref_auto_sort_after_test">مرتب‌سازی خودکار بعد از پینگ گرفتن</string>
     <string name="summary_pref_auto_sort_after_test">نتایج آزمایش ممکن است کاملاً دقیق نباشند.</string>
 
-    <string name="title_mux_settings">تنظیمات MUX</string>
-    <string name="title_pref_mux_enabled">فعال کردن MUX</string>
+    <string name="title_mux_settings">تنظیمات Mux</string>
+    <string name="title_pref_mux_enabled">فعال کردن Mux</string>
     <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید.</string>
     <string name="title_pref_mux_concurrency">اتصالات TCP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP (محدوده -1 تا 1024)</string>
@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
     <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
 
-    <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی</string>
+    <string name="title_pref_fake_dns_enabled">فعال کردن DNS جعلی (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">دی ان اس محلی آدرس های آیپی جعلی را بر می گرداند (سریع تر می باشد و تاخیر را کاهش می دهد اما ممکن است برای برخی از برنامه ها کار نکند)</string>
 
     <string name="title_pref_ipv6_enabled">فعال کردن IPv6</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
 
     <string name="title_core_loglevel">سطح گزارشات</string>
-    <string name="title_outbound_domain_resolve_method">روش پیش‌تفکیک دامنه outbound</string>
+    <string name="title_outbound_domain_resolve_method">روش پیش‌تفکیک دامنه خروجی (outbound)</string>
     <string name="title_mode">حالت</string>
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
@@ -389,13 +389,13 @@
 
     <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
     <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
-    <string name="title_fragment_settings">تنظیمات فرگمنت</string>
+    <string name="title_fragment_settings">تنظیمات فرگمنت (Fragment)</string>
     <string name="title_pref_fragment_packets">بسته های فرگمنت</string>
     <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">حداکثر تقسیم فرگمنت</string>
-    <string name="title_observatory_settings">تنظیمات پایش اتصال</string>
+    <string name="title_observatory_settings">تنظیمات پایش اتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصله leastLoad</string>
     <string name="title_pref_observatory_least_load_method">روش HTTP برای leastLoad</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">نوع گروه خط مشی</string>
     <string name="title_policy_group_subscription_id">از گروه اشتراک</string>
     <string name="title_policy_group_subscription_filter">توضیحات فیلتر معمولی</string>
-    <string name="title_policy_group_test_outbounds">آزمایش خروجی‌ها</string>
-    <string name="title_policy_group_fallback">خروجی جایگزین (اختیاری)</string>
+    <string name="title_policy_group_test_outbounds">آزمایش خروجی‌ها (outbounds)</string>
+    <string name="title_policy_group_fallback">خروجی جایگزین (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>
@@ -482,10 +482,10 @@
     </string-array>
 
     <string-array name="policy_group_type">
-        <item>کمترین پینگ</item>
-        <item>کمترین بار(لود)</item>
-        <item>تصادفی</item>
-        <item>گردشی</item>
+        <item>کمترین پینگ (leastPing)</item>
+        <item>کمترین بار(لود) (leastLoad)</item>
+        <item>تصادفی (random)</item>
+        <item>گردشی (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">محلی</string>

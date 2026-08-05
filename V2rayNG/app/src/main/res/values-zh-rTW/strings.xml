@@ -197,7 +197,7 @@
     <string name="title_pref_speed_enabled">啟用速度顯示</string>
     <string name="summary_pref_speed_enabled">在通知中顯示當前速度\n小圖示顯示流量的轉送狀況</string>
 
-    <string name="title_pref_sniffing_enabled">啟用流量監聽</string>
+    <string name="title_pref_sniffing_enabled">啟用流量監聽 (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">從流量中監聽網域 (預設啟用)</string>
     <string name="title_pref_route_only_enabled">啟用 routeOnly</string>
     <string name="summary_pref_route_only_enabled">將嗅探得到的網域只用於路由，代理目標位址仍為 IP</string>
@@ -205,7 +205,7 @@
     <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模組處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
 
-    <string name="title_pref_fake_dns_enabled">啟用假 DNS</string>
+    <string name="title_pref_fake_dns_enabled">啟用假 DNS (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">本機退回假解析結果 (減低延時，但個別應用可能無法使用)</string>
 
     <string name="title_pref_ipv6_enabled">啟用 IPv6</string>
@@ -290,7 +290,7 @@
     <string name="title_pref_auto_update_interval">自動更新間隔（分鐘，最小值 15）</string>
 
     <string name="title_core_loglevel">記錄層級</string>
-    <string name="title_outbound_domain_resolve_method">出口網域預解析方式</string>
+    <string name="title_outbound_domain_resolve_method">出站網域預解析方式 (outbound)</string>
     <string name="title_mode">模式</string>
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
@@ -395,7 +395,7 @@
     <string name="title_pref_fragment_interval">分片間隔（最小-最大）</string>
     <string name="title_pref_fragment_enabled">啟用分片（Fragment）</string>
     <string name="title_pref_fragment_maxsplit">分片最大分割數</string>
-    <string name="title_observatory_settings">連線觀測設定</string>
+    <string name="title_observatory_settings">連線觀測設定 (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing 探測間隔</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad 探測間隔</string>
     <string name="title_pref_observatory_least_load_method">leastLoad HTTP 方法</string>
@@ -414,8 +414,8 @@
     <string name="title_policy_group_type">策略群組類型</string>
     <string name="title_policy_group_subscription_id">來自訂閱分組</string>
     <string name="title_policy_group_subscription_filter">別名正規過濾</string>
-    <string name="title_policy_group_test_outbounds">測試出口</string>
-    <string name="title_policy_group_fallback">備用出口（選填）</string>
+    <string name="title_policy_group_test_outbounds">測試出站 (outbounds)</string>
+    <string name="title_policy_group_fallback">備用出站 (outbound，選填)</string>
 
     <string name="server_proxy_chain_members">代理鏈成員</string>
     <string name="server_proxy_chain_pick_members">點此選擇成員</string>
@@ -482,10 +482,10 @@
     </string-array>
 
     <string-array name="policy_group_type">
-        <item>最低延遲</item>
-        <item>最少卡頓</item>
-        <item>隨機選擇</item>
-        <item>輪詢</item>
+        <item>最低延遲 (leastPing)</item>
+        <item>最低負載 (leastLoad)</item>
+        <item>隨機選擇 (random)</item>
+        <item>輪詢 (roundRobin)</item>
     </string-array>
 
     <string name="backup_location_local">本地</string>
