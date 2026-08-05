@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,13 +49,14 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+enum class BackupLocation(@StringRes val labelRes: Int) {
+    Local(R.string.backup_location_local),
+    WebDav(R.string.backup_location_webdav)
+}
+
 class BackupActivity : HelperBaseComponentActivity() {
 
     private val viewModel: BackupViewModel by viewModels()
-
-    private val configBackupOptions: Array<out String> by lazy {
-        resources.getStringArray(R.array.config_backup_options)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,19 +92,17 @@ class BackupActivity : HelperBaseComponentActivity() {
         BackupScreen(
             isLoadingState = viewModel.isLoading,
             webDavConfigState = viewModel.webDavConfig,
-            backupOptions = configBackupOptions.toList(),
-            onBackupOptionSelected = { which ->
-                when (which) {
-                    0 -> backupViaLocal()
-                    1 -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
+            onBackupOptionSelected = { location ->
+                when (location) {
+                    BackupLocation.Local -> backupViaLocal()
+                    BackupLocation.WebDav -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
                 }
             },
             onShareClick = { viewModel.shareBackup(cacheDir, getString(R.string.app_name)) },
-            restoreOptions = configBackupOptions.toList(),
-            onRestoreOptionSelected = { which ->
-                when (which) {
-                    0 -> restoreViaLocal()
-                    1 -> viewModel.restoreViaWebDav(cacheDir)
+            onRestoreOptionSelected = { location ->
+                when (location) {
+                    BackupLocation.Local -> restoreViaLocal()
+                    BackupLocation.WebDav -> viewModel.restoreViaWebDav(cacheDir)
                 }
             },
             onWebDavSave = { config -> viewModel.saveWebDavConfig(config) },
@@ -183,11 +183,9 @@ class BackupActivity : HelperBaseComponentActivity() {
 fun BackupScreen(
     isLoadingState: StateFlow<Boolean>,
     webDavConfigState: StateFlow<WebDavConfig?>,
-    backupOptions: List<String>,
-    onBackupOptionSelected: (Int) -> Unit,
+    onBackupOptionSelected: (BackupLocation) -> Unit,
     onShareClick: () -> Unit,
-    restoreOptions: List<String>,
-    onRestoreOptionSelected: (Int) -> Unit,
+    onRestoreOptionSelected: (BackupLocation) -> Unit,
     onWebDavSave: (WebDavConfig) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -243,10 +241,11 @@ fun BackupScreen(
     if (showBackupDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_backup),
-            options = backupOptions,
-            onSelected = { index, _ ->
+            options = BackupLocation.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { location ->
                 showBackupDialog = false
-                onBackupOptionSelected(index)
+                onBackupOptionSelected(location)
             },
             onDismiss = { showBackupDialog = false }
         )
@@ -254,10 +253,11 @@ fun BackupScreen(
     if (showRestoreDialog) {
         SelectListDialog(
             title = stringResource(R.string.title_configuration_restore),
-            options = restoreOptions,
-            onSelected = { index, _ ->
+            options = BackupLocation.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { location ->
                 showRestoreDialog = false
-                onRestoreOptionSelected(index)
+                onRestoreOptionSelected(location)
             },
             onDismiss = { showRestoreDialog = false }
         )
