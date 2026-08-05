@@ -235,7 +235,7 @@
     <string name="summary_pref_delay_test_url">URL</string>
     <string name="title_pref_real_ping_concurrency">آزمایش‌های هم‌زمان تأخیر واقعی</string>
 
-    <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی url</string>
+    <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی URL</string>
     <string name="summary_pref_ip_api_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">اشتراک‌گذاری پروکسی در شبکه محلی (LAN)</string>

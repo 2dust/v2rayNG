@@ -318,7 +318,7 @@
     <string name="title_export_all">匯出設定至剪貼簿</string>
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
-    <string name="sub_setting_url">可選位址(url)</string>
+    <string name="sub_setting_url">可選位址(URL)</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">請求頭（JSON 格式）</string>
     <string name="sub_setting_filter">別名正規過濾</string>
