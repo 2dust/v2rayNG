@@ -420,10 +420,8 @@
     <string name="action_delete">حذف</string>
     <string name="action_close">بستن</string>
 
-    <string-array name="share_sub_method">
-        <item>QRcode</item>
-        <item>خروجی گرفتن در کلیپ‌ بورد</item>
-    </string-array>
+    <string name="share_subscription_qrcode">QRcode</string>
+    <string name="share_subscription_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
@@ -438,13 +436,11 @@
         <item>تاریک</item>
     </string-array>
 
-    <string-array name="preset_rulesets">
-        <item>لیست سفید چین ( دور زدن سرزمین اصلی )</item>
-        <item>لیست سیاه چین</item>
-        <item>جهانی(GLOBAL)</item>
-        <item>ایران</item>
-        <item>لیست سفید روسیه</item>
-    </string-array>
+    <string name="routing_preset_china_whitelist">لیست سفید چین ( دور زدن سرزمین اصلی )</string>
+    <string name="routing_preset_china_blacklist">لیست سیاه چین</string>
+    <string name="routing_preset_global">جهانی(GLOBAL)</string>
+    <string name="routing_preset_iran_whitelist">ایران</string>
+    <string name="routing_preset_russia_whitelist">لیست سفید روسیه</string>
 
     <string-array name="vpn_bypass_lan">
         <item>پیش فرض کانفیگ</item>
@@ -464,9 +460,7 @@
         <item>گردشی</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>محلی</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">محلی</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>
