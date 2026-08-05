@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить профиль</string>
@@ -113,7 +114,7 @@
     <string name="toast_invalid_url">Неправильный URL</string>
     <string name="toast_insecure_url_protocol">Не используйте небезопасный HTTP-протокол в адресе подписки</string>
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
-    <string name="toast_malformed_josn">Профиль повреждён</string>
+    <string name="toast_malformed_json">Профиль повреждён</string>
     <string name="server_lab_request_host6">Узел (SNI) (необязательно)</string>
     <string name="toast_action_not_allowed">Это действие запрещено</string>
     <string name="server_obfs_password">Пароль obfs</string>
@@ -127,7 +128,7 @@
     <string name="server_lab_ech_config_list">ECHConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
-    <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
+    <string name="server_lab_browser_dialer">Включить Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
     <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются ядром Xray версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своём сервере или используйте отпечаток сертификата (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуется сменить его на более безопасный.\nПодробнее: https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">Получить и заполнить отпечаток сертификата</string>
@@ -184,8 +185,8 @@
     <string name="title_mux_settings">Настройки мультиплексирования</string>
     <string name="title_pref_mux_enabled">Использовать мультиплексирование</string>
     <string name="summary_pref_mux_enabled">Быстрее, но это может привести к нестабильному соединению.\nНиже можно настроить обработку TCP, UDP и QUIC.</string>
-    <string name="title_pref_mux_concurency">TCP-соединения (диапазон от 1 до 1024)</string>
-    <string name="title_pref_mux_xudp_concurency">XUDP-соединения (диапазон от 1 до 1024)</string>
+    <string name="title_pref_mux_concurrency">TCP-соединения (диапазон от -1 до 1024)</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP-соединения (диапазон от -1 до 1024)</string>
     <string name="title_pref_mux_xudp_quic">Обработка QUIC в мультиплексном туннеле</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Отклонять</item>
@@ -366,12 +367,13 @@
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain">Домен</string>
     <string name="routing_settings_ip">IP</string>
-    <string name="routing_settings_process">Процесс (название пакета; поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации» и ОС Android 10+)</string>
+    <string name="routing_settings_process">process (имя пакета — поддерживается только при использовании Xray TUN, включённом routeOnly и Android 10+)</string>
     <string name="routing_settings_process_select">Выбор названия пакета</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">Сеть</string>
+    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
     <string name="routing_settings_outbound_tag">Исходящее соединение</string>
 
     <string name="connection_test_pending">Проверить соединение</string>
@@ -383,7 +385,7 @@
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
     <string name="connection_connected">Соединено, нажмите для проверки</string>
     <string name="connection_not_connected">Нет соединения</string>
-    <string name="connection_runing_task_left">Запущено проверок: %s</string>
+    <string name="connection_running_task_left">Запущено проверок: %s</string>
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>

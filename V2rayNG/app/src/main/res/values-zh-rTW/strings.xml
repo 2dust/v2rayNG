@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">開關</string>
     <string name="app_tile_name">開關</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
@@ -20,7 +21,7 @@
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
 
-    <!-- ServerActivity -->
+    <!--ServerActivity-->
     <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增設定</string>
     <string name="menu_item_save_config">儲存設定</string>
@@ -113,7 +114,7 @@
     <string name="toast_invalid_url">URL 無效</string>
     <string name="toast_insecure_url_protocol">請不要使用不安全的 HTTP 協定訂閱位址</string>
     <string name="server_lab_need_inbound">​​確保 inbounds port 和設定中的一致</string>
-    <string name="toast_malformed_josn">設定格式不正確</string>
+    <string name="toast_malformed_json">設定格式不正確</string>
     <string name="server_lab_request_host6">Host (SNI) (可選)</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>
     <string name="server_obfs_password">混淆密碼</string>
@@ -127,6 +128,8 @@
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
     <string name="server_lab_pinned_ca256">證書指紋 (SHA-256)</string>
+    <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
+    <string name="server_lab_browser_dialer_tip">僅支援 xhttp (packet-up) 和 ws 出站；與 TLS 相關的設定可能會被忽略或發生衝突</string>
     <string name="toast_allow_insecure_deprecated">目前節點使用未加密連線，您的通訊可能會被威權政府掌控的網路中間設施直接查看\n為了安全，此類節點無法通過 26.2.6+ 版本的 Xray 核心連線\n如果是自建節點請啟用 TLS 等安全加密，或固定憑證 pinnedCA256\n如果機場節點請聯繫服務商完成技術升級，如服務商拒絕配合，建議更換更重視用戶安全的服務商\n更多的資訊，請訪問 https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">獲取並填充指紋證書</string>
     <string name="toast_fetch_cert_sha256_success">獲取指紋證書完成</string>
@@ -134,7 +137,9 @@
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失敗，請使用檔案總管</string>
+    <string name="menu_item_add_asset">新增資源</string>
     <string name="menu_item_add_file">新增檔案</string>
+    <string name="menu_item_add_url">新增連結</string>
     <string name="menu_item_scan_qrcode">掃描二維碼</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下載檔案</string>
@@ -156,7 +161,7 @@
     <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
     <string name="per_app_proxy_settings">分應用設置</string>
     <string name="per_app_proxy_settings_enable">根據應用分流</string>
-
+    <string name="app_picker_unknown_app">未知應用程式（無法識別 UID）</string>
 
     <!-- Preferences -->
     <string name="title_settings">設定</string>
@@ -167,6 +172,7 @@
     <string name="summary_pref_per_app_proxy">常規：勾選的 App 啟用 Proxy，未勾選的直接連線；\n繞行模式：勾選的 App 直接連線，未勾選的啟用 Proxy。\n可在選單中選擇自動選中需 Proxy 應用</string>
     <string name="title_pref_is_booted">開機時自動連線</string>
     <string name="summary_pref_is_booted">開機時自動連線選擇的伺服器，可能會不成功</string>
+
 
     <string name="subscription_updater_job_tips">任務將在背景運行，在通知中會顯示進度資訊</string>
     <string name="title_pref_auto_test_after_update_subscription">更新訂閱後自動測試</string>
@@ -179,8 +185,8 @@
     <string name="title_mux_settings">Mux 設定</string>
     <string name="title_pref_mux_enabled">啟用 Mux 多路復用</string>
     <string name="summary_pref_mux_enabled">減低延時 但可能會斷流\nTCP，UDP 及 QUIC 流量處理方式下方可選</string>
-    <string name="title_pref_mux_concurency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_concurrency">TCP 復用子鏈接數（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP 復用子鏈接數（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量處理方式</string>
     <string-array name="mux_xudp_quic_entries">
         <item>不代理</item>
@@ -195,7 +201,6 @@
     <string name="summary_pref_sniffing_enabled">從流量中監聽網域 (預設啟用)</string>
     <string name="title_pref_route_only_enabled">啟用 routeOnly</string>
     <string name="summary_pref_route_only_enabled">將嗅探得到的網域只用於路由，代理目標位址仍為 IP</string>
-
 
     <string name="title_pref_local_dns_enabled">啟用本機 DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS 請求匯入 core 由 DNS 模組處理 (建議啟用，如果需要轉送略過區域網路及中國大陸)</string>
@@ -216,10 +221,13 @@
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
 
     <string name="title_pref_vpn_interface_address">VPN 介面位址</string>
+
     <string name="title_pref_vpn_mtu">VPN MTU (預設 1500)</string>
 
-    <string name="summary_pref_domestic_dns">DNS</string>
+
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
+    <string name="summary_pref_domestic_dns">DNS</string>
+
     <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
@@ -299,7 +307,6 @@
     <string name="title_root_lan_sharing">區域網路 / 熱點網路共享 (僅限 Root 使用者)</string>
     <string name="summary_root_lan_sharing">允許透過 Wi-Fi 熱點和 USB 共享網路連線的裝置走 VPN 代理流量</string>
 
-
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_clear">清除</string>
@@ -360,12 +367,13 @@
     <string name="routing_settings_locked">鎖定中，匯入預設時不刪除此規則</string>
     <string name="routing_settings_domain">domain</string>
     <string name="routing_settings_ip">ip</string>
-    <string name="routing_settings_process">process (套件名稱 — 僅在使用 Xray 的 TUN、開啟 routeOnly 且 Android 10+ 時可用)</string>
+    <string name="routing_settings_process">process (套件名稱 — 僅在使用 Xray TUN、開啟 routeOnly 且 Android 10+ 時可用)</string>
     <string name="routing_settings_process_select">選擇包名</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
+    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">"測試連線能力"</string>
@@ -377,12 +385,10 @@
     <string name="connection_test_error_status_code">"錯誤碼：(#%d)"</string>
     <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
     <string name="connection_not_connected">"未連線"</string>
-    <string name="connection_runing_task_left">運行中的測試任務數：%s</string>
+    <string name="connection_running_task_left">運行中的測試任務數：%s</string>
 
     <string name="import_subscription_success">匯入訂閱成功</string>
     <string name="import_subscription_failure">匯入訂閱失敗</string>
-    <string name="menu_item_add_asset">新增資源</string>
-    <string name="menu_item_add_url">新增連結</string>
     <string name="title_fragment_settings">分片（Fragment） 設定</string>
     <string name="title_pref_fragment_packets">分片方式</string>
     <string name="title_pref_fragment_length">分片包長（最小-最大）</string>
@@ -410,6 +416,7 @@
     <string name="title_policy_group_subscription_filter">別名正規過濾</string>
     <string name="title_policy_group_test_outbounds">測試出口</string>
     <string name="title_policy_group_fallback">備用出口（選填）</string>
+
     <string name="server_proxy_chain_members">代理鏈成員</string>
     <string name="server_proxy_chain_pick_members">點此選擇成員</string>
     <string name="server_proxy_chain_member_unselected">請選擇成員</string>
@@ -444,6 +451,12 @@
         <item>僅代理</item>
     </string-array>
 
+    <string-array name="browser_dialer_mode">
+        <item>停用</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
+
     <string-array name="ui_mode_night">
         <item>跟隨系統</item>
         <item>淺色</item>
@@ -467,6 +480,7 @@
         <item>解析後加入 DNS Hosts</item>
         <item>解析後替換原網域名稱</item>
     </string-array>
+
     <string-array name="policy_group_type">
         <item>最低延遲</item>
         <item>最少卡頓</item>

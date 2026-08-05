@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
     <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
@@ -113,7 +114,7 @@
     <string name="toast_invalid_url">无效的网址</string>
     <string name="toast_insecure_url_protocol">请不要使用不安全的 HTTP 协议订阅地址</string>
     <string name="server_lab_need_inbound">确保 inbounds port 和设置中的一致</string>
-    <string name="toast_malformed_josn">配置格式错误</string>
+    <string name="toast_malformed_json">配置格式错误</string>
     <string name="server_lab_request_host6">Host (SNI) (可选)</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
     <string name="server_obfs_password">混淆密码</string>
@@ -127,7 +128,7 @@
     <string name="server_lab_ech_config_list">EchConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify Peer Cert By Name</string>
     <string name="server_lab_pinned_ca256">证书指纹 (SHA-256)</string>
-    <string name="server_lab_browser_dialer">启用浏览器转发</string>
+    <string name="server_lab_browser_dialer">启用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">仅支持 xhttp (packet-up) 和 ws。与优选域名冲突，utls, alpn, ech 等 TLS 设置将被忽略</string>
     <string name="toast_allow_insecure_deprecated">当前节点使用未加密连接，您的通信可能会被威权政府掌控的网络中间设施直接查看\n为了安全，此类节点无法通过 26.2.6+ 版本的 Xray 核心连接\n如果是自建节点请启用 TLS 等安全加密，或固定证书 pinnedCA256\n如果机场节点请联系服务商完成技术升级，如服务商拒绝配合，建议更换更重视用户安全的服务商\n更多的信息，请访问 https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">获取并填充指纹证书</string>
@@ -136,7 +137,9 @@
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">失败, 请使用文件管理器</string>
+    <string name="menu_item_add_asset">添加</string>
     <string name="menu_item_add_file">添加文件</string>
+    <string name="menu_item_add_url">添加链接</string>
     <string name="menu_item_scan_qrcode">扫描 QRcode</string>
     <string name="title_url">URL</string>
     <string name="menu_item_download_file">下载文件</string>
@@ -158,6 +161,7 @@
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
     <string name="per_app_proxy_settings">分应用设置</string>
     <string name="per_app_proxy_settings_enable">启用分应用</string>
+    <string name="app_picker_unknown_app">未知应用（无法识别 UID）</string>
 
     <!-- Preferences -->
     <string name="title_settings">设置</string>
@@ -168,6 +172,7 @@
     <string name="summary_pref_per_app_proxy">常规: 勾选的 App 被代理, 未勾选的直连;\n绕行模式: 勾选的 App 直连, 未勾选的被代理.\n不明白者在菜单中选择自动选中需代理应用</string>
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
+
 
     <string name="subscription_updater_job_tips">任务将在后台运行，在通知中会显示进度信息</string>
     <string name="title_pref_auto_test_after_update_subscription">更新订阅后自动测试</string>
@@ -180,8 +185,8 @@
     <string name="title_mux_settings">Mux 多路复用 设置</string>
     <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
     <string name="summary_pref_mux_enabled">减低延时，但可能会断流，建议不要启用。\nTCP，UDP 及 QUIC 流量处理方式下方可选。</string>
-    <string name="title_pref_mux_concurency">TCP 复用子链接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurency">XUDP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_concurrency">TCP 复用子链接数（可填 -1 至 1024）</string>
+    <string name="title_pref_mux_xudp_concurrency">XUDP 复用子链接数（可填 -1 至 1024）</string>
     <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
     <string-array name="mux_xudp_quic_entries">
         <item>不代理</item>
@@ -216,7 +221,9 @@
     <string name="title_pref_vpn_bypass_lan">VPN 是否绕过局域网</string>
 
     <string name="title_pref_vpn_interface_address">VPN 接口地址</string>
+
     <string name="title_pref_vpn_mtu">VPN MTU (默认 1500)</string>
+
 
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -240,15 +247,15 @@
     <string name="summary_pref_enable_local_proxy">不开启时没有 socks 代理，无法通过代理更新订阅等</string>
     <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">使用 UDP 时，socks5 认证并不完全安全</string>
-     <string name="summary_pref_socks_port">本地代理端口</string>
-     <string name="title_pref_dynamic_socks_port">启用动态本地代理端口</string>
-     <string name="summary_pref_dynamic_socks_port">每次生成 inbound 时随机生成一个本地代理端口</string>
-     <string name="title_pref_socks_username">本地代理用户名 (可选)</string>
-     <string name="summary_pref_socks_username">用户名</string>
-     <string name="title_pref_socks_password">本地代理密码 (可选)</string>
-     <string name="summary_pref_socks_password">密码</string>
+    <string name="summary_pref_socks_port">本地代理端口</string>
+    <string name="title_pref_dynamic_socks_port">启用动态本地代理端口</string>
+    <string name="summary_pref_dynamic_socks_port">每次生成 inbound 时随机生成一个本地代理端口</string>
+    <string name="title_pref_socks_username">本地代理用户名 (可选)</string>
+    <string name="summary_pref_socks_username">用户名</string>
+    <string name="title_pref_socks_password">本地代理密码 (可选)</string>
+    <string name="summary_pref_socks_password">密码</string>
 
-     <string name="title_pref_local_dns_port">本地 DNS 端口</string>
+    <string name="title_pref_local_dns_port">本地 DNS 端口</string>
     <string name="summary_pref_local_dns_port">本地 DNS 端口</string>
 
     <string name="title_pref_confirm_remove">删除配置确认</string>
@@ -300,7 +307,6 @@
     <string name="title_root_lan_sharing">局域网 / 热点网络共享 (仅限 Root 用户)</string>
     <string name="summary_root_lan_sharing">允许通过 Wi-Fi 热点和 USB 共享网络连接的设备走 VPN 代理流量</string>
 
-
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">复制</string>
     <string name="logcat_clear">清除</string>
@@ -330,9 +336,8 @@
     <string name="title_sort_by_test_results">按测试结果排序</string>
     <string name="title_filter_config">过滤配置</string>
     <string name="filter_config_all">所有</string>
-    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
     <string name="summary_scan_qrcode">点击屏幕打开相机扫描</string>
-
+    <string name="title_del_duplicate_config_count">删除 %d 个重复配置</string>
     <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="title_import_config_count">导入 %d 个配置</string>
     <string name="title_export_config_count">导出 %d 个配置</string>
@@ -362,12 +367,13 @@
     <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
     <string name="routing_settings_domain">domain</string>
     <string name="routing_settings_ip">ip</string>
-    <string name="routing_settings_process">process (包名 — 仅在使用 Xray 的 TUN、开启 routeOnly 且 Android 10+ 时可用)</string>
+    <string name="routing_settings_process">process (包名 — 仅在使用 Xray TUN、开启 routeOnly 且 Android 10+ 时可用)</string>
     <string name="routing_settings_process_select">选择包名</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
     <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
+    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
@@ -379,12 +385,10 @@
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
     <string name="connection_connected">"已连接，点击测试连接"</string>
     <string name="connection_not_connected">"未连接"</string>
-    <string name="connection_runing_task_left">运行中的测试任务数：%s</string>
+    <string name="connection_running_task_left">运行中的测试任务数：%s</string>
 
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
-    <string name="menu_item_add_asset">添加</string>
-    <string name="menu_item_add_url">添加链接</string>
     <string name="title_fragment_settings">分片（Fragment）设置</string>
     <string name="title_pref_fragment_packets">分片方式</string>
     <string name="title_pref_fragment_length">分片包长（最小 - 最大）</string>
@@ -412,6 +416,7 @@
     <string name="title_policy_group_subscription_filter">别名正则过滤</string>
     <string name="title_policy_group_test_outbounds">测试出站</string>
     <string name="title_policy_group_fallback">备用出站（可选）</string>
+
     <string name="server_proxy_chain_members">代理链成员</string>
     <string name="server_proxy_chain_pick_members">点此选择成员</string>
     <string name="server_proxy_chain_member_unselected">请选择成员</string>
@@ -426,7 +431,7 @@
     <string name="title_configuration_share">分享配置</string>
     <string name="title_webdav_config_setting">WebDAV 设置</string>
     <string name="title_webdav_config_setting_unknown">请先设置 WebDAV</string>
-    <string name="title_webdav_url">WebDAV 服务器地址</string>WebDAV server address
+    <string name="title_webdav_url">WebDAV 服务器地址</string>
     <string name="title_webdav_user">用户名</string>
     <string name="title_webdav_pass">密码</string>
     <string name="title_webdav_remote_path">远程文件夹名（可选）</string>
@@ -444,6 +449,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>仅代理</item>
+    </string-array>
+
+    <string-array name="browser_dialer_mode">
+        <item>禁用</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
     </string-array>
 
     <string-array name="ui_mode_night">
@@ -469,6 +480,7 @@
         <item>解析后添加至 DNS Hosts</item>
         <item>解析后替换原域名</item>
     </string-array>
+
     <string-array name="policy_group_type">
         <item>最低延迟</item>
         <item>最稳定</item>

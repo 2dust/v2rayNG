@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
     <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
@@ -10,7 +11,7 @@
     <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
-    <!-- Notifications -->↓
+    <!-- Notifications -->
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
@@ -76,7 +77,7 @@
     <string name="server_lab_path_kcp">KCP seed</string>
     <string name="server_lab_path_grpc">نوم سرویس gRPC</string>
     <string name="server_lab_stream_security">TLS</string>
-    <string name="server_lab_stream_fingerprint" translatable="false">Fingerprint</string>
+    <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">هشتن SSL نا ٱمن</string>
     <string name="server_lab_sni">SNI</string>
@@ -113,7 +114,7 @@
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
     <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
     <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
-    <string name="toast_malformed_josn">کانفیگ زبال نؽڌ</string>
+    <string name="toast_malformed_json">کانفیگ زبال نؽڌ</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
@@ -127,6 +128,9 @@
     <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
     <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
     <string name="server_lab_pinned_ca256">جا کلک گوواهی (SHA-256)</string>
+    <string name="server_lab_browser_dialer">Browser Dialer ن ره وستین</string>
+    <string name="server_lab_browser_dialer_tip">تینا وۊرۊیا xhttp (packet-up) وو ws ن پوشتؽووی اکونه؛ گاشڌ سامووا وابسته و TLS ناڌیڌه گرفته ابۊن یا وا همن جۊر نین</string>
+    <string name="toast_allow_insecure_deprecated">ای گر ز منپیز بی رمزنگاری کار اگیره. گاشڌ منپیزا شمو و دست دسگایل میووݩ شبکه ک و دست دولتا استبداڌی کنتورول ابۊن موستقیمن دیڌه ابۊ.\nسی ٱمنیت، ای جۊر گر یل وا هسته Xray نوسخه 26.2.6+ منپیز نابۊن.\nٱر گر خوتووݩ هڌ، رمزنگاری ٱمنی وری TLS ن ره وستین یا اثر انگشت گوواهی pinnedCA256 ن چفت کۊنین.\nٱر گر مال سرویس ڌهنده هڌ، ز سرویس ڌهنده بخواین ٱرتقا فنی ن ٱنجوم بڌه. ٱر همکاری نکونه، بئتره سرویس ڌهنده ی ک ب ٱمنیت کارورووݩ بؽتر اهمیت اڌه پسند کۊنین.\nسی دووسته بؽتر ورین و https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">گرؽڌن وو پور کردن جا کلک گوواهی</string>
     <string name="toast_fetch_cert_sha256_success">جا کلک گوواهی وا مووفقیت گرؽڌه وابی</string>
     <string name="toast_fetch_cert_sha256_failed">گرؽڌن جا کلک گوواهی مووفق نبی</string>
@@ -157,7 +161,7 @@
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
     <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>
     <string name="per_app_proxy_settings_enable">ره وندن ب تفکیک برنومه</string>
-
+    <string name="app_picker_unknown_app">برنومه ناناس (UID ناساڌه)</string>
 
     <!-- Preferences -->
     <string name="title_settings">سامووا</string>
@@ -169,6 +173,10 @@
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
+
+    <string name="subscription_updater_job_tips">وزیفه من پس زمینه کار اکونه وو ایلاعات پؽشرفت من اعلان نشووݩ داڌه ابۊ.</string>
+    <string name="title_pref_auto_test_after_update_subscription">تست خوتکار بئڌ و رۊز کۊنی اشتراک</string>
+    <string name="summary_pref_auto_test_after_update_subscription">تست خوتکار زمووݩ زیاڌی ابره. ٱر ره وست بۊ، وزیفه من پس زمینه کار اکونه؛ وگرنه من همین بلگه کار اکونه.</string>
     <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگا نا موئتبر بئڌ پینگ</string>
     <string name="summary_pref_auto_remove_invalid_after_test">نتیجه یل پینگ گاشڌ دییق نبۊن؛ کانفیگا پاک وابیڌه ن نتری وورگنی.</string>
     <string name="title_pref_auto_sort_after_test">ترتیب خوتکار بئڌ پینگ گرؽڌن</string>
@@ -177,8 +185,8 @@
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ره وندن Mux</string>
     <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ\nمخزن ترافیک TCP وا 8 منپیز پؽش فرز، بارت دؽوۉداری UDP وو QUIC ن ای لم سفارشی کۊنین.</string>
-    <string name="title_pref_mux_concurency">منپیزا TCP (تلایه منجا 1-1024)</string>
-    <string name="title_pref_mux_xudp_concurency">منپیزا XUDP (تلایه منجا 1-1024)</string>
+    <string name="title_pref_mux_concurrency">منپیزا TCP (تلایه منجا -1 تا 1024)</string>
+    <string name="title_pref_mux_xudp_concurrency">منپیزا XUDP (تلایه منجا -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رڌ کردن</item>
@@ -213,7 +221,9 @@
     <string name="title_pref_vpn_bypass_lan">VPN ز شبکه مهلی اگوڌرته؟</string>
 
     <string name="title_pref_vpn_interface_address">نشۊوی رابت VPN</string>
+
     <string name="title_pref_vpn_mtu">VPN MTU (پؽش فرز 1500)</string>
+
 
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
@@ -260,6 +270,7 @@
 
     <string name="title_pref_group_all_display">نشووݩ داڌن پوی بونکۊ یل ن ره ونین</string>
     <string name="summary_pref_group_all_display">ی بلگه «پوی بونکۊ یل کانفیگ» ازاف کۊنین</string>
+
     <!-- AboutActivity -->
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من Github</string>
@@ -309,6 +320,7 @@
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
     <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_request_headers">سرآیندا درخاست (قالوو JSON)</string>
     <string name="sub_setting_filter">نوم موستعار فیلتر</string>
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
     <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
@@ -324,9 +336,8 @@
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی</string>
-    <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
     <string name="summary_scan_qrcode">Click screen open the camera scan</string>
-
+    <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
@@ -354,13 +365,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت من کلیپ بورد</string>
     <string name="routing_settings_locked">چفت هڌ، ای قانووݩ ن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
-    <string name="routing_settings_domain" translatable="false">domain</string>
-    <string name="routing_settings_ip" translatable="false">ip</string>
-    <string name="routing_settings_port" translatable="false">port</string>
-    <string name="routing_settings_protocol" translatable="false">protocol</string>
-    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network" translatable="false">network</string>"[udp|tcp]"
-    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
+    <string name="routing_settings_domain">domain</string>
+    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_process">process (نوم بسته — تینا مجال کار بوردن Xray TUN، ره بیڌن routeOnly وو Android 10+ پوشتؽووی ابۊ)</string>
+    <string name="routing_settings_process_select">نوم بسته ن پسند کۊنین</string>
+    <string name="routing_settings_port">port</string>
+    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
@@ -371,7 +385,7 @@
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
     <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
-    <string name="connection_runing_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
+    <string name="connection_running_task_left">تعداد وزیفه یل آزمایشی ک ره اۊفتانه: %s</string>
 
     <string name="import_subscription_success">اشتراک وا مووفقیت زفت وابی</string>
     <string name="import_subscription_failure">اشتراک زفت نوابی</string>
@@ -402,6 +416,7 @@
     <string name="title_policy_group_subscription_filter">توزیهات فیلتر معمۊلی</string>
     <string name="title_policy_group_test_outbounds">آزمایش بارتا</string>
     <string name="title_policy_group_fallback">بارت جایگزین (اختیاری)</string>
+
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
     <string name="server_proxy_chain_member_unselected">ی عوزو پسند کۊنین</string>
@@ -436,6 +451,12 @@
         <item>تینا پروکسی</item>
     </string-array>
 
+    <string-array name="browser_dialer_mode">
+        <item>خامۊش</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
+
     <string-array name="ui_mode_night">
         <item>و دین کردن سیستوم</item>
         <item>رۊشنا</item>
@@ -459,6 +480,7 @@
         <item>هل وو ٱووردن و میزبووݩ یل دامنه DNS</item>
         <item>هل وو جایونی دامنه</item>
     </string-array>
+
     <string-array name="policy_group_type">
         <item>کم ترین پینگ</item>
         <item>کم ترین بار (لود)</item>
