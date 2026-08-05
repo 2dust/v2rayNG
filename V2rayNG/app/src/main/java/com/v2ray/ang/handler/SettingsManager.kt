@@ -62,12 +62,11 @@ object SettingsManager {
     /**
      * Get preset routing rulesets.
      * @param context The application context.
-     * @param index The index of the routing type.
+     * @param type The routing preset type.
      * @return A mutable list of RulesetItem.
      */
-    private fun getPresetRoutingRulesets(context: Context, index: Int = 0): MutableList<RulesetItem>? {
-        val fileName = RoutingType.fromIndex(index).fileName
-        val assets = Utils.readTextFromAssets(context, fileName)
+    private fun getPresetRoutingRulesets(context: Context, type: RoutingType = RoutingType.WHITE): MutableList<RulesetItem>? {
+        val assets = Utils.readTextFromAssets(context, type.fileName)
         if (TextUtils.isEmpty(assets)) {
             return null
         }
@@ -78,10 +77,10 @@ object SettingsManager {
     /**
      * Reset routing rulesets from presets.
      * @param context The application context.
-     * @param index The index of the routing type.
+     * @param type The routing preset type.
      */
-    fun resetRoutingRulesetsFromPresets(context: Context, index: Int) {
-        val rulesetList = getPresetRoutingRulesets(context, index) ?: return
+    fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType) {
+        val rulesetList = getPresetRoutingRulesets(context, type) ?: return
         resetRoutingRulesetsCommon(rulesetList)
     }
 

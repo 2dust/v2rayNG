@@ -441,10 +441,8 @@
     <string name="action_delete">Удалить</string>
     <string name="action_close">Закрыть</string>
 
-    <string-array name="share_sub_method">
-        <item>QR-код</item>
-        <item>Экспорт в буфер обмена</item>
-    </string-array>
+    <string name="share_subscription_qrcode">QR-код</string>
+    <string name="share_subscription_clipboard">Экспорт в буфер обмена</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
@@ -463,13 +461,11 @@
         <item>Тёмная</item>
     </string-array>
 
-    <string-array name="preset_rulesets">
-        <item>Белый список Китая</item>
-        <item>Чёрный список Китая</item>
-        <item>Общие</item>
-        <item>Белый список Ирана</item>
-        <item>Белый список России</item>
-    </string-array>
+    <string name="routing_preset_china_whitelist">Белый список Китая</string>
+    <string name="routing_preset_china_blacklist">Чёрный список Китая</string>
+    <string name="routing_preset_global">Общие</string>
+    <string name="routing_preset_iran_whitelist">Белый список Ирана</string>
+    <string name="routing_preset_russia_whitelist">Белый список России</string>
 
     <string-array name="vpn_bypass_lan">
         <item>Как в профиле</item>
@@ -490,9 +486,7 @@
         <item>По очереди</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>Локально</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">Локально</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>

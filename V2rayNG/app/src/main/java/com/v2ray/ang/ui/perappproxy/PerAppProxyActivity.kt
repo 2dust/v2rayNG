@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.perappproxy
 
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,12 +45,21 @@ import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDivider
+import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
+
+private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
+    SelectAll(R.string.menu_item_select_all),
+    InvertSelection(R.string.menu_item_invert_selection),
+    SelectProxyApps(R.string.menu_item_select_proxy_app),
+    ImportSelection(R.string.menu_item_import_proxy_app),
+    ExportSelection(R.string.menu_item_export_proxy_app)
+}
 
 class PerAppProxyActivity : BaseComponentActivity() {
 
@@ -100,7 +108,6 @@ class PerAppProxyActivity : BaseComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerAppProxyScreen(
     apps: List<AppInfo>,
@@ -169,30 +176,16 @@ fun PerAppProxyScreen(
                             onDismissRequest = { showMenu = false },
                             containerColor = MaterialTheme.colorScheme.surface
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_select_all)) },
-                                onClick = { showMenu = false; onSelectAll() },
-                                enabled = !isLoading
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_invert_selection)) },
-                                onClick = { showMenu = false; onInvertSelection() },
-                                enabled = !isLoading
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_select_proxy_app)) },
-                                onClick = { showMenu = false; onSelectProxyAuto() },
-                                enabled = !isLoading
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_import_proxy_app)) },
-                                onClick = { showMenu = false; onImportProxyApp() },
-                                enabled = !isLoading
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.menu_item_export_proxy_app)) },
-                                onClick = { showMenu = false; onExportProxyApp() }
-                            )
+                            AppDropdownMenuItems(PerAppMenuAction.entries, { it.labelRes }) { action ->
+                                showMenu = false
+                                when (action) {
+                                    PerAppMenuAction.SelectAll -> onSelectAll()
+                                    PerAppMenuAction.InvertSelection -> onInvertSelection()
+                                    PerAppMenuAction.SelectProxyApps -> onSelectProxyAuto()
+                                    PerAppMenuAction.ImportSelection -> onImportProxyApp()
+                                    PerAppMenuAction.ExportSelection -> onExportProxyApp()
+                                }
+                            }
                         }
                     }
                 }

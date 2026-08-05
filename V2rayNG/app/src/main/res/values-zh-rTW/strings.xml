@@ -436,10 +436,8 @@
     <string name="action_delete">刪除</string>
     <string name="action_close">關閉</string>
 
-    <string-array name="share_sub_method">
-        <item>二維碼</item>
-        <item>匯出至剪貼簿</item>
-    </string-array>
+    <string name="share_subscription_qrcode">二維碼</string>
+    <string name="share_subscription_clipboard">匯出至剪貼簿</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
@@ -452,13 +450,11 @@
         <item>深色</item>
     </string-array>
 
-    <string-array name="preset_rulesets">
-        <item>繞過大陸 (Whitelist)</item>
-        <item>黑名單 (Blacklist)</item>
-        <item>全域 (Global)</item>
-        <item>伊朗 (Iran)</item>
-        <item>俄羅斯白名單 (Russia Whitelist)</item>
-    </string-array>
+    <string name="routing_preset_china_whitelist">繞過大陸 (Whitelist)</string>
+    <string name="routing_preset_china_blacklist">黑名單 (Blacklist)</string>
+    <string name="routing_preset_global">全域 (Global)</string>
+    <string name="routing_preset_iran_whitelist">伊朗 (Iran)</string>
+    <string name="routing_preset_russia_whitelist">俄羅斯白名單 (Russia Whitelist)</string>
 
     <string-array name="vpn_bypass_lan">
         <item>跟隨設定檔</item>
@@ -478,9 +474,7 @@
         <item>輪詢</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>本地</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">本地</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>
