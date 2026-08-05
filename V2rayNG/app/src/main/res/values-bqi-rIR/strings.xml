@@ -79,8 +79,8 @@
     <string name="server_lab_stream_security">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
-    <string name="server_lab_allow_insecure">Skip certificate verification (allowInsecure)</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_allow_insecure">تئیڌ گوواهی ن ناڌیڌه بگرین (allowInsecure)</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
     <string name="server_lab_id3">رزم</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">کیلیت پوی وولاتی</string>
     <string name="server_lab_preshared_key">کیلیت پؽش اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کۊتال</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
@@ -114,7 +114,7 @@
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
     <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
     <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
-    <string name="toast_malformed_json">Invalid configuration.</string>
+    <string name="toast_malformed_json">کانفیگ نا موئتبر هڌ</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
@@ -195,9 +195,9 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
-    <string name="summary_pref_speed_enabled">Show current speeds in the notification.\nThe icon indicates whether proxy or direct traffic is dominant.</string>
+    <string name="summary_pref_speed_enabled">سورعت هیم سکویی من وارسۊوی نشووݩ داڌه ابۊ.\nنماڌ نشووݩ اڌه ک ترافیک پروکسی یا موستقیم بؽتره.</string>
 
-    <string name="title_pref_sniffing_enabled">Detect destination domains (Sniffing)</string>
+    <string name="title_pref_sniffing_enabled">ره وندن در کشیڌن نوم دامنه موورد نزر (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
     <string name="title_pref_route_only_enabled">ره وندن تینا تور جوستن routeOnly</string>
     <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">مجال هل وو فسل نوم دامنه، نشۊویا IPv6 ن ترجی بڌین</string>
 
     <string name="title_pref_remote_dns">DNS ز ره دیر (اختیاری) (udp/tcp/https/quic) (اختیاری)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (تینا IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN ز شبکه مهلی اگوڌرته؟</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">DNS منی (اختیاری)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS هاست موستقیم (قالوو: دامنه: نشۊوی،...)</string>
     <string name="summary_pref_dns_hosts">دامنه:نشۊوی،...</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
     <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو کارایی جۊر ورۊ رسۊوی یل اشتراک نترن پروکسی ن و کار گرن.</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">ائراز هۊویت socks5 مجال استفاڌه ز UDP کاملن ایمن نؽ</string>
     <string name="summary_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_dynamic_socks_port">وورکل پورت موتقیر سی پروکسی مهلی</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">سامووا بونکۊ اشتراک</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندا درخاست (قالوو JSON)</string>
     <string name="sub_setting_filter">نوم موستعار فیلتر</string>
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
-    <string name="toast_fragment_not_available">نتره نما سکویی ن بجۊره</string>
     <string name="title_locate_selected_config">کانفیگ پسند وابیڌه ن بجۊرین</string>
 
     <string name="tasker_start_service">ره وندن سرویس</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">نوم بسته ن پسند کۊنین</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
@@ -413,7 +412,7 @@
 
     <string name="title_policy_group_type">نوع بونکۊ سیاست</string>
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
-    <string name="title_policy_group_subscription_filter">Remarks regex filter</string>
+    <string name="title_policy_group_subscription_filter">فیلتر نیشتنا وا regex</string>
     <string name="title_policy_group_test_outbounds">آزمایش بارتا (outbounds)</string>
     <string name="title_policy_group_fallback">بارت جایگزین (outbound، اختیاری)</string>
 
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">مهلی</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>

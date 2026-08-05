@@ -80,7 +80,7 @@
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">address</string>
     <string name="server_lab_port3">port</string>
     <string name="server_lab_id3">password</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">PublicKey</string>
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">ShortId</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(Optional, separated by commas)</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">Prefer IPv6 addresses when resolving domain names</string>
 
     <string name="title_pref_remote_dns">Remote DNS (udp/tcp/https/quic)(Optional)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">Does VPN bypass LAN</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS hosts (Format: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">Local proxy port</string>
     <string name="title_pref_enable_local_proxy">Enable local proxy</string>
     <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">SOCKS5 authentication is not fully secure when using UDP.</string>
     <string name="summary_pref_socks_port">Local proxy port</string>
     <string name="title_pref_dynamic_socks_port">Enable dynamic local proxy port</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">Subscription group setting</string>
     <string name="sub_setting_remarks">remarks</string>
     <string name="sub_setting_url">Optional URL</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Request Headers (JSON format)</string>
     <string name="sub_setting_filter">Remarks regular filter</string>
     <string name="sub_setting_enable">Enable update</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
-    <string name="toast_fragment_not_available">Current screen is unavailable.</string>
     <string name="title_locate_selected_config">Find selected configuration</string>
 
     <string name="tasker_start_service">Start Service</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">Select package name</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">Check Connectivity</string>
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">Local</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>

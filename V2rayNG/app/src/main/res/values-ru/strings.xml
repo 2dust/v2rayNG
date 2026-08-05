@@ -80,7 +80,7 @@
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn">ALPN</string>
     <string name="server_lab_allow_insecure">Пропускать проверку сертификата (allowInsecure)</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">Адрес</string>
     <string name="server_lab_port3">Порт</string>
     <string name="server_lab_id3">Пароль</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">Открытый ключ</string>
     <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">mldsa65Verify</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса при определении доменных имён</string>
 
     <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN обходит LAN</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">Узлы DNS (формат: домен:адрес,…)</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">Порт локального прокси</string>
     <string name="title_pref_enable_local_proxy">Использовать локальный прокси</string>
     <string name="summary_pref_enable_local_proxy">Если отключено, SOCKS-прокси недоступен, поэтому обновления подписки и подобные действия не смогут использовать прокси</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">Аутентификация SOCKS5 не полностью безопасна при использовании UDP</string>
     <string name="summary_pref_socks_port">Порт локального прокси</string>
     <string name="title_pref_dynamic_socks_port">Динамически менять порт локального прокси</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">Группы</string>
     <string name="sub_setting_remarks">Название</string>
     <string name="sub_setting_url">URL (необязательно)</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Заголовки запроса (формат JSON)</string>
     <string name="sub_setting_filter">Название фильтра</string>
     <string name="sub_setting_enable">Использовать обновление</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
-    <string name="toast_fragment_not_available">Текущий экран недоступен.</string>
     <string name="title_locate_selected_config">Найти выбранный профиль</string>
 
     <string name="tasker_start_service">Запуск службы</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">Выбор названия пакета</string>
     <string name="routing_settings_port">Порт</string>
     <string name="routing_settings_protocol">Протокол</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">Сеть</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">Исходящее соединение</string>
 
     <string name="connection_test_pending">Проверить соединение</string>
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">Локально</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>

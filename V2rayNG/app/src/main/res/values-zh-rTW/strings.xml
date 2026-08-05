@@ -80,7 +80,7 @@
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">伺服器位址</string>
     <string name="server_lab_port3">伺服器埠</string>
     <string name="server_lab_id3">密碼</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">PublicKey</string>
     <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">解析網域名稱時優先使用 IPv6 位址</string>
 
     <string name="title_pref_remote_dns">遠端 DNS (udp/tcp/https/quic)(可選)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN 是否繞過區域網</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">境内 DNS (可选)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS hosts (格式: 網域:位址,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">本地代理埠</string>
     <string name="title_pref_enable_local_proxy">啟用本地代理</string>
     <string name="summary_pref_enable_local_proxy">未開啟時沒有 socks 代理，無法透過代理更新訂閱等</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">使用 UDP 時，socks5 認證並不完全安全</string>
     <string name="summary_pref_socks_port">本地代理埠</string>
     <string name="title_pref_dynamic_socks_port">啟用動態本地代理埠</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">訂閱分組設定</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">可選位址(url)</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">請求頭（JSON 格式）</string>
     <string name="sub_setting_filter">別名正規過濾</string>
     <string name="sub_setting_enable">啟用更新</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">更新了 %1$d 個配置（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="toast_server_not_found_in_group">當前分組中未找到選中的伺服器</string>
-    <string name="toast_fragment_not_available">目前畫面無法使用。</string>
     <string name="title_locate_selected_config">尋找所選設定檔</string>
 
     <string name="tasker_start_service">啟動服務</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">選擇包名</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">"測試連線能力"</string>
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">本地</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>

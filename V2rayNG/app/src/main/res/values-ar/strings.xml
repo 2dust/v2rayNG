@@ -80,7 +80,7 @@
     <string name="server_lab_stream_fingerprint">البصمة</string>
     <string name="server_lab_stream_alpn">بروتوكول الطبقة الآخرى التالية (ALPN)</string>
     <string name="server_lab_allow_insecure">تخطي التحقق من الشهادة (allowInsecure)</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">العنوان</string>
     <string name="server_lab_port3">المنفذ</string>
     <string name="server_lab_id3">كلمة المرور</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">المفتاح العام</string>
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">المعرّف القصير</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
     <string name="server_lab_secret_key">المفتاح السري</string>
     <string name="server_lab_reserved">محجوز (اختياري)</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">تفضيل عناوين IPv6 عند حل أسماء النطاقات</string>
 
     <string name="title_pref_remote_dns">DNS البعيد (udp/tcp/https/quic) (اختياري)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
     <string name="title_pref_vpn_bypass_lan">هل تتجاوز VPN شبكة LAN؟</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">مضيفو DNS (التنسيق: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">منفذ البروكسي المحلي</string>
     <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
     <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">مصادقة socks5 ليست آمنة تمامًا عند استخدام UDP</string>
     <string name="summary_pref_socks_port">منفذ البروكسي المحلي</string>
     <string name="title_pref_dynamic_socks_port">تمكين منفذ وكيل محلي ديناميكي</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">عنوان URL اختياري</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">رؤوس الطلب (بتنسيق JSON)</string>
     <string name="sub_setting_filter">مرشح تعبير نمطي للملاحظات</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
-    <string name="toast_fragment_not_available">الشاشة الحالية غير متاحة.</string>
     <string name="title_locate_selected_config">العثور على التكوين المحدد</string>
 
     <string name="tasker_start_service">بدء الخدمة</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">اختيار اسم الحزمة</string>
     <string name="routing_settings_port">port</string>
     <string name="routing_settings_protocol">protocol</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">network</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">outboundTag</string>
 
     <string name="connection_test_pending">التحقق من الاتصال</string>
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">محلي</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>

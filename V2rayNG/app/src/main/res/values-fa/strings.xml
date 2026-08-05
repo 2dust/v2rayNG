@@ -80,7 +80,7 @@
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn">Alpn</string>
     <string name="server_lab_allow_insecure">نادیده گرفتن تأیید گواهی (allowInsecure)</string>
-    <string name="server_lab_sni">SNI</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشانی</string>
     <string name="server_lab_port3">پورت</string>
     <string name="server_lab_id3">رمز عبور</string>
@@ -92,7 +92,7 @@
     <string name="server_lab_public_key">کلید عمومی</string>
     <string name="server_lab_preshared_key">کلید پیش‌اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کوتاه</string>
-    <string name="server_lab_spider_x">SpiderX</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_prefer_ipv6">هنگام بازیابی نام دامنه، آدرس‌های IPv6 را ترجیح دهید</string>
 
     <string name="title_pref_remote_dns">DNS از راه دور (اختیاری) (udp/tcp/https/quic)</string>
-    <string name="summary_pref_remote_dns">DNS</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
@@ -226,7 +226,7 @@
 
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
-    <string name="summary_pref_domestic_dns">DNS</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">DNS مستقیم هاست (فرمت: دامنه:آدرس،…)</string>
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
@@ -245,7 +245,7 @@
     <string name="title_pref_socks_port">پورت پروکسی محلی</string>
     <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
     <string name="summary_pref_enable_local_proxy">اگر غیرفعال باشد، هیچ پروکسی SOCKS در دسترس نخواهد بود و کارهایی مثل آپدیت اشتراک‌ها نمی‌توانند از پروکسی استفاده کنند.</string>
-    <string name="title_pref_socks_enable_udp">SOCKS5 UDP</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">احراز هویت socks5 هنگام استفاده از UDP کاملاً ایمن نیست</string>
     <string name="summary_pref_socks_port">پورت پروکسی محلی</string>
     <string name="title_pref_dynamic_socks_port">تولید پورت متغیر برای پروکسی محلی</string>
@@ -319,7 +319,7 @@
     <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
-    <string name="sub_setting_user_agent">User Agent</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندهای درخواست (قالب JSON)</string>
     <string name="sub_setting_filter">نام مستعار فیلتر</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
@@ -345,7 +345,6 @@
     <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
     <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
     <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>
-    <string name="toast_fragment_not_available">صفحهٔ فعلی در دسترس نیست.</string>
     <string name="title_locate_selected_config">یافتن پیکربندی انتخاب‌شده</string>
 
     <string name="tasker_start_service">شروع خدمات</string>
@@ -371,9 +370,9 @@
     <string name="routing_settings_process_select">انتخاب نام بسته</string>
     <string name="routing_settings_port">پورت</string>
     <string name="routing_settings_protocol">پورتکل</string>
-    <string name="routing_settings_protocol_tip">[http,tls,bittorrent]</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network">شبکه</string>
-    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;remarks&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag">برچسب خروجی</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
@@ -489,6 +488,6 @@
     </string-array>
 
     <string name="backup_location_local">محلی</string>
-    <string name="backup_location_webdav">WebDAV</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
 </resources>
