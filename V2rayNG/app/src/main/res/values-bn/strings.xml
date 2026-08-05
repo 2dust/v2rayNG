@@ -478,10 +478,8 @@
     <string name="action_delete">মুছুন</string>
     <string name="action_close">বন্ধ করুন</string>
 
-    <string-array name="share_sub_method">
-        <item>QR কোড</item>
-        <item>ক্লিপবোর্ডে রপ্তানি করুন</item>
-    </string-array>
+    <string name="share_subscription_qrcode">QR কোড</string>
+    <string name="share_subscription_clipboard">ক্লিপবোর্ডে রপ্তানি করুন</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
@@ -493,13 +491,11 @@
         <item>লাইট</item>
         <item>ডার্ক</item>
     </string-array>
-    <string-array name="preset_rulesets">
-        <item>চায়না হোয়াইটলিস্ট</item>
-        <item>চায়না ব্ল্যাকলিস্ট</item>
-        <item>গ্লোবাল</item>
-        <item>ইরান হোয়াইটলিস্ট</item>
-        <item>রাশিয়া হোয়াইটলিস্ট</item>
-    </string-array>
+    <string name="routing_preset_china_whitelist">চায়না হোয়াইটলিস্ট</string>
+    <string name="routing_preset_china_blacklist">চায়না ব্ল্যাকলিস্ট</string>
+    <string name="routing_preset_global">গ্লোবাল</string>
+    <string name="routing_preset_iran_whitelist">ইরান হোয়াইটলিস্ট</string>
+    <string name="routing_preset_russia_whitelist">রাশিয়া হোয়াইটলিস্ট</string>
 
     <string-array name="vpn_bypass_lan">
         <item>Follow config</item>
@@ -519,9 +515,7 @@
         <item>Round Robin</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>Local</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">Local</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>

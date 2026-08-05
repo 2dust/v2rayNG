@@ -1,31 +1,26 @@
 package com.v2ray.ang.ui.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,22 +33,49 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
+enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
+    Subscriptions(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting),
+    PerAppProxy(R.drawable.ic_per_apps_24dp, R.string.per_app_proxy_settings),
+    Routing(R.drawable.ic_routing_24dp, R.string.routing_settings_title),
+    UserAssets(R.drawable.ic_file_24dp, R.string.title_user_asset_setting),
+    Settings(R.drawable.ic_settings_24dp, R.string.title_settings),
+    Promotion(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion),
+    Logcat(R.drawable.ic_logcat_24dp, R.string.title_logcat),
+    CheckUpdate(R.drawable.ic_check_update_24dp, R.string.update_check_for_update),
+    BackupRestore(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore),
+    Tethering(R.drawable.ic_device_hub_24dp, R.string.title_tethering),
+    About(R.drawable.ic_about_24dp, R.string.title_about)
+}
+
+private val primaryDrawerItems = listOf(
+    MainDestination.Subscriptions,
+    MainDestination.PerAppProxy,
+    MainDestination.Routing,
+    MainDestination.UserAssets,
+    MainDestination.Settings
+)
+
+private val drawerItems = primaryDrawerItems + listOf(
+    MainDestination.Promotion,
+    MainDestination.Logcat,
+    MainDestination.CheckUpdate,
+    MainDestination.BackupRestore,
+    MainDestination.Tethering,
+    MainDestination.About
+)
+
 @Composable
-fun MainDrawerContent(onNavigate: (String) -> Unit) {
+fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
     val drawerScrollState = rememberScrollState()
     val tetheringEnabled = booleanResource(R.bool.shizuku_tethering_enabled)
 
     ModalDrawerSheet(
-        modifier = Modifier
-            .fillMaxWidth(0.75f)
-            .navigationBarsPadding(),
+        drawerState = drawerState,
+        modifier = Modifier.fillMaxWidth(0.75f),
         drawerContainerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
-            modifier = Modifier
-                .verticalScroll(drawerScrollState)
-                .verticalScrollbar(drawerScrollState)
-                .padding(bottom = 80.dp)
+            modifier = Modifier.verticalScroll(drawerScrollState).verticalScrollbar(drawerScrollState)
         ) {
             Surface(
                 modifier = Modifier
@@ -77,83 +99,17 @@ fun MainDrawerContent(onNavigate: (String) -> Unit) {
                     )
                 }
             }
-            DrawerMenuGroup(
-                items = listOf(
-                    DrawerMenuItemData(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting, "sub_setting"),
-                    DrawerMenuItemData(R.drawable.ic_per_apps_24dp, R.string.per_app_proxy_settings, "per_app_proxy"),
-                    DrawerMenuItemData(R.drawable.ic_routing_24dp, R.string.routing_settings_title, "routing_setting"),
-                    DrawerMenuItemData(R.drawable.ic_file_24dp, R.string.title_user_asset_setting, "user_asset"),
-                    DrawerMenuItemData(R.drawable.ic_settings_24dp, R.string.title_settings, "settings")
-                ),
-                onNavigate = onNavigate
-            )
-            AppDivider()
-            DrawerMenuGroup(
-                items = listOfNotNull(
-                    DrawerMenuItemData(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion, "promotion"),
-                    DrawerMenuItemData(R.drawable.ic_logcat_24dp, R.string.title_logcat, "logcat"),
-                    DrawerMenuItemData(R.drawable.ic_check_update_24dp, R.string.update_check_for_update, "check_update"),
-                    DrawerMenuItemData(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore, "backup_restore"),
-                    if (tetheringEnabled) DrawerMenuItemData(R.drawable.ic_device_hub_24dp, R.string.title_tethering, "tethering") else null,
-                    DrawerMenuItemData(R.drawable.ic_about_24dp, R.string.title_about, "about")
-                ),
-                onNavigate = onNavigate
-            )
+            drawerItems.filter { tetheringEnabled || it != MainDestination.Tethering }
+                .forEachIndexed { index, item ->
+                    if (index == primaryDrawerItems.size) AppDivider()
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(item.labelRes)) },
+                        selected = false,
+                        onClick = { onNavigate(item) },
+                        icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
         }
-    }
-}
-
-data class DrawerMenuItemData(
-    val iconRes: Int,
-    val labelRes: Int,
-    val route: String
-)
-
-@Composable
-private fun DrawerMenuGroup(
-    items: List<DrawerMenuItemData>,
-    onNavigate: (String) -> Unit
-) {
-    items.forEach { item ->
-        DrawerMenuItem(
-            icon = painterResource(item.iconRes),
-            label = stringResource(item.labelRes),
-            onClick = { onNavigate(item.route) }
-        )
-    }
-}
-
-@Composable
-fun DrawerMenuItem(
-    icon: Painter,
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    selected: Boolean = false
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable(onClick = onClick)
-            .background(
-                if (selected) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                else Color.Transparent
-            )
-            .padding(horizontal = 16.dp, vertical = 0.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }

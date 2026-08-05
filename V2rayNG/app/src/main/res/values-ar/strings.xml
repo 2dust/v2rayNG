@@ -479,10 +479,8 @@
     <string name="action_delete">حذف</string>
     <string name="action_close">إغلاق</string>
 
-    <string-array name="share_sub_method">
-        <item>رمز استجابة سريعة (QRcode)</item>
-        <item>تصدير إلى الحافظة</item>
-    </string-array>
+    <string name="share_subscription_qrcode">رمز استجابة سريعة (QRcode)</string>
+    <string name="share_subscription_clipboard">تصدير إلى الحافظة</string>
 
     <string-array name="mode_entries">
         <item>VPN</item>
@@ -513,9 +511,7 @@
         <item>Round Robin</item>
     </string-array>
 
-    <string-array name="config_backup_options">
-        <item>Local</item>
-        <item>WebDAV</item>
-    </string-array>
+    <string name="backup_location_local">Local</string>
+    <string name="backup_location_webdav">WebDAV</string>
 
 </resources>

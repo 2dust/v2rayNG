@@ -184,8 +184,9 @@ fun SettingsListItem(
     enabled: Boolean = true
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    val selectedIndex = values.indexOf(selectedValue).let { if (it >= 0) it else 0 }
-    val summary = entries.getOrNull(selectedIndex).orEmpty()
+    val options = entries.zip(values)
+    val selectedOption = options.find { it.second == selectedValue } ?: options.firstOrNull()
+    val summary = selectedOption?.first.orEmpty()
 
     SettingsItemRow(
         icon = icon,
@@ -201,11 +202,12 @@ fun SettingsListItem(
     if (showDialog) {
         SelectListDialog(
             title = title,
-            options = entries,
-            selectedOption = summary,
-            onSelected = { index, _ ->
+            options = options,
+            optionText = { it.first },
+            selectedOption = selectedOption,
+            onSelected = { option ->
                 showDialog = false
-                values.getOrNull(index)?.let(onSelected)
+                onSelected(option.second)
             },
             onDismiss = { showDialog = false },
             showRadio = true

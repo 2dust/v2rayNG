@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
     isLoading: Boolean,
@@ -39,9 +37,7 @@ fun MainTopBar(
     onSearchToggle: (Boolean) -> Unit,
     onMenuClick: () -> Unit,
     onAction: (MainAction) -> Unit,
-    onDelAllConfig: () -> Unit,
-    onDelDuplicateConfig: () -> Unit,
-    onDelInvalidConfig: () -> Unit
+    onMoreMenuAction: (MainMoreMenuAction) -> Unit
 ) {
     var showImportMenu by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
@@ -111,15 +107,10 @@ fun MainTopBar(
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(moreMenuScrollState)
                 ) {
-                    MoreMenuContent(
-                        onAction = { action ->
-                            showMenu = false
-                            onAction(action)
-                        },
-                        onDelAllConfig = { showMenu = false; onDelAllConfig() },
-                        onDelDuplicateConfig = { showMenu = false; onDelDuplicateConfig() },
-                        onDelInvalidConfig = { showMenu = false; onDelInvalidConfig() }
-                    )
+                    MoreMenuContent { action ->
+                        showMenu = false
+                        onMoreMenuAction(action)
+                    }
                 }
             }
         }

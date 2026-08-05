@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.routing
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,11 +45,13 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableListItem
@@ -68,6 +69,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+
+private enum class RoutingMenuAction(@StringRes val labelRes: Int) {
+    ImportPredefined(R.string.routing_settings_import_predefined_rulesets),
+    ImportClipboard(R.string.routing_settings_import_rulesets_from_clipboard),
+    ImportQRCode(R.string.routing_settings_import_rulesets_from_qrcode),
+    ExportClipboard(R.string.routing_settings_export_rulesets_to_clipboard)
+}
+
+private enum class RoutingPreset(val type: RoutingType, @StringRes val labelRes: Int) {
+    ChinaWhitelist(RoutingType.WHITE, R.string.routing_preset_china_whitelist),
+    ChinaBlacklist(RoutingType.BLACK, R.string.routing_preset_china_blacklist),
+    Global(RoutingType.GLOBAL, R.string.routing_preset_global),
+    IranWhitelist(RoutingType.WHITE_IRAN, R.string.routing_preset_iran_whitelist),
+    RussiaWhitelist(RoutingType.WHITE_RUSSIA, R.string.routing_preset_russia_whitelist)
+}
 
 class RoutingSettingActivity : HelperBaseComponentActivity() {
     private val viewModel: RoutingSettingsViewModel by viewModels()
@@ -92,7 +108,7 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
                 MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
                 domainStrategyState.value = value
             },
-            onImportPredefined = { index -> importPredefined(index) },
+            onImportPredefined = { type -> importPredefined(type) },
             onImportClipboard = { importFromClipboard() },
             onImportQRcode = { importQRcode() },
             onExportClipboard = { export2Clipboard() }
@@ -109,10 +125,10 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: strategies.first()
     }
 
-    private fun importPredefined(index: Int) {
+    private fun importPredefined(type: RoutingType) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, index)
+                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, type)
                 launch(Dispatchers.Main) {
                     viewModel.reload()
                     toastSuccess(R.string.toast_success)
@@ -172,7 +188,6 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutingSettingScreen(
     viewModel: RoutingSettingsViewModel,
@@ -181,7 +196,7 @@ fun RoutingSettingScreen(
     onAddRule: () -> Unit,
     onEditRule: (Int) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
-    onImportPredefined: (Int) -> Unit,
+    onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
     onImportQRcode: () -> Unit,
     onExportClipboard: () -> Unit
@@ -192,8 +207,6 @@ fun RoutingSettingScreen(
     var showPresetDialog by remember { mutableStateOf(false) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
-    val presetRulesets = stringArrayResource(R.array.preset_rulesets).toList()
-
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
@@ -227,22 +240,15 @@ fun RoutingSettingScreen(
                             onDismissRequest = { showMenu = false },
                             containerColor = MaterialTheme.colorScheme.surface
                         ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_predefined_rulesets)) },
-                                onClick = { showMenu = false; showPresetDialog = true }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_rulesets_from_clipboard)) },
-                                onClick = { showMenu = false; onImportClipboard() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_import_rulesets_from_qrcode)) },
-                                onClick = { showMenu = false; onImportQRcode() }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.routing_settings_export_rulesets_to_clipboard)) },
-                                onClick = { showMenu = false; onExportClipboard() }
-                            )
+                            AppDropdownMenuItems(RoutingMenuAction.entries, { it.labelRes }) { action ->
+                                showMenu = false
+                                when (action) {
+                                    RoutingMenuAction.ImportPredefined -> showPresetDialog = true
+                                    RoutingMenuAction.ImportClipboard -> onImportClipboard()
+                                    RoutingMenuAction.ImportQRCode -> onImportQRcode()
+                                    RoutingMenuAction.ExportClipboard -> onExportClipboard()
+                                }
+                            }
                         }
                     }
                 }
@@ -301,10 +307,11 @@ fun RoutingSettingScreen(
     if (showPresetDialog) {
         SelectListDialog(
             title = stringResource(R.string.routing_settings_import_predefined_rulesets),
-            options = presetRulesets,
-            onSelected = { index, _ ->
+            options = RoutingPreset.entries,
+            optionText = { stringResource(it.labelRes) },
+            onSelected = { preset ->
                 showPresetDialog = false
-                onImportPredefined(index)
+                onImportPredefined(preset.type)
             },
             onDismiss = { showPresetDialog = false }
         )

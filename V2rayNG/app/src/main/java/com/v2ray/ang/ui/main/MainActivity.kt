@@ -5,6 +5,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
@@ -99,6 +100,7 @@ class MainActivity : HelperBaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
+        BackHandler { moveTaskToBack(false) }
         MainScreen(
             mainViewModel = mainViewModel,
             onAction = { action ->
@@ -135,27 +137,25 @@ class MainActivity : HelperBaseComponentActivity() {
         }
     }
 
-    private fun navigateTo(destination: String) {
+    private fun navigateTo(destination: MainDestination) {
         val intent = when (destination) {
-            "sub_setting" -> Intent(this, SubSettingActivity::class.java)
-            "per_app_proxy" -> Intent(this, PerAppProxyActivity::class.java)
-            "routing_setting" -> Intent(this, RoutingSettingActivity::class.java)
-            "user_asset" -> Intent(this, UserAssetActivity::class.java)
-            "settings" -> Intent(this, SettingsActivity::class.java)
-            "logcat" -> Intent(this, LogcatActivity::class.java)
-            "check_update" -> Intent(this, CheckUpdateActivity::class.java)
-            "backup_restore" -> Intent(this, BackupActivity::class.java)
-            "tethering" -> Intent(this, ShizukuActivity::class.java)
-            "about" -> Intent(this, AboutActivity::class.java)
-            "promotion" -> {
+            MainDestination.Subscriptions -> Intent(this, SubSettingActivity::class.java)
+            MainDestination.PerAppProxy -> Intent(this, PerAppProxyActivity::class.java)
+            MainDestination.Routing -> Intent(this, RoutingSettingActivity::class.java)
+            MainDestination.UserAssets -> Intent(this, UserAssetActivity::class.java)
+            MainDestination.Settings -> Intent(this, SettingsActivity::class.java)
+            MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
+            MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
+            MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
+            MainDestination.Tethering -> Intent(this, ShizukuActivity::class.java)
+            MainDestination.About -> Intent(this, AboutActivity::class.java)
+            MainDestination.Promotion -> {
                 Utils.openUri(
                     this,
                     "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}"
                 )
                 return
             }
-
-            else -> return
         }
         settingsActivityLauncher.launch(intent)
     }
@@ -282,7 +282,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
+        if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
             moveTaskToBack(false)
             return true
         }
