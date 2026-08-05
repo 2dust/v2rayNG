@@ -199,7 +199,7 @@
 
     <string name="title_pref_sniffing_enabled">স্নিফিং সক্রিয় করুন</string>
     <string name="summary_pref_sniffing_enabled">প্যাকেট থেকে ডোমেইন স্নিফ করার চেষ্টা করুন (ডিফল্টভাবে চালু)</string>
-    <string name="title_pref_route_only_enabled">রুটঅনলি সক্রিয় করুন</string>
+    <string name="title_pref_route_only_enabled">routeOnly সক্রিয় করুন</string>
     <string name="summary_pref_route_only_enabled">রুটিংয়ের জন্য শুধুমাত্র স্নিফড ডোমেইন নাম ব্যবহার করুন, এবং লক্ষ্য ঠিকানা হিসেবে আইপি ঠিকানা রাখুন।</string>
 
     <string name="title_pref_local_dns_enabled">স্থানীয় DNS সক্রিয় করুন</string>

@@ -199,7 +199,7 @@
 
     <string name="title_pref_sniffing_enabled">Анализировать пакеты</string>
     <string name="summary_pref_sniffing_enabled">Пытаться определять доменные имена в пакетах (по умолчанию включено)</string>
-    <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
+    <string name="title_pref_route_only_enabled">Включить routeOnly</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
 
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>

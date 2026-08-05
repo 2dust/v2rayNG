@@ -199,7 +199,7 @@
 
     <string name="title_pref_sniffing_enabled">تفعيل استخراج الشبكة</string>
     <string name="summary_pref_sniffing_enabled">محاولة استخراج النطاق من الحزمة (مفعل افتراضيًا)</string>
-    <string name="title_pref_route_only_enabled">تفعيل التوجيه فقط</string>
+    <string name="title_pref_route_only_enabled">تمكين routeOnly</string>
     <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط، واحتفظ بعنوان الوجهة كعنوان IP.</string>
 
     <string name="title_pref_local_dns_enabled">تفعيل DNS المحلي</string>

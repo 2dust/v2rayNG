@@ -199,7 +199,7 @@
 
     <string name="title_pref_sniffing_enabled">Bật Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Phát hiện tên miền từ lưu lượng truy cập (Được bật theo mặc định). \nỞ Việt Nam: tắt để sử dụng Zalo.</string>
-    <string name="title_pref_route_only_enabled">Bật RouteOnly</string>
+    <string name="title_pref_route_only_enabled">Bật routeOnly</string>
     <string name="summary_pref_route_only_enabled">Chỉ sử dụng tên miền được đánh dấu để định tuyến và giữ địa chỉ đích làm địa chỉ IP.</string>
 
     <string name="title_pref_local_dns_enabled">Bật DNS cục bộ</string>
