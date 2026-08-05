@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">Bỏ qua xác minh chứng chỉ (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">Địa chỉ</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (Không bắt buộc)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4 / IPv6, phân cách bằng dấu phẩy)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Xác minh chứng chỉ ngang hàng theo tên</string>
     <string name="server_lab_pinned_ca256">Dấu vân tay chứng chỉ (SHA-256)</string>
     <string name="server_lab_browser_dialer">Bật Browser Dialer</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">Thêm tệp</string>
     <string name="menu_item_add_url">Thêm liên kết</string>
     <string name="menu_item_scan_qrcode">Quét mã QR</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
     <string name="title_user_asset_add_url">Thêm URL nội dung</string>
     <string name="msg_file_not_found">Không tìm thấy tập tin!</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">URL kiểm tra độ trễ thực </string>
-    <string name="summary_pref_delay_test_url">URL</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">Số lượt kiểm tra độ trễ thực đồng thời</string>
 
     <string name="title_pref_ip_api_url">URL kiểm tra thông tin kết nối hiện tại</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Cho phép kết nối từ mạng LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Các thiết bị khác trong cùng mạng LAN có thể kết nối đến SOCKS / HTTP proxy trên thiết bị của bạn. \nChỉ bật tính năng này trong các mạng đáng tin cậy để tránh kết nối trái phép.</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">Chia sẻ VPN với thiết bị LAN / chia sẻ kết nối (dành cho người dùng Root)</string>
     <string name="summary_root_lan_sharing">Định tuyến lưu lượng từ thiết bị dùng điểm phát Wi-Fi và chia sẻ kết nối USB qua VPN.</string>
 
-    <string name="title_logcat">Logcat</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
     <string name="logcat_clear">Xoá</string>
     <string name="logcat_share">Chia sẻ nhật ký</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Nhập bộ quy tắc từ QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Xuất bộ quy tắc vào bảng nhớ tạm</string>
     <string name="routing_settings_locked">Đã khóa; giữ quy tắc này khi nhập cài đặt sẵn</string>
-    <string name="routing_settings_domain">domain</string>
-    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (tên gói — chỉ được hỗ trợ khi dùng Xray TUN, bật routeOnly và chạy Android 10+)</string>
     <string name="routing_settings_process_select">Chọn tên gói</string>
-    <string name="routing_settings_port">port</string>
-    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">outboundTag</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>

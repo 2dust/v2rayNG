@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">address</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved(Optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer certificate by name</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
     <string name="server_lab_browser_dialer">Enable Browser Dialer</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">Add files</string>
     <string name="menu_item_add_url">Add URL</string>
     <string name="menu_item_scan_qrcode">Scan QRcode</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Download files</string>
     <string name="title_user_asset_add_url">Add asset URL</string>
     <string name="msg_file_not_found">File not found</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">True delay test URL </string>
-    <string name="summary_pref_delay_test_url">URL</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">Concurrent real-delay tests</string>
 
     <string name="title_pref_ip_api_url">Current connection info test URL</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your IP address through local proxy. Only enable in trusted networks to avoid unauthorized connections</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">Share VPN with LAN / tethered devices (root users)</string>
     <string name="summary_root_lan_sharing">Route traffic from Wi-Fi hotspot and USB-tethered devices through the VPN.</string>
 
-    <string name="title_logcat">Logcat</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Copy</string>
     <string name="logcat_clear">Clear</string>
     <string name="logcat_share">Share log</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Import ruleset from QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
     <string name="routing_settings_locked">Locked, keep this rule when import presets</string>
-    <string name="routing_settings_domain">domain</string>
-    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (Package Name — only supported when using Xray TUN, routeOnly enabled, and Android 10+)</string>
     <string name="routing_settings_process_select">Select package name</string>
-    <string name="routing_settings_port">port</string>
-    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">outboundTag</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>

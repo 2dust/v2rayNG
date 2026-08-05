@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">QUIC কী</string>
     <string name="server_lab_path_kcp">kcp বীজ</string>
     <string name="server_lab_path_grpc">gRPC সেবার নাম</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">ফিঙ্গারপ্রিন্ট</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">সার্টিফিকেট যাচাই এড়িয়ে যান (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">ঠিকানা</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
     <string name="server_lab_short_id">শর্ট আইডি</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">সিক্রেট কী</string>
     <string name="server_lab_reserved">সংরক্ষিত (ঐচ্ছিক)</string>
     <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">নাম দিয়ে পিয়ার সার্টিফিকেট যাচাই করুন</string>
     <string name="server_lab_pinned_ca256">সার্টিফিকেট ফিঙ্গারপ্রিন্ট (SHA-256)</string>
     <string name="server_lab_browser_dialer">Browser Dialer চালু করুন</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">ফাইল যোগ করুন</string>
     <string name="menu_item_add_url">URL যোগ করুন</string>
     <string name="menu_item_scan_qrcode">QR কোড স্ক্যান করুন</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">ফাইল ডাউনলোড করুন</string>
     <string name="title_user_asset_add_url">অ্যাসেট URL যোগ করুন</string>
     <string name="msg_file_not_found">ফাইল খুঁজে পাওয়া যায়নি</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">সঠিক বিলম্ব পরীক্ষা ইউআরএল </string>
-    <string name="summary_pref_delay_test_url">ইউআরএল</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">একযোগে প্রকৃত বিলম্ব পরীক্ষা</string>
 
     <string name="title_pref_ip_api_url">বর্তমান সংযোগের তথ্য পরীক্ষার URL</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">LAN থেকে সংযোগ অনুমোদন করুন</string>
     <string name="summary_pref_proxy_sharing_enabled">অন্যান্য ডিভাইসগুলি আপনার আইপি ঠিকানা ব্যবহার করে প্রক্সিতে সংযুক্ত হতে পারে, শুধুমাত্র বিশ্বস্ত নেটওয়ার্কে সক্রিয় করুন যাতে অনুমোদিত সংযোগ এড়ানো যায়</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">LAN / টেদার করা ডিভাইসে VPN শেয়ার করুন (Root ব্যবহারকারীদের জন্য)</string>
     <string name="summary_root_lan_sharing">Wi-Fi হটস্পট ও USB-টেদার করা ডিভাইসের ট্রাফিক VPN-এর মাধ্যমে রাউট করুন।</string>
 
-    <string name="title_logcat">লগক্যাট</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">কপি করুন</string>
     <string name="logcat_clear">স্পষ্ট করুন</string>
     <string name="logcat_share">লগ শেয়ার করুন</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">QRcode থেকে রুলসেট আমদানি করুন</string>
     <string name="routing_settings_export_rulesets_to_clipboard">নিয়মসমূহ ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="routing_settings_locked">লক করা; প্রিসেট আমদানির সময় এই নিয়মটি রাখুন</string>
-    <string name="routing_settings_domain">domain</string>
-    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (প্যাকেজের নাম — শুধু Xray TUN ব্যবহার, routeOnly চালু এবং Android 10+ হলে সমর্থিত)</string>
     <string name="routing_settings_process_select">প্যাকেজের নাম নির্বাচন করুন</string>
-    <string name="routing_settings_port">port</string>
-    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">outboundTag</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>

@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">Ключ QUIC</string>
     <string name="server_lab_path_kcp">Сид KCP</string>
     <string name="server_lab_path_grpc">Служба gRPC</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
-    <string name="server_lab_stream_alpn">ALPN</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">Пропускать проверку сертификата (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">Дополнительный ключ шифрования (необязательно)</string>
     <string name="server_lab_short_id">ShortID</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">Закрытый ключ</string>
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">ECHConfigList</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Включить Browser Dialer</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">Добавить файлы</string>
     <string name="menu_item_add_url">Добавить URL</string>
     <string name="menu_item_scan_qrcode">Сканировать QR-код</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
 
     <string name="title_pref_delay_test_url">Сервис проверки задержки</string>
-    <string name="summary_pref_delay_test_url">URL</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">Параллельная проверка задержки</string>
 
     <string name="title_pref_ip_api_url">Сервис проверки текущего соединения</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать соединения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать локальный прокси. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">Доступ к VPN для устройств LAN/точки доступа (root)</string>
     <string name="summary_root_lan_sharing">Направлять через VPN трафик устройств, подключённых к точке доступа Wi-Fi или по USB.</string>
 
-    <string name="title_logcat">Журнал</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Импорт правил из QR-кода</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Экспорт правил в буфер обмена</string>
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
-    <string name="routing_settings_domain">Домен</string>
-    <string name="routing_settings_ip">IP</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (имя пакета — поддерживается только при использовании Xray TUN, включённом routeOnly и Android 10+)</string>
     <string name="routing_settings_process_select">Выбор названия пакета</string>
-    <string name="routing_settings_port">Порт</string>
-    <string name="routing_settings_protocol">Протокол</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">Сеть</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">Исходящее соединение</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">Проверить соединение</string>
     <string name="connection_test_testing">Проверка…</string>

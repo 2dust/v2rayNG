@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">QUIC 加密密钥</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
-    <string name="server_lab_stream_security">传输层安全 (TLS)</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">跳过证书验证 (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">服务器地址</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">PreSharedKey (optional)</string>
     <string name="server_lab_short_id">ShortId</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可选，逗号隔开)</string>
     <string name="server_lab_local_address">本地地址 (可选 IPv4/IPv6，逗号隔开)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">EchConfigList</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">按名称验证对端证书</string>
     <string name="server_lab_pinned_ca256">证书指纹 (SHA-256)</string>
     <string name="server_lab_browser_dialer">启用 Browser Dialer</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">添加文件</string>
     <string name="menu_item_add_url">添加链接</string>
     <string name="menu_item_scan_qrcode">扫描 QRcode</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">下载文件</string>
     <string name="title_user_asset_add_url">添加资产网址</string>
     <string name="msg_file_not_found">文件未找到</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
     <string name="title_pref_delay_test_url">真连接延迟测试网址 </string>
-    <string name="summary_pref_delay_test_url">URL</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">真连接延迟并发测试数</string>
 
     <string name="title_pref_ip_api_url">当前连接信息测试网址</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">允许来自局域网的连接</string>
     <string name="summary_pref_proxy_sharing_enabled">其他设备可以使用 socks/http 协议通过您的 IP 地址连接到代理, 仅在受信任的网络中启用以避免未经授权的连接</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">与局域网 / 热点设备共享 VPN (仅限 Root 用户)</string>
     <string name="summary_root_lan_sharing">将 Wi-Fi 热点和 USB 网络共享设备的流量通过 VPN 转发。</string>
 
-    <string name="title_logcat">Logcat</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">复制</string>
     <string name="logcat_clear">清除</string>
     <string name="logcat_share">分享日志</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">从 QRcode 导入规则集</string>
     <string name="routing_settings_export_rulesets_to_clipboard">导出规则集至剪贴板</string>
     <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
-    <string name="routing_settings_domain">domain</string>
-    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (包名 — 仅在使用 Xray TUN、开启 routeOnly 且 Android 10+ 时可用)</string>
     <string name="routing_settings_process_select">选择包名</string>
-    <string name="routing_settings_port">port</string>
-    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">outboundTag</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>

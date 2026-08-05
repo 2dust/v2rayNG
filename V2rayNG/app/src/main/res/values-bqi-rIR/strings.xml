@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">تور QUIC</string>
     <string name="server_lab_path_kcp">KCP seed</string>
     <string name="server_lab_path_grpc">نوم سرویس gRPC</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">تئیڌ گوواهی ن ناڌیڌه بگرین (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">کیلیت پؽش اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کۊتال</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">نومگه کانفیگ Ech</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
     <string name="server_lab_pinned_ca256">جا کلک گوواهی (SHA-256)</string>
     <string name="server_lab_browser_dialer">Browser Dialer ن ره وستین</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">ٱووردن فایل</string>
     <string name="menu_item_add_url">ٱووردن لینگ</string>
     <string name="menu_item_scan_qrcode">اسکن QRcode</string>
-    <string name="title_url">نشۊوی اینترنتی</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">دانلود فایلا</string>
     <string name="title_user_asset_add_url">نشۊوی اینترنتی دارایی ن ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">دامنه:نشۊوی،...</string>
 
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی</string>
-    <string name="summary_pref_delay_test_url">نشۊوی اینترنتی</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">تعداد هوم زمووی تست تئخیر واقعی</string>
 
     <string name="title_pref_ip_api_url">نشۊوی اینترنتی آزمایش دووسمندیا منپیز هیم سکویی</string>
-    <string name="summary_pref_ip_api_url">نشۊوی اینترنتی</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">یک رسۊوی پروکسی من شبکه مهلی LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل ائتماد ره ونده بۊ تا ز منپیز قیر موجاز جلو گری بۊ.</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">یک رسۊوی LAN / تترینگ (منتورووݩ رۊت وابیڌه)</string>
     <string name="summary_root_lan_sharing">ترافیک هات‌اسپات وای‌فای وو دسگا یل منپیز وابیڌه وا USB (تترینگ) ن ز تور VPN بفشنین.</string>
 
-    <string name="title_logcat">گوزارشا</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
     <string name="logcat_share">یک رسۊوی گوزارش</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت من کلیپ بورد</string>
     <string name="routing_settings_locked">چفت هڌ، ای قانووݩ ن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
-    <string name="routing_settings_domain">domain</string>
-    <string name="routing_settings_ip">ip</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (نوم بسته — تینا مجال کار بوردن Xray TUN، ره بیڌن routeOnly وو Android 10+ پوشتؽووی ابۊ)</string>
     <string name="routing_settings_process_select">نوم بسته ن پسند کۊنین</string>
-    <string name="routing_settings_port">port</string>
-    <string name="routing_settings_protocol">protocol</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">network</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">outboundTag</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>

@@ -76,9 +76,9 @@
     <string name="server_lab_path_quic">مسیر QUIC</string>
     <string name="server_lab_path_kcp">KCP سید</string>
     <string name="server_lab_path_grpc">gRPC نام سرویس</string>
-    <string name="server_lab_stream_security">TLS</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
-    <string name="server_lab_stream_alpn">Alpn</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">نادیده گرفتن تأیید گواهی (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشانی</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_preshared_key">کلید پیش‌اشتراکی (اختیاری)</string>
     <string name="server_lab_short_id">شناسه کوتاه</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
-    <string name="server_lab_mldsa65_verify">تاییدیه Mldsa65Verify</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
@@ -125,7 +125,7 @@
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
-    <string name="server_lab_ech_config_list">لیست کانفیگ Ech</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تأیید گواهی همتا بر اساس نام</string>
     <string name="server_lab_pinned_ca256">اثر انگشت گواهی (SHA-256)</string>
     <string name="server_lab_browser_dialer">فعال‌سازی Browser Dialer</string>
@@ -141,7 +141,7 @@
     <string name="menu_item_add_file">افزودن فایل ‌ها</string>
     <string name="menu_item_add_url">افزودن لینک</string>
     <string name="menu_item_scan_qrcode">اسکن QRcode</string>
-    <string name="title_url">URL</string>
+    <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
     <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
@@ -232,11 +232,11 @@
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
 
     <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها </string>
-    <string name="summary_pref_delay_test_url">URL</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">آزمایش‌های هم‌زمان تأخیر واقعی</string>
 
     <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی URL</string>
-    <string name="summary_pref_ip_api_url">URL</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">اشتراک‌گذاری پروکسی در شبکه محلی (LAN)</string>
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند با وارد کردن IP شما، از پروکسی‌تان استفاده کنند. برای جلوگیری از سوءاستفاده، فقط در شبکه‌های امن و قابل اعتماد این گزینه را روشن کنید.</string>
@@ -307,7 +307,7 @@
     <string name="title_root_lan_sharing">اشتراک VPN با شبکهٔ محلی / دستگاه‌های متصل (کاربران Root)</string>
     <string name="summary_root_lan_sharing">ترافیک دستگاه‌های متصل به نقطهٔ اتصال Wi-Fi و USB را از VPN عبور می‌دهد.</string>
 
-    <string name="title_logcat">گزارشات</string>
+    <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
     <string name="logcat_share">اشتراک‌گذاری گزارش</string>
@@ -364,16 +364,16 @@
     <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از QRcode</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
     <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
-    <string name="routing_settings_domain">دامنه</string>
-    <string name="routing_settings_ip">آیپی</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (نام بسته — فقط هنگام استفاده از Xray TUN، فعال بودن routeOnly و Android 10+ پشتیبانی می‌شود)</string>
     <string name="routing_settings_process_select">انتخاب نام بسته</string>
-    <string name="routing_settings_port">پورت</string>
-    <string name="routing_settings_protocol">پورتکل</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
-    <string name="routing_settings_network">شبکه</string>
+    <string name="routing_settings_network" translatable="false">network</string>
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
-    <string name="routing_settings_outbound_tag">برچسب خروجی</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش...</string>
