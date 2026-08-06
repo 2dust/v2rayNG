@@ -14,7 +14,6 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +36,9 @@ class CheckUpdateActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.checkForUpdates()
+        }
     }
 
     @Composable
@@ -58,10 +60,6 @@ fun CheckUpdateScreen(
     val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
     val versionText = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})"
-
-    LaunchedEffect(Unit) {
-        viewModel.checkForUpdates()
-    }
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
