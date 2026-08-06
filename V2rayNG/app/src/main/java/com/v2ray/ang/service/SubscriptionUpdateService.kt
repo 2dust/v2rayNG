@@ -184,13 +184,17 @@ class SubscriptionUpdateService : Service() {
     private fun handleWorkerEvent(event: RealPingEvent, remarks: String, onWorkerDone: () -> Unit) {
         when (event) {
             is RealPingEvent.Progress -> {
-                val text = getString(R.string.subscription_update_progress, event.text, remarks)
+                val notificationText = getString(
+                    R.string.subscription_update_progress,
+                    event.text,
+                    remarks
+                )
                 showNotification(
                     context = this,
                     titleResId = R.string.title_real_ping_all_server,
-                    content = text
+                    content = notificationText
                 )
-                LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: $text")
+                LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: ${event.text} in $remarks")
             }
 
             is RealPingEvent.Result -> {

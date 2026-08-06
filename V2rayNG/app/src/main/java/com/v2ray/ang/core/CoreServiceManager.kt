@@ -53,6 +53,11 @@ object CoreServiceManager {
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
 
+    private class CoreStartException(
+        logMessage: String,
+        val displayMessage: String,
+    ) : IllegalStateException(logMessage)
+
     var serviceControl: SoftReference<ServiceControl>? = null
         set(value) {
             field = value
@@ -96,13 +101,20 @@ object CoreServiceManager {
         try {
             doStartCoreLoop(service, vpnInterface)
             return true
+        } catch (e: CoreStartException) {
+            reportCoreStartFailure(service, e.message.orEmpty(), e.displayMessage, e)
+            return false
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
-            NotificationManager.cancelNotification()
+            reportCoreStartFailure(service, message, message, e)
             return false
         }
+    }
+
+    private fun reportCoreStartFailure(service: Service, logMessage: String, displayMessage: String, error: Throwable) {
+        LogUtil.e(AppConfig.TAG, "StartCore-Manager: $logMessage", error)
+        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, displayMessage)
+        NotificationManager.cancelNotification()
     }
 
     @Throws(Exception::class)
@@ -121,15 +133,26 @@ object CoreServiceManager {
     @Throws(Exception::class)
     private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
         val guid = MmkvManager.getSelectServer()
-            ?: error(service.getString(R.string.core_error_no_server_selected))
+            ?: throw CoreStartException(
+                logMessage = "No server selected",
+                displayMessage = service.getString(R.string.core_error_no_server_selected)
+            )
         val config = MmkvManager.decodeServerConfig(guid)
-            ?: error(service.getString(R.string.core_error_decode_server_config))
+            ?: throw CoreStartException(
+                logMessage = "Failed to decode server config",
+                displayMessage = service.getString(R.string.core_error_decode_server_config)
+            )
 
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
         val result = CoreConfigManager.getV2rayConfig(service, guid)
         LogUtil.d(AppConfig.TAG, result.content)
         if (!result.status) {
-            error(result.errorMessage.ifBlank { service.getString(R.string.core_error_get_config) })
+            throw CoreStartException(
+                logMessage = result.errorMessage.ifBlank { "Failed to get V2Ray config" },
+                displayMessage = result.displayMessage.ifBlank {
+                    service.getString(R.string.core_error_get_config)
+                }
+            )
         }
 
         currentConfig = config
@@ -151,7 +174,10 @@ object CoreServiceManager {
         coreController.startLoop(result.content, tunFd)
 
         if (!isRunning()) {
-            error(service.getString(R.string.core_error_start))
+            throw CoreStartException(
+                logMessage = "Core failed to start",
+                displayMessage = service.getString(R.string.core_error_start)
+            )
         }
 
         if (browserDialer != null) {
@@ -262,6 +288,10 @@ object CoreServiceManager {
 
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload finished")
             true
+        } catch (e: CoreStartException) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: ${e.message}", e)
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, e.displayMessage)
+            false
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
