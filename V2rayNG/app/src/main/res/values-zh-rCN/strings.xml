@@ -533,7 +533,6 @@
     <string name="permission_camera">相机</string>
     <string name="permission_notification">通知</string>
     <string name="permission_local_network">局域网</string>
-    <string name="profile_protocol_insecure">%1$s（不验证证书）</string>
     <string name="subscription_update_updating">正在更新订阅：%1$s</string>
     <string name="subscription_update_progress">正在测试%2$s：%1$s</string>
     <string name="tasker_blurb_start">启动 %1$s</string>

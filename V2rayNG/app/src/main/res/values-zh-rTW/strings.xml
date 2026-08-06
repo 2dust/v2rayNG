@@ -533,7 +533,6 @@
     <string name="permission_camera">相機</string>
     <string name="permission_notification">通知</string>
     <string name="permission_local_network">區域網路</string>
-    <string name="profile_protocol_insecure">%1$s（不驗證憑證）</string>
     <string name="subscription_update_updating">正在更新訂閱：%1$s</string>
     <string name="subscription_update_progress">正在測試%2$s：%1$s</string>
     <string name="tasker_blurb_start">啟動 %1$s</string>

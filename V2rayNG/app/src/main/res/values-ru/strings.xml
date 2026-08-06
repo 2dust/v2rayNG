@@ -533,7 +533,6 @@
     <string name="permission_camera">Камера</string>
     <string name="permission_notification">Уведомления</string>
     <string name="permission_local_network">Локальная сеть</string>
-    <string name="profile_protocol_insecure">%1$s (сертификат не проверяется)</string>
     <string name="subscription_update_updating">Обновление подписки: %1$s</string>
     <string name="subscription_update_progress">Тестирование %2$s: %1$s</string>
     <string name="tasker_blurb_start">Запустить %1$s</string>

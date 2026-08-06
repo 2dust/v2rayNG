@@ -533,7 +533,6 @@
     <string name="permission_camera">Máy ảnh</string>
     <string name="permission_notification">Thông báo</string>
     <string name="permission_local_network">Mạng cục bộ</string>
-    <string name="profile_protocol_insecure">%1$s (không xác minh chứng chỉ)</string>
     <string name="subscription_update_updating">Đang cập nhật gói đăng ký: %1$s</string>
     <string name="subscription_update_progress">Đang kiểm tra %2$s: %1$s</string>
     <string name="tasker_blurb_start">Khởi động %1$s</string>

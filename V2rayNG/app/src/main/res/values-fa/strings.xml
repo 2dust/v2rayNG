@@ -533,7 +533,6 @@
     <string name="permission_camera">دوربین</string>
     <string name="permission_notification">اعلان</string>
     <string name="permission_local_network">شبکه محلی</string>
-    <string name="profile_protocol_insecure">%1$s (گواهی تأییدنشده)</string>
     <string name="subscription_update_updating">در حال به‌روزرسانی اشتراک: %1$s</string>
     <string name="subscription_update_progress">در حال آزمایش %2$s: %1$s</string>
     <string name="tasker_blurb_start">شروع %1$s</string>

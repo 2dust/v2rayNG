@@ -533,7 +533,6 @@
     <string name="permission_camera">ক্যামেরা</string>
     <string name="permission_notification">বিজ্ঞপ্তি</string>
     <string name="permission_local_network">স্থানীয় নেটওয়ার্ক</string>
-    <string name="profile_protocol_insecure">%1$s (সার্টিফিকেট যাচাই নেই)</string>
     <string name="subscription_update_updating">সাবস্ক্রিপশন আপডেট করা হচ্ছে: %1$s</string>
     <string name="subscription_update_progress">%2$s পরীক্ষা করা হচ্ছে: %1$s</string>
     <string name="tasker_blurb_start">%1$s চালু করুন</string>

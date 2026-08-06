@@ -533,7 +533,6 @@
     <string name="permission_camera">دوربیݩ</string>
     <string name="permission_notification">وارسۊوی</string>
     <string name="permission_local_network">شبکه محلی</string>
-    <string name="profile_protocol_insecure">%1$s (گوواهی تئیڌ نابۊ)</string>
     <string name="subscription_update_updating">اشتراک %1$s هونی ورۊ ابۊ</string>
     <string name="subscription_update_progress">%2$s هونی آزمایش ابۊ: %1$s</string>
     <string name="tasker_blurb_start">ره وستن %1$s</string>
