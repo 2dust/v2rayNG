@@ -273,8 +273,7 @@ fun PerAppProxyScreen(
                         packageName = app.packageName,
                         icon = null,
                         checked = checked,
-                        onCheckedChange = { onToggleApp(app.packageName) },
-                        enabled = !isLoading
+                        onCheckedChange = { onToggleApp(app.packageName) }
                     )
                     ItemDivider()
                 }
