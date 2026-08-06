@@ -453,14 +453,14 @@ fun SettingsScreen(
                     onCheckedChange = { mux = it }
                 )
                 SettingsEditItem(
-                    title = stringResource(R.string.title_pref_mux_concurency),
+                    title = stringResource(R.string.title_pref_mux_concurrency),
                     value = muxConcurrency,
                     enabled = mux,
                     keyboardNumber = true,
                     onValueChanged = { muxConcurrency = it }
                 )
                 SettingsEditItem(
-                    title = stringResource(R.string.title_pref_mux_xudp_concurency),
+                    title = stringResource(R.string.title_pref_mux_xudp_concurrency),
                     value = muxXudpConcurrency,
                     enabled = mux,
                     keyboardNumber = true,

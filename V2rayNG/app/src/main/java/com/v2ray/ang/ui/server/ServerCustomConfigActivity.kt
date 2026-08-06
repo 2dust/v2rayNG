@@ -121,7 +121,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                 e
             )
             toast(
-                "${getString(R.string.toast_malformed_josn)} " +
+                "${getString(R.string.toast_malformed_json)} " +
                         "${e.cause?.message.orEmpty()}"
             )
             return false
