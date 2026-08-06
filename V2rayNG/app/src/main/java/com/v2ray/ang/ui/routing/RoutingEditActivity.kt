@@ -284,6 +284,10 @@ fun RoutingEditScreen(
             )
             FormDropdownField(
                 label = stringResource(R.string.routing_settings_outbound_tag),
+                placeholder = stringResource(
+                    R.string.routing_settings_outbound_tag_hint,
+                    stringResource(R.string.server_lab_remarks)
+                ),
                 value = outboundTag,
                 options = outboundSuggestions,
                 onValueChange = { outboundTag = it },
