@@ -347,13 +347,13 @@ fun ServerScreen(
                 actions = {
                     if (guid.isNotEmpty() && !isRunning) {
                         IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.menu_item_del_config))
+                            Icon(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.acc_delete))
                         }
                     }
                     IconButton(onClick = {
                         onSave(buildProfileItem())
                     }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), stringResource(R.string.menu_item_save_config))
+                        Icon(painterResource(R.drawable.ic_fab_check), stringResource(R.string.acc_save))
                     }
                 }
             )

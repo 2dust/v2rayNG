@@ -228,11 +228,11 @@ fun ProxyChainScreen(
                 actions = {
                     if (showDelete) {
                         IconButton(onClick = { showProfileDeleteConfirm = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
+                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
                         }
                     }
                     IconButton(onClick = { onSave(remarks, members) }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
             )
@@ -247,7 +247,7 @@ fun ProxyChainScreen(
                     .offset(y = -20.dp)
                     .navigationBarsPadding()
             ) {
-                Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = "Add member")
+                Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_member))
             }
         }
     ) { innerPadding ->
@@ -320,7 +320,7 @@ fun ProxyChainScreen(
                             }) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
-                                    contentDescription = "Remove"
+                                    contentDescription = stringResource(R.string.acc_remove)
                                 )
                             }
                         }

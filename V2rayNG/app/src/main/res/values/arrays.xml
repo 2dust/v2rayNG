@@ -205,7 +205,7 @@
         <item>6</item>
     </string-array>
 
-    <string-array name="vpn_interface_address">
+    <string-array name="vpn_interface_address" translatable="false">
         <item>10.10.14.x</item>
         <item>10.1.0.x</item>
         <item>10.0.0.x</item>

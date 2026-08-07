@@ -34,7 +34,11 @@ object CoreConfigManager {
     fun getV2rayConfig(context: Context, guid: String): ConfigResult {
         try {
             val configContext = CoreConfigContextBuilder.build(context, guid)
-                ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
+                ?: return ConfigResult(
+                    status = false,
+                    guid = guid,
+                    errorMessage = "Failed to build config context"
+                )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
@@ -57,7 +61,11 @@ object CoreConfigManager {
     fun getV2rayConfig4Speedtest(context: Context, guid: String): ConfigResult {
         try {
             val configContext = CoreConfigContextBuilder.build(context, guid)
-                ?: return ConfigResult(status = false, guid = guid, errorMessage = "Failed to build config context")
+                ?: return ConfigResult(
+                    status = false,
+                    guid = guid,
+                    errorMessage = "Failed to build config context"
+                )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
@@ -70,7 +78,7 @@ object CoreConfigManager {
             return ConfigResult(
                 status = false,
                 guid = guid,
-                errorMessage = "Failed to get V2ray config for speedtest: ${e.message ?: e.javaClass.simpleName}"
+                errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
             )
         }
     }
@@ -81,7 +89,11 @@ object CoreConfigManager {
     private fun buildV2rayCustomConfig(configContext: CoreConfigContext): ConfigResult {
         val context = configContext.context
         val raw = MmkvManager.decodeServerRaw(configContext.guid)
-            ?: return ConfigResult(status = false, guid = configContext.guid, errorMessage = "Custom config is empty")
+            ?: return ConfigResult(
+                status = false,
+                guid = configContext.guid,
+                errorMessage = "Failed to build config context, config is empty"
+            )
         val result = ConfigResult(true, configContext.guid, raw)
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result

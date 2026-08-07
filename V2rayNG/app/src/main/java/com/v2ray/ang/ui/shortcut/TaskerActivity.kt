@@ -105,11 +105,10 @@ class TaskerActivity : BaseComponentActivity() {
         val intent = Intent()
 
         val remarks = lstData[position]
-        val blurb = if (switchState.value) {
-            "Start $remarks"
-        } else {
-            "Stop $remarks"
-        }
+        val blurb = getString(
+            if (switchState.value) R.string.tasker_blurb_start else R.string.tasker_blurb_stop,
+            remarks
+        )
 
         intent.putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)
         intent.putExtra(AppConfig.TASKER_EXTRA_STRING_BLURB, blurb)
@@ -135,7 +134,7 @@ fun TaskerScreen(
                 onBackClick = onBackClick,
                 actions = {
                     IconButton(onClick = onSave) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
             )
