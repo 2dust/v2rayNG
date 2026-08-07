@@ -5,7 +5,6 @@ import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.V2rayConfig
@@ -38,8 +37,7 @@ object CoreConfigManager {
                 ?: return ConfigResult(
                     status = false,
                     guid = guid,
-                    errorMessage = "Failed to build config context",
-                    displayMessage = context.getString(R.string.core_error_build_config_context)
+                    errorMessage = "Failed to build config context"
                 )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
@@ -47,15 +45,10 @@ object CoreConfigManager {
             return toConfigResult(configContext, buildUnifiedConfig(configContext))
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config", e)
-            val detail = e.message ?: e.javaClass.simpleName
             return ConfigResult(
                 status = false,
                 guid = guid,
-                errorMessage = "Failed to get V2ray config: $detail",
-                displayMessage = context.getString(
-                    R.string.core_error_get_config_detail,
-                    detail
-                )
+                errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
             )
         }
     }
@@ -71,8 +64,7 @@ object CoreConfigManager {
                 ?: return ConfigResult(
                     status = false,
                     guid = guid,
-                    errorMessage = "Failed to build config context",
-                    displayMessage = context.getString(R.string.core_error_build_config_context)
+                    errorMessage = "Failed to build config context"
                 )
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
@@ -83,15 +75,10 @@ object CoreConfigManager {
             return toConfigResult(configContext, v2rayConfig)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
-            val detail = e.message ?: e.javaClass.simpleName
             return ConfigResult(
                 status = false,
                 guid = guid,
-                errorMessage = "Failed to get V2ray config for speedtest: $detail",
-                displayMessage = context.getString(
-                    R.string.core_error_get_speedtest_config_detail,
-                    detail
-                )
+                errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
             )
         }
     }
@@ -105,8 +92,7 @@ object CoreConfigManager {
             ?: return ConfigResult(
                 status = false,
                 guid = configContext.guid,
-                errorMessage = "Custom config is empty",
-                displayMessage = context.getString(R.string.core_error_custom_config_empty)
+                errorMessage = "Failed to build config context, config is empty"
             )
         val result = ConfigResult(true, configContext.guid, raw)
 
