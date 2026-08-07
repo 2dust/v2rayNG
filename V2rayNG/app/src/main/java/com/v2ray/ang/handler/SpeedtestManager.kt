@@ -48,7 +48,7 @@ object SpeedtestManager {
         return -1
     }
 
-    fun getRemoteIPInfo(unknownLabel: String): String? {
+    fun getRemoteIPInfo(): String? {
         val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
             .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
 
@@ -81,6 +81,6 @@ object SpeedtestManager {
             ipInfo.location?.country_code
         ).firstOrNull { !it.isNullOrBlank() }
 
-        return "(${country ?: unknownLabel}) ${ip ?: unknownLabel}"
+        return "(${country ?: "unknown"}) ${ip ?: "unknown"}"
     }
 }

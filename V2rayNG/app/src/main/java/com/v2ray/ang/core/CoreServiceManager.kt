@@ -375,7 +375,7 @@ object CoreServiceManager {
 
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
-                SpeedtestManager.getRemoteIPInfo(service.getString(R.string.value_unknown))?.let { ip ->
+                SpeedtestManager.getRemoteIPInfo()?.let { ip ->
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, "$result\n$ip")
                 }
             }
