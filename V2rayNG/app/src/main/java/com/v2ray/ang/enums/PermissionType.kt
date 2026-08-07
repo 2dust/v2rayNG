@@ -3,6 +3,8 @@ package com.v2ray.ang.enums
 import android.Manifest
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
+import com.v2ray.ang.R
 
 /**
  * Permission types used in the app, handling API level differences.
@@ -28,12 +30,13 @@ enum class PermissionType {
     /** Return the actual Android permission string */
     abstract fun getPermission(): String
 
-    /** Return a human-readable label for the permission */
-    fun getLabel(): String {
+    /** Return the string resource for the human-readable permission label. */
+    @StringRes
+    fun getLabelRes(): Int {
         return when (this) {
-            CAMERA -> "Camera"
-            POST_NOTIFICATIONS -> "Notification"
-            ACCESS_LOCAL_NETWORK -> "Local Network"
+            CAMERA -> R.string.permission_camera
+            POST_NOTIFICATIONS -> R.string.permission_notification
+            ACCESS_LOCAL_NETWORK -> R.string.permission_local_network
         }
     }
 }

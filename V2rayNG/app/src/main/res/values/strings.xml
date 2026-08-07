@@ -490,4 +490,54 @@
     <string name="backup_location_local">Local</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">Refresh log</string>
+    <string name="toast_permission_denied_for">%1$s permission denied</string>
+    <string name="acc_add_subscription">Add subscription</string>
+    <string name="toast_malformed_json_detail">Invalid configuration: %1$s</string>
+    <string name="acc_add_asset">Add asset source</string>
+    <string name="acc_download_file">Download asset files</string>
+    <string name="acc_qr_code">QR code</string>
+    <string name="acc_copy_log">Copy log</string>
+    <string name="acc_clear_log">Clear log</string>
+    <string name="acc_add_rule">Add routing rule</string>
+    <string name="core_error_no_server_selected">No configuration selected</string>
+    <string name="core_error_decode_server_config">Failed to read the selected configuration</string>
+    <string name="core_error_build_config_context">Failed to prepare the selected configuration</string>
+    <string name="core_error_get_config">Failed to generate the core configuration</string>
+    <string name="core_error_get_config_detail">Failed to generate the core configuration: %1$s</string>
+    <string name="core_error_get_speedtest_config_detail">Failed to generate the core configuration for the speed test: %1$s</string>
+    <string name="core_error_custom_config_empty">Custom configuration is empty</string>
+    <string name="core_error_start">Failed to start the core</string>
+    <string name="acc_start">Start service</string>
+    <string name="acc_stop">Stop service</string>
+    <string name="acc_back">Back</string>
+    <string name="acc_search">Search</string>
+    <string name="acc_add">Add configuration</string>
+    <string name="acc_more">More options</string>
+    <string name="acc_share_subscription">Share subscription link</string>
+    <string name="acc_share_log">Share log</string>
+    <string name="acc_remove">Remove proxy chain member</string>
+    <string name="acc_add_member">Add proxy chain member</string>
+    <string name="acc_start_scanner">Start QR scanner</string>
+    <string name="acc_stop_scanner">Stop QR scanner</string>
+    <string name="acc_turn_torch_on">Turn flashlight on</string>
+    <string name="acc_turn_torch_off">Turn flashlight off</string>
+    <string name="acc_select_image">Select image to scan</string>
+    <string name="acc_locked">This rule is kept when importing presets</string>
+    <string name="acc_open_menu">Open navigation menu</string>
+    <string name="acc_edit">Edit</string>
+    <string name="acc_delete">Delete</string>
+    <string name="acc_save">Save</string>
+    <string name="acc_update_subscriptions">Update subscriptions</string>
+    <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+    <string name="permission_camera">Camera</string>
+    <string name="permission_notification">Notification</string>
+    <string name="permission_local_network">Local network</string>
+    <string name="subscription_update_updating">Updating subscription: %1$s</string>
+    <string name="subscription_update_progress">Testing %2$s: %1$s</string>
+    <string name="tasker_blurb_start">Start %1$s</string>
+    <string name="tasker_blurb_stop">Stop %1$s</string>
+    <string name="connection_test_empty_message">no details available</string>
+    <string name="value_unknown">unknown</string>
+
 </resources>

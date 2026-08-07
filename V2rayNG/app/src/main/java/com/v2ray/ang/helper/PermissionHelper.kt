@@ -36,7 +36,10 @@ class PermissionHelper(private val activity: ComponentActivity) {
                 if (isGranted) {
                     onGranted()
                 } else {
-                    val message = "${activity.getString(R.string.toast_permission_denied)}  ${permissionType.getLabel()}"
+                    val message = activity.getString(
+                        R.string.toast_permission_denied_for,
+                        activity.getString(permissionType.getLabelRes())
+                    )
                     activity.toast(message)
                 }
             }

@@ -173,11 +173,11 @@ fun SubEditScreen(
                         IconButton(onClick = {
                             if (confirmRemove) showDeleteConfirm = true else onDelete()
                         }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.menu_item_del_config))
+                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
                         }
                     }
                     IconButton(onClick = { buildSubItem()?.let { onSave(it) } }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.menu_item_save_config))
+                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
             )
