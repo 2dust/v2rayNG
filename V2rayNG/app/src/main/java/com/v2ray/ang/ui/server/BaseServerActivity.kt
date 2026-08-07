@@ -100,8 +100,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     @Composable
     protected fun CommonBasicFields(
-        state: ServerUiState,
-        showPort: Boolean = true
+        state: ServerUiState
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FormTextField(
@@ -114,14 +113,12 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 state.address,
                 { state.address = it }
             )
-            if (showPort) {
-                FormTextField(
-                    stringResource(R.string.server_lab_port),
-                    state.port,
-                    { state.port = it },
-                    keyboardType = KeyboardType.Number
-                )
-            }
+            FormTextField(
+                stringResource(R.string.server_lab_port),
+                state.port,
+                { state.port = it },
+                keyboardType = KeyboardType.Number
+            )
         }
     }
 
