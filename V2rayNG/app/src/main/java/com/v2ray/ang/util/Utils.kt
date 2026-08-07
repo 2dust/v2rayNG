@@ -400,8 +400,15 @@ object Utils {
      * @return The URL string with illegal characters replaced.
      */
     fun fixIllegalUrl(str: String): String {
-        return str.replace(" ", "%20")
+        val fixed = str.replace(" ", "%20")
             .replace("|", "%7C")
+
+        val parts = fixed.split("#", limit = 2)
+        return if (parts.size == 2) {
+            "${parts[0]}#${parts[1].replace("#", "%23")}"
+        } else {
+            fixed
+        }
     }
 
     /**
