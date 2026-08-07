@@ -120,9 +120,14 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                 "Failed to parse custom configuration",
                 e
             )
+            val detail = e.cause?.message?.takeIf { it.isNotBlank() }
+                ?: e.message?.takeIf { it.isNotBlank() }
             toast(
-                "${getString(R.string.toast_malformed_json)} " +
-                        "${e.cause?.message.orEmpty()}"
+                if (detail.isNullOrBlank()) {
+                    getString(R.string.toast_malformed_json)
+                } else {
+                    getString(R.string.toast_malformed_json_detail, detail)
+                }
             )
             return false
         }
@@ -315,14 +320,14 @@ fun ServerCustomConfigScreen(
                         IconButton(onClick = { showDeleteConfirm = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = stringResource(R.string.menu_item_del_config)
+                                contentDescription = stringResource(R.string.acc_delete)
                             )
                         }
                     }
                     IconButton(onClick = { onSave(remarks, textFieldState.text.toString()) }) {
                         Icon(
                             painterResource(R.drawable.ic_fab_check),
-                            contentDescription = stringResource(R.string.menu_item_save_config)
+                            contentDescription = stringResource(R.string.acc_save)
                         )
                     }
                 }

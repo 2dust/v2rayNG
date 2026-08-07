@@ -466,14 +466,14 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                             IconButton(onClick = { showDeleteDialog = true }) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
-                                    stringResource(R.string.menu_item_del_config)
+                                    stringResource(R.string.acc_delete)
                                 )
                             }
                         }
                         IconButton(onClick = onSaveClick) {
                             Icon(
                                 painterResource(R.drawable.ic_fab_check),
-                                stringResource(R.string.menu_item_save_config)
+                                stringResource(R.string.acc_save)
                             )
                         }
                     }

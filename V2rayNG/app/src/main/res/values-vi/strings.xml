@@ -491,4 +491,54 @@
     <string name="backup_location_local">Cục bộ</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">Làm mới nhật ký</string>
+    <string name="toast_permission_denied_for">Chưa cấp quyền: %1$s</string>
+    <string name="acc_add_subscription">Thêm gói đăng ký</string>
+    <string name="toast_malformed_json_detail">Cấu hình không hợp lệ: %1$s</string>
+    <string name="acc_add_asset">Thêm nguồn tệp tài nguyên</string>
+    <string name="acc_download_file">Tải xuống tệp tài nguyên</string>
+    <string name="acc_qr_code">Mã QR</string>
+    <string name="acc_copy_log">Sao chép nhật ký</string>
+    <string name="acc_clear_log">Xóa nhật ký</string>
+    <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
+    <string name="core_error_no_server_selected">Chưa chọn cấu hình</string>
+    <string name="core_error_decode_server_config">Không thể đọc cấu hình đã chọn</string>
+    <string name="core_error_build_config_context">Không thể chuẩn bị cấu hình đã chọn</string>
+    <string name="core_error_get_config">Không thể tạo cấu hình lõi</string>
+    <string name="core_error_get_config_detail">Không thể tạo cấu hình lõi: %1$s</string>
+    <string name="core_error_get_speedtest_config_detail">Không thể tạo cấu hình lõi để kiểm tra tốc độ: %1$s</string>
+    <string name="core_error_custom_config_empty">Cấu hình tùy chỉnh đang trống</string>
+    <string name="core_error_start">Không thể khởi động lõi</string>
+    <string name="acc_start">Khởi động dịch vụ</string>
+    <string name="acc_stop">Dừng dịch vụ</string>
+    <string name="acc_back">Quay lại</string>
+    <string name="acc_search">Tìm kiếm</string>
+    <string name="acc_add">Thêm cấu hình</string>
+    <string name="acc_more">Tùy chọn khác</string>
+    <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
+    <string name="acc_share_log">Chia sẻ nhật ký</string>
+    <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
+    <string name="acc_add_member">Thêm thành viên vào chuỗi proxy</string>
+    <string name="acc_start_scanner">Khởi động trình quét mã QR</string>
+    <string name="acc_stop_scanner">Dừng trình quét mã QR</string>
+    <string name="acc_turn_torch_on">Bật đèn pin</string>
+    <string name="acc_turn_torch_off">Tắt đèn pin</string>
+    <string name="acc_select_image">Chọn ảnh để quét</string>
+    <string name="acc_locked">Giữ quy tắc khi nhập cài đặt sẵn</string>
+    <string name="acc_open_menu">Mở trình đơn điều hướng</string>
+    <string name="acc_edit">Chỉnh sửa</string>
+    <string name="acc_delete">Xóa</string>
+    <string name="acc_save">Lưu</string>
+    <string name="acc_update_subscriptions">Cập nhật các gói đăng ký</string>
+    <string name="acc_per_app_proxy_information">Thông tin proxy theo ứng dụng</string>
+    <string name="permission_camera">Máy ảnh</string>
+    <string name="permission_notification">Thông báo</string>
+    <string name="permission_local_network">Mạng cục bộ</string>
+    <string name="subscription_update_updating">Đang cập nhật gói đăng ký: %1$s</string>
+    <string name="subscription_update_progress">Đang kiểm tra %2$s: %1$s</string>
+    <string name="tasker_blurb_start">Khởi động %1$s</string>
+    <string name="tasker_blurb_stop">Dừng %1$s</string>
+    <string name="connection_test_empty_message">không có thông tin chi tiết</string>
+    <string name="value_unknown">không xác định</string>
+
 </resources>

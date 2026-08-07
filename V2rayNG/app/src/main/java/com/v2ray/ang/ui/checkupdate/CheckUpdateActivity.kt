@@ -59,7 +59,8 @@ fun CheckUpdateScreen(
     val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
     val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
-    val versionText = "v${BuildConfig.VERSION_NAME} (${CoreNativeManager.getLibVersion()})"
+    val libVersion = CoreNativeManager.getLibVersion()
+    val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,

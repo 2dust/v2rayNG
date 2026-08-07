@@ -491,4 +491,54 @@
     <string name="backup_location_local">Локально</string>
     <string name="backup_location_webdav" translatable="false">WebDAV</string>
 
+    <string name="acc_refresh">Обновить журнал</string>
+    <string name="toast_permission_denied_for">Нет разрешения: %1$s</string>
+    <string name="acc_add_subscription">Добавить подписку</string>
+    <string name="toast_malformed_json_detail">Некорректная конфигурация: %1$s</string>
+    <string name="acc_add_asset">Добавить источник ресурсов</string>
+    <string name="acc_download_file">Загрузить файлы ресурсов</string>
+    <string name="acc_qr_code">QR-код</string>
+    <string name="acc_copy_log">Копировать журнал</string>
+    <string name="acc_clear_log">Очистить журнал</string>
+    <string name="acc_add_rule">Добавить правило маршрутизации</string>
+    <string name="core_error_no_server_selected">Конфигурация не выбрана</string>
+    <string name="core_error_decode_server_config">Не удалось прочитать выбранную конфигурацию</string>
+    <string name="core_error_build_config_context">Не удалось подготовить выбранную конфигурацию</string>
+    <string name="core_error_get_config">Не удалось создать конфигурацию ядра</string>
+    <string name="core_error_get_config_detail">Не удалось создать конфигурацию ядра: %1$s</string>
+    <string name="core_error_get_speedtest_config_detail">Не удалось создать конфигурацию ядра для теста скорости: %1$s</string>
+    <string name="core_error_custom_config_empty">Пользовательская конфигурация пуста</string>
+    <string name="core_error_start">Не удалось запустить ядро</string>
+    <string name="acc_start">Запустить службу</string>
+    <string name="acc_stop">Остановить службу</string>
+    <string name="acc_back">Назад</string>
+    <string name="acc_search">Поиск</string>
+    <string name="acc_add">Добавить профиль</string>
+    <string name="acc_more">Дополнительные параметры</string>
+    <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
+    <string name="acc_share_log">Поделиться журналом</string>
+    <string name="acc_remove">Удалить участника цепочки прокси</string>
+    <string name="acc_add_member">Добавить участника цепочки прокси</string>
+    <string name="acc_start_scanner">Запустить сканер QR-кодов</string>
+    <string name="acc_stop_scanner">Остановить сканер QR-кодов</string>
+    <string name="acc_turn_torch_on">Включить фонарик</string>
+    <string name="acc_turn_torch_off">Выключить фонарик</string>
+    <string name="acc_select_image">Выбрать изображение для сканирования</string>
+    <string name="acc_locked">Правило сохраняется при импорте предустановок</string>
+    <string name="acc_open_menu">Открыть меню навигации</string>
+    <string name="acc_edit">Изменить</string>
+    <string name="acc_delete">Удалить</string>
+    <string name="acc_save">Сохранить</string>
+    <string name="acc_update_subscriptions">Обновить подписки</string>
+    <string name="acc_per_app_proxy_information">Сведения о прокси для приложений</string>
+    <string name="permission_camera">Камера</string>
+    <string name="permission_notification">Уведомления</string>
+    <string name="permission_local_network">Локальная сеть</string>
+    <string name="subscription_update_updating">Обновление подписки: %1$s</string>
+    <string name="subscription_update_progress">Тестирование %2$s: %1$s</string>
+    <string name="tasker_blurb_start">Запустить %1$s</string>
+    <string name="tasker_blurb_stop">Остановить %1$s</string>
+    <string name="connection_test_empty_message">подробности отсутствуют</string>
+    <string name="value_unknown">неизвестно</string>
+
 </resources>
