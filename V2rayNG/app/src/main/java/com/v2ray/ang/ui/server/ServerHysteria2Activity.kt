@@ -25,13 +25,17 @@ class ServerHysteria2Activity : BaseServerActivity() {
             )
         }.apply {
             configType = EConfigType.HYSTERIA2
+            if (streamSecurity.isBlank()) streamSecurity = Appconfig.TLS
         }
+
+        val buildProfileItem = { ui.State.toProfileItem(initialConfig) }
 
         ServerEditorScaffold(
             title = serverConfigType.toString(),
             onSaveClick = { saveServer(uiState) }
         ) {
             CommonBasicFields(uiState)
+            CommonStreamSecurityFields(uiState, options, scope, buildProfileItem)
             Hysteria2ProtocolFields(uiState)
 
         }
@@ -79,22 +83,6 @@ class ServerHysteria2Activity : BaseServerActivity() {
             stringResource(R.string.server_lab_bandwidth_up),
             state.bandwidthUp,
             { state.bandwidthUp = it }
-        )
-
-        SettingsSwitchItem(
-            title = stringResource(R.string.server_lab_allow_insecure),
-            checked = state.allowInsecure,
-            onCheckedChange = { state.allowInsecure = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_sni),
-            state.sni,
-            { state.sni = it }
-        )
-        FormTextField(
-            stringResource(R.string.server_lab_pinned_ca256),
-            state.pinnedCA256,
-            { state.pinnedCA256 = it }
         )
     }
 }
