@@ -248,11 +248,10 @@ class MainViewModel(
             currentCoroutineContext().ensureActive()
             val profile = dataSource.decodeServerConfig(guid) ?: return@mapNotNull null
             val affiliation = dataSource.decodeAffiliationInfo(guid)
-            val testDelayMillis = affiliation?.testDelayMillis ?: 0L
             ServersCache(
                 guid = guid,
                 profile = profile.copy(),
-                testDelayMillis = testDelayMillis
+                testDelayMillis = affiliation?.testDelayMillis ?: 0L
             )
         }
 

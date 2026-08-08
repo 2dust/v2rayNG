@@ -380,7 +380,7 @@
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
     <string name="connection_test_testing_count">測試 %d 個配置中…</string>
-    <string name="connection_test_available">"成功：延遲 %1$s"</string>
+    <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
     <string name="server_test_delay_value">%1$d 毫秒</string>
     <string name="connection_test_error">"測試網際網路連線失敗：%s"</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>

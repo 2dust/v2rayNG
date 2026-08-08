@@ -57,13 +57,14 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
         if (isAppListLoading) return
 
         val applicationContext = context.applicationContext
+        val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
         isAppListLoading = true
         launchLoading {
             try {
                 selectedSnapshot = _selectedPackages.value
                 val apps = withContext(Dispatchers.IO) {
                     val list = AppManagerUtil.loadNetworkAppList(applicationContext)
-                    val special = createSpecialItemUnidentified(getString(R.string.app_picker_unknown_app))
+                    val special = createSpecialItemUnidentified(localizedUnknownApp)
                     sortApps(list + special)
                 }
                 allApps = apps
