@@ -347,8 +347,7 @@ object Utils {
         if (context == null) return ""
 
         return try {
-            context.getExternalFilesDir(AppConfig.DIR_ASSETS)?.absolutePath
-                ?: context.getDir(AppConfig.DIR_ASSETS, 0).absolutePath
+            context.getDir(AppConfig.DIR_ASSETS, Context.MODE_PRIVATE).absolutePath
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get user asset path", e)
             ""

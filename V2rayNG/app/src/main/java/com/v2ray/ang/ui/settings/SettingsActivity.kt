@@ -73,8 +73,8 @@ fun SettingsScreen(
     var muxSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var fragmentSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var observatorySettingsExpanded by rememberSaveable { mutableStateOf(false) }
-    var advancedSettingsExpanded by rememberSaveable { mutableStateOf(false) }
-    var modeSettingsExpanded by rememberSaveable { mutableStateOf(false) }
+    var advancedSettingsExpanded by rememberSaveable { mutableStateOf(true) }
+    var modeSettingsExpanded by rememberSaveable { mutableStateOf(true) }
 
     var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
     var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
