@@ -380,7 +380,7 @@
     <string name="connection_test_pending">Check Connectivity</string>
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
-    <string name="connection_test_available">Success: Connection took %dms</string>
+    <string name="connection_test_available">Success: Connection took %1$s</string>
     <string name="server_test_delay_value">%1$d ms</string>
     <string name="connection_test_error">Fail to detect internet connection: %s</string>
     <string name="connection_test_fail">Internet Unavailable</string>

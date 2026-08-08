@@ -380,7 +380,7 @@
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ...</string>
-    <string name="connection_test_available">مووفق بی: منپیز %dms طۊل کشی</string>
+    <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>

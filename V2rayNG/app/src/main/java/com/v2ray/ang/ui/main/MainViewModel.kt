@@ -46,15 +46,11 @@ class MainViewModel(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-    private var disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
-    private var connectedText: String = dataSource.getString(R.string.connection_connected)
-
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
         MainUiState(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
-            statusText = disconnectedText,
             confirmRemove = dataSource.getConfirmRemove(),
             doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
         )
@@ -113,7 +109,7 @@ class MainViewModel(
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
-                _uiState.update { it.copy(statusText = formatConnectionTestResult(event.result)) }
+                _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
 
             MainServiceEvent.MeasureConfigSuccess -> {
@@ -125,14 +121,7 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
-                _uiState.update {
-                    it.copy(
-                        statusText = dataSource.getString(
-                            R.string.connection_running_task_left,
-                            event.progress
-                        )
-                    )
-                }
+                _uiState.update { it.copy(status = MainStatus.TestProgress(event.progress)) }
             }
 
             is MainServiceEvent.MeasureConfigFinish -> {
@@ -141,9 +130,22 @@ class MainViewModel(
         }
     }
 
+    internal fun formatStatus(status: MainStatus): String = when (status) {
+        MainStatus.Disconnected -> dataSource.getString(R.string.connection_not_connected)
+        MainStatus.Connected -> dataSource.getString(R.string.connection_connected)
+        MainStatus.Testing -> dataSource.getString(R.string.connection_test_testing)
+        is MainStatus.TestProgress -> dataSource.getString(
+            R.string.connection_running_task_left,
+            status.progress
+        )
+
+        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result)
+    }
+
     private fun formatConnectionTestResult(result: ConnectionTestResult): String {
         val status = if (result.delayMillis >= 0) {
-            dataSource.getString(R.string.connection_test_available, result.delayMillis)
+            val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            dataSource.getString(R.string.connection_test_available, delay)
         } else {
             val detail = result.errorMessage.ifBlank {
                 dataSource.getString(R.string.connection_test_empty_message)
@@ -232,18 +234,8 @@ class MainViewModel(
     }
 
     fun refreshUiSettings() {
-        val previousDisconnectedText = disconnectedText
-        val previousConnectedText = connectedText
-        disconnectedText = dataSource.getString(R.string.connection_not_connected)
-        connectedText = dataSource.getString(R.string.connection_connected)
-
         _uiState.update {
             it.copy(
-                statusText = when (it.statusText) {
-                    previousDisconnectedText -> disconnectedText
-                    previousConnectedText -> connectedText
-                    else -> it.statusText
-                },
                 confirmRemove = dataSource.getConfirmRemove(),
                 doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
             )
@@ -251,10 +243,6 @@ class MainViewModel(
     }
 
     // ---------- Group & server loading ----------
-    private fun formatTestDelay(delayMillis: Long): String =
-        if (delayMillis == 0L) ""
-        else dataSource.getString(R.string.server_test_delay_value, delayMillis)
-
     private suspend fun buildServersCache(guids: List<String>): List<ServersCache> =
         guids.mapNotNull { guid ->
             currentCoroutineContext().ensureActive()
@@ -264,8 +252,7 @@ class MainViewModel(
             ServersCache(
                 guid = guid,
                 profile = profile.copy(),
-                testDelayMillis = testDelayMillis,
-                testDelayString = formatTestDelay(testDelayMillis)
+                testDelayMillis = testDelayMillis
             )
         }
 
@@ -694,7 +681,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = false,
-                statusText = if (it.isRunning) connectedText else disconnectedText
+                status = if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
             )
         }
     }
@@ -712,7 +699,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = true,
-                statusText = dataSource.getString(R.string.connection_test_testing)
+                status = MainStatus.Testing
             )
         }
         viewModelScope.launch(ioDispatcher) {
@@ -729,11 +716,7 @@ class MainViewModel(
     }
 
     fun testCurrentServerRealPing() {
-        _uiState.update {
-            it.copy(
-                statusText = dataSource.getString(R.string.connection_test_testing)
-            )
-        }
+        _uiState.update { it.copy(status = MainStatus.Testing) }
         dataSource.testCurrentServerRealPing()
     }
 
@@ -744,7 +727,7 @@ class MainViewModel(
             _uiState.update {
                 it.copy(
                     isTesting = false,
-                    statusText = if (it.isRunning) connectedText else disconnectedText
+                    status = if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
                 )
             }
             reloadAllGroups(_uiState.value.groups.map { it.id })
@@ -780,8 +763,8 @@ class MainViewModel(
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
-                statusText = if (!clearTestingText && state.isTesting) state.statusText
-                else if (running) connectedText else disconnectedText
+                status = if (!clearTestingText && state.isTesting) state.status
+                else if (running) MainStatus.Connected else MainStatus.Disconnected
             )
         }
     }
