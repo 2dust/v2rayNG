@@ -317,7 +317,7 @@
     <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
     <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
-    <string name="title_export_all">خروجی گرفتن کانفیگ‌ها به‌جز کانفیگ‌های JSON سفارشی در کلیپ‌بورد</string>
+    <string name="title_export_all">صادر کردن کانفیگ‌ها به کلیپ‌بورد</string>
     <string name="title_sub_setting">اشتراک‌ها</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">URL اختیاری</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>
-    <string name="sub_setting_pre_profile">نام مستعار پروکسی قبلی</string>
-    <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
+    <string name="sub_setting_pre_profile">پروکسی ورودی</string>
+    <string name="sub_setting_next_profile">پروکسی خروجی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
+    <string name="sub_setting_entry_proxy_tip">پروکسی انتخاب‌شده پیش از هر پروفایل این اشتراک، به‌عنوان حلقهٔ ورودی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
+    <string name="sub_setting_exit_proxy_tip">پروکسی انتخاب‌شده پس از هر پروفایل این اشتراک، به‌عنوان حلقهٔ خروجی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
-    <string name="title_real_ping_all_server">آزمایش تأخیر واقعی کانفیگ‌ها</string>
+    <string name="title_real_ping_all_server">آزمایش تأخیر واقعی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
-    <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
+    <string name="connection_connected">متصل است.\nبرای بررسی اتصال ضربه بزنید.</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
 

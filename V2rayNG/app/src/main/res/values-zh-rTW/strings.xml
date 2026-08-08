@@ -317,7 +317,7 @@
     <string name="title_del_all_config">刪除所有設定</string>
     <string name="title_del_duplicate_config">刪除重複設定</string>
     <string name="title_del_invalid_config">刪除無效設定</string>
-    <string name="title_export_all">將自訂 JSON 以外的設定匯出至剪貼簿</string>
+    <string name="title_export_all">將設定匯出至剪貼簿</string>
     <string name="title_sub_setting">訂閱</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">URL（可選）</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
     <string name="sub_allow_insecure_url">允許不安全的 HTTP 位址</string>
-    <string name="sub_setting_pre_profile">前置代理設定檔別名</string>
-    <string name="sub_setting_next_profile">後置代理設定檔別名</string>
+    <string name="sub_setting_pre_profile">入口代理</string>
+    <string name="sub_setting_next_profile">出口代理</string>
     <string name="sub_setting_pre_profile_tip">請確保設定檔別名存在且唯一</string>
+    <string name="sub_setting_entry_proxy_tip">所選代理會加在此訂閱中每個設定檔之前，作為該設定檔代理鏈的入口節點。</string>
+    <string name="sub_setting_exit_proxy_tip">所選代理會加在此訂閱中每個設定檔之後，作為該設定檔代理鏈的出口節點。</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
-    <string name="title_real_ping_all_server">測試設定的實際延遲</string>
+    <string name="title_real_ping_all_server">測試實際延遲</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
     <string name="title_filter_config">篩選設定</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
-    <string name="connection_connected">"已連線，輕觸以檢查連線能力"</string>
+    <string name="connection_connected">"已連線。輕觸以檢查連線。"</string>
     <string name="connection_not_connected">"未連線"</string>
     <string name="connection_running_task_left">正在執行的測試：%s</string>
 

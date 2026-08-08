@@ -317,7 +317,7 @@
     <string name="title_del_all_config">Delete configs</string>
     <string name="title_del_duplicate_config">Delete duplicate configs</string>
     <string name="title_del_invalid_config">Delete invalid configs</string>
-    <string name="title_export_all">Export non-custom configs to clipboard</string>
+    <string name="title_export_all">Export configs to clipboard</string>
     <string name="title_sub_setting">Subscriptions</string>
     <string name="sub_setting_remarks">Remarks</string>
     <string name="sub_setting_url">Optional URL</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
     <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
-    <string name="sub_setting_pre_profile">Previous proxy config remarks</string>
-    <string name="sub_setting_next_profile">Next proxy config remarks</string>
+    <string name="sub_setting_pre_profile">Entry proxy</string>
+    <string name="sub_setting_next_profile">Exit proxy</string>
     <string name="sub_setting_pre_profile_tip">Make sure the config remarks exist and are unique</string>
+    <string name="sub_setting_entry_proxy_tip">The selected proxy is added before every profile in this subscription as the entry link in the proxy chain for that profile.</string>
+    <string name="sub_setting_exit_proxy_tip">The selected proxy is added after every profile in this subscription as the exit link in the proxy chain for that profile.</string>
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
-    <string name="title_real_ping_all_server">Test real delays for configs</string>
+    <string name="title_real_ping_all_server">Test real delays</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sort by test results</string>
     <string name="title_filter_config">Filter configs</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">Connection test failed: %s</string>
     <string name="connection_test_fail">Internet unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
-    <string name="connection_connected">Connected, tap to check connection</string>
+    <string name="connection_connected">Connected. Tap to check connection.</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
 

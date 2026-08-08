@@ -317,7 +317,7 @@
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
     <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر بونکۊ سکویی</string>
-    <string name="title_export_all">و در کشیڌن کانفیگا غیر سفارشی JSON من کلیپ بورد</string>
+    <string name="title_export_all">و در کشیڌن کانفیگا من کلیپ بورد</string>
     <string name="title_sub_setting">اشتراکا</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
     <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>
-    <string name="sub_setting_pre_profile">نیشتنا کانفیگ پروکسی دیندایی</string>
-    <string name="sub_setting_next_profile">نیشتنا کانفیگ پروکسی نیایی</string>
+    <string name="sub_setting_pre_profile">پروکسی وۊرۊی</string>
+    <string name="sub_setting_next_profile">پروکسی دری</string>
     <string name="sub_setting_pre_profile_tip">موطمئن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
+    <string name="sub_setting_entry_proxy_tip">ای پروکسی پؽش ز هر کانفیگ من ای اشتراک، وری ٱول عوزو زنجیره پروکسی اضاف ابۊ.</string>
+    <string name="sub_setting_exit_proxy_tip">ای پروکسی بئڌ ز هر کانفیگ من ای اشتراک، وری آخر عوزو زنجیره پروکسی اضاف ابۊ.</string>
     <string name="toast_invalid_update_interval">فاصله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
-    <string name="title_real_ping_all_server">آزمایش تئخیر واقعی کانفیگا</string>
+    <string name="title_real_ping_all_server">آزمایش تئخیر واقعی</string>
     <string name="title_user_asset_setting">فایلا بونچک جغرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
-    <string name="connection_connected">منپیز هڌ، سی واجۊری کیلیک کوݩ</string>
+    <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
 

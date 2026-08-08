@@ -317,7 +317,7 @@
     <string name="title_del_all_config">সব কনফিগারেশন মুছে ফেলুন</string>
     <string name="title_del_duplicate_config">ডুপ্লিকেট কনফিগারেশন মুছে ফেলুন</string>
     <string name="title_del_invalid_config">অবৈধ কনফিগারেশন মুছে ফেলুন (প্রথমে পরীক্ষা করুন)</string>
-    <string name="title_export_all">কাস্টম JSON কনফিগারেশন ছাড়া অন্য কনফিগারেশনগুলি ক্লিপবোর্ডে রপ্তানি করুন</string>
+    <string name="title_export_all">কনফিগারেশন ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="title_sub_setting">সাবস্ক্রিপশন</string>
     <string name="sub_setting_remarks">মন্তব্য</string>
     <string name="sub_setting_url">ঐচ্ছিক URL</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">আপডেট সক্রিয় করুন</string>
     <string name="sub_auto_update">স্বয়ংক্রিয় আপডেট সক্রিয় করুন</string>
     <string name="sub_allow_insecure_url">অনিরাপদ HTTP ঠিকানা অনুমোদন করুন</string>
-    <string name="sub_setting_pre_profile">আগের প্রক্সি কনফিগারেশনের মন্তব্য</string>
-    <string name="sub_setting_next_profile">পরবর্তী প্রক্সি কনফিগারেশনের মন্তব্য</string>
+    <string name="sub_setting_pre_profile">প্রবেশ প্রক্সি</string>
+    <string name="sub_setting_next_profile">প্রস্থান প্রক্সি</string>
     <string name="sub_setting_pre_profile_tip">কনফিগারেশনের মন্তব্যটি বিদ্যমান ও অনন্য হতে হবে</string>
+    <string name="sub_setting_entry_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের আগে সেই প্রোফাইলের প্রক্সি চেইনের প্রবেশ লিঙ্ক হিসেবে যোগ করা হবে।</string>
+    <string name="sub_setting_exit_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের পরে সেই প্রোফাইলের প্রক্সি চেইনের প্রস্থান লিঙ্ক হিসেবে যোগ করা হবে।</string>
     <string name="toast_invalid_update_interval">আপডেটের বিরতি সঠিক নয়। সর্বনিম্ন ১৫ মিনিট।</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
-    <string name="title_real_ping_all_server">কনফিগারেশনগুলির প্রকৃত বিলম্ব পরীক্ষা করুন</string>
+    <string name="title_real_ping_all_server">প্রকৃত বিলম্ব পরীক্ষা করুন</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
-    <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
+    <string name="connection_connected">সংযুক্ত।\nসংযোগ পরীক্ষা করতে ট্যাপ করুন।</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_running_task_left">চলমান পরীক্ষা: %s</string>
 

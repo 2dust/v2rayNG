@@ -317,7 +317,7 @@
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
     <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi</string>
-    <string name="title_export_all">Xuất các cấu hình không phải JSON tùy chỉnh vào bảng tạm</string>
+    <string name="title_export_all">Xuất cấu hình vào bảng tạm</string>
     <string name="title_sub_setting">Gói đăng ký</string>
     <string name="sub_setting_remarks">Tên gói đăng ký</string>
     <string name="sub_setting_url">URL gói đăng ký (không bắt buộc)</string>
@@ -327,13 +327,15 @@
     <string name="sub_setting_enable">Bật cập nhật</string>
     <string name="sub_auto_update">Bật tự động cập nhật</string>
     <string name="sub_allow_insecure_url">Cho phép địa chỉ HTTP không an toàn</string>
-    <string name="sub_setting_pre_profile">Tên ghi chú của cấu hình proxy trước đó</string>
-    <string name="sub_setting_next_profile">Tên ghi chú của cấu hình proxy tiếp theo</string>
+    <string name="sub_setting_pre_profile">Proxy đầu vào</string>
+    <string name="sub_setting_next_profile">Proxy đầu ra</string>
     <string name="sub_setting_pre_profile_tip">Tên ghi chú của cấu hình phải tồn tại và là duy nhất</string>
+    <string name="sub_setting_entry_proxy_tip">Proxy đã chọn được thêm trước mỗi cấu hình trong gói đăng ký, làm mắt xích đầu vào của chuỗi proxy cho cấu hình đó.</string>
+    <string name="sub_setting_exit_proxy_tip">Proxy đã chọn được thêm sau mỗi cấu hình trong gói đăng ký, làm mắt xích đầu ra của chuỗi proxy cho cấu hình đó.</string>
     <string name="toast_invalid_update_interval">Khoảng thời gian cập nhật không hợp lệ. Giá trị tối thiểu là 15 phút.</string>
     <string name="title_sub_update">Cập nhật gói đăng ký</string>
     <string name="title_ping_all_server">Kiểm tra độ trễ TCP (TCPing)</string>
-    <string name="title_real_ping_all_server">Kiểm tra độ trễ thực của các cấu hình</string>
+    <string name="title_real_ping_all_server">Kiểm tra độ trễ thực</string>
     <string name="title_user_asset_setting">Tệp tài nguyên</string>
     <string name="title_sort_by_test_results">Sắp xếp theo kết quả kiểm tra</string>
     <string name="title_filter_config">Lọc cấu hình</string>
@@ -386,7 +388,7 @@
     <string name="connection_test_error">Kiểm tra kết nối thất bại: %s</string>
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
-    <string name="connection_connected">Đã kết nối, nhấn để kiểm tra kết nối mạng!</string>
+    <string name="connection_connected">Đã kết nối.\nNhấn để kiểm tra kết nối.</string>
     <string name="connection_not_connected">Chưa kết nối</string>
     <string name="connection_running_task_left">Số lượt kiểm tra đang chạy: %s</string>
 
