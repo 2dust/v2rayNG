@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.TestServiceMessage
@@ -105,19 +106,14 @@ class MainViewModel(
                 updateRunningState(true)
             }
 
-            is MainServiceEvent.StateStartFailure -> {
-                val error = event.errorMessage
-                if (error.isNotBlank()) {
-                    toastError(error)
-                } else {
-                    toastError(R.string.toast_services_failure)
-                }
+            MainServiceEvent.StateStartFailure -> {
+                toastError(R.string.toast_services_failure)
                 updateRunningState(false)
             }
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
-            is MainServiceEvent.MeasureDelaySuccess -> {
-                _uiState.update { it.copy(statusText = event.content) }
+            is MainServiceEvent.MeasureDelayResult -> {
+                _uiState.update { it.copy(statusText = formatConnectionTestResult(event.result)) }
             }
 
             MainServiceEvent.MeasureConfigSuccess -> {
@@ -143,6 +139,24 @@ class MainViewModel(
                 onTestsFinished()
             }
         }
+    }
+
+    private fun formatConnectionTestResult(result: ConnectionTestResult): String {
+        val status = if (result.delayMillis >= 0) {
+            dataSource.getString(R.string.connection_test_available, result.delayMillis)
+        } else {
+            val detail = result.errorMessage.ifBlank {
+                dataSource.getString(R.string.connection_test_empty_message)
+            }
+            dataSource.getString(R.string.connection_test_error, detail)
+        }
+
+        if (result.delayMillis < 0 || (result.country == null && result.ipAddress == null)) {
+            return status
+        }
+
+        val unknown = dataSource.getString(R.string.value_unknown)
+        return "$status\n(${result.country ?: unknown}) ${result.ipAddress ?: unknown}"
     }
 
     // ---------- Public state accessors ----------

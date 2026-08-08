@@ -502,14 +502,6 @@
     <string name="acc_copy_log">Копировать журнал</string>
     <string name="acc_clear_log">Очистить журнал</string>
     <string name="acc_add_rule">Добавить правило маршрутизации</string>
-    <string name="core_error_no_server_selected">Конфигурация не выбрана</string>
-    <string name="core_error_decode_server_config">Не удалось прочитать выбранную конфигурацию</string>
-    <string name="core_error_build_config_context">Не удалось подготовить выбранную конфигурацию</string>
-    <string name="core_error_get_config">Не удалось создать конфигурацию ядра</string>
-    <string name="core_error_get_config_detail">Не удалось создать конфигурацию ядра: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">Не удалось создать конфигурацию ядра для теста скорости: %1$s</string>
-    <string name="core_error_custom_config_empty">Пользовательская конфигурация пуста</string>
-    <string name="core_error_start">Не удалось запустить ядро</string>
     <string name="acc_start">Запустить службу</string>
     <string name="acc_stop">Остановить службу</string>
     <string name="acc_back">Назад</string>

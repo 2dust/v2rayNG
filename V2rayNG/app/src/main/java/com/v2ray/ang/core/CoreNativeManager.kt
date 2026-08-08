@@ -56,14 +56,14 @@ object CoreNativeManager {
     /**
      * Get V2Ray core version.
      *
-     * @return Version string of the V2Ray core
+     * @return Version string of the V2Ray core, or null if it cannot be read.
      */
-    fun getLibVersion(): String {
+    fun getLibVersion(): String? {
         return try {
             Libv2ray.checkVersionX()
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to check V2Ray version", e)
-            "Unknown"
+            null
         }
     }
 
