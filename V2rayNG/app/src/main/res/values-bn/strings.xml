@@ -157,7 +157,7 @@
     <string name="menu_item_invert_selection">নির্বাচন উল্টে দিন</string>
     <string name="msg_enter_keywords">কিওয়ার্ড লিখুন</string>
     <string name="switch_bypass_apps_mode">বাইপাস মোড</string>
-    <string name="menu_item_select_proxy_app">অটো সিলেক্ট প্রক্সি অ্যাপ</string>
+    <string name="menu_item_select_proxy_app">প্রক্সি ব্যবহার করবে এমন অ্যাপ স্বয়ংক্রিয়ভাবে নির্বাচন করুন</string>
     <string name="msg_downloading_content">বিষয়বস্তু ডাউনলোড হচ্ছে</string>
     <string name="menu_item_export_proxy_app">ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="menu_item_import_proxy_app">ক্লিপবোর্ড থেকে আমদানি করুন</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">কোর সেটিংস</string>
     <string name="title_vpn_settings">VPN সেটিংস</string>
     <string name="title_pref_per_app_proxy">প্রতি-অ্যাপ প্রক্সি</string>
-    <string name="summary_pref_per_app_proxy">সাধারণ: নির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে, অনির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়;\nবাইপাস মোড: নির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়, অনির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে।\nপ্রক্সি ব্যবহারকারী অ্যাপ স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্পটি মেনুতে আছে।</string>
+    <string name="summary_pref_per_app_proxy">সাধারণ: নির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে, অনির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়;\nবাইপাস মোড: নির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়, অনির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে।\nযেসব অ্যাপ প্রক্সি ব্যবহার করবে, সেগুলি স্বয়ংক্রিয়ভাবে নির্বাচনের বিকল্পটি মেনুতে আছে।</string>
     <string name="title_pref_is_booted">চালুর সময় স্বয়ংক্রিয় সংযোগ</string>
     <string name="summary_pref_is_booted">চালুর সময় নির্বাচিত সার্ভারে স্বয়ংক্রিয়ভাবে সংযোগ করে; সংযোগ ব্যর্থ হতে পারে</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">সরাসরি DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS হোস্ট ম্যাপিং (ফরম্যাট: domain:address,…)</string>
+    <string name="title_pref_dns_hosts">DNS হোস্ট ম্যাপিং (বিন্যাস: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">প্রকৃত বিলম্ব পরীক্ষার URL</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">ডুপ্লিকেট কনফিগারেশন মুছে ফেলুন</string>
     <string name="title_del_invalid_config">অবৈধ কনফিগারেশন মুছে ফেলুন (প্রথমে পরীক্ষা করুন)</string>
     <string name="title_export_all">কাস্টম JSON কনফিগারেশন ছাড়া অন্য কনফিগারেশনগুলি ক্লিপবোর্ডে রপ্তানি করুন</string>
-    <string name="title_sub_setting">সাবস্ক্রিপশন গ্রুপ সেটিং</string>
+    <string name="title_sub_setting">সাবস্ক্রিপশন</string>
     <string name="sub_setting_remarks">মন্তব্য</string>
     <string name="sub_setting_url">ঐচ্ছিক URL</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">কনফিগারেশনের মন্তব্যটি বিদ্যমান ও অনন্য হতে হবে</string>
     <string name="toast_invalid_update_interval">আপডেটের বিরতি সঠিক নয়। সর্বনিম্ন ১৫ মিনিট।</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
-    <string name="title_ping_all_server">কনফিগারেশনগুলির TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
+    <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
     <string name="title_real_ping_all_server">কনফিগারেশনগুলির প্রকৃত বিলম্ব পরীক্ষা করুন</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">ডোমেইন কৌশল</string>
     <string name="routing_settings_title">রাউটিং সেটিংস</string>
-    <string name="routing_settings_tips">কমা (,) দিয়ে আলাদা করুন। domain, ip বা process-এ একটি নির্বাচন করুন</string>
+    <string name="routing_settings_tips">সব নির্ধারিত মিলের শর্ত একসঙ্গে পূরণ হলেই কেবল নিয়মটি প্রয়োগ হবে (AND)। নিয়মগুলি ওপর থেকে নিচে পরীক্ষা করা হয়; প্রথম মিলে যাওয়া নিয়মটি প্রয়োগ করা হয়।</string>
+    <string name="routing_settings_comma_tip">একাধিক এন্ট্রি কমা (,) দিয়ে আলাদা করুন।</string>
     <string name="routing_settings_save">সেভ করুন</string>
     <string name="routing_settings_delete">মুছে ফেলুন</string>
     <string name="routing_settings_rule_title">রাউটিং নিয়মের সেটিংস</string>

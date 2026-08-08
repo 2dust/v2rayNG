@@ -157,7 +157,7 @@
     <string name="menu_item_invert_selection">Đảo chọn</string>
     <string name="msg_enter_keywords">Nhập từ khoá</string>
     <string name="switch_bypass_apps_mode">Chế độ bỏ qua</string>
-    <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng Proxy</string>
+    <string name="menu_item_select_proxy_app">Tự động chọn ứng dụng cần dùng proxy</string>
     <string name="msg_downloading_content">Đang tải xuống nội dung…</string>
     <string name="menu_item_export_proxy_app">Xuất và Sao chép</string>
     <string name="menu_item_import_proxy_app">Nhập từ bảng tạm</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">Cài đặt lõi</string>
     <string name="title_vpn_settings">Cài đặt VPN</string>
     <string name="title_pref_per_app_proxy">Proxy theo từng ứng dụng</string>
-    <string name="summary_pref_per_app_proxy">Thông thường: ứng dụng đã chọn dùng proxy, ứng dụng chưa chọn kết nối trực tiếp;\nChế độ bỏ qua: ứng dụng đã chọn kết nối trực tiếp, ứng dụng chưa chọn dùng proxy.\nTùy chọn tự động chọn ứng dụng dùng proxy nằm trong trình đơn.</string>
+    <string name="summary_pref_per_app_proxy">Thông thường: ứng dụng đã chọn dùng proxy, ứng dụng chưa chọn kết nối trực tiếp;\nChế độ bỏ qua: ứng dụng đã chọn kết nối trực tiếp, ứng dụng chưa chọn dùng proxy.\nTrong trình đơn có tùy chọn tự động chọn các ứng dụng sẽ dùng proxy.</string>
     <string name="title_pref_is_booted">Tự động kết nối khi khởi động</string>
     <string name="summary_pref_is_booted">Tự động kết nối với máy chủ đã chọn khi khởi động; thao tác này có thể không thành công</string>
 
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">Xoá cấu hình trùng lặp</string>
     <string name="title_del_invalid_config">Xoá cấu hình lỗi</string>
     <string name="title_export_all">Xuất các cấu hình không phải JSON tùy chỉnh vào bảng tạm</string>
-    <string name="title_sub_setting">Cài đặt nhóm đăng ký</string>
+    <string name="title_sub_setting">Gói đăng ký</string>
     <string name="sub_setting_remarks">Tên gói đăng ký</string>
     <string name="sub_setting_url">URL gói đăng ký (không bắt buộc)</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">Tên ghi chú của cấu hình phải tồn tại và là duy nhất</string>
     <string name="toast_invalid_update_interval">Khoảng thời gian cập nhật không hợp lệ. Giá trị tối thiểu là 15 phút.</string>
     <string name="title_sub_update">Cập nhật gói đăng ký</string>
-    <string name="title_ping_all_server">Kiểm tra độ trễ TCP của các cấu hình (TCPing)</string>
+    <string name="title_ping_all_server">Kiểm tra độ trễ TCP (TCPing)</string>
     <string name="title_real_ping_all_server">Kiểm tra độ trễ thực của các cấu hình</string>
     <string name="title_user_asset_setting">Tệp tài nguyên</string>
     <string name="title_sort_by_test_results">Sắp xếp theo kết quả kiểm tra</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Chiến lược tên miền (DomainStrategy)</string>
     <string name="routing_settings_title">Cài đặt định tuyến</string>
-    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Chọn một trong: domain, ip hoặc process</string>
+    <string name="routing_settings_tips">Quy tắc chỉ được áp dụng khi tất cả điều kiện đối sánh đã đặt đều được thỏa mãn cùng lúc (AND). Các quy tắc được kiểm tra từ trên xuống; quy tắc khớp đầu tiên sẽ được áp dụng.</string>
+    <string name="routing_settings_comma_tip">Phân cách nhiều mục bằng dấu phẩy (,).</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_rule_title">Cài đặt quy tắc định tuyến</string>

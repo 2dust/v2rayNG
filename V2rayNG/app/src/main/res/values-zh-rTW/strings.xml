@@ -171,7 +171,7 @@
     <string name="title_core_settings">核心設定</string>
     <string name="title_vpn_settings">VPN 設定</string>
     <string name="title_pref_per_app_proxy">個別應用程式代理</string>
-    <string name="summary_pref_per_app_proxy">一般：已勾選的應用程式使用代理，未勾選的應用程式直接連線；\n繞行模式：已勾選的應用程式直接連線，未勾選的應用程式使用代理。\n自動選取代理應用程式的選項位於選單中。</string>
+    <string name="summary_pref_per_app_proxy">一般：已勾選的應用程式使用代理，未勾選的應用程式直接連線；\n繞行模式：已勾選的應用程式直接連線，未勾選的應用程式使用代理。\n選單中可自動選取需要使用代理的應用程式。</string>
     <string name="title_pref_is_booted">開機時自動連線</string>
     <string name="summary_pref_is_booted">開機時自動連線選擇的伺服器，可能會不成功</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">直接連線 DNS（可選）</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS 主機對應（格式：網域:位址，…）</string>
+    <string name="title_pref_dns_hosts">DNS 主機對應（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">真實延遲測試 URL</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">刪除重複設定</string>
     <string name="title_del_invalid_config">刪除無效設定</string>
     <string name="title_export_all">將自訂 JSON 以外的設定匯出至剪貼簿</string>
-    <string name="title_sub_setting">訂閱群組設定</string>
+    <string name="title_sub_setting">訂閱</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">URL（可選）</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">請確保設定檔別名存在且唯一</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
-    <string name="title_ping_all_server">測試設定的 TCP 延遲（TCPing）</string>
+    <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
     <string name="title_real_ping_all_server">測試設定的實際延遲</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">路由設定</string>
-    <string name="routing_settings_tips">用逗號（,）分隔，選擇填寫 domain、ip 或 process 中的一項</string>
+    <string name="routing_settings_tips">一條規則只有在所有已設定的比對條件同時符合時才會生效（AND）。規則會由上而下檢查，並套用第一條符合的規則。</string>
+    <string name="routing_settings_comma_tip">多個項目請用逗號（,）分隔。</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_rule_title">路由規則設定</string>

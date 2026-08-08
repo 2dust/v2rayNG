@@ -157,7 +157,7 @@
     <string name="menu_item_invert_selection">Invert selection</string>
     <string name="msg_enter_keywords">Enter keywords</string>
     <string name="switch_bypass_apps_mode">Bypass Mode</string>
-    <string name="menu_item_select_proxy_app">Auto select proxy app</string>
+    <string name="menu_item_select_proxy_app">Auto-select apps to be proxied</string>
     <string name="msg_downloading_content">Downloading content</string>
     <string name="menu_item_export_proxy_app">Export to Clipboard</string>
     <string name="menu_item_import_proxy_app">Import from Clipboard</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">Core Settings</string>
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
-    <string name="summary_pref_per_app_proxy">General: checked apps use the proxy, and unchecked apps connect directly;\nBypass mode: checked apps connect directly, and unchecked apps use the proxy.\nThe option to select proxy apps automatically is in the menu.</string>
+    <string name="summary_pref_per_app_proxy">General: checked apps use the proxy, and unchecked apps connect directly;\nBypass mode: checked apps connect directly, and unchecked apps use the proxy.\nThe option to automatically select apps that should use the proxy is in the menu.</string>
     <string name="title_pref_is_booted">Auto connect at startup</string>
     <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
 
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">Delete duplicate configs</string>
     <string name="title_del_invalid_config">Delete invalid configs</string>
     <string name="title_export_all">Export non-custom configs to clipboard</string>
-    <string name="title_sub_setting">Subscription group settings</string>
+    <string name="title_sub_setting">Subscriptions</string>
     <string name="sub_setting_remarks">Remarks</string>
     <string name="sub_setting_url">Optional URL</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">Make sure the config remarks exist and are unique</string>
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
     <string name="title_sub_update">Update subscription</string>
-    <string name="title_ping_all_server">Test TCP delays for configs (TCPing)</string>
+    <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
     <string name="title_real_ping_all_server">Test real delays for configs</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sort by test results</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Domain strategy</string>
     <string name="routing_settings_title">Routing Settings</string>
-    <string name="routing_settings_tips">Separate entries with commas (,).\nChoose domain, ip, or process.</string>
+    <string name="routing_settings_tips">A rule applies only when every configured matching condition is satisfied (AND). Rules are checked from top to bottom; the first matching rule is applied.</string>
+    <string name="routing_settings_comma_tip">Separate multiple entries with commas (,).</string>
     <string name="routing_settings_save">Save</string>
     <string name="routing_settings_delete">Clear</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>

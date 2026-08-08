@@ -171,7 +171,7 @@
     <string name="title_core_settings">تنظیمات هسته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
-    <string name="summary_pref_per_app_proxy">حالت عادی: برنامه‌های انتخاب‌شده از پروکسی استفاده می‌کنند و برنامه‌های انتخاب‌نشده مستقیماً متصل می‌شوند؛\nحالت دور زدن: برنامه‌های انتخاب‌شده مستقیماً متصل می‌شوند و برنامه‌های انتخاب‌نشده از پروکسی استفاده می‌کنند.\nگزینهٔ انتخاب خودکار برنامه‌های پروکسی در منو قرار دارد.</string>
+    <string name="summary_pref_per_app_proxy">حالت عادی: برنامه‌های انتخاب‌شده از پروکسی استفاده می‌کنند و برنامه‌های انتخاب‌نشده مستقیماً متصل می‌شوند؛\nحالت دور زدن: برنامه‌های انتخاب‌شده مستقیماً متصل می‌شوند و برنامه‌های انتخاب‌نشده از پروکسی استفاده می‌کنند.\nگزینهٔ انتخاب خودکار برنامه‌هایی که باید از پروکسی استفاده کنند در منو قرار دارد.</string>
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">DNS مستقیم (اختیاری)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">نگاشت‌های میزبان DNS (قالب: دامنه:آدرس،…)</string>
+    <string name="title_pref_dns_hosts">نگاشت‌های میزبان DNS (قالب: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
 
     <string name="title_pref_delay_test_url">URL آزمایش تأخیر واقعی</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
     <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
     <string name="title_export_all">خروجی گرفتن کانفیگ‌ها به‌جز کانفیگ‌های JSON سفارشی در کلیپ‌بورد</string>
-    <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
+    <string name="title_sub_setting">اشتراک‌ها</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">URL اختیاری</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
-    <string name="title_ping_all_server">آزمایش تأخیر TCP کانفیگ‌ها (TCPing)</string>
+    <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تأخیر واقعی کانفیگ‌ها</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
-    <string name="routing_settings_tips">با کاما (,) جدا کنید. یکی از موارد domain، ip یا process را وارد کنید</string>
+    <string name="routing_settings_tips">یک قانون فقط زمانی اعمال می‌شود که همهٔ شرط‌های تطبیق واردشده هم‌زمان برقرار باشند (AND). قوانین از بالا به پایین بررسی می‌شوند و نخستین قانون منطبق اعمال می‌شود.</string>
+    <string name="routing_settings_comma_tip">چند ورودی را با کاما (,) جدا کنید.</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">حذف</string>
     <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>

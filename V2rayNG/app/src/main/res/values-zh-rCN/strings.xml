@@ -171,7 +171,7 @@
     <string name="title_core_settings">核心设置</string>
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用代理</string>
-    <string name="summary_pref_per_app_proxy">常规：勾选的应用使用代理，未勾选的应用直连；\n绕行模式：勾选的应用直连，未勾选的应用使用代理。\n自动选择代理应用的选项位于菜单中。</string>
+    <string name="summary_pref_per_app_proxy">常规：勾选的应用使用代理，未勾选的应用直连；\n绕行模式：勾选的应用直连，未勾选的应用使用代理。\n菜单中可自动选择需要使用代理的应用。</string>
     <string name="title_pref_is_booted">开机时自动连接</string>
     <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">直连 DNS（可选）</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS 主机映射（格式：域名:地址，…）</string>
+    <string name="title_pref_dns_hosts">DNS 主机映射（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
     <string name="title_pref_delay_test_url">真实延迟测试 URL</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">删除重复配置</string>
     <string name="title_del_invalid_config">删除无效配置</string>
     <string name="title_export_all">将非自定义 JSON 配置导出至剪贴板</string>
-    <string name="title_sub_setting">订阅组设置</string>
+    <string name="title_sub_setting">订阅</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">URL（可选）</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
     <string name="toast_invalid_update_interval">更新间隔无效，最小值为 15 分钟。</string>
     <string name="title_sub_update">更新订阅</string>
-    <string name="title_ping_all_server">测试配置 TCP 延迟（TCPing）</string>
+    <string name="title_ping_all_server">测试 TCP 延迟（TCPing）</string>
     <string name="title_real_ping_all_server">测试配置实际延迟</string>
     <string name="title_user_asset_setting">资源文件</string>
     <string name="title_sort_by_test_results">按测试结果排序</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号（,）分隔，选择填写 domain、ip 或 process 中的一项</string>
+    <string name="routing_settings_tips">一条规则仅在所有已设置的匹配条件同时满足时生效（AND）。规则按从上到下的顺序检查，并应用首条匹配的规则。</string>
+    <string name="routing_settings_comma_tip">多个条目请用逗号（,）分隔。</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>

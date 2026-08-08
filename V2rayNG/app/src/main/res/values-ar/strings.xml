@@ -157,7 +157,7 @@
     <string name="menu_item_invert_selection">عكس الاختيار</string>
     <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
     <string name="switch_bypass_apps_mode">وضع التجاوز</string>
-    <string name="menu_item_select_proxy_app">تحديد تطبيق الوكيل تلقائيًا</string>
+    <string name="menu_item_select_proxy_app">تحديد التطبيقات التي ستستخدم الوكيل تلقائيًا</string>
     <string name="msg_downloading_content">جارٍ تنزيل المحتوى</string>
     <string name="menu_item_export_proxy_app">تصدير إلى الحافظة</string>
     <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">إعدادات النواة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
-    <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر خيار تحديد تطبيقات الوكيل تلقائيًا في القائمة.</string>
+    <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر في القائمة خيار لتحديد التطبيقات التي ستستخدم الوكيل تلقائيًا.</string>
     <string name="title_pref_is_booted">الاتصال تلقائياً عند بدء التشغيل</string>
     <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد عند بدء التشغيل؛ قد لا تنجح المحاولة</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">DNS المباشر (اختياري)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address،…)</string>
+    <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">حذف الإعدادات المكررة</string>
     <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة</string>
     <string name="title_export_all">تصدير الإعدادات باستثناء إعدادات JSON المخصصة إلى الحافظة</string>
-    <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
+    <string name="title_sub_setting">الاشتراكات</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">عنوان URL اختياري</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">يجب أن تكون ملاحظات التكوين موجودة وفريدة</string>
     <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
     <string name="title_sub_update">تحديث الاشتراك</string>
-    <string name="title_ping_all_server">اختبار تأخير TCP للإعدادات (TCPing)</string>
+    <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي للإعدادات</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
     <string name="routing_settings_title">إعدادات التوجيه</string>
-    <string name="routing_settings_tips">افصل بعلامة الفاصلة (,) واختر أحد: domain أو ip أو process</string>
+    <string name="routing_settings_tips">لا تُطبَّق القاعدة إلا إذا تحققت جميع شروط المطابقة المحددة معًا (AND). تُفحص القواعد من الأعلى إلى الأسفل، وتُطبَّق أول قاعدة متطابقة.</string>
+    <string name="routing_settings_comma_tip">افصل بين الإدخالات المتعددة بفواصل (,).</string>
     <string name="routing_settings_save">حفظ</string>
     <string name="routing_settings_delete">مسح</string>
     <string name="routing_settings_rule_title">إعدادات قاعدة التوجيه</string>

@@ -171,7 +171,7 @@
     <string name="title_core_settings">سامووا هسته</string>
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
-    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ.\nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ.\nپسند خوتکار برنومه یل پروکسی من نومگه امکووݩ پذیر هڌ.</string>
+    <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ.\nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ.\nپسند خوتکار برنومه یلی ک وا ی پروکسی منپیز ابۊن من نومگه امکووݩ پذیر هڌ.</string>
     <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
@@ -230,7 +230,7 @@
     <string name="title_pref_domestic_dns">DNS موستقیم (اختیاری)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">هاستا DNS (قالوو: دامنه:نشۊوی،…)</string>
+    <string name="title_pref_dns_hosts">هاستا DNS (قالوو: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">دامنه:نشۊوی،…</string>
 
     <string name="title_pref_delay_test_url">نشۊوی اینترنتی آزمایش تئخیر واقعی</string>
@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">پاک کردن کانفیگا تکراری بونکۊ سکویی</string>
     <string name="title_del_invalid_config">پاک کردن کانفیگا نا موئتبر بونکۊ سکویی</string>
     <string name="title_export_all">و در کشیڌن کانفیگا غیر سفارشی JSON من کلیپ بورد</string>
-    <string name="title_sub_setting">سامووا بونکۊ اشتراک</string>
+    <string name="title_sub_setting">اشتراکا</string>
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -332,7 +332,7 @@
     <string name="sub_setting_pre_profile_tip">موطمئن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
     <string name="toast_invalid_update_interval">فاصله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
-    <string name="title_ping_all_server">TCPing کانفیگا</string>
+    <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تئخیر واقعی کانفیگا</string>
     <string name="title_user_asset_setting">فایلا بونچک جغرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
@@ -355,7 +355,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما (,) ز یک جوڌا ابۊن؛ یکی ن بزنین: domain، ip یا process</string>
+    <string name="routing_settings_tips">پوی شرطا سئت بیڌه بایڌ هوم زمووی جور ابۊن (AND). قانووݩ یل ز سر و ته وارس ابۊن؛ ٱولی قانووݩ جور وابیڌه و کار ابسته ابۊ.</string>
+    <string name="routing_settings_comma_tip">چنتا مقدار ن وا کاما (,) ز یک جوڌا کۊنین.</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
