@@ -17,8 +17,10 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.service.CoreVpnService
 import com.v2ray.ang.service.HevTunnelSettings
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
+import java.io.File
 
 /** Keeps the normal core's lifecycle and the privileged tethering core synchronized. */
 internal object TetheringCoreSync {
@@ -172,18 +174,21 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
     private var tun: ParcelFileDescriptor? = null
     private var routingSnapshot: HotspotRoutingSnapshot? = null
     private var coreConfig: String? = null
+    private var assetDirectory: File? = null
 
     @Synchronized
     fun attach(service: Service, snapshot: HotspotRoutingSnapshot, coreConfig: String) {
         connectivityManager = service.getSystemService(ConnectivityManager::class.java)
         routingSnapshot = snapshot
         this.coreConfig = coreConfig
+        assetDirectory = File(Utils.userAssetPath(service))
     }
 
     @Synchronized
     fun clearEngineConfig() {
         routingSnapshot = null
         coreConfig = null
+        assetDirectory = null
     }
 
     @Synchronized
@@ -206,6 +211,27 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
         }
         return readSide
     }
+
+    @Synchronized
+    override fun assetFingerprint(): String = assetFiles().joinToString("|") {
+        "${it.name}:${it.length()}:${it.lastModified()}"
+    }
+
+    @Synchronized
+    override fun listAssetFiles(): Array<String> = assetFiles().map { it.name }.toTypedArray()
+
+    @Synchronized
+    override fun openAssetFile(name: String): ParcelFileDescriptor {
+        require(name.isNotBlank() && File(name).name == name) { "Invalid asset name" }
+        val file = File(checkNotNull(assetDirectory) { "Core asset directory is unavailable" }, name)
+        require(file.isFile) { "Core asset is unavailable: $name" }
+        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+    }
+
+    private fun assetFiles(): List<File> = assetDirectory?.listFiles()
+        ?.filter { it.isFile }
+        ?.sortedBy { it.name }
+        .orEmpty()
 
     @Synchronized
     override fun holdTestNetwork(tun: ParcelFileDescriptor) {

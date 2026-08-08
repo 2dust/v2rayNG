@@ -1,6 +1,5 @@
 package com.v2ray.ang.shizuku
 
-import android.content.Context
 import com.google.gson.JsonArray
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.HotspotRoutingSnapshot
@@ -20,7 +19,6 @@ internal data class HotspotRoutingLaunchConfig(
     val engine: HotspotRoutingEngineConfig,
     val dnsServers: List<String>,
     val ipv6Enabled: Boolean,
-    val assetPath: String,
     val xudpKey: String,
 )
 
@@ -29,21 +27,19 @@ internal data class HotspotRoutingParameters(
     val profileName: String,
     val dnsServers: List<String>,
     val ipv6Enabled: Boolean,
-    val assetPath: String,
     val xudpKey: String,
 )
 
 /** Builds the privileged datapath configuration from the exact running-core snapshot. */
 internal object HotspotRoutingConfig {
 
-    fun parametersFromSnapshot(context: Context, snapshot: HotspotRoutingSnapshot): HotspotRoutingParameters {
+    fun parametersFromSnapshot(snapshot: HotspotRoutingSnapshot): HotspotRoutingParameters {
         requireRoutableSnapshot(snapshot)
         return HotspotRoutingParameters(
             useHev = snapshot.useHev,
             profileName = snapshot.profileName,
             dnsServers = snapshot.vpnDnsServers,
             ipv6Enabled = snapshot.ipv6Enabled,
-            assetPath = Utils.userAssetPath(context),
             xudpKey = Utils.getDeviceIdForXUDPBaseKey(),
         )
     }

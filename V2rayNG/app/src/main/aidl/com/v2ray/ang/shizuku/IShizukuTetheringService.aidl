@@ -7,7 +7,7 @@ interface IShizukuTetheringService {
     int getActiveTetheringTypes() = 3;
     int getRoutingState() = 4;
     String getRoutingDetail() = 5;
-    int startRouting(boolean useHev, String profileName, in String[] dnsServers, boolean ipv6Enabled, String assetPath, String xudpKey, String syncToken, ICoreTetheringLease coreLease) = 6;
+    int startRouting(boolean useHev, String profileName, in String[] dnsServers, boolean ipv6Enabled, String xudpKey, String syncToken, ICoreTetheringLease coreLease) = 6;
     int stopRouting() = 7;
     int notifyCoreStopping(String syncToken) = 9;
     int synchronizeRouting(String syncToken, boolean useHev, String profileName, in String[] dnsServers, boolean ipv6Enabled, ICoreTetheringLease coreLease) = 10;

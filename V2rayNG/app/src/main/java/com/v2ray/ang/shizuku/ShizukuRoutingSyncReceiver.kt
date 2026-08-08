@@ -139,7 +139,7 @@ private object ShizukuRoutingSyncDispatcher {
                 val coreLease = requireNotNull(pending.coreLease) {
                     "Core-start update has no protected-network lease"
                 }
-                val parameters = HotspotRoutingConfig.parametersFromSnapshot(pending.context, snapshot)
+                val parameters = HotspotRoutingConfig.parametersFromSnapshot(snapshot)
                 val syncResult = service.synchronizeRouting(
                     update.token,
                     parameters.useHev,
@@ -157,7 +157,6 @@ private object ShizukuRoutingSyncDispatcher {
                         parameters.profileName,
                         parameters.dnsServers.toTypedArray(),
                         parameters.ipv6Enabled,
-                        parameters.assetPath,
                         parameters.xudpKey,
                         update.token,
                         coreLease,

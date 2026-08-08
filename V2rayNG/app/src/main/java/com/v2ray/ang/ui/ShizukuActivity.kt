@@ -381,7 +381,7 @@ class ShizukuActivity : BaseComponentActivity() {
         val snapshot = core.snapshot
         val parameters = try {
             withContext(Dispatchers.Default) {
-                HotspotRoutingConfig.parametersFromSnapshot(this@ShizukuActivity, snapshot)
+                HotspotRoutingConfig.parametersFromSnapshot(snapshot)
             }
         } catch (error: CancellationException) {
             throw error
@@ -404,7 +404,6 @@ class ShizukuActivity : BaseComponentActivity() {
                 parameters.profileName,
                 parameters.dnsServers.toTypedArray(),
                 parameters.ipv6Enabled,
-                parameters.assetPath,
                 parameters.xudpKey,
                 syncToken,
                 coreLease,

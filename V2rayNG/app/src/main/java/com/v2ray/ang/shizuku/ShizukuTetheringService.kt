@@ -78,6 +78,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var wrongUpstreamWarningTypes = 0
     private var coreLease: ICoreTetheringLease? = null
     private var coreLifetime: LifetimeWatch? = null
+    private var stagedAssetFingerprint = ""
 
     private val routingActive: Boolean
         get() = routingState == ROUTING_STATE_ACTIVE_HEV ||
@@ -90,7 +91,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     private data class RoutingSession(
         val token: String,
-        val assetPath: String,
         val xudpKey: String,
         var dnsServers: List<String>,
         var ipv6Enabled: Boolean,
@@ -258,7 +258,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         profileName: String,
         dnsServers: Array<out String>,
         ipv6Enabled: Boolean,
-        assetPath: String,
         xudpKey: String,
         syncToken: String,
         coreLease: ICoreTetheringLease,
@@ -281,12 +280,10 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
             dnsServers = dnsServers.toList(),
             ipv6Enabled = ipv6Enabled,
-            assetPath = assetPath,
             xudpKey = xudpKey,
         )
         val newSession = RoutingSession(
             token = syncToken,
-            assetPath = launchConfig.assetPath,
             xudpKey = launchConfig.xudpKey,
             dnsServers = launchConfig.dnsServers,
             ipv6Enabled = launchConfig.ipv6Enabled,
@@ -455,7 +452,6 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 engine = HotspotRoutingEngineConfig(useHev, profileName, readEngineConfig(coreLease)),
                 dnsServers = dnsServers.toList(),
                 ipv6Enabled = ipv6Enabled,
-                assetPath = session.assetPath,
                 xudpKey = session.xudpKey,
             )
             watchCoreLifetimeLocked(coreLease)
@@ -952,8 +948,44 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         if (engine.useHev) {
             startHev(engine.content, fd)
         } else {
-            startNativeXray(engine.content, fd, config.assetPath, config.xudpKey)
+            val lease = checkNotNull(coreLease) { "Core asset lease is unavailable" }
+            startNativeXray(engine.content, fd, stageNativeAssets(lease), config.xudpKey)
         }
+    }
+
+    /**
+     * The ordinary app now keeps geodata and user assets in app-private storage, which the shell
+     * UserService cannot traverse. Stream those files through the existing private core lease and
+     * cache them in the shell runtime directory. The fingerprint avoids recopying unchanged files
+     * during ordinary profile and network synchronization.
+     */
+    private fun stageNativeAssets(coreLease: ICoreTetheringLease): String {
+        val directory = File(SHELL_RUNTIME_DIR, ASSET_DIRECTORY_NAME).apply { mkdirs() }
+        check(directory.isDirectory) { "Unable to create tethering asset directory" }
+        val names = coreLease.listAssetFiles().toList()
+        require(names.all { it.isNotBlank() && File(it).name == it }) { "Invalid core asset name" }
+        val fingerprint = coreLease.assetFingerprint()
+        if (fingerprint == stagedAssetFingerprint && names.all { File(directory, it).isFile }) {
+            return directory.absolutePath
+        }
+
+        directory.listFiles()?.filter { it.isFile && it.name !in names }?.forEach { it.delete() }
+        names.forEach { name ->
+            val target = File(directory, name)
+            val temporary = File(directory, ".$name.tmp")
+            runCatching {
+                ParcelFileDescriptor.AutoCloseInputStream(coreLease.openAssetFile(name)).use { input ->
+                    temporary.outputStream().use { output -> input.copyTo(output) }
+                }
+                check(!target.exists() || target.delete()) { "Unable to replace tethering asset $name" }
+                check(temporary.renameTo(target)) { "Unable to install tethering asset $name" }
+            }.onFailure {
+                temporary.delete()
+                throw it
+            }
+        }
+        stagedAssetFingerprint = fingerprint
+        return directory.absolutePath
     }
 
     private fun readEngineConfig(coreLease: ICoreTetheringLease): String {
@@ -1060,7 +1092,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_753
+        const val USER_SERVICE_VERSION = 20_260_754
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -1071,6 +1103,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             )
         }
         private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
+        private const val ASSET_DIRECTORY_NAME = "v2rayng-tethering-assets"
         private const val CALLBACK_TIMEOUT_SECONDS = 10L
         private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
         private const val TETHERING_STATE_TIMEOUT_SECONDS = 10L
