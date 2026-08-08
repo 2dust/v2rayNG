@@ -29,19 +29,19 @@
     <string name="menu_item_save_config">حفظ التكوين</string>
     <string name="menu_item_edit_config">تعديل التكوين</string>
     <string name="menu_item_del_config">حذف التكوين</string>
-    <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز الاستجابة السريعة (QRcode)</string>
+    <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز QR</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
     <string name="menu_item_import_config_local">استيراد التكوين من الجهاز</string>
     <string name="menu_item_import_config_policy_group">إضافة [مجموعة سياسات]</string>
     <string name="menu_item_import_config_proxy_chain">إضافة [سلسلة وكلاء]</string>
-    <string name="menu_item_import_config_manually_vmess">الكتابة يدويًا [VMess]</string>
-    <string name="menu_item_import_config_manually_vless">الكتابة يدويًا [VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">الكتابة يدويًا [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">الكتابة يدويًا [SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">إدخال يدوي [HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">الكتابة يدويًا [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">الكتابة يدويًا [Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">إدخال يدوي [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_vmess">إضافة [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">إضافة [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">إضافة [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">إضافة [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">إضافة [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">إضافة [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">إضافة [WireGuard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">إضافة [Hysteria2]</string>
     <string name="confirm_delete_visible_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المعروضة حاليًا؟</string>
     <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
     <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
@@ -73,7 +73,7 @@
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
-    <string name="server_lab_path_xhttp">xhttp path </string>
+    <string name="server_lab_path_xhttp">xhttp path</string>
     <string name="server_lab_path_h2">h2 path</string>
     <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">kcp seed</string>
@@ -92,14 +92,14 @@
     <string name="server_lab_encryption">التشفير</string>
     <string name="server_lab_flow">التدفق (flow)</string>
     <string name="server_lab_public_key">المفتاح العام</string>
-    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_preshared_key">PreSharedKey (اختياري)</string>
     <string name="server_lab_short_id">المعرّف القصير</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">المفتاح السري</string>
-    <string name="server_lab_reserved">محجوز (اختياري)</string>
+    <string name="server_lab_reserved">Reserved (اختياري، مفصول بفواصل)</string>
     <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
-    <string name="server_lab_local_mtu">Mtu (اختياري، الافتراضي 1420)</string>
+    <string name="server_lab_local_mtu">MTU (اختياري، الافتراضي 1420)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي في النواة 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي في النواة 50)</string>
     <string name="toast_success">نجاح</string>
@@ -120,13 +120,13 @@
     <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
     <string name="server_obfs_password">كلمة مرور Obfs</string>
-    <string name="server_lab_port_hop">التنقل بين المنافذ</string>
-    <string name="server_lab_port_hop_interval">فاصل تبديل المنفذ</string>
+    <string name="server_lab_port_hop">التنقل بين المنافذ (يتجاوز قيمة المنفذ)</string>
+    <string name="server_lab_port_hop_interval">فاصل تبديل المنفذ (بالثواني)</string>
     <string name="server_lab_bandwidth_down">عرض النطاق للتنزيل (الوحدات المدعومة: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">عرض النطاق للرفع (الوحدات المدعومة: k/m/g/t)</string>
-    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
-    <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_xhttp_mode">وضع XHTTP</string>
+    <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
+    <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>
     <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>
@@ -142,7 +142,7 @@
     <string name="menu_item_add_asset">إضافة أصل</string>
     <string name="menu_item_add_file">إضافة ملفات</string>
     <string name="menu_item_add_url">إضافة URL</string>
-    <string name="menu_item_scan_qrcode">مسح رمز الاستجابة السريعة (QRcode)</string>
+    <string name="menu_item_scan_qrcode">مسح رمز QR</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">تنزيل الملفات</string>
     <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">إعدادات النواة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
-    <string name="summary_pref_per_app_proxy">عام: التطبيق المحدد هو وكيل، غير المحدد اتصال مباشر؛ \nوضع التجاوز: التطبيق المحدد متصل مباشرة، غير المحدد وكيل. \nخيار تحديد تطبيق الوكيل تلقائيًا في القائمة</string>
+    <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر خيار تحديد تطبيقات الوكيل تلقائيًا في القائمة.</string>
     <string name="title_pref_is_booted">الاتصال تلقائياً عند بدء التشغيل</string>
     <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد عند بدء التشغيل؛ قد لا تنجح المحاولة</string>
 
@@ -216,10 +216,10 @@
     <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
     <string name="summary_pref_prefer_ipv6">تفضيل عناوين IPv6 عند حل أسماء النطاقات</string>
 
-    <string name="title_pref_remote_dns">DNS البعيد (udp/tcp/https/quic) (اختياري)</string>
+    <string name="title_pref_remote_dns">DNS البعيد (UDP/TCP/HTTPS/QUIC، اختياري)</string>
     <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (IPv4/v6 فقط)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (IPv4/IPv6 فقط)</string>
     <string name="title_pref_vpn_bypass_lan">هل تتجاوز VPN شبكة LAN؟</string>
 
     <string name="title_pref_vpn_interface_address">عنوان واجهة VPN</string>
@@ -227,10 +227,10 @@
     <string name="title_pref_vpn_mtu">قيمة MTU لشبكة VPN (الافتراضي 1500)</string>
 
 
-    <string name="title_pref_domestic_dns">DNS المحلي (اختياري)</string>
+    <string name="title_pref_domestic_dns">DNS المباشر (اختياري)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">مضيفو DNS (التنسيق: domain:address,…)</string>
+    <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address،…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
@@ -248,7 +248,7 @@
     <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
     <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
-    <string name="summary_pref_socks_enable_udp">مصادقة socks5 ليست آمنة تمامًا عند استخدام UDP</string>
+    <string name="summary_pref_socks_enable_udp">مصادقة SOCKS5 ليست آمنة تمامًا عند استخدام UDP.</string>
     <string name="summary_pref_socks_port">منفذ البروكسي المحلي</string>
     <string name="title_pref_dynamic_socks_port">تمكين منفذ وكيل محلي ديناميكي</string>
     <string name="summary_pref_dynamic_socks_port">إنشاء منفذ وكيل محلي عشوائي في كل مرة يُنشأ فيها inbound</string>
@@ -280,7 +280,7 @@
     <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
     <string name="title_privacy_policy">سياسة الخصوصية</string>
     <string name="title_qr_code">رمز QR</string>
-    <string name="title_about">حول\nترجمة م. ابراهيم قاسم</string>
+    <string name="title_about">حول التطبيق</string>
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_oss_license">تراخيص المصادر المفتوحة</string>
     <string name="title_tg_channel">قناة Telegram</string>
@@ -301,7 +301,7 @@
     <string name="title_pref_use_hev_tunnel">تمكين ميزة Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">عند التمكين، سيستخدم TUN ‏hev-socks5-tunnel؛ وإلا فسيستخدم xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">مستوى سجل Hev TUN</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">مهلة القراءة/الكتابة لـ Hev TUN بالثواني (القيم الافتراضية tcp,udp هي 300,60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">مهلة القراءة/الكتابة لـ Hev TUN (بالثواني؛ القيم الافتراضية لـ TCP/UDP: 300/60)</string>
     <string name="title_mode_settings">إعدادات الوضع</string>
     <string name="title_root_mode_enabled">تمكين وضع Root (لمستخدمي Root)</string>
     <string name="summary_root_mode_enabled">استخدام صلاحيات Root للوكيل الشفاف منخفض المستوى. يدير وضع Root حركة مرور الشبكة مباشرةً بدلاً من استخدام خدمة VPN في Android. أثناء تفعيله، لا يعمل الوضع العادي ولا توجيه التطبيقات ولا إعدادات VPN المرتبطة.</string>
@@ -317,7 +317,7 @@
     <string name="title_del_all_config">حذف جميع الإعدادات</string>
     <string name="title_del_duplicate_config">حذف الإعدادات المكررة</string>
     <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة</string>
-    <string name="title_export_all">تصدير الإعدادات غير المخصصة إلى الحافظة</string>
+    <string name="title_export_all">تصدير الإعدادات باستثناء إعدادات JSON المخصصة إلى الحافظة</string>
     <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
     <string name="sub_setting_remarks">ملاحظات</string>
     <string name="sub_setting_url">عنوان URL اختياري</string>
@@ -332,8 +332,8 @@
     <string name="sub_setting_pre_profile_tip">يجب أن تكون ملاحظات التكوين موجودة وفريدة</string>
     <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
     <string name="title_sub_update">تحديث الاشتراك</string>
-    <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
-    <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي لجميع الإعدادات</string>
+    <string name="title_ping_all_server">اختبار تأخير TCP للإعدادات (TCPing)</string>
+    <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي للإعدادات</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
@@ -380,9 +380,9 @@
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
-    <string name="connection_test_available">نجاح: استغرق اتصال HTTP %1$s</string>
+    <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
-    <string name="connection_test_error">فشل اكتشاف اتصال الإنترنت: %s</string>
+    <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل، انقر للتحقق من الاتصال</string>
@@ -392,11 +392,11 @@
     <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
     <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
     <string name="title_fragment_settings">إعدادات تجزئة الحزم (Fragment)</string>
-    <string name="title_pref_fragment_packets">حزم الجزء</string>
+    <string name="title_pref_fragment_packets">الحزم المراد تجزئتها</string>
     <string name="title_pref_fragment_length">طول الجزء (الحد الأدنى - الحد الأقصى)</string>
     <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
-    <string name="title_pref_fragment_enabled">تفعيل الجزء</string>
-    <string name="title_pref_fragment_maxsplit">ماكس سبليت الجزء</string>
+    <string name="title_pref_fragment_enabled">تفعيل تجزئة الحزم</string>
+    <string name="title_pref_fragment_maxsplit">الحد الأقصى لعدد الأجزاء</string>
     <string name="title_observatory_settings">إعدادات مراقبة الاتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصل leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصل leastLoad</string>
@@ -419,12 +419,12 @@
     <string name="title_policy_group_test_outbounds">اختبار الاتصالات الصادرة (outbounds)</string>
     <string name="title_policy_group_fallback">الاتصال الصادر الاحتياطي (outbound، اختياري)</string>
 
-    <string name="server_proxy_chain_members">اعضاء سلسلة الوكيل</string>
+    <string name="server_proxy_chain_members">أعضاء سلسلة الوكيل</string>
     <string name="server_proxy_chain_pick_members">اضغط هنا لاختيار عضو</string>
-    <string name="server_proxy_chain_member_unselected">اختر عضوا</string>
-    <string name="server_proxy_chain_members_unselected">يرجى اختيار remark لكل صف في السلسلة</string>
-    <string name="server_proxy_chain_members_insufficient">عدد الاعضاء غير كاف</string>
-    <string name="server_proxy_chain_members_invalid">اعضاء سلسلة غير صالحين: %1$s</string>
+    <string name="server_proxy_chain_member_unselected">اختر عضوًا</string>
+    <string name="server_proxy_chain_members_unselected">يرجى اختيار عضو لكل صف في السلسلة</string>
+    <string name="server_proxy_chain_members_insufficient">عدد الأعضاء غير كافٍ</string>
+    <string name="server_proxy_chain_members_invalid">أعضاء سلسلة غير صالحين: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">النسخ الاحتياطي والاستعادة</string>
@@ -438,14 +438,14 @@
     <string name="title_webdav_pass">كلمة المرور</string>
     <string name="title_webdav_remote_path">الدليل البعيد (اختياري)</string>
 
-    <string name="share_method_qrcode">رمز استجابة سريعة (QRcode)</string>
+    <string name="share_method_qrcode">رمز QR</string>
     <string name="share_method_clipboard">تصدير إلى الحافظة</string>
     <string name="share_method_full_content">تصدير التكوين الكامل إلى الحافظة</string>
     <string name="action_edit">تعديل</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">إغلاق</string>
 
-    <string name="share_subscription_qrcode">رمز استجابة سريعة (QRcode)</string>
+    <string name="share_subscription_qrcode">رمز QR</string>
     <string name="share_subscription_clipboard">تصدير إلى الحافظة</string>
 
     <string-array name="mode_entries">

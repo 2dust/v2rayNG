@@ -34,14 +34,14 @@
     <string name="menu_item_import_config_local">ডিভাইস থেকে কনফিগ আমদানি করুন</string>
     <string name="menu_item_import_config_policy_group">[নীতি গ্রুপ] যোগ করুন</string>
     <string name="menu_item_import_config_proxy_chain">[প্রক্সি চেইন] যোগ করুন</string>
-    <string name="menu_item_import_config_manually_vmess">ম্যানুয়ালি টাইপ করুন [VMess]</string>
-    <string name="menu_item_import_config_manually_vless">ম্যানুয়ালি টাইপ করুন [VLESS]</string>
-    <string name="menu_item_import_config_manually_ss">ম্যানুয়ালি টাইপ করুন [Shadowsocks]</string>
-    <string name="menu_item_import_config_manually_socks">ম্যানুয়ালি টাইপ করুন [SOCKS]</string>
-    <string name="menu_item_import_config_manually_http">ম্যানুয়ালি লিখুন [HTTP]</string>
-    <string name="menu_item_import_config_manually_trojan">ম্যানুয়ালি টাইপ করুন [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">ম্যানুয়ালি টাইপ করুন [Wireguard]</string>
-    <string name="menu_item_import_config_manually_hysteria2">ম্যানুয়ালি লিখুন [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_vmess">[VMess] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_vless">[VLESS] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_ss">[Shadowsocks] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_socks">[SOCKS] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_http">[HTTP] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_trojan">[Trojan] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_wireguard">[WireGuard] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_hysteria2">[Hysteria2] যোগ করুন</string>
     <string name="confirm_delete_visible_profiles">আপনি কি বর্তমানে প্রদর্শিত সব প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_duplicate_profiles">আপনি কি বর্তমানে প্রদর্শিত সব সদৃশ প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_invalid_profiles">প্রথমে প্রোফাইলগুলো পরীক্ষা করুন। আপনি কি বর্তমানে প্রদর্শিত সব অবৈধ প্রোফাইল মুছে ফেলতে চান?</string>
@@ -69,7 +69,7 @@
     <string name="server_lab_request_host_xhttp">xhttp হোস্ট</string>
     <string name="server_lab_request_host_h2">h2 হোস্ট</string>
     <string name="server_lab_request_host_quic">QUIC নিরাপত্তা</string>
-    <string name="server_lab_request_host_grpc">gRPC কর্তৃপক্ষ</string>
+    <string name="server_lab_request_host_grpc">gRPC Authority</string>
     <string name="server_lab_path">পথ</string>
     <string name="server_lab_path_ws">ws পথ</string>
     <string name="server_lab_path_httpupgrade">httpupgrade পথ</string>
@@ -92,12 +92,12 @@
     <string name="server_lab_encryption">এনক্রিপশন</string>
     <string name="server_lab_flow">প্রবাহ (flow)</string>
     <string name="server_lab_public_key">পাবলিক কী</string>
-    <string name="server_lab_preshared_key">PreSharedKey(optional)</string>
+    <string name="server_lab_preshared_key">PreSharedKey (ঐচ্ছিক)</string>
     <string name="server_lab_short_id">শর্ট আইডি</string>
     <string name="server_lab_spider_x" translatable="false">SpiderX</string>
     <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
     <string name="server_lab_secret_key">সিক্রেট কী</string>
-    <string name="server_lab_reserved">সংরক্ষিত (ঐচ্ছিক)</string>
+    <string name="server_lab_reserved">Reserved (ঐচ্ছিক, কমা দিয়ে পৃথক)</string>
     <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
     <string name="server_lab_local_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1420)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (ঐচ্ছিক, কোর ডিফল্ট 1350)</string>
@@ -120,13 +120,13 @@
     <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>
     <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
     <string name="server_obfs_password">Obfs পাসওয়ার্ড</string>
-    <string name="server_lab_port_hop">পোর্ট হপিং</string>
-    <string name="server_lab_port_hop_interval">পোর্ট পরিবর্তনের বিরতি</string>
+    <string name="server_lab_port_hop">পোর্ট হপিং (পোর্টের মান প্রতিস্থাপন করবে)</string>
+    <string name="server_lab_port_hop_interval">পোর্ট পরিবর্তনের বিরতি (সেকেন্ড)</string>
     <string name="server_lab_bandwidth_down">ডাউনলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">আপলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
-    <string name="server_lab_xhttp_mode">XHTTP Mode</string>
-    <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
-    <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_xhttp_mode">XHTTP মোড</string>
+    <string name="server_lab_xhttp_extra">XHTTP Extra-এর কাঁচা JSON, ফরম্যাট: { XHTTPObject }</string>
+    <string name="server_lab_final_mask">finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">নাম দিয়ে পিয়ার সার্টিফিকেট যাচাই করুন</string>
     <string name="server_lab_pinned_ca256">সার্টিফিকেট ফিঙ্গারপ্রিন্ট (SHA-256)</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">কোর সেটিংস</string>
     <string name="title_vpn_settings">VPN সেটিংস</string>
     <string name="title_pref_per_app_proxy">প্রতি-অ্যাপ প্রক্সি</string>
-    <string name="summary_pref_per_app_proxy">সাধারণ: চেকড অ্যাপ প্রক্সি, আনচেকড সরাসরি সংযোগ; \nবাইপাস মোড: চেকড অ্যাপ সরাসরি সংযুক্ত, আনচেকড প্রক্সি। \nমেনুতে প্রক্সি অ্যাপ্লিকেশন স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্প</string>
+    <string name="summary_pref_per_app_proxy">সাধারণ: নির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে, অনির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়;\nবাইপাস মোড: নির্বাচিত অ্যাপ সরাসরি সংযুক্ত হয়, অনির্বাচিত অ্যাপ প্রক্সি ব্যবহার করে।\nপ্রক্সি ব্যবহারকারী অ্যাপ স্বয়ংক্রিয়ভাবে নির্বাচন করার বিকল্পটি মেনুতে আছে।</string>
     <string name="title_pref_is_booted">চালুর সময় স্বয়ংক্রিয় সংযোগ</string>
     <string name="summary_pref_is_booted">চালুর সময় নির্বাচিত সার্ভারে স্বয়ংক্রিয়ভাবে সংযোগ করে; সংযোগ ব্যর্থ হতে পারে</string>
 
@@ -216,10 +216,10 @@
     <string name="title_pref_prefer_ipv6">IPv6 অগ্রাধিকার দিন</string>
     <string name="summary_pref_prefer_ipv6">ডোমেইন নাম রেজোলিউশনে IPv6 ঠিকানাকে অগ্রাধিকার দিন</string>
 
-    <string name="title_pref_remote_dns">রিমোট DNS (udp/tcp/https/quic)(ঐচ্ছিক)</string>
+    <string name="title_pref_remote_dns">রিমোট DNS (UDP/TCP/HTTPS/QUIC, ঐচ্ছিক)</string>
     <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (শুধুমাত্র IPv4/v6)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (শুধুমাত্র IPv4/IPv6)</string>
     <string name="title_pref_vpn_bypass_lan">VPN কি LAN এড়িয়ে যাবে?</string>
 
     <string name="title_pref_vpn_interface_address">VPN ইন্টারফেসের ঠিকানা</string>
@@ -227,13 +227,13 @@
     <string name="title_pref_vpn_mtu">VPN MTU (ডিফল্ট 1500)</string>
 
 
-    <string name="title_pref_domestic_dns">ঘরোয়া DNS (ঐচ্ছিক)</string>
+    <string name="title_pref_domestic_dns">সরাসরি DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS হোস্ট (ফরম্যাট: domain:address,…)</string>
+    <string name="title_pref_dns_hosts">DNS হোস্ট ম্যাপিং (ফরম্যাট: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">সঠিক বিলম্ব পরীক্ষা ইউআরএল </string>
+    <string name="title_pref_delay_test_url">প্রকৃত বিলম্ব পরীক্ষার URL</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">একযোগে প্রকৃত বিলম্ব পরীক্ষা</string>
 
@@ -248,7 +248,7 @@
     <string name="title_pref_enable_local_proxy">লোকাল প্রক্সি সক্ষম করুন</string>
     <string name="summary_pref_enable_local_proxy">বন্ধ থাকলে কোনো SOCKS প্রক্সি পাওয়া যাবে না, তাই সাবস্ক্রিপশন আপডেট ও অনুরূপ কাজ প্রক্সি ব্যবহার করতে পারবে না</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
-    <string name="summary_pref_socks_enable_udp">UDP ব্যবহার করার সময় socks5 প্রমাণীকরণ সম্পূর্ণরূপে নিরাপদ নয়</string>
+    <string name="summary_pref_socks_enable_udp">UDP ব্যবহার করার সময় SOCKS5 প্রমাণীকরণ সম্পূর্ণরূপে নিরাপদ নয়।</string>
     <string name="summary_pref_socks_port">স্থানীয় প্রক্সি পোর্ট</string>
     <string name="title_pref_dynamic_socks_port">গতিশীল স্থানীয় প্রক্সি পোর্ট চালু করুন</string>
     <string name="summary_pref_dynamic_socks_port">প্রতিবার inbound তৈরি হলে একটি এলোমেলো স্থানীয় প্রক্সি পোর্ট তৈরি করুন</string>
@@ -289,7 +289,7 @@
 
     <string name="title_pref_auto_update_subscription">স্বয়ংক্রিয় আপডেট সাবস্ক্রিপশন</string>
     <string name="summary_pref_auto_update_subscription">পটভূমিতে একটি নির্দিষ্ট সময় পর পর আপনার সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে আপডেট করুন। ডিভাইসের উপর নির্ভর করে, এই বৈশিষ্ট্যটি সবসময় কাজ নাও করতে পারে</string>
-    <string name="title_pref_auto_update_interval">অটো আপডেট ইন্টারভ্যাল (মিনিট, সর্বনিম্ন মান ১৫)</string>
+    <string name="title_pref_auto_update_interval">স্বয়ংক্রিয় আপডেটের বিরতি (মিনিট; সর্বনিম্ন ১৫)</string>
 
     <string name="title_core_loglevel">লগ স্তর</string>
     <string name="title_outbound_domain_resolve_method">বহির্গামী সংযোগের ডোমেইন রেজলভ পদ্ধতি (outbound)</string>
@@ -301,7 +301,7 @@
     <string name="title_pref_use_hev_tunnel">Hev TUN সুবিধা চালু করুন</string>
     <string name="summary_pref_use_hev_tunnel">চালু থাকলে TUN hev-socks5-tunnel ব্যবহার করবে; অন্যথায় xray-core ব্যবহার করবে।</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN লগ স্তর</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">Hev TUN পড়া/লেখার সময়সীমা, সেকেন্ডে (tcp,udp ডিফল্ট 300,60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">Hev TUN পড়া/লেখার সময়সীমা (সেকেন্ড; TCP/UDP-এর ডিফল্ট: 300/60)</string>
     <string name="title_mode_settings">মোড সেটিংস</string>
     <string name="title_root_mode_enabled">Root মোড চালু (Root ব্যবহারকারীদের জন্য)</string>
     <string name="summary_root_mode_enabled">Root সুবিধা ব্যবহার করে নিম্ন-স্তরের স্বচ্ছ প্রক্সি চালু করুন। এই মোডটি Android-এর মানক সিস্টেম VPN এড়িয়ে সরাসরি অন্তর্নিহিত সব নেটওয়ার্ক ট্রাফিক নিয়ন্ত্রণ করে। চালু করার পর আগের সাধারণ মোড, অ্যাপভিত্তিক রাউটিং এবং সংশ্লিষ্ট VPN সেটিংস আর কার্যকর থাকবে না।</string>
@@ -311,13 +311,13 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">কপি করুন</string>
-    <string name="logcat_clear">স্পষ্ট করুন</string>
+    <string name="logcat_clear">পরিষ্কার করুন</string>
     <string name="logcat_share">লগ শেয়ার করুন</string>
     <string name="title_service_restart">সার্ভিস পুনরায় চালু করুন</string>
     <string name="title_del_all_config">সব কনফিগারেশন মুছে ফেলুন</string>
     <string name="title_del_duplicate_config">ডুপ্লিকেট কনফিগারেশন মুছে ফেলুন</string>
     <string name="title_del_invalid_config">অবৈধ কনফিগারেশন মুছে ফেলুন (প্রথমে পরীক্ষা করুন)</string>
-    <string name="title_export_all">কাস্টম না করা কনফিগারেশনগুলি ক্লিপবোর্ডে রপ্তানি করুন</string>
+    <string name="title_export_all">কাস্টম JSON কনফিগারেশন ছাড়া অন্য কনফিগারেশনগুলি ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="title_sub_setting">সাবস্ক্রিপশন গ্রুপ সেটিং</string>
     <string name="sub_setting_remarks">মন্তব্য</string>
     <string name="sub_setting_url">ঐচ্ছিক URL</string>
@@ -332,8 +332,8 @@
     <string name="sub_setting_pre_profile_tip">কনফিগারেশনের মন্তব্যটি বিদ্যমান ও অনন্য হতে হবে</string>
     <string name="toast_invalid_update_interval">আপডেটের বিরতি সঠিক নয়। সর্বনিম্ন ১৫ মিনিট।</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
-    <string name="title_ping_all_server">সব কনফিগারেশন TCPing</string>
-    <string name="title_real_ping_all_server">সব কনফিগারেশন প্রকৃত বিলম্ব</string>
+    <string name="title_ping_all_server">কনফিগারেশনগুলির TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
+    <string name="title_real_ping_all_server">কনফিগারেশনগুলির প্রকৃত বিলম্ব পরীক্ষা করুন</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>
@@ -363,7 +363,7 @@
     <string name="routing_settings_import_predefined_rulesets">পূর্বনির্ধারিত নিয়মাবলী আমদানি করুন</string>
     <string name="routing_settings_import_rulesets_tip">বিদ্যমান নিয়মসমূহ মুছে যাবে। চালিয়ে যেতে চান?</string>
     <string name="routing_settings_import_rulesets_from_clipboard">ক্লিপবোর্ড থেকে নিয়মসমূহ আমদানি করুন</string>
-    <string name="routing_settings_import_rulesets_from_qrcode">QRcode থেকে রুলসেট আমদানি করুন</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">QR কোড থেকে রুলসেট আমদানি করুন</string>
     <string name="routing_settings_export_rulesets_to_clipboard">নিয়মসমূহ ক্লিপবোর্ডে রপ্তানি করুন</string>
     <string name="routing_settings_locked">লক করা; প্রিসেট আমদানির সময় এই নিয়মটি রাখুন</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
@@ -380,9 +380,9 @@
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
     <string name="connection_test_testing_count">%dটি কনফিগারেশন পরীক্ষা করা হচ্ছে…</string>
-    <string name="connection_test_available">সফল: HTTP সংযোগ নিয়েছে %1$s</string>
+    <string name="connection_test_available">সংযোগ সফল হয়েছে; সময় লেগেছে %1$s</string>
     <string name="server_test_delay_value">%1$d মিলিসেকেন্ড</string>
-    <string name="connection_test_error">ইন্টারনেট সংযোগ সনাক্ত করতে ব্যর্থ: %s</string>
+    <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
     <string name="connection_connected">সংযুক্ত, সংযোগ পরীক্ষা করতে ট্যাপ করুন</string>
