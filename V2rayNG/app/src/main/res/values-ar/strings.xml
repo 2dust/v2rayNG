@@ -314,9 +314,9 @@
     <string name="logcat_clear">مسح</string>
     <string name="logcat_share">مشاركة السجل</string>
     <string name="title_service_restart">إعادة تشغيل الخدمة</string>
-    <string name="title_del_all_config">حذف جميع الإعدادات (قبل أول خطوة)</string>
-    <string name="title_del_duplicate_config">حذف الإعدادات المكررة (2)</string>
-    <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة (بعد الاختبار؛ 4)</string>
+    <string name="title_del_all_config">حذف جميع الإعدادات</string>
+    <string name="title_del_duplicate_config">حذف الإعدادات المكررة</string>
+    <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة</string>
     <string name="title_export_all">تصدير الإعدادات غير المخصصة إلى الحافظة</string>
     <string name="title_sub_setting">إعداد مجموعة الاشتراك</string>
     <string name="sub_setting_remarks">ملاحظات</string>
@@ -331,11 +331,11 @@
     <string name="sub_setting_next_profile">ملاحظات تكوين الوكيل التالي</string>
     <string name="sub_setting_pre_profile_tip">يجب أن تكون ملاحظات التكوين موجودة وفريدة</string>
     <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
-    <string name="title_sub_update">تحديث الاشتراك (أول خطوة)</string>
+    <string name="title_sub_update">تحديث الاشتراك</string>
     <string name="title_ping_all_server">Tcping لجميع الإعدادات</string>
-    <string name="title_real_ping_all_server"> اختبر جميع الإعدادات (3)</string>
+    <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي لجميع الإعدادات</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
-    <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار (5)</string>
+    <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
     <string name="filter_config_all">الكل</string>
     <string name="summary_scan_qrcode">انقر على الشاشة لفتح الكاميرا والمسح</string>
