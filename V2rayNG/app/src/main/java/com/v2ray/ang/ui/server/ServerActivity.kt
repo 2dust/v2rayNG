@@ -261,6 +261,7 @@ fun ServerScreen(
     var allowInsecure by rememberSaveable { mutableStateOf(initialConfig.insecure == true) }
     var fingerPrint by rememberSaveable { mutableStateOf(initialConfig.fingerPrint ?: "") }
     var alpn by rememberSaveable { mutableStateOf(initialConfig.alpn ?: "") }
+    var cipherSuites by rememberSaveable { mutableStateOf(initialConfig.cipherSuites ?: "") }
     var publicKeyReality by rememberSaveable { mutableStateOf(initialConfig.publicKey ?: "") }
     var shortId by rememberSaveable { mutableStateOf(initialConfig.shortId ?: "") }
     var spiderX by rememberSaveable { mutableStateOf(initialConfig.spiderX ?: "") }
@@ -330,6 +331,7 @@ fun ServerScreen(
         insecure = allowInsecure,
         fingerPrint = fingerPrint,
         alpn = alpn,
+        cipherSuites = cipherSuites,
         shortId = shortId,
         spiderX = spiderX,
         mldsa65Verify = mldsa65Verify,
@@ -475,6 +477,7 @@ fun ServerScreen(
                 if (streamSecurity == TLS) {
                     item { SettingsSwitchItem(title = stringResource(R.string.server_lab_allow_insecure), checked = allowInsecure, onCheckedChange = { allowInsecure = it }) }
                     item { FormDropdownField(stringResource(R.string.server_lab_stream_alpn), alpn, alpnOptions, { alpn = it }) }
+                    item { FormTextField(stringResource(R.string.server_lab_cipher_suites), cipherSuites, { cipherSuites = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_ech_config_list), echConfigList, { echConfigList = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_verify_peer_cert_by_name), verifyPeerCertByName, { verifyPeerCertByName = it }) }
                     item { FormTextField(stringResource(R.string.server_lab_pinned_ca256), pinnedCA256, { pinnedCA256 = it }) }

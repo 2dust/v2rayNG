@@ -41,6 +41,7 @@ data class ProfileItem(
     var sni: String? = null,
     var alpn: String? = null,
     var fingerPrint: String? = null,
+    var cipherSuites: String? = null,
     var insecure: Boolean? = null,
     var echConfigList: String? = null,
     var verifyPeerCertByName: String? = null,
