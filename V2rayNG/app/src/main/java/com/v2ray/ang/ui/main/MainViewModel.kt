@@ -251,16 +251,21 @@ class MainViewModel(
     }
 
     // ---------- Group & server loading ----------
+    private fun formatTestDelay(delayMillis: Long): String =
+        if (delayMillis == 0L) ""
+        else dataSource.getString(R.string.server_test_delay_value, delayMillis)
+
     private suspend fun buildServersCache(guids: List<String>): List<ServersCache> =
         guids.mapNotNull { guid ->
             currentCoroutineContext().ensureActive()
             val profile = dataSource.decodeServerConfig(guid) ?: return@mapNotNull null
             val affiliation = dataSource.decodeAffiliationInfo(guid)
+            val testDelayMillis = affiliation?.testDelayMillis ?: 0L
             ServersCache(
                 guid = guid,
                 profile = profile.copy(),
-                testDelayMillis = affiliation?.testDelayMillis ?: 0L,
-                testDelayString = affiliation?.getTestDelayString().orEmpty()
+                testDelayMillis = testDelayMillis,
+                testDelayString = formatTestDelay(testDelayMillis)
             )
         }
 

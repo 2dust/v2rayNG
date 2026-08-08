@@ -381,6 +381,7 @@
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng...</string>
     <string name="connection_test_testing_count">Đang kiểm tra %d cấu hình…</string>
     <string name="connection_test_available">Kiểm tra thành công: thời gian truy cập Google là %d ms</string>
+    <string name="server_test_delay_value">%1$d mili giây</string>
     <string name="connection_test_error">Lỗi kết nối mạng, hãy thử đổi cấu hình hoặc kiểm tra lại! Mã lỗi: %s</string>
     <string name="connection_test_fail">Không có kết nối mạng!</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
