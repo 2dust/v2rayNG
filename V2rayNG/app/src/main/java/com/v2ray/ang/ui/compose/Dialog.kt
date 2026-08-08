@@ -220,7 +220,7 @@ fun <T> SelectListDialog(
                                     role = Role.RadioButton
                                 ) else Modifier.clickable { onSelected(option) }
                             )
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = 12.dp, horizontal = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (showRadio) {
@@ -233,11 +233,7 @@ fun <T> SelectListDialog(
                         Text(
                             text = optionText(option),
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = if (!showRadio)
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp, horizontal = 4.dp)
-                            else Modifier
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
