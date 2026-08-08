@@ -45,8 +45,8 @@ class MainViewModel(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-    private val disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
-    private val connectedText: String = dataSource.getString(R.string.connection_connected)
+    private var disconnectedText: String = dataSource.getString(R.string.connection_not_connected)
+    private var connectedText: String = dataSource.getString(R.string.connection_connected)
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
@@ -218,8 +218,18 @@ class MainViewModel(
     }
 
     fun refreshUiSettings() {
+        val previousDisconnectedText = disconnectedText
+        val previousConnectedText = connectedText
+        disconnectedText = dataSource.getString(R.string.connection_not_connected)
+        connectedText = dataSource.getString(R.string.connection_connected)
+
         _uiState.update {
             it.copy(
+                statusText = when (it.statusText) {
+                    previousDisconnectedText -> disconnectedText
+                    previousConnectedText -> connectedText
+                    else -> it.statusText
+                },
                 confirmRemove = dataSource.getConfirmRemove(),
                 doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
             )

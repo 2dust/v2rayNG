@@ -9,6 +9,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.MessageHelper
@@ -22,15 +23,16 @@ import com.v2ray.ang.util.Utils
 object LauncherManager {
 
     fun startServiceFromToggle(context: Context): Boolean {
+        val localizedContext = AppLocaleManager.localizedContext(context)
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(R.string.app_tile_first_use)
+            localizedContext.toast(R.string.app_tile_first_use)
             return false
         }
         try {
-            startContextService(context)
+            startContextService(localizedContext)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            localizedContext.toast(e.message ?: e.javaClass.simpleName)
             return false
         }
         return true
@@ -39,15 +41,17 @@ object LauncherManager {
     fun startService(context: Context, guid: String? = null) {
         LogUtil.i(AppConfig.TAG, "LauncherManager: startService from ${context::class.java.simpleName}")
 
+        val localizedContext = AppLocaleManager.localizedContext(context)
+
         if (guid != null) {
             MmkvManager.setSelectServer(guid)
         }
 
         try {
-            startContextService(context)
+            startContextService(localizedContext)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            localizedContext.toast(e.message ?: e.javaClass.simpleName)
         }
     }
 

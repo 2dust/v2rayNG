@@ -109,7 +109,7 @@ fun CheckUpdateScreen(
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
-                    Text(stringResource(android.R.string.cancel))
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface
