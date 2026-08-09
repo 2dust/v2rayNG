@@ -137,8 +137,9 @@ class MainViewModel(
             }
 
             is MainServiceEvent.MeasureConfigFinish -> {
-                testResultFlushJob?.cancel()
+                val scheduledFlush = testResultFlushJob
                 testResultFlushJob = viewModelScope.launch {
+                    scheduledFlush?.join()
                     flushPendingTestResults()
                     onTestsFinished()
                 }
@@ -150,8 +151,10 @@ class MainViewModel(
         pendingTestResults[result.guid] = result.delayMillis
         if (testResultFlushJob?.isActive == true) return
         testResultFlushJob = viewModelScope.launch {
-            delay(TEST_RESULT_FLUSH_INTERVAL_MS)
-            flushPendingTestResults()
+            while (pendingTestResults.isNotEmpty()) {
+                delay(TEST_RESULT_FLUSH_INTERVAL_MS)
+                flushPendingTestResults()
+            }
         }
     }
 
@@ -826,6 +829,6 @@ class MainViewModel(
     }
 
     private companion object {
-        const val TEST_RESULT_FLUSH_INTERVAL_MS = 50L
+        const val TEST_RESULT_FLUSH_INTERVAL_MS = 500L
     }
 }

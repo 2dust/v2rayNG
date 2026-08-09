@@ -41,9 +41,7 @@ class MainRepository(
 
     private val _mainServiceEvent = MutableSharedFlow<MainServiceEvent>(
         replay = 0,
-        // A large policy group can finish an entire concurrency wave between
-        // main-thread dispatches. Keep every incremental result until the
-        // ViewModel coalesces it into one row update.
+        // Absorb large result bursts before the ViewModel coalesces UI updates.
         extraBufferCapacity = SERVICE_EVENT_BUFFER_CAPACITY,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )

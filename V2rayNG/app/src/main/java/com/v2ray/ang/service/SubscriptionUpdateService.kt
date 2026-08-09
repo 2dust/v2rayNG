@@ -131,9 +131,9 @@ class SubscriptionUpdateService : Service() {
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)) {
-            testSubscriptionServers(sub)
+            val testCompleted = testSubscriptionServers(sub)
 
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)) {
+            if (testCompleted && MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)) {
                 LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: removing invalid servers for ${subItem.remarks}")
                 showNotification(
                     context = this,
@@ -142,7 +142,7 @@ class SubscriptionUpdateService : Service() {
                 )
                 AngConfigManager.removeInvalidServer(subId)
             }
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)) {
+            if (testCompleted && MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)) {
                 LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: sorting servers for ${subItem.remarks}")
                 showNotification(
                     context = this,
@@ -156,7 +156,7 @@ class SubscriptionUpdateService : Service() {
         LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: Finished ${subItem.remarks}")
     }
 
-    private suspend fun testSubscriptionServers(sub: SubscriptionCache) {
+    private suspend fun testSubscriptionServers(sub: SubscriptionCache): Boolean {
         val subId = sub.guid
         LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: starting test phase for ${sub.subscription.remarks}")
         showNotification(
@@ -166,27 +166,28 @@ class SubscriptionUpdateService : Service() {
         )
 
         val guids = MmkvManager.decodeServerList(subId)
-        if (guids.isNotEmpty()) {
-            val deferred = CompletableDeferred<Unit>()
-            lateinit var worker: RealPingWorkerService
-            worker = RealPingWorkerService(
-                context = this,
-                guids = guids,
-                onEvent = { event ->
-                    handleWorkerEvent(event, sub.subscription.remarks) {
-                        activeWorkers.remove(worker)
-                        deferred.complete(Unit)
-                    }
+        if (guids.isEmpty()) return true
+
+        val deferred = CompletableDeferred<Boolean>()
+        lateinit var worker: RealPingWorkerService
+        worker = RealPingWorkerService(
+            context = this,
+            guids = guids,
+            onEvent = { event ->
+                handleWorkerEvent(event, sub.subscription.remarks) { completed ->
+                    activeWorkers.remove(worker)
+                    deferred.complete(completed)
                 }
-            )
-            activeWorkers.add(worker)
-            worker.start()
-            deferred.await()
-            LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: test phase finished for ${sub.subscription.remarks}")
-        }
+            },
+        )
+        activeWorkers.add(worker)
+        worker.start()
+        val completed = deferred.await()
+        LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: test phase finished for ${sub.subscription.remarks}")
+        return completed
     }
 
-    private fun handleWorkerEvent(event: RealPingEvent, remarks: String, onWorkerDone: () -> Unit) {
+    private fun handleWorkerEvent(event: RealPingEvent, remarks: String, onWorkerDone: (Boolean) -> Unit) {
         when (event) {
             is RealPingEvent.Progress -> {
                 val notificationText = getString(
@@ -207,7 +208,7 @@ class SubscriptionUpdateService : Service() {
             }
 
             is RealPingEvent.Finish -> {
-                onWorkerDone()
+                onWorkerDone(event.status == "0")
             }
         }
     }

@@ -82,7 +82,7 @@ object CoreConfigManager {
     }
 
     /** Builds one isolated Xray configuration for a complete UI delay-test batch. */
-    fun getProbePlan(context: Context, guids: List<String>): ProbePlan {
+    internal fun getProbePlan(context: Context, guids: List<String>): ProbePlan {
         val sources = mutableListOf<ProbeConfigBuilder.Source>()
         val individualGuids = mutableListOf<String>()
         val failedGuids = mutableListOf<String>()

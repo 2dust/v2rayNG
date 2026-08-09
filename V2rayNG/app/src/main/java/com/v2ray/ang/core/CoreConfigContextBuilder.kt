@@ -25,31 +25,31 @@ import com.v2ray.ang.util.Utils
 object CoreConfigContextBuilder {
 
     /** Lazily decoded profile snapshot shared by every config in one probe batch. */
-    class ProbeProfileLookup(requestedGuids: List<String>) {
+    internal class ProbeProfileLookup(requestedGuids: List<String>) {
         private val profilesByGuid = linkedMapOf<String, ProfileItem>()
         private val subscriptionsByGuid = mutableMapOf<String, SubscriptionItem?>()
         private var profilesByRemarks: Map<String, ProfileItem>? = null
         private var allProfiles: List<ProfileItem>? = null
 
         init {
-            requestedGuids.distinct().forEach(::loadProfile)
+            requestedGuids.forEach(::loadProfile)
         }
 
-        internal fun findByGuid(guid: String): ProfileItem? =
+        fun findByGuid(guid: String): ProfileItem? =
             profilesByGuid[guid] ?: loadProfile(guid)
 
-        internal fun findByRemarks(remarks: String?): ProfileItem? {
+        fun findByRemarks(remarks: String?): ProfileItem? {
             if (remarks.isNullOrEmpty()) return null
             ensureAllProfilesLoaded()
             return profilesByRemarks?.get(remarks)
         }
 
-        internal fun profiles(): List<ProfileItem> {
+        fun profiles(): List<ProfileItem> {
             ensureAllProfilesLoaded()
             return allProfiles.orEmpty()
         }
 
-        internal fun subscription(guid: String): SubscriptionItem? {
+        fun subscription(guid: String): SubscriptionItem? {
             if (guid in subscriptionsByGuid) return subscriptionsByGuid[guid]
             return MmkvManager.decodeSubscription(guid).also { subscriptionsByGuid[guid] = it }
         }
@@ -98,7 +98,7 @@ object CoreConfigContextBuilder {
     }
 
     /** Build only the outbound dependency graph required by a RealDelay probe. */
-    fun buildForProbe(
+    internal fun buildForProbe(
         context: Context,
         guid: String,
         lookup: ProbeProfileLookup,
@@ -114,7 +114,6 @@ object CoreConfigContextBuilder {
         lookup: ProbeProfileLookup?,
         includeRouting: Boolean,
     ): CoreConfigContext? {
-
         // CUSTOM: return immediately — CoreConfigManager handles this path on its own.
         if (config.configType == EConfigType.CUSTOM) {
             return CoreConfigContext(context = context, guid = guid, isCustom = true)

@@ -72,7 +72,7 @@ class RealPingWorkerService(
                 if (!finished) {
                     LogUtil.e(AppConfig.TAG, "Probe batch failed", error)
                     failPending()
-                    finish("0")
+                    finish("-1")
                 }
             }
         }

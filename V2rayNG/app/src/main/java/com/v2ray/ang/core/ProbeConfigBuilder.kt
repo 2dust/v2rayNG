@@ -7,7 +7,7 @@ import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.util.JsonUtil
 
 /** Combines v2rayNG-generated real-delay configurations into one probe core. */
-object ProbeConfigBuilder {
+internal object ProbeConfigBuilder {
     data class Source(val guid: String, val config: V2rayConfig)
 
     fun build(sources: List<Source>, destination: String): ProbePlan {
@@ -53,7 +53,7 @@ object ProbeConfigBuilder {
             ),
         )
         return ProbePlan(
-            content = JsonUtil.toJsonPretty(config).orEmpty(),
+            content = JsonUtil.toJson(config),
             profiles = profiles,
             individualGuids = individualGuids,
         )
