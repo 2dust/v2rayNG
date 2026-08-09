@@ -4,3 +4,6 @@
 [submodule "hev-socks5-tunnel"]
 	path = hev-socks5-tunnel
 	url = https://github.com/heiher/hev-socks5-tunnel
+[submodule "hev-socks5-tproxy"]
+	path = hev-socks5-tproxy
+	url = https://github.com/heiher/hev-socks5-tproxy

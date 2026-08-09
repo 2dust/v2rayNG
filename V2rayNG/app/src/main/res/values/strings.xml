@@ -317,6 +317,8 @@
     <string name="title_root_mode_enabled">Enable root mode (root users)</string>
     <string name="summary_root_mode_enabled">Use root access for low-level transparent proxying. Root mode handles network traffic directly instead of using the Android VPN service. Standard mode, per-app routing, and VPN-related settings do not apply while root mode is enabled.</string>
     <string name="toast_root_required">Root access is required for this feature</string>
+    <string name="title_root_tproxy_enabled">Kernel TPROXY engine</string>
+    <string name="summary_root_tproxy_enabled">Route traffic with the kernel\'s TPROXY target instead of a tun device. Lower latency and battery use, and no network interface for apps to detect. Requires kernel TPROXY support; falls back to the tun engine if unavailable. ICMP (ping) is not proxied in this mode.</string>
     <string name="title_root_lan_sharing">Share VPN with LAN / tethered devices (root users)</string>
     <string name="summary_root_lan_sharing">Route traffic from Wi-Fi hotspot and USB-tethered devices through the VPN.</string>
 

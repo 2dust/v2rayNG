@@ -78,6 +78,7 @@ object AppConfig {
     const val PREF_MODE = "pref_mode"
     const val PREF_ROOT_MODE_ENABLE = "pref_root_mode_enabled"
     const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
+    const val PREF_ROOT_TPROXY_ENABLE = "pref_root_tproxy_enabled"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
@@ -246,6 +247,17 @@ object AppConfig {
     const val ROOT_V6_PRE_CHAIN = "CORE6_PRE" // ip6tables mangle/PREROUTING chain: mark forwarded clients' IPv6 into the tun
     const val ROOT_LAN_DNS = "1.1.1.1"          // fallback resolver for tethered clients when no plain-IPv4 DNS is configured
     const val ROOT_OOM_SCORE = "-1000"          // oom_score_adj that makes the LMK never kill us
+
+    /**
+     * Kernel TPROXY run mode. No tun device and no userspace TCP/IP stack: the kernel's own
+     * stack terminates the flow on an IP_TRANSPARENT socket held by a small root helper
+     * (hev-socks5-tproxy), which relays it to the in-process core's SOCKS inbound. The
+     * app-uid core cannot open IP_TRANSPARENT sockets itself, hence the separate helper.
+     */
+    const val ROOT_TPROXY_BIN = "libhevsockstproxy.so"
+    const val ROOT_TPROXY_PORT = 1088           // hev's transparent TCP+UDP listener
+    const val ROOT_TP_OUT_CHAIN = "CORE_TP_OUT" // mangle/OUTPUT: mark the device's own traffic
+    const val ROOT_TP_PRE_CHAIN = "CORE_TP_PRE" // mangle/PREROUTING: TPROXY the looped + forwarded traffic
 
     /** hev-sock5-tunnel read-write-timeout value */
     const val HEVTUN_RW_TIMEOUT = "300,60"
