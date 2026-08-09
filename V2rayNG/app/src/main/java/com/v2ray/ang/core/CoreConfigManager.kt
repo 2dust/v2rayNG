@@ -86,9 +86,11 @@ object CoreConfigManager {
         val sources = mutableListOf<ProbeConfigBuilder.Source>()
         val individualGuids = mutableListOf<String>()
         val failedGuids = mutableListOf<String>()
-        guids.distinct().forEach { guid ->
+        val distinctGuids = guids.distinct()
+        val profileLookup = CoreConfigContextBuilder.ProbeProfileLookup(distinctGuids)
+        distinctGuids.forEach { guid ->
             try {
-                val configContext = CoreConfigContextBuilder.build(context, guid)
+                val configContext = CoreConfigContextBuilder.buildForProbe(context, guid, profileLookup)
                 if (configContext == null) {
                     failedGuids += guid
                 } else if (configContext.isCustom) {
@@ -105,9 +107,11 @@ object CoreConfigManager {
             sources = sources,
             destination = SettingsManager.getDelayTestUrl(),
         )
+        val emptyProfiles = plan.profiles.filter { it.outboundTags.isEmpty() }
         return plan.copy(
+            profiles = plan.profiles.filter { it.outboundTags.isNotEmpty() },
             individualGuids = (individualGuids + plan.individualGuids).distinct(),
-            failedGuids = failedGuids,
+            failedGuids = (failedGuids + emptyProfiles.map { it.guid }).distinct(),
         )
     }
 

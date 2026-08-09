@@ -15,8 +15,6 @@ object ProbeConfigBuilder {
         val balancers = mutableListOf<V2rayConfig.RoutingBean.BalancerBean>()
         val profiles = mutableListOf<ProbeProfile>()
         val individualGuids = mutableListOf<String>()
-        var httpMethod = DEFAULT_HTTP_METHOD
-        var timeout = DEFAULT_TIMEOUT
 
         sources.forEachIndexed { index, source ->
             val namespace = "probe-$index-"
@@ -55,11 +53,6 @@ object ProbeConfigBuilder {
             balancers += probeBalancer
             profiles += ProbeProfile(source.guid, outboundTags, probeBalancer.tag)
 
-            if (strategyType == "leastLoad") {
-                val pingConfig = (source.config.burstObservatory as V2rayConfig.BurstObservatoryObject).pingConfig
-                httpMethod = pingConfig.httpMethod ?: DEFAULT_HTTP_METHOD
-                timeout = pingConfig.timeout ?: DEFAULT_TIMEOUT
-            }
         }
 
         val routing = mutableMapOf<String, Any>(
@@ -76,10 +69,10 @@ object ProbeConfigBuilder {
                 "subjectSelector" to emptyList<String>(),
                 "pingConfig" to mapOf(
                     "destination" to destination,
-                    "httpMethod" to httpMethod,
+                    "httpMethod" to DEFAULT_HTTP_METHOD,
                     "interval" to "1h",
                     "sampling" to 1,
-                    "timeout" to timeout,
+                    "timeout" to DEFAULT_TIMEOUT,
                 ),
             ),
         )

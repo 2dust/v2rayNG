@@ -4,6 +4,7 @@ import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.CoreResolvedType
 import com.v2ray.ang.enums.EConfigType
@@ -23,6 +24,68 @@ import com.v2ray.ang.util.Utils
  */
 object CoreConfigContextBuilder {
 
+    /** Lazily decoded profile snapshot shared by every config in one probe batch. */
+    class ProbeProfileLookup(requestedGuids: List<String>) {
+        private val profilesByGuid = linkedMapOf<String, ProfileItem>()
+        private val subscriptionsByGuid = mutableMapOf<String, SubscriptionItem?>()
+        private var profilesByRemarks: Map<String, ProfileItem>? = null
+        private var allProfiles: List<ProfileItem>? = null
+
+        init {
+            requestedGuids.distinct().forEach(::loadProfile)
+        }
+
+        internal fun findByGuid(guid: String): ProfileItem? =
+            profilesByGuid[guid] ?: loadProfile(guid)
+
+        internal fun findByRemarks(remarks: String?): ProfileItem? {
+            if (remarks.isNullOrEmpty()) return null
+            ensureAllProfilesLoaded()
+            return profilesByRemarks?.get(remarks)
+        }
+
+        internal fun profiles(): List<ProfileItem> {
+            ensureAllProfilesLoaded()
+            return allProfiles.orEmpty()
+        }
+
+        internal fun subscription(guid: String): SubscriptionItem? {
+            if (guid in subscriptionsByGuid) return subscriptionsByGuid[guid]
+            return MmkvManager.decodeSubscription(guid).also { subscriptionsByGuid[guid] = it }
+        }
+
+        private fun loadProfile(guid: String): ProfileItem? {
+            if (guid.isBlank()) return null
+            return MmkvManager.decodeServerConfig(guid)?.also { profilesByGuid[guid] = it }
+        }
+
+        private fun ensureAllProfilesLoaded() {
+            if (allProfiles != null) return
+            val ordered = mutableListOf<ProfileItem>()
+            val seenGuids = mutableSetOf<String>()
+            MmkvManager.decodeAllServerList().forEach { guid ->
+                val profile = findByGuid(guid) ?: return@forEach
+                if (seenGuids.add(guid)) ordered += profile
+            }
+            profilesByGuid.forEach { (guid, profile) ->
+                if (seenGuids.add(guid)) ordered += profile
+            }
+            allProfiles = ordered
+            profilesByRemarks = buildMap {
+                ordered.forEach { profile -> putIfAbsent(profile.remarks, profile) }
+            }
+        }
+    }
+
+    private fun findProfileByRemarks(
+        lookup: ProbeProfileLookup?,
+        remarks: String?,
+    ): ProfileItem? = if (lookup != null) {
+        lookup.findByRemarks(remarks)
+    } else {
+        SettingsManager.getServerViaRemarks(remarks)
+    }
+
     /**
      * Load one profile and produce a fully analyzed context.
      *
@@ -31,22 +94,43 @@ object CoreConfigContextBuilder {
     fun build(context: Context, guid: String): CoreConfigContext? {
         val config = MmkvManager.decodeServerConfig(guid) ?: return null
 
+        return buildResolved(context, guid, config, lookup = null, includeRouting = true)
+    }
+
+    /** Build only the outbound dependency graph required by a RealDelay probe. */
+    fun buildForProbe(
+        context: Context,
+        guid: String,
+        lookup: ProbeProfileLookup,
+    ): CoreConfigContext? {
+        val config = lookup.findByGuid(guid) ?: return null
+        return buildResolved(context, guid, config, lookup, includeRouting = false)
+    }
+
+    private fun buildResolved(
+        context: Context,
+        guid: String,
+        config: ProfileItem,
+        lookup: ProbeProfileLookup?,
+        includeRouting: Boolean,
+    ): CoreConfigContext? {
+
         // CUSTOM: return immediately — CoreConfigManager handles this path on its own.
         if (config.configType == EConfigType.CUSTOM) {
             return CoreConfigContext(context = context, guid = guid, isCustom = true)
         }
 
         // Step 1: Resolve the main outbound (always tag = TAG_PROXY).
-        val primaryResolvedOutbound = resolveOutbound(AppConfig.TAG_PROXY, config) ?: run {
+        val primaryResolvedOutbound = resolveOutbound(AppConfig.TAG_PROXY, config, lookup) ?: run {
             LogUtil.e(AppConfig.TAG, "Failed to resolve main outbound for '${config.remarks}'")
             return null
         }
 
         // Step 2: Resolve all non-builtin routing outbound tags.
-        val routingResolvedOutbounds = resolveRoutingOutbounds()
+        val routingResolvedOutbounds = if (includeRouting) resolveRoutingOutbounds() else emptyList()
         val resolvedOutbounds = listOf(primaryResolvedOutbound) + routingResolvedOutbounds
-        val fallbackResolvedOutbounds = resolveFallbackOutbounds(resolvedOutbounds)
-        val routingDomainRules = collectRoutingDomainRulesForDns()
+        val fallbackResolvedOutbounds = resolveFallbackOutbounds(resolvedOutbounds, lookup)
+        val routingDomainRules = if (includeRouting) collectRoutingDomainRulesForDns() else emptyList()
 
         return CoreConfigContext(
             context = context,
@@ -61,25 +145,29 @@ object CoreConfigContextBuilder {
      *
      * Custom profiles are ignored at this stage and produce no entry.
      */
-    private fun resolveOutbound(tag: String, profile: ProfileItem): CoreConfigContext.ResolvedOutbound? {
+    private fun resolveOutbound(
+        tag: String,
+        profile: ProfileItem,
+        lookup: ProbeProfileLookup? = null,
+    ): CoreConfigContext.ResolvedOutbound? {
         if (profile.configType == EConfigType.CUSTOM) {
             return null
         }
 
         val (resolvedProfiles, resolvedType) = when (profile.configType) {
             EConfigType.POLICYGROUP -> Pair(
-                resolvePolicyGroupProfiles(profile),
+                resolvePolicyGroupProfiles(profile, lookup),
                 CoreResolvedType.POLICYGROUP,
             )
 
             EConfigType.PROXYCHAIN -> {
-                val chainProfiles = resolveProxyChainProfiles(profile)
+                val chainProfiles = resolveProxyChainProfiles(profile, lookup)
                 val type = if (chainProfiles.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
                 Pair(chainProfiles, type)
             }
 
             else -> {
-                val chainProfiles = resolveProxyChainProfilesFromGroup(profile)
+                val chainProfiles = resolveProxyChainProfilesFromGroup(profile, lookup)
                 val type = if (chainProfiles.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
                 Pair(chainProfiles, type)
             }
@@ -141,12 +229,14 @@ object CoreConfigContextBuilder {
         return resolvedOutbounds
     }
 
-    private fun resolvePolicyGroupProfiles(config: ProfileItem): List<ProfileItem> {
+    private fun resolvePolicyGroupProfiles(
+        config: ProfileItem,
+        lookup: ProbeProfileLookup?,
+    ): List<ProfileItem> {
         try {
-            val serverList = MmkvManager.decodeAllServerList()
-            return serverList
-                .asSequence()
-                .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
+            val profiles = lookup?.profiles() ?: MmkvManager.decodeAllServerList()
+                .mapNotNull(MmkvManager::decodeServerConfig)
+            return profiles.asSequence()
                 .filter { profile ->
                     val subscriptionId = config.policyGroupSubscriptionId
                     if (subscriptionId.isNullOrBlank()) {
@@ -177,7 +267,10 @@ object CoreConfigContextBuilder {
         }
     }
 
-    private fun resolveProxyChainProfiles(config: ProfileItem): List<ProfileItem> {
+    private fun resolveProxyChainProfiles(
+        config: ProfileItem,
+        lookup: ProbeProfileLookup?,
+    ): List<ProfileItem> {
         if (config.proxyChainProfiles.isNullOrBlank()) {
             return listOf(config)
         }
@@ -185,7 +278,7 @@ object CoreConfigContextBuilder {
         try {
             return config.proxyChainProfiles.orEmpty().split(",")
                 .asSequence()
-                .mapNotNull { remark -> SettingsManager.getServerViaRemarks(remark) }
+                .mapNotNull { remark -> findProfileByRemarks(lookup, remark) }
                 .filter { it.server.isNotNullEmpty() }
                 .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
                 .filter { !it.configType.isComplexType() }
@@ -202,17 +295,26 @@ object CoreConfigContextBuilder {
      *
      * When no chain is available, return a single-node result.
      */
-    private fun resolveProxyChainProfilesFromGroup(config: ProfileItem): List<ProfileItem> {
+    private fun resolveProxyChainProfilesFromGroup(
+        config: ProfileItem,
+        lookup: ProbeProfileLookup?,
+    ): List<ProfileItem> {
         if (config.subscriptionId.isEmpty()) {
             return listOf(config)
         }
 
         try {
-            val subItem = MmkvManager.decodeSubscription(config.subscriptionId) ?: return listOf(config)
+            val subItem = if (lookup != null) {
+                lookup.subscription(config.subscriptionId)
+            } else {
+                MmkvManager.decodeSubscription(config.subscriptionId)
+            } ?: return listOf(config)
             val resolved = mutableListOf<ProfileItem>()
-            SettingsManager.getServerViaRemarks(subItem.nextProfile)?.let { resolved.add(it) }
+            findProfileByRemarks(lookup, subItem.nextProfile)
+                ?.let { resolved.add(it) }
             resolved.add(config)
-            SettingsManager.getServerViaRemarks(subItem.prevProfile)?.let { resolved.add(it) }
+            findProfileByRemarks(lookup, subItem.prevProfile)
+                ?.let { resolved.add(it) }
             return resolved
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to resolve proxy chain from group for '${config.remarks}'", e)
@@ -255,7 +357,10 @@ object CoreConfigContextBuilder {
      *
      * Fallback targets must not overlap with already resolved tags or builtin tags.
      */
-    private fun resolveFallbackOutbounds(resolvedOutbounds: List<CoreConfigContext.ResolvedOutbound>): List<CoreConfigContext.ResolvedOutbound> {
+    private fun resolveFallbackOutbounds(
+        resolvedOutbounds: List<CoreConfigContext.ResolvedOutbound>,
+        lookup: ProbeProfileLookup?,
+    ): List<CoreConfigContext.ResolvedOutbound> {
         return resolvedOutbounds
             .asSequence()
             .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
@@ -264,9 +369,9 @@ object CoreConfigContextBuilder {
             .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS && resolvedOutbounds.none { outbound -> outbound.tag == it } }
             .distinct()
             .mapNotNull { tag ->
-                SettingsManager.getServerViaRemarks(tag)
+                findProfileByRemarks(lookup, tag)
                     ?.takeUnless { it.configType == EConfigType.CUSTOM || it.configType == EConfigType.POLICYGROUP }
-                    ?.let { resolveOutbound(tag, it) }
+                    ?.let { resolveOutbound(tag, it, lookup) }
             }
             .toList()
     }

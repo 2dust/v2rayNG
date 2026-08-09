@@ -1,6 +1,7 @@
 package com.v2ray.ang.service
 
 import android.content.Context
+import android.os.SystemClock
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
@@ -38,6 +39,9 @@ class RealPingWorkerService(
     private var finished = false
     private val emittedDelays = mutableMapOf<String, Long>()
     private val pendingGuids = guids.toMutableSet()
+    private var completedWorkUnits = 0
+    private var totalWorkUnits = guids.size
+    private var lastProgressAt = 0L
 
     fun start() {
         if (onlyTcp) {
@@ -47,10 +51,14 @@ class RealPingWorkerService(
         scope.launch {
             try {
                 val plan = CoreConfigManager.getProbePlan(context, guids)
-                plan.failedGuids.forEach { emitResult(it, -1L, completed = true) }
+                val probeCount = plan.profiles.sumOf { it.outboundTags.size }
+                setTotalWorkUnits(probeCount + plan.individualGuids.size + plan.failedGuids.size)
+                plan.failedGuids.forEach {
+                    emitResult(it, -1L, completed = true)
+                    completeWorkUnit()
+                }
                 if (plan.profiles.isNotEmpty()) {
                     val concurrency = SettingsManager.getRealPingConcurrency()
-                    val probeCount = plan.profiles.sumOf { it.outboundTags.size }
                     LogUtil.i(
                         AppConfig.TAG,
                         "Starting $probeCount real-delay probes for ${plan.profiles.size} profiles with limit $concurrency",
@@ -67,6 +75,7 @@ class RealPingWorkerService(
                                 completed: Boolean,
                             ): Long {
                                 emitResult(groupID!!, if (alive) delay else -1L, completed)
+                                completeWorkUnit()
                                 return 0
                             }
                         },
@@ -91,6 +100,7 @@ class RealPingWorkerService(
         val jobs = guids.map { guid ->
             scope.launch(dispatcher) {
                 emitResult(guid, startTcping(guid), completed = true)
+                completeWorkUnit()
             }
         }
         scope.launch {
@@ -114,6 +124,7 @@ class RealPingWorkerService(
         individualGuids.map { guid ->
             scope.launch(dispatcher) {
                 emitResult(guid, startRealPing(guid), completed = true)
+                completeWorkUnit()
             }
         }.joinAll()
     }
@@ -134,8 +145,28 @@ class RealPingWorkerService(
         }
         if (completed) {
             pendingGuids.remove(guid)
-            onEvent(RealPingEvent.Progress("${pendingGuids.size} / ${guids.size}"))
         }
+    }
+
+    @Synchronized
+    private fun setTotalWorkUnits(total: Int) {
+        totalWorkUnits = total.coerceAtLeast(1)
+        completedWorkUnits = 0
+        lastProgressAt = 0L
+        emitProgress(force = true)
+    }
+
+    @Synchronized
+    private fun completeWorkUnit() {
+        completedWorkUnits = (completedWorkUnits + 1).coerceAtMost(totalWorkUnits)
+        emitProgress(force = completedWorkUnits == totalWorkUnits)
+    }
+
+    private fun emitProgress(force: Boolean) {
+        val now = SystemClock.elapsedRealtime()
+        if (!force && now - lastProgressAt < PROGRESS_UPDATE_INTERVAL_MS) return
+        lastProgressAt = now
+        onEvent(RealPingEvent.Progress("$completedWorkUnits / $totalWorkUnits"))
     }
 
     @Synchronized
@@ -173,5 +204,9 @@ class RealPingWorkerService(
         val configResult = CoreConfigManager.getV2rayConfig4RealDelay(context, guid)
         if (!configResult.status) return -1L
         return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+    }
+
+    private companion object {
+        const val PROGRESS_UPDATE_INTERVAL_MS = 100L
     }
 }

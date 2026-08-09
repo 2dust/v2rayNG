@@ -13,6 +13,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.RealPingEvent
+import com.v2ray.ang.dto.RealPingResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
@@ -150,7 +151,11 @@ class CoreTestService : Service() {
 
             is RealPingEvent.Result -> {
                 MmkvManager.encodeServerTestDelayMillis(event.guid, event.delayMillis)
-                MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_SUCCESS, event.guid)
+                MessageHelper.sendMsg2UI(
+                    this,
+                    AppConfig.MSG_MEASURE_CONFIG_SUCCESS,
+                    RealPingResult(event.guid, event.delayMillis),
+                )
             }
 
             is RealPingEvent.Finish -> {

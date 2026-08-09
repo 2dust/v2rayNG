@@ -8,12 +8,14 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.RealPingResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
@@ -39,11 +41,18 @@ class MainRepository(
 
     private val _mainServiceEvent = MutableSharedFlow<MainServiceEvent>(
         replay = 0,
-        extraBufferCapacity = 64,
+        // A large policy group can finish an entire concurrency wave between
+        // main-thread dispatches. Keep every incremental result until the
+        // ViewModel coalesces it into one row update.
+        extraBufferCapacity = SERVICE_EVENT_BUFFER_CAPACITY,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
     override val mainServiceEvent: SharedFlow<MainServiceEvent> = _mainServiceEvent.asSharedFlow()
+
+    private companion object {
+        const val SERVICE_EVENT_BUFFER_CAPACITY = 2048
+    }
 
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,7 +70,9 @@ class MainRepository(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
 
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> safeIntent
+                    .serializable<RealPingResult>("content")
+                    ?.let(MainServiceEvent::MeasureConfigSuccess)
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
                     safeIntent.getStringExtra("content").orEmpty()
                 )
