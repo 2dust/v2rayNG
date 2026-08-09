@@ -107,11 +107,9 @@ object CoreConfigManager {
             sources = sources,
             destination = SettingsManager.getDelayTestUrl(),
         )
-        val emptyProfiles = plan.profiles.filter { it.outboundTags.isEmpty() }
         return plan.copy(
-            profiles = plan.profiles.filter { it.outboundTags.isNotEmpty() },
-            individualGuids = (individualGuids + plan.individualGuids).distinct(),
-            failedGuids = (failedGuids + emptyProfiles.map { it.guid }).distinct(),
+            individualGuids = individualGuids + plan.individualGuids,
+            failedGuids = failedGuids,
         )
     }
 

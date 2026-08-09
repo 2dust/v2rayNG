@@ -5,6 +5,7 @@ import android.os.SystemClock
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.dto.ProbePlan
 import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
@@ -18,7 +19,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import libv2ray.Libv2ray
@@ -32,15 +35,15 @@ class RealPingWorkerService(
     private val onEvent: (RealPingEvent) -> Unit = {},
 ) {
     private val guids = guids.distinct()
-    private val job = Job()
+    private val job = SupervisorJob()
     private val scope = CoroutineScope(job + Dispatchers.IO + CoroutineName("ProbeBatch"))
     private val controller = Libv2ray.newProbeController()
     @Volatile
     private var finished = false
     private val emittedDelays = mutableMapOf<String, Long>()
-    private val pendingGuids = guids.toMutableSet()
     private var completedWorkUnits = 0
     private var totalWorkUnits = guids.size
+    private val remainingWorkUnits = guids.associateWith { 1 }.toMutableMap()
     private var lastProgressAt = 0L
 
     fun start() {
@@ -52,36 +55,16 @@ class RealPingWorkerService(
             try {
                 val plan = CoreConfigManager.getProbePlan(context, guids)
                 val probeCount = plan.profiles.sumOf { it.outboundTags.size }
-                setTotalWorkUnits(probeCount + plan.individualGuids.size + plan.failedGuids.size)
-                plan.failedGuids.forEach {
-                    emitResult(it, -1L, completed = true)
-                    completeWorkUnit()
-                }
+                setWorkUnits(plan)
+                val concurrency = SettingsManager.getRealPingConcurrency()
                 if (plan.profiles.isNotEmpty()) {
-                    val concurrency = SettingsManager.getRealPingConcurrency()
                     LogUtil.i(
                         AppConfig.TAG,
                         "Starting $probeCount real-delay probes for ${plan.profiles.size} profiles with limit $concurrency",
                     )
-                    controller.probe(
-                        plan.content,
-                        JsonUtil.toJson(plan.profiles),
-                        concurrency,
-                        object : ProbeHandler {
-                            override fun onProbeResult(
-                                groupID: String?,
-                                delay: Long,
-                                alive: Boolean,
-                                completed: Boolean,
-                            ): Long {
-                                emitResult(groupID!!, if (alive) delay else -1L, completed)
-                                completeWorkUnit()
-                                return 0
-                            }
-                        },
-                    )
                 }
-                probeIndividually(plan.individualGuids)
+                runPlan(plan, concurrency)
+                failPending()
                 finish("0")
             } catch (_: CancellationException) {
                 finish("-1")
@@ -99,8 +82,8 @@ class RealPingWorkerService(
         val dispatcher = Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency())
         val jobs = guids.map { guid ->
             scope.launch(dispatcher) {
-                emitResult(guid, startTcping(guid), completed = true)
-                completeWorkUnit()
+                emitResult(guid, safelyProbe(guid, ::startTcping))
+                completeWork(guid, profileCompleted = true)
             }
         }
         scope.launch {
@@ -119,46 +102,121 @@ class RealPingWorkerService(
         finish("-1")
     }
 
-    private suspend fun probeIndividually(individualGuids: List<String>) {
-        val dispatcher = Dispatchers.IO.limitedParallelism(SettingsManager.getRealPingConcurrency())
+    private suspend fun runPlan(plan: ProbePlan, concurrency: Int) {
+        plan.failedGuids.forEach { guid ->
+            emitResult(guid, -1L)
+            completeWork(guid, profileCompleted = true)
+        }
+        probeBatch(plan, concurrency)
+        probeIndividually(plan.individualGuids, concurrency)
+    }
+
+    private suspend fun probeIndividually(individualGuids: List<String>, concurrency: Int) {
+        val dispatcher = Dispatchers.IO.limitedParallelism(concurrency)
         individualGuids.map { guid ->
             scope.launch(dispatcher) {
-                emitResult(guid, startRealPing(guid), completed = true)
-                completeWorkUnit()
+                emitResult(guid, safelyProbe(guid, ::startRealPing))
+                completeWork(guid, profileCompleted = true)
             }
         }.joinAll()
     }
 
-    @Synchronized
-    private fun failPending() {
-        pendingGuids.toList().forEach { guid ->
-            emitResult(guid, emittedDelays[guid] ?: -1L, completed = true)
+    private suspend fun probeBatch(plan: ProbePlan, concurrency: Int) {
+        if (plan.profiles.isEmpty()) return
+        try {
+            controller.probe(
+                plan.content,
+                JsonUtil.toJson(plan.profiles),
+                concurrency,
+                object : ProbeHandler {
+                    override fun onProbeResult(
+                        groupID: String?,
+                        delay: Long,
+                        completed: Boolean,
+                    ) {
+                        val guid = groupID ?: return
+                        emitResult(guid, delay)
+                        completeWork(guid, profileCompleted = completed)
+                    }
+                },
+            )
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            currentCoroutineContext().ensureActive()
+            val retryGuids = plan.profiles.map { it.guid }.filter(::isPending)
+            LogUtil.w(
+                AppConfig.TAG,
+                "Shared probe core rejected ${retryGuids.size} profiles; isolating the failing profile",
+                error,
+            )
+            retryProbeGuids(retryGuids, concurrency)
+        }
+    }
+
+    /** Binary isolation keeps one malformed Xray config from degrading every valid profile. */
+    private suspend fun retryProbeGuids(retryGuids: List<String>, concurrency: Int) {
+        currentCoroutineContext().ensureActive()
+        val activeGuids = retryGuids.filter(::isPending)
+        if (activeGuids.isEmpty()) return
+        if (activeGuids.size == 1) {
+            probeIndividually(activeGuids, concurrency)
+            return
+        }
+        val halves = activeGuids.chunked((activeGuids.size + 1) / 2)
+        halves.forEach { half ->
+            currentCoroutineContext().ensureActive()
+            val retryPlan = try {
+                CoreConfigManager.getProbePlan(context, half)
+            } catch (error: Exception) {
+                LogUtil.w(AppConfig.TAG, "Failed to rebuild ${half.size} isolated probe profiles", error)
+                retryProbeGuids(half, concurrency)
+                return@forEach
+            }
+            runPlan(retryPlan, concurrency)
         }
     }
 
     @Synchronized
-    private fun emitResult(guid: String, delay: Long, completed: Boolean) {
+    private fun failPending() {
+        remainingWorkUnits.filterValues { it > 0 }.keys.toList().forEach { guid ->
+            emitResult(guid, emittedDelays[guid] ?: -1L)
+            completeWork(guid, profileCompleted = true)
+        }
+    }
+
+    @Synchronized
+    private fun isPending(guid: String): Boolean = remainingWorkUnits[guid]?.let { it > 0 } == true
+
+    @Synchronized
+    private fun emitResult(guid: String, delay: Long) {
         if (finished) return
         if (emittedDelays[guid] != delay) {
             emittedDelays[guid] = delay
             onEvent(RealPingEvent.Result(guid, delay))
         }
-        if (completed) {
-            pendingGuids.remove(guid)
-        }
     }
 
     @Synchronized
-    private fun setTotalWorkUnits(total: Int) {
-        totalWorkUnits = total.coerceAtLeast(1)
+    private fun setWorkUnits(plan: ProbePlan) {
+        remainingWorkUnits.clear()
+        guids.forEach { remainingWorkUnits[it] = 1 }
+        plan.profiles.forEach { profile ->
+            remainingWorkUnits[profile.guid] = profile.outboundTags.size.coerceAtLeast(1)
+        }
+        totalWorkUnits = remainingWorkUnits.values.sum().coerceAtLeast(1)
         completedWorkUnits = 0
         lastProgressAt = 0L
         emitProgress(force = true)
     }
 
     @Synchronized
-    private fun completeWorkUnit() {
-        completedWorkUnits = (completedWorkUnits + 1).coerceAtMost(totalWorkUnits)
+    private fun completeWork(guid: String, profileCompleted: Boolean) {
+        val remaining = remainingWorkUnits[guid] ?: return
+        if (remaining <= 0) return
+        val completed = if (profileCompleted) remaining else 1
+        remainingWorkUnits[guid] = remaining - completed
+        completedWorkUnits = (completedWorkUnits + completed).coerceAtMost(totalWorkUnits)
         emitProgress(force = completedWorkUnits == totalWorkUnits)
     }
 
@@ -191,19 +249,18 @@ class RealPingWorkerService(
     }
 
     private fun startRealPing(guid: String): Long {
-        val config = MmkvManager.decodeServerConfig(guid) ?: return -1L
-        if (!config.configType.isComplexType() &&
-            config.configType != EConfigType.HYSTERIA2 &&
-            config.configType != EConfigType.WIREGUARD &&
-            config.alpn?.startsWith("h3") != true &&
-            config.server.isNotNullEmpty() &&
-            config.serverPort?.toIntOrNull() != null &&
-            SpeedtestManager.socketConnectTime(config.server.orEmpty(), config.serverPort.orEmpty().toInt(), 1000) <= -1L
-        ) return -1L
-
         val configResult = CoreConfigManager.getV2rayConfig4RealDelay(context, guid)
         if (!configResult.status) return -1L
         return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+    }
+
+    private fun safelyProbe(guid: String, probe: (String) -> Long): Long = try {
+        probe(guid)
+    } catch (error: CancellationException) {
+        throw error
+    } catch (error: Exception) {
+        LogUtil.e(AppConfig.TAG, "Probe failed for $guid", error)
+        -1L
     }
 
     private companion object {
