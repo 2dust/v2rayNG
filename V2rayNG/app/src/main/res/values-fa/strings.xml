@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
 
     <string name="share_method_qrcode">کد QR</string>
-    <string name="share_method_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>
-    <string name="share_method_full_content">خروجی گرفتن کانفیگ کامل در کلیپ بورد</string>
+    <string name="share_method_clipboard">کپی لینک کانفیگ</string>
+    <string name="share_method_full_content">کپی کانفیگ کامل</string>
     <string name="action_edit">ویرایش</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">بستن</string>

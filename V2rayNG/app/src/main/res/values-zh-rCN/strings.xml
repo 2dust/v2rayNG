@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">远程文件夹名（可选）</string>
 
     <string name="share_method_qrcode">二维码</string>
-    <string name="share_method_clipboard">导出至剪贴板</string>
-    <string name="share_method_full_content">导出完整配置至剪贴板</string>
+    <string name="share_method_clipboard">复制配置链接</string>
+    <string name="share_method_full_content">复制完整配置</string>
     <string name="action_edit">编辑</string>
     <string name="action_delete">删除</string>
     <string name="action_close">关闭</string>

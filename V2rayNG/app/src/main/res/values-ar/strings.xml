@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">الدليل البعيد (اختياري)</string>
 
     <string name="share_method_qrcode">رمز QR</string>
-    <string name="share_method_clipboard">تصدير إلى الحافظة</string>
-    <string name="share_method_full_content">تصدير التكوين الكامل إلى الحافظة</string>
+    <string name="share_method_clipboard">نسخ رابط التكوين</string>
+    <string name="share_method_full_content">نسخ التكوين الكامل</string>
     <string name="action_edit">تعديل</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">إغلاق</string>

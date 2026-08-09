@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">遠端目錄（可選）</string>
 
     <string name="share_method_qrcode">QR Code</string>
-    <string name="share_method_clipboard">匯出至剪貼簿</string>
-    <string name="share_method_full_content">匯出完整設定至剪貼簿</string>
+    <string name="share_method_clipboard">複製設定連結</string>
+    <string name="share_method_full_content">複製完整設定</string>
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
     <string name="action_close">關閉</string>

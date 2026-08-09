@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
 
     <string name="share_method_qrcode">QR code</string>
-    <string name="share_method_clipboard">Export to clipboard</string>
-    <string name="share_method_full_content">Export full config to clipboard</string>
+    <string name="share_method_clipboard">Copy profile link</string>
+    <string name="share_method_full_content">Copy full configuration</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_close">Close</string>

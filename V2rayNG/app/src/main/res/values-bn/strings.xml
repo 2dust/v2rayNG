@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">দূরবর্তী ডিরেক্টরি (ঐচ্ছিক)</string>
 
     <string name="share_method_qrcode">QR কোড</string>
-    <string name="share_method_clipboard">ক্লিপবোর্ডে রপ্তানি করুন</string>
-    <string name="share_method_full_content">পূর্ণ কনফিগারেশন ক্লিপবোর্ডে রপ্তানি করুন</string>
+    <string name="share_method_clipboard">প্রোফাইল লিংক কপি করুন</string>
+    <string name="share_method_full_content">পূর্ণ কনফিগারেশন কপি করুন</string>
     <string name="action_edit">সম্পাদনা</string>
     <string name="action_delete">মুছুন</string>
     <string name="action_close">বন্ধ করুন</string>

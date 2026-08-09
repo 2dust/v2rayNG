@@ -436,8 +436,8 @@
     <string name="title_webdav_remote_path">دایرکتوری ره دیر (اختیاری)</string>
 
     <string name="share_method_qrcode">کود QR</string>
-    <string name="share_method_clipboard">و در کشیڌن من کلیپ بورد</string>
-    <string name="share_method_full_content">و در کشیڌن پوی کانفیگ من کلیپ بورد</string>
+    <string name="share_method_clipboard">لف گیری لینک کانفیگ</string>
+    <string name="share_method_full_content">لف گیری پوی کانفیگ</string>
     <string name="action_edit">آلشتکاری</string>
     <string name="action_delete">پاک کردن</string>
     <string name="action_close">بستن</string>
