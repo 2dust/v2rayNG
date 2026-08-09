@@ -336,14 +336,19 @@ object RootTproxyManager {
     /**
      * mangle PREROUTING chain: the actual TPROXY hand-off.
      *
-     * Two populations arrive here. The device's own traffic has already been filtered and marked
-     * by [buildOutputMarking] and loops in via the `local ... dev lo` route, so matching the mark
-     * is enough — all per-app and bypass decisions were made in OUTPUT. Tethered clients arrive
-     * natively and unmarked on a real interface; they get the bypass CIDRs applied here instead.
+     * Two populations arrive here, separated by arrival interface. The device's own traffic was
+     * already filtered and marked by [buildOutputMarking] and loops back in through `lo`, so every
+     * per-app and bypass decision was made in OUTPUT and anything reaching here on `lo` is meant
+     * to be proxied. Tethered clients arrive unmarked on a real interface and get the bypass
+     * CIDRs applied here instead; [srcNotLocal] narrows those to traffic that did not originate
+     * on this device, when the kernel ships `xt_addrtype`.
      *
-     * `! -i lo` is what separates the two: locally-looped packets are delivered through loopback,
-     * forwarded client packets arrive on the LAN interface. [srcNotLocal] narrows it further to
-     * traffic that did not originate on this device, when the kernel ships `xt_addrtype`.
+     * Deliberately does NOT key on the fwmark. Whether the mark set in OUTPUT survives the trip
+     * through the `local ... dev lo` route is an assumption this engine does not need to make,
+     * and if it fails to hold the chain matches nothing and all proxied traffic stops.
+     *
+     * The loopback RETURN must stay first: genuine loopback traffic arrives on `lo` too, and
+     * TPROXYing the core's own SOCKS connections would loop the proxy into itself.
      */
     private fun buildTproxyChain(
         cmd: String,
@@ -353,18 +358,31 @@ object RootTproxyManager {
     ): String {
         val tproxy = "-j TPROXY --on-port $PORT --tproxy-mark $MARK"
         return buildString {
+            val loopback = if (cmd == "ip6tables") "::1/128" else "127.0.0.0/8"
+            val client = "! -i lo $srcNotLocal".trimEnd()
             appendLine("$cmd -t mangle -N $PRE_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -F $PRE_CHAIN")
-            // the device's own looped traffic
-            appendLine("$cmd -t mangle -A $PRE_CHAIN -m mark --mark $MARK -p tcp $tproxy")
-            appendLine("$cmd -t mangle -A $PRE_CHAIN -m mark --mark $MARK -p udp $tproxy")
+            // MUST be first. Genuine loopback traffic also arrives on lo — including the
+            // core's own connections to its SOCKS inbound — and TPROXYing that would loop
+            // the proxy into itself.
+            appendLine("$cmd -t mangle -A $PRE_CHAIN -d $loopback -j RETURN")
+            // DNS before the LAN bypass below, so a query aimed at a router/LAN resolver is
+            // still hijacked instead of being answered by the local network's resolver.
+            appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp --dport 53 $tproxy")
+            appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp --dport 53 $tproxy")
             if (lanShare) {
-                // hotspot / USB-tethered clients: keep their LAN-local traffic direct, tunnel
-                // the rest. DNS first, so a query to the router's resolver is still hijacked.
-                val client = "! -i lo $srcNotLocal".trimEnd()
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp --dport 53 $tproxy")
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp --dport 53 $tproxy")
-                cidrs.forEach { appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -d $it -j RETURN") }
+            }
+            cidrs.forEach { appendLine("$cmd -t mangle -A $PRE_CHAIN -d $it -j RETURN") }
+            // The device's own traffic, looped back in by the `local ... dev lo` route. Keyed
+            // on the arrival interface rather than on the fwmark set in OUTPUT: relying on the
+            // mark surviving the loop is an assumption this engine does not need to make, and
+            // if it does not hold every rule here silently stops matching.
+            appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp $tproxy")
+            appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp $tproxy")
+            if (lanShare) {
+                // hotspot / USB-tethered clients arrive on a real interface, not lo
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp $tproxy")
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp $tproxy")
             }
