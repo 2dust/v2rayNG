@@ -1,7 +1,17 @@
 package com.v2ray.ang.ui.main
 
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
+
+/** Locale-neutral state formatted only when it reaches the main UI. */
+sealed interface MainStatus {
+    data object Disconnected : MainStatus
+    data object Connected : MainStatus
+    data object Testing : MainStatus
+    data class TestProgress(val progress: String) : MainStatus
+    data class ConnectionTest(val result: ConnectionTestResult) : MainStatus
+}
 
 /**
  * Main UI state
@@ -12,7 +22,7 @@ data class MainUiState(
     val selectedGuid: String? = null,
     val isRunning: Boolean = false,
     val isTesting: Boolean = false,
-    val statusText: String = "",
+    val status: MainStatus = MainStatus.Disconnected,
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,

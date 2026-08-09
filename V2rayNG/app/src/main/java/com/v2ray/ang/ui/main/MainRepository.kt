@@ -8,12 +8,14 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
@@ -52,14 +54,12 @@ class MainRepository(
                 AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
                 AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
                 AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
-                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
-                    safeIntent.getStringExtra("content").orEmpty()
-                )
+                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> MainServiceEvent.MeasureDelaySuccess(
-                    safeIntent.getStringExtra("content").orEmpty()
-                )
+                AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
+                    .serializable<ConnectionTestResult>("content")
+                    ?.let { MainServiceEvent.MeasureDelayResult(it) }
 
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(

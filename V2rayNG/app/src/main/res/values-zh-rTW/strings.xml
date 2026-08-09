@@ -327,9 +327,11 @@
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
     <string name="sub_allow_insecure_url">允許不安全的 HTTP 位址</string>
-    <string name="sub_setting_pre_profile">前置代理設定檔别名</string>
-    <string name="sub_setting_next_profile">落地代理設定檔別名</string>
+    <string name="sub_setting_pre_profile">入口代理</string>
+    <string name="sub_setting_next_profile">出口代理</string>
     <string name="sub_setting_pre_profile_tip">請確保設定檔別名存在且唯一</string>
+    <string name="sub_setting_entry_proxy_tip">所選代理會加在此訂閱中每個設定檔之前，作為該設定檔代理鏈的入口節點。</string>
+    <string name="sub_setting_exit_proxy_tip">所選代理會加在此訂閱中每個設定檔之後，作為該設定檔代理鏈的出口節點。</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
@@ -355,7 +357,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">路由設定</string>
-    <string name="routing_settings_tips">用逗號（,）分隔，選擇填寫 domain、ip 或 process 中的一項</string>
+    <string name="routing_settings_tips">一條規則只有在所有已設定的比對條件同時符合時才會生效（AND）。規則會由上而下檢查，並套用第一條符合的規則。</string>
+    <string name="routing_settings_comma_tip">多個項目請用逗號（,）分隔。</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_rule_title">路由規則設定</string>
@@ -380,7 +383,8 @@
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
-    <string name="connection_test_available">"成功：%d ms延遲"</string>
+    <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
+    <string name="server_test_delay_value">%1$d 毫秒</string>
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
@@ -502,14 +506,6 @@
     <string name="acc_copy_log">複製日誌</string>
     <string name="acc_clear_log">清除日誌</string>
     <string name="acc_add_rule">新增路由規則</string>
-    <string name="core_error_no_server_selected">未選取設定</string>
-    <string name="core_error_decode_server_config">無法讀取所選設定</string>
-    <string name="core_error_build_config_context">無法準備所選設定</string>
-    <string name="core_error_get_config">無法產生核心設定</string>
-    <string name="core_error_get_config_detail">無法產生核心設定：%1$s</string>
-    <string name="core_error_get_speedtest_config_detail">無法產生測速用核心設定：%1$s</string>
-    <string name="core_error_custom_config_empty">自訂設定為空</string>
-    <string name="core_error_start">無法啟動核心</string>
     <string name="acc_start">啟動服務</string>
     <string name="acc_stop">停止服務</string>
     <string name="acc_back">返回</string>
