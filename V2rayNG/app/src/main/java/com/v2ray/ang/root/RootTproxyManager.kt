@@ -112,7 +112,7 @@ object RootTproxyManager {
                 appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
                 appendLine("$cmd -t mangle -A $chain -m conntrack --ctdir REPLY -j RETURN 2>/dev/null && echo CTDIR$fam=1 || echo CTDIR$fam=0")
                 appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
-                appendLine("$cmd -t mangle -A $chain -m addrtype ! --src-type LOCAL -j RETURN 2>/dev/null && echo ADDRTYPE$fam=1 || echo ADDRTYPE$fam=0")
+                appendLine("$cmd -t mangle -A $chain -m addrtype ! --dst-type LOCAL -j RETURN 2>/dev/null && echo ADDRTYPE$fam=1 || echo ADDRTYPE$fam=0")
                 appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
                 appendLine("$cmd -t mangle -X $chain 2>/dev/null || true")
             }
@@ -139,9 +139,18 @@ object RootTproxyManager {
         )
     }
 
-    /** The "did not originate on this device" match, or empty when the kernel lacks it. */
-    private fun srcNotLocal(hasAddrType: Boolean) =
-        if (hasAddrType) "-m addrtype ! --src-type LOCAL" else ""
+    /**
+     * Match for a packet being *forwarded through* this device — a tethered client's traffic —
+     * or null when the kernel cannot express it, in which case LAN sharing must be skipped.
+     *
+     * Keyed on the DESTINATION not being local. Source is useless here: an ordinary reply
+     * arriving from the internet also has a non-local source, so `! --src-type LOCAL` matches
+     * all inbound traffic. And `! -i lo` alone is not a substitute — every packet from the
+     * network arrives on a real interface, so on its own it TPROXYs the whole inbound path and
+     * takes the device offline.
+     */
+    private fun clientMatch(hasAddrType: Boolean): String? =
+        if (hasAddrType) "! -i lo -m addrtype ! --dst-type LOCAL" else null
 
     // ------------------------------------------------------------------- setup
 
@@ -167,7 +176,14 @@ object RootTproxyManager {
         if (ipv6Wanted && !ipv6) {
             LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel cannot TPROXY IPv6, blackholing it instead")
         }
-        val lanShare = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
+        // LAN sharing needs xt_addrtype to tell a forwarded client packet from an ordinary
+        // inbound reply. Without it there is no safe match, and a catch-all would TPROXY the
+        // entire inbound path and take the device offline — so drop the feature, not the device.
+        val lanShareWanted = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
+        val lanShare = lanShareWanted && caps.addrType4
+        if (lanShareWanted && !lanShare) {
+            LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel has no xt_addrtype, LAN sharing unavailable under TPROXY")
+        }
         val corePid = Process.myPid()
         // /proc/net/tcp* renders the listening port as uppercase hex.
         val hexPort = "%04X".format(PORT)
@@ -221,14 +237,14 @@ object RootTproxyManager {
             appendLine("ip rule add fwmark $MARK table $TABLE priority $PRIORITY")
 
             append(buildOutputMarking("iptables", caps.antiSpoof4!!, appUid, perAppEnabled, bypassApps, selectedUids))
-            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, srcNotLocal(caps.addrType4)))
+            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, clientMatch(caps.addrType4)))
 
             appendLine("set +e")
             if (ipv6) {
                 appendLine("ip -6 route replace local default dev lo table $TABLE 2>/dev/null || true")
                 appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
                 append(buildOutputMarking("ip6tables", caps.antiSpoof6!!, appUid, perAppEnabled, bypassApps, selectedUids))
-                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, srcNotLocal(caps.addrType6)))
+                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, clientMatch(caps.addrType6)))
             } else {
                 // v6 disabled: blackhole native v6 egress so v6-capable apps fall back to
                 // v4-through-proxy instead of reaching destinations natively. Reuses the
@@ -340,8 +356,8 @@ object RootTproxyManager {
      * already filtered and marked by [buildOutputMarking] and loops back in through `lo`, so every
      * per-app and bypass decision was made in OUTPUT and anything reaching here on `lo` is meant
      * to be proxied. Tethered clients arrive unmarked on a real interface and get the bypass
-     * CIDRs applied here instead; [srcNotLocal] narrows those to traffic that did not originate
-     * on this device, when the kernel ships `xt_addrtype`.
+     * CIDRs applied here instead, and are identified by [clientMatch]. When the kernel cannot
+     * express that match, client rules are omitted entirely rather than widened.
      *
      * Deliberately does NOT key on the fwmark. Whether the mark set in OUTPUT survives the trip
      * through the `local ... dev lo` route is an assumption this engine does not need to make,
@@ -354,12 +370,12 @@ object RootTproxyManager {
         cmd: String,
         lanShare: Boolean,
         cidrs: List<String>,
-        srcNotLocal: String,
+        client: String?,
     ): String {
         val tproxy = "-j TPROXY --on-port $PORT --tproxy-mark $MARK"
+        val shareClients = lanShare && client != null
         return buildString {
             val loopback = if (cmd == "ip6tables") "::1/128" else "127.0.0.0/8"
-            val client = "! -i lo $srcNotLocal".trimEnd()
             appendLine("$cmd -t mangle -N $PRE_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -F $PRE_CHAIN")
             // MUST be first. Genuine loopback traffic also arrives on lo — including the
@@ -370,7 +386,7 @@ object RootTproxyManager {
             // still hijacked instead of being answered by the local network's resolver.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp --dport 53 $tproxy")
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp --dport 53 $tproxy")
-            if (lanShare) {
+            if (shareClients) {
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp --dport 53 $tproxy")
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp --dport 53 $tproxy")
             }
@@ -381,8 +397,8 @@ object RootTproxyManager {
             // if it does not hold every rule here silently stops matching.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp $tproxy")
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp $tproxy")
-            if (lanShare) {
-                // hotspot / USB-tethered clients arrive on a real interface, not lo
+            if (shareClients) {
+                // hotspot / USB-tethered clients: forwarded through us, so non-local destination
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp $tproxy")
                 appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp $tproxy")
             }
