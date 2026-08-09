@@ -41,16 +41,30 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     }
 
     fun loadApps(context: Context) {
-        if (allApps != null || isAppListLoading) return
+        allApps?.let { apps ->
+            val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
+            val updatedApps = apps.map { appInfo ->
+                if (appInfo.packageName == AppConfig.UNIDENTIFIED_PACKAGE) {
+                    appInfo.copy(appName = localizedUnknownApp)
+                } else {
+                    appInfo
+                }
+            }
+            allApps = sortApps(updatedApps)
+            _displayedApps.value = applyFilter(currentQuery)
+            return
+        }
+        if (isAppListLoading) return
 
         val applicationContext = context.applicationContext
+        val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
         isAppListLoading = true
         launchLoading {
             try {
                 selectedSnapshot = _selectedPackages.value
                 val apps = withContext(Dispatchers.IO) {
                     val list = AppManagerUtil.loadNetworkAppList(applicationContext)
-                    val special = createSpecialItemUnidentified(applicationContext)
+                    val special = createSpecialItemUnidentified(localizedUnknownApp)
                     sortApps(list + special)
                 }
                 allApps = apps
@@ -122,9 +136,9 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
         }
     }
 
-    private fun createSpecialItemUnidentified(context: Context): AppInfo {
+    private fun createSpecialItemUnidentified(appName: String): AppInfo {
         return AppInfo(
-            appName = context.getString(R.string.app_picker_unknown_app),
+            appName = appName,
             packageName = AppConfig.UNIDENTIFIED_PACKAGE,
             isSystemApp = false,
             isSelected = 0

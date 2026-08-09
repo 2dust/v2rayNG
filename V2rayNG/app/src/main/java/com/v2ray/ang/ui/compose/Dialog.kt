@@ -44,8 +44,8 @@ import com.v2ray.ang.R
 fun ConfirmDialog(
     title: String? = null,
     message: String,
-    confirmText: String = stringResource(android.R.string.ok),
-    dismissText: String? = stringResource(android.R.string.cancel),
+    confirmText: String = stringResource(R.string.action_ok),
+    dismissText: String? = stringResource(R.string.action_cancel),
     confirmIcon: @Composable (() -> Unit)? = null,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
@@ -242,7 +242,7 @@ fun <T> SelectListDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel))
+                Text(stringResource(R.string.action_cancel))
             }
         },
         containerColor = MaterialTheme.colorScheme.surface

@@ -8,6 +8,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="migration_success">Data migration success!</string>
     <string name="action_stop_service">Stop service</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Cancel</string>
     <string name="migration_fail">Data migration failed!</string>
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
