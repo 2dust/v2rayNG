@@ -8,7 +8,9 @@
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="migration_success">Данные успешно перенесены!</string>
     <string name="action_stop_service">Остановить службу</string>
-    <string name="migration_fail">Не удалось перенести данные!</string>
+    <string name="action_ok">ОК</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="migration_fail">Перенос данных не выполнен!</string>
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->

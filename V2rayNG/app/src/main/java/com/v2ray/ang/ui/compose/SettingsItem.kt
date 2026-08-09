@@ -164,8 +164,8 @@ fun SettingsEditItem(
                 )
             ),
             onFieldChange = { _, v -> text = v },
-            confirmText = stringResource(android.R.string.ok),
-            dismissText = stringResource(android.R.string.cancel),
+            confirmText = stringResource(R.string.action_ok),
+            dismissText = stringResource(R.string.action_cancel),
             onConfirm = { showDialog = false; onValueChanged(text) },
             onDismiss = { showDialog = false }
         )
