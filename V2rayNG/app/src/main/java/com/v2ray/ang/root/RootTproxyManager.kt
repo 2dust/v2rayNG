@@ -42,9 +42,34 @@ object RootTproxyManager {
     private const val MARK = AppConfig.ROOT_MARK_ROUTE
     private const val PORT = AppConfig.ROOT_TPROXY_PORT
 
+    /**
+     * Which kernel matches are actually available. Android kernels differ in what netfilter
+     * modules they ship, so this is probed on-device rather than assumed — a missing module
+     * makes the corresponding rule a silent no-op, which for this engine means traffic
+     * egressing in the clear or a routing loop.
+     */
+    private data class Caps(
+        val tproxy4: Boolean,
+        val tproxy6: Boolean,
+        val antiSpoof4: String?,
+        val antiSpoof6: String?,
+        /** `xt_addrtype` specifically — the only way to say "not from this device" in PREROUTING. */
+        val addrType4: Boolean,
+        val addrType6: Boolean,
+    )
+
     fun start(context: Context): Boolean {
         teardown(context)
-        val script = buildSetup(context) ?: return false
+        val caps = probe(context)
+        if (caps == null || !caps.tproxy4 || caps.antiSpoof4 == null) {
+            LogUtil.w(
+                AppConfig.TAG,
+                "RootTproxyManager: kernel lacks TPROXY support (tproxy=${caps?.tproxy4}, " +
+                    "anti-spoof match=${caps?.antiSpoof4}), cannot use this engine"
+            )
+            return false
+        }
+        val script = buildSetup(context, caps) ?: return false
         val result = RootShell.runScript(context, "setup_tproxy.sh", script)
         if (!result.success) {
             LogUtil.e(AppConfig.TAG, "RootTproxyManager: setup failed, rolling back:\n${result.output}")
@@ -64,9 +89,63 @@ object RootTproxyManager {
         RootShell.runScript(context, "teardown_tproxy.sh", buildTeardown(context))
     }
 
+    // ------------------------------------------------------------------- probe
+
+    /**
+     * Test each required match by actually installing it into a throwaway chain — that both
+     * loads the module and proves the running kernel accepts the exact rule this engine emits.
+     * A `--help`-style check would pass on the userspace extension alone, even with no kernel
+     * module behind it.
+     *
+     * `conntrack --ctdir REPLY` is preferred over `addrtype ! --src-type LOCAL` because it
+     * identifies hev's spoofed replies by connection direction rather than by address, so it
+     * still holds when a proxied destination happens to be a local address.
+     */
+    private fun probe(context: Context): Caps? {
+        val chain = "CORE_TP_PROBE"
+        val script = buildString {
+            for (cmd in listOf("iptables", "ip6tables")) {
+                val fam = if (cmd == "ip6tables") "6" else "4"
+                appendLine("$cmd -t mangle -N $chain 2>/dev/null || true")
+                appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
+                appendLine("$cmd -t mangle -A $chain -p tcp -j TPROXY --on-port $PORT --tproxy-mark $MARK 2>/dev/null && echo TPROXY$fam=1 || echo TPROXY$fam=0")
+                appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
+                appendLine("$cmd -t mangle -A $chain -m conntrack --ctdir REPLY -j RETURN 2>/dev/null && echo CTDIR$fam=1 || echo CTDIR$fam=0")
+                appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
+                appendLine("$cmd -t mangle -A $chain -m addrtype ! --src-type LOCAL -j RETURN 2>/dev/null && echo ADDRTYPE$fam=1 || echo ADDRTYPE$fam=0")
+                appendLine("$cmd -t mangle -F $chain 2>/dev/null || true")
+                appendLine("$cmd -t mangle -X $chain 2>/dev/null || true")
+            }
+        }
+        val result = RootShell.runScript(context, "probe_tproxy.sh", script)
+        if (!result.success) {
+            LogUtil.e(AppConfig.TAG, "RootTproxyManager: capability probe failed:\n${result.output}")
+            return null
+        }
+        val out = result.output
+        fun has(key: String) = out.contains("$key=1")
+        fun antiSpoof(fam: String) = when {
+            has("CTDIR$fam") -> "-m conntrack --ctdir REPLY"
+            has("ADDRTYPE$fam") -> "-m addrtype ! --src-type LOCAL"
+            else -> null
+        }
+        return Caps(
+            tproxy4 = has("TPROXY4"),
+            tproxy6 = has("TPROXY6"),
+            antiSpoof4 = antiSpoof("4"),
+            antiSpoof6 = antiSpoof("6"),
+            addrType4 = has("ADDRTYPE4"),
+            addrType6 = has("ADDRTYPE6"),
+        )
+    }
+
+    /** The "did not originate on this device" match, or empty when the kernel lacks it. */
+    private fun srcNotLocal(hasAddrType: Boolean) =
+        if (hasAddrType) "-m addrtype ! --src-type LOCAL" else ""
+
     // ------------------------------------------------------------------- setup
 
-    private fun buildSetup(context: Context): String? {
+    private fun buildSetup(context: Context, caps: Caps): String? {
         val bin = File(context.applicationInfo.nativeLibraryDir, AppConfig.ROOT_TPROXY_BIN)
         if (!bin.exists()) {
             LogUtil.e(AppConfig.TAG, "RootTproxyManager: hev-socks5-tproxy binary missing at ${bin.absolutePath}")
@@ -79,7 +158,15 @@ object RootTproxyManager {
         val logFile = File(runDir, "tproxy.log").absolutePath
         val cfgFile = File(runDir, "tproxy.yml").absolutePath
         val oomGuardPid = File(runDir, "oomguard.pid").absolutePath
-        val ipv6 = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)
+        // IPv6 through the tunnel needs its own TPROXY target and anti-spoof match. When the
+        // kernel is missing either, fall back to blackholing v6 rather than aborting the
+        // working IPv4 setup — v6 stays unproxied either way, and blackholing keeps it from
+        // leaking natively.
+        val ipv6Wanted = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)
+        val ipv6 = ipv6Wanted && caps.tproxy6 && caps.antiSpoof6 != null
+        if (ipv6Wanted && !ipv6) {
+            LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel cannot TPROXY IPv6, blackholing it instead")
+        }
         val lanShare = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
         val corePid = Process.myPid()
         // /proc/net/tcp* renders the listening port as uppercase hex.
@@ -97,11 +184,6 @@ object RootTproxyManager {
         return buildString {
             appendLine("set -e")
             appendLine("BIN='${bin.absolutePath}'")
-            // The TPROXY target and the transparent-socket lookup live in separate kernel
-            // modules. Without them every rule below is a no-op and traffic would egress in
-            // the clear, so refuse to continue rather than silently run unprotected.
-            appendLine("iptables -t mangle -j TPROXY --help >/dev/null 2>&1 || { echo 'kernel has no TPROXY target'; exit 1; }")
-
             // Protect the core from the low-memory killer (system_server keeps recomputing
             // oom_score_adj for app processes, so re-pin it from a root loop).
             appendLine("nohup sh -c 'while true; do echo ${AppConfig.ROOT_OOM_SCORE} > /proc/$corePid/oom_score_adj 2>/dev/null; sleep 5; done' >/dev/null 2>&1 &")
@@ -117,7 +199,7 @@ object RootTproxyManager {
             // hev-socks5-tproxy holds the IP_TRANSPARENT listener and forwards to the core's
             // SOCKS inbound on loopback. `mark` is applied to its UPSTREAM socket only (see
             // hev_socks5_session_tcp_bind) — the accepted transparent socket is NOT marked,
-            // which is why the OUTPUT chain needs the anti-spoof RETURNs below.
+            // which is why the OUTPUT chain needs the anti-spoof RETURN below.
             appendLine("cat > '$cfgFile' <<'HEVCFG'")
             append(buildHevConfig(port))
             appendLine("HEVCFG")
@@ -138,15 +220,15 @@ object RootTproxyManager {
             appendLine("ip route replace local default dev lo table $TABLE")
             appendLine("ip rule add fwmark $MARK table $TABLE priority $PRIORITY")
 
-            append(buildOutputMarking("iptables", appUid, perAppEnabled, bypassApps, selectedUids))
-            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs))
+            append(buildOutputMarking("iptables", caps.antiSpoof4!!, appUid, perAppEnabled, bypassApps, selectedUids))
+            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, srcNotLocal(caps.addrType4)))
 
             appendLine("set +e")
             if (ipv6) {
                 appendLine("ip -6 route replace local default dev lo table $TABLE 2>/dev/null || true")
                 appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
-                append(buildOutputMarking("ip6tables", appUid, perAppEnabled, bypassApps, selectedUids))
-                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6))
+                append(buildOutputMarking("ip6tables", caps.antiSpoof6!!, appUid, perAppEnabled, bypassApps, selectedUids))
+                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, srcNotLocal(caps.addrType6)))
             } else {
                 // v6 disabled: blackhole native v6 egress so v6-capable apps fall back to
                 // v4-through-proxy instead of reaching destinations natively. Reuses the
@@ -195,19 +277,18 @@ object RootTproxyManager {
 
     /**
      * mangle OUTPUT chain. Same per-app semantics as the tun2socks engine's marking chain, plus
-     * two RETURNs that engine does not need.
+     * one RETURN that engine does not need.
      *
-     * The extra RETURNs stop a routing loop unique to TPROXY: hev's accepted transparent socket
+     * The extra RETURN stops a routing loop unique to TPROXY: hev's accepted transparent socket
      * is bound to the connection's ORIGINAL DESTINATION, so its reply packets leave through
      * OUTPUT with a spoofed, non-local source. Marking those would loop them straight back into
-     * the TPROXY target. Genuine locally-generated traffic always has a local source and is in
-     * the conntrack ORIGINAL direction, so both matches exempt exactly the spoofed replies.
-     * They are tried independently because `xt_addrtype` is missing on some Android kernels and
-     * `xt_conntrack --ctdir` on others; the chain aborts if neither is available, because
-     * without one of them this engine would melt the routing table.
+     * the TPROXY target. Genuine locally-generated traffic has a local source and is in the
+     * conntrack ORIGINAL direction, so [antiSpoof] — whichever match the kernel supports, as
+     * decided by [probe] — exempts exactly the spoofed replies.
      */
     private fun buildOutputMarking(
         cmd: String,
+        antiSpoof: String,
         appUid: Int,
         perAppEnabled: Boolean,
         bypassApps: Boolean,
@@ -220,10 +301,7 @@ object RootTproxyManager {
             appendLine("$cmd -t mangle -N $OUT_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -F $OUT_CHAIN")
             // anti-loop: hev's spoofed transparent replies must never be marked
-            appendLine("ANTISPOOF=0")
-            appendLine("$cmd -t mangle -A $OUT_CHAIN -m conntrack --ctdir REPLY -j RETURN 2>/dev/null && ANTISPOOF=1 || true")
-            appendLine("$cmd -t mangle -A $OUT_CHAIN -m addrtype ! --src-type LOCAL -j RETURN 2>/dev/null && ANTISPOOF=1 || true")
-            appendLine("[ \"\$ANTISPOOF\" = 1 ] || { echo 'no conntrack/addrtype match available for TPROXY anti-loop'; exit 1; }")
+            appendLine("$cmd -t mangle -A $OUT_CHAIN $antiSpoof -j RETURN")
             // hev's upstream socket carries this mark; its destination is loopback anyway
             appendLine("$cmd -t mangle -A $OUT_CHAIN -m mark --mark $FWMARK -j RETURN")
             // the app's own core traffic (the real outbound) must not be captured
@@ -257,10 +335,18 @@ object RootTproxyManager {
      * Two populations arrive here. The device's own traffic has already been filtered and marked
      * by [buildOutputMarking] and loops in via the `local ... dev lo` route, so matching the mark
      * is enough — all per-app and bypass decisions were made in OUTPUT. Tethered clients arrive
-     * natively and unmarked, and are recognised by a non-local source address; they get the
-     * bypass CIDRs applied here instead.
+     * natively and unmarked on a real interface; they get the bypass CIDRs applied here instead.
+     *
+     * `! -i lo` is what separates the two: locally-looped packets are delivered through loopback,
+     * forwarded client packets arrive on the LAN interface. [srcNotLocal] narrows it further to
+     * traffic that did not originate on this device, when the kernel ships `xt_addrtype`.
      */
-    private fun buildTproxyChain(cmd: String, lanShare: Boolean, cidrs: List<String>): String {
+    private fun buildTproxyChain(
+        cmd: String,
+        lanShare: Boolean,
+        cidrs: List<String>,
+        srcNotLocal: String,
+    ): String {
         val tproxy = "-j TPROXY --on-port $PORT --tproxy-mark $MARK"
         return buildString {
             appendLine("$cmd -t mangle -N $PRE_CHAIN 2>/dev/null || true")
@@ -271,11 +357,12 @@ object RootTproxyManager {
             if (lanShare) {
                 // hotspot / USB-tethered clients: keep their LAN-local traffic direct, tunnel
                 // the rest. DNS first, so a query to the router's resolver is still hijacked.
-                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -m addrtype ! --src-type LOCAL -p udp --dport 53 $tproxy 2>/dev/null || true")
-                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -m addrtype ! --src-type LOCAL -p tcp --dport 53 $tproxy 2>/dev/null || true")
+                val client = "! -i lo $srcNotLocal".trimEnd()
+                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp --dport 53 $tproxy")
+                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp --dport 53 $tproxy")
                 cidrs.forEach { appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -d $it -j RETURN") }
-                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -m addrtype ! --src-type LOCAL -p tcp $tproxy 2>/dev/null || true")
-                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -m addrtype ! --src-type LOCAL -p udp $tproxy 2>/dev/null || true")
+                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp $tproxy")
+                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp $tproxy")
             }
             appendLine("$cmd -t mangle -D PREROUTING -j $PRE_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -A PREROUTING -j $PRE_CHAIN")
