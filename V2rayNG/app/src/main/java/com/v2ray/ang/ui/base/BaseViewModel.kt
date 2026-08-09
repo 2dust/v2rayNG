@@ -1,12 +1,14 @@
 package com.v2ray.ang.ui.base
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.AppLocaleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,9 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         application as AngApplication
     }
 
+    protected val localizedContext: Context
+        get() = AppLocaleManager.localizedContext(app)
+
     @Suppress("PropertyName")
     protected val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -39,7 +44,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      * Send neutral toast event (Resource ID).
      */
     fun toast(resId: Int) {
-        app.toast(resId)
+        localizedContext.toast(resId)
     }
 
     /**
@@ -53,7 +58,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      * Send success toast event (Resource ID).
      */
     fun toastSuccess(resId: Int) {
-        app.toastSuccess(resId)
+        localizedContext.toastSuccess(resId)
     }
 
     /**
@@ -67,7 +72,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      * Send error toast event (Resource ID).
      */
     fun toastError(resId: Int) {
-        app.toastError(resId)
+        localizedContext.toastError(resId)
     }
 
     /**
@@ -81,14 +86,14 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      * Get string from resource ID.
      */
     fun getString(resId: Int): String {
-        return app.getString(resId)
+        return localizedContext.getString(resId)
     }
 
     /**
      * Get formatted string from resource ID.
      */
     fun getString(resId: Int, vararg formatArgs: Any?): String {
-        return app.getString(resId, *formatArgs)
+        return localizedContext.getString(resId, *formatArgs)
     }
 
     /**

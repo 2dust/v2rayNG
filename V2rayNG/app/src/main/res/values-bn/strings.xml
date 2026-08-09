@@ -8,6 +8,8 @@
     <string name="navigation_drawer_close">নেভিগেশন ড্রয়ার বন্ধ করুন</string>
     <string name="migration_success">ডেটা স্থানান্তর সফল!</string>
     <string name="action_stop_service">সেবা বন্ধ করুন</string>
+    <string name="action_ok">ঠিক আছে</string>
+    <string name="action_cancel">বাতিল</string>
     <string name="migration_fail">ডেটা স্থানান্তর ব্যর্থ!</string>
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
