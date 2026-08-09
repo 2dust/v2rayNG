@@ -8,6 +8,8 @@
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
     <string name="migration_success">جاگورویی داڌه یل وا مووفقیت ٱنجوم وابی!</string>
     <string name="action_stop_service">واڌاشتن سرویس</string>
+    <string name="action_ok">قوۊل</string>
+    <string name="action_cancel">لغو</string>
     <string name="migration_fail">جاگورویی داڌه یل شکست خرد!</string>
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 

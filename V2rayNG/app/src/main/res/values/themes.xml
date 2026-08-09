@@ -2,7 +2,7 @@
     <color name="window_background_light">#FFFFFFFF</color>
     <color name="window_background_dark">#FF1C1B1F</color>
 
-    <style name="AppThemeBase" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <style name="AppThemeBase" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>

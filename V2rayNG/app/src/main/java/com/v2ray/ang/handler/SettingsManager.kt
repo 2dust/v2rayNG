@@ -16,7 +16,6 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.Language
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
 import com.v2ray.ang.extension.moveItem
@@ -31,7 +30,6 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Locale
 import kotlin.random.Random
 
 object SettingsManager {
@@ -386,29 +384,6 @@ object SettingsManager {
     fun getRealPingConcurrency(): Int {
         val value = MmkvManager.decodeSettingsString(AppConfig.PREF_REAL_PING_CONCURRENCY)?.toIntOrNull() ?: 16
         return value.coerceIn(1, 128)
-    }
-
-    /**
-     * Get the locale.
-     * @return The locale.
-     */
-    fun getLocale(): Locale {
-        val langCode =
-            MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE) ?: Language.AUTO.code
-        val language = Language.fromCode(langCode)
-
-        return when (language) {
-            Language.AUTO -> Utils.getSysLocale()
-            Language.ENGLISH -> Locale.ENGLISH
-            Language.CHINA -> Locale.CHINA
-            Language.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
-            Language.VIETNAMESE -> Locale.forLanguageTag("vi")
-            Language.RUSSIAN -> Locale.forLanguageTag("ru")
-            Language.PERSIAN -> Locale.forLanguageTag("fa")
-            Language.ARABIC -> Locale.forLanguageTag("ar")
-            Language.BANGLA -> Locale.forLanguageTag("bn")
-            Language.BAKHTIARI -> Locale.forLanguageTag("bqi-IR")
-        }
     }
 
     /**

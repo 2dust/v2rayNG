@@ -8,6 +8,8 @@
     <string name="navigation_drawer_close">关闭导航栏</string>
     <string name="migration_success">数据迁移成功!</string>
     <string name="action_stop_service">停止服务</string>
+    <string name="action_ok">确定</string>
+    <string name="action_cancel">取消</string>
     <string name="migration_fail">数据迁移失败啦!</string>
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 

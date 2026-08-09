@@ -317,7 +317,7 @@ private fun WebDavInputDialog(
             }
         },
         confirmText = stringResource(R.string.menu_item_save_config),
-        dismissText = stringResource(android.R.string.cancel),
+        dismissText = stringResource(R.string.action_cancel),
         onConfirm = {
             onSave(
                 WebDavConfig(
