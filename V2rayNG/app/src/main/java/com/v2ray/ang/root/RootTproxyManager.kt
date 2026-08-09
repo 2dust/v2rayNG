@@ -261,7 +261,11 @@ object RootTproxyManager {
             appendLine("  port: $socksPort")
             appendLine("  address: '${AppConfig.LOOPBACK}'")
             appendLine("  udp: 'udp'")
-            appendLine("  mark: $FWMARK")
+            // No `mark:` on purpose. Android's netd encodes the netId in the low bits of a
+            // socket's fwmark, so an arbitrary SO_MARK can steer the socket into a network
+            // that does not exist. hev's only upstream socket targets loopback, which the
+            // 127.0.0.0/8 RETURN already exempts, so the mark buys nothing. The tun2socks
+            // engine omits it for the same reason.
             if (user != null && pass != null) {
                 appendLine("  username: '$user'")
                 appendLine("  password: '$pass'")
