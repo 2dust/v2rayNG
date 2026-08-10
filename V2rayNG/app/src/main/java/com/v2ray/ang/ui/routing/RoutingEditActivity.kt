@@ -119,6 +119,7 @@ fun RoutingEditScreen(
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
+    val processSelectTitle = stringResource(R.string.routing_settings_process_select)
     val scrollState = rememberScrollState()
 
     var remarks by rememberSaveable { mutableStateOf(initial?.remarks ?: "") }
@@ -258,7 +259,7 @@ fun RoutingEditScreen(
                             AppPickerActivity.createIntent(
                                 context = context,
                                 selectedPackages = current,
-                                title = context.getString(R.string.routing_settings_process_select)
+                                title = processSelectTitle
                             )
                         )
                     },
@@ -269,7 +270,7 @@ fun RoutingEditScreen(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.routing_settings_process_select))
+                    Text(processSelectTitle)
                 }
             }
             FormTextField(
