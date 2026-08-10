@@ -51,21 +51,51 @@ object RootTproxyManager {
     private data class Caps(
         val tproxy4: Boolean,
         val tproxy6: Boolean,
-        val antiSpoof4: String?,
-        val antiSpoof6: String?,
-        /** `xt_addrtype` specifically — the only way to say "not from this device" in PREROUTING. */
+        val ctdir4: Boolean,
+        val ctdir6: Boolean,
         val addrType4: Boolean,
         val addrType6: Boolean,
-    )
+    ) {
+        fun tproxy(v6: Boolean) = if (v6) tproxy6 else tproxy4
+        fun ctdir(v6: Boolean) = if (v6) ctdir6 else ctdir4
+        fun addrType(v6: Boolean) = if (v6) addrType6 else addrType4
+
+        /**
+         * OUTPUT guard against hev's spoofed replies, which carry a non-local SOURCE.
+         * Source-keyed matches are safe here because OUTPUT never sees inbound traffic.
+         */
+        fun antiSpoof(v6: Boolean): String? = when {
+            ctdir(v6) -> "-m conntrack --ctdir REPLY"
+            addrType(v6) -> "-m addrtype ! --src-type LOCAL"
+            else -> null
+        }
+
+        /**
+         * PREROUTING guard for traffic coming back to this device. hev's reply to a proxied
+         * connection is addressed to the device's own IP, so the kernel delivers it locally —
+         * which sends it out through `lo` and straight back into the `-i lo` TPROXY rules,
+         * where it would be handed to hev again and never reach the app that was waiting.
+         * A public device address makes this certain, since the private-range bypasses miss it.
+         *
+         * Keyed on connection direction (the reply of an ORIGINAL we already proxied) or, failing
+         * that, on the destination being one of ours. NOT source-keyed: a reply's source is the
+         * remote peer, which is exactly what the OUTPUT guard above looks for.
+         */
+        fun replyGuard(v6: Boolean): String? = when {
+            ctdir(v6) -> "-m conntrack --ctdir REPLY"
+            addrType(v6) -> "-m addrtype --dst-type LOCAL"
+            else -> null
+        }
+    }
 
     fun start(context: Context): Boolean {
         teardown(context)
         val caps = probe(context)
-        if (caps == null || !caps.tproxy4 || caps.antiSpoof4 == null) {
+        if (caps == null || !caps.tproxy4 || caps.antiSpoof(false) == null) {
             LogUtil.w(
                 AppConfig.TAG,
                 "RootTproxyManager: kernel lacks TPROXY support (tproxy=${caps?.tproxy4}, " +
-                    "anti-spoof match=${caps?.antiSpoof4}), cannot use this engine"
+                    "anti-spoof match=${caps?.antiSpoof(false)}), cannot use this engine"
             )
             return false
         }
@@ -124,16 +154,11 @@ object RootTproxyManager {
         }
         val out = result.output
         fun has(key: String) = out.contains("$key=1")
-        fun antiSpoof(fam: String) = when {
-            has("CTDIR$fam") -> "-m conntrack --ctdir REPLY"
-            has("ADDRTYPE$fam") -> "-m addrtype ! --src-type LOCAL"
-            else -> null
-        }
         return Caps(
             tproxy4 = has("TPROXY4"),
             tproxy6 = has("TPROXY6"),
-            antiSpoof4 = antiSpoof("4"),
-            antiSpoof6 = antiSpoof("6"),
+            ctdir4 = has("CTDIR4"),
+            ctdir6 = has("CTDIR6"),
             addrType4 = has("ADDRTYPE4"),
             addrType6 = has("ADDRTYPE6"),
         )
@@ -172,7 +197,7 @@ object RootTproxyManager {
         // working IPv4 setup — v6 stays unproxied either way, and blackholing keeps it from
         // leaking natively.
         val ipv6Wanted = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED)
-        val ipv6 = ipv6Wanted && caps.tproxy6 && caps.antiSpoof6 != null
+        val ipv6 = ipv6Wanted && caps.tproxy6 && caps.antiSpoof(true) != null && caps.replyGuard(true) != null
         if (ipv6Wanted && !ipv6) {
             LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel cannot TPROXY IPv6, blackholing it instead")
         }
@@ -236,15 +261,15 @@ object RootTproxyManager {
             appendLine("ip route replace local default dev lo table $TABLE")
             appendLine("ip rule add fwmark $MARK table $TABLE priority $PRIORITY")
 
-            append(buildOutputMarking("iptables", caps.antiSpoof4!!, appUid, perAppEnabled, bypassApps, selectedUids))
-            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, clientMatch(caps.addrType4)))
+            append(buildOutputMarking("iptables", caps.antiSpoof(false)!!, appUid, perAppEnabled, bypassApps, selectedUids))
+            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, clientMatch(caps.addrType4), caps.replyGuard(false)!!))
 
             appendLine("set +e")
             if (ipv6) {
                 appendLine("ip -6 route replace local default dev lo table $TABLE 2>/dev/null || true")
                 appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
-                append(buildOutputMarking("ip6tables", caps.antiSpoof6!!, appUid, perAppEnabled, bypassApps, selectedUids))
-                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, clientMatch(caps.addrType6)))
+                append(buildOutputMarking("ip6tables", caps.antiSpoof(true)!!, appUid, perAppEnabled, bypassApps, selectedUids))
+                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, clientMatch(caps.addrType6), caps.replyGuard(true)!!))
             } else {
                 // v6 disabled: blackhole native v6 egress so v6-capable apps fall back to
                 // v4-through-proxy instead of reaching destinations natively. Reuses the
@@ -371,6 +396,7 @@ object RootTproxyManager {
         lanShare: Boolean,
         cidrs: List<String>,
         client: String?,
+        replyGuard: String,
     ): String {
         val tproxy = "-j TPROXY --on-port $PORT --tproxy-mark $MARK"
         val shareClients = lanShare && client != null
@@ -382,6 +408,12 @@ object RootTproxyManager {
             // core's own connections to its SOCKS inbound — and TPROXYing that would loop
             // the proxy into itself.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -d $loopback -j RETURN")
+            // Second, and just as load-bearing: let the proxied connections' replies through.
+            // hev answers on the connection's original destination but addresses the reply to
+            // this device, so the kernel delivers it locally via lo, right back into the rules
+            // below. Without this the reply is handed to hev again instead of to the waiting
+            // app, and the connection dies retransmitting.
+            appendLine("$cmd -t mangle -A $PRE_CHAIN $replyGuard -j RETURN")
             // DNS before the LAN bypass below, so a query aimed at a router/LAN resolver is
             // still hijacked instead of being answered by the local network's resolver.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp --dport 53 $tproxy")
