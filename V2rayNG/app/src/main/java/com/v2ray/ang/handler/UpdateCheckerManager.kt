@@ -14,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object UpdateCheckerManager {
+    private const val GITHUB_RELEASE_HEADERS = """{"Accept":"application/vnd.github.full+json"}"""
+
     suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
         val url = if (includePreRelease) {
             AppConfig.APP_API_URL
@@ -27,7 +29,8 @@ object UpdateCheckerManager {
         var response = HttpUtil.getUrlContent(
             UrlContentRequest(
                 url = url,
-                timeout = 5000
+                timeout = 5000,
+                requestHeaders = GITHUB_RELEASE_HEADERS
             )
         )
         if (response.isNullOrEmpty()) {
@@ -38,7 +41,8 @@ object UpdateCheckerManager {
                     timeout = 5000,
                     httpPort = httpPort,
                     proxyUsername = proxyUsername,
-                    proxyPassword = proxyPassword
+                    proxyPassword = proxyPassword,
+                    requestHeaders = GITHUB_RELEASE_HEADERS
                 )
             )
                 ?: throw IllegalStateException("Failed to get response")
@@ -67,6 +71,7 @@ object UpdateCheckerManager {
                 hasUpdate = true,
                 latestVersion = latestVersion,
                 releaseNotes = latestRelease.body,
+                releaseNotesHtml = latestRelease.bodyHtml,
                 downloadUrl = downloadUrl,
                 isPreRelease = latestRelease.prerelease
             )

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,10 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
@@ -98,7 +105,12 @@ fun CheckUpdateScreen(
         AlertDialog(
             onDismissRequest = { viewModel.dismissUpdateDialog() },
             title = { Text(stringResource(R.string.update_new_version_found, result.latestVersion ?: "")) },
-            text = { Text(result.releaseNotes ?: "") },
+            text = {
+                ReleaseNotesText(
+                    releaseNotes = result.releaseNotes.orEmpty(),
+                    releaseNotesHtml = result.releaseNotesHtml
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.dismissUpdateDialog()
@@ -115,4 +127,39 @@ fun CheckUpdateScreen(
             containerColor = MaterialTheme.colorScheme.surface
         )
     }
+}
+
+@Composable
+private fun ReleaseNotesText(
+    releaseNotes: String,
+    releaseNotesHtml: String?
+) {
+    val scrollState = rememberScrollState()
+    val linkColor = MaterialTheme.colorScheme.primary
+    val annotatedNotes = remember(releaseNotes, releaseNotesHtml, linkColor) {
+        releaseNotesHtml
+            ?.takeIf { it.isNotBlank() }
+            ?.let { html ->
+                runCatching {
+                    AnnotatedString.fromHtml(
+                        htmlString = html,
+                        linkStyles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = linkColor,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    )
+                }.getOrNull()
+            }
+            ?: AnnotatedString(releaseNotes)
+    }
+
+    Text(
+        text = annotatedNotes,
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(scrollState),
+        style = MaterialTheme.typography.bodyMedium
+    )
 }
