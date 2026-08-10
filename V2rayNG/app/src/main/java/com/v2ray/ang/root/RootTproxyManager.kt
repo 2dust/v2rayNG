@@ -164,18 +164,6 @@ object RootTproxyManager {
         )
     }
 
-    /**
-     * Match for a packet being *forwarded through* this device — a tethered client's traffic —
-     * or null when the kernel cannot express it, in which case LAN sharing must be skipped.
-     *
-     * Keyed on the DESTINATION not being local. Source is useless here: an ordinary reply
-     * arriving from the internet also has a non-local source, so `! --src-type LOCAL` matches
-     * all inbound traffic. And `! -i lo` alone is not a substitute — every packet from the
-     * network arrives on a real interface, so on its own it TPROXYs the whole inbound path and
-     * takes the device offline.
-     */
-    private fun clientMatch(hasAddrType: Boolean): String? =
-        if (hasAddrType) "! -i lo -m addrtype ! --dst-type LOCAL" else null
 
     // ------------------------------------------------------------------- setup
 
@@ -201,14 +189,7 @@ object RootTproxyManager {
         if (ipv6Wanted && !ipv6) {
             LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel cannot TPROXY IPv6, blackholing it instead")
         }
-        // LAN sharing needs xt_addrtype to tell a forwarded client packet from an ordinary
-        // inbound reply. Without it there is no safe match, and a catch-all would TPROXY the
-        // entire inbound path and take the device offline — so drop the feature, not the device.
-        val lanShareWanted = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
-        val lanShare = lanShareWanted && caps.addrType4
-        if (lanShareWanted && !lanShare) {
-            LogUtil.w(AppConfig.TAG, "RootTproxyManager: kernel has no xt_addrtype, LAN sharing unavailable under TPROXY")
-        }
+        val lanShare = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
         val corePid = Process.myPid()
         // /proc/net/tcp* renders the listening port as uppercase hex.
         val hexPort = "%04X".format(PORT)
@@ -262,14 +243,14 @@ object RootTproxyManager {
             appendLine("ip rule add fwmark $MARK table $TABLE priority $PRIORITY")
 
             append(buildOutputMarking("iptables", caps.antiSpoof(false)!!, appUid, perAppEnabled, bypassApps, selectedUids))
-            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, clientMatch(caps.addrType4), caps.replyGuard(false)!!))
+            append(buildTproxyChain("iptables", lanShare, RootProxyManager.bypassCidrs, caps.replyGuard(false)!!, caps.addrType4))
 
             appendLine("set +e")
             if (ipv6) {
                 appendLine("ip -6 route replace local default dev lo table $TABLE 2>/dev/null || true")
                 appendLine("ip -6 rule add fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
                 append(buildOutputMarking("ip6tables", caps.antiSpoof(true)!!, appUid, perAppEnabled, bypassApps, selectedUids))
-                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, clientMatch(caps.addrType6), caps.replyGuard(true)!!))
+                append(buildTproxyChain("ip6tables", lanShare, RootProxyManager.bypassCidrsV6, caps.replyGuard(true)!!, caps.addrType6))
             } else {
                 // v6 disabled: blackhole native v6 egress so v6-capable apps fall back to
                 // v4-through-proxy instead of reaching destinations natively. Reuses the
@@ -377,12 +358,16 @@ object RootTproxyManager {
     /**
      * mangle PREROUTING chain: the actual TPROXY hand-off.
      *
-     * Two populations arrive here, separated by arrival interface. The device's own traffic was
-     * already filtered and marked by [buildOutputMarking] and loops back in through `lo`, so every
-     * per-app and bypass decision was made in OUTPUT and anything reaching here on `lo` is meant
-     * to be proxied. Tethered clients arrive unmarked on a real interface and get the bypass
-     * CIDRs applied here instead, and are identified by [clientMatch]. When the kernel cannot
-     * express that match, client rules are omitted entirely rather than widened.
+     * Two populations arrive here. The device's own traffic was already filtered and marked by
+     * [buildOutputMarking] and loops back in through `lo`, so every per-app and bypass decision
+     * was made in OUTPUT and anything reaching here on `lo` is meant to be proxied. Tethered
+     * clients arrive unmarked on a real interface and get the bypass CIDRs applied here instead.
+     *
+     * Forwarded traffic is defined by exclusion rather than by guessing tethering interface names,
+     * which vary per ROM: once everything addressed to this device has been returned, whatever is
+     * left arriving on a real interface is by definition passing *through* us. `xt_addrtype`
+     * expresses that directly; without it the same set is materialized by enumerating the device's
+     * own addresses when the rules are installed.
      *
      * Deliberately does NOT key on the fwmark. Whether the mark set in OUTPUT survives the trip
      * through the `local ... dev lo` route is an assumption this engine does not need to make,
@@ -395,13 +380,13 @@ object RootTproxyManager {
         cmd: String,
         lanShare: Boolean,
         cidrs: List<String>,
-        client: String?,
         replyGuard: String,
+        hasAddrType: Boolean,
     ): String {
         val tproxy = "-j TPROXY --on-port $PORT --tproxy-mark $MARK"
-        val shareClients = lanShare && client != null
+        val v6 = cmd == "ip6tables"
         return buildString {
-            val loopback = if (cmd == "ip6tables") "::1/128" else "127.0.0.0/8"
+            val loopback = if (v6) "::1/128" else "127.0.0.0/8"
             appendLine("$cmd -t mangle -N $PRE_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -F $PRE_CHAIN")
             // MUST be first. Genuine loopback traffic also arrives on lo — including the
@@ -414,13 +399,28 @@ object RootTproxyManager {
             // below. Without this the reply is handed to hev again instead of to the waiting
             // app, and the connection dies retransmitting.
             appendLine("$cmd -t mangle -A $PRE_CHAIN $replyGuard -j RETURN")
+            // Everything addressed to this device goes to this device. This is what separates a
+            // tethered client's forwarded packet from an ordinary inbound one, and it also covers
+            // a proxied app that happened to dial one of our own addresses.
+            if (hasAddrType) {
+                appendLine("$cmd -t mangle -A $PRE_CHAIN -m addrtype --dst-type LOCAL -j RETURN")
+            } else {
+                // No xt_addrtype: materialize the same set from the addresses the device holds
+                // when the rules go in. Evaluated by the shell at install time, not when the
+                // script was generated, so it reflects the interfaces that are actually up.
+                val ipCmd = if (v6) "ip -6" else "ip -4"
+                appendLine("for A in \$($ipCmd -o addr show 2>/dev/null | awk '{print \$4}' | cut -d/ -f1); do")
+                appendLine("  $cmd -t mangle -A $PRE_CHAIN -d \"\$A\" -j RETURN 2>/dev/null || true")
+                appendLine("done")
+                if (!v6) appendLine("$cmd -t mangle -A $PRE_CHAIN -d 255.255.255.255 -j RETURN")
+            }
             // DNS before the LAN bypass below, so a query aimed at a router/LAN resolver is
             // still hijacked instead of being answered by the local network's resolver.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp --dport 53 $tproxy")
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp --dport 53 $tproxy")
-            if (shareClients) {
-                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp --dport 53 $tproxy")
-                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp --dport 53 $tproxy")
+            if (lanShare) {
+                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -p udp --dport 53 $tproxy")
+                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -p tcp --dport 53 $tproxy")
             }
             cidrs.forEach { appendLine("$cmd -t mangle -A $PRE_CHAIN -d $it -j RETURN") }
             // The device's own traffic, looped back in by the `local ... dev lo` route. Keyed
@@ -429,10 +429,11 @@ object RootTproxyManager {
             // if it does not hold every rule here silently stops matching.
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p tcp $tproxy")
             appendLine("$cmd -t mangle -A $PRE_CHAIN -i lo -p udp $tproxy")
-            if (shareClients) {
-                // hotspot / USB-tethered clients: forwarded through us, so non-local destination
-                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p tcp $tproxy")
-                appendLine("$cmd -t mangle -A $PRE_CHAIN $client -p udp $tproxy")
+            if (lanShare) {
+                // Whatever is still here arrived on a real interface and is not addressed to us:
+                // a hotspot / USB-tethered client's traffic passing through.
+                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -p tcp $tproxy")
+                appendLine("$cmd -t mangle -A $PRE_CHAIN ! -i lo -p udp $tproxy")
             }
             appendLine("$cmd -t mangle -D PREROUTING -j $PRE_CHAIN 2>/dev/null || true")
             appendLine("$cmd -t mangle -A PREROUTING -j $PRE_CHAIN")
