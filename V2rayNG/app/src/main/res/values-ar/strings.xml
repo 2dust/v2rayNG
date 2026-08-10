@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">رؤوس الطلب (بتنسيق JSON)</string>
     <string name="sub_setting_filter">مرشح تعبير نمطي للملاحظات</string>
+    <string name="sub_setting_network_filter">مرشح نوع الشبكة</string>
+    <string name="sub_setting_network_filter_tip">قيم مفصولة بفاصلة إنجليزية، مثل: ws, grpc, xhttp</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
     <string name="sub_allow_insecure_url">السماح بعنوان HTTP غير آمن</string>

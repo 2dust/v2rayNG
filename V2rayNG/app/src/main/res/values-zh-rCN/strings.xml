@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">请求头（JSON 格式）</string>
     <string name="sub_setting_filter">别名正则过滤</string>
+    <string name="sub_setting_network_filter">传输协议筛选</string>
+    <string name="sub_setting_network_filter_tip">使用英文逗号分隔，例如：ws, grpc, xhttp</string>
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
     <string name="sub_allow_insecure_url">允许不安全的 HTTP 地址</string>

@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندهای درخواست (قالب JSON)</string>
     <string name="sub_setting_filter">فیلتر عبارت منظم برای نام‌ها</string>
+    <string name="sub_setting_network_filter">فیلتر نوع شبکه</string>
+    <string name="sub_setting_network_filter_tip">با ویرگول انگلیسی جدا کنید، مانند: ws, grpc, xhttp</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>

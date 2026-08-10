@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Request Headers (JSON format)</string>
     <string name="sub_setting_filter">Remarks filter (regular expression)</string>
+    <string name="sub_setting_network_filter">Network type filter</string>
+    <string name="sub_setting_network_filter_tip">Comma-separated, e.g. ws, grpc, xhttp</string>
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
     <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>

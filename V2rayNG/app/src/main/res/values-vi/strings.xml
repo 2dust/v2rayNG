@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Tiêu đề yêu cầu (định dạng JSON)</string>
     <string name="sub_setting_filter">Bộ lọc biểu thức chính quy cho tên ghi chú</string>
+    <string name="sub_setting_network_filter">Bộ lọc giao thức truyền tải</string>
+    <string name="sub_setting_network_filter_tip">Phân tách bằng dấu phẩy, ví dụ: ws, grpc, xhttp</string>
     <string name="sub_setting_enable">Bật cập nhật</string>
     <string name="sub_auto_update">Bật tự động cập nhật</string>
     <string name="sub_allow_insecure_url">Cho phép địa chỉ HTTP không an toàn</string>

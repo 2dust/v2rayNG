@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندا درخواست (قالوو JSON)</string>
     <string name="sub_setting_filter">فیلتر نیشتنا وا regex</string>
+    <string name="sub_setting_network_filter">فیلتر نوع شبکه</string>
+    <string name="sub_setting_network_filter_tip">وا کاما (,) ز یک جوڌا ابۊن: ws, grpc, xhttp</string>
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
     <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>

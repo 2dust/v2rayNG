@@ -492,6 +492,9 @@ object AngConfigManager {
                     .containsMatchIn(input = config.remarks)
                 if (!matched) return null
             }
+            if (!matchesNetworkFilter(config.network, subItem?.networkFilter)) {
+                return null
+            }
 
             config.subscriptionId = subid
             config.description = generateDescription(config)
@@ -507,6 +510,15 @@ object AngConfigManager {
             LogUtil.e(AppConfig.TAG, "Failed to parse config", e)
             return null
         }
+    }
+
+    internal fun matchesNetworkFilter(network: String?, filter: String?): Boolean {
+        val networkTypes = filter.orEmpty()
+            .split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
+        return networkTypes.isEmpty() || networkTypes.any { it.equals(network, ignoreCase = true) }
     }
 
     /**

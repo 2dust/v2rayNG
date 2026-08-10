@@ -11,6 +11,7 @@ data class SubscriptionItem(
     var prevProfile: String? = null,
     var nextProfile: String? = null,
     var filter: String? = null,
+    var networkFilter: String? = null,
     var allowInsecureUrl: Boolean = false,
     var userAgent: String? = null,
     var requestHeaders: String? = null,

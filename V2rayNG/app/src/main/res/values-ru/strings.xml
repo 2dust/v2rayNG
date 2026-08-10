@@ -324,6 +324,8 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Заголовки запроса (формат JSON)</string>
     <string name="sub_setting_filter">Фильтр названий (регулярное выражение)</string>
+    <string name="sub_setting_network_filter">Фильтр по типу сети</string>
+    <string name="sub_setting_network_filter_tip">Через запятую, например: ws, grpc, xhttp</string>
     <string name="sub_setting_enable">Включить обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
     <string name="sub_allow_insecure_url">Разрешать незащищённые HTTP-адреса</string>

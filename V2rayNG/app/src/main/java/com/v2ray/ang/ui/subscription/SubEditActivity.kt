@@ -135,6 +135,7 @@ fun SubEditScreen(
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }
     var requestHeaders by rememberSaveable { mutableStateOf(initial.requestHeaders.orEmpty()) }
     var filter by rememberSaveable { mutableStateOf(initial.filter ?: "") }
+    var networkFilter by rememberSaveable { mutableStateOf(initial.networkFilter ?: "") }
     var enabled by rememberSaveable { mutableStateOf(initial.enabled) }
     var autoUpdate by rememberSaveable { mutableStateOf(initial.autoUpdate) }
     var updateInterval by rememberSaveable { mutableStateOf(initial.updateInterval.toString()) }
@@ -153,6 +154,7 @@ fun SubEditScreen(
         subItem.userAgent = userAgent
         subItem.requestHeaders = requestHeaders
         subItem.filter = filter
+        subItem.networkFilter = networkFilter
         subItem.enabled = enabled
         subItem.autoUpdate = autoUpdate
         subItem.updateInterval = updateInterval.toLongEx()
@@ -199,6 +201,13 @@ fun SubEditScreen(
             FormTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
             FormTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
             FormTextField(stringResource(R.string.sub_setting_filter), filter, { filter = it })
+            FormTextField(
+                label = stringResource(R.string.sub_setting_network_filter),
+                value = networkFilter,
+                onValueChange = { networkFilter = it },
+                placeholder = stringResource(R.string.sub_setting_network_filter_tip),
+                maxLines = 1
+            )
             SettingsSwitchItem(
                 title = stringResource(R.string.sub_setting_enable),
                 checked = enabled,
