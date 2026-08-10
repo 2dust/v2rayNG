@@ -2,6 +2,7 @@ package com.v2ray.ang.service
 
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -13,6 +14,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.helper.NotificationHelper
@@ -20,6 +22,10 @@ import com.v2ray.ang.util.LogUtil
 import java.util.Collections
 
 class CoreTestService : Service() {
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase?.let(AppLocaleManager::localizedContext))
+    }
 
     // manage active batch workers so each batch is independent and cancellable
     private val activeWorkers = Collections.synchronizedList(mutableListOf<RealPingWorkerService>())
@@ -36,7 +42,7 @@ class CoreTestService : Service() {
         )
         NotificationCompat.Action.Builder(
             R.drawable.ic_stop_24dp,
-            getString(android.R.string.cancel),
+            getString(R.string.action_cancel),
             pendingIntent
         ).build()
     }

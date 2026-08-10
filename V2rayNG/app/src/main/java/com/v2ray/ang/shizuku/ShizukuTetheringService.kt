@@ -232,7 +232,9 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
 
     @Synchronized
     override fun getRoutingDetail(): String {
-        if (!routingActive && routingState != ROUTING_STATE_WAITING) return routingDetail
+        // The shell process keeps platform diagnostics in English for logs. Expose only live
+        // interface/profile data; the app maps error states and result codes to localized text.
+        if (!routingActive && routingState != ROUTING_STATE_WAITING) return ""
         val upstreamInterface = runCatching {
             TetheringPlatformCompat.getUpstreamInterfaceName()
         }.onFailure {
@@ -1005,6 +1007,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private fun setRoutingError(detail: String) {
         routingState = ROUTING_STATE_ERROR
         routingDetail = detail
+        Log.e(TAG, detail)
     }
 
     private fun updateRoutingDetailLocked() {
@@ -1092,7 +1095,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_754
+        const val USER_SERVICE_VERSION = 20_260_755
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)

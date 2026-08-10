@@ -203,8 +203,13 @@ internal fun TetheringScreen(
         ?.let { stringResource(it.labelRes) }
     val hotspotIpMode = state.ipMode(ShizukuTetheringService.TETHERING_TYPE_WIFI)
         ?.let { stringResource(it.labelRes) }
+    val routingDetail = if (state.routingState == ShizukuTetheringService.ROUTING_STATE_ERROR) {
+        stringResource(R.string.shizuku_operation_failed)
+    } else {
+        state.routingDetail.ifBlank { routingSummary }
+    }
     val routingDetails = buildString {
-        append(state.routingDetail.ifBlank { routingSummary })
+        append(routingDetail)
         if (usbActive) {
             append("\n").append(usbStatus)
             usbIpMode?.let { append(" · ").append(it) }

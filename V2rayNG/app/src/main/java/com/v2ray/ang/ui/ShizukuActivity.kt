@@ -30,6 +30,7 @@ import com.v2ray.ang.shizuku.IShizukuTetheringService
 import com.v2ray.ang.shizuku.ShizukuTetheringService
 import com.v2ray.ang.shizuku.coreTetheringLease
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -219,7 +220,8 @@ class ShizukuActivity : BaseComponentActivity() {
             ShizukuStatus.PERMISSION_REQUIRED -> runCatching {
                 Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
             }.onFailure {
-                toastError(it.message ?: getString(R.string.shizuku_operation_failed))
+                LogUtil.e(AppConfig.TAG, "Unable to request Shizuku permission", it)
+                toastError(R.string.shizuku_operation_failed)
                 refreshShizukuStatus()
             }
 
@@ -239,7 +241,8 @@ class ShizukuActivity : BaseComponentActivity() {
             Shizuku.bindUserService(userServiceArgs, userServiceConnection)
         }.onFailure {
             clearServiceState()
-            toastError(it.message ?: getString(R.string.shizuku_operation_failed))
+            LogUtil.e(AppConfig.TAG, "Unable to bind Shizuku tethering service", it)
+            toastError(R.string.shizuku_operation_failed)
         }
     }
 
@@ -298,7 +301,7 @@ class ShizukuActivity : BaseComponentActivity() {
                 callService { service.stopRouting() }
             }
             if (result != ShizukuTetheringService.RESULT_OK) {
-                showRoutingError(result, service)
+                showRoutingError(result)
                 return@launchOperation
             }
             if (!enable) MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
@@ -319,7 +322,7 @@ class ShizukuActivity : BaseComponentActivity() {
             if (enable && !uiState.routingActive) {
                 val routingResult = startRouting(service)
                 if (routingResult != ShizukuTetheringService.RESULT_OK) {
-                    showRoutingError(routingResult, service)
+                    showRoutingError(routingResult)
                     return@launchOperation
                 }
                 routingStartedHere = true
@@ -358,7 +361,8 @@ class ShizukuActivity : BaseComponentActivity() {
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Throwable) {
-                toastError(error.message ?: getString(R.string.shizuku_operation_failed))
+                LogUtil.e(AppConfig.TAG, "Shizuku tethering operation failed", error)
+                toastError(R.string.shizuku_operation_failed)
             } finally {
                 if (generation == operationGeneration) {
                     operationJob = null
@@ -386,7 +390,8 @@ class ShizukuActivity : BaseComponentActivity() {
         } catch (error: CancellationException) {
             throw error
         } catch (error: Throwable) {
-            toastError(error.message ?: getString(R.string.shizuku_routing_snapshot_timeout))
+            LogUtil.e(AppConfig.TAG, "Unable to prepare Shizuku tethering configuration", error)
+            toastError(R.string.shizuku_routing_snapshot_timeout)
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
         val coreLease = core.lease ?: run {
@@ -426,15 +431,12 @@ class ShizukuActivity : BaseComponentActivity() {
             .also { if (snapshotWaiter === waiter) snapshotWaiter = null }
     }
 
-    private suspend fun showRoutingError(result: Int, service: IShizukuTetheringService) {
-        val detail = withContext(Dispatchers.IO) {
-            runCatching { service.routingDetail }.getOrDefault("")
-        }
+    private fun showRoutingError(result: Int) {
         toastError(
             getString(
                 R.string.shizuku_routing_operation_failed,
                 result,
-                detail.ifBlank { getString(R.string.shizuku_operation_failed) }
+                getString(R.string.shizuku_operation_failed)
             )
         )
     }
