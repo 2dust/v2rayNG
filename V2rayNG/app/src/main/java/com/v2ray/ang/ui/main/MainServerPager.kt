@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -252,6 +253,7 @@ private fun ServerItemRow(
         testResult = serverCache.testDelayString,
         testDelayMillis = serverCache.testDelayMillis,
         isSelected = serverCache.guid == selectedGuid,
+        isDeprecated = serverCache.isDeprecated,
         subscriptionRemarks = subRemarks,
         doubleColumnDisplay = false,
         onClick = { onSelectServer(serverCache.guid) },
@@ -286,6 +288,7 @@ private fun ServerItemColumn(
             testResult = serverCache.testDelayString,
             testDelayMillis = serverCache.testDelayMillis,
             isSelected = serverCache.guid == selectedGuid,
+            isDeprecated = serverCache.isDeprecated,
             subscriptionRemarks = subRemarks,
             doubleColumnDisplay = doubleColumnDisplay,
             onClick = { onSelectServer(serverCache.guid) },
@@ -306,6 +309,7 @@ fun ServerListItem(
     testResult: String,
     testDelayMillis: Long,
     isSelected: Boolean,
+    isDeprecated: Boolean,
     subscriptionRemarks: String,
     doubleColumnDisplay: Boolean,
     onClick: () -> Unit,
@@ -320,6 +324,11 @@ fun ServerListItem(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .then(
+                if (isDeprecated) {
+                    Modifier.background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.55f))
+                } else Modifier
+            )
             .clickable(onClick = onClick)
             .then(dragModifier)
     ) {
@@ -375,7 +384,17 @@ fun ServerListItem(
             }
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(typeDescription, style = MaterialTheme.typography.bodySmall, color = colorConfigType, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = if (isDeprecated) {
+                        stringResource(R.string.profile_deprecated)
+                    } else {
+                        typeDescription
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isDeprecated) MaterialTheme.colorScheme.error else colorConfigType,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Text(testResult, style = MaterialTheme.typography.bodySmall, color = if (testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }

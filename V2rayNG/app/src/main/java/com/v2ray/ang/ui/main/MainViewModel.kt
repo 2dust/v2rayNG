@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.XrayOutboundCompatibility
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.TestServiceMessage
@@ -142,6 +143,33 @@ class MainViewModel(
             is MainServiceEvent.MeasureConfigFinish -> {
                 onTestsFinished()
             }
+
+            is MainServiceEvent.SubscriptionDataChanged -> {
+                refreshChangedSubscription(event.subscriptionId)
+            }
+        }
+    }
+
+    private fun refreshChangedSubscription(subscriptionId: String) {
+        viewModelScope.launch(ioDispatcher) {
+            val visibleGroupIds = uiState.value.groups.mapTo(HashSet()) { it.id }
+            val affectedGroupIds = buildList {
+                if (subscriptionId in visibleGroupIds) add(subscriptionId)
+                if ("" in visibleGroupIds) add("")
+            }
+            affectedGroupIds.forEach { groupId ->
+                val loadMutex = groupLoadMutexes.computeIfAbsent(groupId) { Mutex() }
+                // Do not let an in-flight preload restore the stale snapshot after invalidation.
+                loadMutex.withLock {
+                    cacheMutex.withLock { groupDataCache.remove(groupId) }
+                }
+            }
+
+            val selectedGroupId = uiState.value.selectedGroupId
+            if (selectedGroupId in affectedGroupIds) {
+                updateGroupUi(selectedGroupId, loadGroup(selectedGroupId))
+            }
+            _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
         }
     }
 
@@ -235,6 +263,7 @@ class MainViewModel(
             ServersCache(
                 guid = guid,
                 profile = profile.copy(),
+                isDeprecated = XrayOutboundCompatibility.isDeprecated(profile),
                 testDelayMillis = affiliation?.testDelayMillis ?: 0L,
                 testDelayString = affiliation?.getTestDelayString().orEmpty()
             )

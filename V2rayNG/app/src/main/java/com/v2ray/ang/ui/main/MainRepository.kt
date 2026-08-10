@@ -70,6 +70,10 @@ class MainRepository(
                     safeIntent.getStringExtra("content")
                 )
 
+                AppConfig.MSG_SUB_UPDATE_DATA_CHANGED -> safeIntent.getStringExtra("content")
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let(MainServiceEvent::SubscriptionDataChanged)
+
                 else -> null
             }
             event?.let { _mainServiceEvent.tryEmit(it) }
