@@ -263,6 +263,7 @@ object RootTproxyManager {
                 // accepts, no DNS DNAT and no MSS clamp — only IP forwarding itself.
                 appendLine("echo 1 > /proc/sys/net/ipv4/ip_forward 2>/dev/null || true")
                 if (ipv6) appendLine("echo 1 > /proc/sys/net/ipv6/conf/all/forwarding 2>/dev/null || true")
+                append(buildLanShareV6Guard())
             }
         }
     }
@@ -440,6 +441,43 @@ object RootTproxyManager {
         }
     }
 
+    /**
+     * ip6tables FORWARD guard for LAN sharing — the one piece of tethering the TPROXY chains
+     * cannot express on their own.
+     *
+     * Hotspot / USB clients get a native, RA-assigned **global** IPv6 out of the upstream's
+     * delegated prefix, and netd turns on v6 forwarding for them. That traffic is forwarded, so
+     * it never enters mangle OUTPUT and is therefore untouched by [RootProxyManager.buildV6Blackhole],
+     * which only hooks OUTPUT and only covers this device's own packets. Without this chain a
+     * tethered client reaches every v6-capable destination directly while its v4 goes through the
+     * proxy — the client looks unproxied to any site that offers AAAA records.
+     *
+     * Correct in both v6 modes, which is why it is installed unconditionally:
+     *  - v6 not tunneled: nothing else touches forwarded v6, so this is the only thing stopping
+     *    the leak. Rejecting makes v6-capable clients fall back to v4-through-the-proxy, exactly
+     *    as they do behind a v4-only VpnService.
+     *  - v6 tunneled: the `! -i lo` TPROXY rules in [buildTproxyChain] already consumed the
+     *    client's traffic and delivered it locally, so it never reached FORWARD. Anything still
+     *    arriving here escaped the TPROXY hand-off and would leak, so rejecting it is fail-closed.
+     *
+     * Link-local, ULA and multicast are RETURNed first so NDP/RA and client-to-client LAN traffic
+     * keep working; only routable global v6 is rejected. `icmp6-no-route` is an instant failure,
+     * so happy-eyeballs falls back to v4 without waiting out a timeout.
+     */
+    private fun buildLanShareV6Guard(): String {
+        val chain = AppConfig.ROOT_V6_FWD_CHAIN
+        return buildString {
+            appendLine("ip6tables -N $chain 2>/dev/null || true")
+            appendLine("ip6tables -F $chain 2>/dev/null || true")
+            RootProxyManager.bypassCidrsV6.forEach {
+                appendLine("ip6tables -A $chain -d $it -j RETURN 2>/dev/null || true")
+            }
+            appendLine("ip6tables -A $chain -j REJECT --reject-with icmp6-no-route 2>/dev/null || true")
+            appendLine("ip6tables -D FORWARD -j $chain 2>/dev/null || true")
+            appendLine("ip6tables -I FORWARD -j $chain 2>/dev/null || true")
+        }
+    }
+
     // ---------------------------------------------------------------- teardown
 
     private fun buildTeardown(context: Context): String {
@@ -460,6 +498,11 @@ object RootTproxyManager {
             appendLine("ip6tables -t filter -D OUTPUT -j ${AppConfig.ROOT_V6_CHAIN} 2>/dev/null || true")
             appendLine("ip6tables -t filter -F ${AppConfig.ROOT_V6_CHAIN} 2>/dev/null || true")
             appendLine("ip6tables -t filter -X ${AppConfig.ROOT_V6_CHAIN} 2>/dev/null || true")
+            // LAN-sharing IPv6 FORWARD guard. Must go, and go on every stop: leaving it behind
+            // would keep rejecting tethered clients' IPv6 long after the proxy is gone.
+            appendLine("ip6tables -D FORWARD -j ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -F ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -X ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
             // routing rule + table
             appendLine("ip rule del fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
             appendLine("ip -6 rule del fwmark $MARK table $TABLE priority $PRIORITY 2>/dev/null || true")
