@@ -532,6 +532,7 @@
     <string name="acc_save">Save</string>
     <string name="acc_update_subscriptions">Update subscriptions</string>
     <string name="acc_per_app_proxy_information">Per-app proxy information</string>
+<string name="acc_share_server">Share</string>
     <string name="permission_camera">Camera</string>
     <string name="permission_notification">Notification</string>
     <string name="permission_local_network">Local network</string>
