@@ -114,6 +114,8 @@
     <string name="server_lab_content">Content</string>
     <string name="toast_none_data_clipboard">There is no data in the clipboard</string>
     <string name="toast_invalid_url">Invalid URL</string>
+    <string name="subscription_traffic_info">Traffic: %1$s / %2$s</string>
+    <string name="subscription_expiration">Expires: %1$s</string>
     <string name="toast_insecure_url_protocol">Do not use an insecure HTTP subscription URL</string>
     <string name="server_lab_need_inbound">Make sure the inbound port matches the settings</string>
     <string name="toast_malformed_json">Invalid configuration.</string>

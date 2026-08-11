@@ -4,6 +4,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.UrlContentRequest
+import com.v2ray.ang.dto.UrlContentResponse
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -144,6 +145,11 @@ object HttpUtil {
      */
     @Throws(IOException::class)
     fun getUrlContentWithUserAgent(request: UrlContentRequest): String {
+        return getUrlContentWithUserAgentResponse(request).content
+    }
+
+    @Throws(IOException::class)
+    fun getUrlContentWithUserAgentResponse(request: UrlContentRequest): UrlContentResponse {
         var currentUrl = request.url
         var redirects = 0
         val maxRedirects = 3
@@ -193,7 +199,10 @@ object HttpUtil {
                     }
 
                     response.isSuccessful -> {
-                        return response.body?.string() ?: ""
+                        val headers = response.headers.names().associateWith { name ->
+                            response.header(name).orEmpty()
+                        }
+                        return UrlContentResponse(response.body?.string().orEmpty(), headers)
                     }
 
                     else -> {

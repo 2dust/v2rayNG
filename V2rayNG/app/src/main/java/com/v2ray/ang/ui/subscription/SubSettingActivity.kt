@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -41,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -182,6 +184,37 @@ fun SubSettingScreen(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                }
+                                val used = subCache.subscription.upload + subCache.subscription.download
+                                if (subCache.subscription.total > 0 || subCache.subscription.expire > 0) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    if (subCache.subscription.total > 0) {
+                                        Text(
+                                            text = stringResource(
+                                                R.string.subscription_traffic_info,
+                                                used.toTrafficString(),
+                                                subCache.subscription.total.toTrafficString()
+                                            ),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        LinearProgressIndicator(
+                                            progress = {
+                                                (used.toFloat() / subCache.subscription.total.toFloat()).coerceIn(0f, 1f)
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                    if (subCache.subscription.expire > 0) {
+                                        Text(
+                                            text = stringResource(
+                                                R.string.subscription_expiration,
+                                                Utils.formatTimestamp(subCache.subscription.expire)
+                                            ),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(

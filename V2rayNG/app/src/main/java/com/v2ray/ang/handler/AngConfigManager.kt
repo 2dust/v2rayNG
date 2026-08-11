@@ -8,6 +8,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.UrlContentRequest
+import com.v2ray.ang.dto.UrlContentResponse
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
@@ -26,6 +27,7 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.util.SubscriptionUserInfoParser
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
@@ -562,9 +564,9 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
-            var configText = try {
+            var response: UrlContentResponse? = try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(
+                HttpUtil.getUrlContentWithUserAgentResponse(
                     UrlContentRequest(
                         url = url,
                         userAgent = userAgent,
@@ -577,11 +579,11 @@ object AngConfigManager {
                 )
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
-                ""
+                null
             }
-            if (configText.isEmpty()) {
-                configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(
+            if (response?.content.isNullOrEmpty()) {
+                response = try {
+                    HttpUtil.getUrlContentWithUserAgentResponse(
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent,
@@ -590,15 +592,23 @@ object AngConfigManager {
                     )
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
-                    ""
+                    null
                 }
             }
+            val configText = response?.content.orEmpty()
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
 
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
+                val userInfo = response?.headers?.entries?.firstOrNull { (name, _) ->
+                    name.equals("subscription-userinfo", ignoreCase = true)
+                }?.value?.let(SubscriptionUserInfoParser::parse)
+                it.subscription.upload = userInfo?.upload ?: 0
+                it.subscription.download = userInfo?.download ?: 0
+                it.subscription.total = userInfo?.total ?: 0
+                it.subscription.expire = userInfo?.expire ?: -1
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
