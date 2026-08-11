@@ -20,9 +20,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +37,8 @@ import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
 
 @Composable
 fun MainBottomBar(
@@ -39,6 +47,32 @@ fun MainBottomBar(
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
 ) {
+    val context = LocalContext.current
+    var lastAnnouncedText by remember { mutableStateOf("") }
+    var isInitialLoad by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(displayText) {
+        if (isInitialLoad) {
+            isInitialLoad = false
+            return@LaunchedEffect
+        }
+        
+        if (displayText.isNotEmpty() && displayText != lastAnnouncedText) {
+            lastAnnouncedText = displayText
+            try {
+                val am = context.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+                if (am.isEnabled) {
+                    val event = AccessibilityEvent.obtain(AccessibilityEvent.TYPE_ANNOUNCEMENT)
+                    event.text.add(displayText)
+                    am.sendAccessibilityEvent(event)
+                    event.recycle()
+                }
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+    }
+    
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth()) {
             AppDivider()
