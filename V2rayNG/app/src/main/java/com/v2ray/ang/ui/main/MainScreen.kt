@@ -193,7 +193,7 @@ fun MainScreen(
                 drawerState = drawerState,
                 onNavigate = { route ->
                     scope.launch {
-                        drawerState.close()
+                        drawerState.snapTo(DrawerValue.Closed)
                         onNavigate(route)
                     }
                 }
