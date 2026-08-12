@@ -4,17 +4,20 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -448,7 +451,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
         val scrollState = rememberScrollState()
         Scaffold(
-            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+            contentWindowInsets = WindowInsets(0),
             topBar = {
                 AppTopBar(
                     title = title,
@@ -481,9 +484,11 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     .verticalScroll(scrollState)
                     .verticalScrollbar(scrollState)
                     .padding(bottom = 36.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                content = content
-            )
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                content()
+                Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+            }
         }
         if (showDeleteDialog) {
             DeleteConfirmDialog(
