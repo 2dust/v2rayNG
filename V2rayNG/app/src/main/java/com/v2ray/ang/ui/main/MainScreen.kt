@@ -187,12 +187,15 @@ fun MainScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
         drawerContent = {
             MainDrawerContent(
                 drawerState = drawerState,
                 onNavigate = { route ->
-                    scope.launch { drawerState.close() }
-                    onNavigate(route)
+                    scope.launch {
+                        drawerState.close()
+                        onNavigate(route)
+                    }
                 }
             )
         }
