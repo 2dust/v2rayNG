@@ -29,7 +29,7 @@
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
     <string name="menu_item_edit_config">ویرایش کردن کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
-    <string name="menu_item_import_config_qrcode">کانفیگ را از QRcode وارد کنید</string>
+    <string name="menu_item_import_config_qrcode">کانفیگ را از کد QR وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
     <string name="menu_item_import_config_policy_group">افزودن [گروه خط‌‌ مشی]</string>
@@ -40,7 +40,7 @@
     <string name="menu_item_import_config_manually_socks">افزودن [SOCKS]</string>
     <string name="menu_item_import_config_manually_http">افزودن [HTTP]</string>
     <string name="menu_item_import_config_manually_trojan">افزودن [Trojan]</string>
-    <string name="menu_item_import_config_manually_wireguard">افزودن [Wireguard]</string>
+    <string name="menu_item_import_config_manually_wireguard">افزودن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">افزودن [Hysteria2]</string>
     <string name="confirm_delete_visible_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نمایش‌داده‌شده را حذف کنید؟</string>
     <string name="confirm_delete_duplicate_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های تکراری نمایش‌داده‌شده را حذف کنید؟</string>
@@ -75,7 +75,7 @@
     <string name="server_lab_path_httpupgrade">مسیر HTTPUpgrade</string>
     <string name="server_lab_path_xhttp">مسیر XHTTP</string>
     <string name="server_lab_path_h2">مسیر H2</string>
-    <string name="server_lab_path_quic">مسیر QUIC</string>
+    <string name="server_lab_path_quic">کلید QUIC</string>
     <string name="server_lab_path_kcp">KCP سید</string>
     <string name="server_lab_path_grpc">gRPC نام سرویس</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
@@ -120,13 +120,13 @@
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">رمز عبور obfs</string>
-    <string name="server_lab_port_hop">پورت پرش (درگاه سرور را بازنویسی می کند)</string>
+    <string name="server_lab_port_hop">پرش پورت (پورت سرور را بازنویسی می‌کند)</string>
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
-    <string name="server_lab_bandwidth_down">کاهش پهنای باند (واحد)</string>
-    <string name="server_lab_bandwidth_up">افزایش پهنای باند (واحد)</string>
+    <string name="server_lab_bandwidth_down">پهنای باند دانلود (واحدهای پشتیبانی‌شده: k/m/g/t)</string>
+    <string name="server_lab_bandwidth_up">پهنای باند آپلود (واحدهای پشتیبانی‌شده: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
-    <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_final_mask">JSON خام finalMask، قالب: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تأیید گواهی همتا بر اساس نام</string>
     <string name="server_lab_pinned_ca256">اثر انگشت گواهی (SHA-256)</string>
@@ -141,24 +141,24 @@
     <string name="toast_asset_copy_failed">کپی فایل شکست خورد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_asset">افزودن منبع</string>
     <string name="menu_item_add_file">افزودن فایل ‌ها</string>
-    <string name="menu_item_add_url">افزودن لینک</string>
-    <string name="menu_item_scan_qrcode">اسکن QRcode</string>
+    <string name="menu_item_add_url">افزودن URL</string>
+    <string name="menu_item_scan_qrcode">اسکن کد QR</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
-    <string name="title_user_asset_add_url">آدرس اینترنتی را اضافه کنید</string>
+    <string name="title_user_asset_add_url">افزودن URL منبع</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">این نام از قبل وجود دارد</string>
     <string name="asset_geo_files_sources">منبع فایل های جغرافیایی (اختیاری)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">در حال بارگذاری...</string>
+    <string name="msg_dialog_progress">در حال بارگذاری…</string>
     <string name="menu_item_search">جستجو</string>
     <string name="menu_item_select_all">انتخاب همه</string>
     <string name="menu_item_invert_selection">معکوس کردن انتخاب‌ها</string>
     <string name="msg_enter_keywords">کلمات کلیدی را وارد کنید</string>
     <string name="switch_bypass_apps_mode">حالت دور زدن</string>
     <string name="menu_item_select_proxy_app">انتخاب خودکار برنامه‌های نیازمند پروکسی</string>
-    <string name="msg_downloading_content">در حال دانلود محتوا...</string>
+    <string name="msg_downloading_content">در حال دانلود محتوا…</string>
     <string name="menu_item_export_proxy_app">خروجی گرفتن در کلیپ‌ بورد</string>
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
     <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>
@@ -171,7 +171,7 @@
     <string name="title_core_settings">تنظیمات هسته</string>
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
-    <string name="summary_pref_per_app_proxy">عمومی: برنامه انتخاب شده از طریق یک پروکسی متصل می شود، برنامه انتخاب نشده مستقیماً متصل می شود. \nحالت دور زدن: برنامه انتخاب شده مستقیماً متصل می شود، برنامه انتخاب نشده از طریق یک پروکسی متصل می شود. \nانتخاب خودکار برنامه های پراکسی در منو امکان پذیر است.</string>
+    <string name="summary_pref_per_app_proxy">حالت عادی: برنامه‌های انتخاب‌شده از پروکسی استفاده می‌کنند و برنامه‌های انتخاب‌نشده مستقیماً متصل می‌شوند؛\nحالت دور زدن: برنامه‌های انتخاب‌شده مستقیماً متصل می‌شوند و برنامه‌های انتخاب‌نشده از پروکسی استفاده می‌کنند.\nگزینهٔ انتخاب خودکار برنامه‌هایی که باید از پروکسی استفاده کنند در منو قرار دارد.</string>
     <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
     <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
 
@@ -186,7 +186,7 @@
 
     <string name="title_mux_settings">تنظیمات Mux</string>
     <string name="title_pref_mux_enabled">فعال کردن Mux</string>
-    <string name="summary_pref_mux_enabled">سریعتر است، اما ممکن است باعث اتصال ناپایدار شود\nمخزن ترافیک TCP با 8 اتصال پیش‌فرض، نحوه مدیریت UDP و QUIC را در زیر سفارشی کنید.</string>
+    <string name="summary_pref_mux_enabled">سریع‌تر است، اما ممکن است اتصال را ناپایدار کند.\nدر ادامه می‌توانید نحوهٔ پردازش TCP، UDP و QUIC را تنظیم کنید.</string>
     <string name="title_pref_mux_concurrency">اتصالات TCP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP (محدوده -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل MUX</string>
@@ -202,7 +202,7 @@
     <string name="title_pref_sniffing_enabled">فعال‌سازی تشخیص دامنهٔ مقصد در ترافیک (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">شناسایی دامنه‌های مقصد از ترافیک (به‌طور پیش‌فرض فعال است).</string>
     <string name="title_pref_route_only_enabled">فعال‌سازی routeOnly</string>
-    <string name="summary_pref_route_only_enabled">از نام دامنه (Snnifed) فقط برای مسیریابی استفاده کنید و آدرس مقصد را به عنوان IP ذخیره کنید.</string>
+    <string name="summary_pref_route_only_enabled">از نام دامنهٔ شناسایی‌شده فقط برای مسیریابی استفاده کنید و آدرس مقصد را به‌صورت IP نگه دارید.</string>
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
     <string name="summary_pref_local_dns_enabled">درخواست های DNS به هسته وارد شده و توسط ماژول DNS پردازش می شوند (توصیه می شود در صورت نیاز به مسیریابی برای دور زدن آدرس های LAN و سرزمین اصلی فعال شود)</string>
@@ -213,13 +213,13 @@
     <string name="title_pref_ipv6_enabled">فعال کردن IPv6</string>
     <string name="summary_pref_ipv6_enabled">آدرس و مسیرهای IPv6 را به رابط VPN اضافه کنید</string>
 
-    <string name="title_pref_prefer_ipv6">ترجیح دادن IPV6</string>
+    <string name="title_pref_prefer_ipv6">ترجیح دادن IPv6</string>
     <string name="summary_pref_prefer_ipv6">هنگام بازیابی نام دامنه، آدرس‌های IPv6 را ترجیح دهید</string>
 
-    <string name="title_pref_remote_dns">DNS از راه دور (اختیاری) (udp/tcp/https/quic)</string>
+    <string name="title_pref_remote_dns">DNS راه دور (UDP/TCP/HTTPS/QUIC، اختیاری)</string>
     <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/v6)</string>
+    <string name="title_pref_vpn_dns">VPN DNS (فقط IPv4/IPv6)</string>
     <string name="title_pref_vpn_bypass_lan">آیا VPN از شبکه محلی عبور می کند؟</string>
 
     <string name="title_pref_vpn_interface_address">آدرس واسط VPN</string>
@@ -227,17 +227,17 @@
     <string name="title_pref_vpn_mtu">VPN MTU (پیش‌فرض 1500)</string>
 
 
-    <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
+    <string name="title_pref_domestic_dns">DNS مستقیم (اختیاری)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_hosts">DNS مستقیم هاست (فرمت: دامنه:آدرس،…)</string>
+    <string name="title_pref_dns_hosts">نگاشت‌های میزبان DNS (قالب: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">دامنه:آدرس،…</string>
 
-    <string name="title_pref_delay_test_url">آدرس اینترنتی آزمایش تاخیر واقعی کانفیگ ها </string>
+    <string name="title_pref_delay_test_url">URL آزمایش تأخیر واقعی</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">آزمایش‌های هم‌زمان تأخیر واقعی</string>
 
-    <string name="title_pref_ip_api_url">تست اطلاعات اتصال فعلی URL</string>
+    <string name="title_pref_ip_api_url">URL آزمایش اطلاعات اتصال فعلی</string>
     <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">اشتراک‌گذاری پروکسی در شبکه محلی (LAN)</string>
@@ -248,7 +248,7 @@
     <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
     <string name="summary_pref_enable_local_proxy">اگر غیرفعال باشد، هیچ پروکسی SOCKS در دسترس نخواهد بود و کارهایی مثل آپدیت اشتراک‌ها نمی‌توانند از پروکسی استفاده کنند.</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
-    <string name="summary_pref_socks_enable_udp">احراز هویت socks5 هنگام استفاده از UDP کاملاً ایمن نیست</string>
+    <string name="summary_pref_socks_enable_udp">احراز هویت SOCKS5 هنگام استفاده از UDP کاملاً ایمن نیست.</string>
     <string name="summary_pref_socks_port">پورت پروکسی محلی</string>
     <string name="title_pref_dynamic_socks_port">تولید پورت متغیر برای پروکسی محلی</string>
     <string name="summary_pref_dynamic_socks_port">با هر بار ایجاد یک کانکشن ورودی، یک پورت تصادفی تولید می‌کند.</string>
@@ -289,7 +289,7 @@
 
     <string name="title_pref_auto_update_subscription">به‌ روزرسانی خودکار اشتراک ها</string>
     <string name="summary_pref_auto_update_subscription">اشتراک های خود را به طور خودکار با فاصله زمانی در پس زمینه به روز کنید. بسته به دستگاه، این ویژگی ممکن است همیشه کار نکند.</string>
-    <string name="title_pref_auto_update_interval">فاصله به‌ روزرسانی خودکار ( حداقل مقدار ، 15 دقیقه )</string>
+    <string name="title_pref_auto_update_interval">فاصلهٔ به‌روزرسانی خودکار (دقیقه؛ حداقل 15)</string>
 
     <string name="title_core_loglevel">سطح گزارشات</string>
     <string name="title_outbound_domain_resolve_method">روش نام‌گشایی دامنهٔ خروجی (outbound)</string>
@@ -298,10 +298,12 @@
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
-    <string name="title_pref_use_hev_tunnel">استفاده از قابلیت Hev TUN</string>
+    <string name="title_pref_dynamic_color">فعال‌سازی رنگ پویا</string>
+    <string name="summary_pref_dynamic_color">فقط روی اندروید ۱۲+ کار می‌کند</string>
+    <string name="title_pref_use_hev_tunnel">استفاده از Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">اگر فعال باشد، تونل VPN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از xray-core استفاده خواهد شد.</string>
-    <string name="title_pref_hev_tunnel_loglevel">سطح گزارشات Hev Tun</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">زمان انتظار خواندن/نوشتن Hev Tun (ثانیه) (پیش‌فرض tcp,udp 300،60)</string>
+    <string name="title_pref_hev_tunnel_loglevel">سطح گزارش‌های Hev TUN</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">مهلت خواندن/نوشتن Hev TUN (ثانیه؛ پیش‌فرض TCP/UDP: 300/60)</string>
     <string name="title_mode_settings">تنظیمات حالت</string>
     <string name="title_root_mode_enabled">فعال‌سازی حالت Root (کاربران Root)</string>
     <string name="summary_root_mode_enabled">برای پروکسی شفاف سطح پایین از دسترسی Root استفاده می‌کند. حالت Root به‌جای سرویس VPN در Android، ترافیک شبکه را مستقیماً مدیریت می‌کند. هنگام فعال بودن این حالت، حالت عادی، مسیریابی جداگانهٔ برنامه‌ها و تنظیمات مرتبط با VPN اعمال نمی‌شوند.</string>
@@ -317,25 +319,27 @@
     <string name="title_del_all_config">حذف تمام کانفیگ های گروه فعلی</string>
     <string name="title_del_duplicate_config">حذف کانفیگ های تکراری گروه فعلی</string>
     <string name="title_del_invalid_config">حذف کانفیگ های نامعتبر گروه فعلی (ابتدا آزمایش کنید)</string>
-    <string name="title_export_all">خروجی گرفتن کانفیگ های غیرسفارشی گروه فعلی در کلیپ ‌بورد</string>
-    <string name="title_sub_setting">تنظیمات گروه‌ اشتراک</string>
+    <string name="title_export_all">صادر کردن کانفیگ‌ها به کلیپ‌بورد</string>
+    <string name="title_sub_setting">اشتراک‌ها</string>
     <string name="sub_setting_remarks">ملاحظات</string>
-    <string name="sub_setting_url">نشانی اینترنتی اختیاری</string>
+    <string name="sub_setting_url">URL اختیاری</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندهای درخواست (قالب JSON)</string>
-    <string name="sub_setting_filter">نام مستعار فیلتر</string>
+    <string name="sub_setting_filter">فیلتر عبارت منظم برای نام‌ها</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>
-    <string name="sub_setting_pre_profile">نام مستعار پروکسی قبلی</string>
-    <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
+    <string name="sub_setting_pre_profile">پروکسی ورودی</string>
+    <string name="sub_setting_next_profile">پروکسی خروجی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
+    <string name="sub_setting_entry_proxy_tip">پروکسی انتخاب‌شده پیش از هر پروفایل این اشتراک، به‌عنوان حلقهٔ ورودی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
+    <string name="sub_setting_exit_proxy_tip">پروکسی انتخاب‌شده پس از هر پروفایل این اشتراک، به‌عنوان حلقهٔ خروجی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
-    <string name="title_ping_all_server">TCPING کانفیگ های گروه فعلی</string>
-    <string name="title_real_ping_all_server">تاخیر واقعی کانفیگ های گروه فعلی</string>
+    <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
+    <string name="title_real_ping_all_server">آزمایش تأخیر واقعی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
-    <string name="title_sort_by_test_results">مرتب‌ سازی بر اساس نتایج آزمایش</string>
+    <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
     <string name="filter_config_all">همه</string>
     <string name="summary_scan_qrcode">برای باز کردن دوربین و اسکن، روی صفحه بزنید</string>
@@ -355,7 +359,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
-    <string name="routing_settings_tips">با کاما (,) جدا کنید. یکی از موارد domain، ip یا process را وارد کنید</string>
+    <string name="routing_settings_tips">یک قانون فقط زمانی اعمال می‌شود که همهٔ شرط‌های تطبیق واردشده هم‌زمان برقرار باشند (AND). قوانین از بالا به پایین بررسی می‌شوند و نخستین قانون منطبق اعمال می‌شود.</string>
+    <string name="routing_settings_comma_tip">چند ورودی را با کاما (,) جدا کنید.</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">حذف</string>
     <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>
@@ -363,7 +368,7 @@
     <string name="routing_settings_import_predefined_rulesets">وارد کردن مجموعه قوانین از پیش تعریف شده</string>
     <string name="routing_settings_import_rulesets_tip">مجموعه قوانین موجود حذف خواهند شد، آیا مطمئن هستید که ادامه می دهید؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">وارد کردن مجموعه قوانین از کلیپ بورد</string>
-    <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از QRcode</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از کد QR</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
     <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
@@ -378,24 +383,25 @@
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
-    <string name="connection_test_testing">در حال آزمایش...</string>
+    <string name="connection_test_testing">در حال آزمایش…</string>
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
-    <string name="connection_test_available">موفقیت: اتصال %dms طول کشید</string>
-    <string name="connection_test_error">اتصال به اینترنت شناسایی نشد: %s</string>
+    <string name="connection_test_available">اتصال در %1$s با موفقیت برقرار شد</string>
+    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
-    <string name="connection_connected">متصل است، برای بررسی اتصال ضربه بزنید</string>
+    <string name="connection_connected">متصل است.\nبرای بررسی اتصال ضربه بزنید.</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
 
-    <string name="import_subscription_success">اشتراک با موفقیت ذخیره شد</string>
-    <string name="import_subscription_failure">ذخیره اشتراک ناموفق بود</string>
+    <string name="import_subscription_success">اشتراک با موفقیت وارد شد</string>
+    <string name="import_subscription_failure">وارد کردن اشتراک ناموفق بود</string>
     <string name="title_fragment_settings">تنظیمات قطعه‌بندی بسته‌ها (Fragment)</string>
-    <string name="title_pref_fragment_packets">بسته های فرگمنت</string>
-    <string name="title_pref_fragment_length">طول بسته های فرگمنت (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_interval">فاصله بین بسته های فرگمنت (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_enabled">فعال کردن فرگمنت</string>
-    <string name="title_pref_fragment_maxsplit">حداکثر تقسیم فرگمنت</string>
+    <string name="title_pref_fragment_packets">بسته‌های مورد قطعه‌بندی (Fragment)</string>
+    <string name="title_pref_fragment_length">طول قطعه (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_interval">فاصلهٔ قطعه‌ها (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
+    <string name="title_pref_fragment_maxsplit">حداکثر تعداد قطعه‌ها</string>
     <string name="title_observatory_settings">تنظیمات پایش اتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصله leastLoad</string>
@@ -421,7 +427,7 @@
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>
     <string name="server_proxy_chain_member_unselected">یک عضو را انتخاب کنید</string>
-    <string name="server_proxy_chain_members_unselected">لطفا برای هر ردیف زنجیره remark انتخاب کنید</string>
+    <string name="server_proxy_chain_members_unselected">لطفاً برای هر ردیف زنجیره یک عضو انتخاب کنید</string>
     <string name="server_proxy_chain_members_insufficient">تعداد اعضا کافی نیست</string>
     <string name="server_proxy_chain_members_invalid">اعضای نامعتبر زنجیره: %1$s</string>
 
@@ -431,20 +437,20 @@
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
-    <string name="title_webdav_config_setting_unknown">لطفا ابتدا WebDAV را پیکربندی کنید.</string>
-    <string name="title_webdav_url">لینک سرور WebDAV</string>
-    <string name="title_webdav_user">یوزرنیم</string>
-    <string name="title_webdav_pass">پسورد</string>
+    <string name="title_webdav_config_setting_unknown">لطفاً ابتدا WebDAV را پیکربندی کنید.</string>
+    <string name="title_webdav_url">URL سرور WebDAV</string>
+    <string name="title_webdav_user">نام کاربری</string>
+    <string name="title_webdav_pass">رمز عبور</string>
     <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
 
-    <string name="share_method_qrcode">QRcode</string>
-    <string name="share_method_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>
-    <string name="share_method_full_content">خروجی گرفتن کانفیگ کامل در کلیپ بورد</string>
+    <string name="share_method_qrcode">کد QR</string>
+    <string name="share_method_clipboard">کپی لینک کانفیگ</string>
+    <string name="share_method_full_content">کپی کانفیگ کامل</string>
     <string name="action_edit">ویرایش</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">بستن</string>
 
-    <string name="share_subscription_qrcode">QRcode</string>
+    <string name="share_subscription_qrcode">کد QR</string>
     <string name="share_subscription_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>
 
     <string-array name="mode_entries">
@@ -466,8 +472,8 @@
 
     <string name="routing_preset_china_whitelist">لیست سفید چین ( دور زدن سرزمین اصلی )</string>
     <string name="routing_preset_china_blacklist">لیست سیاه چین</string>
-    <string name="routing_preset_global">جهانی(GLOBAL)</string>
-    <string name="routing_preset_iran_whitelist">ایران</string>
+    <string name="routing_preset_global">جهانی (Global)</string>
+    <string name="routing_preset_iran_whitelist">فهرست سفید ایران</string>
     <string name="routing_preset_russia_whitelist">لیست سفید روسیه</string>
 
     <string-array name="vpn_bypass_lan">
@@ -502,14 +508,6 @@
     <string name="acc_copy_log">کپی گزارش</string>
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
-    <string name="core_error_no_server_selected">هیچ پیکربندی‌ای انتخاب نشده است</string>
-    <string name="core_error_decode_server_config">خواندن پیکربندی انتخاب‌شده ناموفق بود</string>
-    <string name="core_error_build_config_context">آماده‌سازی پیکربندی انتخاب‌شده ناموفق بود</string>
-    <string name="core_error_get_config">ایجاد پیکربندی هسته ناموفق بود</string>
-    <string name="core_error_get_config_detail">ایجاد پیکربندی هسته ناموفق بود: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">ایجاد پیکربندی هسته برای آزمایش سرعت ناموفق بود: %1$s</string>
-    <string name="core_error_custom_config_empty">پیکربندی سفارشی خالی است</string>
-    <string name="core_error_start">راه‌اندازی هسته ناموفق بود</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
     <string name="acc_back">بازگشت</string>

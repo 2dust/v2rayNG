@@ -1,12 +1,10 @@
 package com.v2ray.ang.ui.compose
 
-import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -43,19 +41,19 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.v2ray.ang.util.AppIconFetcher
-import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
+import com.v2ray.ang.util.AppIconFetcher
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,7 +108,7 @@ fun AppTopBar(
             enter = expandVertically(),
             exit = shrinkVertically()
         ) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = colorFabActive)
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
@@ -211,7 +209,7 @@ fun AppListItem(
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(checkedColor = colorFabActive)
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.secondary)
         )
     }
 }

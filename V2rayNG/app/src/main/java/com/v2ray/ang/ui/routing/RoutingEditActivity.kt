@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
@@ -118,6 +119,7 @@ fun RoutingEditScreen(
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
+    val processSelectTitle = stringResource(R.string.routing_settings_process_select)
     val scrollState = rememberScrollState()
 
     var remarks by rememberSaveable { mutableStateOf(initial?.remarks ?: "") }
@@ -220,21 +222,27 @@ fun RoutingEditScreen(
                 checked = locked,
                 onCheckedChange = { locked = it }
             )
+            Text(
+                text = stringResource(R.string.routing_settings_tips),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             FormTextField(
                 label = stringResource(R.string.routing_settings_domain),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = domain,
                 onValueChange = { domain = it }
             )
             FormTextField(
                 label = stringResource(R.string.routing_settings_ip),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = ip,
                 onValueChange = { ip = it }
             )
             FormTextField(
                 label = stringResource(R.string.routing_settings_process),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = processText,
                 onValueChange = { processText = it },
                 enabled = canUseProcess
@@ -251,7 +259,7 @@ fun RoutingEditScreen(
                             AppPickerActivity.createIntent(
                                 context = context,
                                 selectedPackages = current,
-                                title = context.getString(R.string.routing_settings_process_select)
+                                title = processSelectTitle
                             )
                         )
                     },
@@ -262,7 +270,7 @@ fun RoutingEditScreen(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.routing_settings_process_select))
+                    Text(processSelectTitle)
                 }
             }
             FormTextField(

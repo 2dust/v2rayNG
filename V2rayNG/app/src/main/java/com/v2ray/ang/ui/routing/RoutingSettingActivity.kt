@@ -58,7 +58,6 @@ import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
-import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -386,7 +385,7 @@ private fun RoutingRulesetItem(
                 modifier = Modifier.scale(0.7f),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                    checkedTrackColor = colorFabActive
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary
                 )
             )
         }

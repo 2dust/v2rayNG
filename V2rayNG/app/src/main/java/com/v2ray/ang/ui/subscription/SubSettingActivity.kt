@@ -51,7 +51,6 @@ import com.v2ray.ang.ui.compose.QRCodeDialog
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
@@ -233,7 +232,7 @@ fun SubSettingScreen(
                                     modifier = Modifier.scale(0.7f),
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                        checkedTrackColor = colorFabActive
+                                        checkedTrackColor = MaterialTheme.colorScheme.secondary
                                     )
                                 )
                             }

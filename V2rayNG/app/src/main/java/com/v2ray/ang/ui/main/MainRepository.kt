@@ -59,14 +59,12 @@ class MainRepository(
                 AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
                 AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
                 AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
-                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
-                    safeIntent.getStringExtra("content").orEmpty()
-                )
+                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
-                AppConfig.MSG_MEASURE_DELAY_SUCCESS -> MainServiceEvent.MeasureDelaySuccess(
-                    safeIntent.getStringExtra("content").orEmpty()
-                )
+                AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
+                    .serializable<ConnectionTestResult>("content")
+                    ?.let { MainServiceEvent.MeasureDelayResult(it) }
 
                 AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> safeIntent
                     .serializable<RealPingResult>("content")

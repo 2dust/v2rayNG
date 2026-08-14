@@ -49,7 +49,6 @@ import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 
@@ -224,7 +223,7 @@ fun PerAppProxyScreen(
                             onCheckedChange = onPerAppProxyChanged,
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = colorFabActive
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary
                             )
                         )
                     }
@@ -245,7 +244,7 @@ fun PerAppProxyScreen(
                             onCheckedChange = onBypassAppsChanged,
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = colorFabActive
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary
                             )
                         )
                     }

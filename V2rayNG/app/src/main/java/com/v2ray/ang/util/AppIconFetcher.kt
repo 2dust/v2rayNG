@@ -35,7 +35,7 @@ class AppIconFetcher(
     class Factory(private val context: Context) : Fetcher.Factory<Any> {
         override fun create(data: Any, options: Options, imageLoader: ImageLoader): Fetcher? {
             val dataString = data.toString()
-            
+
             if (dataString.startsWith("appicon:")) {
                 val pkg = dataString.substringAfter("appicon:")
                 return AppIconFetcher(pkg, context)
