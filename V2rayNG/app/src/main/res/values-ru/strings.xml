@@ -449,6 +449,7 @@
     <string name="action_edit">Изменить</string>
     <string name="action_delete">Удалить</string>
     <string name="action_close">Закрыть</string>
+    <string name="action_exit">Выход</string>
 
     <string name="share_subscription_qrcode">QR-код</string>
     <string name="share_subscription_clipboard">Экспорт в буфер обмена</string>

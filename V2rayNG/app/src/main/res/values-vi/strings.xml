@@ -449,6 +449,7 @@
     <string name="action_edit">Chỉnh sửa</string>
     <string name="action_delete">Xoá</string>
     <string name="action_close">Đóng</string>
+    <string name="action_exit">Thoát</string>
 
     <string name="share_subscription_qrcode">Xuất gói ra mã QR (Chụp màn hình để lưu)</string>
     <string name="share_subscription_clipboard">Xuất gói vào bảng tạm</string>

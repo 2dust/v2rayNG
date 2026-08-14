@@ -449,6 +449,7 @@
     <string name="action_edit">آلشتکاری</string>
     <string name="action_delete">پاک کردن</string>
     <string name="action_close">بستن</string>
+    <string name="action_exit">خروج</string>
 
     <string name="share_subscription_qrcode">کود QR</string>
     <string name="share_subscription_clipboard">و در کشیڌن من کلیپ بورد</string>

@@ -449,6 +449,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_close">Close</string>
+    <string name="action_exit">Exit</string>
 
     <string name="share_subscription_qrcode">QR code</string>
     <string name="share_subscription_clipboard">Export to clipboard</string>

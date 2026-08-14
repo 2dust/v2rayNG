@@ -49,14 +49,22 @@ import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 class MainActivity : HelperBaseComponentActivity() {
+
+    companion object {
+        private const val SERVICE_STOP_TIMEOUT_MILLIS = 5_000L
+    }
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
+    private var serviceTransitionJob: Job? = null
 
     private val requestVpnPermission =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -111,6 +119,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     MainAction.ImportConfigLocal -> importConfigLocal()
                     is MainAction.ImportManually -> importManually(action.type)
                     MainAction.RestartService -> restartV2Ray()
+                    MainAction.Exit -> exitApp()
                     MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
                     is MainAction.SelectServer -> setSelectServer(action.guid)
                     is MainAction.EditServer -> editServer(action.guid, action.profile)
@@ -276,6 +285,24 @@ class MainActivity : HelperBaseComponentActivity() {
         if (guid != selected) {
             mainViewModel.updateSelectedGuid(guid)
             if (mainViewModel.uiState.value.isRunning) restartV2Ray()
+        }
+    }
+
+    private fun exitApp() {
+        serviceTransitionJob?.cancel()
+        if (!mainViewModel.uiState.value.isRunning) {
+            LauncherManager.stopService(this)
+            finishAndRemoveTask()
+            return
+        }
+
+        val stopGeneration = mainViewModel.serviceStopGeneration.value
+        LauncherManager.stopService(this)
+        serviceTransitionJob = lifecycleScope.launch {
+            withTimeoutOrNull(SERVICE_STOP_TIMEOUT_MILLIS) {
+                mainViewModel.serviceStopGeneration.first { it > stopGeneration }
+            }
+            finishAndRemoveTask()
         }
     }
 

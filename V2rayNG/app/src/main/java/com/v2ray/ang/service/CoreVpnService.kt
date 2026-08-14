@@ -21,6 +21,7 @@ import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.root.RootLanSharing
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -72,6 +73,7 @@ class CoreVpnService : VpnService(), ServiceControl {
 
         unlockStart()
         NotificationManager.cancelNotification()
+        MessageHelper.sendMsg2UI(this, AppConfig.MSG_STATE_STOP_COMPLETE, "")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -52,6 +52,7 @@ sealed interface MainAction {
     data object ImportConfigLocal : MainAction
     data class ImportManually(val type: Int) : MainAction
     data object RestartService : MainAction
+    data object Exit : MainAction
     data object LocateSelectedServer : MainAction
 
     data class SelectGroup(val groupId: String) : MainAction

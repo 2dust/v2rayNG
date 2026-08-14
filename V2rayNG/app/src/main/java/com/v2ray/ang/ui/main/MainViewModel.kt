@@ -57,6 +57,9 @@ class MainViewModel(
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    private val _serviceStopGeneration = MutableStateFlow(0L)
+    val serviceStopGeneration: StateFlow<Long> = _serviceStopGeneration.asStateFlow()
+
     // ---------- Keyword filtering ----------
     @Volatile
     private var keywordFilter: String = ""
@@ -108,6 +111,7 @@ class MainViewModel(
             }
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopComplete -> _serviceStopGeneration.update { it + 1L }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -208,6 +212,7 @@ class MainViewModel(
             MainAction.ImportConfigLocal,
             is MainAction.ImportManually,
             MainAction.RestartService,
+            MainAction.Exit,
             MainAction.LocateSelectedServer,
             is MainAction.EditServer,
             is MainAction.ShareClipboard,

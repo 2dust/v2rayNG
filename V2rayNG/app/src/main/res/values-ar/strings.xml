@@ -449,6 +449,7 @@
     <string name="action_edit">تعديل</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">إغلاق</string>
+    <string name="action_exit">خروج</string>
 
     <string name="share_subscription_qrcode">رمز QR</string>
     <string name="share_subscription_clipboard">تصدير إلى الحافظة</string>

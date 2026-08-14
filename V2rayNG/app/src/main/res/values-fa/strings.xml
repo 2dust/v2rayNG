@@ -449,6 +449,7 @@
     <string name="action_edit">ویرایش</string>
     <string name="action_delete">حذف</string>
     <string name="action_close">بستن</string>
+    <string name="action_exit">خروج</string>
 
     <string name="share_subscription_qrcode">کد QR</string>
     <string name="share_subscription_clipboard">خروجی گرفتن در کلیپ‌ بورد</string>

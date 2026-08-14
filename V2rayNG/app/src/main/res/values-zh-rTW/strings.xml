@@ -449,6 +449,7 @@
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
     <string name="action_close">關閉</string>
+    <string name="action_exit">退出</string>
 
     <string name="share_subscription_qrcode">QR Code</string>
     <string name="share_subscription_clipboard">匯出至剪貼簿</string>

@@ -9,6 +9,7 @@ import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.NotificationManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
 import java.lang.ref.SoftReference
 
@@ -48,6 +49,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
     override fun onDestroy() {
         super.onDestroy()
         CoreServiceManager.stopCoreLoop()
+        MessageHelper.sendMsg2UI(this, AppConfig.MSG_STATE_STOP_COMPLETE, "")
     }
 
     /**

@@ -449,6 +449,7 @@
     <string name="action_edit">সম্পাদনা</string>
     <string name="action_delete">মুছুন</string>
     <string name="action_close">বন্ধ করুন</string>
+    <string name="action_exit">প্রস্থান</string>
 
     <string name="share_subscription_qrcode">QR কোড</string>
     <string name="share_subscription_clipboard">ক্লিপবোর্ডে রপ্তানি করুন</string>
