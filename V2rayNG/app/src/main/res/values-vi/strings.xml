@@ -298,6 +298,8 @@
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt UI</string>
     <string name="title_pref_ui_mode_night">Cài đặt chế độ UI</string>
+    <string name="title_pref_dynamic_color">Bật màu động</string>
+    <string name="summary_pref_dynamic_color">Chỉ hoạt động trên Android 12+</string>
     <string name="title_pref_use_hev_tunnel">Dùng Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">Khi bật, TUN sẽ dùng hev-socks5-tunnel; nếu không, TUN sẽ dùng xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Mức nhật ký Hev TUN</string>
@@ -327,9 +329,11 @@
     <string name="sub_setting_enable">Bật cập nhật</string>
     <string name="sub_auto_update">Bật tự động cập nhật</string>
     <string name="sub_allow_insecure_url">Cho phép địa chỉ HTTP không an toàn</string>
-    <string name="sub_setting_pre_profile">Tên ghi chú của cấu hình proxy trước đó</string>
-    <string name="sub_setting_next_profile">Tên ghi chú của cấu hình proxy tiếp theo</string>
+    <string name="sub_setting_pre_profile">Proxy đầu vào</string>
+    <string name="sub_setting_next_profile">Proxy đầu ra</string>
     <string name="sub_setting_pre_profile_tip">Tên ghi chú của cấu hình phải tồn tại và là duy nhất</string>
+    <string name="sub_setting_entry_proxy_tip">Proxy đã chọn được thêm trước mỗi cấu hình trong gói đăng ký, làm mắt xích đầu vào của chuỗi proxy cho cấu hình đó.</string>
+    <string name="sub_setting_exit_proxy_tip">Proxy đã chọn được thêm sau mỗi cấu hình trong gói đăng ký, làm mắt xích đầu ra của chuỗi proxy cho cấu hình đó.</string>
     <string name="toast_invalid_update_interval">Khoảng thời gian cập nhật không hợp lệ. Giá trị tối thiểu là 15 phút.</string>
     <string name="title_sub_update">Cập nhật gói đăng ký</string>
     <string name="title_ping_all_server">Kiểm tra độ trễ TCP (TCPing)</string>
@@ -355,7 +359,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Chiến lược tên miền (DomainStrategy)</string>
     <string name="routing_settings_title">Cài đặt định tuyến</string>
-    <string name="routing_settings_tips">Phân cách bằng dấu phẩy (,). Chọn một trong: domain, ip hoặc process</string>
+    <string name="routing_settings_tips">Quy tắc chỉ được áp dụng khi tất cả điều kiện đối sánh đã đặt đều được thỏa mãn cùng lúc (AND). Các quy tắc được kiểm tra từ trên xuống; quy tắc khớp đầu tiên sẽ được áp dụng.</string>
+    <string name="routing_settings_comma_tip">Phân cách nhiều mục bằng dấu phẩy (,).</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_rule_title">Cài đặt quy tắc định tuyến</string>
@@ -380,7 +385,8 @@
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng…</string>
     <string name="connection_test_testing_count">Đang kiểm tra %d cấu hình…</string>
-    <string name="connection_test_available">Kiểm tra thành công: thời gian truy cập Google là %d ms</string>
+    <string name="connection_test_available">Kết nối thành công sau %1$s</string>
+    <string name="server_test_delay_value">%1$d mili giây</string>
     <string name="connection_test_error">Kiểm tra kết nối thất bại: %s</string>
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
@@ -558,14 +564,6 @@
     <string name="acc_copy_log">Sao chép nhật ký</string>
     <string name="acc_clear_log">Xóa nhật ký</string>
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
-    <string name="core_error_no_server_selected">Chưa chọn cấu hình</string>
-    <string name="core_error_decode_server_config">Không thể đọc cấu hình đã chọn</string>
-    <string name="core_error_build_config_context">Không thể chuẩn bị cấu hình đã chọn</string>
-    <string name="core_error_get_config">Không thể tạo cấu hình lõi</string>
-    <string name="core_error_get_config_detail">Không thể tạo cấu hình lõi: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">Không thể tạo cấu hình lõi để kiểm tra tốc độ: %1$s</string>
-    <string name="core_error_custom_config_empty">Cấu hình tùy chỉnh đang trống</string>
-    <string name="core_error_start">Không thể khởi động lõi</string>
     <string name="acc_start">Khởi động dịch vụ</string>
     <string name="acc_stop">Dừng dịch vụ</string>
     <string name="acc_back">Quay lại</string>
