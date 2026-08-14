@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">删除重复配置</string>
     <string name="title_del_invalid_config">删除无效配置</string>
     <string name="title_export_all">将配置导出至剪贴板</string>
-    <string name="title_sub_setting">订阅</string>
+    <string name="title_sub_setting">订阅分组</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">URL（可选）</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -327,8 +327,8 @@
     <string name="sub_setting_enable">启用更新</string>
     <string name="sub_auto_update">启用自动更新</string>
     <string name="sub_allow_insecure_url">允许不安全的 HTTP 地址</string>
-    <string name="sub_setting_pre_profile">入口代理</string>
-    <string name="sub_setting_next_profile">出口代理</string>
+    <string name="sub_setting_pre_profile">前置代理配置别名</string>
+    <string name="sub_setting_next_profile">落地代理配置別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
     <string name="sub_setting_entry_proxy_tip">所选代理会添加到该订阅中每个配置的前面，作为该配置代理链的入口节点。</string>
     <string name="sub_setting_exit_proxy_tip">所选代理会添加到该订阅中每个配置的后面，作为该配置代理链的出口节点。</string>
