@@ -73,7 +73,9 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
         drawerContainerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
-            modifier = Modifier.verticalScroll(drawerScrollState).verticalScrollbar(drawerScrollState)
+            modifier = Modifier
+                .verticalScroll(drawerScrollState)
+                .verticalScrollbar(drawerScrollState)
         ) {
             Surface(
                 modifier = Modifier

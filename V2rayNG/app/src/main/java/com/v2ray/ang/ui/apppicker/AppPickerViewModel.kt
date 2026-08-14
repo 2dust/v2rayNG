@@ -116,7 +116,7 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
 
         return apps.filter {
             it.appName.contains(query, ignoreCase = true) ||
-                it.packageName.contains(query, ignoreCase = true)
+                    it.packageName.contains(query, ignoreCase = true)
         }
     }
 

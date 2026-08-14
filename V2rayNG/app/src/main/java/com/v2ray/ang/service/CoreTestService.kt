@@ -151,7 +151,7 @@ class CoreTestService : Service() {
             }
 
             is RealPingEvent.Finish -> {
-                if(message.subscriptionId.isNotEmpty()){
+                if (message.subscriptionId.isNotEmpty()) {
                     if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)) {
                         AngConfigManager.removeInvalidServer(message.subscriptionId)
                     }
