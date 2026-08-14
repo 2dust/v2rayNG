@@ -30,6 +30,7 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 @Composable
 fun MainTopBar(
     isLoading: Boolean,
+    isRunning: Boolean,
     showSearch: Boolean,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
@@ -107,7 +108,7 @@ fun MainTopBar(
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(moreMenuScrollState)
                 ) {
-                    MoreMenuContent { action ->
+                    MoreMenuContent(isRunning) { action ->
                         showMenu = false
                         onMoreMenuAction(action)
                     }
