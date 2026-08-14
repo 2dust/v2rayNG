@@ -318,7 +318,7 @@
     <string name="title_del_duplicate_config">删除重复配置</string>
     <string name="title_del_invalid_config">删除无效配置</string>
     <string name="title_export_all">将配置导出至剪贴板</string>
-    <string name="title_sub_setting">订阅</string>
+    <string name="title_sub_setting">订阅分组</string>
     <string name="sub_setting_remarks">备注</string>
     <string name="sub_setting_url">URL（可选）</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -330,6 +330,8 @@
     <string name="sub_setting_pre_profile">前置代理配置别名</string>
     <string name="sub_setting_next_profile">落地代理配置別名</string>
     <string name="sub_setting_pre_profile_tip">请确保配置别名存在并唯一</string>
+    <string name="sub_setting_entry_proxy_tip">所选代理会添加到该订阅中每个配置的前面，作为该配置代理链的入口节点。</string>
+    <string name="sub_setting_exit_proxy_tip">所选代理会添加到该订阅中每个配置的后面，作为该配置代理链的出口节点。</string>
     <string name="toast_invalid_update_interval">更新间隔无效，最小值为 15 分钟。</string>
     <string name="title_sub_update">更新订阅</string>
     <string name="title_ping_all_server">测试 TCP 延迟（TCPing）</string>
@@ -355,7 +357,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">域名策略</string>
     <string name="routing_settings_title">路由设置</string>
-    <string name="routing_settings_tips">用逗号（,）分隔，选择填写 domain、ip 或 process 中的一项</string>
+    <string name="routing_settings_tips">一条规则仅在所有已设置的匹配条件同时满足时生效（AND）。规则按从上到下的顺序检查，并应用首条匹配的规则。</string>
+    <string name="routing_settings_comma_tip">多个条目请用逗号（,）分隔。</string>
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
@@ -380,7 +383,8 @@
     <string name="connection_test_pending">"检查网络连接"</string>
     <string name="connection_test_testing">"测试中…"</string>
     <string name="connection_test_testing_count">测试 %d 个配置中…</string>
-    <string name="connection_test_available">"连接成功：延时 %d 毫秒"</string>
+    <string name="connection_test_available">"连接成功：延时 %1$s"</string>
+    <string name="server_test_delay_value">%1$d 毫秒</string>
     <string name="connection_test_error">连接测试失败：%s</string>
     <string name="connection_test_fail">无法访问互联网</string>
     <string name="connection_test_error_status_code">错误码：#%d</string>
@@ -502,14 +506,6 @@
     <string name="acc_copy_log">复制日志</string>
     <string name="acc_clear_log">清除日志</string>
     <string name="acc_add_rule">添加路由规则</string>
-    <string name="core_error_no_server_selected">未选择配置</string>
-    <string name="core_error_decode_server_config">无法读取所选配置</string>
-    <string name="core_error_build_config_context">无法准备所选配置</string>
-    <string name="core_error_get_config">无法生成核心配置</string>
-    <string name="core_error_get_config_detail">无法生成核心配置：%1$s</string>
-    <string name="core_error_get_speedtest_config_detail">无法生成测速用核心配置：%1$s</string>
-    <string name="core_error_custom_config_empty">自定义配置为空</string>
-    <string name="core_error_start">无法启动核心</string>
     <string name="acc_start">启动服务</string>
     <string name="acc_stop">停止服务</string>
     <string name="acc_back">返回</string>

@@ -327,9 +327,11 @@
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
     <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>
-    <string name="sub_setting_pre_profile">نیشتنا کانفیگ پروکسی دیندایی</string>
-    <string name="sub_setting_next_profile">نیشتنا کانفیگ پروکسی نیایی</string>
+    <string name="sub_setting_pre_profile">پروکسی وۊرۊی</string>
+    <string name="sub_setting_next_profile">پروکسی دری</string>
     <string name="sub_setting_pre_profile_tip">موطمئن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
+    <string name="sub_setting_entry_proxy_tip">ای پروکسی پؽش ز هر کانفیگ من ای اشتراک، وری ٱول عوزو زنجیره پروکسی اضاف ابۊ.</string>
+    <string name="sub_setting_exit_proxy_tip">ای پروکسی بئڌ ز هر کانفیگ من ای اشتراک، وری آخر عوزو زنجیره پروکسی اضاف ابۊ.</string>
     <string name="toast_invalid_update_interval">فاصله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
@@ -355,7 +357,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">وا کاما (,) ز یک جوڌا ابۊن؛ یکی ن بزنین: domain، ip یا process</string>
+    <string name="routing_settings_tips">پوی شرطا سئت بیڌه بایڌ هوم زمووی جور ابۊن (AND). قانووݩ یل ز سر و ته وارس ابۊن؛ ٱولی قانووݩ جور وابیڌه و کار ابسته ابۊ.</string>
+    <string name="routing_settings_comma_tip">چنتا مقدار ن وا کاما (,) ز یک جوڌا کۊنین.</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
@@ -380,7 +383,8 @@
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
-    <string name="connection_test_available">مووفق بی: منپیز %dms طۊل کشی</string>
+    <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
+    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
@@ -502,14 +506,6 @@
     <string name="acc_copy_log">لف گیری گوزارش</string>
     <string name="acc_clear_log">روفتن گوزارش</string>
     <string name="acc_add_rule">ٱووردن قانووݩ</string>
-    <string name="core_error_no_server_selected">هیچ کانفیگ پسند وابیڌه نؽ</string>
-    <string name="core_error_decode_server_config">خوندن کانفیگ پسند وابیڌه مووفق نبی</string>
-    <string name="core_error_build_config_context">پردازشت کانفیگ پسند وابیڌه مووفق نبی</string>
-    <string name="core_error_get_config">ساڌن کانفیگ هسته مووفق نبی</string>
-    <string name="core_error_get_config_detail">ساڌن کانفیگ هسته مووفق نبی: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">ساڌن کانفیگ هسته سی آزمایش سورعت مووفق نبی: %1$s</string>
-    <string name="core_error_custom_config_empty">کانفیگ سفارشی نؽ</string>
-    <string name="core_error_start">ره وستن هسته مووفق نبی</string>
     <string name="acc_start">ره وستن سرویس</string>
     <string name="acc_stop">واڌاشتن سرویس</string>
     <string name="acc_back">برگشت</string>

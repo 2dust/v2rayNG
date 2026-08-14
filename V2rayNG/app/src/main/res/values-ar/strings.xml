@@ -327,9 +327,11 @@
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
     <string name="sub_allow_insecure_url">السماح بعنوان HTTP غير آمن</string>
-    <string name="sub_setting_pre_profile">ملاحظات تكوين الوكيل السابق</string>
-    <string name="sub_setting_next_profile">ملاحظات تكوين الوكيل التالي</string>
+    <string name="sub_setting_pre_profile">وكيل الدخول</string>
+    <string name="sub_setting_next_profile">وكيل الخروج</string>
     <string name="sub_setting_pre_profile_tip">يجب أن تكون ملاحظات التكوين موجودة وفريدة</string>
+    <string name="sub_setting_entry_proxy_tip">يُضاف الوكيل المحدد قبل كل ملف تعريف في هذا الاشتراك كحلقة الدخول في سلسلة الوكلاء لذلك الملف.</string>
+    <string name="sub_setting_exit_proxy_tip">يُضاف الوكيل المحدد بعد كل ملف تعريف في هذا الاشتراك كحلقة الخروج في سلسلة الوكلاء لذلك الملف.</string>
     <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
     <string name="title_sub_update">تحديث الاشتراك</string>
     <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
@@ -355,7 +357,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
     <string name="routing_settings_title">إعدادات التوجيه</string>
-    <string name="routing_settings_tips">افصل بعلامة الفاصلة (,) واختر أحد: domain أو ip أو process</string>
+    <string name="routing_settings_tips">لا تُطبَّق القاعدة إلا إذا تحققت جميع شروط المطابقة المحددة معًا (AND). تُفحص القواعد من الأعلى إلى الأسفل، وتُطبَّق أول قاعدة متطابقة.</string>
+    <string name="routing_settings_comma_tip">افصل بين الإدخالات المتعددة بفواصل (,).</string>
     <string name="routing_settings_save">حفظ</string>
     <string name="routing_settings_delete">مسح</string>
     <string name="routing_settings_rule_title">إعدادات قاعدة التوجيه</string>
@@ -380,7 +383,8 @@
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
-    <string name="connection_test_available">نجاح: استغرق اتصال HTTP %dms</string>
+    <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
+    <string name="server_test_delay_value">%1$d ملي ثانية</string>
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
@@ -502,14 +506,6 @@
     <string name="acc_copy_log">نسخ السجل</string>
     <string name="acc_clear_log">مسح السجل</string>
     <string name="acc_add_rule">إضافة قاعدة توجيه</string>
-    <string name="core_error_no_server_selected">لم يتم تحديد تكوين</string>
-    <string name="core_error_decode_server_config">تعذرت قراءة التكوين المحدد</string>
-    <string name="core_error_build_config_context">تعذر إعداد التكوين المحدد</string>
-    <string name="core_error_get_config">تعذر إنشاء تكوين النواة</string>
-    <string name="core_error_get_config_detail">تعذر إنشاء تكوين النواة: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">تعذر إنشاء تكوين النواة لاختبار السرعة: %1$s</string>
-    <string name="core_error_custom_config_empty">التكوين المخصص فارغ</string>
-    <string name="core_error_start">تعذر تشغيل النواة</string>
     <string name="acc_start">بدء الخدمة</string>
     <string name="acc_stop">إيقاف الخدمة</string>
     <string name="acc_back">رجوع</string>

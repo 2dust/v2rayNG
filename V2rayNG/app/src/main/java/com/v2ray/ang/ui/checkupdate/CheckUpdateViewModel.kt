@@ -42,12 +42,8 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
                     toastSuccess(R.string.update_already_latest_version)
                 }
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to check for updates: ${e.message}")
-                if (e.message == null) {
-                    toastError(R.string.toast_failure)
-                } else {
-                    toastError(e.message.orEmpty())
-                }
+                LogUtil.e(AppConfig.TAG, "Failed to check for updates", e)
+                toastError(R.string.toast_failure)
             }
         }
     }
