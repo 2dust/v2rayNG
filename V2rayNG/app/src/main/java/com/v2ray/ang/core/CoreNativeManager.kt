@@ -68,22 +68,6 @@ object CoreNativeManager {
     }
 
     /**
-     * Measure outbound connection delay.
-     *
-     * @param config The configuration JSON string
-     * @param testUrl The URL to test against
-     * @return Delay in milliseconds, or -1 if test failed
-     */
-    fun measureOutboundDelay(config: String, testUrl: String): Long {
-        return try {
-            Libv2ray.measureOutboundDelay(config, testUrl)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
-            -1L
-        }
-    }
-
-    /**
      * Create a new core controller instance.
      *
      * @param handler The callback handler for core events

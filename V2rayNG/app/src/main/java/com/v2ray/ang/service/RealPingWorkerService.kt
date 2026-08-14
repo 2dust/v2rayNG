@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.SystemClock
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
-import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.ProbePlan
 import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.enums.EConfigType
@@ -108,17 +107,16 @@ class RealPingWorkerService(
             completeWork(guid, profileCompleted = true)
         }
         probeBatch(plan, concurrency)
-        probeIndividually(plan.individualGuids, concurrency)
+        probeIndividually(plan.individualGuids)
     }
 
-    private suspend fun probeIndividually(individualGuids: List<String>, concurrency: Int) {
-        val dispatcher = Dispatchers.IO.limitedParallelism(concurrency)
-        individualGuids.map { guid ->
-            scope.launch(dispatcher) {
-                emitResult(guid, safelyProbe(guid, ::startRealPing))
-                completeWork(guid, profileCompleted = true)
-            }
-        }.joinAll()
+    /** Each fallback needs its own Xray instance, so these cannot overlap safely. */
+    private suspend fun probeIndividually(individualGuids: List<String>) {
+        individualGuids.forEach { guid ->
+            currentCoroutineContext().ensureActive()
+            emitResult(guid, safelyProbe(guid, ::startRealPing))
+            completeWork(guid, profileCompleted = true)
+        }
     }
 
     private suspend fun probeBatch(plan: ProbePlan, concurrency: Int) {
@@ -160,7 +158,7 @@ class RealPingWorkerService(
         val activeGuids = retryGuids.filter(::isPending)
         if (activeGuids.isEmpty()) return
         if (activeGuids.size == 1) {
-            probeIndividually(activeGuids, concurrency)
+            probeIndividually(activeGuids)
             return
         }
         val halves = activeGuids.chunked((activeGuids.size + 1) / 2)
@@ -251,7 +249,7 @@ class RealPingWorkerService(
     private fun startRealPing(guid: String): Long {
         val configResult = CoreConfigManager.getV2rayConfig4RealDelay(context, guid)
         if (!configResult.status) return -1L
-        return CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        return controller.measureDelay(configResult.content, SettingsManager.getDelayTestUrl())
     }
 
     private fun safelyProbe(guid: String, probe: (String) -> Long): Long = try {

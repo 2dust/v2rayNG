@@ -42,6 +42,8 @@ class SubscriptionUpdateService : Service() {
     private val activeWorkers = Collections.synchronizedList(mutableListOf<RealPingWorkerService>())
 
     private val updateSemaphore = Semaphore(2)
+    // Downloads may overlap, but native probe batches in this process may not.
+    private val probeSemaphore = Semaphore(1)
 
     override fun onCreate() {
         super.onCreate()
@@ -131,7 +133,9 @@ class SubscriptionUpdateService : Service() {
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)) {
-            val testCompleted = testSubscriptionServers(sub)
+            val testCompleted = probeSemaphore.withPermit {
+                testSubscriptionServers(sub)
+            }
 
             if (testCompleted && MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)) {
                 LogUtil.i(AppConfig.TAG, "SubscriptionUpdateService: removing invalid servers for ${subItem.remarks}")

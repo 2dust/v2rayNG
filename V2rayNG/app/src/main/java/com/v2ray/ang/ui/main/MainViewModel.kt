@@ -154,10 +154,7 @@ class MainViewModel(
                 if (delayMillis == null || delayMillis == server.testDelayMillis) {
                     server
                 } else {
-                    server.copy(
-                        testDelayMillis = delayMillis,
-                        testDelayString = if (delayMillis == 0L) "" else "${delayMillis}ms",
-                    )
+                    server.copy(testDelayMillis = delayMillis)
                 }
             }
         }
@@ -739,7 +736,7 @@ class MainViewModel(
         mutableServersForGroup(groupId).update { current ->
             current.map { server ->
                 if (server.testDelayMillis == 0L) server
-                else server.copy(testDelayMillis = 0L, testDelayString = "")
+                else server.copy(testDelayMillis = 0L)
             }
         }
         testingGroupId = groupId
