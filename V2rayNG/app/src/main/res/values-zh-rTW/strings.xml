@@ -298,6 +298,8 @@
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顯示設定</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
+    <string name="title_pref_dynamic_color">開啟莫奈取色</string>
+    <string name="summary_pref_dynamic_color">僅在 Android 12+ 裝置上工作</string>
     <string name="title_pref_use_hev_tunnel">啟用 Hev TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">啟用後，TUN 會使用 hev-socks5-tunnel；否則使用 xray-core。</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN 日誌層級</string>

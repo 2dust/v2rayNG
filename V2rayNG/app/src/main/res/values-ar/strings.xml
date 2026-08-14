@@ -298,6 +298,8 @@
     <string name="title_language">اللغة</string>
     <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
     <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
+    <string name="title_pref_dynamic_color">تفعيل الألوان الديناميكية</string>
+    <string name="summary_pref_dynamic_color">يعمل فقط على أندرويد 12+</string>
     <string name="title_pref_use_hev_tunnel">تمكين ميزة Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">عند التمكين، سيستخدم TUN ‏hev-socks5-tunnel؛ وإلا فسيستخدم xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">مستوى سجل Hev TUN</string>

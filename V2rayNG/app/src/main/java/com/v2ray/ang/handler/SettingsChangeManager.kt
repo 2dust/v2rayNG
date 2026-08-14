@@ -19,6 +19,7 @@ object SettingsChangeManager {
         AppConfig.PREF_GROUP_ALL_DISPLAY,
         AppConfig.PREF_LANGUAGE,
         AppConfig.PREF_UI_MODE_NIGHT,
+        AppConfig.PREF_DYNAMIC_COLOR,
         AppConfig.PREF_IS_BOOTED,
     )
 
