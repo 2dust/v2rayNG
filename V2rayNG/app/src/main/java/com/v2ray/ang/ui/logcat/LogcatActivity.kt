@@ -43,7 +43,7 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.navigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -211,7 +211,7 @@ fun LogcatScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScrollbar(listState),
-                contentPadding = navigationBarsBottomPadding()
+                contentPadding = NavigationBarsBottomPadding()
             ) {
                 itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
                     LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })

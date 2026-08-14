@@ -36,7 +36,7 @@ import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.navigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 private enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
@@ -187,7 +187,7 @@ fun AppPickerScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScrollbar(listState),
-            contentPadding = navigationBarsBottomPadding()
+            contentPadding = NavigationBarsBottomPadding()
         ) {
             items(items = apps, key = { it.packageName }) { app ->
                 val checked = selectedPackages.contains(app.packageName)

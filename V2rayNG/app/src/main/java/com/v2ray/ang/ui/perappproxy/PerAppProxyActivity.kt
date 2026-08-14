@@ -50,7 +50,7 @@ import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.colorFabActive
-import com.v2ray.ang.ui.compose.navigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 
@@ -266,7 +266,7 @@ fun PerAppProxyScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScrollbar(listState),
-                contentPadding = navigationBarsBottomPadding()
+                contentPadding = NavigationBarsBottomPadding()
             ) {
                 items(items = apps, key = { it.packageName }) { app ->
                     val checked = blacklist.contains(app.packageName)

@@ -59,7 +59,7 @@ import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorFabActive
-import com.v2ray.ang.ui.compose.navigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -262,7 +262,7 @@ fun RoutingSettingScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScrollbar(lazyListState),
-            contentPadding = navigationBarsBottomPadding()
+            contentPadding = NavigationBarsBottomPadding()
         ) {
             item(key = "domain_strategy") {
                 SettingsListItem(

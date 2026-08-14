@@ -236,7 +236,7 @@ fun NavigationBarsSpacer(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun navigationBarsBottomPadding(): PaddingValues {
+fun NavigationBarsBottomPadding(): PaddingValues {
     val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     return PaddingValues(bottom = bottom)
 }

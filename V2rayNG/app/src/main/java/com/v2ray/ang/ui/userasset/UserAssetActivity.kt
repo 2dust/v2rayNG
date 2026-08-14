@@ -58,7 +58,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.SettingsListItem
-import com.v2ray.ang.ui.compose.navigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -313,7 +313,7 @@ fun UserAssetScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScrollbar(listState),
-            contentPadding = navigationBarsBottomPadding()
+            contentPadding = NavigationBarsBottomPadding()
         ) {
             item(key = "geo_source_$trigger") {
                 SettingsListItem(
