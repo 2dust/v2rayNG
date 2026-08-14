@@ -43,6 +43,11 @@ class CoreRootService : Service(), ServiceControl {
         NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
 
+        if (CoreServiceManager.isRunning()) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Root: Core is already running")
+            return START_STICKY
+        }
+
         // Start the in-process core first (this also posts the foreground notification),
         // then install the root routing off the main thread.
         if (!CoreServiceManager.startCoreLoop(null)) {
