@@ -129,6 +129,13 @@ jobs:
         name: universal-apk
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
 
+    - name: Upload mapping file
+      uses: actions/upload-artifact@v7
+      if: ${{ success() }}
+      with:
+        name: mapping
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/mapping/*/release/mapping.txt
+
   sign-and-release:
     needs: build
     runs-on: ubuntu-26.04
