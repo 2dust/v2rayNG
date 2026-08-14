@@ -1,5 +1,6 @@
 package com.v2ray.ang.core
 
+import android.app.Activity
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -474,6 +475,9 @@ object CoreServiceManager {
 
                 AppConfig.MSG_STATE_RESTART -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Restart service")
+                    // The UI and daemon run in separate processes, so acknowledge the active
+                    // daemon before stopping it instead of relying on possibly stale UI state.
+                    if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
                     serviceControl.stopService()
                     Thread.sleep(500L)
                     LauncherManager.startService(serviceControl.getService())

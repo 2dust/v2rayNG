@@ -75,10 +75,10 @@ class MainActivity : HelperBaseComponentActivity() {
             val restartService = data.getBooleanExtra(
                 ProfileEditorResult.EXTRA_RESTART_SERVICE, false
             )
+            val selectedProfileSaved = action == ProfileEditorResult.ACTION_SAVED &&
+                data.getStringExtra(ProfileEditorResult.EXTRA_GUID) == mainViewModel.uiState.value.selectedGuid
             mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService && mainViewModel.uiState.value.isRunning) {
-                restartV2Ray()
-            }
+            if (restartService || selectedProfileSaved) LauncherManager.restartService(this)
         }
 
     private val settingsActivityLauncher =
@@ -87,7 +87,7 @@ class MainActivity : HelperBaseComponentActivity() {
             val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
             mainViewModel.refreshUiSettings()
             if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService && mainViewModel.uiState.value.isRunning) restartV2Ray()
+            if (restartService) LauncherManager.restartService(this)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,7 +110,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     MainAction.ImportClipboard -> importClipboard()
                     MainAction.ImportConfigLocal -> importConfigLocal()
                     is MainAction.ImportManually -> importManually(action.type)
-                    MainAction.RestartService -> restartV2Ray()
+                    MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
                     MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
                     is MainAction.SelectServer -> setSelectServer(action.guid)
                     is MainAction.EditServer -> editServer(action.guid, action.profile)
@@ -161,12 +161,18 @@ class MainActivity : HelperBaseComponentActivity() {
     private fun handleFabAction() {
         if (mainViewModel.uiState.value.isRunning) {
             LauncherManager.stopService(this)
-        } else if (SettingsManager.isVpnMode()) {
-            val intent = VpnService.prepare(this)
-            if (intent == null) startV2Ray() else requestVpnPermission.launch(intent)
         } else {
-            startV2Ray()
+            requestServiceStart()
         }
+    }
+
+    private fun requestServiceStart() {
+        if (!SettingsManager.isVpnMode()) {
+            startV2Ray()
+            return
+        }
+        val intent = VpnService.prepare(this)
+        if (intent == null) startV2Ray() else requestVpnPermission.launch(intent)
     }
 
     private fun handleLayoutTestClick() {
@@ -186,14 +192,6 @@ class MainActivity : HelperBaseComponentActivity() {
             checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
         }
         LauncherManager.startService(this)
-    }
-
-    private fun restartV2Ray() {
-        if (mainViewModel.uiState.value.isRunning) LauncherManager.stopService(this)
-        lifecycleScope.launch {
-            kotlinx.coroutines.delay(500)
-            startV2Ray()
-        }
     }
 
     private fun importManually(createConfigType: Int) {
@@ -275,7 +273,7 @@ class MainActivity : HelperBaseComponentActivity() {
         val selected = mainViewModel.uiState.value.selectedGuid
         if (guid != selected) {
             mainViewModel.updateSelectedGuid(guid)
-            if (mainViewModel.uiState.value.isRunning) restartV2Ray()
+            LauncherManager.restartService(this)
         }
     }
 
