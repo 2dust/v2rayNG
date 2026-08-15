@@ -348,6 +348,7 @@
     <string name="title_import_config_count">Nhập %d cấu hình</string>
     <string name="title_export_config_count">Xuất %d cấu hình</string>
     <string name="title_update_config_count">Cập nhật %d cấu hình</string>
+    <string name="title_update_asset_count">Đã cập nhật %d tệp tài nguyên</string>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
