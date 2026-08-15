@@ -10,6 +10,10 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.ThemeManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class AngApplication : Application() {
     companion object {
@@ -29,6 +33,8 @@ class AngApplication : Application() {
         .setDefaultProcessName("${ANG_PACKAGE}:bg")
         .build()
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     /**
      * Initializes the application.
      */
@@ -44,6 +50,9 @@ class AngApplication : Application() {
 
         // Ensure critical preference defaults are present in MMKV early
         SettingsManager.initApp(this)
+        applicationScope.launch {
+            SettingsManager.cleanupOrphanedServerProfilesOnce()
+        }
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()

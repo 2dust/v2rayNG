@@ -44,8 +44,10 @@ import com.v2ray.ang.ui.compose.InputField
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -79,6 +81,9 @@ class BackupActivity : HelperBaseComponentActivity() {
 
                         is BackupViewModel.BackupViewModelEvent.RestoreSuccess -> {
                             SettingsManager.initApp(this@BackupActivity)
+                            withContext(Dispatchers.IO) {
+                                SettingsManager.cleanupOrphanedServerProfilesOnce()
+                            }
                         }
 
                         else -> {}

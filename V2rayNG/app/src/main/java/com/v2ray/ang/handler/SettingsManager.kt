@@ -560,6 +560,21 @@ object SettingsManager {
     }
 
     /**
+     * Runs the initial orphan cleanup after legacy server lists have been migrated.
+     * Later subscription replacements run the same idempotent cleanup directly.
+     */
+    internal fun cleanupOrphanedServerProfilesOnce() {
+        try {
+            val removed = MmkvManager.removeOrphanedServerProfilesOnce() ?: return
+            if (removed > 0) {
+                LogUtil.i(AppConfig.TAG, "Removed $removed orphaned server profiles")
+            }
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to clean orphaned server profiles", e)
+        }
+    }
+
+    /**
      * Ensures the default subscription exists for ungrouped servers.
      * This subscription is used internally to store servers without a subscription.
      * Made public for migration in SettingsManager.
