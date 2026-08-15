@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
@@ -40,25 +42,36 @@ fun MainBottomBar(
     onAction: (MainAction) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
-                .windowInsetsPadding(WindowInsets.navigationBars)
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             AppDivider()
-            Row(
+
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .height(64.dp)
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .clickable(onClick = { onAction(MainAction.TestCurrentServer) }),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp
             ) {
-                Text(text = displayText, style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = displayText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.semantics {
+                            contentDescription = displayText
+                        }
+                    )
+                }
             }
         }
+
         FloatingActionButton(
             onClick = { onAction(MainAction.ToggleService) },
             modifier = Modifier
@@ -66,13 +79,20 @@ fun MainBottomBar(
                 .padding(end = 24.dp)
                 .offset(y = (-28).dp)
                 .navigationBarsPadding(),
-            containerColor = if (isRunning) colorFabActive
-            else if (isDarkTheme) colorFabInactiveDark
-            else colorFabInactiveLight
+            containerColor = if (isRunning) {
+                colorFabActive
+            } else if (isDarkTheme) {
+                colorFabInactiveDark
+            } else {
+                colorFabInactiveLight
+            }
         ) {
             Icon(
-                painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
-                else painterResource(R.drawable.ic_play_24dp),
+                painter = if (isRunning) {
+                    painterResource(R.drawable.ic_stop_24dp)
+                } else {
+                    painterResource(R.drawable.ic_play_24dp)
+                },
                 contentDescription = stringResource(
                     if (isRunning) R.string.acc_stop else R.string.acc_start
                 ),
