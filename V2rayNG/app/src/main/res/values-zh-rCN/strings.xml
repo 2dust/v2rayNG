@@ -436,6 +436,11 @@
     <string name="title_configuration_backup_restore">备份 &amp; 还原</string>
     <string name="title_configuration_backup">备份配置</string>
     <string name="title_configuration_restore">还原配置</string>
+    <string name="title_profile_storage_cleanup">修复配置存储</string>
+    <string name="summary_profile_storage_cleanup">删除未使用的配置数据</string>
+    <string name="message_profile_storage_cleanup">要删除已不再被任何分组使用的配置数据吗？当前选中的配置以及无法安全判定为未使用的数据将会保留。</string>
+    <string name="toast_profile_storage_cleanup">已删除未使用的配置：%1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">无法安全判定哪些配置数据未被使用。未删除任何数据。</string>
     <string name="title_configuration_share">分享配置</string>
     <string name="title_webdav_config_setting">WebDAV 设置</string>
     <string name="title_webdav_config_setting_unknown">请先设置 WebDAV</string>

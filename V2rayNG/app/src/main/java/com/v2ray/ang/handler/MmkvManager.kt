@@ -426,6 +426,56 @@ object MmkvManager {
         return serverRawStorage.decodeString(guid)
     }
 
+    /**
+     * Removes profile payloads that are provably absent from their raw SUB_SERVERS_* index.
+     *
+     * SUB_IDS and SUB are intentionally ignored: either store can be missing after MMKV
+     * recovery while the group indexes still identify live profiles. If any group index or
+     * profile payload needed for a decision is unreadable, that data is preserved.
+     *
+     * @return The number of profile payloads removed, or null if cleanup could not run safely.
+     */
+    internal fun removeOrphanedServerProfiles(): Int? = synchronized(mainStorage) {
+        mainStorage.lock()
+        try {
+            val indexedServersBySubscription = mainStorage.allKeys().orEmpty()
+                .asSequence()
+                .filter { key -> key.startsWith(KEY_SUB_SERVER_PREFIX) }
+                .associate { key ->
+                    val subscriptionId = key.removePrefix(KEY_SUB_SERVER_PREFIX)
+                    val json = mainStorage.decodeString(key)
+                    val serverIds = if (json.isNullOrBlank()) {
+                        null
+                    } else {
+                        JsonUtil.fromJsonSafe(json, Array<String>::class.java)?.toSet()
+                    }
+                    subscriptionId to serverIds
+                }
+
+            val profiles = profileFullStorage.allKeys().orEmpty().map { guid ->
+                StoredProfileReference(
+                    guid = guid,
+                    subscriptionId = decodeServerConfig(guid)?.subscriptionId,
+                )
+            }
+            val orphans = OrphanProfileCleaner.findOrphans(
+                profiles = profiles,
+                indexedServersBySubscription = indexedServersBySubscription,
+                selectedServer = getSelectServer(),
+            ) ?: return@synchronized null
+
+            if (orphans.isNotEmpty()) {
+                val keys = orphans.toTypedArray()
+                profileFullStorage.removeValuesForKeys(keys)
+                serverAffStorage.removeValuesForKeys(keys)
+                serverRawStorage.removeValuesForKeys(keys)
+            }
+            orphans.size
+        } finally {
+            mainStorage.unlock()
+        }
+    }
+
     //endregion
 
     //region Subscriptions
