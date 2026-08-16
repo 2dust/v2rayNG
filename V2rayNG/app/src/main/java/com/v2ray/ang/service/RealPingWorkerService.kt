@@ -23,8 +23,25 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import libv2ray.Libv2ray
 import libv2ray.ProbeHandler
+
+internal object RealPingExecutionLimiter {
+    private val customConfigMutex = Mutex()
+
+    suspend fun <T> run(configType: EConfigType, block: () -> T): T {
+        // Custom profiles start complete Xray configs. Keep their native
+        // lifecycle serialized across workers, matching the upstream safety
+        // boundary while generated Observatory profiles remain concurrent.
+        return if (configType == EConfigType.CUSTOM) {
+            customConfigMutex.withLock { block() }
+        } else {
+            block()
+        }
+    }
+}
 
 /** Runs one progressively reported delay-test batch through one native core. */
 class RealPingWorkerService(
@@ -246,13 +263,16 @@ class RealPingWorkerService(
         return -1L
     }
 
-    private fun startRealPing(guid: String): Long {
+    private suspend fun startRealPing(guid: String): Long {
+        val config = MmkvManager.decodeServerConfig(guid) ?: return -1L
         val configResult = CoreConfigManager.getV2rayConfig4RealDelay(context, guid)
         if (!configResult.status) return -1L
-        return controller.measureDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        return RealPingExecutionLimiter.run(config.configType) {
+            controller.measureDelay(configResult.content, SettingsManager.getDelayTestUrl())
+        }
     }
 
-    private fun safelyProbe(guid: String, probe: (String) -> Long): Long = try {
+    private suspend fun safelyProbe(guid: String, probe: suspend (String) -> Long): Long = try {
         probe(guid)
     } catch (error: CancellationException) {
         throw error

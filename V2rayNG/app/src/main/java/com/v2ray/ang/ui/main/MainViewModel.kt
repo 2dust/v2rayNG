@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
+import com.v2ray.ang.extension.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -256,7 +256,7 @@ class MainViewModel(
         viewModelScope.launch(preloadDispatcher) {
             try {
                 initialPageReady.await()
-                delay(32L)
+                delay(32)
                 dataSource.initAssets()
                 dataSource.syncSubscriptions()
             } catch (cancelled: CancellationException) {
@@ -398,7 +398,7 @@ class MainViewModel(
                 preloadJob = viewModelScope.launch(preloadDispatcher) {
                     preloadOrder.forEach { groupId ->
                         ensureActive()
-                        delay(32L)
+                        delay(32)
                         val servers = loadGroup(groupId, forceRefresh)
                         updateGroupUi(groupId, servers)
                     }
@@ -651,7 +651,7 @@ class MainViewModel(
             }
             order.forEachIndexed { index, groupId ->
                 ensureActive()
-                if (index > 0) delay(32L)
+                if (index > 0) delay(32)
                 updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
             }
         }
@@ -662,7 +662,7 @@ class MainViewModel(
         keywordFilter = keyword
         filterJob?.cancel()
         filterJob = viewModelScope.launch(defaultDispatcher) {
-            delay(300L)
+            delay(300)
             val snapshot = cacheMutex.withLock { groupDataCache.toMap() }
             ensureActive()
             snapshot.forEach { (groupId, servers) ->

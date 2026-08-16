@@ -128,7 +128,7 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
-    <string name="server_lab_verify_peer_cert_by_name">依名稱驗證對端憑證</string>
+    <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
     <string name="server_lab_pinned_ca256">憑證指紋 (SHA-256)</string>
     <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">僅支援 xhttp (packet-up) 和 ws 出站；與 TLS 相關的設定可能會被忽略或發生衝突</string>
@@ -233,7 +233,7 @@
     <string name="title_pref_dns_hosts">DNS 主機對應（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">真實延遲測試 URL</string>
+    <string name="title_pref_delay_test_url">真連接延遲測試 URL</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">同時執行的真實延遲測試數</string>
 
@@ -337,7 +337,7 @@
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
-    <string name="title_real_ping_all_server">測試實際延遲</string>
+    <string name="title_real_ping_all_server">測試真連接延遲</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
     <string name="title_filter_config">篩選設定</string>
@@ -348,6 +348,7 @@
     <string name="title_import_config_count">匯入 %d 個設定</string>
     <string name="title_export_config_count">匯出 %d 個設定</string>
     <string name="title_update_config_count">更新 %d 個設定</string>
+    <string name="title_update_asset_count">已更新 %d 個資源檔案</string>
     <string name="title_update_subscription_result">更新了 %1$d 個設定（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="toast_server_not_found_in_group">目前群組中找不到所選伺服器</string>
@@ -386,7 +387,7 @@
     <string name="connection_test_testing">"測試中……"</string>
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
     <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
-    <string name="server_test_delay_value">%1$d 毫秒</string>
+    <string name="server_test_delay_value">%1$d ms</string>
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
