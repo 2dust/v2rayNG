@@ -56,6 +56,18 @@ object LauncherManager {
         MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
+    /** Restarts the active daemon without starting a stopped service. */
+    fun restartService(context: Context) {
+        MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+    }
+
+    /** Restarts the active daemon, or delegates to the caller's permission-aware start flow. */
+    fun restartServiceOrStart(context: Context, startIfStopped: () -> Unit) {
+        MessageHelper.sendMsg2ServiceForResult(context, AppConfig.MSG_STATE_RESTART, "") { handled ->
+            if (!handled) startIfStopped()
+        }
+    }
+
     @Throws(Exception::class)
     private fun startContextService(context: Context) {
         // Note: isRunning check is removed here to avoid loading Native libraries in the UI process.
