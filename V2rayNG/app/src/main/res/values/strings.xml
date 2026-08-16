@@ -299,6 +299,8 @@
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
     <string name="title_pref_ui_mode_night">UI mode settings</string>
+    <string name="title_pref_dynamic_color">Enable dynamic color</string>
+    <string name="summary_pref_dynamic_color">Only works on Android 12+ devices</string>
     <string name="title_pref_use_hev_tunnel">Use Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN log level</string>
@@ -328,9 +330,11 @@
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
     <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
-    <string name="sub_setting_pre_profile">Previous proxy config remarks</string>
-    <string name="sub_setting_next_profile">Next proxy config remarks</string>
+    <string name="sub_setting_pre_profile">Entry proxy</string>
+    <string name="sub_setting_next_profile">Exit proxy</string>
     <string name="sub_setting_pre_profile_tip">Make sure the config remarks exist and are unique</string>
+    <string name="sub_setting_entry_proxy_tip">The selected proxy is added before every profile in this subscription as the entry link in the proxy chain for that profile.</string>
+    <string name="sub_setting_exit_proxy_tip">The selected proxy is added after every profile in this subscription as the exit link in the proxy chain for that profile.</string>
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
@@ -345,6 +349,7 @@
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
     <string name="title_update_config_count">Update %d configs</string>
+    <string name="title_update_asset_count">Updated %d asset files</string>
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
@@ -356,7 +361,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Domain strategy</string>
     <string name="routing_settings_title">Routing Settings</string>
-    <string name="routing_settings_tips">Separated by commas(,), \nchoose domain or ip or process</string>
+    <string name="routing_settings_tips">A rule applies only when every configured matching condition is satisfied (AND). Rules are checked from top to bottom; the first matching rule is applied.</string>
+    <string name="routing_settings_comma_tip">Separate multiple entries with commas (,).</string>
     <string name="routing_settings_save">Save</string>
     <string name="routing_settings_delete">Clear</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>
@@ -381,7 +387,8 @@
     <string name="connection_test_pending">Check connectivity</string>
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
-    <string name="connection_test_available">Success: Connection took %dms</string>
+    <string name="connection_test_available">Connection succeeded in %1$s</string>
+    <string name="server_test_delay_value">%1$d ms</string>
     <string name="connection_test_error">Connection test failed: %s</string>
     <string name="connection_test_fail">Internet unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
@@ -503,14 +510,6 @@
     <string name="acc_copy_log">Copy log</string>
     <string name="acc_clear_log">Clear log</string>
     <string name="acc_add_rule">Add routing rule</string>
-    <string name="core_error_no_server_selected">No configuration selected</string>
-    <string name="core_error_decode_server_config">Failed to read the selected configuration</string>
-    <string name="core_error_build_config_context">Failed to prepare the selected configuration</string>
-    <string name="core_error_get_config">Failed to generate the core configuration</string>
-    <string name="core_error_get_config_detail">Failed to generate the core configuration: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">Failed to generate the core configuration for the speed test: %1$s</string>
-    <string name="core_error_custom_config_empty">Custom configuration is empty</string>
-    <string name="core_error_start">Failed to start the core</string>
     <string name="acc_start">Start service</string>
     <string name="acc_stop">Stop service</string>
     <string name="acc_back">Back</string>

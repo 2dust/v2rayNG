@@ -35,7 +35,7 @@ fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleSmall,
-        color = colorFabActive,
+        color = MaterialTheme.colorScheme.secondary,
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
@@ -59,13 +59,13 @@ fun CollapsiblePreferenceGroupHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            color = colorFabActive,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.weight(1f)
         )
         Icon(
             painter = painterResource(R.drawable.ic_expand_more_24dp),
             contentDescription = null,
-            tint = colorFabActive,
+            tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
                 .size(24.dp)
                 .rotate(if (expanded) 180f else 0f)

@@ -396,6 +396,7 @@ object CoreOutboundBuilder {
                         )
                     )
                 }
+                udpMaskList.reverse()
                 streamSettings.finalmask = OutboundBean.StreamSettingsBean.FinalMaskBean(
                     udp = udpMaskList.toList()
                 )
@@ -636,8 +637,7 @@ object CoreOutboundBuilder {
                 JsonUtil.parseString(JsonUtil.toJson(existingFinalMask))
             } ?: JsonObject()
 
-            // finalmask.tcp / finalmask.udp are arrays; prepend mask at index 0.
-            fun prependMask(scope: String, mask: OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean) {
+            fun appendMask(scope: String, mask: OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean) {
                 val current = finalMaskObj.get(scope)
                 if (current != null && current.isJsonArray && current.asJsonArray.size() > 0) {
                     return
@@ -652,8 +652,8 @@ object CoreOutboundBuilder {
                 finalMaskObj.add(scope, newArray)
             }
 
-            prependMask("tcp", fragmentMask)
-            prependMask("udp", noiseMask)
+            appendMask("tcp", fragmentMask)
+            appendMask("udp", noiseMask)
             streamSettings.finalmask = finalMaskObj
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to update outbound fragment", e)

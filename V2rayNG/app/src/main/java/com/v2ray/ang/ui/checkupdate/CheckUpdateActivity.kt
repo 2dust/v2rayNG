@@ -3,14 +3,16 @@ package com.v2ray.ang.ui.checkupdate
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,9 +27,11 @@ import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.VersionInfoBlock
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 
 class CheckUpdateActivity : BaseComponentActivity() {
@@ -63,7 +67,7 @@ fun CheckUpdateScreen(
     val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
 
     Scaffold(
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.update_check_for_update),
@@ -90,6 +94,7 @@ fun CheckUpdateScreen(
                 onClick = { viewModel.checkForUpdates() }
             )
             VersionInfoBlock(versionText = versionText)
+            NavigationBarsSpacer()
         }
     }
 
@@ -98,7 +103,16 @@ fun CheckUpdateScreen(
         AlertDialog(
             onDismissRequest = { viewModel.dismissUpdateDialog() },
             title = { Text(stringResource(R.string.update_new_version_found, result.latestVersion ?: "")) },
-            text = { Text(result.releaseNotes ?: "") },
+            text = {
+                val scrollState = rememberScrollState()
+                Text(
+                    text = result.releaseNotes.orEmpty(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState)
+                        .verticalScrollbar(scrollState)
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.dismissUpdateDialog()

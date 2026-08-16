@@ -11,9 +11,9 @@ import android.os.ParcelFileDescriptor
 import android.system.OsConstants
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
@@ -31,7 +31,6 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.jvm.Volatile
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.ProcessFinder
@@ -321,28 +320,34 @@ object CoreServiceManager {
                 time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
-                errorStr = e.message?.substringAfter("\":") ?: "empty message"
+                errorStr = e.message?.substringAfter("\":").orEmpty()
             }
             if (time == -1L) {
                 try {
                     time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
-                    errorStr = e.message?.substringAfter("\":") ?: "empty message"
+                    errorStr = e.message?.substringAfter("\":").orEmpty()
                 }
             }
 
-            val result = if (time >= 0) {
-                service.getString(R.string.connection_test_available, time)
-            } else {
-                service.getString(R.string.connection_test_error, errorStr)
-            }
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, result)
+            val result = ConnectionTestResult(
+                delayMillis = time,
+                errorMessage = errorStr,
+            )
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result)
 
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
                 SpeedtestManager.getRemoteIPInfo()?.let { ip ->
-                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_SUCCESS, "$result\n$ip")
+                    MessageHelper.sendMsg2UI(
+                        service,
+                        AppConfig.MSG_MEASURE_DELAY_RESULT,
+                        result.copy(
+                            country = ip.country,
+                            ipAddress = ip.ipAddress,
+                        ),
+                    )
                 }
             }
         }
