@@ -220,7 +220,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
             val result = viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             withContext(Dispatchers.Main) {
                 if (result.successCount > 0) {
-                    toast(getString(R.string.title_update_config_count, result.successCount))
+                    toast(getString(R.string.title_update_asset_count, result.successCount))
                 } else {
                     toast(getString(R.string.toast_failure))
                 }
