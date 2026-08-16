@@ -5,9 +5,9 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.ThemeManager
 
@@ -35,7 +35,7 @@ class AngApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        MMKV.initialize(this)
+        MmkvManager.initialize(this)
 
         AppLocaleManager.initialize(this)
 
