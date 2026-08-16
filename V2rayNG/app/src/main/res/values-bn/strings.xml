@@ -283,6 +283,10 @@
     <string name="title_about">সম্পর্কিত</string>
     <string name="title_source_code">সোর্স কোড</string>
     <string name="title_oss_license">ওপেন সোর্স লাইসেন্স</string>
+    <string name="title_translators">অনুবাদকগণ</string>
+    <string name="translators_intro">রক্ষণাবেক্ষণ করা প্রতিটি অনুবাদের প্রধান অবদানকারীরা।</string>
+    <string name="translators_audit_title">সাম্প্রতিক স্থানীয়করণ নিরীক্ষা</string>
+    <string name="translators_audit_note">সাম্প্রতিক সব ভাষার স্থানীয়করণ নিরীক্ষা GPT-5.6-Sol ব্যবহার করে করা হয়েছে এবং eliotcougar তা পর্যালোচনা করেছেন।</string>
     <string name="title_tg_channel">টেলিগ্রাম চ্যানেল</string>
 
     <string name="title_pref_promotion">প্রচার</string>
