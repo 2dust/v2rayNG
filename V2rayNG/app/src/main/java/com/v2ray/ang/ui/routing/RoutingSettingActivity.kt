@@ -233,7 +233,7 @@ fun RoutingSettingScreen(
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_more_vert_24dp),
-                                contentDescription = null
+                                contentDescription = stringResource(R.string.acc_more)
                             )
                         }
                         DropdownMenu(
