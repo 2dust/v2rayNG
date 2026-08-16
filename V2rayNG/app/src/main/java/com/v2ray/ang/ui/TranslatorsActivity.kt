@@ -58,13 +58,6 @@ fun TranslatorsScreen(onBackClick: () -> Unit) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                Text(
-                    text = stringResource(R.string.translators_intro),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
             items(translationCredits, key = { it.language }) { credit ->
                 TranslationCreditCard(credit)
             }
@@ -94,11 +87,11 @@ private fun TranslationCreditCard(credit: TranslationCredit) {
                 style = MaterialTheme.typography.titleMedium
             )
             credit.contributors.forEach { contributor ->
-                val githubLogin = contributor.githubLogin
+                val linkUrl = contributor.linkUrl
                 Text(
                     text = contributor.displayName,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (githubLogin != null) {
+                    color = if (linkUrl != null) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.onSurface
@@ -106,9 +99,9 @@ private fun TranslationCreditCard(credit: TranslationCredit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(
-                            if (githubLogin != null) {
+                            if (linkUrl != null) {
                                 Modifier.clickable(role = Role.Button) {
-                                    Utils.openUri(context, "https://github.com/$githubLogin")
+                                    Utils.openUri(context, linkUrl)
                                 }
                             } else {
                                 Modifier
@@ -151,77 +144,74 @@ private data class TranslationCredit(
 
 private data class Contributor(
     val displayName: String,
-    val githubLogin: String? = null
+    val linkUrl: String?
 )
 
-private fun githubContributor(login: String) = Contributor(
-    displayName = "@$login",
-    githubLogin = login
-)
+private fun contributor(displayName: String, linkUrl: String?) = Contributor(displayName, linkUrl)
 
 private val translationCredits = listOf(
     TranslationCredit(
         language = "العربية (Arabic)",
-        contributors = listOf(githubContributor("MrIbrahem"))
+        contributors = listOf(contributor("@MrIbrahem", "https://github.com/MrIbrahem"))
     ),
     TranslationCredit(
         language = "বাংলা (Bengali)",
-        contributors = listOf(githubContributor("CodeWithTamim"))
+        contributors = listOf(contributor("@CodeWithTamim", "https://github.com/CodeWithTamim"))
     ),
     TranslationCredit(
         language = "لری بختیاری (Luri Bakhtiari)",
         contributors = listOf(
-            githubContributor("hosseinabaspanah"),
-            githubContributor("CodeWithTamim")
+            contributor("@hosseinabaspanah", "https://github.com/hosseinabaspanah"),
+            contributor("@CodeWithTamim", "https://github.com/CodeWithTamim")
         )
     ),
     TranslationCredit(
         language = "فارسی (Persian)",
         contributors = listOf(
-            githubContributor("TheMRVX"),
-            githubContributor("Skh-web6982"),
-            githubContributor("Ptechgithub"),
-            Contributor("@Pk-web6936"),
-            Contributor("@alphax-hue3682"),
-            Contributor("@phoenix6936"),
-            Contributor("@DecorativeFamily"),
-            Contributor("@decorativeman"),
-            githubContributor("mh292929"),
-            githubContributor("Amir-yazdanmanesh"),
-            githubContributor("CUMOON"),
-            githubContributor("hadi-norouzi"),
-            Contributor("Vahid Farid")
+            contributor("@TheMRVX", "https://github.com/TheMRVX"),
+            contributor("@Skh-web6982", "https://github.com/Skh-web6982"),
+            contributor("@Ptechgithub", "https://github.com/Ptechgithub"),
+            contributor("@Pk-web6936", null),
+            contributor("@alphax-hue3682", null),
+            contributor("@phoenix6936", null),
+            contributor("@DecorativeFamily", null),
+            contributor("@decorativeman", null),
+            contributor("@mh292929", "https://github.com/mh292929"),
+            contributor("@Amir-yazdanmanesh", "https://github.com/Amir-yazdanmanesh"),
+            contributor("@CUMOON", "https://github.com/CUMOON"),
+            contributor("@hadi-norouzi", "https://github.com/hadi-norouzi"),
+            contributor("Vahid Farid", null)
         )
     ),
     TranslationCredit(
         language = "Русский (Russian)",
         contributors = listOf(
-            githubContributor("solokot"),
-            githubContributor("Liniya"),
-            githubContributor("eliotcougar")
+            contributor("@solokot", "https://github.com/solokot"),
+            contributor("@Liniya", "https://github.com/Liniya"),
+            contributor("@eliotcougar", "https://github.com/eliotcougar")
         )
     ),
     TranslationCredit(
         language = "Tiếng Việt (Vietnamese)",
         contributors = listOf(
-            githubContributor("admarty"),
-            githubContributor("user09283"),
-            githubContributor("yuhan6665")
+            contributor("@admarty", "https://github.com/admarty"),
+            contributor("@user09283", "https://github.com/user09283"),
+            contributor("@yuhan6665", "https://github.com/yuhan6665")
         )
     ),
     TranslationCredit(
         language = "简体中文 (Simplified Chinese)",
         contributors = listOf(
-            githubContributor("2dust"),
-            githubContributor("Yau08")
+            contributor("@2dust", "https://github.com/2dust"),
+            contributor("@Yau08", "https://github.com/Yau08")
         )
     ),
     TranslationCredit(
         language = "繁體中文 (Traditional Chinese)",
         contributors = listOf(
-            githubContributor("2dust"),
-            githubContributor("Yau08"),
-            githubContributor("Fubuki0x10DE")
+            contributor("@2dust", "https://github.com/2dust"),
+            contributor("@Yau08", "https://github.com/Yau08"),
+            contributor("@Fubuki0x10DE", "https://github.com/Fubuki0x10DE")
         )
     )
 )

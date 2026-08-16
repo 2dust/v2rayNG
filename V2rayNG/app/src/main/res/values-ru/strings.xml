@@ -284,7 +284,6 @@
     <string name="title_source_code">Исходный код</string>
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_translators">Переводчики</string>
-    <string name="translators_intro">Основные участники перевода для каждого поддерживаемого языка.</string>
     <string name="translators_audit_title">Недавняя проверка локализации</string>
     <string name="translators_audit_note">Недавняя проверка локализации всех языков выполнена с помощью GPT-5.6-Sol и проверена eliotcougar.</string>
     <string name="title_tg_channel">Telegram-канал</string>
