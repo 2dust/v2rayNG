@@ -436,6 +436,11 @@
     <string name="title_configuration_backup_restore">النسخ الاحتياطي والاستعادة</string>
     <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
     <string name="title_configuration_restore">استعادة التكوين</string>
+    <string name="title_profile_storage_cleanup">إصلاح بيانات ملفات التعريف</string>
+    <string name="summary_profile_storage_cleanup">حذف بيانات ملفات التعريف غير المستخدمة</string>
+    <string name="message_profile_storage_cleanup">هل تريد حذف بيانات ملفات التعريف التي لم تعد مستخدمة في أي مجموعة؟ سيُحتفظ بملف التعريف المحدد وأي بيانات يتعذر التأكد من أنها غير مستخدمة.</string>
+    <string name="toast_profile_storage_cleanup">تم حذف ملفات التعريف غير المستخدمة: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">تعذّر تحديد بيانات ملفات التعريف غير المستخدمة بأمان. لم يُحذف أي شيء.</string>
     <string name="title_configuration_share">مشاركة التكوين</string>
     <string name="title_webdav_config_setting">إعدادات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">يرجى إعداد WebDAV أولاً.</string>

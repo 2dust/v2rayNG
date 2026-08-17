@@ -436,6 +436,11 @@
     <string name="title_configuration_backup_restore">備份與還原</string>
     <string name="title_configuration_backup">備份設定</string>
     <string name="title_configuration_restore">還原設定</string>
+    <string name="title_profile_storage_cleanup">修復設定檔儲存空間</string>
+    <string name="summary_profile_storage_cleanup">刪除未使用的設定檔資料</string>
+    <string name="message_profile_storage_cleanup">要刪除已不再由任何群組使用的設定檔資料嗎？目前選取的設定檔，以及無法安全判定為未使用的資料，都會予以保留。</string>
+    <string name="toast_profile_storage_cleanup">已刪除未使用的設定檔：%1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">無法安全判定哪些設定檔資料未被使用。未刪除任何資料。</string>
     <string name="title_configuration_share">分享設定</string>
     <string name="title_webdav_config_setting">WebDAV 設定</string>
     <string name="title_webdav_config_setting_unknown">請先設定 WebDAV</string>

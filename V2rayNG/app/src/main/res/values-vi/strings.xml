@@ -436,6 +436,11 @@
     <string name="title_configuration_backup_restore">Sao lưu &amp; khôi phục</string>
     <string name="title_configuration_backup">Sao lưu cấu hình</string>
     <string name="title_configuration_restore">Khôi phục cấu hình</string>
+    <string name="title_profile_storage_cleanup">Sửa dữ liệu cấu hình</string>
+    <string name="summary_profile_storage_cleanup">Xóa dữ liệu cấu hình không còn được sử dụng</string>
+    <string name="message_profile_storage_cleanup">Xóa dữ liệu cấu hình không còn được nhóm nào sử dụng? Cấu hình đang chọn và dữ liệu không thể xác định chắc chắn là không còn được sử dụng sẽ được giữ lại.</string>
+    <string name="toast_profile_storage_cleanup">Đã xóa cấu hình không dùng: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">Không thể xác định chắc chắn dữ liệu cấu hình không còn được sử dụng. Không có dữ liệu nào bị xóa.</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_webdav_config_setting">Cài đặt WebDAV</string>
     <string name="title_webdav_config_setting_unknown">Vui lòng cấu hình WebDAV trước.</string>
