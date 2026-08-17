@@ -159,7 +159,7 @@ private val translationCredits = listOf(
         contributors = listOf(contributor("@CodeWithTamim", "https://github.com/CodeWithTamim"))
     ),
     TranslationCredit(
-        language = "لری بختیاری (Luri Bakhtiari)",
+        language = "لۊری بختیاری (Luri Bakhtiari)",
         contributors = listOf(
             contributor("@hosseinabaspanah", "https://github.com/hosseinabaspanah"),
             contributor("@CodeWithTamim", "https://github.com/CodeWithTamim")
@@ -201,15 +201,11 @@ private val translationCredits = listOf(
     ),
     TranslationCredit(
         language = "简体中文 (Simplified Chinese)",
-        contributors = listOf(
-            contributor("@2dust", "https://github.com/2dust"),
-            contributor("@Yau08", "https://github.com/Yau08")
-        )
+        contributors = listOf(contributor("@Yau08", "https://github.com/Yau08"))
     ),
     TranslationCredit(
         language = "繁體中文 (Traditional Chinese)",
         contributors = listOf(
-            contributor("@2dust", "https://github.com/2dust"),
             contributor("@Yau08", "https://github.com/Yau08"),
             contributor("@Fubuki0x10DE", "https://github.com/Fubuki0x10DE")
         )
