@@ -437,6 +437,11 @@
     <string name="title_configuration_backup_restore">لادراری گرؽڌن &amp; وورگندن</string>
     <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
     <string name="title_configuration_restore">وورگندن کانفیگ</string>
+    <string name="title_profile_storage_cleanup">جۊر کردن داڌه یل کانفیگا</string>
+    <string name="summary_profile_storage_cleanup">پاک کردن داڌه یل کانفیگا ک دی و کار نؽن</string>
+    <string name="message_profile_storage_cleanup">داڌه یل کانفیگا ک دی من هیچ بونکۊی و کار نؽن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ کانفیگا پسند وابیڌه وو داڌه یلی ک نتری وا موطمئنی بفهمی دی و کار نؽن پاک نابۊن.</string>
+    <string name="toast_profile_storage_cleanup">کانفیگا ک دی و کار نؽن پاک وابیڌن: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">نتری وا موطمئنی بفهمی ک کۊی داڌه یل کانفیگا دی و کار نؽن. هیچ داڌه ای پاک نوابی.</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
     <string name="title_webdav_config_setting">WebDAV سامووا</string>
     <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>

@@ -437,6 +437,11 @@
     <string name="title_configuration_backup_restore">ব্যাকআপ ও পুনরুদ্ধার</string>
     <string name="title_configuration_backup">কনফিগারেশন ব্যাকআপ</string>
     <string name="title_configuration_restore">কনফিগারেশন পুনরুদ্ধার</string>
+    <string name="title_profile_storage_cleanup">প্রোফাইল স্টোরেজ মেরামত করুন</string>
+    <string name="summary_profile_storage_cleanup">অব্যবহৃত প্রোফাইল ডেটা মুছে ফেলুন</string>
+    <string name="message_profile_storage_cleanup">কোনো গ্রুপে আর ব্যবহৃত হয় না এমন প্রোফাইল ডেটা মুছে ফেলবেন? নির্বাচিত প্রোফাইল এবং নিরাপদে অব্যবহৃত বলে নির্ধারণ করা যায় না এমন ডেটা রাখা হবে।</string>
+    <string name="toast_profile_storage_cleanup">অব্যবহৃত প্রোফাইল মুছে ফেলা হয়েছে: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">কোন প্রোফাইল ডেটা অব্যবহৃত তা নিরাপদে নির্ধারণ করা যায়নি। কিছুই মুছে ফেলা হয়নি।</string>
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
     <string name="title_webdav_config_setting">WebDAV সেটিংস</string>
     <string name="title_webdav_config_setting_unknown">প্রথমে WebDAV কনফিগার করুন।</string>

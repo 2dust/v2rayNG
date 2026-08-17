@@ -13,9 +13,11 @@ import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.ui.base.ViewModelEvent
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ZipUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -35,6 +37,24 @@ class BackupViewModel(application: Application) : BaseViewModel(application) {
         MmkvManager.encodeWebDavConfig(config)
         _webDavConfig.value = config
         toastSuccess(R.string.toast_success)
+    }
+
+    fun cleanupProfileStorage() {
+        launchLoading {
+            try {
+                val removed = withContext(Dispatchers.IO) {
+                    MmkvManager.removeOrphanedServerProfiles()
+                }
+                if (removed == null) {
+                    toastError(R.string.toast_profile_storage_cleanup_skipped)
+                } else {
+                    toastSuccess(getString(R.string.toast_profile_storage_cleanup, removed))
+                }
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to clean up profile storage", e)
+                toastError(R.string.toast_failure)
+            }
+        }
     }
 
     fun shareBackup(cacheDir: File, appName: String) {

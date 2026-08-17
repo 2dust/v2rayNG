@@ -437,6 +437,11 @@
     <string name="title_configuration_backup_restore">Резервное копирование и восстановление</string>
     <string name="title_configuration_backup">Создать резервную копию</string>
     <string name="title_configuration_restore">Восстановление конфигурации</string>
+    <string name="title_profile_storage_cleanup">Исправить хранилище профилей</string>
+    <string name="summary_profile_storage_cleanup">Удалить данные неиспользуемых профилей</string>
+    <string name="message_profile_storage_cleanup">Удалить данные профилей, которые больше не используются ни в одной группе? Выбранный профиль и данные, которые нельзя с уверенностью отнести к неиспользуемым, будут сохранены.</string>
+    <string name="toast_profile_storage_cleanup">Удалено неиспользуемых профилей: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">Не удалось достоверно определить неиспользуемые данные профилей. Ничего не удалено.</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
     <string name="title_webdav_config_setting">Настройки WebDAV</string>
     <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV</string>

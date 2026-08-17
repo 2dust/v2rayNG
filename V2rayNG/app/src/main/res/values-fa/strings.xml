@@ -437,6 +437,11 @@
     <string name="title_configuration_backup_restore">پشتیبان‌گیری و بازیابی</string>
     <string name="title_configuration_backup">پشتیبان گیری از پیکربندی</string>
     <string name="title_configuration_restore">بازیابی پیکربندی</string>
+    <string name="title_profile_storage_cleanup">ترمیم فضای ذخیره‌سازی پروفایل‌ها</string>
+    <string name="summary_profile_storage_cleanup">حذف داده‌های پروفایل بلااستفاده</string>
+    <string name="message_profile_storage_cleanup">داده‌های پروفایلی که دیگر در هیچ گروهی استفاده نمی‌شوند حذف شوند؟ پروفایل انتخاب‌شده و داده‌هایی که نمی‌توان با اطمینان بلااستفاده بودنشان را تشخیص داد حفظ خواهند شد.</string>
+    <string name="toast_profile_storage_cleanup">پروفایل‌های بلااستفاده حذف شدند: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">امکان تشخیص مطمئن داده‌های پروفایل بلااستفاده وجود نداشت. هیچ موردی حذف نشد.</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفاً ابتدا WebDAV را پیکربندی کنید.</string>
