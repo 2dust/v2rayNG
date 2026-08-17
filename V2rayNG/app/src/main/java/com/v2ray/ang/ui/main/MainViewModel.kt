@@ -728,11 +728,11 @@ class MainViewModel(
         testResultFlushJob?.cancel()
         testResultFlushJob = null
         pendingTestResults.clear()
-        dataSource.clearAllTestDelayResults(servers.map { it.guid })
         if (servers.isEmpty()) {
             _uiState.update { it.copy(isTesting = false) }
             return
         }
+        val serverGuids = servers.map { it.guid }
         mutableServersForGroup(groupId).update { current ->
             current.map { server ->
                 if (server.testDelayMillis == 0L) server
@@ -747,12 +747,13 @@ class MainViewModel(
             )
         }
         viewModelScope.launch(ioDispatcher) {
+            dataSource.clearAllTestDelayResults(serverGuids)
             cacheMutex.withLock { groupDataCache.remove(groupId) }
             dataSource.sendMsg2TestService(
                 TestServiceMessage(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     subscriptionId = groupId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) servers.map { it.guid } else emptyList(),
+                    serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
                     onlyTcp = onlyTcp
                 )
             )
