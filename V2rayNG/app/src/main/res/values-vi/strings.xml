@@ -348,6 +348,7 @@
     <string name="title_import_config_count">Nhập %d cấu hình</string>
     <string name="title_export_config_count">Xuất %d cấu hình</string>
     <string name="title_update_config_count">Cập nhật %d cấu hình</string>
+    <string name="title_update_asset_count">Đã cập nhật %d tệp tài nguyên</string>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">Đã tắt điểm phát sóng Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">Thao tác với điểm phát sóng không thành công (lỗi %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Chia sẻ kết nối đã bị hủy trong lúc Android chuyển đổi kết nối. Hãy đợi một lát rồi thử lại.</string>
+  
+    <string name="title_profile_storage_cleanup">Sửa dữ liệu cấu hình</string>
+    <string name="summary_profile_storage_cleanup">Xóa dữ liệu cấu hình không còn được sử dụng</string>
+    <string name="message_profile_storage_cleanup">Xóa dữ liệu cấu hình không còn được nhóm nào sử dụng? Cấu hình đang chọn và dữ liệu không thể xác định chắc chắn là không còn được sử dụng sẽ được giữ lại.</string>
+    <string name="toast_profile_storage_cleanup">Đã xóa cấu hình không dùng: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">Không thể xác định chắc chắn dữ liệu cấu hình không còn được sử dụng. Không có dữ liệu nào bị xóa.</string>
     <string name="title_configuration_share">Chia sẻ cấu hình</string>
     <string name="title_webdav_config_setting">Cài đặt WebDAV</string>
     <string name="title_webdav_config_setting_unknown">Vui lòng cấu hình WebDAV trước.</string>

@@ -7,13 +7,13 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +38,9 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.InputDialog
+import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.InputField
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsMenuItem
@@ -105,6 +107,7 @@ class BackupActivity : HelperBaseComponentActivity() {
                     BackupLocation.WebDav -> viewModel.restoreViaWebDav(cacheDir)
                 }
             },
+            onCleanupProfiles = viewModel::cleanupProfileStorage,
             onWebDavSave = { config -> viewModel.saveWebDavConfig(config) },
             onBackClick = { finish() }
         )
@@ -186,6 +189,7 @@ fun BackupScreen(
     onBackupOptionSelected: (BackupLocation) -> Unit,
     onShareClick: () -> Unit,
     onRestoreOptionSelected: (BackupLocation) -> Unit,
+    onCleanupProfiles: () -> Unit,
     onWebDavSave: (WebDavConfig) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -193,12 +197,13 @@ fun BackupScreen(
     val currentWebDavConfig by webDavConfigState.collectAsState()
     var showBackupDialog by remember { mutableStateOf(false) }
     var showRestoreDialog by remember { mutableStateOf(false) }
+    var showCleanupDialog by remember { mutableStateOf(false) }
     var showWebDavDialog by remember { mutableStateOf(false) }
 
     val webDavSummary = currentWebDavConfig?.baseUrl
 
     Scaffold(
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_configuration_backup_restore),
@@ -228,6 +233,12 @@ fun BackupScreen(
                 title = stringResource(R.string.title_configuration_restore),
                 onClick = { showRestoreDialog = true }
             )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_delete_24dp),
+                title = stringResource(R.string.title_profile_storage_cleanup),
+                subtitle = stringResource(R.string.summary_profile_storage_cleanup),
+                onClick = { showCleanupDialog = true }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_settings_24dp),
@@ -235,6 +246,7 @@ fun BackupScreen(
                 subtitle = webDavSummary,
                 onClick = { showWebDavDialog = true }
             )
+            NavigationBarsSpacer()
         }
     }
 
@@ -260,6 +272,13 @@ fun BackupScreen(
                 onRestoreOptionSelected(location)
             },
             onDismiss = { showRestoreDialog = false }
+        )
+    }
+    if (showCleanupDialog) {
+        DeleteConfirmDialog(
+            message = stringResource(R.string.message_profile_storage_cleanup),
+            onConfirm = onCleanupProfiles,
+            onDismiss = { showCleanupDialog = false }
         )
     }
     if (showWebDavDialog) {

@@ -348,6 +348,7 @@
     <string name="title_import_config_count">%dটি কনফিগারেশন আমদানি করুন</string>
     <string name="title_export_config_count">%dটি কনফিগারেশন রপ্তানি করুন</string>
     <string name="title_update_config_count">%dটি কনফিগারেশন আপডেট করুন</string>
+    <string name="title_update_asset_count">%dটি অ্যাসেট ফাইল আপডেট হয়েছে</string>
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
     <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">Wi-Fi হটস্পট বন্ধ হয়েছে</string>
     <string name="shizuku_hotspot_operation_failed">হটস্পট অপারেশন ব্যর্থ হয়েছে (ত্রুটি %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Android সংযোগ পরিবর্তন করার সময় টেথারিং বাতিল হয়েছে। একটু অপেক্ষা করে আবার চেষ্টা করুন।</string>
+  
+    <string name="title_profile_storage_cleanup">প্রোফাইল স্টোরেজ মেরামত করুন</string>
+    <string name="summary_profile_storage_cleanup">অব্যবহৃত প্রোফাইল ডেটা মুছে ফেলুন</string>
+    <string name="message_profile_storage_cleanup">কোনো গ্রুপে আর ব্যবহৃত হয় না এমন প্রোফাইল ডেটা মুছে ফেলবেন? নির্বাচিত প্রোফাইল এবং নিরাপদে অব্যবহৃত বলে নির্ধারণ করা যায় না এমন ডেটা রাখা হবে।</string>
+    <string name="toast_profile_storage_cleanup">অব্যবহৃত প্রোফাইল মুছে ফেলা হয়েছে: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">কোন প্রোফাইল ডেটা অব্যবহৃত তা নিরাপদে নির্ধারণ করা যায়নি। কিছুই মুছে ফেলা হয়নি।</string>
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
     <string name="title_webdav_config_setting">WebDAV সেটিংস</string>
     <string name="title_webdav_config_setting_unknown">প্রথমে WebDAV কনফিগার করুন।</string>

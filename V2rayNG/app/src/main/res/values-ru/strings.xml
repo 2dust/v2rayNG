@@ -348,6 +348,7 @@
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
     <string name="title_update_config_count">Обновлено профилей: %d</string>
+    <string name="title_update_asset_count">Обновлено файлов ресурсов: %d</string>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">Точка доступа Wi-Fi отключена</string>
     <string name="shizuku_hotspot_operation_failed">Не удалось выполнить операцию с точкой доступа (ошибка %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Раздача была отменена, пока Android переключал подключение. Немного подождите и попробуйте ещё раз.</string>
+  
+    <string name="title_profile_storage_cleanup">Исправить хранилище профилей</string>
+    <string name="summary_profile_storage_cleanup">Удалить данные неиспользуемых профилей</string>
+    <string name="message_profile_storage_cleanup">Удалить данные профилей, которые больше не используются ни в одной группе? Выбранный профиль и данные, которые нельзя с уверенностью отнести к неиспользуемым, будут сохранены.</string>
+    <string name="toast_profile_storage_cleanup">Удалено неиспользуемых профилей: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">Не удалось достоверно определить неиспользуемые данные профилей. Ничего не удалено.</string>
     <string name="title_configuration_share">Поделиться конфигурацией</string>
     <string name="title_webdav_config_setting">Настройки WebDAV</string>
     <string name="title_webdav_config_setting_unknown">Необходимо настроить WebDAV</string>

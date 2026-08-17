@@ -33,10 +33,10 @@
     <shortcut
         android:enabled="true"
         android:icon="@drawable/ic_qu_start_24dp"
-        android:shortcutDisabledMessage="@string/toast_services_start"
+        android:shortcutDisabledMessage="@string/acc_start"
         android:shortcutId="shortcuts_start"
-        android:shortcutLongLabel="@string/toast_services_start"
-        android:shortcutShortLabel="@string/toast_services_start">
+        android:shortcutLongLabel="@string/acc_start"
+        android:shortcutShortLabel="@string/acc_start">
 
         <!--suppress AndroidDomInspection -->
         <intent
@@ -48,10 +48,10 @@
     <shortcut
         android:enabled="true"
         android:icon="@drawable/ic_qu_stop_24dp"
-        android:shortcutDisabledMessage="@string/toast_services_stop"
+        android:shortcutDisabledMessage="@string/acc_stop"
         android:shortcutId="shortcuts_stop"
-        android:shortcutLongLabel="@string/toast_services_stop"
-        android:shortcutShortLabel="@string/toast_services_stop">
+        android:shortcutLongLabel="@string/acc_stop"
+        android:shortcutShortLabel="@string/acc_stop">
 
         <!--suppress AndroidDomInspection -->
         <intent

@@ -348,6 +348,7 @@
     <string name="title_import_config_count">استيراد %d من التكوينات</string>
     <string name="title_export_config_count">تصدير %d من التكوينات</string>
     <string name="title_update_config_count">تحديث %d من التكوينات</string>
+    <string name="title_update_asset_count">تم تحديث %d من ملفات الأصول</string>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">تم تعطيل نقطة اتصال Wi-Fi</string>
     <string name="shizuku_hotspot_operation_failed">فشلت عملية نقطة الاتصال (الخطأ %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">أُلغي الربط أثناء تبديل Android للاتصال. انتظر قليلًا ثم حاول مرة أخرى.</string>
+  
+    <string name="title_profile_storage_cleanup">إصلاح بيانات ملفات التعريف</string>
+    <string name="summary_profile_storage_cleanup">حذف بيانات ملفات التعريف غير المستخدمة</string>
+    <string name="message_profile_storage_cleanup">هل تريد حذف بيانات ملفات التعريف التي لم تعد مستخدمة في أي مجموعة؟ سيُحتفظ بملف التعريف المحدد وأي بيانات يتعذر التأكد من أنها غير مستخدمة.</string>
+    <string name="toast_profile_storage_cleanup">تم حذف ملفات التعريف غير المستخدمة: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">تعذّر تحديد بيانات ملفات التعريف غير المستخدمة بأمان. لم يُحذف أي شيء.</string>
     <string name="title_configuration_share">مشاركة التكوين</string>
     <string name="title_webdav_config_setting">إعدادات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">يرجى إعداد WebDAV أولاً.</string>

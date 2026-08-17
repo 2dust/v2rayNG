@@ -348,6 +348,7 @@
     <string name="title_import_config_count">وارد کردن %d کانفیگ</string>
     <string name="title_export_config_count">صادر کردن %d کانفیگ</string>
     <string name="title_update_config_count">آپدیت کردن %d کانفیگ</string>
+    <string name="title_update_asset_count">%d فایل منبع بروزرسانی شد</string>
     <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
     <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
     <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">نقطه اتصال Wi-Fi خاموش شد</string>
     <string name="shizuku_hotspot_operation_failed">عملیات نقطه اتصال ناموفق بود (خطای %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">هنگام تغییر اتصال توسط Android، تترینگ لغو شد. کمی صبر کنید و دوباره تلاش کنید.</string>
+  
+    <string name="title_profile_storage_cleanup">ترمیم فضای ذخیره‌سازی پروفایل‌ها</string>
+    <string name="summary_profile_storage_cleanup">حذف داده‌های پروفایل بلااستفاده</string>
+    <string name="message_profile_storage_cleanup">داده‌های پروفایلی که دیگر در هیچ گروهی استفاده نمی‌شوند حذف شوند؟ پروفایل انتخاب‌شده و داده‌هایی که نمی‌توان با اطمینان بلااستفاده بودنشان را تشخیص داد حفظ خواهند شد.</string>
+    <string name="toast_profile_storage_cleanup">پروفایل‌های بلااستفاده حذف شدند: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">امکان تشخیص مطمئن داده‌های پروفایل بلااستفاده وجود نداشت. هیچ موردی حذف نشد.</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفاً ابتدا WebDAV را پیکربندی کنید.</string>

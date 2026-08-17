@@ -348,6 +348,7 @@
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
     <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
+    <string name="title_update_asset_count">%d فایل بونچک جغرافیایی ورۊ وابی</string>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">هات‌اسپات وای‌فای واداشت وابی</string>
     <string name="shizuku_hotspot_operation_failed">کار هات‌اسپات نامووفق وابی (خوتا %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">وختی Android اتصال ن عوض اکرد، تترینگ لغو وابی. یه کم وارِسین و دوواره امتحان کنین.</string>
+  
+    <string name="title_profile_storage_cleanup">جۊر کردن داڌه یل کانفیگا</string>
+    <string name="summary_profile_storage_cleanup">پاک کردن داڌه یل کانفیگا ک دی و کار نؽن</string>
+    <string name="message_profile_storage_cleanup">داڌه یل کانفیگا ک دی من هیچ بونکۊی و کار نؽن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ کانفیگا پسند وابیڌه وو داڌه یلی ک نتری وا موطمئنی بفهمی دی و کار نؽن پاک نابۊن.</string>
+    <string name="toast_profile_storage_cleanup">کانفیگا ک دی و کار نؽن پاک وابیڌن: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">نتری وا موطمئنی بفهمی ک کۊی داڌه یل کانفیگا دی و کار نؽن. هیچ داڌه ای پاک نوابی.</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
     <string name="title_webdav_config_setting">WebDAV سامووا</string>
     <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>

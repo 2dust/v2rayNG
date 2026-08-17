@@ -348,6 +348,7 @@
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
     <string name="title_update_config_count">Update %d configs</string>
+    <string name="title_update_asset_count">Updated %d asset files</string>
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>
@@ -491,6 +492,12 @@
     <string name="shizuku_hotspot_disabled">Wi-Fi hotspot disabled</string>
     <string name="shizuku_hotspot_operation_failed">Hotspot operation failed (error %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Tethering was cancelled while Android was switching connections. Wait a moment, then try again.</string>
+  
+    <string name="title_profile_storage_cleanup">Repair profile storage</string>
+    <string name="summary_profile_storage_cleanup">Remove unused profile data</string>
+    <string name="message_profile_storage_cleanup">Delete profile data that is no longer used by any group? Selected profiles and data that cannot be safely classified will be kept.</string>
+    <string name="toast_profile_storage_cleanup">Unused profiles removed: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">Profile storage could not be safely classified. Nothing was removed.</string>
     <string name="title_configuration_share">Share config</string>
     <string name="title_webdav_config_setting">WebDAV Settings</string>
     <string name="title_webdav_config_setting_unknown">Please configure WebDAV first.</string>
