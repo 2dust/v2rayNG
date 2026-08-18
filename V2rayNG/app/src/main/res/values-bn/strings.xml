@@ -313,7 +313,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">কপি করুন</string>
-    <string name="logcat_clear">পরিষ্কার করুন</string>
+    <string name="action_clear">পরিষ্কার করুন</string>
     <string name="logcat_share">লগ শেয়ার করুন</string>
     <string name="title_service_restart">সার্ভিস পুনরায় চালু করুন</string>
     <string name="title_del_all_config">সব কনফিগারেশন মুছে ফেলুন</string>

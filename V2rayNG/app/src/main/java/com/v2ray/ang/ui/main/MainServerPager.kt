@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -138,6 +140,7 @@ private fun ServerListPage(
             state = gridState,
             modifier = Modifier
                 .fillMaxSize()
+                .selectableGroup()
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
@@ -184,6 +187,7 @@ private fun ServerListPage(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
+                .selectableGroup()
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
@@ -319,12 +323,11 @@ fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, testDelayMillis)
     }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .clickable(onClick = onClick)
+            .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
             .then(dragModifier)
     ) {
         Box(
