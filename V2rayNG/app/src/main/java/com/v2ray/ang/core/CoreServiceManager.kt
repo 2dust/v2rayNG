@@ -347,7 +347,7 @@ object CoreServiceManager {
             ensureActive()
             val endpoint = if (time >= 0) {
                 val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
-                    { url: String -> coreController.getUrlContent(url) }
+                    { url: String -> coreController.getUrlContent(url, AppConfig.TAG_PROXY) }
                 } else {
                     null
                 }
