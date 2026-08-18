@@ -341,7 +341,12 @@ object CoreServiceManager {
 
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
-                SpeedtestManager.getRemoteIPInfo()?.let { ip ->
+                val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
+                    { url: String -> coreController.getUrlContent(url) }
+                } else {
+                    null
+                }
+                SpeedtestManager.getRemoteIPInfo(fetchViaCore)?.let { ip ->
                     MessageHelper.sendMsg2UI(
                         service,
                         AppConfig.MSG_MEASURE_DELAY_RESULT,
