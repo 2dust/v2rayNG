@@ -18,6 +18,7 @@ import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
@@ -342,7 +343,14 @@ object CoreServiceManager {
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
                 val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
-                    { url: String -> coreController.getUrlContent(url, AppConfig.TAG_PROXY) }
+                    { url: String ->
+                        val outboundTag = if (currentConfig?.configType == EConfigType.POLICYGROUP) {
+                            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+                        } else {
+                            AppConfig.TAG_PROXY
+                        }
+                        coreController.getUrlContent(url, outboundTag)
+                    }
                 } else {
                     null
                 }
