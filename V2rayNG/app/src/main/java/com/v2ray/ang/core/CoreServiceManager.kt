@@ -342,7 +342,7 @@ object CoreServiceManager {
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
                 val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
-                    { url: String -> coreController.getUrlContent(url) }
+                    { url: String -> coreController.getUrlContent(url, AppConfig.TAG_PROXY) }
                 } else {
                     null
                 }
