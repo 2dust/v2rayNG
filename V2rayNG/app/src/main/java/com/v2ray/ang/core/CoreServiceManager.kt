@@ -345,7 +345,14 @@ object CoreServiceManager {
             }
 
             ensureActive()
-            val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
+            val endpoint = if (time >= 0) {
+                val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
+                    { url: String -> coreController.getUrlContent(url) }
+                } else {
+                    null
+                }
+                SpeedtestManager.getRemoteIPInfo(fetchViaCore)
+            } else null
             val result = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
