@@ -161,7 +161,7 @@ private val translationCredits = listOf(
     TranslationCredit(
         language = "لۊری بختیاری (Luri Bakhtiari)",
         contributors = listOf(
-            contributor("@hosseinabaspanah", "https://github.com/hosseinabaspanah"),
+            contributor("Hossein Abaspanah", "https://github.com/hosseinabaspanah"),
             contributor("@CodeWithTamim", "https://github.com/CodeWithTamim")
         )
     ),
