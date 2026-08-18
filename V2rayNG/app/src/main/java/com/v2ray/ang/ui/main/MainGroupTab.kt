@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.GroupMapItem
-import com.v2ray.ang.dto.entities.ServersCache
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -53,7 +52,7 @@ fun GroupTabBar(
             GroupTabItem(
                 group = group,
                 selected = index == selectedTabIndex,
-                serverFlowProvider = { mainViewModel.serversForGroup(group.id) },
+                groupStateProvider = { mainViewModel.serverGroupState(group.id) },
                 onClick = { onTabClick(index) }
             )
         }
@@ -64,11 +63,11 @@ fun GroupTabBar(
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
-    serverFlowProvider: () -> StateFlow<List<ServersCache>>,
+    groupStateProvider: () -> StateFlow<ServerGroupUiState>,
     onClick: () -> Unit
 ) {
-    val serverFlow = remember(group.id) { serverFlowProvider() }
-    val servers by serverFlow.collectAsStateWithLifecycle()
+    val groupStateFlow = remember(group.id) { groupStateProvider() }
+    val groupState by groupStateFlow.collectAsStateWithLifecycle()
     Tab(
         selected = selected,
         onClick = onClick,
@@ -76,7 +75,7 @@ private fun GroupTabItem(
             val text = if (group.id.isEmpty()) {
                 group.remarks
             } else {
-                "${group.remarks} (${servers.size})"
+                "${group.remarks} (${groupState.servers.size})"
             }
             Text(
                 text = text,
