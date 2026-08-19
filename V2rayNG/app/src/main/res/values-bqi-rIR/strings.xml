@@ -50,7 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">ای عوزو زنجیره پروکسی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_file">فایل بونچک جغرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_file">فایل بونچک جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="confirm_delete_asset_source">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
@@ -531,6 +531,10 @@
     <string name="acc_routing_rule_switch">ای قانووݩ</string>
     <string name="acc_routing_rule_on">روشن</string>
     <string name="acc_routing_rule_off">خاموش</string>
+    <string name="acc_asset_announcement">%1$s، %2$s، %3$s</string>
+    <string name="acc_asset_file_size">قەبارە فایل %1$s</string>
+    <string name="acc_asset_updated_on">ورۊ وابیڌه من %1$s</string>
+    <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

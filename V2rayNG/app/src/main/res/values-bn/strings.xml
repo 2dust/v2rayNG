@@ -50,7 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">আপনি কি এই প্রক্সি চেইন সদস্যটিকে মুছে ফেলতে চান?</string>
     <string name="confirm_delete_routing_rule">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_subscription_group">আপনি কি এই সাবস্ক্রিপশন গ্রুপটি মুছে ফেলতে চান?</string>
-    <string name="confirm_delete_asset_file">আপনি কি \"%1$s\" অ্যাসেট ফাইলটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_asset_file">আপনি কি এই অ্যাসেট ফাইলটি মুছে ফেলতে চান?\n%1$s</string>
     <string name="confirm_delete_asset_source">আপনি কি এই অ্যাসেট উৎসটি মুছে ফেলতে চান?</string>
     <string name="server_lab_remarks">মন্তব্য</string>
     <string name="server_lab_address">ঠিকানা</string>
@@ -531,6 +531,10 @@
     <string name="acc_routing_rule_switch">নিয়মটি</string>
     <string name="acc_routing_rule_on">চালু</string>
     <string name="acc_routing_rule_off">বন্ধ</string>
+    <string name="acc_asset_announcement">%1$s, %2$s, %3$s</string>
+    <string name="acc_asset_file_size">ফাইলের আকার %1$s</string>
+    <string name="acc_asset_updated_on">আপডেট হয়েছে %1$s তারিখে</string>
+    <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

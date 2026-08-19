@@ -36,6 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -361,11 +364,37 @@ private fun UserAssetItem(
     } else {
         stringResource(R.string.msg_file_not_found)
     }
+    val assetAnnouncement = if (fileMetadata != null) {
+        val accessibilityDate = remember(fileMetadata) {
+            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
+            dateFormat.format(Date(fileMetadata.lastModified))
+        }
+        val fileSizeDescription = stringResource(
+            R.string.acc_asset_file_size,
+            fileMetadata.length.toTrafficString()
+        )
+        val updatedOnDescription = stringResource(R.string.acc_asset_updated_on, accessibilityDate)
+        stringResource(
+            R.string.acc_asset_announcement,
+            item.assetUrl.remarks,
+            fileSizeDescription,
+            updatedOnDescription
+        )
+    } else {
+        stringResource(
+            R.string.acc_asset_announcement_missing,
+            item.assetUrl.remarks,
+            stringResource(R.string.msg_file_not_found)
+        )
+    }
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = assetAnnouncement
+            }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -383,6 +412,7 @@ private fun UserAssetItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = propertiesText,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

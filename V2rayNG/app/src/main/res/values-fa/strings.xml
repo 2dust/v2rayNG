@@ -50,7 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">آیا مطمئن هستید که می‌خواهید این عضو زنجیره پراکسی را حذف کنید؟</string>
     <string name="confirm_delete_routing_rule">آیا مطمئن هستید که می‌خواهید این قانون مسیریابی را حذف کنید؟</string>
     <string name="confirm_delete_subscription_group">آیا مطمئن هستید که می‌خواهید این گروه اشتراک را حذف کنید؟</string>
-    <string name="confirm_delete_asset_file">آیا مطمئن هستید که می‌خواهید فایل دارایی \"%1$s\" را حذف کنید؟</string>
+    <string name="confirm_delete_asset_file">آیا مطمئن هستید که می‌خواهید این فایل دارایی را حذف کنید؟\n%1$s</string>
     <string name="confirm_delete_asset_source">آیا مطمئن هستید که می‌خواهید این منبع دارایی را حذف کنید؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
     <string name="server_lab_address">نشانی</string>
@@ -531,6 +531,10 @@
     <string name="acc_routing_rule_switch">قانون</string>
     <string name="acc_routing_rule_on">روشن</string>
     <string name="acc_routing_rule_off">خاموش</string>
+    <string name="acc_asset_announcement">%1$s، %2$s، %3$s</string>
+    <string name="acc_asset_file_size">اندازه فایل %1$s</string>
+    <string name="acc_asset_updated_on">به‌روزرسانی در %1$s</string>
+    <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>

@@ -50,7 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
     <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group?</string>
-    <string name="confirm_delete_asset_file">Are you sure you want to delete the asset file \"%1$s\"?</string>
+    <string name="confirm_delete_asset_file">Are you sure you want to delete this asset file?\n%1$s</string>
     <string name="confirm_delete_asset_source">Are you sure you want to delete this asset source?</string>
     <string name="server_lab_remarks">remarks</string>
     <string name="server_lab_address">address</string>
@@ -531,6 +531,10 @@
     <string name="acc_routing_rule_switch">The rule is</string>
     <string name="acc_routing_rule_on">on</string>
     <string name="acc_routing_rule_off">off</string>
+    <string name="acc_asset_announcement">%1$s, %2$s, %3$s</string>
+    <string name="acc_asset_file_size">file size %1$s</string>
+    <string name="acc_asset_updated_on">updated on %1$s</string>
+    <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
