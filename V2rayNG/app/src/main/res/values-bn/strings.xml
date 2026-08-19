@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">ফাইলের আকার %1$s</string>
     <string name="acc_asset_updated_on">আপডেট হয়েছে %1$s তারিখে</string>
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
+    <string name="acc_unavailable_setting">অনুপলব্ধ সেটিং, %1$s</string>
+    <string name="acc_unavailable_setting_with_description">অনুপলব্ধ সেটিং, %1$s, %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s বর্তমানে</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

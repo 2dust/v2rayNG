@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">kích thước tệp %1$s</string>
     <string name="acc_asset_updated_on">cập nhật vào %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
+    <string name="acc_unavailable_setting">Cài đặt không khả dụng, %1$s</string>
+    <string name="acc_unavailable_setting_with_description">Cài đặt không khả dụng, %1$s, %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s hiện đang</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

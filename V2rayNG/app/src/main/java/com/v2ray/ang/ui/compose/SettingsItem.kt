@@ -26,6 +26,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -87,11 +89,25 @@ private fun SettingsItemRow(
     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
     else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+    val unavailableAnnouncement = if (!enabled) {
+        if (description.isNullOrEmpty()) {
+            stringResource(R.string.acc_unavailable_setting, title)
+        } else {
+            stringResource(R.string.acc_unavailable_setting_with_description, title, description)
+        }
+    } else {
+        null
+    }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
+            .semantics(mergeDescendants = true) {
+                if (unavailableAnnouncement != null) {
+                    contentDescription = unavailableAnnouncement
+                }
+            }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -253,10 +269,15 @@ fun SettingsSwitchItem(
         } else null,
         modifier = modifier,
         trailing = {
+            val switchDescription = stringResource(R.string.acc_setting_switch_prefix, title)
             Switch(
                 checked = checked,
                 onCheckedChange = if (enabled) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                modifier = Modifier
+                    .scale(0.8f)
+                    .semantics {
+                        contentDescription = switchDescription
+                    },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary

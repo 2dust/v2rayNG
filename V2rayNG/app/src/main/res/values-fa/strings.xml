@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">اندازه فایل %1$s</string>
     <string name="acc_asset_updated_on">به‌روزرسانی در %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
+    <string name="acc_unavailable_setting">تنظیم در دسترس نیست، %1$s</string>
+    <string name="acc_unavailable_setting_with_description">تنظیم در دسترس نیست، %1$s، %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s در حال حاضر</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>

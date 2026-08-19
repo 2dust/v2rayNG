@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">檔案大小 %1$s</string>
     <string name="acc_asset_updated_on">更新於 %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s，%2$s</string>
+    <string name="acc_unavailable_setting">無法使用的設定，%1$s</string>
+    <string name="acc_unavailable_setting_with_description">無法使用的設定，%1$s，%2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s目前為</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>

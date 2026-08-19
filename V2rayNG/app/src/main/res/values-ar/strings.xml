@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">حجم الملف %1$s</string>
     <string name="acc_asset_updated_on">تم التحديث في %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
+    <string name="acc_unavailable_setting">إعداد غير متاح، %1$s</string>
+    <string name="acc_unavailable_setting_with_description">إعداد غير متاح، %1$s، %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s حاليًا</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

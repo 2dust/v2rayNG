@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">قەبارە فایل %1$s</string>
     <string name="acc_asset_updated_on">ورۊ وابیڌه من %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
+    <string name="acc_unavailable_setting">سامووای نارس، %1$s</string>
+    <string name="acc_unavailable_setting_with_description">سامووای نارس، %1$s، %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s هنی</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

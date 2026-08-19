@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">размер файла %1$s</string>
     <string name="acc_asset_updated_on">обновлено: %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
+    <string name="acc_unavailable_setting">Недоступная настройка, %1$s</string>
+    <string name="acc_unavailable_setting_with_description">Недоступная настройка, %1$s, %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s сейчас</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>

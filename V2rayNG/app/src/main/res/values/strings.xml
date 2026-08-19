@@ -535,6 +535,9 @@
     <string name="acc_asset_file_size">file size %1$s</string>
     <string name="acc_asset_updated_on">updated on %1$s</string>
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
+    <string name="acc_unavailable_setting">Unavailable setting, %1$s</string>
+    <string name="acc_unavailable_setting_with_description">Unavailable setting, %1$s, %2$s</string>
+    <string name="acc_setting_switch_prefix">%1$s is currently</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
