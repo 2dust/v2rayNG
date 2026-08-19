@@ -520,6 +520,7 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
+    <string name="acc_currently_selected_server">Máy chủ hiện được chọn</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

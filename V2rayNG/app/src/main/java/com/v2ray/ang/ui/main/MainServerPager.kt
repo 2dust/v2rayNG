@@ -39,6 +39,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -323,10 +325,20 @@ fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, testDelayMillis)
     }
+    val selectedStateDescription = stringResource(R.string.acc_currently_selected_server)
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .then(
+                if (isSelected) {
+                    Modifier.semantics {
+                        stateDescription = selectedStateDescription
+                    }
+                } else {
+                    Modifier
+                }
+            )
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
             .then(dragModifier)
     ) {

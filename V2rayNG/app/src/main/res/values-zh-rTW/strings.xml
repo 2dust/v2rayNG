@@ -520,6 +520,7 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
+    <string name="acc_currently_selected_server">目前選取的伺服器</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>
