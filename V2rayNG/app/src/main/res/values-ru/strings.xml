@@ -49,7 +49,7 @@
     <string name="confirm_delete_policy_group">Удалить эту политику группы?</string>
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>
-    <string name="confirm_delete_subscription_group">Удалить эту подписку?</string>
+    <string name="confirm_delete_subscription_group">Удалить эту подписку? %1$s</string>
     <string name="confirm_delete_asset_file">Удалить файл ресурсов «%1$s»?</string>
     <string name="confirm_delete_asset_source">Удалить этот источник ресурсов?</string>
     <string name="server_lab_remarks">Название</string>

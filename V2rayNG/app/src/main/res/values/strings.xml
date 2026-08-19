@@ -49,7 +49,7 @@
     <string name="confirm_delete_policy_group">Are you sure you want to delete this policy group?</string>
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
-    <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group?</string>
+    <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group? %1$s</string>
     <string name="confirm_delete_asset_file">Are you sure you want to delete the asset file \"%1$s\"?</string>
     <string name="confirm_delete_asset_source">Are you sure you want to delete this asset source?</string>
     <string name="server_lab_remarks">remarks</string>

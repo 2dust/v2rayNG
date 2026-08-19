@@ -49,7 +49,7 @@
     <string name="confirm_delete_policy_group">確定要刪除此策略組嗎？</string>
     <string name="confirm_delete_proxy_chain_member">確定要刪除此代理鏈成員嗎？</string>
     <string name="confirm_delete_routing_rule">確定要刪除此路由規則嗎？</string>
-    <string name="confirm_delete_subscription_group">確定要刪除此訂閱群組嗎？</string>
+    <string name="confirm_delete_subscription_group">確定要刪除此訂閱群組嗎？%1$s</string>
     <string name="confirm_delete_asset_file">確定要刪除資源檔案「%1$s」嗎？</string>
     <string name="confirm_delete_asset_source">確定要刪除此資源來源嗎？</string>
     <string name="server_lab_remarks">備註</string>

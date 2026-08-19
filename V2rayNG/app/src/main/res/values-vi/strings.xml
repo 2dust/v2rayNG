@@ -49,7 +49,7 @@
     <string name="confirm_delete_policy_group">Bạn có chắc muốn xóa nhóm chính sách này không?</string>
     <string name="confirm_delete_proxy_chain_member">Bạn có chắc muốn xóa thành viên này khỏi chuỗi proxy không?</string>
     <string name="confirm_delete_routing_rule">Bạn có chắc muốn xóa quy tắc định tuyến này không?</string>
-    <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không?</string>
+    <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không? %1$s</string>
     <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên \"%1$s\" không?</string>
     <string name="confirm_delete_asset_source">Bạn có chắc muốn xóa nguồn tài nguyên này không?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>

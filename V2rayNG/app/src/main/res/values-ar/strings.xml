@@ -49,7 +49,7 @@
     <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟</string>
     <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟</string>
     <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟</string>
-    <string name="confirm_delete_subscription_group">هل أنت متأكد من أنك تريد حذف مجموعة الاشتراك هذه؟</string>
+    <string name="confirm_delete_subscription_group">هل أنت متأكد من أنك تريد حذف مجموعة الاشتراك هذه؟ %1$s</string>
     <string name="confirm_delete_asset_file">هل أنت متأكد من أنك تريد حذف ملف الأصول \"%1$s\"؟</string>
     <string name="confirm_delete_asset_source">هل أنت متأكد من أنك تريد حذف مصدر الأصول هذا؟</string>
     <string name="server_lab_remarks">ملاحظات</string>
