@@ -405,6 +405,7 @@ private fun UserAssetItem(
         ) {
             Text(
                 text = item.assetUrl.remarks,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis

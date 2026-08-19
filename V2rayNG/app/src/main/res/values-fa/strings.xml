@@ -522,7 +522,10 @@
     <string name="acc_more">گزینه‌های بیشتر</string>
     <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_last_updated">آخرین به‌روزرسانی %1$s</string>
-    <string name="acc_subscription_update">به‌روزرسانی است</string>
+    <string name="acc_subscription_announcement">%1$s، %2$s</string>
+    <string name="acc_subscription_update">به‌روزرسانی %1$s</string>
+    <string name="acc_state_on">روشن</string>
+    <string name="acc_state_off">خاموش</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">مسدود است</string>
     <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_unavailable_setting">تنظیم در دسترس نیست، %1$s</string>
     <string name="acc_unavailable_setting_with_description">تنظیم در دسترس نیست، %1$s، %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s در حال حاضر</string>
+    <string name="acc_setting_switch">%1$s در حال حاضر %2$s</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>

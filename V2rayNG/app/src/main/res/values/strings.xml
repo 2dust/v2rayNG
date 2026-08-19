@@ -522,7 +522,10 @@
     <string name="acc_more">More options</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">Last updated %1$s</string>
-    <string name="acc_subscription_update">Update is</string>
+    <string name="acc_subscription_announcement">%1$s, %2$s</string>
+    <string name="acc_subscription_update">Update is %1$s</string>
+    <string name="acc_state_on">on</string>
+    <string name="acc_state_off">off</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">is blocked</string>
     <string name="acc_routing_rule_routed_through">routed through %1$s</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
     <string name="acc_unavailable_setting">Unavailable setting, %1$s</string>
     <string name="acc_unavailable_setting_with_description">Unavailable setting, %1$s, %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s is currently</string>
+    <string name="acc_setting_switch">%1$s is currently %2$s</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>

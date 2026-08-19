@@ -522,7 +522,10 @@
     <string name="acc_more">আরও বিকল্প</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">সর্বশেষ আপডেট %1$s</string>
-    <string name="acc_subscription_update">আপডেট হলো</string>
+    <string name="acc_subscription_announcement">%1$s, %2$s</string>
+    <string name="acc_subscription_update">আপডেট %1$s</string>
+    <string name="acc_state_on">চালু</string>
+    <string name="acc_state_off">বন্ধ</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">ব্লক করা হয়েছে</string>
     <string name="acc_routing_rule_routed_through">%1$s-এর মাধ্যমে রাউট করা হয়েছে</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
     <string name="acc_unavailable_setting">অনুপলব্ধ সেটিং, %1$s</string>
     <string name="acc_unavailable_setting_with_description">অনুপলব্ধ সেটিং, %1$s, %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s বর্তমানে</string>
+    <string name="acc_setting_switch">%1$s বর্তমানে %2$s</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

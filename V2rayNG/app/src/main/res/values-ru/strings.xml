@@ -522,7 +522,10 @@
     <string name="acc_more">Дополнительные параметры</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">Последнее обновление: %1$s</string>
-    <string name="acc_subscription_update">Обновление</string>
+    <string name="acc_subscription_announcement">%1$s, %2$s</string>
+    <string name="acc_subscription_update">Обновление %1$s</string>
+    <string name="acc_state_on">включено</string>
+    <string name="acc_state_off">выключено</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">заблокировано</string>
     <string name="acc_routing_rule_routed_through">маршрутизируется через %1$s</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
     <string name="acc_unavailable_setting">Недоступная настройка, %1$s</string>
     <string name="acc_unavailable_setting_with_description">Недоступная настройка, %1$s, %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s сейчас</string>
+    <string name="acc_setting_switch">%1$s сейчас %2$s</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>

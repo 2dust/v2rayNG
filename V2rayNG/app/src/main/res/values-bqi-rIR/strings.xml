@@ -522,7 +522,10 @@
     <string name="acc_more">امکووݩا بؽتر</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">ورۊ رسۊوی نهایی %1$s</string>
-    <string name="acc_subscription_update">ورۊ کۊنی هڌ</string>
+    <string name="acc_subscription_announcement">%1$s، %2$s</string>
+    <string name="acc_subscription_update">ورۊ کۊنی %1$s</string>
+    <string name="acc_state_on">روشن</string>
+    <string name="acc_state_off">خاموش</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">مسدود هڌ</string>
     <string name="acc_routing_rule_routed_through">وا %1$s ره اڌه</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_unavailable_setting">سامووای نارس، %1$s</string>
     <string name="acc_unavailable_setting_with_description">سامووای نارس، %1$s، %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s هنی</string>
+    <string name="acc_setting_switch">%1$s هنی %2$s</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

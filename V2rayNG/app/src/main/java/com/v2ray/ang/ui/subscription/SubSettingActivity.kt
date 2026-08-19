@@ -7,6 +7,7 @@ import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,6 +40,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -129,7 +133,6 @@ fun SubSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
-    val subscriptionUpdateDescription = stringResource(R.string.acc_subscription_update)
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         viewModel.move(from.index, to.index)
     }
@@ -164,6 +167,37 @@ fun SubSettingScreen(
                 items = subscriptions,
                 key = { _, item -> item.guid }
             ) { _, subCache ->
+                val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
+                val lastUpdatedAccessibility = if (lastUpdated.isNotEmpty()) {
+                    stringResource(
+                        R.string.acc_last_updated,
+                        DateUtils.formatDateTime(
+                            context,
+                            subCache.subscription.lastUpdated,
+                            DateUtils.FORMAT_SHOW_DATE or
+                                DateUtils.FORMAT_SHOW_TIME or
+                                DateUtils.FORMAT_SHOW_YEAR
+                        )
+                    )
+                } else {
+                    ""
+                }
+                val subscriptionAnnouncement = if (lastUpdatedAccessibility.isNotEmpty()) {
+                    stringResource(
+                        R.string.acc_subscription_announcement,
+                        subCache.subscription.remarks,
+                        lastUpdatedAccessibility
+                    )
+                } else {
+                    subCache.subscription.remarks
+                }
+                val subscriptionUpdateDescription = stringResource(
+                    R.string.acc_subscription_update,
+                    stringResource(
+                        if (subCache.subscription.enabled) R.string.acc_state_on
+                        else R.string.acc_state_off
+                    )
+                )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
                     ReorderableListItem(
                         scope = this,
@@ -172,13 +206,16 @@ fun SubSettingScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .semantics(mergeDescendants = true) {}
+                                .semantics(mergeDescendants = true) {
+                                    contentDescription = subscriptionAnnouncement
+                                }
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = subCache.subscription.remarks,
+                                    modifier = Modifier.clearAndSetSemantics {},
                                     style = MaterialTheme.typography.bodyLarge,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -194,24 +231,11 @@ fun SubSettingScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-                                val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
                                 if (lastUpdated.isNotEmpty()) {
-                                    val lastUpdatedAccessibility = stringResource(
-                                        R.string.acc_last_updated,
-                                        DateUtils.formatDateTime(
-                                            context,
-                                            subCache.subscription.lastUpdated,
-                                            DateUtils.FORMAT_SHOW_DATE or
-                                                DateUtils.FORMAT_SHOW_TIME or
-                                                DateUtils.FORMAT_SHOW_YEAR
-                                        )
-                                    )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         text = lastUpdated,
-                                        modifier = Modifier.semantics {
-                                            contentDescription = lastUpdatedAccessibility
-                                        },
+                                        modifier = Modifier.clearAndSetSemantics {},
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -250,23 +274,33 @@ fun SubSettingScreen(
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Switch(
-                                    checked = subCache.subscription.enabled,
-                                    onCheckedChange = { checked ->
-                                        val updated = subCache.subscription.copy()
-                                        updated.enabled = checked
-                                        viewModel.update(subCache.guid, updated)
-                                    },
+                                val updateSubscription: (Boolean) -> Unit = { checked ->
+                                    val updated = subCache.subscription.copy()
+                                    updated.enabled = checked
+                                    viewModel.update(subCache.guid, updated)
+                                }
+                                Box(
                                     modifier = Modifier
                                         .scale(0.7f)
-                                        .semantics {
+                                        .clearAndSetSemantics {
                                             contentDescription = subscriptionUpdateDescription
-                                        },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                        checkedTrackColor = MaterialTheme.colorScheme.secondary
+                                            role = Role.Switch
+                                            onClick {
+                                                updateSubscription(!subCache.subscription.enabled)
+                                                true
+                                            }
+                                        }
+                                ) {
+                                    Switch(
+                                        checked = subCache.subscription.enabled,
+                                        onCheckedChange = updateSubscription,
+                                        modifier = Modifier.clearAndSetSemantics {},
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                            checkedTrackColor = MaterialTheme.colorScheme.secondary
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                     }

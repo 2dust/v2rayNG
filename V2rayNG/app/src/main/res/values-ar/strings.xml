@@ -522,7 +522,10 @@
     <string name="acc_more">المزيد من الخيارات</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">آخر تحديث %1$s</string>
-    <string name="acc_subscription_update">التحديث هو</string>
+    <string name="acc_subscription_announcement">%1$s، %2$s</string>
+    <string name="acc_subscription_update">التحديث %1$s</string>
+    <string name="acc_state_on">مفعّل</string>
+    <string name="acc_state_off">غير مفعّل</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">محظورة</string>
     <string name="acc_routing_rule_routed_through">موجّهة عبر %1$s</string>
@@ -537,7 +540,7 @@
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_unavailable_setting">إعداد غير متاح، %1$s</string>
     <string name="acc_unavailable_setting_with_description">إعداد غير متاح، %1$s، %2$s</string>
-    <string name="acc_setting_switch_prefix">%1$s حاليًا</string>
+    <string name="acc_setting_switch">%1$s حاليًا %2$s</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

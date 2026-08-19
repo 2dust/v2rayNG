@@ -40,6 +40,9 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -351,7 +354,7 @@ private fun RoutingRulesetItem(
         routeDescription,
         ruleState
     )
-    val ruleSwitchDescription = stringResource(R.string.acc_routing_rule_switch)
+    val ruleSwitchDescription = ruleState
 
     Row(
         modifier = Modifier
@@ -366,6 +369,7 @@ private fun RoutingRulesetItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = ruleset.remarks ?: "",
+                    modifier = Modifier.clearAndSetSemantics {},
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -414,19 +418,28 @@ private fun RoutingRulesetItem(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Switch(
-                checked = enabled,
-                onCheckedChange = onEnabledChange,
+            Box(
                 modifier = Modifier
                     .scale(0.7f)
-                    .semantics {
+                    .clearAndSetSemantics {
                         contentDescription = ruleSwitchDescription
-                    },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                    checkedTrackColor = MaterialTheme.colorScheme.secondary
+                        role = Role.Switch
+                        onClick {
+                            onEnabledChange(!enabled)
+                            true
+                        }
+                    }
+            ) {
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = onEnabledChange,
+                    modifier = Modifier.clearAndSetSemantics {},
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                        checkedTrackColor = MaterialTheme.colorScheme.secondary
+                    )
                 )
-            )
+            }
         }
     }
 }

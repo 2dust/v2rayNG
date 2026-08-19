@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.compose
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +27,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -123,6 +128,7 @@ private fun SettingsItemRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
+                modifier = if (!enabled) Modifier.clearAndSetSemantics {} else Modifier,
                 style = MaterialTheme.typography.bodyLarge,
                 color = titleColor
             )
@@ -130,6 +136,7 @@ private fun SettingsItemRow(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
+                    modifier = if (!enabled) Modifier.clearAndSetSemantics {} else Modifier,
                     style = MaterialTheme.typography.bodySmall,
                     color = descriptionColor
                 )
@@ -269,21 +276,46 @@ fun SettingsSwitchItem(
         } else null,
         modifier = modifier,
         trailing = {
-            val switchDescription = stringResource(R.string.acc_setting_switch_prefix, title)
-            Switch(
-                checked = checked,
-                onCheckedChange = if (enabled) onCheckedChange else null,
+            val switchDescription = if (enabled) {
+                stringResource(
+                    R.string.acc_setting_switch,
+                    title,
+                    stringResource(
+                        if (checked) R.string.acc_state_on else R.string.acc_state_off
+                    )
+                )
+            } else {
+                ""
+            }
+            Box(
                 modifier = Modifier
                     .scale(0.8f)
-                    .semantics {
-                        contentDescription = switchDescription
-                    },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                    checkedTrackColor = MaterialTheme.colorScheme.secondary
-                ),
-                enabled = enabled
-            )
+                    .then(
+                        if (enabled) {
+                            Modifier.clearAndSetSemantics {
+                                contentDescription = switchDescription
+                                role = Role.Switch
+                                onClick {
+                                    onCheckedChange(!checked)
+                                    true
+                                }
+                            }
+                        } else {
+                            Modifier.clearAndSetSemantics {}
+                        }
+                    )
+            ) {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = if (enabled) onCheckedChange else null,
+                    modifier = Modifier.clearAndSetSemantics {},
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                        checkedTrackColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    enabled = enabled
+                )
+            }
         }
     )
 }
