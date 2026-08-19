@@ -28,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,13 +75,14 @@ private enum class AddAssetMenuAction(@StringRes val labelRes: Int) {
     QRCode(R.string.menu_item_scan_qrcode)
 }
 
+private data class AssetDeleteTarget(val guid: String, val name: String)
+
 class UserAssetActivity : HelperBaseComponentActivity() {
 
     private val viewModel: UserAssetViewModel by viewModels()
-    val extDir by lazy { File(Utils.userAssetPath(this)) }
+    private val extDir by lazy { File(Utils.userAssetPath(this)) }
     private val isLoadingState = MutableStateFlow(false)
     private val geoFilesSourceState = MutableStateFlow("")
-    private val refreshTrigger = MutableStateFlow(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,12 +91,13 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
+        val isLoading by isLoadingState.collectAsStateWithLifecycle()
+        val geoFilesSource by geoFilesSourceState.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         UserAssetScreen(
-            viewModel = viewModel,
-            extDir = extDir,
-            isLoadingState = isLoadingState,
-            geoFilesSourceState = geoFilesSourceState,
-            refreshTrigger = refreshTrigger,
+            uiState = uiState,
+            isLoading = isLoading,
+            geoFilesSource = geoFilesSource,
             geoFilesSourcesList = AppConfig.GEO_FILES_SOURCES.toList(),
             onBackClick = { finish() },
             onGeoSourceSelected = { value ->
@@ -111,13 +112,10 @@ class UserAssetActivity : HelperBaseComponentActivity() {
             onEditAsset = { guid ->
                 startActivity(Intent(this, UserAssetUrlActivity::class.java).putExtra("assetId", guid))
             },
-            onRemoveAsset = { guid ->
-                val asset = viewModel.getAssets().find { it.guid == guid }
-                if (asset != null) {
-                    extDir.listFiles()?.find { it.name == asset.assetUrl.remarks }?.delete()
-                    MmkvManager.removeAssetUrl(guid)
-                    initAssets()
-                }
+            onRemoveAsset = { guid, name ->
+                extDir.listFiles()?.find { it.name == name }?.delete()
+                MmkvManager.removeAssetUrl(guid)
+                initAssets()
             }
         )
     }
@@ -209,28 +207,28 @@ class UserAssetActivity : HelperBaseComponentActivity() {
     }
 
     private fun downloadGeoFiles() {
-        refreshData()
         isLoadingState.value = true
         toast(R.string.msg_downloading_content)
 
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
-            withContext(Dispatchers.Main) {
-                if (result.successCount > 0) {
-                    toast(getString(R.string.title_update_asset_count, result.successCount))
-                } else {
-                    toast(getString(R.string.toast_failure))
-                }
-                refreshData()
-                isLoadingState.value = false
+        lifecycleScope.launch {
+            refreshData().join()
+            val result = withContext(Dispatchers.IO) {
+                viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             }
+            if (result.successCount > 0) {
+                toast(getString(R.string.title_update_asset_count, result.successCount))
+            } else {
+                toast(getString(R.string.toast_failure))
+            }
+            refreshData().join()
+            isLoadingState.value = false
         }
     }
 
-    fun initAssets() {
+    private fun initAssets() {
         lifecycleScope.launch(Dispatchers.Default) {
             SettingsManager.initAssets(this@UserAssetActivity, assets)
             withContext(Dispatchers.Main) {
@@ -239,19 +237,14 @@ class UserAssetActivity : HelperBaseComponentActivity() {
         }
     }
 
-    fun refreshData() {
-        viewModel.reload(getGeoFilesSources())
-        refreshTrigger.value++
-    }
+    private fun refreshData() = viewModel.reload(getGeoFilesSources(), extDir)
 }
 
 @Composable
-fun UserAssetScreen(
-    viewModel: UserAssetViewModel,
-    extDir: File,
-    isLoadingState: MutableStateFlow<Boolean>,
-    geoFilesSourceState: MutableStateFlow<String>,
-    refreshTrigger: MutableStateFlow<Int>,
+internal fun UserAssetScreen(
+    uiState: UserAssetUiState,
+    isLoading: Boolean,
+    geoFilesSource: String,
     geoFilesSourcesList: List<String>,
     onBackClick: () -> Unit,
     onGeoSourceSelected: (String) -> Unit,
@@ -260,15 +253,10 @@ fun UserAssetScreen(
     onAddQrcodeClick: () -> Unit,
     onDownloadClick: () -> Unit,
     onEditAsset: (String) -> Unit,
-    onRemoveAsset: (String) -> Unit
+    onRemoveAsset: (String, String) -> Unit
 ) {
-    val isLoading by isLoadingState.collectAsState()
-    val geoFilesSource by geoFilesSourceState.collectAsState()
-    val assets by viewModel.assetsFlow.collectAsStateWithLifecycle()
-    val trigger by refreshTrigger.collectAsState()
-
     var showAddMenu by remember { mutableStateOf(false) }
-    var deleteTargetGuid by remember { mutableStateOf<String?>(null) }
+    var deleteTarget by remember { mutableStateOf<AssetDeleteTarget?>(null) }
     val listState = rememberLazyListState()
 
     Scaffold(
@@ -315,7 +303,7 @@ fun UserAssetScreen(
                 .verticalScrollbar(listState),
             contentPadding = NavigationBarsBottomPadding()
         ) {
-            item(key = "geo_source_$trigger") {
+            item(key = "geo_source") {
                 SettingsListItem(
                     title = stringResource(R.string.asset_geo_files_sources),
                     entries = geoFilesSourcesList,
@@ -331,12 +319,14 @@ fun UserAssetScreen(
                     modifier = Modifier.padding(16.dp)
                 )
             }
-            itemsIndexed(items = assets, key = { _, item -> "${item.guid}_$trigger" }) { _, item ->
+            itemsIndexed(items = uiState.assets, key = { _, item -> item.guid }) { _, item ->
                 UserAssetItem(
                     item = item,
-                    extDir = extDir,
+                    fileMetadata = uiState.fileMetadata[item.guid],
                     onEdit = { onEditAsset(item.guid) },
-                    onDeleteClick = { deleteTargetGuid = item.guid }
+                    onDeleteClick = {
+                        deleteTarget = AssetDeleteTarget(item.guid, item.assetUrl.remarks)
+                    }
                 )
                 ItemDivider()
             }
@@ -344,13 +334,14 @@ fun UserAssetScreen(
     }
 
 
-    if (deleteTargetGuid != null) {
-        val guid = deleteTargetGuid!!
-        val assetName = assets.find { it.guid == guid }?.assetUrl?.remarks ?: ""
+    deleteTarget?.let { asset ->
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_asset_file, assetName),
-            onConfirm = { onRemoveAsset(guid) },
-            onDismiss = { deleteTargetGuid = null }
+            message = stringResource(R.string.confirm_delete_asset_file, asset.name),
+            onConfirm = {
+                deleteTarget = null
+                onRemoveAsset(asset.guid, asset.name)
+            },
+            onDismiss = { deleteTarget = null }
         )
     }
 }
@@ -358,16 +349,15 @@ fun UserAssetScreen(
 @Composable
 private fun UserAssetItem(
     item: AssetUrlCache,
-    extDir: File,
+    fileMetadata: AssetFileMetadata?,
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val file = remember(item.guid, item.assetUrl.remarks) {
-        extDir.listFiles()?.find { it.name == item.assetUrl.remarks }
-    }
-    val propertiesText = if (file != null) {
-        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-        "${file.length().toTrafficString()}  •  ${dateFormat.format(Date(file.lastModified()))}"
+    val propertiesText = if (fileMetadata != null) {
+        remember(fileMetadata) {
+            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
+            "${fileMetadata.length.toTrafficString()}  •  ${dateFormat.format(Date(fileMetadata.lastModified))}"
+        }
     } else {
         stringResource(R.string.msg_file_not_found)
     }
