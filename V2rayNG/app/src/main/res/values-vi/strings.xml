@@ -523,6 +523,14 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">Cập nhật lần cuối %1$s</string>
     <string name="acc_subscription_update">Cập nhật là</string>
+    <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
+    <string name="acc_routing_rule_blocked">bị chặn</string>
+    <string name="acc_routing_rule_routed_through">được định tuyến qua %1$s</string>
+    <string name="acc_routing_rule_routed_directly">được định tuyến trực tiếp</string>
+    <string name="acc_routing_rule_state">quy tắc đang %1$s</string>
+    <string name="acc_routing_rule_switch">Quy tắc đang</string>
+    <string name="acc_routing_rule_on">bật</string>
+    <string name="acc_routing_rule_off">tắt</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

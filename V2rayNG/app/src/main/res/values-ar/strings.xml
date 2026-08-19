@@ -523,6 +523,14 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">آخر تحديث %1$s</string>
     <string name="acc_subscription_update">التحديث هو</string>
+    <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
+    <string name="acc_routing_rule_blocked">محظورة</string>
+    <string name="acc_routing_rule_routed_through">موجّهة عبر %1$s</string>
+    <string name="acc_routing_rule_routed_directly">موجّهة مباشرة</string>
+    <string name="acc_routing_rule_state">القاعدة %1$s</string>
+    <string name="acc_routing_rule_switch">القاعدة</string>
+    <string name="acc_routing_rule_on">مفعّلة</string>
+    <string name="acc_routing_rule_off">غير مفعّلة</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

@@ -523,6 +523,14 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">上次更新：%1$s</string>
     <string name="acc_subscription_update">更新为</string>
+    <string name="acc_routing_rule_announcement">%1$s，%2$s，%3$s</string>
+    <string name="acc_routing_rule_blocked">已拦截</string>
+    <string name="acc_routing_rule_routed_through">通过 %1$s 路由</string>
+    <string name="acc_routing_rule_routed_directly">直接路由</string>
+    <string name="acc_routing_rule_state">规则%1$s</string>
+    <string name="acc_routing_rule_switch">规则</string>
+    <string name="acc_routing_rule_on">开启</string>
+    <string name="acc_routing_rule_off">关闭</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>

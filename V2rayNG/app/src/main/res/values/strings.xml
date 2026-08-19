@@ -523,6 +523,14 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">Last updated %1$s</string>
     <string name="acc_subscription_update">Update is</string>
+    <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
+    <string name="acc_routing_rule_blocked">is blocked</string>
+    <string name="acc_routing_rule_routed_through">routed through %1$s</string>
+    <string name="acc_routing_rule_routed_directly">routed directly</string>
+    <string name="acc_routing_rule_state">the rule is %1$s</string>
+    <string name="acc_routing_rule_switch">The rule is</string>
+    <string name="acc_routing_rule_on">on</string>
+    <string name="acc_routing_rule_off">off</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
