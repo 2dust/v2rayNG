@@ -58,11 +58,15 @@ fun MainScreen(
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
-    var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
+    var showRemoveConfirm by remember { mutableStateOf<ServerDeleteTarget?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    val removeServer: (String) -> Unit = { guid ->
-        if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
+    val removeServer: (String, ProfileItem) -> Unit = { guid, profile ->
+        if (confirmRemove) {
+            showRemoveConfirm = ServerDeleteTarget(guid, profile.remarks)
+        } else {
+            onAction(MainAction.RemoveServer(guid))
+        }
     }
 
     val pagerState = rememberPagerState(
@@ -178,7 +182,7 @@ fun MainScreen(
             more = more,
             onDismiss = { shareTarget = null },
             onAction = onAction,
-            onRemove = removeServer,
+            onRemove = { targetGuid -> removeServer(targetGuid, profile) },
         )
     }
     if (shareQRCodeBitmap != null) {

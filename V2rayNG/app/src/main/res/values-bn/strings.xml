@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">আপনি কি বর্তমানে প্রদর্শিত সব প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_duplicate_profiles">আপনি কি বর্তমানে প্রদর্শিত সব সদৃশ প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_invalid_profiles">প্রথমে প্রোফাইলগুলো পরীক্ষা করুন। আপনি কি বর্তমানে প্রদর্শিত সব অবৈধ প্রোফাইল মুছে ফেলতে চান?</string>
-    <string name="confirm_delete_profile">আপনি কি এই প্রোফাইলটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_profile">আপনি কি এই প্রোফাইলটি মুছে ফেলতে চান?\n%1$s</string>
     <string name="confirm_delete_policy_group">আপনি কি এই পলিসি গ্রুপটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_proxy_chain_member">আপনি কি এই প্রক্সি চেইন সদস্যটিকে মুছে ফেলতে চান?</string>
     <string name="confirm_delete_routing_rule">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?</string>
@@ -521,7 +521,7 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
-    <string name="acc_currently_selected_server">বর্তমানে নির্বাচিত সার্ভার</string>
+    <string name="acc_selected_server">নির্বাচিত সার্ভার</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

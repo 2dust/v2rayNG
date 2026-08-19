@@ -38,11 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,7 +79,7 @@ fun GroupPagerPage(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onRemoveServer: (String, ProfileItem) -> Unit,
     contentPadding: PaddingValues
 ) {
     val serverFlow = remember(groupId) {
@@ -125,7 +122,7 @@ private fun ServerListPage(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onRemoveServer: (String, ProfileItem) -> Unit,
     onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues
 ) {
@@ -245,7 +242,7 @@ private fun ServerItemRow(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String, ProfileItem) -> Unit
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -265,7 +262,7 @@ private fun ServerItemRow(
         onClick = { onSelectServer(serverCache.guid) },
         onShare = { onShareServer(serverCache.guid, profile) },
         onEdit = { onEditServer(serverCache.guid, profile) },
-        onRemove = { onRemoveServer(serverCache.guid) },
+        onRemove = { onRemoveServer(serverCache.guid, profile) },
         onMore = { onMoreServer(serverCache.guid, profile) }
     )
 }
@@ -280,7 +277,7 @@ private fun ServerItemColumn(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String, ProfileItem) -> Unit
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -298,7 +295,7 @@ private fun ServerItemColumn(
             onClick = { onSelectServer(serverCache.guid) },
             onEdit = { onEditServer(serverCache.guid, profile) },
             onShare = { onShareServer(serverCache.guid, profile) },
-            onRemove = { onRemoveServer(serverCache.guid) },
+            onRemove = { onRemoveServer(serverCache.guid, profile) },
             onMore = { onMoreServer(serverCache.guid, profile) }
         )
         ItemDivider()
@@ -339,29 +336,32 @@ fun ServerListItem(
             contentDescription = testResultAccessibility
         }
     }
-    val selectedStateDescription = stringResource(R.string.acc_currently_selected_server)
+    val selectedServerPrefix = stringResource(R.string.acc_selected_server)
+    val selectionPrefixModifier = if (isSelected) {
+        Modifier.semantics {
+            contentDescription = selectedServerPrefix
+        }
+    } else {
+        Modifier
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .then(
                 if (isSelected) {
-                    Modifier.semantics {
-                        selected = true
-                        stateDescription = selectedStateDescription
-                    }
+                    Modifier.semantics(mergeDescendants = true) {}
                 } else {
-                    Modifier
+                    Modifier.clickable(onClick = onClick)
                 }
             )
-            // Do not publish selected = false: TalkBack announces it as "Not selected".
-            .clickable(role = Role.RadioButton, onClick = onClick)
             .then(dragModifier)
     ) {
         Box(
             Modifier
                 .width(10.dp)
                 .fillMaxHeight()
+                .then(selectionPrefixModifier)
         ) {
             if (isSelected) {
                 Row {

@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">Are you sure you want to delete all profiles currently shown?</string>
     <string name="confirm_delete_duplicate_profiles">Are you sure you want to delete all duplicate profiles currently shown?</string>
     <string name="confirm_delete_invalid_profiles">Please test the profiles first. Are you sure you want to delete all invalid profiles currently shown?</string>
-    <string name="confirm_delete_profile">Are you sure you want to delete this profile?</string>
+    <string name="confirm_delete_profile">Are you sure you want to delete this profile?\n%1$s</string>
     <string name="confirm_delete_policy_group">Are you sure you want to delete this policy group?</string>
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
@@ -521,7 +521,7 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
-    <string name="acc_currently_selected_server">Currently selected server</string>
+    <string name="acc_selected_server">Selected server</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>

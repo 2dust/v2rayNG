@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">Bạn có chắc muốn xóa tất cả cấu hình đang hiển thị không?</string>
     <string name="confirm_delete_duplicate_profiles">Bạn có chắc muốn xóa tất cả cấu hình trùng lặp đang hiển thị không?</string>
     <string name="confirm_delete_invalid_profiles">Vui lòng kiểm tra các cấu hình trước. Bạn có chắc muốn xóa tất cả cấu hình không hợp lệ đang hiển thị không?</string>
-    <string name="confirm_delete_profile">Bạn có chắc muốn xóa cấu hình này không?</string>
+    <string name="confirm_delete_profile">Bạn có chắc muốn xóa cấu hình này không?\n%1$s</string>
     <string name="confirm_delete_policy_group">Bạn có chắc muốn xóa nhóm chính sách này không?</string>
     <string name="confirm_delete_proxy_chain_member">Bạn có chắc muốn xóa thành viên này khỏi chuỗi proxy không?</string>
     <string name="confirm_delete_routing_rule">Bạn có chắc muốn xóa quy tắc định tuyến này không?</string>
@@ -521,7 +521,7 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_currently_selected_server">Máy chủ hiện được chọn</string>
+    <string name="acc_selected_server">Máy chủ được chọn</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
