@@ -521,6 +521,7 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>
