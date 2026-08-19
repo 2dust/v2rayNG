@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.subscription
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -33,8 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -123,6 +128,8 @@ fun SubSettingScreen(
     var showQRCodeBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+    val subscriptionUpdateDescription = stringResource(R.string.acc_subscription_update)
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         viewModel.move(from.index, to.index)
     }
@@ -165,6 +172,7 @@ fun SubSettingScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .semantics(mergeDescendants = true) {}
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -179,18 +187,35 @@ fun SubSettingScreen(
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         text = subCache.subscription.url,
+                                        modifier = Modifier.clearAndSetSemantics {},
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
+                                if (lastUpdated.isNotEmpty()) {
+                                    val lastUpdatedAccessibility = stringResource(
+                                        R.string.acc_last_updated,
+                                        DateUtils.formatDateTime(
+                                            context,
+                                            subCache.subscription.lastUpdated,
+                                            DateUtils.FORMAT_SHOW_DATE or
+                                                DateUtils.FORMAT_SHOW_TIME or
+                                                DateUtils.FORMAT_SHOW_YEAR
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = lastUpdated,
+                                        modifier = Modifier.semantics {
+                                            contentDescription = lastUpdatedAccessibility
+                                        },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
 
                             Column(
@@ -232,7 +257,11 @@ fun SubSettingScreen(
                                         updated.enabled = checked
                                         viewModel.update(subCache.guid, updated)
                                     },
-                                    modifier = Modifier.scale(0.7f),
+                                    modifier = Modifier
+                                        .scale(0.7f)
+                                        .semantics {
+                                            contentDescription = subscriptionUpdateDescription
+                                        },
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                         checkedTrackColor = MaterialTheme.colorScheme.secondary

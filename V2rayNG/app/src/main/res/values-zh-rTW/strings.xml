@@ -521,6 +521,8 @@
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
     <string name="acc_selected_server">Selected</string>
+    <string name="acc_last_updated">上次更新：%1$s</string>
+    <string name="acc_subscription_update">更新為</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>

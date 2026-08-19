@@ -521,6 +521,8 @@
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
     <string name="acc_selected_server">Selected</string>
+    <string name="acc_last_updated">Last updated %1$s</string>
+    <string name="acc_subscription_update">Update is</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>

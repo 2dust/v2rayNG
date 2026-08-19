@@ -521,6 +521,8 @@
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
     <string name="acc_selected_server">Selected</string>
+    <string name="acc_last_updated">Cập nhật lần cuối %1$s</string>
+    <string name="acc_subscription_update">Cập nhật là</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
