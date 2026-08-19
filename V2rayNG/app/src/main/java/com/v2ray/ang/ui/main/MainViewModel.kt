@@ -717,10 +717,22 @@ class MainViewModel(
         dataSource.cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
-        dataSource.clearAllTestDelayResults(servers.map { it.guid })
         if (servers.isEmpty()) {
             _uiState.update { it.copy(isTesting = false) }
             return
+        }
+        val serverGuids = servers.map { it.guid }
+        mutableServerGroupState(groupId).update { current ->
+            current.copy(
+                servers = current.servers.map { server ->
+                    if (server.testDelayMillis == 0L) server
+                    else server.copy(testDelayMillis = 0L)
+                },
+                rows = current.rows.map { row ->
+                    if (row.testDelayMillis == 0L) row
+                    else row.copy(testDelayMillis = 0L)
+                }
+            )
         }
         testingGroupId = groupId
         _uiState.update {
@@ -730,12 +742,13 @@ class MainViewModel(
             )
         }
         viewModelScope.launch(ioDispatcher) {
+            dataSource.clearAllTestDelayResults(serverGuids)
             cacheMutex.withLock { groupDataCache.remove(groupId) }
             dataSource.sendMsg2TestService(
                 TestServiceMessage(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     subscriptionId = groupId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) servers.map { it.guid } else emptyList(),
+                    serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
                     onlyTcp = onlyTcp
                 )
             )
