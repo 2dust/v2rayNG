@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">التحديث %1$s</string>
     <string name="acc_state_on">مفعّل</string>
     <string name="acc_state_off">غير مفعّل</string>
+    <string name="acc_app_announcement">%1$s، %2$s</string>
+    <string name="acc_app_checked">محدّد</string>
+    <string name="acc_app_not_checked">غير محدّد</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">محظورة</string>
     <string name="acc_routing_rule_routed_through">موجّهة عبر %1$s</string>

@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">Cập nhật %1$s</string>
     <string name="acc_state_on">bật</string>
     <string name="acc_state_off">tắt</string>
+    <string name="acc_app_announcement">%1$s, %2$s</string>
+    <string name="acc_app_checked">đã chọn</string>
+    <string name="acc_app_not_checked">chưa chọn</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">bị chặn</string>
     <string name="acc_routing_rule_routed_through">được định tuyến qua %1$s</string>

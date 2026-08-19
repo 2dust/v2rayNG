@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">Обновление %1$s</string>
     <string name="acc_state_on">включено</string>
     <string name="acc_state_off">выключено</string>
+    <string name="acc_app_announcement">%1$s, %2$s</string>
+    <string name="acc_app_checked">отмечено</string>
+    <string name="acc_app_not_checked">не отмечено</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">заблокировано</string>
     <string name="acc_routing_rule_routed_through">маршрутизируется через %1$s</string>

@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">به‌روزرسانی %1$s</string>
     <string name="acc_state_on">روشن</string>
     <string name="acc_state_off">خاموش</string>
+    <string name="acc_app_announcement">%1$s، %2$s</string>
+    <string name="acc_app_checked">انتخاب‌شده</string>
+    <string name="acc_app_not_checked">انتخاب‌نشده</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">مسدود است</string>
     <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>

@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">আপডেট %1$s</string>
     <string name="acc_state_on">চালু</string>
     <string name="acc_state_off">বন্ধ</string>
+    <string name="acc_app_announcement">%1$s, %2$s</string>
+    <string name="acc_app_checked">চেক করা আছে</string>
+    <string name="acc_app_not_checked">চেক করা নেই</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">ব্লক করা হয়েছে</string>
     <string name="acc_routing_rule_routed_through">%1$s-এর মাধ্যমে রাউট করা হয়েছে</string>

@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">Update is %1$s</string>
     <string name="acc_state_on">on</string>
     <string name="acc_state_off">off</string>
+    <string name="acc_app_announcement">%1$s, %2$s</string>
+    <string name="acc_app_checked">checked</string>
+    <string name="acc_app_not_checked">not checked</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">is blocked</string>
     <string name="acc_routing_rule_routed_through">routed through %1$s</string>

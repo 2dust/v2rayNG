@@ -526,6 +526,9 @@
     <string name="acc_subscription_update">更新為%1$s</string>
     <string name="acc_state_on">開啟</string>
     <string name="acc_state_off">關閉</string>
+    <string name="acc_app_announcement">%1$s，%2$s</string>
+    <string name="acc_app_checked">已勾選</string>
+    <string name="acc_app_not_checked">未勾選</string>
     <string name="acc_routing_rule_announcement">%1$s，%2$s，%3$s</string>
     <string name="acc_routing_rule_blocked">已封鎖</string>
     <string name="acc_routing_rule_routed_through">透過 %1$s 路由</string>

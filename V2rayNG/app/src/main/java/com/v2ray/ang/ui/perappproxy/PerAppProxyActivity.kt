@@ -37,6 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
@@ -132,6 +137,16 @@ fun PerAppProxyScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
+    val perAppProxySwitchDescription = stringResource(
+        R.string.acc_setting_switch,
+        stringResource(R.string.per_app_proxy_settings_enable),
+        stringResource(if (perAppProxyEnabled) R.string.acc_state_on else R.string.acc_state_off)
+    )
+    val bypassAppsSwitchDescription = stringResource(
+        R.string.acc_setting_switch,
+        stringResource(R.string.switch_bypass_apps_mode),
+        stringResource(if (bypassApps) R.string.acc_state_on else R.string.acc_state_off)
+    )
 
     LaunchedEffect(Unit) {
         onSearch(searchQuery)
@@ -221,8 +236,17 @@ fun PerAppProxyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Switch(
                             checked = perAppProxyEnabled,
-                            modifier = Modifier.scale(0.65f),
                             onCheckedChange = onPerAppProxyChanged,
+                            modifier = Modifier
+                                .scale(0.65f)
+                                .clearAndSetSemantics {
+                                    contentDescription = perAppProxySwitchDescription
+                                    role = Role.Switch
+                                    onClick {
+                                        onPerAppProxyChanged(!perAppProxyEnabled)
+                                        true
+                                    }
+                                },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary
@@ -242,8 +266,17 @@ fun PerAppProxyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Switch(
                             checked = bypassApps,
-                            modifier = Modifier.scale(0.65f),
                             onCheckedChange = onBypassAppsChanged,
+                            modifier = Modifier
+                                .scale(0.65f)
+                                .clearAndSetSemantics {
+                                    contentDescription = bypassAppsSwitchDescription
+                                    role = Role.Switch
+                                    onClick {
+                                        onBypassAppsChanged(!bypassApps)
+                                        true
+                                    }
+                                },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary
