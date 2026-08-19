@@ -388,6 +388,7 @@
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
     <string name="connection_test_available">اتصال در %1$s با موفقیت برقرار شد</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <string name="server_test_delay_accessibility_value">%1$d میلی‌ثانیه</string>
     <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>

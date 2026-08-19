@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -326,6 +327,18 @@ fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, testDelayMillis)
     }
+    val testResultAccessibility = if (testDelayMillis == 0L) {
+        ""
+    } else {
+        stringResource(R.string.server_test_delay_accessibility_value, testDelayMillis)
+    }
+    val testResultModifier = if (testDelayMillis == 0L) {
+        Modifier
+    } else {
+        Modifier.semantics {
+            contentDescription = testResultAccessibility
+        }
+    }
     val selectedStateDescription = stringResource(R.string.acc_currently_selected_server)
     Row(
         modifier = modifier
@@ -420,7 +433,7 @@ fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(typeDescription, style = MaterialTheme.typography.bodySmall, color = colorConfigType, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(testResult, style = MaterialTheme.typography.bodySmall, color = if (testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(testResult, testResultModifier, style = MaterialTheme.typography.bodySmall, color = if (testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
