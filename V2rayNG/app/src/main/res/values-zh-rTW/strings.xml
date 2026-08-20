@@ -128,7 +128,7 @@
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
-    <string name="server_lab_verify_peer_cert_by_name">依名稱驗證對端憑證</string>
+    <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
     <string name="server_lab_pinned_ca256">憑證指紋 (SHA-256)</string>
     <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">僅支援 xhttp (packet-up) 和 ws 出站；與 TLS 相關的設定可能會被忽略或發生衝突</string>
@@ -233,7 +233,7 @@
     <string name="title_pref_dns_hosts">DNS 主機對應（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 
-    <string name="title_pref_delay_test_url">真實延遲測試 URL</string>
+    <string name="title_pref_delay_test_url">真連接延遲測試 URL</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">同時執行的真實延遲測試數</string>
 
@@ -298,6 +298,8 @@
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顯示設定</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
+    <string name="title_pref_dynamic_color">開啟莫奈取色</string>
+    <string name="summary_pref_dynamic_color">僅在 Android 12+ 裝置上工作</string>
     <string name="title_pref_use_hev_tunnel">啟用 Hev TUN 功能</string>
     <string name="summary_pref_use_hev_tunnel">啟用後，TUN 會使用 hev-socks5-tunnel；否則使用 xray-core。</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN 日誌層級</string>
@@ -318,7 +320,7 @@
     <string name="title_del_duplicate_config">刪除重複設定</string>
     <string name="title_del_invalid_config">刪除無效設定</string>
     <string name="title_export_all">將設定匯出至剪貼簿</string>
-    <string name="title_sub_setting">訂閱</string>
+    <string name="title_sub_setting">訂閱分組</string>
     <string name="sub_setting_remarks">備註</string>
     <string name="sub_setting_url">URL（可選）</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
@@ -330,10 +332,12 @@
     <string name="sub_setting_pre_profile">前置代理設定檔别名</string>
     <string name="sub_setting_next_profile">落地代理設定檔別名</string>
     <string name="sub_setting_pre_profile_tip">請確保設定檔別名存在且唯一</string>
+    <string name="sub_setting_entry_proxy_tip">所選代理會加在此訂閱中每個設定檔之前，作為該設定檔代理鏈的入口節點。</string>
+    <string name="sub_setting_exit_proxy_tip">所選代理會加在此訂閱中每個設定檔之後，作為該設定檔代理鏈的出口節點。</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
-    <string name="title_real_ping_all_server">測試實際延遲</string>
+    <string name="title_real_ping_all_server">測試真連接延遲</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
     <string name="title_filter_config">篩選設定</string>
@@ -344,6 +348,7 @@
     <string name="title_import_config_count">匯入 %d 個設定</string>
     <string name="title_export_config_count">匯出 %d 個設定</string>
     <string name="title_update_config_count">更新 %d 個設定</string>
+    <string name="title_update_asset_count">已更新 %d 個資源檔案</string>
     <string name="title_update_subscription_result">更新了 %1$d 個設定（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
     <string name="toast_server_not_found_in_group">目前群組中找不到所選伺服器</string>
@@ -355,7 +360,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">網域策略</string>
     <string name="routing_settings_title">路由設定</string>
-    <string name="routing_settings_tips">用逗號（,）分隔，選擇填寫 domain、ip 或 process 中的一項</string>
+    <string name="routing_settings_tips">一條規則只有在所有已設定的比對條件同時符合時才會生效（AND）。規則會由上而下檢查，並套用第一條符合的規則。</string>
+    <string name="routing_settings_comma_tip">多個項目請用逗號（,）分隔。</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
     <string name="routing_settings_rule_title">路由規則設定</string>
@@ -380,7 +386,8 @@
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
-    <string name="connection_test_available">"成功：%d ms延遲"</string>
+    <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
+    <string name="server_test_delay_value">%1$d ms</string>
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
@@ -485,6 +492,11 @@
     <string name="shizuku_hotspot_disabled">Wi-Fi 熱點已關閉</string>
     <string name="shizuku_hotspot_operation_failed">熱點操作失敗（錯誤 %1$d）</string>
     <string name="shizuku_tethering_wrong_upstream">Android 切換連線時已取消網路共用。請稍候片刻再試。</string>
+    <string name="title_profile_storage_cleanup">修復設定檔儲存空間</string>
+    <string name="summary_profile_storage_cleanup">刪除未使用的設定檔資料</string>
+    <string name="message_profile_storage_cleanup">要刪除已不再由任何群組使用的設定檔資料嗎？目前選取的設定檔，以及無法安全判定為未使用的資料，都會予以保留。</string>
+    <string name="toast_profile_storage_cleanup">已刪除未使用的設定檔：%1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">無法安全判定哪些設定檔資料未被使用。未刪除任何資料。</string>
     <string name="title_configuration_share">分享設定</string>
     <string name="title_webdav_config_setting">WebDAV 設定</string>
     <string name="title_webdav_config_setting_unknown">請先設定 WebDAV</string>
@@ -558,20 +570,13 @@
     <string name="acc_copy_log">複製日誌</string>
     <string name="acc_clear_log">清除日誌</string>
     <string name="acc_add_rule">新增路由規則</string>
-    <string name="core_error_no_server_selected">未選取設定</string>
-    <string name="core_error_decode_server_config">無法讀取所選設定</string>
-    <string name="core_error_build_config_context">無法準備所選設定</string>
-    <string name="core_error_get_config">無法產生核心設定</string>
-    <string name="core_error_get_config_detail">無法產生核心設定：%1$s</string>
-    <string name="core_error_get_speedtest_config_detail">無法產生測速用核心設定：%1$s</string>
-    <string name="core_error_custom_config_empty">自訂設定為空</string>
-    <string name="core_error_start">無法啟動核心</string>
     <string name="acc_start">啟動服務</string>
     <string name="acc_stop">停止服務</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>

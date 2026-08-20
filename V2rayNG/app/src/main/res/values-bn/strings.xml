@@ -298,6 +298,8 @@
     <string name="title_language">ভাষা</string>
     <string name="title_ui_settings">ইউআই সেটিংস</string>
     <string name="title_pref_ui_mode_night">ইউআই মোড সেটিংস</string>
+    <string name="title_pref_dynamic_color">ডায়নামিক রঙ চালু করুন</string>
+    <string name="summary_pref_dynamic_color">শুধুমাত্র Android 12+ ডিভাইসে কাজ করে</string>
     <string name="title_pref_use_hev_tunnel">Hev TUN সুবিধা চালু করুন</string>
     <string name="summary_pref_use_hev_tunnel">চালু থাকলে TUN hev-socks5-tunnel ব্যবহার করবে; অন্যথায় xray-core ব্যবহার করবে।</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN লগ স্তর</string>
@@ -327,9 +329,11 @@
     <string name="sub_setting_enable">আপডেট সক্রিয় করুন</string>
     <string name="sub_auto_update">স্বয়ংক্রিয় আপডেট সক্রিয় করুন</string>
     <string name="sub_allow_insecure_url">অনিরাপদ HTTP ঠিকানা অনুমোদন করুন</string>
-    <string name="sub_setting_pre_profile">আগের প্রক্সি কনফিগারেশনের মন্তব্য</string>
-    <string name="sub_setting_next_profile">পরবর্তী প্রক্সি কনফিগারেশনের মন্তব্য</string>
+    <string name="sub_setting_pre_profile">প্রবেশ প্রক্সি</string>
+    <string name="sub_setting_next_profile">প্রস্থান প্রক্সি</string>
     <string name="sub_setting_pre_profile_tip">কনফিগারেশনের মন্তব্যটি বিদ্যমান ও অনন্য হতে হবে</string>
+    <string name="sub_setting_entry_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের আগে সেই প্রোফাইলের প্রক্সি চেইনের প্রবেশ লিঙ্ক হিসেবে যোগ করা হবে।</string>
+    <string name="sub_setting_exit_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের পরে সেই প্রোফাইলের প্রক্সি চেইনের প্রস্থান লিঙ্ক হিসেবে যোগ করা হবে।</string>
     <string name="toast_invalid_update_interval">আপডেটের বিরতি সঠিক নয়। সর্বনিম্ন ১৫ মিনিট।</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
@@ -344,6 +348,7 @@
     <string name="title_import_config_count">%dটি কনফিগারেশন আমদানি করুন</string>
     <string name="title_export_config_count">%dটি কনফিগারেশন রপ্তানি করুন</string>
     <string name="title_update_config_count">%dটি কনফিগারেশন আপডেট করুন</string>
+    <string name="title_update_asset_count">%dটি অ্যাসেট ফাইল আপডেট হয়েছে</string>
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
     <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>
@@ -355,7 +360,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">ডোমেইন কৌশল</string>
     <string name="routing_settings_title">রাউটিং সেটিংস</string>
-    <string name="routing_settings_tips">কমা (,) দিয়ে আলাদা করুন। domain, ip বা process-এ একটি নির্বাচন করুন</string>
+    <string name="routing_settings_tips">সব নির্ধারিত মিলের শর্ত একসঙ্গে পূরণ হলেই কেবল নিয়মটি প্রয়োগ হবে (AND)। নিয়মগুলি ওপর থেকে নিচে পরীক্ষা করা হয়; প্রথম মিলে যাওয়া নিয়মটি প্রয়োগ করা হয়।</string>
+    <string name="routing_settings_comma_tip">একাধিক এন্ট্রি কমা (,) দিয়ে আলাদা করুন।</string>
     <string name="routing_settings_save">সেভ করুন</string>
     <string name="routing_settings_delete">মুছে ফেলুন</string>
     <string name="routing_settings_rule_title">রাউটিং নিয়মের সেটিংস</string>
@@ -380,7 +386,8 @@
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
     <string name="connection_test_testing_count">%dটি কনফিগারেশন পরীক্ষা করা হচ্ছে…</string>
-    <string name="connection_test_available">সফল: HTTP সংযোগ নিয়েছে %dms</string>
+    <string name="connection_test_available">সংযোগ সফল হয়েছে; সময় লেগেছে %1$s</string>
+    <string name="server_test_delay_value">%1$d মিলিসেকেন্ড</string>
     <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
@@ -485,6 +492,11 @@
     <string name="shizuku_hotspot_disabled">Wi-Fi হটস্পট বন্ধ হয়েছে</string>
     <string name="shizuku_hotspot_operation_failed">হটস্পট অপারেশন ব্যর্থ হয়েছে (ত্রুটি %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Android সংযোগ পরিবর্তন করার সময় টেথারিং বাতিল হয়েছে। একটু অপেক্ষা করে আবার চেষ্টা করুন।</string>
+    <string name="title_profile_storage_cleanup">প্রোফাইল স্টোরেজ মেরামত করুন</string>
+    <string name="summary_profile_storage_cleanup">অব্যবহৃত প্রোফাইল ডেটা মুছে ফেলুন</string>
+    <string name="message_profile_storage_cleanup">কোনো গ্রুপে আর ব্যবহৃত হয় না এমন প্রোফাইল ডেটা মুছে ফেলবেন? নির্বাচিত প্রোফাইল এবং নিরাপদে অব্যবহৃত বলে নির্ধারণ করা যায় না এমন ডেটা রাখা হবে।</string>
+    <string name="toast_profile_storage_cleanup">অব্যবহৃত প্রোফাইল মুছে ফেলা হয়েছে: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">কোন প্রোফাইল ডেটা অব্যবহৃত তা নিরাপদে নির্ধারণ করা যায়নি। কিছুই মুছে ফেলা হয়নি।</string>
     <string name="title_configuration_share">কনফিগারেশন শেয়ার করুন</string>
     <string name="title_webdav_config_setting">WebDAV সেটিংস</string>
     <string name="title_webdav_config_setting_unknown">প্রথমে WebDAV কনফিগার করুন।</string>
@@ -558,20 +570,13 @@
     <string name="acc_copy_log">লগ কপি করুন</string>
     <string name="acc_clear_log">লগ মুছুন</string>
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
-    <string name="core_error_no_server_selected">কোনো কনফিগারেশন নির্বাচন করা হয়নি</string>
-    <string name="core_error_decode_server_config">নির্বাচিত কনফিগারেশন পড়তে ব্যর্থ</string>
-    <string name="core_error_build_config_context">নির্বাচিত কনফিগারেশন প্রস্তুত করতে ব্যর্থ</string>
-    <string name="core_error_get_config">কোর কনফিগারেশন তৈরি করতে ব্যর্থ</string>
-    <string name="core_error_get_config_detail">কোর কনফিগারেশন তৈরি করতে ব্যর্থ: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">স্পিড টেস্টের জন্য কোর কনফিগারেশন তৈরি করতে ব্যর্থ: %1$s</string>
-    <string name="core_error_custom_config_empty">কাস্টম কনফিগারেশন খালি</string>
-    <string name="core_error_start">কোর চালু করতে ব্যর্থ</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>
     <string name="acc_stop">সার্ভিস বন্ধ করুন</string>
     <string name="acc_back">ফিরে যান</string>
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

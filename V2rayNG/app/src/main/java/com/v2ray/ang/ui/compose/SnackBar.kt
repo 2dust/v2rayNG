@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.delay
+import com.v2ray.ang.extension.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -88,7 +88,7 @@ class AppSnackbarController(
             if (currentShowTime != 0L) {
                 val elapsed = System.currentTimeMillis() - currentShowTime
                 if (elapsed < SnackbarThrottleMs) {
-                    delay((SnackbarThrottleMs - elapsed).milliseconds)
+                    delay((SnackbarThrottleMs - elapsed))
                 }
             }
 

@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,8 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +46,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +120,7 @@ fun RoutingEditScreen(
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
+    val processSelectTitle = stringResource(R.string.routing_settings_process_select)
     val scrollState = rememberScrollState()
 
     var remarks by rememberSaveable { mutableStateOf(initial?.remarks ?: "") }
@@ -176,7 +179,7 @@ fun RoutingEditScreen(
     }
 
     Scaffold(
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.routing_settings_rule_title),
@@ -220,21 +223,27 @@ fun RoutingEditScreen(
                 checked = locked,
                 onCheckedChange = { locked = it }
             )
+            Text(
+                text = stringResource(R.string.routing_settings_tips),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             FormTextField(
                 label = stringResource(R.string.routing_settings_domain),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = domain,
                 onValueChange = { domain = it }
             )
             FormTextField(
                 label = stringResource(R.string.routing_settings_ip),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = ip,
                 onValueChange = { ip = it }
             )
             FormTextField(
                 label = stringResource(R.string.routing_settings_process),
-                placeholder = stringResource(R.string.routing_settings_tips),
+                placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = processText,
                 onValueChange = { processText = it },
                 enabled = canUseProcess
@@ -251,7 +260,7 @@ fun RoutingEditScreen(
                             AppPickerActivity.createIntent(
                                 context = context,
                                 selectedPackages = current,
-                                title = context.getString(R.string.routing_settings_process_select)
+                                title = processSelectTitle
                             )
                         )
                     },
@@ -262,7 +271,7 @@ fun RoutingEditScreen(
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.routing_settings_process_select))
+                    Text(processSelectTitle)
                 }
             }
             FormTextField(
@@ -294,6 +303,7 @@ fun RoutingEditScreen(
                 editable = true
             )
             Spacer(modifier = Modifier.height(36.dp))
+            NavigationBarsSpacer()
         }
 
         if (showDeleteConfirm) {

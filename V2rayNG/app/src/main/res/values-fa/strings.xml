@@ -298,6 +298,8 @@
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
+    <string name="title_pref_dynamic_color">فعال‌سازی رنگ پویا</string>
+    <string name="summary_pref_dynamic_color">فقط روی اندروید ۱۲+ کار می‌کند</string>
     <string name="title_pref_use_hev_tunnel">استفاده از Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">اگر فعال باشد، تونل VPN از hev-socks5-tunnel استفاده می‌کند؛ در غیر این صورت از xray-core استفاده خواهد شد.</string>
     <string name="title_pref_hev_tunnel_loglevel">سطح گزارش‌های Hev TUN</string>
@@ -327,9 +329,11 @@
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>
-    <string name="sub_setting_pre_profile">نام مستعار پروکسی قبلی</string>
-    <string name="sub_setting_next_profile">نام مستعار پروکسی بعدی</string>
+    <string name="sub_setting_pre_profile">پروکسی ورودی</string>
+    <string name="sub_setting_next_profile">پروکسی خروجی</string>
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
+    <string name="sub_setting_entry_proxy_tip">پروکسی انتخاب‌شده پیش از هر پروفایل این اشتراک، به‌عنوان حلقهٔ ورودی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
+    <string name="sub_setting_exit_proxy_tip">پروکسی انتخاب‌شده پس از هر پروفایل این اشتراک، به‌عنوان حلقهٔ خروجی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
@@ -344,6 +348,7 @@
     <string name="title_import_config_count">وارد کردن %d کانفیگ</string>
     <string name="title_export_config_count">صادر کردن %d کانفیگ</string>
     <string name="title_update_config_count">آپدیت کردن %d کانفیگ</string>
+    <string name="title_update_asset_count">%d فایل منبع بروزرسانی شد</string>
     <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
     <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
     <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>
@@ -355,7 +360,8 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتژی دامنه</string>
     <string name="routing_settings_title">تنظیمات مسیریابی</string>
-    <string name="routing_settings_tips">با کاما (,) جدا کنید. یکی از موارد domain، ip یا process را وارد کنید</string>
+    <string name="routing_settings_tips">یک قانون فقط زمانی اعمال می‌شود که همهٔ شرط‌های تطبیق واردشده هم‌زمان برقرار باشند (AND). قوانین از بالا به پایین بررسی می‌شوند و نخستین قانون منطبق اعمال می‌شود.</string>
+    <string name="routing_settings_comma_tip">چند ورودی را با کاما (,) جدا کنید.</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">حذف</string>
     <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>
@@ -380,7 +386,8 @@
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش…</string>
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
-    <string name="connection_test_available">موفقیت: اتصال %dms طول کشید</string>
+    <string name="connection_test_available">اتصال در %1$s با موفقیت برقرار شد</string>
+    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
     <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
@@ -485,6 +492,11 @@
     <string name="shizuku_hotspot_disabled">نقطه اتصال Wi-Fi خاموش شد</string>
     <string name="shizuku_hotspot_operation_failed">عملیات نقطه اتصال ناموفق بود (خطای %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">هنگام تغییر اتصال توسط Android، تترینگ لغو شد. کمی صبر کنید و دوباره تلاش کنید.</string>
+    <string name="title_profile_storage_cleanup">ترمیم فضای ذخیره‌سازی پروفایل‌ها</string>
+    <string name="summary_profile_storage_cleanup">حذف داده‌های پروفایل بلااستفاده</string>
+    <string name="message_profile_storage_cleanup">داده‌های پروفایلی که دیگر در هیچ گروهی استفاده نمی‌شوند حذف شوند؟ پروفایل انتخاب‌شده و داده‌هایی که نمی‌توان با اطمینان بلااستفاده بودنشان را تشخیص داد حفظ خواهند شد.</string>
+    <string name="toast_profile_storage_cleanup">پروفایل‌های بلااستفاده حذف شدند: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">امکان تشخیص مطمئن داده‌های پروفایل بلااستفاده وجود نداشت. هیچ موردی حذف نشد.</string>
     <string name="title_configuration_share">اشتراک گذاری پیکربندی</string>
     <string name="title_webdav_config_setting">تنظیمات WebDAV</string>
     <string name="title_webdav_config_setting_unknown">لطفاً ابتدا WebDAV را پیکربندی کنید.</string>
@@ -558,20 +570,13 @@
     <string name="acc_copy_log">کپی گزارش</string>
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
-    <string name="core_error_no_server_selected">هیچ پیکربندی‌ای انتخاب نشده است</string>
-    <string name="core_error_decode_server_config">خواندن پیکربندی انتخاب‌شده ناموفق بود</string>
-    <string name="core_error_build_config_context">آماده‌سازی پیکربندی انتخاب‌شده ناموفق بود</string>
-    <string name="core_error_get_config">ایجاد پیکربندی هسته ناموفق بود</string>
-    <string name="core_error_get_config_detail">ایجاد پیکربندی هسته ناموفق بود: %1$s</string>
-    <string name="core_error_get_speedtest_config_detail">ایجاد پیکربندی هسته برای آزمایش سرعت ناموفق بود: %1$s</string>
-    <string name="core_error_custom_config_empty">پیکربندی سفارشی خالی است</string>
-    <string name="core_error_start">راه‌اندازی هسته ناموفق بود</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
     <string name="acc_back">بازگشت</string>
     <string name="acc_search">جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
+    <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>

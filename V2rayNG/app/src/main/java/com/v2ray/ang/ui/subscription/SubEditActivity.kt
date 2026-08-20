@@ -3,6 +3,8 @@ package com.v2ray.ang.ui.subscription
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -12,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
@@ -163,7 +165,7 @@ fun SubEditScreen(
     }
 
     Scaffold(
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+        contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_sub_setting),
@@ -227,7 +229,8 @@ fun SubEditScreen(
                 value = prevProfile,
                 options = profileSuggestions,
                 onValueChange = { prevProfile = it },
-                editable = true
+                editable = true,
+                supportingText = stringResource(R.string.sub_setting_entry_proxy_tip)
             )
             FormDropdownField(
                 label = stringResource(R.string.sub_setting_next_profile),
@@ -235,8 +238,10 @@ fun SubEditScreen(
                 value = nextProfile,
                 options = profileSuggestions,
                 onValueChange = { nextProfile = it },
-                editable = true
+                editable = true,
+                supportingText = stringResource(R.string.sub_setting_exit_proxy_tip)
             )
+            NavigationBarsSpacer()
         }
     }
 
