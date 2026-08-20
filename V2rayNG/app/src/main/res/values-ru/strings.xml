@@ -531,7 +531,7 @@
     <string name="acc_app_not_checked">не отмечено</string>
     <string name="acc_app_routing_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_app_routed_directly">маршрутизируется напрямую</string>
-    <string name="acc_app_routed_through">маршрутизируется через v2rayNG</string>
+    <string name="acc_app_routed_through">маршрутизируется через приложение</string>
     <string name="acc_per_app_routing_disabled">маршрутизация по приложениям не включена</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">заблокировано</string>

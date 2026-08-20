@@ -531,7 +531,7 @@
     <string name="acc_app_not_checked">চেক করা নেই</string>
     <string name="acc_app_routing_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_app_routed_directly">সরাসরি রাউট করা হয়েছে</string>
-    <string name="acc_app_routed_through">v2rayNG-এর মাধ্যমে রাউট করা হয়েছে</string>
+    <string name="acc_app_routed_through">অ্যাপের মাধ্যমে রাউট করা হয়েছে</string>
     <string name="acc_per_app_routing_disabled">অ্যাপভিত্তিক রাউটিং চালু নেই</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">ব্লক করা হয়েছে</string>

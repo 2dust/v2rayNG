@@ -531,7 +531,7 @@
     <string name="acc_app_not_checked">chưa chọn</string>
     <string name="acc_app_routing_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_app_routed_directly">được định tuyến trực tiếp</string>
-    <string name="acc_app_routed_through">được định tuyến qua v2rayNG</string>
+    <string name="acc_app_routed_through">được định tuyến qua ứng dụng</string>
     <string name="acc_per_app_routing_disabled">định tuyến theo ứng dụng chưa được bật</string>
     <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
     <string name="acc_routing_rule_blocked">bị chặn</string>

@@ -531,7 +531,7 @@
     <string name="acc_app_not_checked">未勾选</string>
     <string name="acc_app_routing_announcement">%1$s，%2$s，%3$s</string>
     <string name="acc_app_routed_directly">直接路由</string>
-    <string name="acc_app_routed_through">通过 v2rayNG 路由</string>
+    <string name="acc_app_routed_through">通过应用路由</string>
     <string name="acc_per_app_routing_disabled">未启用分应用路由</string>
     <string name="acc_routing_rule_announcement">%1$s，%2$s，%3$s</string>
     <string name="acc_routing_rule_blocked">已拦截</string>

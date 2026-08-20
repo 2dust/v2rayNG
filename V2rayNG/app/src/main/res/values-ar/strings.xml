@@ -531,7 +531,7 @@
     <string name="acc_app_not_checked">غير محدّد</string>
     <string name="acc_app_routing_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_app_routed_directly">موجّه مباشرةً</string>
-    <string name="acc_app_routed_through">موجّه عبر v2rayNG</string>
+    <string name="acc_app_routed_through">موجّه عبر التطبيق</string>
     <string name="acc_per_app_routing_disabled">التوجيه حسب التطبيق غير مفعّل</string>
     <string name="acc_routing_rule_announcement">%1$s، %2$s، %3$s</string>
     <string name="acc_routing_rule_blocked">محظورة</string>
