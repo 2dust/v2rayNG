@@ -60,6 +60,7 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.compose.ItemDivider
@@ -360,7 +361,8 @@ fun ServerListItem(
             context,
             AccessibilityManager::class.java,
         )
-        if (accessibilityManager?.isEnabled != true) {
+        if (accessibilityManager?.isTouchExplorationEnabled != true) {
+            context.toastSuccess(R.string.toast_services_success)
             onFocusRestored()
             return@LaunchedEffect
         }
