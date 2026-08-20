@@ -549,7 +549,7 @@
     <string name="acc_unavailable_setting_with_description">অনুপলব্ধ সেটিং, %1$s, %2$s</string>
     <string name="acc_setting_value">%1$s, %2$s</string>
     <string name="acc_setting_switch">%1$s হলো %2$s</string>
-    <string name="acc_setting_switch_with_description">%1$s হলো %2$s, %3$s</string>
+    <string name="acc_setting_switch_with_description">%1$s হলো %2$s। %3$s</string>
     <string name="acc_settings_group">%1$s, গ্রুপটি %2$s</string>
     <string name="acc_group_expanded">প্রসারিত</string>
     <string name="acc_group_collapsed">সংকুচিত</string>

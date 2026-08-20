@@ -549,7 +549,7 @@
     <string name="acc_unavailable_setting_with_description">無法使用的設定，%1$s，%2$s</string>
     <string name="acc_setting_value">%1$s，%2$s</string>
     <string name="acc_setting_switch">%1$s為%2$s</string>
-    <string name="acc_setting_switch_with_description">%1$s為%2$s，%3$s</string>
+    <string name="acc_setting_switch_with_description">%1$s為%2$s。%3$s</string>
     <string name="acc_settings_group">%1$s，群組已%2$s</string>
     <string name="acc_group_expanded">展開</string>
     <string name="acc_group_collapsed">收合</string>
