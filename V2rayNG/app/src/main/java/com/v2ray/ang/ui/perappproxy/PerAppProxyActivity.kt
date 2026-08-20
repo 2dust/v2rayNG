@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.perappproxy
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,17 @@ private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
     SelectProxyApps(R.string.menu_item_select_proxy_app),
     ImportSelection(R.string.menu_item_import_proxy_app),
     ExportSelection(R.string.menu_item_export_proxy_app)
+}
+
+@StringRes
+internal fun perAppRoutingDescription(
+    perAppProxyEnabled: Boolean,
+    bypassApps: Boolean,
+    checked: Boolean
+): Int = when {
+    !perAppProxyEnabled -> R.string.acc_per_app_routing_disabled
+    checked == bypassApps -> R.string.acc_app_routed_directly
+    else -> R.string.acc_app_routed_through
 }
 
 class PerAppProxyActivity : BaseComponentActivity() {
@@ -236,9 +248,13 @@ fun PerAppProxyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Switch(
                             checked = perAppProxyEnabled,
-                            onCheckedChange = onPerAppProxyChanged,
+                            onCheckedChange = null,
                             modifier = Modifier
                                 .scale(0.65f)
+                                .clickable(
+                                    role = Role.Switch,
+                                    onClick = { onPerAppProxyChanged(!perAppProxyEnabled) }
+                                )
                                 .clearAndSetSemantics {
                                     contentDescription = perAppProxySwitchDescription
                                     role = Role.Switch
@@ -266,9 +282,13 @@ fun PerAppProxyScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Switch(
                             checked = bypassApps,
-                            onCheckedChange = onBypassAppsChanged,
+                            onCheckedChange = null,
                             modifier = Modifier
                                 .scale(0.65f)
+                                .clickable(
+                                    role = Role.Switch,
+                                    onClick = { onBypassAppsChanged(!bypassApps) }
+                                )
                                 .clearAndSetSemantics {
                                     contentDescription = bypassAppsSwitchDescription
                                     role = Role.Switch
@@ -303,12 +323,16 @@ fun PerAppProxyScreen(
             ) {
                 items(items = apps, key = { it.packageName }) { app ->
                     val checked = blacklist.contains(app.packageName)
+                    val routingDescription = stringResource(
+                        perAppRoutingDescription(perAppProxyEnabled, bypassApps, checked)
+                    )
                     AppListItem(
                         appName = app.appName,
                         packageName = app.packageName,
                         icon = null,
                         checked = checked,
-                        onCheckedChange = { onToggleApp(app.packageName) }
+                        onCheckedChange = { onToggleApp(app.packageName) },
+                        routingDescription = routingDescription
                     )
                     ItemDivider()
                 }

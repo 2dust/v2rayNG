@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,6 +60,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
@@ -212,6 +214,7 @@ fun RoutingSettingScreen(
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
+    var deleteRuleId by remember { mutableStateOf<String?>(null) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
@@ -302,7 +305,8 @@ fun RoutingSettingScreen(
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
                                 viewModel.update(index, updated)
-                            }
+                            },
+                            onDelete = { deleteRuleId = ruleset.id }
                         )
                     }
                     ItemDivider()
@@ -311,6 +315,19 @@ fun RoutingSettingScreen(
         }
     }
 
+
+    deleteRuleId?.let { ruleId ->
+        val ruleName = rulesets.firstOrNull { it.id == ruleId }?.remarks.orEmpty()
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_routing_rule, ruleName),
+            onConfirm = {
+                val position = rulesets.indexOfFirst { it.id == ruleId }
+                if (position >= 0) viewModel.remove(position)
+                deleteRuleId = null
+            },
+            onDismiss = { deleteRuleId = null }
+        )
+    }
 
     if (showPresetDialog) {
         SelectListDialog(
@@ -330,9 +347,11 @@ fun RoutingSettingScreen(
 private fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
-    onEnabledChange: (Boolean) -> Unit
+    onEnabledChange: (Boolean) -> Unit,
+    onDelete: () -> Unit
 ) {
     val enabled = ruleset.enabled
+    val ruleName = ruleset.remarks.orEmpty()
     val outboundTag = ruleset.outboundTag.ifBlank { AppConfig.TAG_PROXY }
     val routeDescription = when {
         outboundTag.equals(AppConfig.TAG_BLOCKED, ignoreCase = true) ->
@@ -354,7 +373,11 @@ private fun RoutingRulesetItem(
         routeDescription,
         ruleState
     )
-    val ruleSwitchDescription = ruleState
+    val ruleSwitchDescription = stringResource(
+        R.string.acc_routing_rule_switch,
+        ruleName,
+        stringResource(if (enabled) R.string.acc_routing_rule_on else R.string.acc_routing_rule_off)
+    )
 
     Row(
         modifier = Modifier
@@ -411,16 +434,28 @@ private fun RoutingRulesetItem(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(start = 8.dp)
         ) {
-            IconButton(onClick = onEdit) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit)
-                )
+            Row {
+                IconButton(onClick = onEdit) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_edit_24dp),
+                        contentDescription = stringResource(R.string.acc_edit_named, ruleName)
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete_24dp),
+                        contentDescription = stringResource(R.string.acc_delete_named, ruleName)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Box(
                 modifier = Modifier
                     .scale(0.7f)
+                    .clickable(
+                        role = Role.Switch,
+                        onClick = { onEnabledChange(!enabled) }
+                    )
                     .clearAndSetSemantics {
                         contentDescription = ruleSwitchDescription
                         role = Role.Switch
@@ -432,7 +467,7 @@ private fun RoutingRulesetItem(
             ) {
                 Switch(
                     checked = enabled,
-                    onCheckedChange = onEnabledChange,
+                    onCheckedChange = null,
                     modifier = Modifier.clearAndSetSemantics {},
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,

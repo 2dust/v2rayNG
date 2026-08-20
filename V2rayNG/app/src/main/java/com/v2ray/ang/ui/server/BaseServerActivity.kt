@@ -491,7 +491,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         if (showDeleteDialog) {
             DeleteConfirmDialog(
-                message = stringResource(R.string.confirm_delete_profile),
+                message = stringResource(R.string.confirm_delete_profile, initialConfig.remarks),
                 onConfirm = {
                     showDeleteDialog = false
                     deleteServer(editGuid)

@@ -56,10 +56,20 @@ fun CollapsiblePreferenceGroupHeader(
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val groupAnnouncement = stringResource(
+        R.string.acc_settings_group,
+        title,
+        stringResource(
+            if (expanded) R.string.acc_group_expanded else R.string.acc_group_collapsed
+        )
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onExpandedChange(!expanded) }
+            .clickable(role = Role.Button) { onExpandedChange(!expanded) }
+            .semantics(mergeDescendants = true) {
+                contentDescription = groupAnnouncement
+            }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -67,7 +77,9 @@ fun CollapsiblePreferenceGroupHeader(
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .clearAndSetSemantics {}
         )
         Icon(
             painter = painterResource(R.drawable.ic_expand_more_24dp),
@@ -88,20 +100,21 @@ private fun SettingsItemRow(
     enabled: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    accessibilityDescription: String? = null,
     trailing: @Composable (() -> Unit)? = null
 ) {
     val titleColor = if (enabled) MaterialTheme.colorScheme.onSurface
     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
     else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-    val unavailableAnnouncement = if (!enabled) {
+    val rowAnnouncement = if (!enabled) {
         if (description.isNullOrEmpty()) {
             stringResource(R.string.acc_unavailable_setting, title)
         } else {
             stringResource(R.string.acc_unavailable_setting_with_description, title, description)
         }
     } else {
-        null
+        accessibilityDescription
     }
 
     Row(
@@ -109,8 +122,8 @@ private fun SettingsItemRow(
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
             .semantics(mergeDescendants = true) {
-                if (unavailableAnnouncement != null) {
-                    contentDescription = unavailableAnnouncement
+                if (rowAnnouncement != null) {
+                    contentDescription = rowAnnouncement
                 }
             }
             .padding(16.dp),
@@ -128,7 +141,7 @@ private fun SettingsItemRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                modifier = if (!enabled) Modifier.clearAndSetSemantics {} else Modifier,
+                modifier = if (rowAnnouncement != null) Modifier.clearAndSetSemantics {} else Modifier,
                 style = MaterialTheme.typography.bodyLarge,
                 color = titleColor
             )
@@ -136,7 +149,7 @@ private fun SettingsItemRow(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
-                    modifier = if (!enabled) Modifier.clearAndSetSemantics {} else Modifier,
+                    modifier = if (rowAnnouncement != null) Modifier.clearAndSetSemantics {} else Modifier,
                     style = MaterialTheme.typography.bodySmall,
                     color = descriptionColor
                 )
@@ -172,7 +185,12 @@ fun SettingsEditItem(
         onClick = if (enabled) {
             { showDialog = true }
         } else null,
-        modifier = modifier
+        modifier = modifier,
+        accessibilityDescription = if (description == null) {
+            title
+        } else {
+            stringResource(R.string.acc_setting_value, title, description)
+        }
     )
 
     if (showDialog) {
@@ -219,7 +237,12 @@ fun SettingsListItem(
         onClick = if (enabled) {
             { showDialog = true }
         } else null,
-        modifier = modifier
+        modifier = modifier,
+        accessibilityDescription = if (summary.isEmpty()) {
+            title
+        } else {
+            stringResource(R.string.acc_setting_value, title, summary)
+        }
     )
 
     if (showDialog) {
@@ -252,7 +275,12 @@ fun SettingsMenuItem(
         description = subtitle,
         enabled = true,
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier,
+        accessibilityDescription = if (subtitle.isNullOrEmpty()) {
+            title
+        } else {
+            stringResource(R.string.acc_setting_value, title, subtitle)
+        }
     )
 }
 
@@ -266,6 +294,12 @@ fun SettingsSwitchItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val state = stringResource(if (checked) R.string.acc_state_on else R.string.acc_state_off)
+    val rowDescription = if (summary.isNullOrEmpty()) {
+        stringResource(R.string.acc_setting_switch, title, state)
+    } else {
+        stringResource(R.string.acc_setting_switch_with_description, title, state, summary)
+    }
     SettingsItemRow(
         icon = icon,
         title = title,
@@ -275,21 +309,26 @@ fun SettingsSwitchItem(
             { onCheckedChange(!checked) }
         } else null,
         modifier = modifier,
+        accessibilityDescription = rowDescription,
         trailing = {
             val switchDescription = if (enabled) {
-                stringResource(
-                    R.string.acc_setting_switch,
-                    title,
-                    stringResource(
-                        if (checked) R.string.acc_state_on else R.string.acc_state_off
-                    )
-                )
+                stringResource(R.string.acc_setting_switch, title, state)
             } else {
                 ""
             }
             Box(
                 modifier = Modifier
                     .scale(0.8f)
+                    .then(
+                        if (enabled) {
+                            Modifier.clickable(
+                                role = Role.Switch,
+                                onClick = { onCheckedChange(!checked) }
+                            )
+                        } else {
+                            Modifier
+                        }
+                    )
                     .then(
                         if (enabled) {
                             Modifier.clearAndSetSemantics {
@@ -307,7 +346,7 @@ fun SettingsSwitchItem(
             ) {
                 Switch(
                     checked = checked,
-                    onCheckedChange = if (enabled) onCheckedChange else null,
+                    onCheckedChange = null,
                     modifier = Modifier.clearAndSetSemantics {},
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,

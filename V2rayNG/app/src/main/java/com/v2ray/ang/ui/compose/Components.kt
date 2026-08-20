@@ -53,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -80,8 +81,16 @@ fun AppTopBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
+    val screenAnnouncement = stringResource(
+        R.string.acc_screen_title,
+        stringResource(R.string.app_name),
+        title
+    )
     Column {
         TopAppBar(
+            modifier = Modifier.semantics {
+                paneTitle = screenAnnouncement
+            },
             title = {
                 if (isSearchActive) {
                     SearchInputField(
@@ -169,14 +178,23 @@ fun AppListItem(
     icon: Any?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    routingDescription: String? = null
 ) {
     val context = LocalContext.current
-    val appAnnouncement = stringResource(
-        R.string.acc_app_announcement,
-        appName,
-        stringResource(if (checked) R.string.acc_app_checked else R.string.acc_app_not_checked)
+    val checkedDescription = stringResource(
+        if (checked) R.string.acc_app_checked else R.string.acc_app_not_checked
     )
+    val appAnnouncement = if (routingDescription == null) {
+        stringResource(R.string.acc_app_announcement, appName, checkedDescription)
+    } else {
+        stringResource(
+            R.string.acc_app_routing_announcement,
+            appName,
+            checkedDescription,
+            routingDescription
+        )
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()

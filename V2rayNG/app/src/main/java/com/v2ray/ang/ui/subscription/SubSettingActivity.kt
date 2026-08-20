@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -198,6 +199,7 @@ fun SubSettingScreen(
                 }
                 val subscriptionUpdateDescription = stringResource(
                     R.string.acc_subscription_update,
+                    subCache.subscription.remarks,
                     stringResource(
                         if (subCache.subscription.enabled) R.string.acc_state_on
                         else R.string.acc_state_off
@@ -258,14 +260,20 @@ fun SubSettingScreen(
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
-                                                contentDescription = stringResource(R.string.acc_share_subscription)
+                                                contentDescription = stringResource(
+                                                    R.string.acc_share_named,
+                                                    subCache.subscription.remarks
+                                                )
                                             )
                                         }
                                     }
                                     IconButton(onClick = { onEditSub(subCache.guid) }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_edit_24dp),
-                                            contentDescription = stringResource(R.string.acc_edit)
+                                            contentDescription = stringResource(
+                                                R.string.acc_edit_named,
+                                                subCache.subscription.remarks
+                                            )
                                         )
                                     }
                                     IconButton(onClick = {
@@ -279,7 +287,10 @@ fun SubSettingScreen(
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_delete_24dp),
-                                            contentDescription = stringResource(R.string.acc_delete)
+                                            contentDescription = stringResource(
+                                                R.string.acc_delete_named,
+                                                subCache.subscription.remarks
+                                            )
                                         )
                                     }
                                 }
@@ -292,6 +303,12 @@ fun SubSettingScreen(
                                 Box(
                                     modifier = Modifier
                                         .scale(0.7f)
+                                        .clickable(
+                                            role = Role.Switch,
+                                            onClick = {
+                                                updateSubscription(!subCache.subscription.enabled)
+                                            }
+                                        )
                                         .clearAndSetSemantics {
                                             contentDescription = subscriptionUpdateDescription
                                             role = Role.Switch
@@ -303,7 +320,7 @@ fun SubSettingScreen(
                                 ) {
                                     Switch(
                                         checked = subCache.subscription.enabled,
-                                        onCheckedChange = updateSubscription,
+                                        onCheckedChange = null,
                                         modifier = Modifier.clearAndSetSemantics {},
                                         colors = SwitchDefaults.colors(
                                             checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
