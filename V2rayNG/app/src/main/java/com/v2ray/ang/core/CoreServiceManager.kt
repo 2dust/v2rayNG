@@ -373,6 +373,7 @@ object CoreServiceManager {
          * @return 0 for success, any other value for failure.
          */
         override fun startup(): Long {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: CoreCallback startup")
             return 0
         }
 
@@ -381,14 +382,8 @@ object CoreServiceManager {
          * @return 0 for success, any other value for failure.
          */
         override fun shutdown(): Long {
-            val serviceControl = serviceControl?.get() ?: return -1
-            return try {
-                serviceControl.stopService()
-                0
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop service", e)
-                -1
-            }
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: CoreCallback shutdown")
+            return 0
         }
 
         /**
@@ -398,6 +393,7 @@ object CoreServiceManager {
          * @return Always returns 0.
          */
         override fun onEmitStatus(l: Long, s: String?): Long {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: CoreCallback onEmitStatus $s")
             return 0
         }
     }
