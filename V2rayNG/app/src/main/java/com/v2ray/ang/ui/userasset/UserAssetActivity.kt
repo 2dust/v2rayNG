@@ -423,7 +423,10 @@ private fun UserAssetItem(
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit),
+                    contentDescription = stringResource(
+                        R.string.acc_edit_named,
+                        item.assetUrl.remarks
+                    ),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -431,7 +434,10 @@ private fun UserAssetItem(
         IconButton(onClick = onDeleteClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = stringResource(R.string.acc_delete),
+                contentDescription = stringResource(
+                    R.string.acc_delete_named,
+                    item.assetUrl.remarks
+                ),
                 modifier = Modifier.size(24.dp)
             )
         }
