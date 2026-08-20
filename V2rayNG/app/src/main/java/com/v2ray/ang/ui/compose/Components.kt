@@ -81,11 +81,12 @@ fun AppTopBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    val screenAnnouncement = stringResource(
-        R.string.acc_screen_title,
-        stringResource(R.string.app_name),
-        title
-    )
+    val appName = stringResource(R.string.app_name)
+    val screenAnnouncement = if (title.isBlank()) {
+        appName
+    } else {
+        stringResource(R.string.acc_screen_title, appName, title)
+    }
     Column {
         TopAppBar(
             modifier = Modifier.semantics {
