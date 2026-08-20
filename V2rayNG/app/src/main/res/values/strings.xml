@@ -520,7 +520,7 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">Selected server</string>
     <string name="acc_last_updated">Last updated %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, update is %2$s</string>
