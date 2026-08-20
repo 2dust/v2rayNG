@@ -16,9 +16,11 @@ import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.OutboundTrafficStat
+import com.v2ray.ang.dto.ServiceRestartRequest
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -333,25 +335,21 @@ object CoreServiceManager {
                 }
             }
 
-            val result = ConnectionTestResult(
+            var result = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
             )
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result)
 
             // Only fetch IP info if the delay test was successful
             if (time >= 0) {
                 SpeedtestManager.getRemoteIPInfo()?.let { ip ->
-                    MessageHelper.sendMsg2UI(
-                        service,
-                        AppConfig.MSG_MEASURE_DELAY_RESULT,
-                        result.copy(
-                            country = ip.country,
-                            ipAddress = ip.ipAddress,
-                        ),
+                    result = result.copy(
+                        country = ip.country,
+                        ipAddress = ip.ipAddress,
                     )
                 }
             }
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result)
         }
     }
 
@@ -475,13 +473,17 @@ object CoreServiceManager {
                     // The UI and daemon run in separate processes, so acknowledge the active
                     // daemon before stopping it instead of relying on possibly stale UI state.
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
+                    val request = intent.serializable<ServiceRestartRequest>("content")
 
                     val pendingResult = goAsync()
                     CoroutineScope(Dispatchers.Default).launch {
                         try {
                             serviceControl.stopService()
                             delay(500L)
-                            LauncherManager.startService(serviceControl.getService())
+                            LauncherManager.startService(
+                                serviceControl.getService(),
+                                announceStart = request?.suppressIntermediateAnnouncements != true,
+                            )
                         } finally {
                             pendingResult.finish()
                         }

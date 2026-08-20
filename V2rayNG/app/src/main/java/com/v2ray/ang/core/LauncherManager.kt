@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ServiceRestartRequest
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -36,7 +37,11 @@ object LauncherManager {
         return true
     }
 
-    fun startService(context: Context, guid: String? = null) {
+    fun startService(
+        context: Context,
+        guid: String? = null,
+        announceStart: Boolean = true,
+    ) {
         LogUtil.i(AppConfig.TAG, "LauncherManager: startService from ${context::class.java.simpleName}")
 
         if (guid != null) {
@@ -44,7 +49,7 @@ object LauncherManager {
         }
 
         try {
-            startContextService(context)
+            startContextService(context, announceStart)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
             context.toast(e.message ?: e.javaClass.simpleName)
@@ -57,19 +62,27 @@ object LauncherManager {
     }
 
     /** Restarts the active daemon without starting a stopped service. */
-    fun restartService(context: Context) {
-        MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+    fun restartService(context: Context, suppressIntermediateAnnouncements: Boolean = false) {
+        MessageHelper.sendMsg2Service(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            ServiceRestartRequest(suppressIntermediateAnnouncements),
+        )
     }
 
     /** Restarts the active daemon, or delegates to the caller's permission-aware start flow. */
     fun restartServiceOrStart(context: Context, startIfStopped: () -> Unit) {
-        MessageHelper.sendMsg2ServiceForResult(context, AppConfig.MSG_STATE_RESTART, "") { handled ->
+        MessageHelper.sendMsg2ServiceForResult(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            ServiceRestartRequest(),
+        ) { handled ->
             if (!handled) startIfStopped()
         }
     }
 
     @Throws(Exception::class)
-    private fun startContextService(context: Context) {
+    private fun startContextService(context: Context, announceStart: Boolean = true) {
         // Note: isRunning check is removed here to avoid loading Native libraries in the UI process.
         // The check is performed in CoreServiceManager when the service starts in the daemon process.
 
@@ -102,7 +115,7 @@ object LauncherManager {
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
-        } else {
+        } else if (announceStart) {
             context.toast(R.string.toast_services_start)
         }
 

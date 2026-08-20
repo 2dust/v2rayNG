@@ -535,6 +535,17 @@
     <string name="acc_open_menu">گۊشیڌن نومگه کشاری</string>
     <string name="acc_edit">آلشتکاری</string>
     <string name="acc_delete">پاک کردن</string>
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">بونکۊ %1$s، %2$d سرور داره</item>
+        <item quantity="other">بونکۊ %1$s، %2$d سرور داره</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
+        <item quantity="other">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
+    </plurals>
     <string name="acc_save">زفت کردن</string>
     <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
     <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>

@@ -535,6 +535,17 @@
     <string name="acc_open_menu">باز کردن منوی پیمایش</string>
     <string name="acc_edit">ویرایش</string>
     <string name="acc_delete">حذف</string>
+    <string name="acc_share_config_named">اشتراک‌گذاری پیکربندی %1$s</string>
+    <string name="acc_edit_config_named">ویرایش پیکربندی %1$s</string>
+    <string name="acc_delete_config_named">حذف پیکربندی %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">گروه %1$s شامل %2$d سرور است</item>
+        <item quantity="other">گروه %1$s شامل %2$d سرور است</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">انتخاب‌شده. گروه %1$s شامل %2$d سرور است</item>
+        <item quantity="other">انتخاب‌شده. گروه %1$s شامل %2$d سرور است</item>
+    </plurals>
     <string name="acc_save">ذخیره</string>
     <string name="acc_update_subscriptions">به‌روزرسانی اشتراک‌ها</string>
     <string name="acc_per_app_proxy_information">اطلاعات پروکسی به تفکیک برنامه</string>

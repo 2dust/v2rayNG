@@ -535,6 +535,15 @@
     <string name="acc_open_menu">Mở trình đơn điều hướng</string>
     <string name="acc_edit">Chỉnh sửa</string>
     <string name="acc_delete">Xóa</string>
+    <string name="acc_share_config_named">Chia sẻ cấu hình %1$s</string>
+    <string name="acc_edit_config_named">Chỉnh sửa cấu hình %1$s</string>
+    <string name="acc_delete_config_named">Xóa cấu hình %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="other">Nhóm %1$s chứa %2$d máy chủ</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="other">Đã chọn. Nhóm %1$s chứa %2$d máy chủ</item>
+    </plurals>
     <string name="acc_save">Lưu</string>
     <string name="acc_update_subscriptions">Cập nhật các gói đăng ký</string>
     <string name="acc_per_app_proxy_information">Thông tin proxy theo ứng dụng</string>

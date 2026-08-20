@@ -535,6 +535,25 @@
     <string name="acc_open_menu">فتح قائمة التنقل</string>
     <string name="acc_edit">تعديل</string>
     <string name="acc_delete">حذف</string>
+    <string name="acc_share_config_named">مشاركة التكوين %1$s</string>
+    <string name="acc_edit_config_named">تعديل التكوين %1$s</string>
+    <string name="acc_delete_config_named">حذف التكوين %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="zero">المجموعة %1$s لا تحتوي على أي خوادم</item>
+        <item quantity="one">المجموعة %1$s تحتوي على خادم واحد</item>
+        <item quantity="two">المجموعة %1$s تحتوي على خادمين</item>
+        <item quantity="few">المجموعة %1$s تحتوي على %2$d خوادم</item>
+        <item quantity="many">المجموعة %1$s تحتوي على %2$d خادمًا</item>
+        <item quantity="other">المجموعة %1$s تحتوي على %2$d خادم</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="zero">محددة. المجموعة %1$s لا تحتوي على أي خوادم</item>
+        <item quantity="one">محددة. المجموعة %1$s تحتوي على خادم واحد</item>
+        <item quantity="two">محددة. المجموعة %1$s تحتوي على خادمين</item>
+        <item quantity="few">محددة. المجموعة %1$s تحتوي على %2$d خوادم</item>
+        <item quantity="many">محددة. المجموعة %1$s تحتوي على %2$d خادمًا</item>
+        <item quantity="other">محددة. المجموعة %1$s تحتوي على %2$d خادم</item>
+    </plurals>
     <string name="acc_save">حفظ</string>
     <string name="acc_update_subscriptions">تحديث الاشتراكات</string>
     <string name="acc_per_app_proxy_information">معلومات الوكيل لكل تطبيق</string>

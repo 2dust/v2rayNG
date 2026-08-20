@@ -87,7 +87,19 @@ fun ShareMethodDialog(
     )
     SelectListDialog(
         options = menuActions,
-        optionText = { stringResource(it.labelRes) },
+        optionText = { action ->
+            when (action) {
+                ServerMenuAction.Edit -> stringResource(
+                    R.string.acc_edit_config_named,
+                    profile.remarks,
+                )
+                ServerMenuAction.Delete -> stringResource(
+                    R.string.acc_delete_config_named,
+                    profile.remarks,
+                )
+                else -> stringResource(action.labelRes)
+            }
+        },
         onSelected = { action ->
             onDismiss()
             when (action) {

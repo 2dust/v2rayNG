@@ -535,6 +535,15 @@
     <string name="acc_open_menu">開啟導覽選單</string>
     <string name="acc_edit">編輯</string>
     <string name="acc_delete">刪除</string>
+    <string name="acc_share_config_named">分享設定 %1$s</string>
+    <string name="acc_edit_config_named">編輯設定 %1$s</string>
+    <string name="acc_delete_config_named">刪除設定 %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="other">群組 %1$s 包含 %2$d 個伺服器</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="other">已選取。群組 %1$s 包含 %2$d 個伺服器</item>
+    </plurals>
     <string name="acc_save">儲存</string>
     <string name="acc_update_subscriptions">更新訂閱</string>
     <string name="acc_per_app_proxy_information">個別應用程式代理資訊</string>

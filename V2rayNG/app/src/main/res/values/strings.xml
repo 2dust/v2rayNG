@@ -535,6 +535,17 @@
     <string name="acc_open_menu">Open navigation menu</string>
     <string name="acc_edit">Edit</string>
     <string name="acc_delete">Delete</string>
+    <string name="acc_share_config_named">Share config %1$s</string>
+    <string name="acc_edit_config_named">Edit config %1$s</string>
+    <string name="acc_delete_config_named">Delete config %1$s</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">Group %1$s contains %2$d server</item>
+        <item quantity="other">Group %1$s contains %2$d servers</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">Selected. Group %1$s contains %2$d server</item>
+        <item quantity="other">Selected. Group %1$s contains %2$d servers</item>
+    </plurals>
     <string name="acc_save">Save</string>
     <string name="acc_update_subscriptions">Update subscriptions</string>
     <string name="acc_per_app_proxy_information">Per-app proxy information</string>

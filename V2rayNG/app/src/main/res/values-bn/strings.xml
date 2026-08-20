@@ -535,6 +535,17 @@
     <string name="acc_open_menu">নেভিগেশন মেনু খুলুন</string>
     <string name="acc_edit">সম্পাদনা করুন</string>
     <string name="acc_delete">মুছুন</string>
+    <string name="acc_share_config_named">%1$s কনফিগারেশন শেয়ার করুন</string>
+    <string name="acc_edit_config_named">%1$s কনফিগারেশন সম্পাদনা করুন</string>
+    <string name="acc_delete_config_named">%1$s কনফিগারেশন মুছুন</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">গ্রুপ %1$s-এ %2$dটি সার্ভার রয়েছে</item>
+        <item quantity="other">গ্রুপ %1$s-এ %2$dটি সার্ভার রয়েছে</item>
+    </plurals>
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">নির্বাচিত। গ্রুপ %1$s-এ %2$dটি সার্ভার রয়েছে</item>
+        <item quantity="other">নির্বাচিত। গ্রুপ %1$s-এ %2$dটি সার্ভার রয়েছে</item>
+    </plurals>
     <string name="acc_save">সংরক্ষণ করুন</string>
     <string name="acc_update_subscriptions">সাবস্ক্রিপশন আপডেট করুন</string>
     <string name="acc_per_app_proxy_information">প্রতি-অ্যাপ প্রক্সির তথ্য</string>

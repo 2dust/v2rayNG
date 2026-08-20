@@ -77,6 +77,9 @@ class MainViewModel(
     @Volatile
     private var testingGroupId: String? = null
 
+    @Volatile
+    private var pendingServerActivationGuid: String? = null
+
     private val initialPageReady = CompletableDeferred<Unit>()
 
     // ---------- Service events ----------
@@ -95,19 +98,49 @@ class MainViewModel(
 
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
-            MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
+            MainServiceEvent.StateRunning -> {
+                if (pendingServerActivationGuid == null) {
+                    updateRunningState(true, clearTestingText = false)
+                }
+            }
+            MainServiceEvent.StateNotRunning -> {
+                if (pendingServerActivationGuid == null) {
+                    updateRunningState(false, clearTestingText = false)
+                }
+            }
             MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
-                updateRunningState(true)
+                val activatedGuid = pendingServerActivationGuid
+                pendingServerActivationGuid = null
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = activatedGuid ?: it.selectedGuid,
+                        isRunning = true,
+                        status = MainStatus.Connected,
+                        restoreServerFocusGuid = activatedGuid,
+                    )
+                }
             }
 
             MainServiceEvent.StateStartFailure -> {
                 toastError(R.string.toast_services_failure)
-                updateRunningState(false)
+                val failedGuid = pendingServerActivationGuid
+                pendingServerActivationGuid = null
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = failedGuid ?: it.selectedGuid,
+                        isRunning = false,
+                        status = MainStatus.Disconnected,
+                        restoreServerFocusGuid = null,
+                    )
+                }
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                if (pendingServerActivationGuid == null) {
+                    updateRunningState(false)
+                }
+            }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -141,6 +174,15 @@ class MainViewModel(
 
         is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result)
     }
+
+    internal fun formatStatusForAccessibility(status: MainStatus, isRunning: Boolean): String =
+        when (status) {
+            MainStatus.Testing,
+            is MainStatus.TestProgress -> formatStatus(
+                if (isRunning) MainStatus.Connected else MainStatus.Disconnected
+            )
+            else -> formatStatus(status)
+        }
 
     private fun formatConnectionTestResult(result: ConnectionTestResult): String {
         val status = if (result.delayMillis >= 0) {
@@ -192,6 +234,7 @@ class MainViewModel(
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.ServerFocusHandled -> consumeServerFocusRequest(action.guid)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -643,8 +686,30 @@ class MainViewModel(
         _uiState.update { it.copy(selectedGuid = guid) }
     }
 
+    /** Selects immediately when stopped, or defers the visible active state until restart succeeds. */
+    fun selectServerForActivation(guid: String): Boolean {
+        if (guid == uiState.value.selectedGuid) return false
+        dataSource.setSelectServer(guid)
+        if (!uiState.value.isRunning) {
+            _uiState.update { it.copy(selectedGuid = guid) }
+            return false
+        }
+
+        pendingServerActivationGuid = guid
+        _uiState.update { it.copy(restoreServerFocusGuid = null) }
+        return true
+    }
+
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        if (pendingServerActivationGuid == null) {
+            _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        }
+    }
+
+    private fun consumeServerFocusRequest(guid: String) {
+        _uiState.update {
+            if (it.restoreServerFocusGuid == guid) it.copy(restoreServerFocusGuid = null) else it
+        }
     }
 
     fun removeServerAndRefresh(guid: String) {
