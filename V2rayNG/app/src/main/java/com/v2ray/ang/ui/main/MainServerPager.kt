@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import android.os.Build
 import android.view.accessibility.AccessibilityManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -351,11 +351,11 @@ fun ServerListItem(
     dragModifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(restoreFocus) {
         if (!restoreFocus) return@LaunchedEffect
 
-        val baseDelay = 4_000
         val accessibilityManager = ContextCompat.getSystemService(
             context,
             AccessibilityManager::class.java,
@@ -365,15 +365,11 @@ fun ServerListItem(
             return@LaunchedEffect
         }
 
-        val recommendedDelay = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            accessibilityManager.getRecommendedTimeoutMillis(
-                baseDelay,
-                AccessibilityManager.FLAG_CONTENT_TEXT,
-            )
-        } else {
-            baseDelay
-        }
-        delay(recommendedDelay.toLong() + 250L)
+        // A Snackbar becomes an accessibility pane and can send TalkBack to the first top-bar
+        // control when it disappears. Announce the final result without creating a focus target,
+        // then restore the row only after TalkBack has had time to finish speaking it.
+        view.announceForAccessibility(context.getString(R.string.toast_services_success))
+        delay(4_000)
         runCatching { focusRequester.requestFocus() }
         onFocusRestored()
     }
@@ -406,11 +402,15 @@ fun ServerListItem(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            // Keep one semantics node alive while the row changes from selectable to selected.
+            // Replacing the row's only semantics modifier makes TalkBack fall back to the first
+            // control in the window before the completed restart can restore the row.
+            .semantics(mergeDescendants = true) {}
             .then(
-                if (isSelected) {
-                    Modifier.semantics(mergeDescendants = true) {}
-                } else {
+                if (!isSelected) {
                     Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
                 }
             )
             .then(

@@ -109,9 +109,11 @@ class MainViewModel(
                 }
             }
             MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
                 val activatedGuid = pendingServerActivationGuid
                 pendingServerActivationGuid = null
+                if (activatedGuid == null) {
+                    toastSuccess(R.string.toast_services_success)
+                }
                 _uiState.update {
                     it.copy(
                         selectedGuid = activatedGuid ?: it.selectedGuid,
@@ -138,6 +140,7 @@ class MainViewModel(
 
             MainServiceEvent.StateStopSuccess -> {
                 if (pendingServerActivationGuid == null) {
+                    toastSuccess(R.string.toast_services_stop)
                     updateRunningState(false)
                 }
             }
