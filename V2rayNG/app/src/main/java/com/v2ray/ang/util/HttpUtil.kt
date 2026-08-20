@@ -151,23 +151,13 @@ object HttpUtil {
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
             val client = buildOkHttpClient(request.timeout, request.httpPort, request.proxyUsername, request.proxyPassword, followRedirects = false)
-            val finalUserAgent = if (request.userAgent.isNullOrBlank()) {
-                "v2rayNG/${BuildConfig.VERSION_NAME}"
-            } else {
-                request.userAgent
-            }
             val requestBuilder = Request.Builder()
                 .url(currentUrl)
                 .get()
-                .header("User-agent", finalUserAgent)
                 .header("Connection", "close")
 
-            applyEmbeddedBasicAuthHeader(currentUrl, requestBuilder)
-
-
-            val headersMap = JsonUtil.parseHeadersToMap(request.requestHeaders)
-            for ((key, value) in headersMap) {
-                LogUtil.d(AppConfig.TAG, "Adding custom header: $key = $value")
+            for ((key, value) in buildRequestHeaders(request.copy(url = currentUrl), true)) {
+                LogUtil.d(AppConfig.TAG, "Adding request header: $key")
                 try {
                     requestBuilder.header(key, value)
                 } catch (_: IllegalArgumentException) {
@@ -205,9 +195,23 @@ object HttpUtil {
         throw IOException("Too many redirects")
     }
 
-    private fun applyEmbeddedBasicAuthHeader(rawUrl: String, requestBuilder: Request.Builder) {
-        val parsed = runCatching { URL(rawUrl) }.getOrNull() ?: return
-        parsed.userInfo?.let { userInfo ->
+    internal fun buildRequestHeaders(
+        request: UrlContentRequest,
+        includeDefaultUserAgent: Boolean,
+    ): Map<String, String> {
+        val headers = linkedMapOf<String, String>()
+        fun setHeader(key: String, value: String) {
+            headers.keys.firstOrNull { it.equals(key, ignoreCase = true) }?.let(headers::remove)
+            headers[key] = value
+        }
+        val userAgent = request.userAgent?.takeUnless { it.isBlank() }
+            ?: if (includeDefaultUserAgent) "v2rayNG/${BuildConfig.VERSION_NAME}" else null
+        if (userAgent != null) {
+            setHeader("User-Agent", userAgent)
+        }
+
+        val parsed = request.url?.let { runCatching { URL(it) }.getOrNull() }
+        parsed?.userInfo?.let { userInfo ->
             val colon = userInfo.indexOf(':')
             val user = runCatching {
                 Utils.decodeURIComponent(if (colon >= 0) userInfo.substring(0, colon) else userInfo)
@@ -215,8 +219,11 @@ object HttpUtil {
             val pass = runCatching {
                 Utils.decodeURIComponent(if (colon >= 0) userInfo.substring(colon + 1) else "")
             }.getOrDefault(if (colon >= 0) userInfo.substring(colon + 1) else "")
-            requestBuilder.header("Authorization", Credentials.basic(user, pass))
+            setHeader("Authorization", Credentials.basic(user, pass))
         }
+
+        JsonUtil.parseHeadersToMap(request.requestHeaders).forEach(::setHeader)
+        return headers
     }
 
     private fun buildOkHttpClient(
