@@ -347,8 +347,14 @@
     <string name="title_del_config_count">%dটি কনফিগারেশন মুছুন</string>
     <string name="title_import_config_count">%dটি কনফিগারেশন আমদানি করুন</string>
     <string name="title_export_config_count">%dটি কনফিগারেশন রপ্তানি করুন</string>
-    <string name="title_update_config_count">%dটি কনফিগারেশন আপডেট করুন</string>
-    <string name="title_update_asset_count">%dটি অ্যাসেট ফাইল আপডেট হয়েছে</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$dটি কনফিগারেশন আপডেট হয়েছে</item>
+        <item quantity="other">%1$dটি কনফিগারেশন আপডেট হয়েছে</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$dটি অ্যাসেট ফাইল আপডেট হয়েছে</item>
+        <item quantity="other">%1$dটি অ্যাসেট ফাইল আপডেট হয়েছে</item>
+    </plurals>
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
     <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>

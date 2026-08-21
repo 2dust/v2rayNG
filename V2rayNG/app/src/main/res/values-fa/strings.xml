@@ -347,8 +347,14 @@
     <string name="title_del_config_count">حذف %d کانفیگ</string>
     <string name="title_import_config_count">وارد کردن %d کانفیگ</string>
     <string name="title_export_config_count">صادر کردن %d کانفیگ</string>
-    <string name="title_update_config_count">آپدیت کردن %d کانفیگ</string>
-    <string name="title_update_asset_count">%d فایل منبع بروزرسانی شد</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$d کانفیگ به‌روزرسانی شد</item>
+        <item quantity="other">%1$d کانفیگ به‌روزرسانی شد</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$d فایل منبع به‌روزرسانی شد</item>
+        <item quantity="other">%1$d فایل منبع به‌روزرسانی شد</item>
+    </plurals>
     <string name="title_update_subscription_result">بروزرسانی %1$d کانفیگ انجام شد (%2$d موفق، %3$d شکست خورده، %4$d نادیده گرفته شده)</string>
     <string name="title_update_subscription_no_subscription">هیچ اشتراکی وجود ندارد</string>
     <string name="toast_server_not_found_in_group">سرور انتخاب‌شده در گروه فعلی پیدا نشد</string>

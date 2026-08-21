@@ -91,7 +91,11 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
 
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
                         toast(
-                            getString(R.string.title_update_config_count, result.configCount),
+                            getQuantityString(
+                                R.plurals.title_update_config_count,
+                                result.configCount,
+                                result.configCount,
+                            ),
                             announceForAccessibility = true,
                         )
 

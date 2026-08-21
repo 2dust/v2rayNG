@@ -208,7 +208,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
     private fun downloadGeoFiles() {
         isLoadingState.value = true
-        toast(R.string.msg_downloading_content)
+        toast(R.string.msg_downloading_content, announceForAccessibility = true)
 
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
@@ -220,7 +220,11 @@ class UserAssetActivity : HelperBaseComponentActivity() {
             }
             if (result.successCount > 0) {
                 toast(
-                    getString(R.string.title_update_asset_count, result.successCount),
+                    resources.getQuantityString(
+                        R.plurals.title_update_asset_count,
+                        result.successCount,
+                        result.successCount,
+                    ),
                     announceForAccessibility = true,
                 )
             } else {

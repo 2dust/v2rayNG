@@ -14,7 +14,6 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.areCoreServiceNotificationsEnabled
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.ui.base.BaseViewModel
@@ -121,7 +120,7 @@ class MainViewModel(
                 pendingServiceTransition = null
                 toastSuccess(
                     R.string.toast_services_success,
-                    announceForAccessibility = !localizedContext.areCoreServiceNotificationsEnabled(),
+                    announceForAccessibility = true,
                 )
                 _uiState.update {
                     it.copy(
@@ -152,7 +151,7 @@ class MainViewModel(
                 if (pendingServiceTransition == null) {
                     toastSuccess(
                         R.string.toast_services_stop,
-                        announceForAccessibility = !localizedContext.areCoreServiceNotificationsEnabled(),
+                        announceForAccessibility = true,
                     )
                     updateRunningState(false)
                 }
@@ -502,8 +501,9 @@ class MainViewModel(
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
                             toast(
-                                dataSource.getString(
-                                    R.string.title_update_config_count,
+                                dataSource.getQuantityString(
+                                    R.plurals.title_update_config_count,
+                                    result.configCount,
                                     result.configCount,
                                 ),
                                 announceForAccessibility = true,

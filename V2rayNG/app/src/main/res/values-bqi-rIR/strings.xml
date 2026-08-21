@@ -347,8 +347,14 @@
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
-    <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
-    <string name="title_update_asset_count">%d فایل بونچک جغرافیایی ورۊ وابی</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
+        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+    </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
