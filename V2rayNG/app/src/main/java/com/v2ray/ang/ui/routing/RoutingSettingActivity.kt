@@ -319,7 +319,7 @@ fun RoutingSettingScreen(
     deleteRuleId?.let { ruleId ->
         val ruleName = rulesets.firstOrNull { it.id == ruleId }?.remarks.orEmpty()
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_routing_rule, ruleName),
+            message = stringResource(R.string.confirm_delete_routing_rule_named, ruleName),
             onConfirm = {
                 val position = rulesets.indexOfFirst { it.id == ruleId }
                 if (position >= 0) viewModel.remove(position)

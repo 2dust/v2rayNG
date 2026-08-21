@@ -364,7 +364,7 @@ fun SubSettingScreen(
     val deleteTarget = removeTarget
     if (deleteTarget != null) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_subscription_group, deleteTarget.name),
+            message = stringResource(R.string.confirm_delete_subscription_group_named, deleteTarget.name),
             onConfirm = {
                 onRemoveSub(deleteTarget.guid)
                 removeTarget = null
