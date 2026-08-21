@@ -88,7 +88,8 @@
     <string name="confirm_delete_visible_profiles">Удалить все отображаемые профили?</string>
     <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
     <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
-    <string name="confirm_delete_profile">Удалить этот профиль?\n%1$s</string>
+    <string name="confirm_delete_profile">Удалить этот профиль?</string>
+    <string name="confirm_delete_profile_named">Удалить этот профиль?\n%1$s</string>
     <string name="confirm_delete_policy_group">Удалить эту политику группы?</string>
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>

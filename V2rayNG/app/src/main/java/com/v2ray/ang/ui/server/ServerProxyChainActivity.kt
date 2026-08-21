@@ -341,7 +341,7 @@ fun ProxyChainScreen(
 
     if (showProfileDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile, remarks),
+            message = stringResource(R.string.confirm_delete_profile_named, remarks),
             onConfirm = { showProfileDeleteConfirm = false; onDelete() },
             onDismiss = { showProfileDeleteConfirm = false }
         )

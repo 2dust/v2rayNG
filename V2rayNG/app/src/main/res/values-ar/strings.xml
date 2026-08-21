@@ -98,7 +98,8 @@
     <string name="confirm_delete_visible_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المعروضة حاليًا؟</string>
     <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
     <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
-    <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟\n%1$s</string>
+    <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟</string>
+    <string name="confirm_delete_profile_named">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟\n%1$s</string>
     <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟</string>
     <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟</string>
     <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟</string>

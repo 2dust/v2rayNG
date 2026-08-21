@@ -78,7 +78,8 @@
     <string name="confirm_delete_visible_profiles">پوی کانفیگا ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_duplicate_profiles">پوی کانفیگا تکراری ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_invalid_profiles">ٱول کانفیگا ن آزمایش کۊنین. پوی کانفیگا نا موئتبر ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
-    <string name="confirm_delete_profile">ای کانفیگ پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
+    <string name="confirm_delete_profile">ای کانفیگ پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_profile_named">ای کانفیگ پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="confirm_delete_policy_group">ای بونکۊ سیاست پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_proxy_chain_member">ای عوزو زنجیره پروکسی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>

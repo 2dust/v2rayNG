@@ -49,7 +49,7 @@ fun MainDialogs(
     if (showRemoveConfirm != null) {
         val target = showRemoveConfirm
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile, target.profileName),
+            message = stringResource(R.string.confirm_delete_profile_named, target.profileName),
             onConfirm = { onConfirmRemove(target.guid) },
             onDismiss = onDismissRemove
         )
