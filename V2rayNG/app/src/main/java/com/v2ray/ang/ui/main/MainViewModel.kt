@@ -737,7 +737,7 @@ class MainViewModel(
 
     /** Selects immediately when stopped, or defers the visible active state until restart succeeds. */
     fun selectServerForActivation(guid: String): Boolean {
-        if (guid == uiState.value.selectedGuid) return false
+        if (guid == uiState.value.selectedGuid || pendingServiceTransition != null) return false
         dataSource.setSelectServer(guid)
         if (!uiState.value.isRunning) {
             _uiState.update { it.copy(selectedGuid = guid) }
