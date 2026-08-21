@@ -1,8 +1,14 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
+import android.view.View
+import android.view.accessibility.AccessibilityEvent
+import android.widget.TextView
 import android.widget.Toast
 import com.v2ray.ang.ui.compose.AppSnackbarManager
 import com.v2ray.ang.ui.compose.ToastType
@@ -12,11 +18,9 @@ import com.v2ray.ang.ui.compose.ToastType
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toast(message: Int) {
+fun Context.toast(message: Int, announceForAccessibility: Boolean = false) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.NORMAL) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.NORMAL, announceForAccessibility)
 }
 
 /**
@@ -24,10 +28,8 @@ fun Context.toast(message: Int) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toast(message: CharSequence) {
-    dispatchMessage(message, ToastType.NORMAL) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+fun Context.toast(message: CharSequence, announceForAccessibility: Boolean = false) {
+    dispatchMessage(message, ToastType.NORMAL, announceForAccessibility)
 }
 
 /**
@@ -35,11 +37,9 @@ fun Context.toast(message: CharSequence) {
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toastSuccess(message: Int) {
+fun Context.toastSuccess(message: Int, announceForAccessibility: Boolean = false) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.SUCCESS) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.SUCCESS, announceForAccessibility)
 }
 
 /**
@@ -47,10 +47,8 @@ fun Context.toastSuccess(message: Int) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toastSuccess(message: CharSequence) {
-    dispatchMessage(message, ToastType.SUCCESS) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+fun Context.toastSuccess(message: CharSequence, announceForAccessibility: Boolean = false) {
+    dispatchMessage(message, ToastType.SUCCESS, announceForAccessibility)
 }
 
 /**
@@ -58,11 +56,9 @@ fun Context.toastSuccess(message: CharSequence) {
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toastError(message: Int) {
+fun Context.toastError(message: Int, announceForAccessibility: Boolean = true) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.ERROR) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.ERROR, announceForAccessibility)
 }
 
 /**
@@ -70,10 +66,8 @@ fun Context.toastError(message: Int) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toastError(message: CharSequence) {
-    dispatchMessage(message, ToastType.ERROR) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+fun Context.toastError(message: CharSequence, announceForAccessibility: Boolean = true) {
+    dispatchMessage(message, ToastType.ERROR, announceForAccessibility)
 }
 
 /**
@@ -81,11 +75,9 @@ fun Context.toastError(message: CharSequence) {
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toastInfo(message: Int) {
+fun Context.toastInfo(message: Int, announceForAccessibility: Boolean = false) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.INFO) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.INFO, announceForAccessibility)
 }
 
 /**
@@ -93,10 +85,8 @@ fun Context.toastInfo(message: Int) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+fun Context.toastInfo(message: CharSequence, announceForAccessibility: Boolean = false) {
+    dispatchMessage(message, ToastType.INFO, announceForAccessibility)
 }
 
 private inline fun runOnMain(crossinline block: () -> Unit) {
@@ -107,11 +97,11 @@ private inline fun runOnMain(crossinline block: () -> Unit) {
     }
 }
 
-private inline fun dispatchMessage(
+private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
+    announceForAccessibility: Boolean,
     long: Boolean = false,
-    crossinline fallback: () -> Unit
 ) {
     val handledBySnackbar = AppSnackbarManager.show(
         message = message,
@@ -119,6 +109,43 @@ private inline fun dispatchMessage(
         long = long
     )
     if (!handledBySnackbar) {
-        runOnMain { fallback() }
+        runOnMain { showAccessibilitySilentToast(message, long) }
     }
+    if (announceForAccessibility) {
+        announceImportantForAccessibility(message)
+    }
+}
+
+/**
+ * Native text Toasts generate their own accessibility event. The fallback therefore uses a
+ * custom view hidden from accessibility so only the explicit important announcement is spoken.
+ */
+@Suppress("DEPRECATION")
+private fun Context.showAccessibilitySilentToast(message: CharSequence, long: Boolean) {
+    val density = resources.displayMetrics.density
+    val horizontalPadding = (16 * density).toInt()
+    val verticalPadding = (12 * density).toInt()
+    val bottomOffset = (100 * density).toInt()
+    val background = GradientDrawable().apply {
+        setColor(Color.argb(235, 48, 48, 48))
+        cornerRadius = 24 * density
+    }
+    val content = object : TextView(this) {
+        override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent): Boolean = true
+    }.apply {
+        text = message
+        setTextColor(Color.WHITE)
+        textSize = 14f
+        gravity = Gravity.CENTER
+        maxLines = 8
+        setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
+        this.background = background
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+    }
+
+    Toast(this).apply {
+        duration = if (long) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+        view = content
+        setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, bottomOffset)
+    }.show()
 }

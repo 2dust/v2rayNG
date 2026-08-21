@@ -123,13 +123,13 @@ class ScannerActivity : HelperBaseComponentActivity() {
                 inputStream?.close()
                 val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
                 if (text.isNullOrEmpty()) {
-                    toast(R.string.toast_decoding_failed)
+                    toast(R.string.toast_decoding_failed, announceForAccessibility = true)
                 } else {
                     finished(text)
                 }
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to decode QR code from file", e)
-                toast(R.string.toast_decoding_failed)
+                toast(R.string.toast_decoding_failed, announceForAccessibility = true)
             }
         }
     }

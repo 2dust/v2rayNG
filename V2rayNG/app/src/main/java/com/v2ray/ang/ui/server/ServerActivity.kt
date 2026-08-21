@@ -94,12 +94,12 @@ class ServerActivity : BaseComponentActivity() {
 
     private fun saveServer(config: ProfileItem): Boolean {
         if (config.remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(R.string.server_lab_remarks, announceForAccessibility = true)
             return false
         }
 
         if (config.server.isNullOrBlank()) {
-            toast(R.string.server_lab_address)
+            toast(R.string.server_lab_address, announceForAccessibility = true)
             return false
         }
 
@@ -107,7 +107,7 @@ class ServerActivity : BaseComponentActivity() {
             config.configType != EConfigType.HYSTERIA2 &&
             (config.serverPort?.toIntOrNull() ?: 0) <= 0
         ) {
-            toast(R.string.server_lab_port)
+            toast(R.string.server_lab_port, announceForAccessibility = true)
             return false
         }
 
@@ -123,7 +123,7 @@ class ServerActivity : BaseComponentActivity() {
 
                 else -> R.string.server_lab_id
             }
-            toast(message)
+            toast(message, announceForAccessibility = true)
             return false
         }
 
@@ -131,7 +131,7 @@ class ServerActivity : BaseComponentActivity() {
             config.configType == EConfigType.TROJAN &&
             config.security.isNullOrBlank()
         ) {
-            toast(R.string.server_lab_stream_security)
+            toast(R.string.server_lab_stream_security, announceForAccessibility = true)
             return false
         }
 
@@ -139,7 +139,7 @@ class ServerActivity : BaseComponentActivity() {
             !config.xhttpExtra.isNullOrBlank() &&
             JsonUtil.parseString(config.xhttpExtra) == null
         ) {
-            toast(R.string.server_lab_xhttp_extra)
+            toast(R.string.server_lab_xhttp_extra, announceForAccessibility = true)
             return false
         }
 
@@ -147,7 +147,7 @@ class ServerActivity : BaseComponentActivity() {
             !config.finalMask.isNullOrBlank() &&
             JsonUtil.parseString(config.finalMask) == null
         ) {
-            toast(R.string.server_lab_final_mask)
+            toast(R.string.server_lab_final_mask, announceForAccessibility = true)
             return false
         }
 
@@ -186,7 +186,7 @@ class ServerActivity : BaseComponentActivity() {
             guid.isEmpty() ||
             guid == MmkvManager.getSelectServer()
         ) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return
         }
 
@@ -484,17 +484,26 @@ fun ServerScreen(
                         Button(
                             onClick = {
                                 if (address.isBlank()) {
-                                    context.toast(R.string.server_lab_address); return@Button
+                                    context.toast(
+                                        R.string.server_lab_address,
+                                        announceForAccessibility = true,
+                                    ); return@Button
                                 }
                                 if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) {
-                                    context.toast(R.string.server_lab_port); return@Button
+                                    context.toast(
+                                        R.string.server_lab_port,
+                                        announceForAccessibility = true,
+                                    ); return@Button
                                 }
                                 val temp = buildProfileItem()
                                 scope.launch {
                                     isFetchingCert = true
                                     try {
                                         val sha256 = withContext(Dispatchers.IO) { CertificateFingerprintManager.fetchForManualFill(temp) }
-                                        if (sha256.isNullOrBlank()) context.toast(R.string.toast_fetch_cert_sha256_failed) else {
+                                        if (sha256.isNullOrBlank()) context.toast(
+                                            R.string.toast_fetch_cert_sha256_failed,
+                                            announceForAccessibility = true,
+                                        ) else {
                                             pinnedCA256 = sha256
                                             context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
                                         }

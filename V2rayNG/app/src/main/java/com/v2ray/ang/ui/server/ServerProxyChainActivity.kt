@@ -100,7 +100,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         members: List<String>
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(R.string.server_lab_remarks, announceForAccessibility = true)
             return false
         }
 
@@ -109,12 +109,18 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             .filter { it.isNotEmpty() }
 
         if (chainMembers.size != members.size) {
-            toast(R.string.server_proxy_chain_members_unselected)
+            toast(
+                R.string.server_proxy_chain_members_unselected,
+                announceForAccessibility = true,
+            )
             return false
         }
 
         if (chainMembers.size < 2) {
-            toast(R.string.server_proxy_chain_members_insufficient)
+            toast(
+                R.string.server_proxy_chain_members_insufficient,
+                announceForAccessibility = true,
+            )
             return false
         }
 
@@ -128,7 +134,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 getString(
                     R.string.server_proxy_chain_members_invalid,
                     invalidMembers.joinToString(", ")
-                )
+                ),
+                announceForAccessibility = true,
             )
             return false
         }
@@ -174,7 +181,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return false
         }
 

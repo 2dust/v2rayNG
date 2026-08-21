@@ -84,13 +84,28 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
 
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
-                        toast(R.string.title_update_subscription_no_subscription)
+                        toast(
+                            R.string.title_update_subscription_no_subscription,
+                            announceForAccessibility = true,
+                        )
 
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                        toast(getString(R.string.title_update_config_count, result.configCount))
+                        toast(
+                            getString(R.string.title_update_config_count, result.configCount),
+                            announceForAccessibility = true,
+                        )
 
                     else ->
-                        toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                        toast(
+                            getString(
+                                R.string.title_update_subscription_result,
+                                result.configCount,
+                                result.successCount,
+                                result.failureCount,
+                                result.skipCount,
+                            ),
+                            announceForAccessibility = true,
+                        )
                 }
                 reload()
             } catch (cancelled: CancellationException) {

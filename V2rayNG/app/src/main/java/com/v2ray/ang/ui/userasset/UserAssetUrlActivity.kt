@@ -103,15 +103,15 @@ class UserAssetUrlActivity : BaseComponentActivity() {
 
         val assetList = MmkvManager.decodeAssetUrls()
         if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-            toast(R.string.msg_remark_is_duplicate)
+            toast(R.string.msg_remark_is_duplicate, announceForAccessibility = true)
             return false
         }
         if (TextUtils.isEmpty(assetItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
+            toast(R.string.sub_setting_remarks, announceForAccessibility = true)
             return false
         }
         if (TextUtils.isEmpty(assetItem.url)) {
-            toast(R.string.title_url)
+            toast(R.string.title_url, announceForAccessibility = true)
             return false
         }
 

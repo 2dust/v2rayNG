@@ -24,14 +24,14 @@ object LauncherManager {
 
     fun startServiceFromToggle(context: Context): Boolean {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(R.string.app_tile_first_use)
+            context.toastError(R.string.app_tile_first_use)
             return false
         }
         try {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
             return false
         }
         return true
@@ -41,7 +41,8 @@ object LauncherManager {
         context: Context,
         guid: String? = null,
         announceStart: Boolean = true,
-    ) {
+        showError: Boolean = true,
+    ): Boolean {
         LogUtil.i(AppConfig.TAG, "LauncherManager: startService from ${context::class.java.simpleName}")
 
         if (guid != null) {
@@ -50,9 +51,13 @@ object LauncherManager {
 
         try {
             startContextService(context, announceStart)
+            return true
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            if (showError) {
+                context.toastError(e.message ?: e.javaClass.simpleName)
+            }
+            return false
         }
     }
 
@@ -113,7 +118,10 @@ object LauncherManager {
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
+            context.toast(
+                R.string.toast_warning_pref_proxysharing_short,
+                announceForAccessibility = true,
+            )
         } else if (announceStart) {
             context.toast(R.string.toast_services_start)
         }

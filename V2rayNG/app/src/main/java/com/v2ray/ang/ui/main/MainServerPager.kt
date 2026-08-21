@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import android.view.accessibility.AccessibilityManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -53,14 +51,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.nullIfBlank
-import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.extension.isTouchExplorationEnabled
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.compose.ItemDivider
@@ -352,25 +349,17 @@ fun ServerListItem(
     dragModifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val view = LocalView.current
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(restoreFocus) {
         if (!restoreFocus) return@LaunchedEffect
 
-        val accessibilityManager = ContextCompat.getSystemService(
-            context,
-            AccessibilityManager::class.java,
-        )
-        if (accessibilityManager?.isTouchExplorationEnabled != true) {
-            context.toastSuccess(R.string.toast_services_success)
+        if (!context.isTouchExplorationEnabled()) {
             onFocusRestored()
             return@LaunchedEffect
         }
 
-        // A Snackbar becomes an accessibility pane and can send TalkBack to the first top-bar
-        // control when it disappears. Announce the final result without creating a focus target,
-        // then restore the row only after TalkBack has had time to finish speaking it.
-        view.announceForAccessibility(context.getString(R.string.toast_services_success))
+        // MainViewModel has already delivered the one final announcement, either directly or via
+        // the foreground notification. Restore the stable row after TalkBack has finished it.
         delay(4_000)
         runCatching { focusRequester.requestFocus() }
         onFocusRestored()

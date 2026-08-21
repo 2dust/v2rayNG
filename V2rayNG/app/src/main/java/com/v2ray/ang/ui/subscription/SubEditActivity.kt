@@ -81,16 +81,16 @@ class SubEditActivity : BaseComponentActivity() {
     private fun saveServer(subItem: SubscriptionItem): Boolean {
 
         if (TextUtils.isEmpty(subItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
+            toast(R.string.sub_setting_remarks, announceForAccessibility = true)
             return false
         }
         if (subItem.url.isNotEmpty()) {
             if (!Utils.isValidUrl(subItem.url)) {
-                toast(R.string.toast_invalid_url)
+                toast(R.string.toast_invalid_url, announceForAccessibility = true)
                 return false
             }
             if (!Utils.isValidSubUrl(subItem.url)) {
-                toast(R.string.toast_insecure_url_protocol)
+                toast(R.string.toast_insecure_url_protocol, announceForAccessibility = true)
                 if (!subItem.allowInsecureUrl) {
                     return false
                 }
@@ -98,7 +98,7 @@ class SubEditActivity : BaseComponentActivity() {
         }
 
         if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-            toast(R.string.toast_invalid_update_interval)
+            toast(R.string.toast_invalid_update_interval, announceForAccessibility = true)
             return false
         }
 

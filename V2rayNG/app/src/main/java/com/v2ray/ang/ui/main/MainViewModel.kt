@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.areCoreServiceNotificationsEnabled
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.ui.base.BaseViewModel
@@ -78,7 +79,7 @@ class MainViewModel(
     private var testingGroupId: String? = null
 
     @Volatile
-    private var pendingServerActivationGuid: String? = null
+    private var pendingServiceTransition: PendingServiceTransition? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -99,21 +100,29 @@ class MainViewModel(
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
             MainServiceEvent.StateRunning -> {
-                if (pendingServerActivationGuid == null) {
+                if (pendingServiceTransition == null) {
                     updateRunningState(true, clearTestingText = false)
                 }
             }
             MainServiceEvent.StateNotRunning -> {
-                if (pendingServerActivationGuid == null) {
+                if (pendingServiceTransition == null) {
                     updateRunningState(false, clearTestingText = false)
                 }
             }
-            MainServiceEvent.StateStartSuccess -> {
-                val activatedGuid = pendingServerActivationGuid
-                pendingServerActivationGuid = null
-                if (activatedGuid == null) {
-                    toastSuccess(R.string.toast_services_success)
+            MainServiceEvent.StateRestarting -> {
+                // A server change is already the more specific restart transition.
+                if (pendingServiceTransition == null) {
+                    pendingServiceTransition = PendingServiceTransition.BackgroundRestart
                 }
+            }
+            MainServiceEvent.StateStartSuccess -> {
+                val transition = pendingServiceTransition
+                val activatedGuid = (transition as? PendingServiceTransition.ServerChange)?.guid
+                pendingServiceTransition = null
+                toastSuccess(
+                    R.string.toast_services_success,
+                    announceForAccessibility = !localizedContext.areCoreServiceNotificationsEnabled(),
+                )
                 _uiState.update {
                     it.copy(
                         selectedGuid = activatedGuid ?: it.selectedGuid,
@@ -126,8 +135,9 @@ class MainViewModel(
 
             MainServiceEvent.StateStartFailure -> {
                 toastError(R.string.toast_services_failure)
-                val failedGuid = pendingServerActivationGuid
-                pendingServerActivationGuid = null
+                val failedGuid =
+                    (pendingServiceTransition as? PendingServiceTransition.ServerChange)?.guid
+                pendingServiceTransition = null
                 _uiState.update {
                     it.copy(
                         selectedGuid = failedGuid ?: it.selectedGuid,
@@ -139,8 +149,11 @@ class MainViewModel(
             }
 
             MainServiceEvent.StateStopSuccess -> {
-                if (pendingServerActivationGuid == null) {
-                    toastSuccess(R.string.toast_services_stop)
+                if (pendingServiceTransition == null) {
+                    toastSuccess(
+                        R.string.toast_services_stop,
+                        announceForAccessibility = !localizedContext.areCoreServiceNotificationsEnabled(),
+                    )
                     updateRunningState(false)
                 }
             }
@@ -482,13 +495,31 @@ class MainViewModel(
                     }
                     when {
                         result.successCount + result.failureCount + result.skipCount == 0 ->
-                            toast(R.string.title_update_subscription_no_subscription)
+                            toast(
+                                R.string.title_update_subscription_no_subscription,
+                                announceForAccessibility = true,
+                            )
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                            toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+                            toast(
+                                dataSource.getString(
+                                    R.string.title_update_config_count,
+                                    result.configCount,
+                                ),
+                                announceForAccessibility = true,
+                            )
 
                         else ->
-                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                            toast(
+                                dataSource.getString(
+                                    R.string.title_update_subscription_result,
+                                    result.configCount,
+                                    result.successCount,
+                                    result.failureCount,
+                                    result.skipCount,
+                                ),
+                                announceForAccessibility = true,
+                            )
                     }
                     if (result.configCount > 0) {
                         setupGroupTab(forceRefresh = true)
@@ -716,13 +747,13 @@ class MainViewModel(
             return false
         }
 
-        pendingServerActivationGuid = guid
+        pendingServiceTransition = PendingServiceTransition.ServerChange(guid)
         _uiState.update { it.copy(restoreServerFocusGuid = null) }
         return true
     }
 
     fun refreshSelectedGuid() {
-        if (pendingServerActivationGuid == null) {
+        if (pendingServiceTransition !is PendingServiceTransition.ServerChange) {
             _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
         }
     }
@@ -733,9 +764,14 @@ class MainViewModel(
         }
     }
 
+    private sealed interface PendingServiceTransition {
+        data object BackgroundRestart : PendingServiceTransition
+        data class ServerChange(val guid: String) : PendingServiceTransition
+    }
+
     fun removeServerAndRefresh(guid: String) {
         if (guid == uiState.value.selectedGuid) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return
         }
         viewModelScope.launch(ioDispatcher) {

@@ -53,6 +53,9 @@ object CoreServiceManager {
     @Volatile
     private var isReloading = false
 
+    @Volatile
+    private var isServiceRestarting = false
+
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
 
@@ -102,6 +105,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
+            isServiceRestarting = false
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
@@ -174,6 +178,7 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
+            isServiceRestarting = false
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         }
         NotificationManager.startSpeedNotification()
@@ -209,7 +214,9 @@ object CoreServiceManager {
             browserDialer = null
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        if (!isServiceRestarting) {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        }
         NotificationManager.cancelNotification()
 
         try {
@@ -474,15 +481,43 @@ object CoreServiceManager {
                     // daemon before stopping it instead of relying on possibly stale UI state.
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
                     val request = intent.serializable<ServiceRestartRequest>("content")
+                    isServiceRestarting = true
+
+                    // Let the UI treat stop/start as one transition. This suppresses the
+                    // intermediate stopped state for both background restarts and server changes.
+                    MessageHelper.sendMsg2UI(
+                        serviceControl.getService(),
+                        AppConfig.MSG_STATE_RESTART,
+                        request ?: ServiceRestartRequest(),
+                    )
 
                     val pendingResult = goAsync()
                     CoroutineScope(Dispatchers.Default).launch {
                         try {
                             serviceControl.stopService()
                             delay(500L)
-                            LauncherManager.startService(
+                            val startRequested = LauncherManager.startService(
                                 serviceControl.getService(),
                                 announceStart = request?.suppressIntermediateAnnouncements != true,
+                                showError = false,
+                            )
+                            if (!startRequested) {
+                                isServiceRestarting = false
+                                MessageHelper.sendMsg2UI(
+                                    serviceControl.getService(),
+                                    AppConfig.MSG_STATE_START_FAILURE,
+                                    "",
+                                )
+                            }
+                        } catch (e: Exception) {
+                            val message = e.message?.takeUnless { it.isBlank() }
+                                ?: e.javaClass.simpleName
+                            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Restart failed: $message", e)
+                            isServiceRestarting = false
+                            MessageHelper.sendMsg2UI(
+                                serviceControl.getService(),
+                                AppConfig.MSG_STATE_START_FAILURE,
+                                message,
                             )
                         } finally {
                             pendingResult.finish()

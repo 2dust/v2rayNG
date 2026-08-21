@@ -144,7 +144,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
                 val assetList = MmkvManager.decodeAssetUrls()
                 if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-                    toast(R.string.msg_remark_is_duplicate)
+                    toast(R.string.msg_remark_is_duplicate, announceForAccessibility = true)
                 } else {
                     MmkvManager.encodeAsset(assetId, assetItem)
                     copyFile(uri)
@@ -192,7 +192,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
     private fun importAsset(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
-                toast(R.string.toast_invalid_url)
+                toast(R.string.toast_invalid_url, announceForAccessibility = true)
                 return false
             }
             startActivity(
@@ -219,9 +219,12 @@ class UserAssetActivity : HelperBaseComponentActivity() {
                 viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             }
             if (result.successCount > 0) {
-                toast(getString(R.string.title_update_asset_count, result.successCount))
+                toast(
+                    getString(R.string.title_update_asset_count, result.successCount),
+                    announceForAccessibility = true,
+                )
             } else {
-                toast(getString(R.string.toast_failure))
+                toastError(R.string.toast_failure)
             }
             refreshData().join()
             isLoadingState.value = false

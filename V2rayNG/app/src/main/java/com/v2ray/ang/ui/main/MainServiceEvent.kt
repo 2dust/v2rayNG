@@ -5,6 +5,7 @@ import com.v2ray.ang.dto.ConnectionTestResult
 sealed class MainServiceEvent {
     data object StateRunning : MainServiceEvent()
     data object StateNotRunning : MainServiceEvent()
+    data object StateRestarting : MainServiceEvent()
     data object StateStartSuccess : MainServiceEvent()
     data object StateStartFailure : MainServiceEvent()
     data object StateStopSuccess : MainServiceEvent()

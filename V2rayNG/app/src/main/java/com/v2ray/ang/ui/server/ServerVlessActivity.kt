@@ -47,7 +47,7 @@ class ServerVlessActivity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(R.string.server_lab_id)
+            toast(R.string.server_lab_id, announceForAccessibility = true)
             return false
         }
         return true

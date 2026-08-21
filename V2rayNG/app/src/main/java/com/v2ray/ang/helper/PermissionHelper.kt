@@ -40,7 +40,7 @@ class PermissionHelper(private val activity: ComponentActivity) {
                         R.string.toast_permission_denied_for,
                         activity.getString(permissionType.getLabelRes())
                     )
-                    activity.toast(message)
+                    activity.toast(message, announceForAccessibility = true)
                 }
             }
             permissionLauncher.launch(permission)
