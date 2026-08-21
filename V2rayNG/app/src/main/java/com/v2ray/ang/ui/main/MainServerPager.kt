@@ -3,7 +3,6 @@ package com.v2ray.ang.ui.main
 import android.view.accessibility.AccessibilityManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -404,26 +403,11 @@ fun ServerListItem(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            // Keep one semantics node alive while the row changes from selectable to selected.
-            // Replacing the row's only semantics modifier makes TalkBack fall back to the first
-            // control in the window before the completed restart can restore the row.
+            // Keep the same semantics and clickable focus target while the row becomes selected.
+            // The explicit request below remains as a fallback after the final announcement.
             .semantics(mergeDescendants = true) {}
-            .then(
-                if (!isSelected) {
-                    Modifier.clickable(onClick = onClick)
-                } else {
-                    Modifier
-                }
-            )
-            .then(
-                if (isSelected) {
-                    Modifier
-                        .focusRequester(focusRequester)
-                        .focusable()
-                } else {
-                    Modifier
-                }
-            )
+            .focusRequester(focusRequester)
+            .clickable(onClick = onClick)
             .then(dragModifier)
     ) {
         Box(
