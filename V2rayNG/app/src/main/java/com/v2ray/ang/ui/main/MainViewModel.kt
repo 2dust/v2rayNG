@@ -65,7 +65,7 @@ class MainViewModel(
     // ---------- Groups & cache ----------
     private val cacheMutex = Mutex()
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
-    private val groupPageFlows = ConcurrentHashMap<String, MutableStateFlow<List<ServersCache>>>()
+    private val groupUiFlows = ConcurrentHashMap<String, MutableStateFlow<ServerGroupUiState>>()
     private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
     private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
@@ -162,15 +162,14 @@ class MainViewModel(
     }
 
     // ---------- Public state accessors ----------
-    fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
-        groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
-            .asStateFlow()
+    internal fun serverGroupState(groupId: String): StateFlow<ServerGroupUiState> =
+        mutableServerGroupState(groupId).asStateFlow()
 
-    private fun mutableServersForGroup(groupId: String): MutableStateFlow<List<ServersCache>> =
-        groupPageFlows.computeIfAbsent(groupId) { MutableStateFlow(emptyList()) }
+    private fun mutableServerGroupState(groupId: String): MutableStateFlow<ServerGroupUiState> =
+        groupUiFlows.computeIfAbsent(groupId) { MutableStateFlow(ServerGroupUiState()) }
 
     private fun currentServers(): List<ServersCache> =
-        mutableServersForGroup(uiState.value.selectedGroupId).value
+        mutableServerGroupState(uiState.value.selectedGroupId).value.servers
 
     // ---------- Action handler ----------
     fun onAction(action: MainAction) {
@@ -289,7 +288,31 @@ class MainViewModel(
     }
 
     private fun updateGroupUi(groupId: String, servers: List<ServersCache>) {
-        mutableServersForGroup(groupId).value = applyKeywordFilter(servers)
+        val filteredServers = applyKeywordFilter(servers)
+        mutableServerGroupState(groupId).value = ServerGroupUiState(
+            servers = filteredServers,
+            rows = buildServerRows(groupId, filteredServers)
+        )
+    }
+
+    private fun buildServerRows(groupId: String, servers: List<ServersCache>): List<ServerRowUiModel> {
+        val subscriptionRemarks = if (groupId.isEmpty()) {
+            servers.asSequence()
+                .map { it.profile.subscriptionId }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .associateWith { subscriptionId ->
+                    dataSource.getSubscriptionItem(subscriptionId)?.remarks.orEmpty()
+                }
+        } else {
+            emptyMap()
+        }
+        return servers.map { server ->
+            buildServerRowUiModel(
+                server = server,
+                subscriptionRemarks = subscriptionRemarks[server.profile.subscriptionId].orEmpty()
+            )
+        }
     }
 
     fun getSubscriptions(): List<SubscriptionCache> = dataSource.getSubscriptions()
@@ -334,17 +357,18 @@ class MainViewModel(
                 }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
-                groupPageFlows.keys.removeAll { it !in validIds }
+                groupUiFlows.keys.removeAll { it !in validIds }
                 groupLoadMutexes.keys.removeAll { it !in validIds }
 
+                val selectedGuid = dataSource.getSelectServer()
                 _uiState.update {
                     it.copy(
                         groups = groups,
                         selectedGroupId = selectedGroup,
-                        selectedGuid = dataSource.getSelectServer()
+                        selectedGuid = selectedGuid
                     )
                 }
-                groups.forEach { mutableServersForGroup(it.id) }
+                groups.forEach { mutableServerGroupState(it.id) }
 
                 if (groups.isEmpty()) {
                     cacheMutex.withLock { groupDataCache.clear() }
@@ -582,7 +606,7 @@ class MainViewModel(
 
     fun subscriptionIdChanged(id: String) {
         if (_uiState.value.groups.none { it.id == id }) return
-        mutableServersForGroup(id)
+        mutableServerGroupState(id)
         if (uiState.value.selectedGroupId != id) {
             dataSource.setSelectedSubscriptionId(id)
             _uiState.update { it.copy(selectedGroupId = id) }
@@ -644,7 +668,8 @@ class MainViewModel(
     }
 
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        val selectedGuid = dataSource.getSelectServer()
+        _uiState.update { it.copy(selectedGuid = selectedGuid) }
     }
 
     fun removeServerAndRefresh(guid: String) {
@@ -660,10 +685,13 @@ class MainViewModel(
     }
 
     fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
-        val servers = mutableServersForGroup(groupId).value.toMutableList()
+        val groupState = mutableServerGroupState(groupId).value
+        val servers = groupState.servers.toMutableList()
         if (!servers.moveItem(fromPosition, toPosition)) return
+        val rows = groupState.rows.toMutableList()
+        rows.moveItem(fromPosition, toPosition)
         val guids = servers.map { it.guid }
-        mutableServersForGroup(groupId).value = servers
+        mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
         serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
@@ -694,11 +722,17 @@ class MainViewModel(
             return
         }
         val serverGuids = servers.map { it.guid }
-        mutableServersForGroup(groupId).update { current ->
-            current.map { server ->
-                if (server.testDelayMillis == 0L) server
-                else server.copy(testDelayMillis = 0L)
-            }
+        mutableServerGroupState(groupId).update { current ->
+            current.copy(
+                servers = current.servers.map { server ->
+                    if (server.testDelayMillis == 0L) server
+                    else server.copy(testDelayMillis = 0L)
+                },
+                rows = current.rows.map { row ->
+                    if (row.testDelayMillis == 0L) row
+                    else row.copy(testDelayMillis = 0L)
+                }
+            )
         }
         testingGroupId = groupId
         _uiState.update {
