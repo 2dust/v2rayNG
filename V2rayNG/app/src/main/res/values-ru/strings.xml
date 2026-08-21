@@ -522,7 +522,7 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">выбрано</string>
     <string name="acc_last_updated">Последнее обновление: %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, обновление %2$s</string>

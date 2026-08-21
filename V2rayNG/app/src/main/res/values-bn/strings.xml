@@ -522,7 +522,7 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">নির্বাচিত</string>
     <string name="acc_last_updated">সর্বশেষ আপডেট %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, আপডেট %2$s</string>
