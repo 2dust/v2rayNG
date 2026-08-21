@@ -112,7 +112,7 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
         proxyUsername: String?,
         proxyPassword: String?
     ): Boolean {
-        val targetTemp = File(extDir, item.remarks + "_temp")
+        val targetTemp = File(extDir, ".${Utils.getUuid()}.download")
         val target = File(extDir, item.remarks)
         val request = UrlContentRequest(
             url = item.url,
@@ -130,14 +130,14 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
                     portsToTry.any { tryHttpDownload(request, targetTemp, it) }
                 }
             }
-            if (downloaded && targetTemp.renameTo(target)) {
-                return true
-            }
+            if (!downloaded || targetTemp.length() == 0L) return false
+            return targetTemp.renameTo(target)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
+            return false
+        } finally {
+            targetTemp.delete()
         }
-        targetTemp.delete()
-        return false
     }
 
     private fun tryHttpDownload(request: UrlContentRequest, targetFile: File, httpPort: Int): Boolean =
