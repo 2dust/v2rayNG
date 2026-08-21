@@ -4,9 +4,13 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.LocaleSpan
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.ContextCompat
+import com.v2ray.ang.handler.AppLocaleManager
 
 private const val DuplicateAnnouncementWindowMs = 1_000L
 
@@ -31,6 +35,16 @@ private object AccessibilityAnnouncementDispatcher {
         val appContext = context.applicationContext
         val text = message.toString()
         if (text.isBlank()) return
+        val locale = AppLocaleManager.localizedContext(context)
+            .resources.configuration.locales[0]
+        val localizedMessage = SpannableString(message).apply {
+            setSpan(
+                LocaleSpan(locale),
+                0,
+                length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
 
         mainHandler.post {
             val manager = ContextCompat.getSystemService(
@@ -50,7 +64,7 @@ private object AccessibilityAnnouncementDispatcher {
             val event = AccessibilityEvent.obtain(AccessibilityEvent.TYPE_ANNOUNCEMENT).apply {
                 packageName = appContext.packageName
                 className = appContext.javaClass.name
-                this.text.add(text)
+                this.text.add(localizedMessage)
             }
             manager.sendAccessibilityEvent(event)
         }
