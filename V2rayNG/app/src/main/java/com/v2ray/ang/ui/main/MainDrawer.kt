@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
@@ -111,12 +113,21 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
             }
             drawerItems.forEachIndexed { index, item ->
                 if (index == primaryDrawerItems.size) AppDivider()
+                val itemLabel = stringResource(item.labelRes)
                 NavigationDrawerItem(
-                    label = { Text(stringResource(item.labelRes)) },
+                    label = { Text(itemLabel) },
                     selected = false,
                     onClick = { onNavigate(item) },
                     icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    modifier = Modifier
+                        .padding(NavigationDrawerItemDefaults.ItemPadding)
+                        .clearAndSetSemantics {
+                            contentDescription = itemLabel
+                            onClick {
+                                onNavigate(item)
+                                true
+                            }
+                        }
                 )
             }
         }

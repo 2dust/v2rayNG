@@ -520,7 +520,6 @@
     <string name="acc_search">جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
-    <string name="acc_selected_server">سرور انتخاب‌شده</string>
     <string name="acc_last_updated">آخرین به‌روزرسانی %1$s</string>
     <string name="acc_subscription_announcement">%1$s، %2$s</string>
     <string name="acc_subscription_update">%1$s، به‌روزرسانی %2$s</string>

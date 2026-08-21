@@ -520,7 +520,6 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
-    <string name="acc_selected_server">الخادم المحدد</string>
     <string name="acc_last_updated">آخر تحديث %1$s</string>
     <string name="acc_subscription_announcement">%1$s، %2$s</string>
     <string name="acc_subscription_update">%1$s، التحديث %2$s</string>

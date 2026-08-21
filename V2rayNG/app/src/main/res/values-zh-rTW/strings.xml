@@ -520,7 +520,6 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
-    <string name="acc_selected_server">選取的伺服器</string>
     <string name="acc_last_updated">上次更新：%1$s</string>
     <string name="acc_subscription_announcement">%1$s，%2$s</string>
     <string name="acc_subscription_update">%1$s，更新為%2$s</string>

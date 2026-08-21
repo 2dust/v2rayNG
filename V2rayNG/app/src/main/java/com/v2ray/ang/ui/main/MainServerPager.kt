@@ -322,7 +322,7 @@ fun ServerListItem(
         stringResource(R.string.server_test_delay_value, testDelayMillis)
     }
     val selectedStateDescription = if (isSelected) {
-        stringResource(R.string.acc_selected_server)
+        stringResource(R.string.acc_selected)
     } else {
         null
     }
