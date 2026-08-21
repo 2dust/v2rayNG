@@ -559,7 +559,6 @@
     <string name="acc_share_named">%1$s শেয়ার করুন</string>
     <string name="acc_edit_named">%1$s সম্পাদনা করুন</string>
     <string name="acc_delete_named">%1$s মুছুন</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

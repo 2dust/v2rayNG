@@ -53,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -81,17 +80,8 @@ fun AppTopBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    val appName = stringResource(R.string.app_name)
-    val screenAnnouncement = if (title.isBlank()) {
-        appName
-    } else {
-        stringResource(R.string.acc_screen_title, appName, title)
-    }
     Column {
         TopAppBar(
-            modifier = Modifier.semantics {
-                paneTitle = screenAnnouncement
-            },
             title = {
                 if (isSearchActive) {
                     SearchInputField(

@@ -559,7 +559,6 @@
     <string name="acc_share_named">Share %1$s</string>
     <string name="acc_edit_named">Edit %1$s</string>
     <string name="acc_delete_named">Delete %1$s</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>

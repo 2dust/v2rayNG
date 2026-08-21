@@ -559,7 +559,6 @@
     <string name="acc_share_named">یک رسۊوی %1$s</string>
     <string name="acc_edit_named">آلشتکاری %1$s</string>
     <string name="acc_delete_named">پاک کردن %1$s</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

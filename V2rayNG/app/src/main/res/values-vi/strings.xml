@@ -559,7 +559,6 @@
     <string name="acc_share_named">Chia sẻ %1$s</string>
     <string name="acc_edit_named">Chỉnh sửa %1$s</string>
     <string name="acc_delete_named">Xóa %1$s</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

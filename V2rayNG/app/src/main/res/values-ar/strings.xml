@@ -559,7 +559,6 @@
     <string name="acc_share_named">مشاركة %1$s</string>
     <string name="acc_edit_named">تعديل %1$s</string>
     <string name="acc_delete_named">حذف %1$s</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

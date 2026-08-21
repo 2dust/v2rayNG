@@ -559,7 +559,6 @@
     <string name="acc_share_named">分享%1$s</string>
     <string name="acc_edit_named">編輯%1$s</string>
     <string name="acc_delete_named">刪除%1$s</string>
-    <string name="acc_screen_title">%1$s - %2$s</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>
