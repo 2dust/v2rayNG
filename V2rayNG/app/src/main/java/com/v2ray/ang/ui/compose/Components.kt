@@ -52,7 +52,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -80,6 +82,7 @@ fun AppTopBar(
 ) {
     Column {
         TopAppBar(
+            modifier = Modifier.semantics { isTraversalGroup = true },
             title = {
                 if (isSearchActive) {
                     SearchInputField(
@@ -88,7 +91,10 @@ fun AppTopBar(
                         placeholder = searchPlaceholder
                     )
                 } else {
-                    Text(text = title)
+                    Text(
+                        text = title,
+                        modifier = Modifier.semantics { traversalIndex = -1f }
+                    )
                 }
             },
             navigationIcon = {
