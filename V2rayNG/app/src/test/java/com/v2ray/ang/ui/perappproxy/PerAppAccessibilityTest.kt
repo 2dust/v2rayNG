@@ -19,7 +19,7 @@ class PerAppAccessibilityTest {
     }
 
     @Test
-    fun proxyModeRoutesCheckedAppsThroughV2rayNg() {
+    fun proxyModeRoutesCheckedAppsThroughApp() {
         assertEquals(
             R.string.acc_app_routed_directly,
             perAppRoutingDescription(true, bypassApps = false, checked = false)

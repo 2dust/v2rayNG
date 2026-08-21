@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.compose
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +31,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -66,10 +64,15 @@ fun CollapsiblePreferenceGroupHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button) { onExpandedChange(!expanded) }
-            .semantics(mergeDescendants = true) {
+            .clearAndSetSemantics {
                 contentDescription = groupAnnouncement
+                role = Role.Button
+                onClick {
+                    onExpandedChange(!expanded)
+                    true
+                }
             }
+            .clickable(role = Role.Button) { onExpandedChange(!expanded) }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -77,9 +80,7 @@ fun CollapsiblePreferenceGroupHeader(
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier
-                .weight(1f)
-                .clearAndSetSemantics {}
+            modifier = Modifier.weight(1f)
         )
         Icon(
             painter = painterResource(R.drawable.ic_expand_more_24dp),
@@ -100,7 +101,7 @@ private fun SettingsItemRow(
     enabled: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
-    accessibilityDescription: String? = null,
+    accessibilityDescription: String,
     accessibilityRole: Role? = null,
     trailing: @Composable (() -> Unit)? = null
 ) {
@@ -108,56 +109,37 @@ private fun SettingsItemRow(
     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
     else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-    val rowAnnouncement = if (!enabled) {
+    val rowAnnouncement = if (enabled) {
+        accessibilityDescription
+    } else {
         if (description.isNullOrEmpty()) {
             stringResource(R.string.acc_unavailable_setting, title)
         } else {
             stringResource(R.string.acc_unavailable_setting_with_description, title, description)
         }
-    } else {
-        accessibilityDescription
     }
     val clickAction = if (enabled) onClick else null
+    val accessibilityModifier = Modifier.clearAndSetSemantics {
+        contentDescription = rowAnnouncement
+        if (clickAction != null) {
+            if (accessibilityRole != null) role = accessibilityRole
+            onClick {
+                clickAction()
+                true
+            }
+        }
+    }
+    val clickModifier = if (clickAction != null) {
+        Modifier.clickable(role = accessibilityRole, onClick = clickAction)
+    } else {
+        Modifier
+    }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (clickAction != null && rowAnnouncement != null) {
-                    Modifier
-                        .clearAndSetSemantics {
-                            contentDescription = rowAnnouncement
-                            if (accessibilityRole != null) {
-                                role = accessibilityRole
-                            }
-                            onClick {
-                                clickAction()
-                                true
-                            }
-                        }
-                        .clickable(
-                            role = accessibilityRole,
-                            onClick = clickAction
-                        )
-                } else {
-                    Modifier
-                        .then(
-                            if (clickAction != null) {
-                                Modifier.clickable(
-                                    role = accessibilityRole,
-                                    onClick = clickAction
-                                )
-                            } else {
-                                Modifier
-                            }
-                        )
-                        .semantics(mergeDescendants = true) {
-                            if (rowAnnouncement != null) {
-                                contentDescription = rowAnnouncement
-                            }
-                        }
-                }
-            )
+            .then(accessibilityModifier)
+            .then(clickModifier)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -173,7 +155,6 @@ private fun SettingsItemRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                modifier = if (rowAnnouncement != null) Modifier.clearAndSetSemantics {} else Modifier,
                 style = MaterialTheme.typography.bodyLarge,
                 color = titleColor
             )
@@ -181,7 +162,6 @@ private fun SettingsItemRow(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
-                    modifier = if (rowAnnouncement != null) Modifier.clearAndSetSemantics {} else Modifier,
                     style = MaterialTheme.typography.bodySmall,
                     color = descriptionColor
                 )
@@ -346,22 +326,18 @@ fun SettingsSwitchItem(
         accessibilityDescription = rowDescription,
         accessibilityRole = if (enabled) Role.Switch else null,
         trailing = {
-            Box(
+            Switch(
+                checked = checked,
+                onCheckedChange = null,
                 modifier = Modifier
                     .scale(0.8f)
-                    .clearAndSetSemantics {}
-            ) {
-                Switch(
-                    checked = checked,
-                    onCheckedChange = null,
-                    modifier = Modifier.clearAndSetSemantics {},
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                        checkedTrackColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    enabled = enabled
-                )
-            }
+                    .clearAndSetSemantics {},
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary
+                ),
+                enabled = enabled
+            )
         }
     )
 }

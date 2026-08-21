@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -300,15 +298,11 @@ fun SubSettingScreen(
                                     updated.enabled = checked
                                     viewModel.update(subCache.guid, updated)
                                 }
-                                Box(
+                                Switch(
+                                    checked = subCache.subscription.enabled,
+                                    onCheckedChange = updateSubscription,
                                     modifier = Modifier
                                         .scale(0.7f)
-                                        .clickable(
-                                            role = Role.Switch,
-                                            onClick = {
-                                                updateSubscription(!subCache.subscription.enabled)
-                                            }
-                                        )
                                         .clearAndSetSemantics {
                                             contentDescription = subscriptionUpdateDescription
                                             role = Role.Switch
@@ -316,18 +310,12 @@ fun SubSettingScreen(
                                                 updateSubscription(!subCache.subscription.enabled)
                                                 true
                                             }
-                                        }
-                                ) {
-                                    Switch(
-                                        checked = subCache.subscription.enabled,
-                                        onCheckedChange = null,
-                                        modifier = Modifier.clearAndSetSemantics {},
-                                        colors = SwitchDefaults.colors(
-                                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                            checkedTrackColor = MaterialTheme.colorScheme.secondary
-                                        )
+                                        },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                        checkedTrackColor = MaterialTheme.colorScheme.secondary
                                     )
-                                }
+                                )
                             }
                         }
                     }

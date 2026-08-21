@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -449,13 +448,11 @@ private fun RoutingRulesetItem(
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Box(
+            Switch(
+                checked = enabled,
+                onCheckedChange = onEnabledChange,
                 modifier = Modifier
                     .scale(0.7f)
-                    .clickable(
-                        role = Role.Switch,
-                        onClick = { onEnabledChange(!enabled) }
-                    )
                     .clearAndSetSemantics {
                         contentDescription = ruleSwitchDescription
                         role = Role.Switch
@@ -463,18 +460,12 @@ private fun RoutingRulesetItem(
                             onEnabledChange(!enabled)
                             true
                         }
-                    }
-            ) {
-                Switch(
-                    checked = enabled,
-                    onCheckedChange = null,
-                    modifier = Modifier.clearAndSetSemantics {},
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                        checkedTrackColor = MaterialTheme.colorScheme.secondary
-                    )
+                    },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary
                 )
-            }
+            )
         }
     }
 }

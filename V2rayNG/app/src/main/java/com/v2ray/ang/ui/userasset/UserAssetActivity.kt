@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -69,8 +71,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.DateFormat
-import java.util.Date
 
 private enum class AddAssetMenuAction(@StringRes val labelRes: Int) {
     File(R.string.menu_item_add_file),
@@ -356,24 +356,30 @@ private fun UserAssetItem(
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val propertiesText = if (fileMetadata != null) {
-        remember(fileMetadata) {
-            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-            "${fileMetadata.length.toTrafficString()}  •  ${dateFormat.format(Date(fileMetadata.lastModified))}"
+    val context = LocalContext.current
+    val formattedDate = fileMetadata?.let { metadata ->
+        remember(metadata.lastModified) {
+            DateUtils.formatDateTime(
+                context,
+                metadata.lastModified,
+                DateUtils.FORMAT_SHOW_DATE or
+                    DateUtils.FORMAT_SHOW_TIME or
+                    DateUtils.FORMAT_SHOW_YEAR,
+            )
         }
+    }.orEmpty()
+    val fileSize = fileMetadata?.length?.toTrafficString().orEmpty()
+    val propertiesText = if (fileMetadata != null) {
+        "$fileSize  •  $formattedDate"
     } else {
         stringResource(R.string.msg_file_not_found)
     }
     val assetAnnouncement = if (fileMetadata != null) {
-        val accessibilityDate = remember(fileMetadata) {
-            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-            dateFormat.format(Date(fileMetadata.lastModified))
-        }
         val fileSizeDescription = stringResource(
             R.string.acc_asset_file_size,
-            fileMetadata.length.toTrafficString()
+            fileSize
         )
-        val updatedOnDescription = stringResource(R.string.acc_asset_updated_on, accessibilityDate)
+        val updatedOnDescription = stringResource(R.string.acc_asset_updated_on, formattedDate)
         stringResource(
             R.string.acc_asset_announcement,
             item.assetUrl.remarks,

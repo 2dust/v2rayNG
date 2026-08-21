@@ -79,6 +79,54 @@ internal fun perAppRoutingDescription(
     else -> R.string.acc_app_routed_through
 }
 
+@Composable
+private fun PerAppSwitch(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val accessibilityDescription = stringResource(
+        R.string.acc_setting_switch,
+        label,
+        stringResource(if (checked) R.string.acc_state_on else R.string.acc_state_off),
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clearAndSetSemantics {
+                contentDescription = accessibilityDescription
+                role = Role.Switch
+                onClick {
+                    onCheckedChange(!checked)
+                    true
+                }
+            }
+            .clickable(
+                role = Role.Switch,
+                onClick = { onCheckedChange(!checked) },
+            ),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            modifier = Modifier
+                .scale(0.65f)
+                .clearAndSetSemantics {},
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                checkedTrackColor = MaterialTheme.colorScheme.secondary,
+            ),
+        )
+    }
+}
+
 class PerAppProxyActivity : BaseComponentActivity() {
 
     private val viewModel: PerAppProxyViewModel by viewModels()
@@ -149,16 +197,6 @@ fun PerAppProxyScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-    val perAppProxySwitchDescription = stringResource(
-        R.string.acc_setting_switch,
-        stringResource(R.string.per_app_proxy_settings_enable),
-        stringResource(if (perAppProxyEnabled) R.string.acc_state_on else R.string.acc_state_off)
-    )
-    val bypassAppsSwitchDescription = stringResource(
-        R.string.acc_setting_switch,
-        stringResource(R.string.switch_bypass_apps_mode),
-        stringResource(if (bypassApps) R.string.acc_state_on else R.string.acc_state_off)
-    )
 
     LaunchedEffect(Unit) {
         onSearch(searchQuery)
@@ -236,77 +274,19 @@ fun PerAppProxyScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clearAndSetSemantics {
-                                contentDescription = perAppProxySwitchDescription
-                                role = Role.Switch
-                                onClick {
-                                    onPerAppProxyChanged(!perAppProxyEnabled)
-                                    true
-                                }
-                            }
-                            .clickable(
-                                role = Role.Switch,
-                                onClick = { onPerAppProxyChanged(!perAppProxyEnabled) }
-                            )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.per_app_proxy_settings_enable),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = perAppProxyEnabled,
-                            onCheckedChange = null,
-                            modifier = Modifier
-                                .scale(0.65f)
-                                .clearAndSetSemantics {},
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
+                    PerAppSwitch(
+                        label = stringResource(R.string.per_app_proxy_settings_enable),
+                        checked = perAppProxyEnabled,
+                        onCheckedChange = onPerAppProxyChanged,
+                        modifier = Modifier.weight(1f),
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clearAndSetSemantics {
-                                contentDescription = bypassAppsSwitchDescription
-                                role = Role.Switch
-                                onClick {
-                                    onBypassAppsChanged(!bypassApps)
-                                    true
-                                }
-                            }
-                            .clickable(
-                                role = Role.Switch,
-                                onClick = { onBypassAppsChanged(!bypassApps) }
-                            )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.switch_bypass_apps_mode),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = bypassApps,
-                            onCheckedChange = null,
-                            modifier = Modifier
-                                .scale(0.65f)
-                                .clearAndSetSemantics {},
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
+                    PerAppSwitch(
+                        label = stringResource(R.string.switch_bypass_apps_mode),
+                        checked = bypassApps,
+                        onCheckedChange = onBypassAppsChanged,
+                        modifier = Modifier.weight(1f),
+                    )
                     IconButton(onClick = onInfoClick) {
                         Icon(
                             painter = painterResource(R.drawable.ic_about_24dp),
