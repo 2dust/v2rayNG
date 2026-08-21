@@ -238,7 +238,20 @@ fun PerAppProxyScreen(
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clearAndSetSemantics {
+                                contentDescription = perAppProxySwitchDescription
+                                role = Role.Switch
+                                onClick {
+                                    onPerAppProxyChanged(!perAppProxyEnabled)
+                                    true
+                                }
+                            }
+                            .clickable(
+                                role = Role.Switch,
+                                onClick = { onPerAppProxyChanged(!perAppProxyEnabled) }
+                            )
                     ) {
                         Text(
                             text = stringResource(R.string.per_app_proxy_settings_enable),
@@ -251,18 +264,7 @@ fun PerAppProxyScreen(
                             onCheckedChange = null,
                             modifier = Modifier
                                 .scale(0.65f)
-                                .clickable(
-                                    role = Role.Switch,
-                                    onClick = { onPerAppProxyChanged(!perAppProxyEnabled) }
-                                )
-                                .clearAndSetSemantics {
-                                    contentDescription = perAppProxySwitchDescription
-                                    role = Role.Switch
-                                    onClick {
-                                        onPerAppProxyChanged(!perAppProxyEnabled)
-                                        true
-                                    }
-                                },
+                                .clearAndSetSemantics {},
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary
@@ -272,7 +274,20 @@ fun PerAppProxyScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clearAndSetSemantics {
+                                contentDescription = bypassAppsSwitchDescription
+                                role = Role.Switch
+                                onClick {
+                                    onBypassAppsChanged(!bypassApps)
+                                    true
+                                }
+                            }
+                            .clickable(
+                                role = Role.Switch,
+                                onClick = { onBypassAppsChanged(!bypassApps) }
+                            )
                     ) {
                         Text(
                             text = stringResource(R.string.switch_bypass_apps_mode),
@@ -285,18 +300,7 @@ fun PerAppProxyScreen(
                             onCheckedChange = null,
                             modifier = Modifier
                                 .scale(0.65f)
-                                .clickable(
-                                    role = Role.Switch,
-                                    onClick = { onBypassAppsChanged(!bypassApps) }
-                                )
-                                .clearAndSetSemantics {
-                                    contentDescription = bypassAppsSwitchDescription
-                                    role = Role.Switch
-                                    onClick {
-                                        onBypassAppsChanged(!bypassApps)
-                                        true
-                                    }
-                                },
+                                .clearAndSetSemantics {},
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                 checkedTrackColor = MaterialTheme.colorScheme.secondary

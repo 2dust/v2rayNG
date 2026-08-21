@@ -36,6 +36,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -201,7 +205,8 @@ fun <T> SelectListDialog(
     onDismiss: () -> Unit,
     title: String? = null,
     selectedOption: T? = null,
-    showRadio: Boolean = false
+    showRadio: Boolean = false,
+    announceSelectionStateAfterLabel: Boolean = false
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -210,11 +215,37 @@ fun <T> SelectListDialog(
             LazyColumn {
                 items(options) { option ->
                     val isSelected = option == selectedOption
+                    val optionLabel = optionText(option)
+                    val selectionAnnouncement = if (announceSelectionStateAfterLabel) {
+                        stringResource(
+                            R.string.acc_selection_option,
+                            optionLabel,
+                            stringResource(
+                                if (isSelected) R.string.acc_selected else R.string.acc_not_selected
+                            )
+                        )
+                    } else {
+                        null
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .then(
-                                if (showRadio) Modifier.selectable(
+                                if (showRadio && selectionAnnouncement != null) {
+                                    Modifier
+                                        .clearAndSetSemantics {
+                                            contentDescription = selectionAnnouncement
+                                            role = Role.RadioButton
+                                            onClick {
+                                                onSelected(option)
+                                                true
+                                            }
+                                        }
+                                        .clickable(
+                                            role = Role.RadioButton,
+                                            onClick = { onSelected(option) }
+                                        )
+                                } else if (showRadio) Modifier.selectable(
                                     selected = isSelected,
                                     onClick = { onSelected(option) },
                                     role = Role.RadioButton
@@ -231,7 +262,7 @@ fun <T> SelectListDialog(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
-                            text = optionText(option),
+                            text = optionLabel,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )

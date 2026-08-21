@@ -101,6 +101,7 @@ private fun SettingsItemRow(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     accessibilityDescription: String? = null,
+    accessibilityRole: Role? = null,
     trailing: @Composable (() -> Unit)? = null
 ) {
     val titleColor = if (enabled) MaterialTheme.colorScheme.onSurface
@@ -116,16 +117,47 @@ private fun SettingsItemRow(
     } else {
         accessibilityDescription
     }
+    val clickAction = if (enabled) onClick else null
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
-            .semantics(mergeDescendants = true) {
-                if (rowAnnouncement != null) {
-                    contentDescription = rowAnnouncement
+            .then(
+                if (clickAction != null && rowAnnouncement != null) {
+                    Modifier
+                        .clearAndSetSemantics {
+                            contentDescription = rowAnnouncement
+                            if (accessibilityRole != null) {
+                                role = accessibilityRole
+                            }
+                            onClick {
+                                clickAction()
+                                true
+                            }
+                        }
+                        .clickable(
+                            role = accessibilityRole,
+                            onClick = clickAction
+                        )
+                } else {
+                    Modifier
+                        .then(
+                            if (clickAction != null) {
+                                Modifier.clickable(
+                                    role = accessibilityRole,
+                                    onClick = clickAction
+                                )
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .semantics(mergeDescendants = true) {
+                            if (rowAnnouncement != null) {
+                                contentDescription = rowAnnouncement
+                            }
+                        }
                 }
-            }
+            )
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -222,7 +254,8 @@ fun SettingsListItem(
     selectedValue: String,
     onSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    announceSelectionStateAfterLabel: Boolean = false
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val options = entries.zip(values)
@@ -256,7 +289,8 @@ fun SettingsListItem(
                 onSelected(option.second)
             },
             onDismiss = { showDialog = false },
-            showRadio = true
+            showRadio = true,
+            announceSelectionStateAfterLabel = announceSelectionStateAfterLabel
         )
     }
 }
@@ -310,39 +344,12 @@ fun SettingsSwitchItem(
         } else null,
         modifier = modifier,
         accessibilityDescription = rowDescription,
+        accessibilityRole = if (enabled) Role.Switch else null,
         trailing = {
-            val switchDescription = if (enabled) {
-                stringResource(R.string.acc_setting_switch, title, state)
-            } else {
-                ""
-            }
             Box(
                 modifier = Modifier
                     .scale(0.8f)
-                    .then(
-                        if (enabled) {
-                            Modifier.clickable(
-                                role = Role.Switch,
-                                onClick = { onCheckedChange(!checked) }
-                            )
-                        } else {
-                            Modifier
-                        }
-                    )
-                    .then(
-                        if (enabled) {
-                            Modifier.clearAndSetSemantics {
-                                contentDescription = switchDescription
-                                role = Role.Switch
-                                onClick {
-                                    onCheckedChange(!checked)
-                                    true
-                                }
-                            }
-                        } else {
-                            Modifier.clearAndSetSemantics {}
-                        }
-                    )
+                    .clearAndSetSemantics {}
             ) {
                 Switch(
                     checked = checked,
