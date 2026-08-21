@@ -292,19 +292,29 @@ object HttpUtil {
 
         return try {
             client.newCall(requestBuilder.build()).execute().use { response ->
-                if (!response.isSuccessful) {
+                if (!response.isSuccessful || response.code == 206) {
                     LogUtil.w(AppConfig.TAG, "Failed to download file, code=${response.code}, url=$url")
                     return false
                 }
-                val body = response.body ?: return false
-                body.byteStream().use { input ->
+                val body = response.body
+                val expectedLength = body.contentLength()
+                val receivedLength = body.byteStream().use { input ->
                     targetFile.outputStream().use { output ->
                         input.copyTo(output)
                     }
                 }
+                if (expectedLength >= 0L && receivedLength != expectedLength) {
+                    targetFile.delete()
+                    LogUtil.w(
+                        AppConfig.TAG,
+                        "Incomplete download: expected=$expectedLength, received=$receivedLength"
+                    )
+                    return false
+                }
                 true
             }
         } catch (e: Exception) {
+            targetFile.delete()
             LogUtil.e(AppConfig.TAG, "Failed to download file: $url", e)
             false
         }
