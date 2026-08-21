@@ -283,6 +283,7 @@
     <string name="title_about">Giới thiệu</string>
     <string name="title_source_code">Mã nguồn</string>
     <string name="title_oss_license">Giấy phép mã nguồn mở</string>
+    <string name="title_translators">Người dịch</string>
     <string name="title_tg_channel">Kênh Telegram</string>
 
     <string name="title_pref_promotion">Ưu đãi</string>

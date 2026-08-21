@@ -1,0 +1,68 @@
+[
+  {
+    "language": "العربية (Arabic)",
+    "contributors": [
+      { "name": "@mribrahem", "displayName": "ibrahem Qasim", "url": "https://github.com/mribrahem" }
+    ]
+  },
+  {
+    "language": "বাংলা (Bengali)",
+    "contributors": [
+      { "name": "@codewithtamim", "displayName": "Tamim Hossain", "url": "https://github.com/codewithtamim" }
+    ]
+  },
+  {
+    "language": "لۊری بختیاری (Luri Bakhtiari)",
+    "contributors": [
+      { "name": "@hosseinabaspanah", "displayName": "Hossein Abaspanah", "url": "https://github.com/hosseinabaspanah" },
+      { "name": "@codewithtamim", "displayName": "Tamim Hossain", "url": "https://github.com/codewithtamim" }
+    ]
+  },
+  {
+    "language": "فارسی (Persian)",
+    "contributors": [
+      { "name": "@themrvx", "displayName": "MRVX", "url": "https://github.com/themrvx" },
+      { "name": "@skh-web6982", "url": "https://github.com/skh-web6982" },
+      { "name": "@ptechgithub", "displayName": "Peyman", "url": "https://github.com/ptechgithub" },
+      { "name": "@pk-web6936" },
+      { "name": "@alphax-hue3682" },
+      { "name": "@phoenix6936" },
+      { "name": "@decorativefamily" },
+      { "name": "@decorativeman" },
+      { "name": "@mh292929", "displayName": "MH", "url": "https://github.com/mh292929" },
+      { "name": "@amir-yazdanmanesh", "displayName": "AmirMohammad Yazdanmanesh", "url": "https://github.com/amir-yazdanmanesh" },
+      { "name": "@cumoon", "displayName": "C_U_Moon", "url": "https://github.com/cumoon" },
+      { "name": "@hadi-norouzi", "displayName": "Hadi Norouzi", "url": "https://github.com/hadi-norouzi" },
+      { "name": "Vahid Farid" }
+    ]
+  },
+  {
+    "language": "Русский (Russian)",
+    "contributors": [
+      { "name": "@solokot", "url": "https://github.com/solokot" },
+      { "name": "@liniya", "url": "https://github.com/liniya" },
+      { "name": "@eliotcougar", "url": "https://github.com/eliotcougar" }
+    ]
+  },
+  {
+    "language": "Tiếng Việt (Vietnamese)",
+    "contributors": [
+      { "name": "@admarty", "url": "https://github.com/admarty" },
+      { "name": "@user09283", "url": "https://github.com/user09283" },
+      { "name": "@yuhan6665", "url": "https://github.com/yuhan6665" }
+    ]
+  },
+  {
+    "language": "简体中文 (Simplified Chinese)",
+    "contributors": [
+      { "name": "@yau08", "displayName": "David", "url": "https://github.com/yau08" }
+    ]
+  },
+  {
+    "language": "繁體中文 (Traditional Chinese)",
+    "contributors": [
+      { "name": "@yau08", "displayName": "David", "url": "https://github.com/yau08" },
+      { "name": "@fubuki0x10de", "url": "https://github.com/fubuki0x10de" }
+    ]
+  }
+]
