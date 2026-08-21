@@ -283,6 +283,7 @@
     <string name="title_about">關於</string>
     <string name="title_source_code">原始碼</string>
     <string name="title_oss_license">開放原始碼授權</string>
+    <string name="title_translators">翻譯貢獻者</string>
     <string name="title_tg_channel">Telegram 頻道</string>
 
     <string name="title_pref_promotion">推廣</string>
