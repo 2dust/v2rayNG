@@ -47,13 +47,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.ConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
@@ -153,9 +153,6 @@ class PerAppProxyActivity : BaseComponentActivity() {
             onBackClick = { finish() },
             onPerAppProxyChanged = { viewModel.setPerAppProxyEnabled(it) },
             onBypassAppsChanged = { viewModel.setBypassAppsEnabled(it) },
-            onInfoClick = {
-                toastInfo(R.string.summary_pref_per_app_proxy)
-            },
             onToggleApp = { viewModel.toggle(it) },
             onSearch = { viewModel.filterApps(it) },
             onSelectAll = { viewModel.selectAll() },
@@ -184,7 +181,6 @@ fun PerAppProxyScreen(
     onBackClick: () -> Unit,
     onPerAppProxyChanged: (Boolean) -> Unit,
     onBypassAppsChanged: (Boolean) -> Unit,
-    onInfoClick: () -> Unit,
     onToggleApp: (String) -> Unit,
     onSearch: (String) -> Unit,
     onSelectAll: () -> Unit,
@@ -196,6 +192,7 @@ fun PerAppProxyScreen(
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
+    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
@@ -287,7 +284,7 @@ fun PerAppProxyScreen(
                         onCheckedChange = onBypassAppsChanged,
                         modifier = Modifier.weight(1f),
                     )
-                    IconButton(onClick = onInfoClick) {
+                    IconButton(onClick = { showInfoDialog = true }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_about_24dp),
                             contentDescription = stringResource(R.string.acc_per_app_proxy_information),
@@ -322,5 +319,15 @@ fun PerAppProxyScreen(
                 }
             }
         }
+    }
+
+    if (showInfoDialog) {
+        ConfirmDialog(
+            title = stringResource(R.string.title_pref_per_app_proxy),
+            message = stringResource(R.string.summary_pref_per_app_proxy),
+            dismissText = null,
+            onConfirm = {},
+            onDismiss = { showInfoDialog = false },
+        )
     }
 }

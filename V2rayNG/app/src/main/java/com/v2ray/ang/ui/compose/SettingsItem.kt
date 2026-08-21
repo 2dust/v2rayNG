@@ -102,6 +102,7 @@ private fun SettingsItemRow(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     accessibilityDescription: String,
+    unavailableDescription: String? = description,
     accessibilityRole: Role? = null,
     trailing: @Composable (() -> Unit)? = null
 ) {
@@ -112,10 +113,14 @@ private fun SettingsItemRow(
     val rowAnnouncement = if (enabled) {
         accessibilityDescription
     } else {
-        if (description.isNullOrEmpty()) {
+        if (unavailableDescription.isNullOrEmpty()) {
             stringResource(R.string.acc_unavailable_setting, title)
         } else {
-            stringResource(R.string.acc_unavailable_setting_with_description, title, description)
+            stringResource(
+                R.string.acc_unavailable_setting_with_description,
+                title,
+                unavailableDescription
+            )
         }
     }
     val clickAction = if (enabled) onClick else null
@@ -202,7 +207,8 @@ fun SettingsEditItem(
             title
         } else {
             stringResource(R.string.acc_setting_value, title, description)
-        }
+        },
+        unavailableDescription = null
     )
 
     if (showDialog) {
@@ -255,7 +261,8 @@ fun SettingsListItem(
             title
         } else {
             stringResource(R.string.acc_setting_value, title, summary)
-        }
+        },
+        unavailableDescription = null
     )
 
     if (showDialog) {

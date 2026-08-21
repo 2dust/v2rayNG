@@ -525,7 +525,7 @@
     <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_last_updated">آخرین به‌روزرسانی %1$s</string>
     <string name="acc_subscription_announcement">%1$s، %2$s</string>
-    <string name="acc_subscription_update">%1$s، به‌روزرسانی %2$s</string>
+    <string name="acc_subscription_update">%1$s، به‌روزرسانی %2$s است</string>
     <string name="acc_state_on">روشن</string>
     <string name="acc_state_off">خاموش</string>
     <string name="acc_app_announcement">%1$s. %2$s.</string>
@@ -545,7 +545,7 @@
     <string name="acc_routing_rule_off">خاموش</string>
     <string name="acc_asset_announcement">%1$s. %2$s. %3$s</string>
     <string name="acc_asset_file_size">اندازه فایل %1$s</string>
-    <string name="acc_asset_updated_on">به‌روزرسانی در %1$s</string>
+    <string name="acc_asset_updated_on">در %1$s به‌روزرسانی شد</string>
     <string name="acc_asset_announcement_missing">%1$s، %2$s</string>
     <string name="acc_unavailable_setting">تنظیم در دسترس نیست، %1$s</string>
     <string name="acc_unavailable_setting_with_description">تنظیم در دسترس نیست، %1$s، %2$s</string>

@@ -561,7 +561,7 @@
     <string name="acc_share_named">Поделиться: %1$s</string>
     <string name="acc_edit_named">Изменить: %1$s</string>
     <string name="acc_delete_named">Удалить: %1$s</string>
-    <string name="confirm_delete_policy_group_named">Удалить эту политику группы?\n%1$s</string>
+    <string name="confirm_delete_policy_group_named">Удалить эту группу политик?\n%1$s</string>
     <string name="confirm_delete_proxy_chain_member_named">Удалить этого участника цепочки прокси?\n%1$s</string>
     <string name="confirm_delete_routing_rule_named">Удалить это правило маршрутизации?\n%1$s</string>
     <string name="confirm_delete_subscription_group_named">Удалить эту подписку? %1$s</string>
