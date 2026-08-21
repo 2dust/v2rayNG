@@ -22,6 +22,34 @@
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
     <string name="toast_services_success">Đã khởi động v2rayNG!</string>
     <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
+    <!-- Compose accessibility resources -->
+    <string name="action_clear">Xoá</string>
+
+    <plurals name="title_update_config_count">
+        <item quantity="other">Đã cập nhật %1$d cấu hình</item>
+    </plurals>
+
+    <plurals name="title_update_asset_count">
+        <item quantity="other">Đã cập nhật %1$d tệp tài nguyên</item>
+    </plurals>
+
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d mili giây</item>
+    </plurals>
+
+    <string name="acc_share_config_named">Chia sẻ cấu hình %1$s</string>
+
+    <string name="acc_edit_config_named">Chỉnh sửa cấu hình %1$s</string>
+
+    <string name="acc_delete_config_named">Xóa cấu hình %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="other">Nhóm %1$s chứa %2$d máy chủ</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="other">Đã chọn. Nhóm %1$s chứa %2$d máy chủ</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">v2rayNG</string>
@@ -314,7 +342,6 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
-    <string name="action_clear">Xoá</string>
     <string name="logcat_share">Chia sẻ nhật ký</string>
     <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
@@ -348,12 +375,6 @@
     <string name="title_del_config_count">Xóa %d cấu hình</string>
     <string name="title_import_config_count">Nhập %d cấu hình</string>
     <string name="title_export_config_count">Xuất %d cấu hình</string>
-    <plurals name="title_update_config_count">
-        <item quantity="other">Đã cập nhật %1$d cấu hình</item>
-    </plurals>
-    <plurals name="title_update_asset_count">
-        <item quantity="other">Đã cập nhật %1$d tệp tài nguyên</item>
-    </plurals>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
@@ -393,9 +414,6 @@
     <string name="connection_test_testing_count">Đang kiểm tra %d cấu hình…</string>
     <string name="connection_test_available">Kết nối thành công sau %1$s</string>
     <string name="server_test_delay_value">%1$d mili giây</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="other">%1$d mili giây</item>
-    </plurals>
     <string name="connection_test_error">Kiểm tra kết nối thất bại: %s</string>
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
@@ -528,7 +546,7 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_selected_server">Máy chủ được chọn</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
@@ -542,15 +560,6 @@
     <string name="acc_open_menu">Mở trình đơn điều hướng</string>
     <string name="acc_edit">Chỉnh sửa</string>
     <string name="acc_delete">Xóa</string>
-    <string name="acc_share_config_named">Chia sẻ cấu hình %1$s</string>
-    <string name="acc_edit_config_named">Chỉnh sửa cấu hình %1$s</string>
-    <string name="acc_delete_config_named">Xóa cấu hình %1$s</string>
-    <plurals name="acc_group_tab">
-        <item quantity="other">Nhóm %1$s chứa %2$d máy chủ</item>
-    </plurals>
-    <plurals name="acc_selected_group_tab">
-        <item quantity="other">Đã chọn. Nhóm %1$s chứa %2$d máy chủ</item>
-    </plurals>
     <string name="acc_save">Lưu</string>
     <string name="acc_update_subscriptions">Cập nhật các gói đăng ký</string>
     <string name="acc_per_app_proxy_information">Thông tin proxy theo ứng dụng</string>

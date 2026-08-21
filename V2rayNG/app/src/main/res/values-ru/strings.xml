@@ -22,6 +22,49 @@
     <string name="toast_services_stop">Службы остановлены</string>
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
+    <!-- Compose accessibility resources -->
+    <string name="action_clear">Очистить</string>
+
+    <plurals name="title_update_config_count">
+        <item quantity="one">Обновлён %1$d профиль</item>
+        <item quantity="few">Обновлено %1$d профиля</item>
+        <item quantity="many">Обновлено %1$d профилей</item>
+        <item quantity="other">Обновлено %1$d профиля</item>
+    </plurals>
+
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Обновлён %1$d файл ресурсов</item>
+        <item quantity="few">Обновлено %1$d файла ресурсов</item>
+        <item quantity="many">Обновлено %1$d файлов ресурсов</item>
+        <item quantity="other">Обновлено %1$d файла ресурсов</item>
+    </plurals>
+
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d миллисекунда</item>
+        <item quantity="few">%1$d миллисекунды</item>
+        <item quantity="many">%1$d миллисекунд</item>
+        <item quantity="other">%1$d миллисекунды</item>
+    </plurals>
+
+    <string name="acc_share_config_named">Поделиться конфигурацией %1$s</string>
+
+    <string name="acc_edit_config_named">Изменить конфигурацию %1$s</string>
+
+    <string name="acc_delete_config_named">Удалить конфигурацию %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="one">Группа %1$s содержит %2$d сервер</item>
+        <item quantity="few">Группа %1$s содержит %2$d сервера</item>
+        <item quantity="many">Группа %1$s содержит %2$d серверов</item>
+        <item quantity="other">Группа %1$s содержит %2$d серверов</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">Выбрана. Группа %1$s содержит %2$d сервер</item>
+        <item quantity="few">Выбрана. Группа %1$s содержит %2$d сервера</item>
+        <item quantity="many">Выбрана. Группа %1$s содержит %2$d серверов</item>
+        <item quantity="other">Выбрана. Группа %1$s содержит %2$d серверов</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">Профиль</string>
@@ -314,7 +357,6 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Копировать</string>
-    <string name="action_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить профили</string>
@@ -348,18 +390,6 @@
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
-    <plurals name="title_update_config_count">
-        <item quantity="one">Обновлён %1$d профиль</item>
-        <item quantity="few">Обновлено %1$d профиля</item>
-        <item quantity="many">Обновлено %1$d профилей</item>
-        <item quantity="other">Обновлено %1$d профиля</item>
-    </plurals>
-    <plurals name="title_update_asset_count">
-        <item quantity="one">Обновлён %1$d файл ресурсов</item>
-        <item quantity="few">Обновлено %1$d файла ресурсов</item>
-        <item quantity="many">Обновлено %1$d файлов ресурсов</item>
-        <item quantity="other">Обновлено %1$d файла ресурсов</item>
-    </plurals>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
@@ -399,12 +429,6 @@
     <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Соединение установлено за %1$s</string>
     <string name="server_test_delay_value">%1$d мс</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d миллисекунда</item>
-        <item quantity="few">%1$d миллисекунды</item>
-        <item quantity="many">%1$d миллисекунд</item>
-        <item quantity="other">%1$d миллисекунды</item>
-    </plurals>
     <string name="connection_test_error">Ошибка проверки соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
@@ -537,7 +561,7 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
-    <string name="acc_selected_server">Выбранный сервер</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>
@@ -551,21 +575,6 @@
     <string name="acc_open_menu">Открыть меню навигации</string>
     <string name="acc_edit">Изменить</string>
     <string name="acc_delete">Удалить</string>
-    <string name="acc_share_config_named">Поделиться конфигурацией %1$s</string>
-    <string name="acc_edit_config_named">Изменить конфигурацию %1$s</string>
-    <string name="acc_delete_config_named">Удалить конфигурацию %1$s</string>
-    <plurals name="acc_group_tab">
-        <item quantity="one">Группа %1$s содержит %2$d сервер</item>
-        <item quantity="few">Группа %1$s содержит %2$d сервера</item>
-        <item quantity="many">Группа %1$s содержит %2$d серверов</item>
-        <item quantity="other">Группа %1$s содержит %2$d серверов</item>
-    </plurals>
-    <plurals name="acc_selected_group_tab">
-        <item quantity="one">Выбрана. Группа %1$s содержит %2$d сервер</item>
-        <item quantity="few">Выбрана. Группа %1$s содержит %2$d сервера</item>
-        <item quantity="many">Выбрана. Группа %1$s содержит %2$d серверов</item>
-        <item quantity="other">Выбрана. Группа %1$s содержит %2$d серверов</item>
-    </plurals>
     <string name="acc_save">Сохранить</string>
     <string name="acc_update_subscriptions">Обновить подписки</string>
     <string name="acc_per_app_proxy_information">Сведения о прокси для приложений</string>

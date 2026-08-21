@@ -22,6 +22,34 @@
     <string name="toast_services_stop">服务已停止</string>
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
+    <!-- Compose accessibility resources -->
+    <string name="action_clear">清除</string>
+
+    <plurals name="title_update_config_count">
+        <item quantity="other">已更新 %1$d 个配置</item>
+    </plurals>
+
+    <plurals name="title_update_asset_count">
+        <item quantity="other">已更新 %1$d 个资源文件</item>
+    </plurals>
+
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+
+    <string name="acc_share_config_named">分享配置 %1$s</string>
+
+    <string name="acc_edit_config_named">编辑配置 %1$s</string>
+
+    <string name="acc_delete_config_named">删除配置 %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="other">组 %1$s 包含 %2$d 个服务器</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="other">已选中。组 %1$s 包含 %2$d 个服务器</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">配置项</string>
@@ -314,7 +342,6 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">复制</string>
-    <string name="action_clear">清除</string>
     <string name="logcat_share">分享日志</string>
     <string name="title_service_restart">服务重启</string>
     <string name="title_del_all_config">删除配置</string>
@@ -348,12 +375,6 @@
     <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="title_import_config_count">导入 %d 个配置</string>
     <string name="title_export_config_count">导出 %d 个配置</string>
-    <plurals name="title_update_config_count">
-        <item quantity="other">已更新 %1$d 个配置</item>
-    </plurals>
-    <plurals name="title_update_asset_count">
-        <item quantity="other">已更新 %1$d 个资源文件</item>
-    </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
@@ -393,9 +414,6 @@
     <string name="connection_test_testing_count">测试 %d 个配置中…</string>
     <string name="connection_test_available">"连接成功：延时 %1$s"</string>
     <string name="server_test_delay_value">%1$d ms</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="other">%1$d 毫秒</item>
-    </plurals>
     <string name="connection_test_error">连接测试失败：%s</string>
     <string name="connection_test_fail">无法访问互联网</string>
     <string name="connection_test_error_status_code">错误码：#%d</string>
@@ -528,7 +546,7 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
-    <string name="acc_selected_server">选中的服务器</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>
@@ -542,15 +560,6 @@
     <string name="acc_open_menu">打开导航菜单</string>
     <string name="acc_edit">编辑</string>
     <string name="acc_delete">删除</string>
-    <string name="acc_share_config_named">分享配置 %1$s</string>
-    <string name="acc_edit_config_named">编辑配置 %1$s</string>
-    <string name="acc_delete_config_named">删除配置 %1$s</string>
-    <plurals name="acc_group_tab">
-        <item quantity="other">组 %1$s 包含 %2$d 个服务器</item>
-    </plurals>
-    <plurals name="acc_selected_group_tab">
-        <item quantity="other">已选中。组 %1$s 包含 %2$d 个服务器</item>
-    </plurals>
     <string name="acc_save">保存</string>
     <string name="acc_update_subscriptions">更新订阅</string>
     <string name="acc_per_app_proxy_information">分应用代理信息</string>

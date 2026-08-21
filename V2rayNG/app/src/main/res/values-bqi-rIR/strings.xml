@@ -22,6 +22,39 @@
     <string name="toast_services_stop">واڌاشتن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
+    <!-- Compose accessibility resources -->
+    <string name="action_clear">روفتن</string>
+
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
+        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
+    </plurals>
+
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+    </plurals>
+
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
+
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="one">بونکۊ %1$s، %2$d سرور داره</item>
+        <item quantity="other">بونکۊ %1$s، %2$d سرور داره</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
+        <item quantity="other">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -314,7 +347,6 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">لف گیری</string>
-    <string name="action_clear">روفتن</string>
     <string name="logcat_share">یک رسۊوی گوزارش</string>
     <string name="title_service_restart">ره وندن دووارته سرویس</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
@@ -348,14 +380,6 @@
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
-    <plurals name="title_update_config_count">
-        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
-        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
-    </plurals>
-    <plurals name="title_update_asset_count">
-        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
-        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
-    </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
@@ -395,10 +419,6 @@
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
     <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d میلی‌ثانیه</item>
-        <item quantity="other">%1$d میلی‌ثانیه</item>
-    </plurals>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
@@ -531,7 +551,7 @@
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
     <string name="acc_more">امکووݩا بؽتر</string>
-    <string name="acc_selected_server">سرور پسند وابی</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
@@ -545,17 +565,6 @@
     <string name="acc_open_menu">گۊشیڌن نومگه کشاری</string>
     <string name="acc_edit">آلشتکاری</string>
     <string name="acc_delete">پاک کردن</string>
-    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
-    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
-    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
-    <plurals name="acc_group_tab">
-        <item quantity="one">بونکۊ %1$s، %2$d سرور داره</item>
-        <item quantity="other">بونکۊ %1$s، %2$d سرور داره</item>
-    </plurals>
-    <plurals name="acc_selected_group_tab">
-        <item quantity="one">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
-        <item quantity="other">پسند وابی. بونکۊ %1$s، %2$d سرور داره</item>
-    </plurals>
     <string name="acc_save">زفت کردن</string>
     <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
     <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>
