@@ -81,6 +81,7 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">加密套件 (Cipher Suites)</string>
     <string name="server_lab_allow_insecure">跳过证书验证 (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">服务器地址</string>
