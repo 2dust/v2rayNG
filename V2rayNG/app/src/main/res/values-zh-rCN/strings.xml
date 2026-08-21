@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">确定要删除当前显示的所有配置吗？</string>
     <string name="confirm_delete_duplicate_profiles">确定要删除当前显示的所有重复配置吗？</string>
     <string name="confirm_delete_invalid_profiles">请先测试配置。确定要删除当前显示的所有无效配置吗？</string>
-    <string name="confirm_delete_profile">确定要删除此配置吗？\n%1$s</string>
+    <string name="confirm_delete_profile">确定要删除此配置吗？</string>
     <string name="confirm_delete_policy_group">确定要删除此策略组吗？\n%1$s</string>
     <string name="confirm_delete_proxy_chain_member">确定要删除此代理链成员吗？\n%1$s</string>
     <string name="confirm_delete_routing_rule">确定要删除此路由规则吗？\n%1$s</string>
@@ -521,6 +521,7 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">上次更新：%1$s</string>
     <string name="acc_subscription_announcement">%1$s，%2$s</string>
     <string name="acc_subscription_update">%1$s，更新为%2$s</string>

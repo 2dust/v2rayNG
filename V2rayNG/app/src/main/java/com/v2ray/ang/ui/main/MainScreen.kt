@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import com.v2ray.ang.extension.delay
@@ -59,18 +58,11 @@ fun MainScreen(
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
-    var showRemoveConfirm by remember { mutableStateOf<ServerDeleteTarget?>(null) }
+    var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
     val removeServer: (String) -> Unit = { guid ->
-        if (confirmRemove) {
-            showRemoveConfirm = ServerDeleteTarget(
-                guid = guid,
-                name = MmkvManager.decodeServerConfig(guid)?.remarks.orEmpty()
-            )
-        } else {
-            onAction(MainAction.RemoveServer(guid))
-        }
+        if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
     }
 
     val pagerState = rememberPagerState(

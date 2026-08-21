@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">Удалить все отображаемые профили?</string>
     <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
     <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
-    <string name="confirm_delete_profile">Удалить этот профиль?\n%1$s</string>
+    <string name="confirm_delete_profile">Удалить этот профиль?</string>
     <string name="confirm_delete_policy_group">Удалить эту политику группы?\n%1$s</string>
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?\n%1$s</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?\n%1$s</string>
@@ -521,6 +521,7 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">Последнее обновление: %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, обновление %2$s</string>

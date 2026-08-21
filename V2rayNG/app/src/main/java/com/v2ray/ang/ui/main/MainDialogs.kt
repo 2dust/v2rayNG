@@ -5,8 +5,6 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 
-data class ServerDeleteTarget(val guid: String, val name: String)
-
 @Composable
 fun MainDialogs(
     showDelAllConfirm: Boolean,
@@ -18,7 +16,7 @@ fun MainDialogs(
     showDelInvalidConfirm: Boolean,
     onDismissDelInvalid: () -> Unit,
     onConfirmDelInvalid: () -> Unit,
-    showRemoveConfirm: ServerDeleteTarget?,
+    showRemoveConfirm: String?,
     onDismissRemove: () -> Unit,
     onConfirmRemove: (String) -> Unit,
 ) {
@@ -44,10 +42,10 @@ fun MainDialogs(
         )
     }
     if (showRemoveConfirm != null) {
-        val target = showRemoveConfirm
+        val guid = showRemoveConfirm
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile, target.name),
-            onConfirm = { onConfirmRemove(target.guid) },
+            message = stringResource(R.string.confirm_delete_profile),
+            onConfirm = { onConfirmRemove(guid) },
             onDismiss = onDismissRemove
         )
     }

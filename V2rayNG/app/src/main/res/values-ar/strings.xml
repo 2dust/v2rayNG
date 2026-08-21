@@ -45,7 +45,7 @@
     <string name="confirm_delete_visible_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المعروضة حاليًا؟</string>
     <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
     <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
-    <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟\n%1$s</string>
+    <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟</string>
     <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟\n%1$s</string>
     <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟\n%1$s</string>
     <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟\n%1$s</string>
@@ -521,6 +521,7 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
+    <string name="acc_selected_server">Selected</string>
     <string name="acc_last_updated">آخر تحديث %1$s</string>
     <string name="acc_subscription_announcement">%1$s، %2$s</string>
     <string name="acc_subscription_update">%1$s، التحديث %2$s</string>
