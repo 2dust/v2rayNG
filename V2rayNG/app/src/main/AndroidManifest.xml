@@ -209,6 +209,9 @@
         <activity
             android:name=".ui.AboutActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.TranslatorsActivity"
+            android:exported="false" />
 
         <service
             android:name=".service.CoreVpnService"
