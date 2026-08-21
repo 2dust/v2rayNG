@@ -24,7 +24,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,6 +57,7 @@ import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.isTouchExplorationEnabled
+import com.v2ray.ang.extension.toPluralQuantity
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.compose.ItemDivider
@@ -154,7 +154,6 @@ private fun ServerListPage(
             state = gridState,
             modifier = Modifier
                 .fillMaxSize()
-                .selectableGroup()
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
@@ -203,7 +202,6 @@ private fun ServerListPage(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .selectableGroup()
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
@@ -361,7 +359,7 @@ fun ServerListItem(
         // MainViewModel has already delivered the one final announcement, either directly or via
         // the foreground notification. Restore the stable row after TalkBack has finished it.
         delay(4_000)
-        runCatching { focusRequester.requestFocus() }
+        focusRequester.requestFocus()
         onFocusRestored()
     }
     val testResult = if (testDelayMillis == 0L) {
@@ -485,9 +483,6 @@ fun ServerListItem(
         }
     }
 }
-
-private fun Long.toPluralQuantity(): Int =
-    coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
 
 private fun getProtocolDescription(profile: ProfileItem): String {
     if (profile.configType.isComplexType()) return profile.configType.name

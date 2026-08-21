@@ -8,8 +8,8 @@ import android.os.Looper
 import android.view.Gravity
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
-import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatTextView
 import com.v2ray.ang.ui.compose.AppSnackbarManager
 import com.v2ray.ang.ui.compose.ToastType
 
@@ -56,9 +56,9 @@ fun Context.toastSuccess(message: CharSequence, announceForAccessibility: Boolea
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toastError(message: Int, announceForAccessibility: Boolean = true) {
+fun Context.toastError(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.ERROR, announceForAccessibility)
+    dispatchMessage(text, ToastType.ERROR, announceForAccessibility = true)
 }
 
 /**
@@ -66,8 +66,8 @@ fun Context.toastError(message: Int, announceForAccessibility: Boolean = true) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toastError(message: CharSequence, announceForAccessibility: Boolean = true) {
-    dispatchMessage(message, ToastType.ERROR, announceForAccessibility)
+fun Context.toastError(message: CharSequence) {
+    dispatchMessage(message, ToastType.ERROR, announceForAccessibility = true)
 }
 
 /**
@@ -75,9 +75,9 @@ fun Context.toastError(message: CharSequence, announceForAccessibility: Boolean 
  *
  * @param message The resource ID of the message to show.
  */
-fun Context.toastInfo(message: Int, announceForAccessibility: Boolean = false) {
+fun Context.toastInfo(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.INFO, announceForAccessibility)
+    dispatchMessage(text, ToastType.INFO, announceForAccessibility = false)
 }
 
 /**
@@ -85,8 +85,8 @@ fun Context.toastInfo(message: Int, announceForAccessibility: Boolean = false) {
  *
  * @param message The text of the message to show.
  */
-fun Context.toastInfo(message: CharSequence, announceForAccessibility: Boolean = false) {
-    dispatchMessage(message, ToastType.INFO, announceForAccessibility)
+fun Context.toastInfo(message: CharSequence) {
+    dispatchMessage(message, ToastType.INFO, announceForAccessibility = false)
 }
 
 private inline fun runOnMain(crossinline block: () -> Unit) {
@@ -130,7 +130,7 @@ private fun Context.showAccessibilitySilentToast(message: CharSequence, long: Bo
         setColor(Color.argb(235, 48, 48, 48))
         cornerRadius = 24 * density
     }
-    val content = object : TextView(this) {
+    val content = object : AppCompatTextView(this) {
         override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent): Boolean = true
     }.apply {
         text = message

@@ -153,7 +153,7 @@ private fun SearchInputField(
             IconButton(onClick = { onQueryChange("") }) {
                 Icon(
                     painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
-                    contentDescription = stringResource(R.string.action_clear)
+                    contentDescription = stringResource(R.string.logcat_clear)
                 )
             }
         }

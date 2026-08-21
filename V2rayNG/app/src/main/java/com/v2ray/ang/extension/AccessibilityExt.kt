@@ -26,6 +26,9 @@ fun Context.isTouchExplorationEnabled(): Boolean =
     ContextCompat.getSystemService(this, AccessibilityManager::class.java)
         ?.isTouchExplorationEnabled == true
 
+internal fun Long.toPluralQuantity(): Int =
+    coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+
 private object AccessibilityAnnouncementDispatcher {
     private val mainHandler = Handler(Looper.getMainLooper())
     private var lastMessage: String? = null

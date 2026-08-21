@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,7 +68,7 @@ fun GroupTabBar(
             GroupTabItem(
                 group = group,
                 selected = index == selectedIndex,
-                serverFlowProvider = { mainViewModel.serversForGroup(group.id) },
+                serverFlow = mainViewModel.serversForGroup(group.id),
                 onClick = { onTabClick(index) }
             )
         }
@@ -80,10 +79,9 @@ fun GroupTabBar(
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
-    serverFlowProvider: () -> StateFlow<List<ServersCache>>,
+    serverFlow: StateFlow<List<ServersCache>>,
     onClick: () -> Unit
 ) {
-    val serverFlow = remember(group.id) { serverFlowProvider() }
     val servers by serverFlow.collectAsStateWithLifecycle()
     val accessibilityLabel = pluralStringResource(
         if (selected) R.plurals.acc_selected_group_tab else R.plurals.acc_group_tab,

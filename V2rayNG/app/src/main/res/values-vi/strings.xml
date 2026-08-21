@@ -23,16 +23,6 @@
     <string name="toast_services_success">Đã khởi động v2rayNG!</string>
     <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
     <!-- Compose accessibility resources -->
-    <string name="action_clear">Xoá</string>
-
-    <plurals name="title_update_config_count">
-        <item quantity="other">Đã cập nhật %1$d cấu hình</item>
-    </plurals>
-
-    <plurals name="title_update_asset_count">
-        <item quantity="other">Đã cập nhật %1$d tệp tài nguyên</item>
-    </plurals>
-
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d mili giây</item>
     </plurals>
@@ -343,6 +333,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Sao chép</string>
+    <string name="logcat_clear">Xoá</string>
     <string name="logcat_share">Chia sẻ nhật ký</string>
     <string name="title_service_restart">Khởi động lại dịch vụ lõi</string>
     <string name="title_del_all_config">Xoá tất cả cấu hình</string>
@@ -376,6 +367,12 @@
     <string name="title_del_config_count">Xóa %d cấu hình</string>
     <string name="title_import_config_count">Nhập %d cấu hình</string>
     <string name="title_export_config_count">Xuất %d cấu hình</string>
+    <plurals name="title_update_config_count">
+        <item quantity="other">Đã cập nhật %1$d cấu hình</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="other">Đã cập nhật %1$d tệp tài nguyên</item>
+    </plurals>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>

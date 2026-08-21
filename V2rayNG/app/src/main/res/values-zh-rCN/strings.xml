@@ -23,16 +23,6 @@
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
     <!-- Compose accessibility resources -->
-    <string name="action_clear">清除</string>
-
-    <plurals name="title_update_config_count">
-        <item quantity="other">已更新 %1$d 个配置</item>
-    </plurals>
-
-    <plurals name="title_update_asset_count">
-        <item quantity="other">已更新 %1$d 个资源文件</item>
-    </plurals>
-
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d 毫秒</item>
     </plurals>
@@ -343,6 +333,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">复制</string>
+    <string name="logcat_clear">清除</string>
     <string name="logcat_share">分享日志</string>
     <string name="title_service_restart">服务重启</string>
     <string name="title_del_all_config">删除配置</string>
@@ -376,6 +367,12 @@
     <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="title_import_config_count">导入 %d 个配置</string>
     <string name="title_export_config_count">导出 %d 个配置</string>
+    <plurals name="title_update_config_count">
+        <item quantity="other">已更新 %1$d 个配置</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="other">已更新 %1$d 个资源文件</item>
+    </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>

@@ -487,13 +487,15 @@ fun ServerScreen(
                                     context.toast(
                                         R.string.server_lab_address,
                                         announceForAccessibility = true,
-                                    ); return@Button
+                                    )
+                                    return@Button
                                 }
                                 if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) {
                                     context.toast(
                                         R.string.server_lab_port,
                                         announceForAccessibility = true,
-                                    ); return@Button
+                                    )
+                                    return@Button
                                 }
                                 val temp = buildProfileItem()
                                 scope.launch {

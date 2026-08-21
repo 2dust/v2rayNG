@@ -23,18 +23,6 @@
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
     <!-- Compose accessibility resources -->
-    <string name="action_clear">روفتن</string>
-
-    <plurals name="title_update_config_count">
-        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
-        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
-    </plurals>
-
-    <plurals name="title_update_asset_count">
-        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
-        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
-    </plurals>
-
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d میلی‌ثانیه</item>
         <item quantity="other">%1$d میلی‌ثانیه</item>
@@ -348,6 +336,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">لف گیری</string>
+    <string name="logcat_clear">روفتن</string>
     <string name="logcat_share">یک رسۊوی گوزارش</string>
     <string name="title_service_restart">ره وندن دووارته سرویس</string>
     <string name="title_del_all_config">پاک کردن پوی کانفیگا بونکۊ سکویی</string>
@@ -381,6 +370,14 @@
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
+        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+    </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>

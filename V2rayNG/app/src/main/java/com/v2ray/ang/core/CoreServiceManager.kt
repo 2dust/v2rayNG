@@ -16,11 +16,9 @@ import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.OutboundTrafficStat
-import com.v2ray.ang.dto.ServiceRestartRequest
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -480,7 +478,8 @@ object CoreServiceManager {
                     // The UI and daemon run in separate processes, so acknowledge the active
                     // daemon before stopping it instead of relying on possibly stale UI state.
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
-                    val request = intent.serializable<ServiceRestartRequest>("content")
+                    val suppressIntermediateAnnouncements =
+                        intent.getStringExtra("content").toBoolean()
                     isServiceRestarting = true
 
                     // Let the UI treat stop/start as one transition. This suppresses the
@@ -488,7 +487,7 @@ object CoreServiceManager {
                     MessageHelper.sendMsg2UI(
                         serviceControl.getService(),
                         AppConfig.MSG_STATE_RESTART,
-                        request ?: ServiceRestartRequest(),
+                        "",
                     )
 
                     val pendingResult = goAsync()
@@ -498,7 +497,7 @@ object CoreServiceManager {
                             delay(500L)
                             val startRequested = LauncherManager.startService(
                                 serviceControl.getService(),
-                                announceStart = request?.suppressIntermediateAnnouncements != true,
+                                announceStart = !suppressIntermediateAnnouncements,
                                 showError = false,
                             )
                             if (!startRequested) {

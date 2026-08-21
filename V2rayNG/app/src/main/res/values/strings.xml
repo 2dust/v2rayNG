@@ -23,18 +23,6 @@
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
     <!-- Compose accessibility resources -->
-    <string name="action_clear">Clear</string>
-
-    <plurals name="title_update_config_count">
-        <item quantity="one">Updated %1$d config</item>
-        <item quantity="other">Updated %1$d configs</item>
-    </plurals>
-
-    <plurals name="title_update_asset_count">
-        <item quantity="one">Updated %1$d asset file</item>
-        <item quantity="other">Updated %1$d asset files</item>
-    </plurals>
-
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d millisecond</item>
         <item quantity="other">%1$d milliseconds</item>
@@ -348,6 +336,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Copy</string>
+    <string name="logcat_clear">Clear</string>
     <string name="logcat_share">Share log</string>
     <string name="title_service_restart">Restart service</string>
     <string name="title_del_all_config">Delete configs</string>
@@ -381,6 +370,14 @@
     <string name="title_del_config_count">Delete %d configs</string>
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">Updated %1$d config</item>
+        <item quantity="other">Updated %1$d configs</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Updated %1$d asset file</item>
+        <item quantity="other">Updated %1$d asset files</item>
+    </plurals>
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>

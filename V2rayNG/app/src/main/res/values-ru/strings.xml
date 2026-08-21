@@ -23,22 +23,6 @@
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
     <!-- Compose accessibility resources -->
-    <string name="action_clear">Очистить</string>
-
-    <plurals name="title_update_config_count">
-        <item quantity="one">Обновлён %1$d профиль</item>
-        <item quantity="few">Обновлено %1$d профиля</item>
-        <item quantity="many">Обновлено %1$d профилей</item>
-        <item quantity="other">Обновлено %1$d профиля</item>
-    </plurals>
-
-    <plurals name="title_update_asset_count">
-        <item quantity="one">Обновлён %1$d файл ресурсов</item>
-        <item quantity="few">Обновлено %1$d файла ресурсов</item>
-        <item quantity="many">Обновлено %1$d файлов ресурсов</item>
-        <item quantity="other">Обновлено %1$d файла ресурсов</item>
-    </plurals>
-
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d миллисекунда</item>
         <item quantity="few">%1$d миллисекунды</item>
@@ -358,6 +342,7 @@
 
     <string name="title_logcat" translatable="false">Logcat</string>
     <string name="logcat_copy">Копировать</string>
+    <string name="logcat_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
     <string name="title_service_restart">Перезапуск службы</string>
     <string name="title_del_all_config">Удалить профили</string>
@@ -391,6 +376,18 @@
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">Обновлён %1$d профиль</item>
+        <item quantity="few">Обновлено %1$d профиля</item>
+        <item quantity="many">Обновлено %1$d профилей</item>
+        <item quantity="other">Обновлено %1$d профиля</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Обновлён %1$d файл ресурсов</item>
+        <item quantity="few">Обновлено %1$d файла ресурсов</item>
+        <item quantity="many">Обновлено %1$d файлов ресурсов</item>
+        <item quantity="other">Обновлено %1$d файла ресурсов</item>
+    </plurals>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>

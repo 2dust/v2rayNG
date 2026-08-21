@@ -71,15 +71,15 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     /**
      * Send error toast event (Resource ID).
      */
-    fun toastError(resId: Int, announceForAccessibility: Boolean = true) {
-        localizedContext.toastError(resId, announceForAccessibility)
+    fun toastError(resId: Int) {
+        localizedContext.toastError(resId)
     }
 
     /**
      * Send error toast event (String).
      */
-    fun toastError(message: String, announceForAccessibility: Boolean = true) {
-        app.toastError(message, announceForAccessibility)
+    fun toastError(message: String) {
+        app.toastError(message)
     }
 
     /**

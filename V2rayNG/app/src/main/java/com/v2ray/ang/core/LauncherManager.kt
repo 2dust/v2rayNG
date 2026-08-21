@@ -6,7 +6,6 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.ServiceRestartRequest
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
@@ -70,7 +69,7 @@ object LauncherManager {
         MessageHelper.sendMsg2Service(
             context,
             AppConfig.MSG_STATE_RESTART,
-            ServiceRestartRequest(suppressIntermediateAnnouncements),
+            suppressIntermediateAnnouncements.toString(),
         )
     }
 
@@ -79,7 +78,7 @@ object LauncherManager {
         MessageHelper.sendMsg2ServiceForResult(
             context,
             AppConfig.MSG_STATE_RESTART,
-            ServiceRestartRequest(),
+            "",
         ) { handled ->
             if (!handled) startIfStopped()
         }

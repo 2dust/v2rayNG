@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import com.v2ray.ang.extension.delay
+import com.v2ray.ang.extension.toPluralQuantity
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,7 +78,6 @@ class MainViewModel(
     @Volatile
     private var testingGroupId: String? = null
 
-    @Volatile
     private var pendingServiceTransition: PendingServiceTransition? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
@@ -734,9 +734,6 @@ class MainViewModel(
         dataSource.setSelectServer(guid)
         _uiState.update { it.copy(selectedGuid = guid) }
     }
-
-    private fun Long.toPluralQuantity(): Int =
-        coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
 
     /** Selects immediately when stopped, or defers the visible active state until restart succeeds. */
     fun selectServerForActivation(guid: String): Boolean {
