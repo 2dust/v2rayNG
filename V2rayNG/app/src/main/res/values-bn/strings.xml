@@ -388,7 +388,10 @@
     <string name="connection_test_testing_count">%dটি কনফিগারেশন পরীক্ষা করা হচ্ছে…</string>
     <string name="connection_test_available">সংযোগ সফল হয়েছে; সময় লেগেছে %1$s</string>
     <string name="server_test_delay_value">%1$d মিলিসেকেন্ড</string>
-    <string name="server_test_delay_accessibility_value">%1$d মিলিসেকেন্ড</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d মিলিসেকেন্ড</item>
+        <item quantity="other">%1$d মিলিসেকেন্ড</item>
+    </plurals>
     <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>

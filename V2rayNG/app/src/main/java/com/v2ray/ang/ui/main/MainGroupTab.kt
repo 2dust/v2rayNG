@@ -1,16 +1,22 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryScrollableTabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,7 +29,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
@@ -39,31 +44,31 @@ fun GroupTabBar(
     onTabClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    PrimaryScrollableTabRow(
-        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
-        modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        edgePadding = 16.dp,
-        minTabWidth = 56.dp,
-        indicator = {
-            TabRowDefaults.PrimaryIndicator(
-                modifier = Modifier
-                    .tabIndicatorOffset(
-                        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
-                        matchContentSize = true
-                    )
-                    .clip(RoundedCornerShape(3.dp)),
-                width = Dp.Unspecified,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        },
-        divider = {}
+    val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(selectedIndex) {
+        listState.animateScrollToItem(selectedIndex)
+    }
+
+    // Unlike ScrollableTabRow, a lazy list exposes scroll-to-index semantics. TalkBack can
+    // therefore move past the last visible tab (or back before the first visible tab), and the
+    // list brings the newly focused off-screen tab into view instead of leaving the tab strip.
+    LazyRow(
+        state = listState,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        groups.forEachIndexed { index, group ->
+        itemsIndexed(
+            items = groups,
+            key = { _, group -> group.id },
+        ) { index, group ->
             GroupTabItem(
                 group = group,
-                selected = index == selectedTabIndex,
+                selected = index == selectedIndex,
                 serverFlowProvider = { mainViewModel.serversForGroup(group.id) },
                 onClick = { onTabClick(index) }
             )
@@ -97,6 +102,7 @@ private fun GroupTabItem(
     Box(
         modifier = Modifier
             .heightIn(min = 48.dp)
+            .widthIn(min = 56.dp)
             .clickable(role = Role.Tab, onClick = onClick)
             .clearAndSetSemantics {
                 contentDescription = accessibilityLabel
@@ -117,5 +123,15 @@ private fun GroupTabItem(
             softWrap = false,
             overflow = TextOverflow.Ellipsis,
         )
+        if (selected) {
+            Box(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+            )
+        }
     }
 }

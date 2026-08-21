@@ -43,6 +43,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -382,7 +383,11 @@ fun ServerListItem(
     val testResultAccessibility = if (testDelayMillis == 0L) {
         ""
     } else {
-        stringResource(R.string.server_test_delay_accessibility_value, testDelayMillis)
+        pluralStringResource(
+            R.plurals.server_test_delay_accessibility_value,
+            testDelayMillis.toPluralQuantity(),
+            testDelayMillis,
+        )
     }
     val testResultModifier = if (testDelayMillis == 0L) {
         Modifier
@@ -491,6 +496,9 @@ fun ServerListItem(
         }
     }
 }
+
+private fun Long.toPluralQuantity(): Int =
+    coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
 
 private fun getProtocolDescription(profile: ProfileItem): String {
     if (profile.configType.isComplexType()) return profile.configType.name

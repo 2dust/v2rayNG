@@ -388,7 +388,14 @@
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
     <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
-    <string name="server_test_delay_accessibility_value">%1$d ملي ثانية</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="zero">%1$d مللي ثانية</item>
+        <item quantity="one">مللي ثانية واحدة</item>
+        <item quantity="two">مللي ثانيتان</item>
+        <item quantity="few">%1$d مللي ثوانٍ</item>
+        <item quantity="many">%1$d مللي ثانية</item>
+        <item quantity="other">%1$d مللي ثانية</item>
+    </plurals>
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>

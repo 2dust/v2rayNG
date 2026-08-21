@@ -388,7 +388,10 @@
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
     <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
-    <string name="server_test_delay_accessibility_value">%1$d میلی‌ثانیه</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>

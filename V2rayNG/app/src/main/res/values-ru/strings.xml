@@ -388,7 +388,12 @@
     <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Соединение установлено за %1$s</string>
     <string name="server_test_delay_value">%1$d мс</string>
-    <string name="server_test_delay_accessibility_value">%1$d миллисекунд</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d миллисекунда</item>
+        <item quantity="few">%1$d миллисекунды</item>
+        <item quantity="many">%1$d миллисекунд</item>
+        <item quantity="other">%1$d миллисекунды</item>
+    </plurals>
     <string name="connection_test_error">Ошибка проверки соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>

@@ -388,7 +388,9 @@
     <string name="connection_test_testing_count">Đang kiểm tra %d cấu hình…</string>
     <string name="connection_test_available">Kết nối thành công sau %1$s</string>
     <string name="server_test_delay_value">%1$d mili giây</string>
-    <string name="server_test_delay_accessibility_value">%1$d mili giây</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d mili giây</item>
+    </plurals>
     <string name="connection_test_error">Kiểm tra kết nối thất bại: %s</string>
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>

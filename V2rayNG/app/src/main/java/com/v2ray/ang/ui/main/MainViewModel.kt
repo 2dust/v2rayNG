@@ -175,7 +175,7 @@ class MainViewModel(
             status.progress
         )
 
-        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result)
+        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result, accessible = false)
     }
 
     internal fun formatStatusForAccessibility(status: MainStatus, isRunning: Boolean): String =
@@ -184,12 +184,27 @@ class MainViewModel(
             is MainStatus.TestProgress -> formatStatus(
                 if (isRunning) MainStatus.Connected else MainStatus.Disconnected
             )
+            is MainStatus.ConnectionTest -> formatConnectionTestResult(
+                status.result,
+                accessible = true,
+            )
             else -> formatStatus(status)
         }
 
-    private fun formatConnectionTestResult(result: ConnectionTestResult): String {
+    private fun formatConnectionTestResult(
+        result: ConnectionTestResult,
+        accessible: Boolean,
+    ): String {
         val status = if (result.delayMillis >= 0) {
-            val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            val delay = if (accessible) {
+                dataSource.getQuantityString(
+                    R.plurals.server_test_delay_accessibility_value,
+                    result.delayMillis.toPluralQuantity(),
+                    result.delayMillis,
+                )
+            } else {
+                dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            }
             dataSource.getString(R.string.connection_test_available, delay)
         } else {
             val detail = result.errorMessage.ifBlank {
@@ -688,6 +703,9 @@ class MainViewModel(
         dataSource.setSelectServer(guid)
         _uiState.update { it.copy(selectedGuid = guid) }
     }
+
+    private fun Long.toPluralQuantity(): Int =
+        coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
 
     /** Selects immediately when stopped, or defers the visible active state until restart succeeds. */
     fun selectServerForActivation(guid: String): Boolean {
