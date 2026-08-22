@@ -217,6 +217,9 @@
         <activity
             android:name=".ui.AboutActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.TranslatorsActivity"
+            android:exported="false" />
 
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
