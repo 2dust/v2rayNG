@@ -181,9 +181,7 @@ class MainViewModel(
     internal fun formatStatus(status: MainStatus): String = when (status) {
         MainStatus.Disconnected -> dataSource.getString(R.string.connection_not_connected)
         MainStatus.Connected -> dataSource.getString(R.string.connection_connected)
-        MainStatus.Testing,
-        MainStatus.CurrentConnectionTesting ->
-            dataSource.getString(R.string.connection_test_testing)
+        MainStatus.Testing -> dataSource.getString(R.string.connection_test_testing)
         is MainStatus.TestProgress -> dataSource.getString(
             R.string.connection_running_task_left,
             status.progress
@@ -194,7 +192,6 @@ class MainViewModel(
 
     internal fun formatStatusForAccessibility(status: MainStatus, isRunning: Boolean): String =
         when (status) {
-            MainStatus.Testing,
             is MainStatus.TestProgress -> formatStatus(
                 if (isRunning) MainStatus.Connected else MainStatus.Disconnected
             )
@@ -843,7 +840,7 @@ class MainViewModel(
     }
 
     fun testCurrentServerRealPing() {
-        _uiState.update { it.copy(status = MainStatus.CurrentConnectionTesting) }
+        _uiState.update { it.copy(status = MainStatus.Testing) }
         dataSource.testCurrentServerRealPing()
     }
 
