@@ -86,7 +86,7 @@ class RoutingEditActivity : BaseComponentActivity() {
 
     private fun saveServer(rulesetItem: RulesetItem): Boolean {
         if (rulesetItem.remarks.isNullOrEmpty()) {
-            toast(R.string.sub_setting_remarks)
+            toast(R.string.sub_setting_remarks, announceForAccessibility = true)
             return false
         }
         if (position < 0 && rulesetItem.id.isEmpty()) {

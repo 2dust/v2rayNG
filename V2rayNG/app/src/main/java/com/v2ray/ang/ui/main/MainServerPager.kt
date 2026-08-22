@@ -30,14 +30,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
@@ -49,7 +54,10 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.extension.isTouchExplorationEnabled
+import com.v2ray.ang.extension.toPluralQuantity
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.compose.ItemDivider
@@ -69,6 +77,7 @@ fun GroupPagerPage(
     groupId: String,
     mainViewModel: MainViewModel,
     selectedGuid: String?,
+    restoreFocusGuid: String?,
     doubleColumnDisplay: Boolean,
     confirmRemove: Boolean,
     searchQuery: String,
@@ -78,7 +87,8 @@ fun GroupPagerPage(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onRemoveServer: (String, ProfileItem) -> Unit,
+    onServerFocusRestored: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
     val serverFlow = remember(groupId) {
@@ -89,6 +99,7 @@ fun GroupPagerPage(
     ServerListPage(
         servers = servers,
         selectedGuid = selectedGuid,
+        restoreFocusGuid = restoreFocusGuid,
         canReorder = canReorder,
         doubleColumnDisplay = doubleColumnDisplay,
         subscriptionId = groupId,
@@ -101,6 +112,7 @@ fun GroupPagerPage(
         onShareServer = onShareServer,
         onMoreServer = onMoreServer,
         onRemoveServer = onRemoveServer,
+        onServerFocusRestored = onServerFocusRestored,
         onMoveServer = { fromIndex, toIndex -> mainViewModel.moveServer(groupId, fromIndex, toIndex) },
         contentPadding = contentPadding
     )
@@ -110,6 +122,7 @@ fun GroupPagerPage(
 private fun ServerListPage(
     servers: List<ServersCache>,
     selectedGuid: String?,
+    restoreFocusGuid: String?,
     canReorder: Boolean,
     doubleColumnDisplay: Boolean,
     subscriptionId: String,
@@ -121,7 +134,8 @@ private fun ServerListPage(
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onRemoveServer: (String, ProfileItem) -> Unit,
+    onServerFocusRestored: (String) -> Unit,
     onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues
 ) {
@@ -148,13 +162,15 @@ private fun ServerListPage(
                     ServerItemColumn(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
+                        restoreFocus = serverCache.guid == restoreFocusGuid,
                         subscriptionId = subscriptionId,
                         doubleColumnDisplay = true,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
                         onMoreServer = onMoreServer,
-                        onRemoveServer = onRemoveServer
+                        onRemoveServer = onRemoveServer,
+                        onServerFocusRestored = onServerFocusRestored,
                     )
                 }
                 if (canReorder && reorderableGridState != null) {
@@ -202,12 +218,14 @@ private fun ServerListPage(
                             ServerItemRow(
                                 serverCache = serverCache,
                                 selectedGuid = selectedGuid,
+                                restoreFocus = serverCache.guid == restoreFocusGuid,
                                 subscriptionId = subscriptionId,
                                 onSelectServer = onSelectServer,
                                 onEditServer = onEditServer,
                                 onShareServer = onShareServer,
                                 onMoreServer = onMoreServer,
-                                onRemoveServer = onRemoveServer
+                                onRemoveServer = onRemoveServer,
+                                onServerFocusRestored = onServerFocusRestored,
                             )
                         }
                         ItemDivider()
@@ -216,12 +234,14 @@ private fun ServerListPage(
                     ServerItemRow(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
+                        restoreFocus = serverCache.guid == restoreFocusGuid,
                         subscriptionId = subscriptionId,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
                         onMoreServer = onMoreServer,
-                        onRemoveServer = onRemoveServer
+                        onRemoveServer = onRemoveServer,
+                        onServerFocusRestored = onServerFocusRestored,
                     )
                     ItemDivider()
                 }
@@ -234,12 +254,14 @@ private fun ServerListPage(
 private fun ServerItemRow(
     serverCache: ServersCache,
     selectedGuid: String?,
+    restoreFocus: Boolean,
     subscriptionId: String,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String, ProfileItem) -> Unit,
+    onServerFocusRestored: (String) -> Unit,
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -254,13 +276,15 @@ private fun ServerItemRow(
         typeDescription = getProtocolDescription(profile),
         testDelayMillis = serverCache.testDelayMillis,
         isSelected = serverCache.guid == selectedGuid,
+        restoreFocus = restoreFocus,
         subscriptionRemarks = subRemarks,
         doubleColumnDisplay = false,
         onClick = { onSelectServer(serverCache.guid) },
         onShare = { onShareServer(serverCache.guid, profile) },
         onEdit = { onEditServer(serverCache.guid, profile) },
-        onRemove = { onRemoveServer(serverCache.guid) },
-        onMore = { onMoreServer(serverCache.guid, profile) }
+        onRemove = { onRemoveServer(serverCache.guid, profile) },
+        onMore = { onMoreServer(serverCache.guid, profile) },
+        onFocusRestored = { onServerFocusRestored(serverCache.guid) },
     )
 }
 
@@ -268,13 +292,15 @@ private fun ServerItemRow(
 private fun ServerItemColumn(
     serverCache: ServersCache,
     selectedGuid: String?,
+    restoreFocus: Boolean,
     subscriptionId: String,
     doubleColumnDisplay: Boolean,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit
+    onRemoveServer: (String, ProfileItem) -> Unit,
+    onServerFocusRestored: (String) -> Unit,
 ) {
     val profile = serverCache.profile
     val subRemarks = if (subscriptionId.isEmpty()) {
@@ -287,13 +313,15 @@ private fun ServerItemColumn(
             typeDescription = getProtocolDescription(profile),
             testDelayMillis = serverCache.testDelayMillis,
             isSelected = serverCache.guid == selectedGuid,
+            restoreFocus = restoreFocus,
             subscriptionRemarks = subRemarks,
             doubleColumnDisplay = doubleColumnDisplay,
             onClick = { onSelectServer(serverCache.guid) },
             onEdit = { onEditServer(serverCache.guid, profile) },
             onShare = { onShareServer(serverCache.guid, profile) },
-            onRemove = { onRemoveServer(serverCache.guid) },
-            onMore = { onMoreServer(serverCache.guid, profile) }
+            onRemove = { onRemoveServer(serverCache.guid, profile) },
+            onMore = { onMoreServer(serverCache.guid, profile) },
+            onFocusRestored = { onServerFocusRestored(serverCache.guid) },
         )
         ItemDivider()
     }
@@ -306,6 +334,7 @@ fun ServerListItem(
     typeDescription: String,
     testDelayMillis: Long,
     isSelected: Boolean,
+    restoreFocus: Boolean,
     subscriptionRemarks: String,
     doubleColumnDisplay: Boolean,
     onClick: () -> Unit,
@@ -313,28 +342,63 @@ fun ServerListItem(
     onShare: () -> Unit,
     onRemove: () -> Unit,
     onMore: () -> Unit,
+    onFocusRestored: () -> Unit,
     modifier: Modifier = Modifier,
     dragModifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(restoreFocus) {
+        if (!restoreFocus) return@LaunchedEffect
+
+        if (!context.isTouchExplorationEnabled()) {
+            onFocusRestored()
+            return@LaunchedEffect
+        }
+
+        // MainViewModel has already delivered the one final announcement, either directly or via
+        // the foreground notification. Restore the stable row after TalkBack has finished it.
+        delay(4_000)
+        focusRequester.requestFocus()
+        onFocusRestored()
+    }
     val testResult = if (testDelayMillis == 0L) {
         ""
     } else {
         stringResource(R.string.server_test_delay_value, testDelayMillis)
     }
-    val selectedStateDescription = if (isSelected) {
-        stringResource(R.string.acc_selected_server)
+    val testResultAccessibility = if (testDelayMillis == 0L) {
+        ""
     } else {
-        null
+        pluralStringResource(
+            R.plurals.server_test_delay_accessibility_value,
+            testDelayMillis.toPluralQuantity(),
+            testDelayMillis,
+        )
+    }
+    val testResultModifier = if (testDelayMillis == 0L) {
+        Modifier
+    } else {
+        Modifier.semantics {
+            contentDescription = testResultAccessibility
+        }
+    }
+    val selectedServerPrefix = stringResource(R.string.acc_selected_server)
+    val selectionPrefixModifier = if (isSelected) {
+        Modifier.semantics {
+            contentDescription = selectedServerPrefix
+        }
+    } else {
+        Modifier
     }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .semantics {
-                if (selectedStateDescription != null) {
-                    stateDescription = selectedStateDescription
-                }
-            }
+            // Keep the same semantics and clickable focus target while the row becomes selected.
+            // The explicit request below remains as a fallback after the final announcement.
+            .semantics(mergeDescendants = true) {}
+            .focusRequester(focusRequester)
             .clickable(onClick = onClick)
             .then(dragModifier)
     ) {
@@ -342,6 +406,7 @@ fun ServerListItem(
             Modifier
                 .width(10.dp)
                 .fillMaxHeight()
+                .then(selectionPrefixModifier)
         ) {
             if (isSelected) {
                 Row {
@@ -376,21 +441,21 @@ fun ServerListItem(
                     IconButton(onClick = onShare, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
-                            stringResource(R.string.title_configuration_share),
+                            stringResource(R.string.acc_share_config_named, remarks),
                             Modifier.size(24.dp)
                         )
                     }
                     IconButton(onClick = onEdit, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
-                            stringResource(R.string.acc_edit),
+                            stringResource(R.string.acc_edit_config_named, remarks),
                             Modifier.size(24.dp)
                         )
                     }
                     IconButton(onClick = onRemove, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
-                            stringResource(R.string.acc_delete),
+                            stringResource(R.string.acc_delete_config_named, remarks),
                             Modifier.size(24.dp)
                         )
                     }
@@ -413,7 +478,7 @@ fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(typeDescription, style = MaterialTheme.typography.bodySmall, color = colorConfigType, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(testResult, style = MaterialTheme.typography.bodySmall, color = if (testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(testResult, testResultModifier, style = MaterialTheme.typography.bodySmall, color = if (testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

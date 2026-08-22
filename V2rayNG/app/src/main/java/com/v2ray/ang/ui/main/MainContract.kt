@@ -24,6 +24,7 @@ data class MainUiState(
     val isTesting: Boolean = false,
     val status: MainStatus = MainStatus.Disconnected,
     val locateTarget: LocateTarget? = null,
+    val restoreServerFocusGuid: String? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
     val shareQRCodeBitmap: android.graphics.Bitmap? = null
@@ -67,4 +68,5 @@ sealed interface MainAction {
     data class ImportBatchConfig(val configText: String) : MainAction
 
     data class LocateHandled(val target: LocateTarget) : MainAction
+    data class ServerFocusHandled(val guid: String) : MainAction
 }

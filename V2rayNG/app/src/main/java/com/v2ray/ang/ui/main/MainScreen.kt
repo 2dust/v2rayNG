@@ -45,6 +45,10 @@ fun MainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
     val displayText = mainViewModel.formatStatus(uiState.status)
+    val accessibilityText = mainViewModel.formatStatusForAccessibility(
+        status = uiState.status,
+        isRunning = isRunning,
+    )
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -58,11 +62,15 @@ fun MainScreen(
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
-    var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
+    var showRemoveConfirm by remember { mutableStateOf<ServerDeleteTarget?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    val removeServer: (String) -> Unit = { guid ->
-        if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
+    val removeServer: (String, ProfileItem) -> Unit = { guid, profile ->
+        if (confirmRemove) {
+            showRemoveConfirm = ServerDeleteTarget(guid, profile.remarks)
+        } else {
+            onAction(MainAction.RemoveServer(guid))
+        }
     }
 
     val pagerState = rememberPagerState(
@@ -178,7 +186,7 @@ fun MainScreen(
             more = more,
             onDismiss = { shareTarget = null },
             onAction = onAction,
-            onRemove = removeServer,
+            onRemove = { targetGuid -> removeServer(targetGuid, profile) },
         )
     }
     if (shareQRCodeBitmap != null) {
@@ -235,6 +243,7 @@ fun MainScreen(
             bottomBar = {
                 MainBottomBar(
                     displayText = displayText,
+                    accessibilityText = accessibilityText,
                     isRunning = isRunning,
                     isDarkTheme = isDarkTheme,
                     onAction = onAction
@@ -279,6 +288,8 @@ fun MainScreen(
                             groupId = group.id,
                             mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
+                            restoreFocusGuid = uiState.restoreServerFocusGuid
+                                .takeIf { page == pagerState.currentPage },
                             doubleColumnDisplay = doubleColumnDisplay,
                             confirmRemove = confirmRemove,
                             searchQuery = searchQuery,
@@ -293,6 +304,9 @@ fun MainScreen(
                                 shareTarget = Triple(guid, profile, true)
                             },
                             onRemoveServer = removeServer,
+                            onServerFocusRestored = { guid ->
+                                onAction(MainAction.ServerFocusHandled(guid))
+                            },
                             contentPadding = PaddingValues(
                                 start = 0.dp,
                                 top = 0.dp,

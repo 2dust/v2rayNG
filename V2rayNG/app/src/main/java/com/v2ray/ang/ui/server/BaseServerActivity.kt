@@ -307,14 +307,20 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 Button(
                     onClick = {
                         if (state.address.isBlank()) {
-                            context.toast(R.string.server_lab_address)
+                            context.toast(
+                                R.string.server_lab_address,
+                                announceForAccessibility = true,
+                            )
                             return@Button
                         }
                         if (
                             state.configType != EConfigType.HYSTERIA2 &&
                             (state.port.toIntOrNull() ?: 0) <= 0
                         ) {
-                            context.toast(R.string.server_lab_port)
+                            context.toast(
+                                R.string.server_lab_port,
+                                announceForAccessibility = true,
+                            )
                             return@Button
                         }
                         val temp = buildProfileItem()
@@ -325,7 +331,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                                     CertificateFingerprintManager.fetchForManualFill(temp)
                                 }
                                 if (sha256.isNullOrBlank()) {
-                                    context.toast(R.string.toast_fetch_cert_sha256_failed)
+                                    context.toast(
+                                        R.string.toast_fetch_cert_sha256_failed,
+                                        announceForAccessibility = true,
+                                    )
                                 } else {
                                     state.pinnedCA256 = sha256
                                     context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
@@ -367,18 +376,18 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     protected fun validateBasicConfig(state: ServerUiState): Boolean {
         if (state.remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(R.string.server_lab_remarks, announceForAccessibility = true)
             return false
         }
         if (state.address.isBlank()) {
-            toast(R.string.server_lab_address)
+            toast(R.string.server_lab_address, announceForAccessibility = true)
             return false
         }
         if (
             state.configType != EConfigType.HYSTERIA2 &&
             (state.port.toIntOrNull() ?: 0) <= 0
         ) {
-            toast(R.string.server_lab_port)
+            toast(R.string.server_lab_port, announceForAccessibility = true)
             return false
         }
         return true
@@ -392,7 +401,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             if (config.configType == EConfigType.VMESS ||
                 config.configType == EConfigType.VLESS
             ) {
-                toast(R.string.server_lab_id)
+                toast(R.string.server_lab_id, announceForAccessibility = true)
                 return false
             }
 
@@ -400,7 +409,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 config.configType == EConfigType.SHADOWSOCKS ||
                 config.configType == EConfigType.HYSTERIA2
             ) {
-                toast(R.string.server_lab_id3)
+                toast(R.string.server_lab_id3, announceForAccessibility = true)
                 return false
             }
         }
@@ -409,15 +418,15 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             config.configType == EConfigType.TROJAN &&
             config.security.isNullOrBlank()
         ) {
-            toast(R.string.server_lab_stream_security)
+            toast(R.string.server_lab_stream_security, announceForAccessibility = true)
             return false
         }
         if (!config.xhttpExtra.isNullOrBlank() && JsonUtil.parseString(config.xhttpExtra) == null) {
-            toast(R.string.server_lab_xhttp_extra)
+            toast(R.string.server_lab_xhttp_extra, announceForAccessibility = true)
             return false
         }
         if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
-            toast(R.string.server_lab_final_mask)
+            toast(R.string.server_lab_final_mask, announceForAccessibility = true)
             return false
         }
         return true
@@ -491,7 +500,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         if (showDeleteDialog) {
             DeleteConfirmDialog(
-                message = stringResource(R.string.confirm_delete_profile),
+                message = stringResource(R.string.confirm_delete_profile_named, initialConfig.remarks),
                 onConfirm = {
                     showDeleteDialog = false
                     deleteServer(editGuid)
@@ -503,7 +512,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     private fun deleteServer(guid: String) {
         if (guid.isEmpty() || guid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return
         }
         MmkvManager.removeServer(guid)

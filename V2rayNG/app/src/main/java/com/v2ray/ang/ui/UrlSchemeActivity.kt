@@ -81,7 +81,10 @@ class UrlSchemeActivity : BaseComponentActivity() {
                     if (count + countSub > 0) {
                         toast(R.string.import_subscription_success)
                     } else {
-                        toast(R.string.import_subscription_failure)
+                        toast(
+                            R.string.import_subscription_failure,
+                            announceForAccessibility = true,
+                        )
                     }
                 }
             }

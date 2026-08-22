@@ -39,7 +39,7 @@ class ServerHysteria2Activity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(R.string.server_lab_id3)
+            toast(R.string.server_lab_id3, announceForAccessibility = true)
             return false
         }
         if (config.security.isNullOrBlank()) {

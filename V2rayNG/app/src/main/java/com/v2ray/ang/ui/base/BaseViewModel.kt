@@ -43,29 +43,29 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     /**
      * Send neutral toast event (Resource ID).
      */
-    fun toast(resId: Int) {
-        localizedContext.toast(resId)
+    fun toast(resId: Int, announceForAccessibility: Boolean = false) {
+        localizedContext.toast(resId, announceForAccessibility)
     }
 
     /**
      * Send neutral toast event (String).
      */
-    fun toast(message: String) {
-        app.toast(message)
+    fun toast(message: String, announceForAccessibility: Boolean = false) {
+        app.toast(message, announceForAccessibility)
     }
 
     /**
      * Send success toast event (Resource ID).
      */
-    fun toastSuccess(resId: Int) {
-        localizedContext.toastSuccess(resId)
+    fun toastSuccess(resId: Int, announceForAccessibility: Boolean = false) {
+        localizedContext.toastSuccess(resId, announceForAccessibility)
     }
 
     /**
      * Send success toast event (String).
      */
-    fun toastSuccess(message: String) {
-        app.toastSuccess(message)
+    fun toastSuccess(message: String, announceForAccessibility: Boolean = false) {
+        app.toastSuccess(message, announceForAccessibility)
     }
 
     /**
@@ -94,6 +94,13 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      */
     fun getString(resId: Int, vararg formatArgs: Any?): String {
         return localizedContext.getString(resId, *formatArgs)
+    }
+
+    /**
+     * Get a localized quantity string from a plurals resource.
+     */
+    fun getQuantityString(resId: Int, quantity: Int, vararg formatArgs: Any): String {
+        return localizedContext.resources.getQuantityString(resId, quantity, *formatArgs)
     }
 
     /**

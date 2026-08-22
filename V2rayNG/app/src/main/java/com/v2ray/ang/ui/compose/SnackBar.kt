@@ -25,6 +25,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -163,7 +164,7 @@ fun AppSnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(modifier = modifier) {
+    BoxWithConstraints(modifier = modifier.clearAndSetSemantics { }) {
         val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
         val density = LocalDensity.current
         val navigationBarHeight = with(density) {

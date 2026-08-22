@@ -19,9 +19,42 @@
     <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
     <string name="notification_action_more">انقر للمزيد</string>
     <string name="toast_services_start">بدء الخدمات</string>
-    <string name="toast_services_stop">إيقاف الخدمات</string>
+    <string name="toast_services_stop">تم إيقاف الخدمة</string>
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="zero">%1$d مللي ثانية</item>
+        <item quantity="one">مللي ثانية واحدة</item>
+        <item quantity="two">مللي ثانيتان</item>
+        <item quantity="few">%1$d مللي ثوانٍ</item>
+        <item quantity="many">%1$d مللي ثانية</item>
+        <item quantity="other">%1$d مللي ثانية</item>
+    </plurals>
+
+    <string name="acc_share_config_named">مشاركة التكوين %1$s</string>
+
+    <string name="acc_edit_config_named">تعديل التكوين %1$s</string>
+
+    <string name="acc_delete_config_named">حذف التكوين %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="zero">المجموعة %1$s لا تحتوي على أي خوادم</item>
+        <item quantity="one">المجموعة %1$s تحتوي على خادم واحد</item>
+        <item quantity="two">المجموعة %1$s تحتوي على خادمين</item>
+        <item quantity="few">المجموعة %1$s تحتوي على %2$d خوادم</item>
+        <item quantity="many">المجموعة %1$s تحتوي على %2$d خادمًا</item>
+        <item quantity="other">المجموعة %1$s تحتوي على %2$d خادم</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="zero">محددة. المجموعة %1$s لا تحتوي على أي خوادم</item>
+        <item quantity="one">محددة. المجموعة %1$s تحتوي على خادم واحد</item>
+        <item quantity="two">محددة. المجموعة %1$s تحتوي على خادمين</item>
+        <item quantity="few">محددة. المجموعة %1$s تحتوي على %2$d خوادم</item>
+        <item quantity="many">محددة. المجموعة %1$s تحتوي على %2$d خادمًا</item>
+        <item quantity="other">محددة. المجموعة %1$s تحتوي على %2$d خادم</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>
@@ -46,6 +79,7 @@
     <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
     <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
     <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟</string>
+    <string name="confirm_delete_profile_named">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟\n%1$s</string>
     <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟</string>
     <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟</string>
     <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟</string>
@@ -348,8 +382,22 @@
     <string name="title_del_config_count">حذف %d من التكوينات</string>
     <string name="title_import_config_count">استيراد %d من التكوينات</string>
     <string name="title_export_config_count">تصدير %d من التكوينات</string>
-    <string name="title_update_config_count">تحديث %d من التكوينات</string>
-    <string name="title_update_asset_count">تم تحديث %d من ملفات الأصول</string>
+    <plurals name="title_update_config_count">
+        <item quantity="zero">لم يتم تحديث أي تكوينات</item>
+        <item quantity="one">تم تحديث تكوين واحد</item>
+        <item quantity="two">تم تحديث تكوينين</item>
+        <item quantity="few">تم تحديث %1$d تكوينات</item>
+        <item quantity="many">تم تحديث %1$d تكوينًا</item>
+        <item quantity="other">تم تحديث %1$d تكوين</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="zero">لم يتم تحديث أي ملفات أصول</item>
+        <item quantity="one">تم تحديث ملف أصول واحد</item>
+        <item quantity="two">تم تحديث ملفي أصول</item>
+        <item quantity="few">تم تحديث %1$d ملفات أصول</item>
+        <item quantity="many">تم تحديث %1$d ملف أصول</item>
+        <item quantity="other">تم تحديث %1$d ملف أصول</item>
+    </plurals>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
@@ -521,7 +569,7 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">محدّد</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

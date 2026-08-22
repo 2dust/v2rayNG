@@ -23,20 +23,25 @@ object LauncherManager {
 
     fun startServiceFromToggle(context: Context): Boolean {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(R.string.app_tile_first_use)
+            context.toastError(R.string.app_tile_first_use)
             return false
         }
         try {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
             return false
         }
         return true
     }
 
-    fun startService(context: Context, guid: String? = null) {
+    fun startService(
+        context: Context,
+        guid: String? = null,
+        announceStart: Boolean = true,
+        showError: Boolean = true,
+    ): Boolean {
         LogUtil.i(AppConfig.TAG, "LauncherManager: startService from ${context::class.java.simpleName}")
 
         if (guid != null) {
@@ -44,32 +49,43 @@ object LauncherManager {
         }
 
         try {
-            startContextService(context)
+            startContextService(context, announceStart)
+            return true
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            if (showError) {
+                context.toastError(e.message ?: e.javaClass.simpleName)
+            }
+            return false
         }
     }
 
     fun stopService(context: Context) {
-        //context.toast(R.string.toast_services_stop)
         MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
     /** Restarts the active daemon without starting a stopped service. */
-    fun restartService(context: Context) {
-        MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
+    fun restartService(context: Context, suppressIntermediateAnnouncements: Boolean = false) {
+        MessageHelper.sendMsg2Service(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            suppressIntermediateAnnouncements.toString(),
+        )
     }
 
     /** Restarts the active daemon, or delegates to the caller's permission-aware start flow. */
     fun restartServiceOrStart(context: Context, startIfStopped: () -> Unit) {
-        MessageHelper.sendMsg2ServiceForResult(context, AppConfig.MSG_STATE_RESTART, "") { handled ->
+        MessageHelper.sendMsg2ServiceForResult(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            "",
+        ) { handled ->
             if (!handled) startIfStopped()
         }
     }
 
     @Throws(Exception::class)
-    private fun startContextService(context: Context) {
+    private fun startContextService(context: Context, announceStart: Boolean = true) {
         // Note: isRunning check is removed here to avoid loading Native libraries in the UI process.
         // The check is performed in CoreServiceManager when the service starts in the daemon process.
 
@@ -101,8 +117,11 @@ object LauncherManager {
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
-        } else {
+            context.toast(
+                R.string.toast_warning_pref_proxysharing_short,
+                announceForAccessibility = true,
+            )
+        } else if (announceStart) {
             context.toast(R.string.toast_services_start)
         }
 

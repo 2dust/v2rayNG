@@ -19,9 +19,30 @@
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
     <string name="notification_action_more">سی دووسمندیا قلوه کیلیک کوݩ</string>
     <string name="toast_services_start">ره وستن سرویس</string>
-    <string name="toast_services_stop">واڌاشتن سرویس</string>
+    <string name="toast_services_stop">واڌاشتن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
+
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="one">بونکۊ %1$s، %2$d سرور منس هڌ</item>
+        <item quantity="other">بونکۊ %1$s، %2$d سرور منس هڌ</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">پسند وابیڌه. بونکۊ %1$s، %2$d سرور منس هڌ</item>
+        <item quantity="other">پسند وابیڌه. بونکۊ %1$s، %2$d سرور منس هڌ</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
@@ -46,6 +67,7 @@
     <string name="confirm_delete_duplicate_profiles">پوی کانفیگا تکراری ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_invalid_profiles">ٱول کانفیگا ن آزمایش کۊنین. پوی کانفیگا نا موئتبر ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_profile">ای کانفیگ پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_profile_named">ای کانفیگ پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="confirm_delete_policy_group">ای بونکۊ سیاست پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_proxy_chain_member">ای عوزو زنجیره پروکسی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
@@ -348,8 +370,14 @@
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
     <string name="title_export_config_count">و در کشیڌن %d کانفیگ</string>
-    <string name="title_update_config_count">ورۊ کردن %d کانفیگ</string>
-    <string name="title_update_asset_count">%d فایل بونچک جغرافیایی ورۊ وابی</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$d کانفیگ ورۊ وابی</item>
+        <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+    </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
     <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
@@ -521,7 +549,7 @@
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
     <string name="acc_more">امکووݩا بؽتر</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">پسند وابیڌه</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

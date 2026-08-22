@@ -110,7 +110,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         content: String
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(R.string.server_lab_remarks, announceForAccessibility = true)
             return false
         }
 
@@ -129,7 +129,8 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                     getString(R.string.toast_malformed_json)
                 } else {
                     getString(R.string.toast_malformed_json_detail, detail)
-                }
+                },
+                announceForAccessibility = true,
             )
             return false
         }
@@ -174,7 +175,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return false
         }
 
@@ -486,7 +487,7 @@ fun ServerCustomConfigScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile),
+            message = stringResource(R.string.confirm_delete_profile_named, remarks),
             onConfirm = {
                 showDeleteConfirm = false
                 onDelete()

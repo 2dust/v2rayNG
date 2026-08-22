@@ -117,7 +117,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         fallbackTag: String,
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(R.string.server_lab_remarks, announceForAccessibility = true)
             return false
         }
 
@@ -176,7 +176,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return false
         }
 

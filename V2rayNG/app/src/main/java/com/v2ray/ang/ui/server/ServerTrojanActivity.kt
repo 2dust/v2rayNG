@@ -44,11 +44,11 @@ class ServerTrojanActivity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(R.string.server_lab_id3)
+            toast(R.string.server_lab_id3, announceForAccessibility = true)
             return false
         }
         if (config.security.isNullOrBlank()) {
-            toast(R.string.server_lab_stream_security)
+            toast(R.string.server_lab_stream_security, announceForAccessibility = true)
             return false
         }
         return true

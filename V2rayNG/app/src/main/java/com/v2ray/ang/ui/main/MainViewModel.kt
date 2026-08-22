@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import com.v2ray.ang.extension.delay
+import com.v2ray.ang.extension.toPluralQuantity
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,6 +78,8 @@ class MainViewModel(
     @Volatile
     private var testingGroupId: String? = null
 
+    private var pendingServiceTransition: PendingServiceTransition? = null
+
     private val initialPageReady = CompletableDeferred<Unit>()
 
     // ---------- Service events ----------
@@ -95,19 +98,64 @@ class MainViewModel(
 
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
-            MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
+            MainServiceEvent.StateRunning -> {
+                if (pendingServiceTransition == null) {
+                    updateRunningState(true, clearTestingText = false)
+                }
+            }
+            MainServiceEvent.StateNotRunning -> {
+                if (pendingServiceTransition == null) {
+                    updateRunningState(false, clearTestingText = false)
+                }
+            }
+            MainServiceEvent.StateRestarting -> {
+                // A server change is already the more specific restart transition.
+                if (pendingServiceTransition == null) {
+                    pendingServiceTransition = PendingServiceTransition.BackgroundRestart
+                }
+            }
             MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
-                updateRunningState(true)
+                val transition = pendingServiceTransition
+                val activatedGuid = (transition as? PendingServiceTransition.ServerChange)?.guid
+                pendingServiceTransition = null
+                toastSuccess(
+                    R.string.toast_services_success,
+                    announceForAccessibility = true,
+                )
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = activatedGuid ?: it.selectedGuid,
+                        isRunning = true,
+                        status = MainStatus.Connected,
+                        restoreServerFocusGuid = activatedGuid,
+                    )
+                }
             }
 
             MainServiceEvent.StateStartFailure -> {
                 toastError(R.string.toast_services_failure)
-                updateRunningState(false)
+                val failedGuid =
+                    (pendingServiceTransition as? PendingServiceTransition.ServerChange)?.guid
+                pendingServiceTransition = null
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = failedGuid ?: it.selectedGuid,
+                        isRunning = false,
+                        status = MainStatus.Disconnected,
+                        restoreServerFocusGuid = null,
+                    )
+                }
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                if (pendingServiceTransition == null) {
+                    toastSuccess(
+                        R.string.toast_services_stop,
+                        announceForAccessibility = true,
+                    )
+                    updateRunningState(false)
+                }
+            }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -139,12 +187,35 @@ class MainViewModel(
             status.progress
         )
 
-        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result)
+        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result, accessible = false)
     }
 
-    private fun formatConnectionTestResult(result: ConnectionTestResult): String {
+    internal fun formatStatusForAccessibility(status: MainStatus, isRunning: Boolean): String =
+        when (status) {
+            is MainStatus.TestProgress -> formatStatus(
+                if (isRunning) MainStatus.Connected else MainStatus.Disconnected
+            )
+            is MainStatus.ConnectionTest -> formatConnectionTestResult(
+                status.result,
+                accessible = true,
+            )
+            else -> formatStatus(status)
+        }
+
+    private fun formatConnectionTestResult(
+        result: ConnectionTestResult,
+        accessible: Boolean,
+    ): String {
         val status = if (result.delayMillis >= 0) {
-            val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            val delay = if (accessible) {
+                dataSource.getQuantityString(
+                    R.plurals.server_test_delay_accessibility_value,
+                    result.delayMillis.toPluralQuantity(),
+                    result.delayMillis,
+                )
+            } else {
+                dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            }
             dataSource.getString(R.string.connection_test_available, delay)
         } else {
             val detail = result.errorMessage.ifBlank {
@@ -192,6 +263,7 @@ class MainViewModel(
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.ServerFocusHandled -> consumeServerFocusRequest(action.guid)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -421,13 +493,32 @@ class MainViewModel(
                     }
                     when {
                         result.successCount + result.failureCount + result.skipCount == 0 ->
-                            toast(R.string.title_update_subscription_no_subscription)
+                            toast(
+                                R.string.title_update_subscription_no_subscription,
+                                announceForAccessibility = true,
+                            )
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                            toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+                            toast(
+                                dataSource.getQuantityString(
+                                    R.plurals.title_update_config_count,
+                                    result.configCount,
+                                    result.configCount,
+                                ),
+                                announceForAccessibility = true,
+                            )
 
                         else ->
-                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                            toast(
+                                dataSource.getString(
+                                    R.string.title_update_subscription_result,
+                                    result.configCount,
+                                    result.successCount,
+                                    result.failureCount,
+                                    result.skipCount,
+                                ),
+                                announceForAccessibility = true,
+                            )
                     }
                     if (result.configCount > 0) {
                         setupGroupTab(forceRefresh = true)
@@ -643,13 +734,40 @@ class MainViewModel(
         _uiState.update { it.copy(selectedGuid = guid) }
     }
 
+    /** Selects immediately when stopped, or defers the visible active state until restart succeeds. */
+    fun selectServerForActivation(guid: String): Boolean {
+        if (guid == uiState.value.selectedGuid || pendingServiceTransition != null) return false
+        dataSource.setSelectServer(guid)
+        if (!uiState.value.isRunning) {
+            _uiState.update { it.copy(selectedGuid = guid) }
+            return false
+        }
+
+        pendingServiceTransition = PendingServiceTransition.ServerChange(guid)
+        _uiState.update { it.copy(restoreServerFocusGuid = null) }
+        return true
+    }
+
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        if (pendingServiceTransition !is PendingServiceTransition.ServerChange) {
+            _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        }
+    }
+
+    private fun consumeServerFocusRequest(guid: String) {
+        _uiState.update {
+            if (it.restoreServerFocusGuid == guid) it.copy(restoreServerFocusGuid = null) else it
+        }
+    }
+
+    private sealed interface PendingServiceTransition {
+        data object BackgroundRestart : PendingServiceTransition
+        data class ServerChange(val guid: String) : PendingServiceTransition
     }
 
     fun removeServerAndRefresh(guid: String) {
         if (guid == uiState.value.selectedGuid) {
-            toast(R.string.toast_action_not_allowed)
+            toast(R.string.toast_action_not_allowed, announceForAccessibility = true)
             return
         }
         viewModelScope.launch(ioDispatcher) {

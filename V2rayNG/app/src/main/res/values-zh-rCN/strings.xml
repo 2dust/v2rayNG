@@ -19,9 +19,27 @@
     <string name="toast_permission_denied_notification">无法取得通知权限</string>
     <string name="notification_action_more">点击了解更多</string>
     <string name="toast_services_start">启动服务</string>
-    <string name="toast_services_stop">关闭服务</string>
+    <string name="toast_services_stop">服务已停止</string>
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+
+    <string name="acc_share_config_named">分享配置 %1$s</string>
+
+    <string name="acc_edit_config_named">编辑配置 %1$s</string>
+
+    <string name="acc_delete_config_named">删除配置 %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="other">组 %1$s 包含 %2$d 个服务器</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="other">已选中。组 %1$s 包含 %2$d 个服务器</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">配置项</string>
@@ -46,6 +64,7 @@
     <string name="confirm_delete_duplicate_profiles">确定要删除当前显示的所有重复配置吗？</string>
     <string name="confirm_delete_invalid_profiles">请先测试配置。确定要删除当前显示的所有无效配置吗？</string>
     <string name="confirm_delete_profile">确定要删除此配置吗？</string>
+    <string name="confirm_delete_profile_named">确定要删除此配置吗？\n%1$s</string>
     <string name="confirm_delete_policy_group">确定要删除此策略组吗？</string>
     <string name="confirm_delete_proxy_chain_member">确定要删除此代理链成员吗？</string>
     <string name="confirm_delete_routing_rule">确定要删除此路由规则吗？</string>
@@ -348,8 +367,12 @@
     <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="title_import_config_count">导入 %d 个配置</string>
     <string name="title_export_config_count">导出 %d 个配置</string>
-    <string name="title_update_config_count">更新 %d 个配置</string>
-    <string name="title_update_asset_count">已更新 %d 个资源文件</string>
+    <plurals name="title_update_config_count">
+        <item quantity="other">已更新 %1$d 个配置</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="other">已更新 %1$d 个资源文件</item>
+    </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
@@ -521,7 +544,7 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">已选择</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>

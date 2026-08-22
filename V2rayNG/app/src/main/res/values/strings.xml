@@ -19,9 +19,30 @@
     <string name="toast_permission_denied_notification">Notification permission denied</string>
     <string name="notification_action_more">Tap for more</string>
     <string name="toast_services_start">Starting service</string>
-    <string name="toast_services_stop">Stopping service</string>
+    <string name="toast_services_stop">Service stopped</string>
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisecond</item>
+        <item quantity="other">%1$d milliseconds</item>
+    </plurals>
+
+    <string name="acc_share_config_named">Share config %1$s</string>
+
+    <string name="acc_edit_config_named">Edit config %1$s</string>
+
+    <string name="acc_delete_config_named">Delete config %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="one">Group %1$s contains %2$d server</item>
+        <item quantity="other">Group %1$s contains %2$d servers</item>
+    </plurals>
+
+    <plurals name="acc_selected_group_tab">
+        <item quantity="one">Selected. Group %1$s contains %2$d server</item>
+        <item quantity="other">Selected. Group %1$s contains %2$d servers</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">Config</string>
@@ -46,6 +67,7 @@
     <string name="confirm_delete_duplicate_profiles">Are you sure you want to delete all duplicate profiles currently shown?</string>
     <string name="confirm_delete_invalid_profiles">Please test the profiles first. Are you sure you want to delete all invalid profiles currently shown?</string>
     <string name="confirm_delete_profile">Are you sure you want to delete this profile?</string>
+    <string name="confirm_delete_profile_named">Are you sure you want to delete this profile?\n%1$s</string>
     <string name="confirm_delete_policy_group">Are you sure you want to delete this policy group?</string>
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
@@ -348,8 +370,14 @@
     <string name="title_del_config_count">Delete %d configs</string>
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
-    <string name="title_update_config_count">Update %d configs</string>
-    <string name="title_update_asset_count">Updated %d asset files</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">Updated %1$d config</item>
+        <item quantity="other">Updated %1$d configs</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Updated %1$d asset file</item>
+        <item quantity="other">Updated %1$d asset files</item>
+    </plurals>
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>

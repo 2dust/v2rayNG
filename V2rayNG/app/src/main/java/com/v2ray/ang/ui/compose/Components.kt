@@ -151,7 +151,10 @@ private fun SearchInputField(
         )
         if (query.isNotEmpty()) {
             IconButton(onClick = { onQueryChange("") }) {
-                Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), "Clear")
+                Icon(
+                    painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                    contentDescription = stringResource(R.string.logcat_clear)
+                )
             }
         }
     }
