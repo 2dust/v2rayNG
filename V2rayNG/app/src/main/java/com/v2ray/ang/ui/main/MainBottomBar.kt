@@ -39,6 +39,7 @@ fun MainBottomBar(
     displayText: String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
+    showServiceToggle: Boolean,
     onAction: (MainAction) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -67,26 +68,28 @@ fun MainBottomBar(
                 )
             }
         }
-        FloatingActionButton(
-            onClick = { onAction(MainAction.ToggleService) },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 24.dp)
-                .offset(y = (-28).dp)
-                .navigationBarsPadding(),
-            containerColor = if (isRunning) colorFabActive
-            else if (isDarkTheme) colorFabInactiveDark
-            else colorFabInactiveLight
-        ) {
-            Icon(
-                painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
-                else painterResource(R.drawable.ic_play_24dp),
-                contentDescription = stringResource(
-                    if (isRunning) R.string.acc_stop else R.string.acc_start
-                ),
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
+        if (showServiceToggle) {
+            FloatingActionButton(
+                onClick = { onAction(MainAction.ToggleService) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 24.dp)
+                    .offset(y = (-28).dp)
+                    .navigationBarsPadding(),
+                containerColor = if (isRunning) colorFabActive
+                else if (isDarkTheme) colorFabInactiveDark
+                else colorFabInactiveLight
+            ) {
+                Icon(
+                    painter = if (isRunning) painterResource(R.drawable.ic_stop_24dp)
+                    else painterResource(R.drawable.ic_play_24dp),
+                    contentDescription = stringResource(
+                        if (isRunning) R.string.acc_stop else R.string.acc_start
+                    ),
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }
