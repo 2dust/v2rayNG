@@ -27,7 +27,9 @@ import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.shizuku.HotspotRoutingConfig
 import com.v2ray.ang.shizuku.ICoreTetheringLease
 import com.v2ray.ang.shizuku.IShizukuTetheringService
+import com.v2ray.ang.shizuku.ITetheringStatusListener
 import com.v2ray.ang.shizuku.ShizukuTetheringService
+import com.v2ray.ang.shizuku.TetheringStatusSnapshot
 import com.v2ray.ang.shizuku.coreTetheringLease
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.util.LogUtil
@@ -46,6 +48,7 @@ class ShizukuActivity : BaseComponentActivity() {
     private var tetheringService: IShizukuTetheringService? = null
     private var operationJob: Job? = null
     private var operationGeneration = 0L
+    private var statusRefreshPending = false
     private var snapshotWaiter: CompletableDeferred<CoreRoutingSnapshot>? = null
     private var uiState by mutableStateOf(TetheringUiState())
 
@@ -55,12 +58,22 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private val userServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-            tetheringService = IShizukuTetheringService.Stub.asInterface(binder)
+            val service = IShizukuTetheringService.Stub.asInterface(binder)
+            tetheringService = service
+            runCatching { service.setStatusListener(statusListener) }
             refreshTetheringStatus()
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             clearServiceState()
+        }
+    }
+
+    private val statusListener = object : ITetheringStatusListener.Stub() {
+        override fun onStatusChanged() {
+            // Platform callbacks and core synchronization can change the shell-side state while
+            // this screen is idle. Refresh from that source of truth instead of polling it.
+            runOnUiThread { refreshTetheringStatus() }
         }
     }
 
@@ -157,6 +170,7 @@ class ShizukuActivity : BaseComponentActivity() {
         Shizuku.removeBinderReceivedListener(binderReceivedListener)
         Shizuku.removeBinderDeadListener(binderDeadListener)
         Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        runCatching { tetheringService?.setStatusListener(null) }
         if (tetheringService != null || uiState.operation == TetheringOperation.CONNECTING) {
             runCatching {
                 // The service owns the live TUN and tethering upstream. Screen teardown must
@@ -248,37 +262,36 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private fun refreshTetheringStatus() {
         if (uiState.operation.isToggleInProgress) return
+        if (uiState.operation == TetheringOperation.CHECKING) {
+            statusRefreshPending = true
+            return
+        }
         val service = tetheringService ?: run {
             clearServiceState()
             return
         }
+        statusRefreshPending = false
         val generation = cancelCurrentOperation()
         uiState = uiState.copy(operation = TetheringOperation.CHECKING)
         operationJob = lifecycleScope.launch {
             val ipv6Enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true
             val status = withContext(Dispatchers.IO) {
-                StatusSnapshot(
-                    routing = runCatching { service.routingState }
-                        .getOrDefault(ShizukuTetheringService.ROUTING_STATE_ERROR),
-                    detail = runCatching { service.routingDetail }.getOrDefault(""),
-                    tetheringTypes = runCatching { service.activeTetheringTypes }
-                        .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN),
-                    ipv6TetheringTypes = if (ipv6Enabled) {
-                        runCatching { service.ipv6TetheringTypes }
-                            .getOrDefault(ShizukuTetheringService.TETHERING_TYPES_UNKNOWN)
-                    } else {
-                        ShizukuTetheringService.TETHERING_TYPES_UNKNOWN
-                    },
-                    warning = runCatching { service.consumeWarning() }
-                        .getOrDefault(ShizukuTetheringService.RESULT_OK),
+                runCatching { service.getStatus(ipv6Enabled) }.getOrDefault(
+                    TetheringStatusSnapshot(
+                        routingState = ShizukuTetheringService.ROUTING_STATE_ERROR,
+                        routingDetail = "",
+                        activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+                        ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+                        warning = ShizukuTetheringService.RESULT_OK,
+                    ),
                 )
             }
             if (generation != operationGeneration) return@launch
             uiState = uiState.copy(
                 operation = TetheringOperation.NONE,
-                routingState = status.routing,
-                routingDetail = status.detail,
-                activeTetheringTypes = status.tetheringTypes,
+                routingState = status.routingState,
+                routingDetail = status.routingDetail,
+                activeTetheringTypes = status.activeTetheringTypes,
                 ipv6TetheringTypes = status.ipv6TetheringTypes,
                 ipv6Enabled = ipv6Enabled,
             )
@@ -286,6 +299,7 @@ class ShizukuActivity : BaseComponentActivity() {
             if (status.warning == ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
                 toastInfo(R.string.shizuku_tethering_wrong_upstream)
             }
+            if (statusRefreshPending) refreshTetheringStatus()
         }
     }
 
@@ -450,6 +464,7 @@ class ShizukuActivity : BaseComponentActivity() {
 
     private fun clearServiceState() {
         cancelCurrentOperation()
+        statusRefreshPending = false
         tetheringService = null
         uiState = uiState.copy(
             operation = TetheringOperation.NONE,
@@ -467,14 +482,6 @@ class ShizukuActivity : BaseComponentActivity() {
     } catch (_: PackageManager.NameNotFoundException) {
         false
     }
-
-    private data class StatusSnapshot(
-        val routing: Int,
-        val detail: String,
-        val tetheringTypes: Int,
-        val ipv6TetheringTypes: Int,
-        val warning: Int,
-    )
 
     companion object {
         private const val SHIZUKU_PERMISSION_REQUEST_CODE = 1001

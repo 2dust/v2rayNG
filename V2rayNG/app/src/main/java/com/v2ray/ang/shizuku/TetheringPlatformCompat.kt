@@ -1,15 +1,20 @@
 package com.v2ray.ang.shizuku
 
 import android.annotation.SuppressLint
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.TetheringManager
 import android.os.Build
-import java.util.concurrent.CompletableFuture
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicReference
 
 /** Android 13+ tethering calls that are shared with, or hidden before, API 36. */
 internal object TetheringPlatformCompat {
@@ -21,43 +26,72 @@ internal object TetheringPlatformCompat {
         .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
         .build()
 
-    fun getUpstreamInterfaceName(): String {
+    fun observeUpstream(
+        service: Any,
+        connectivityManager: ConnectivityManager,
+        executor: Executor,
+        onChanged: () -> Unit,
+    ): TetheringUpstreamMonitor {
         require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        val process = ProcessBuilder("dumpsys", "tethering")
-            .redirectErrorStream(true)
-            .start()
-        // Drain the pipe concurrently so neither a full buffer nor a stuck dumpsys can hold the
-        // synchronized tethering state machine indefinitely.
-        val output = CompletableFuture.supplyAsync {
-            process.inputStream.bufferedReader().useLines { lines ->
-                lines.firstNotNullOfOrNull(::parseUpstreamInterfaceName).orEmpty()
+        // This callback exists on every supported release, but its type is hidden from the public
+        // SDK. Implement the runtime interface directly so fail-closed protection receives changes
+        // immediately without polling dumpsys or depending on OEM-specific diagnostic text.
+        val callbackClass = Class.forName(TETHERING_EVENT_CALLBACK_CLASS)
+        check(callbackClass.isInterface) { "Tethering event callback is not an interface" }
+        val interfaceNames = AtomicReference<String?>(null)
+        val changeExecutor = Executors.newSingleThreadExecutor { command ->
+            Thread(command, UPSTREAM_MONITOR_THREAD).apply { isDaemon = true }
+        }
+        val callback = Proxy.newProxyInstance(
+            TetheringPlatformCompat::class.java.classLoader,
+            arrayOf(callbackClass),
+        ) { proxy, method, arguments ->
+            when (method.name) {
+                "onUpstreamChanged" -> {
+                    val network = arguments?.firstOrNull() as? Network
+                    interfaceNames.set(upstreamInterfaceNames(connectivityManager, network))
+                    runCatching { changeExecutor.execute(onChanged) }
+                    null
+                }
+                "onTetheredInterfacesChanged" -> {
+                    runCatching { changeExecutor.execute(onChanged) }
+                    null
+                }
+                "equals" -> proxy === arguments?.firstOrNull()
+                "hashCode" -> System.identityHashCode(proxy)
+                "toString" -> "v2rayNG tethering upstream callback"
+                else -> null
             }
         }
-        return try {
-            output.get(DUMPSYS_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-        } catch (error: TimeoutException) {
-            throw IllegalStateException("Timed out reading Android tethering state", error)
-        } catch (error: InterruptedException) {
-            Thread.currentThread().interrupt()
+        val register = service.javaClass.methods.firstOrNull {
+            it.name == "registerTetheringEventCallback" &&
+                it.parameterTypes.contentEquals(arrayOf(Executor::class.java, callbackClass))
+        } ?: error("TetheringManager.registerTetheringEventCallback is unavailable")
+        val unregister = service.javaClass.methods.firstOrNull {
+            it.name == "unregisterTetheringEventCallback" &&
+                it.parameterTypes.contentEquals(arrayOf(callbackClass))
+        } ?: error("TetheringManager.unregisterTetheringEventCallback is unavailable")
+        try {
+            register.invoke(service, executor, callback)
+        } catch (error: Throwable) {
+            changeExecutor.shutdownNow()
             throw error
-        } finally {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                process.destroyForcibly()
-            } else {
-                process.destroy()
-            }
-            output.cancel(true)
         }
+        return TetheringUpstreamMonitor(
+            service,
+            callback,
+            unregister,
+            changeExecutor,
+            interfaceNames,
+        )
     }
 
-    internal fun parseUpstreamInterfaceName(line: String): String? {
-        val trimmed = line.trimStart()
-        if (!trimmed.startsWith(UPSTREAM_INTERFACES_PREFIX)) return null
-        val interfaces = trimmed.substringAfter(UPSTREAM_INTERFACES_PREFIX)
-            .trim()
-            .removePrefix("[")
-            .removeSuffix("]")
-        return interfaces.takeUnless { it == "null" }.orEmpty()
+    private fun upstreamInterfaceNames(
+        connectivityManager: ConnectivityManager,
+        network: Network?,
+    ): String {
+        val properties = network?.let(connectivityManager::getLinkProperties) ?: return ""
+        return properties.interfaceName.orEmpty()
     }
 
     internal fun isProtectedUpstream(actual: String, expected: String): Boolean {
@@ -170,13 +204,30 @@ internal object TetheringPlatformCompat {
     private fun compileRegexes(patterns: List<String>?): List<Regex> = patterns.orEmpty()
         .mapNotNull { pattern -> runCatching { Regex(pattern) }.getOrNull() }
 
-    private const val UPSTREAM_INTERFACES_PREFIX = "Current upstream interface(s):"
-    private const val DUMPSYS_TIMEOUT_SECONDS = 2L
+    private const val TETHERING_EVENT_CALLBACK_CLASS =
+        "android.net.TetheringManager\$TetheringEventCallback"
+    private const val UPSTREAM_MONITOR_THREAD = "TetheringUpstreamMonitor"
     private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
     private const val LEGACY_TETHERING_TYPE_WIFI_P2P = 3
     private const val LEGACY_TETHERING_TYPE_NCM = 4
     private const val LEGACY_TETHERING_TYPE_ETHERNET = 5
+}
+
+internal class TetheringUpstreamMonitor(
+    private val service: Any,
+    private val callback: Any,
+    private val unregister: Method,
+    private val changeExecutor: ExecutorService,
+    private val interfaceNames: AtomicReference<String?>,
+) : AutoCloseable {
+    val currentInterfaceNames: String?
+        get() = interfaceNames.get()
+
+    override fun close() {
+        runCatching { unregister.invoke(service, callback) }
+        changeExecutor.shutdownNow()
+    }
 }
 
 internal data class ActiveTetheringInterface(

@@ -45,25 +45,17 @@ class TetheringPlatformCompatTest {
     }
 
     @Test
-    fun parsesTheCurrentTetheringUpstream() {
+    fun acceptsOnlyTheOwnedUpstreamInterface() {
+        assertEquals(true, TetheringPlatformCompat.isProtectedUpstream("testtun17", "testtun17"))
         assertEquals(
-            "testtun17",
-            TetheringPlatformCompat.parseUpstreamInterfaceName(
-                "    Current upstream interface(s): [testtun17]",
-            ),
+            true,
+            TetheringPlatformCompat.isProtectedUpstream("testtun17, testtun17", "testtun17"),
         )
+        assertEquals(false, TetheringPlatformCompat.isProtectedUpstream("", "testtun17"))
+        assertEquals(false, TetheringPlatformCompat.isProtectedUpstream("eth0", "testtun17"))
         assertEquals(
-            "eth0, rmnet0",
-            TetheringPlatformCompat.parseUpstreamInterfaceName(
-                "Current upstream interface(s): [eth0, rmnet0]",
-            ),
+            false,
+            TetheringPlatformCompat.isProtectedUpstream("testtun17, eth0", "testtun17"),
         )
-        assertEquals(
-            "",
-            TetheringPlatformCompat.parseUpstreamInterfaceName(
-                "    Current upstream interface(s): null",
-            ),
-        )
-        assertNull(TetheringPlatformCompat.parseUpstreamInterfaceName("Upstream wanted: true"))
     }
 }

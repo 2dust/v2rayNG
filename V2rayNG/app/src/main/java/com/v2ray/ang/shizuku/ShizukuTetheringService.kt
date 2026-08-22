@@ -67,6 +67,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     private var routingProfileName = ""
     private var routingSession: RoutingSession? = null
     private var testNetworkHandle: TestNetworkHandle? = null
+    private var upstreamMonitor: TetheringUpstreamMonitor? = null
+    private var statusListener: ITetheringStatusListener? = null
     private var nativeController: CoreController? = null
     private var hevConfigFile: File? = null
     // Tethering callbacks can acknowledge a start before the downstream appears in the active
@@ -169,33 +171,27 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 }
             }
         }
+        notifyStatusChangedLocked()
         return result
     }
 
-    override fun getActiveTetheringTypes(): Int {
+    private fun getActiveTetheringTypes(): Int {
         return try {
-            getTetheredInterfaces().fold(0) { mask, item ->
-                mask or tetheringTypeBit(item.type)
-            }
+            tetheringTypeMask(getTetheredInterfaces())
         } catch (error: Throwable) {
             Log.e(TAG, "Unable to read tethering state", error)
             TETHERING_TYPES_UNKNOWN
         }
     }
 
+    private fun tetheringTypeMask(interfaces: List<ActiveTetheringInterface>): Int {
+        return interfaces.fold(0) { mask, item -> mask or tetheringTypeBit(item.type) }
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun getIpv6TetheringTypes(): Int {
-        return try {
-            getTetheredInterfaces().fold(0) { mask, item ->
-                if (hasDelegatedIpv6Prefix(item.name)) {
-                    mask or tetheringTypeBit(item.type)
-                } else {
-                    mask
-                }
-            }
-        } catch (error: Throwable) {
-            Log.e(TAG, "Unable to read tethered IPv6 state", error)
-            TETHERING_TYPES_UNKNOWN
+    private fun ipv6TetheringTypeMask(interfaces: List<ActiveTetheringInterface>): Int {
+        return interfaces.fold(0) { mask, item ->
+            if (hasDelegatedIpv6Prefix(item.name)) mask or tetheringTypeBit(item.type) else mask
         }
     }
 
@@ -222,29 +218,22 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return addresses.asSequence().any(TETHERING_IPV6_PREFIX::contains)
     }
 
-    @Synchronized
-    override fun getRoutingState(): Int {
+    private fun currentRoutingStateLocked(): Int {
         if (routingState == ROUTING_STATE_ACTIVE_NATIVE && nativeController?.isRunning != true) {
             setRoutingError("Native Xray core stopped unexpectedly")
         }
         return routingState
     }
 
-    @Synchronized
-    override fun getRoutingDetail(): String {
+    private fun currentRoutingDetailLocked(): String {
         // The shell process keeps platform diagnostics in English for logs. Expose only live
         // interface/profile data; the app maps error states and result codes to localized text.
         if (!routingActive && routingState != ROUTING_STATE_WAITING) return ""
-        val upstreamInterface = runCatching {
-            TetheringPlatformCompat.getUpstreamInterfaceName()
-        }.onFailure {
-            Log.e(TAG, "Unable to read the active tethering upstream", it)
-        }.getOrDefault("")
+        val upstreamInterface = upstreamMonitor?.currentInterfaceNames.orEmpty()
         return formatRoutingDetail(upstreamInterface)
     }
 
-    @Synchronized
-    override fun consumeWarning(): Int {
+    private fun consumeWarningLocked(): Int {
         val warning = if (wrongUpstreamWarningTypes == 0) {
             RESULT_OK
         } else {
@@ -252,6 +241,34 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         }
         wrongUpstreamWarningTypes = 0
         return warning
+    }
+
+    override fun getStatus(includeIpv6: Boolean): TetheringStatusSnapshot {
+        val interfaces = runCatching { getTetheredInterfaces() }
+            .onFailure { Log.e(TAG, "Unable to read tethering status", it) }
+            .getOrNull()
+        val activeTypes = interfaces?.let(::tetheringTypeMask) ?: TETHERING_TYPES_UNKNOWN
+        val ipv6Types = if (includeIpv6 && interfaces != null) {
+            runCatching { ipv6TetheringTypeMask(interfaces) }
+                .onFailure { Log.e(TAG, "Unable to read tethered IPv6 state", it) }
+                .getOrDefault(TETHERING_TYPES_UNKNOWN)
+        } else {
+            TETHERING_TYPES_UNKNOWN
+        }
+        return synchronized(this) {
+            TetheringStatusSnapshot(
+                routingState = currentRoutingStateLocked(),
+                routingDetail = currentRoutingDetailLocked(),
+                activeTetheringTypes = activeTypes,
+                ipv6TetheringTypes = ipv6Types,
+                warning = consumeWarningLocked(),
+            )
+        }
+    }
+
+    @Synchronized
+    override fun setStatusListener(listener: ITetheringStatusListener?) {
+        statusListener = listener
     }
 
     @Synchronized
@@ -350,6 +367,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         routingDetail = "Creating Android test-network TUN"
 
         try {
+            startUpstreamMonitorLocked()
             setPreferTestNetworks(true)
             createTestNetwork(config.dnsServers, config.ipv6Enabled)
             val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
@@ -364,7 +382,11 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     @Synchronized
-    override fun stopRouting(): Int = shutdownRoutingLocked()
+    override fun stopRouting(): Int {
+        val result = shutdownRoutingLocked()
+        notifyStatusChangedLocked()
+        return result
+    }
 
     private fun shutdownRoutingLocked(): Int {
         val tetheringResult = stopActiveTetheringLocked(clearDesired = true)
@@ -382,13 +404,15 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         return RESULT_OK
     }
 
-    private fun stopActiveTetheringLocked(clearDesired: Boolean): Int {
-        val activeTypes = getActiveTetheringTypes()
-        if (activeTypes < 0) return RESULT_INTERNAL_ERROR
-
-        // Include starts that Android accepted but has not published as active yet. The protected
-        // test network and routing engine must not be removed while such a start can still finish.
-        val typesToStop = activeTypes or requestedTetheringTypes
+    private fun stopActiveTetheringLocked(
+        clearDesired: Boolean,
+        activeTypes: Int = getActiveTetheringTypes(),
+    ): Int {
+        // Include accepted starts and the session's last desired state. This both covers Android's
+        // delayed active-state publication and provides a safe fallback if the state query fails.
+        val knownTypes = requestedTetheringTypes or (routingSession?.desiredTetheringTypes ?: 0)
+        if (activeTypes < 0 && knownTypes == 0) return RESULT_INTERNAL_ERROR
+        val typesToStop = activeTypes.coerceAtLeast(0) or knownTypes
         if (clearDesired) routingSession?.desiredTetheringTypes = 0
 
         var result = RESULT_OK
@@ -408,6 +432,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     override fun notifyCoreStopping(token: String): Int {
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
         pauseForCoreRestartLocked(session, "Main core stopping")
+        notifyStatusChangedLocked()
         return RESULT_OK
     }
 
@@ -449,7 +474,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
         val session = findRoutingSession(token) ?: return RESULT_INVALID_SESSION
-        return runCatching {
+        val result = runCatching {
             val launchConfig = HotspotRoutingLaunchConfig(
                 engine = HotspotRoutingEngineConfig(useHev, profileName, readEngineConfig(coreLease)),
                 dnsServers = dnsServers.toList(),
@@ -463,6 +488,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             failRoutingSynchronizationLocked(it, session)
             RESULT_ROUTING_FAILED
         }
+        notifyStatusChangedLocked()
+        return result
     }
 
     @Synchronized
@@ -472,6 +499,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
             IllegalStateException(detail.ifBlank { "v2rayNG failed to restart" }),
             session,
         )
+        notifyStatusChangedLocked()
         return RESULT_OK
     }
 
@@ -501,6 +529,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
                 routingSession?.let {
                     Log.w(TAG, "Main core process died without a stop notification")
                     pauseForCoreRestartLocked(it, "Main core process died")
+                    notifyStatusChangedLocked()
                 }
             }
         }
@@ -743,8 +772,50 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
     }
 
     private fun readUpstreamInterface(): String = runCatching {
-        TetheringPlatformCompat.getUpstreamInterfaceName()
+        upstreamMonitor?.currentInterfaceNames.orEmpty()
     }.getOrDefault("")
+
+    private fun startUpstreamMonitorLocked() {
+        if (upstreamMonitor != null) return
+        upstreamMonitor = TetheringPlatformCompat.observeUpstream(
+            tetheringManager,
+            connectivityManager,
+            executor,
+            ::onTetheringChanged,
+        )
+    }
+
+    private fun onTetheringChanged() {
+        synchronized(this) {
+            enforceProtectedUpstreamLocked()
+            notifyStatusChangedLocked()
+        }
+    }
+
+    /** Stops every known downstream if Android ever moves it away from the owned test TUN. */
+    private fun enforceProtectedUpstreamLocked() {
+        val expected = testInterfaceName ?: return
+        val actual = upstreamMonitor?.currentInterfaceNames ?: return
+        if (actual.isBlank() || TetheringPlatformCompat.isProtectedUpstream(actual, expected)) return
+
+        val activeTypes = getActiveTetheringTypes()
+        val affectedTypes = activeTypes.coerceAtLeast(0) or requestedTetheringTypes or
+            (routingSession?.desiredTetheringTypes ?: 0)
+        if (affectedTypes == 0) return
+
+        wrongUpstreamWarningTypes = wrongUpstreamWarningTypes or affectedTypes
+        Log.e(TAG, "Android moved tethering to unprotected upstream $actual; stopping downstreams")
+        val result = stopActiveTetheringLocked(clearDesired = false, activeTypes = activeTypes)
+        if (result != RESULT_OK) {
+            Log.e(TAG, "Unable to stop every downstream after unprotected upstream selection: $result")
+        }
+    }
+
+    private fun notifyStatusChangedLocked() {
+        val listener = statusListener ?: return
+        runCatching { listener.onStatusChanged() }
+            .onFailure { statusListener = null }
+    }
 
     private fun isRoutingReadyLocked(): Boolean {
         return when (routingState) {
@@ -1069,6 +1140,8 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         stopRoutingEngineLocked()
         runCatching { coreLease?.releaseTestNetwork() }
 
+        upstreamMonitor?.close()
+        upstreamMonitor = null
         testNetworkHandle?.release()
         testNetworkHandle = null
         routingProfileName = ""
@@ -1095,7 +1168,7 @@ class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub(
         // Shizuku UserServices can outlive an APK update. Bump this whenever the service
         // implementation or its AIDL contract changes so an incompatible shell process is
         // replaced even when a locally rebuilt APK keeps the same Android versionCode.
-        const val USER_SERVICE_VERSION = 20_260_755
+        const val USER_SERVICE_VERSION = 20_260_757
         private const val TETHERING_SERVICE = "tethering"
         private const val TEST_NETWORK_SERVICE = "test_network"
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
