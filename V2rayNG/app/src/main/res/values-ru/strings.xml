@@ -522,7 +522,8 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
-    <string name="acc_selected_server">выбрано</string>
+    <string name="acc_selected_server">Selected</string>
+    <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_last_updated">Последнее обновление: %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, обновление %2$s</string>
@@ -566,7 +567,6 @@
     <string name="confirm_delete_routing_rule_named">Удалить это правило маршрутизации?\n%1$s</string>
     <string name="confirm_delete_subscription_group_named">Удалить эту подписку? %1$s</string>
     <string name="confirm_delete_asset_source_named">Удалить этот источник ресурсов?\n%1$s</string>
-    <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>
     <string name="acc_add_member">Добавить участника цепочки прокси</string>

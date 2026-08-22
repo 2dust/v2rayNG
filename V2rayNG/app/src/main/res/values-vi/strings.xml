@@ -522,7 +522,8 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_selected_server">đã chọn</string>
+    <string name="acc_selected_server">Selected</string>
+    <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_last_updated">Cập nhật lần cuối vào %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, tính năng cập nhật đang %2$s</string>
@@ -566,7 +567,6 @@
     <string name="confirm_delete_routing_rule_named">Bạn có chắc muốn xóa quy tắc định tuyến này không?\n%1$s</string>
     <string name="confirm_delete_subscription_group_named">Bạn có chắc muốn xóa nhóm đăng ký này không? %1$s</string>
     <string name="confirm_delete_asset_source_named">Bạn có chắc muốn xóa nguồn tài nguyên này không?\n%1$s</string>
-    <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
     <string name="acc_add_member">Thêm thành viên vào chuỗi proxy</string>

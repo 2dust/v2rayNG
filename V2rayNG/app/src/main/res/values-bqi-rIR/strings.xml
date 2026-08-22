@@ -522,7 +522,8 @@
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
     <string name="acc_more">امکووݩا بؽتر</string>
-    <string name="acc_selected_server">پسند وابیڌه</string>
+    <string name="acc_selected_server">Selected</string>
+    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_last_updated">ورۊ رسۊوی نهایی %1$s</string>
     <string name="acc_subscription_announcement">%1$s، %2$s</string>
     <string name="acc_subscription_update">%1$s، ورۊ کردن %2$s هڌ</string>
@@ -566,7 +567,6 @@
     <string name="confirm_delete_routing_rule_named">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="confirm_delete_subscription_group_named">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟ %1$s</string>
     <string name="confirm_delete_asset_source_named">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
-    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
     <string name="acc_add_member">ٱووردن عوزو زنجیره پروکسی</string>

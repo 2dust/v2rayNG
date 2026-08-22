@@ -522,7 +522,8 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
-    <string name="acc_selected_server">নির্বাচিত</string>
+    <string name="acc_selected_server">Selected</string>
+    <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_last_updated">সর্বশেষ আপডেট %1$s</string>
     <string name="acc_subscription_announcement">%1$s, %2$s</string>
     <string name="acc_subscription_update">%1$s, আপডেট %2$s</string>
@@ -566,7 +567,6 @@
     <string name="confirm_delete_routing_rule_named">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?\n%1$s</string>
     <string name="confirm_delete_subscription_group_named">আপনি কি এই সাবস্ক্রিপশন গ্রুপটি মুছে ফেলতে চান? %1$s</string>
     <string name="confirm_delete_asset_source_named">আপনি কি এই অ্যাসেট উৎসটি মুছে ফেলতে চান?\n%1$s</string>
-    <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>
     <string name="acc_add_member">প্রক্সি চেইনে সদস্য যোগ করুন</string>
