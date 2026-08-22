@@ -181,7 +181,9 @@ class MainViewModel(
     internal fun formatStatus(status: MainStatus): String = when (status) {
         MainStatus.Disconnected -> dataSource.getString(R.string.connection_not_connected)
         MainStatus.Connected -> dataSource.getString(R.string.connection_connected)
-        MainStatus.Testing -> dataSource.getString(R.string.connection_test_testing)
+        MainStatus.Testing,
+        MainStatus.CurrentConnectionTesting ->
+            dataSource.getString(R.string.connection_test_testing)
         is MainStatus.TestProgress -> dataSource.getString(
             R.string.connection_running_task_left,
             status.progress
@@ -841,7 +843,7 @@ class MainViewModel(
     }
 
     fun testCurrentServerRealPing() {
-        _uiState.update { it.copy(status = MainStatus.Testing) }
+        _uiState.update { it.copy(status = MainStatus.CurrentConnectionTesting) }
         dataSource.testCurrentServerRealPing()
     }
 
