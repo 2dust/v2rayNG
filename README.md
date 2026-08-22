@@ -79,6 +79,15 @@ Release files are signed with GPG to verify authenticity and integrity, helping 
 
 ---
 
+## Android Developer Key Hash / 安卓开发者公钥指纹
+
+```text
+com.v2ray.ang
+B7:DC:88:3E:76:78:D6:C6:18:56:9E:48:A1:C8:C2:67:A1:34:A7:5F:8B:CB:76:35:10:C8:BF:FB:3B:90:B0:77
+```
+
+---
+
 ## Community / 社区
 
 Telegram Group / Telegram 群组：
