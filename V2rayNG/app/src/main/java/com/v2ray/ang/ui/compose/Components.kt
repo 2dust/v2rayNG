@@ -50,6 +50,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -77,6 +82,7 @@ fun AppTopBar(
 ) {
     Column {
         TopAppBar(
+            modifier = Modifier.semantics { isTraversalGroup = true },
             title = {
                 if (isSearchActive) {
                     SearchInputField(
@@ -85,7 +91,10 @@ fun AppTopBar(
                         placeholder = searchPlaceholder
                     )
                 } else {
-                    Text(text = title)
+                    Text(
+                        text = title,
+                        modifier = Modifier.semantics { traversalIndex = -1f }
+                    )
                 }
             },
             navigationIcon = {
@@ -164,13 +173,30 @@ fun AppListItem(
     icon: Any?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    routingDescription: String? = null
 ) {
     val context = LocalContext.current
+    val checkedDescription = stringResource(
+        if (checked) R.string.acc_app_checked else R.string.acc_app_not_checked
+    )
+    val appAnnouncement = if (routingDescription == null) {
+        stringResource(R.string.acc_app_announcement, appName, checkedDescription)
+    } else {
+        stringResource(
+            R.string.acc_app_routing_announcement,
+            appName,
+            checkedDescription,
+            routingDescription
+        )
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onCheckedChange(!checked) }
+            .semantics(mergeDescendants = true) {
+                contentDescription = appAnnouncement
+            }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -198,6 +224,7 @@ fun AppListItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = appName,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -205,6 +232,7 @@ fun AppListItem(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = packageName,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -214,6 +242,7 @@ fun AppListItem(
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
+            modifier = Modifier.clearAndSetSemantics {},
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.secondary)
         )
     }

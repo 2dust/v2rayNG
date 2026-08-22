@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.perappproxy
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,17 +38,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.extension.toastInfo
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.ConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
@@ -60,6 +66,65 @@ private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
     SelectProxyApps(R.string.menu_item_select_proxy_app),
     ImportSelection(R.string.menu_item_import_proxy_app),
     ExportSelection(R.string.menu_item_export_proxy_app)
+}
+
+@StringRes
+internal fun perAppRoutingDescription(
+    perAppProxyEnabled: Boolean,
+    bypassApps: Boolean,
+    checked: Boolean
+): Int = when {
+    !perAppProxyEnabled -> R.string.acc_per_app_routing_disabled
+    checked == bypassApps -> R.string.acc_app_routed_directly
+    else -> R.string.acc_app_routed_through
+}
+
+@Composable
+private fun PerAppSwitch(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val accessibilityDescription = stringResource(
+        R.string.acc_setting_switch,
+        label,
+        stringResource(if (checked) R.string.acc_state_on else R.string.acc_state_off),
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clearAndSetSemantics {
+                contentDescription = accessibilityDescription
+                role = Role.Switch
+                onClick {
+                    onCheckedChange(!checked)
+                    true
+                }
+            }
+            .clickable(
+                role = Role.Switch,
+                onClick = { onCheckedChange(!checked) },
+            ),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            modifier = Modifier
+                .scale(0.65f)
+                .clearAndSetSemantics {},
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                checkedTrackColor = MaterialTheme.colorScheme.secondary,
+            ),
+        )
+    }
 }
 
 class PerAppProxyActivity : BaseComponentActivity() {
@@ -88,9 +153,6 @@ class PerAppProxyActivity : BaseComponentActivity() {
             onBackClick = { finish() },
             onPerAppProxyChanged = { viewModel.setPerAppProxyEnabled(it) },
             onBypassAppsChanged = { viewModel.setBypassAppsEnabled(it) },
-            onInfoClick = {
-                toastInfo(R.string.summary_pref_per_app_proxy)
-            },
             onToggleApp = { viewModel.toggle(it) },
             onSearch = { viewModel.filterApps(it) },
             onSelectAll = { viewModel.selectAll() },
@@ -119,7 +181,6 @@ fun PerAppProxyScreen(
     onBackClick: () -> Unit,
     onPerAppProxyChanged: (Boolean) -> Unit,
     onBypassAppsChanged: (Boolean) -> Unit,
-    onInfoClick: () -> Unit,
     onToggleApp: (String) -> Unit,
     onSearch: (String) -> Unit,
     onSelectAll: () -> Unit,
@@ -131,6 +192,7 @@ fun PerAppProxyScreen(
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
+    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
@@ -209,48 +271,20 @@ fun PerAppProxyScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.per_app_proxy_settings_enable),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = perAppProxyEnabled,
-                            modifier = Modifier.scale(0.65f),
-                            onCheckedChange = onPerAppProxyChanged,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
+                    PerAppSwitch(
+                        label = stringResource(R.string.per_app_proxy_settings_enable),
+                        checked = perAppProxyEnabled,
+                        onCheckedChange = onPerAppProxyChanged,
+                        modifier = Modifier.weight(1f),
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.switch_bypass_apps_mode),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
-                            checked = bypassApps,
-                            modifier = Modifier.scale(0.65f),
-                            onCheckedChange = onBypassAppsChanged,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
-                    IconButton(onClick = onInfoClick) {
+                    PerAppSwitch(
+                        label = stringResource(R.string.switch_bypass_apps_mode),
+                        checked = bypassApps,
+                        onCheckedChange = onBypassAppsChanged,
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(onClick = { showInfoDialog = true }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_about_24dp),
                             contentDescription = stringResource(R.string.acc_per_app_proxy_information),
@@ -270,16 +304,30 @@ fun PerAppProxyScreen(
             ) {
                 items(items = apps, key = { it.packageName }) { app ->
                     val checked = blacklist.contains(app.packageName)
+                    val routingDescription = stringResource(
+                        perAppRoutingDescription(perAppProxyEnabled, bypassApps, checked)
+                    )
                     AppListItem(
                         appName = app.appName,
                         packageName = app.packageName,
                         icon = null,
                         checked = checked,
-                        onCheckedChange = { onToggleApp(app.packageName) }
+                        onCheckedChange = { onToggleApp(app.packageName) },
+                        routingDescription = routingDescription
                     )
                     ItemDivider()
                 }
             }
         }
+    }
+
+    if (showInfoDialog) {
+        ConfirmDialog(
+            title = stringResource(R.string.title_pref_per_app_proxy),
+            message = stringResource(R.string.summary_pref_per_app_proxy),
+            dismissText = null,
+            onConfirm = {},
+            onDismiss = { showInfoDialog = false },
+        )
     }
 }

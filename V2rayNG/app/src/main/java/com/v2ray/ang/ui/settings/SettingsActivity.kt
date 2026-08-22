@@ -254,6 +254,7 @@ fun SettingsScreen(
                     entries = languageEntries,
                     values = languageValues,
                     selectedValue = language,
+                    announceSelectionStateAfterLabel = true,
                     onSelected = {
                         language = it
                         AppLocaleManager.setApplicationLanguage(it)
