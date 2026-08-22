@@ -395,6 +395,7 @@
     <string name="connection_connected">সংযুক্ত।\nসংযোগ পরীক্ষা করতে ট্যাপ করুন।</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_running_task_left">চলমান পরীক্ষা: %s</string>
+    <string name="connection_test_servers_live">%1$d/%2$dটি সার্ভার সচল</string>
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>

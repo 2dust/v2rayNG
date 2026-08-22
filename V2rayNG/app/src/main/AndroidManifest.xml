@@ -259,7 +259,7 @@
             android:name=".service.CoreTestService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":Probe">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="test" />
@@ -269,7 +269,7 @@
             android:name=".service.SubscriptionUpdateService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":SubscriptionUpdate">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="test" />

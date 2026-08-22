@@ -395,6 +395,7 @@
     <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
+    <string name="connection_test_servers_live">%1$d/%2$d سرور فعالن</string>
 
     <string name="import_subscription_success">اشتراک وا مووفقیت و من ٱووڌه وابی</string>
     <string name="import_subscription_failure">و من ٱووردن اشتراک مووفق نبی</string>

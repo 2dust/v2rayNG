@@ -395,6 +395,7 @@
     <string name="connection_connected">Подключено.\nНажмите, чтобы проверить соединение.</string>
     <string name="connection_not_connected">Нет соединения</string>
     <string name="connection_running_task_left">Выполняется проверок: %s</string>
+    <string name="connection_test_servers_live">Доступно серверов: %1$d/%2$d</string>
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>

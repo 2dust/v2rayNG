@@ -9,7 +9,8 @@ sealed interface MainStatus {
     data object Disconnected : MainStatus
     data object Connected : MainStatus
     data object Testing : MainStatus
-    data class TestProgress(val progress: String) : MainStatus
+    data class TestProgress(val completed: Int, val total: Int) : MainStatus
+    data class TestSummary(val live: Int, val total: Int) : MainStatus
     data class ConnectionTest(val result: ConnectionTestResult) : MainStatus
 }
 

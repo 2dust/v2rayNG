@@ -9,6 +9,9 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConnectionTestResult
+import com.v2ray.ang.dto.RealPingProgress
+import com.v2ray.ang.dto.RealPingResult
+import com.v2ray.ang.dto.RealPingSummary
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -24,10 +27,9 @@ import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainRepository(
@@ -39,13 +41,10 @@ class MainRepository(
 
     private val closed = AtomicBoolean(false)
 
-    private val _mainServiceEvent = MutableSharedFlow<MainServiceEvent>(
-        replay = 0,
-        extraBufferCapacity = 64,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    // Delay results must remain ordered and lossless; the ViewModel coalesces their UI updates.
+    private val mainServiceEventChannel = Channel<MainServiceEvent>(Channel.UNLIMITED)
 
-    override val mainServiceEvent: SharedFlow<MainServiceEvent> = _mainServiceEvent.asSharedFlow()
+    override val mainServiceEvent: Flow<MainServiceEvent> = mainServiceEventChannel.receiveAsFlow()
 
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,18 +60,21 @@ class MainRepository(
                     .serializable<ConnectionTestResult>("content")
                     ?.let { MainServiceEvent.MeasureDelayResult(it) }
 
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
-                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
-                    safeIntent.getStringExtra("content").orEmpty()
-                )
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> safeIntent
+                    .serializable<RealPingResult>("content")
+                    ?.let { MainServiceEvent.MeasureConfigSuccess(it) }
 
-                AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
-                    safeIntent.getStringExtra("content")
-                )
+                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> safeIntent
+                    .serializable<RealPingProgress>("content")
+                    ?.let { MainServiceEvent.MeasureConfigNotify(it) }
+
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> safeIntent
+                    .serializable<RealPingSummary>("content")
+                    ?.let { MainServiceEvent.MeasureConfigFinish(it) }
 
                 else -> null
             }
-            event?.let { _mainServiceEvent.tryEmit(it) }
+            event?.let { mainServiceEventChannel.trySend(it) }
         }
     }
 
@@ -98,6 +100,7 @@ class MainRepository(
         }.onFailure {
             LogUtil.e(AppConfig.TAG, "Failed to unregister main service receiver", it)
         }
+        mainServiceEventChannel.close()
     }
 
     override fun getSelectedSubscriptionId(): String =

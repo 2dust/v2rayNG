@@ -395,6 +395,7 @@
     <string name="connection_connected">Connected. Tap to check connection.</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
+    <string name="connection_test_servers_live">%1$d/%2$d servers live</string>
 
     <string name="import_subscription_success">Subscription imported successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>

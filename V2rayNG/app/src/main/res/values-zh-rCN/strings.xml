@@ -395,6 +395,7 @@
     <string name="connection_connected">"已连接。点击检查连接。"</string>
     <string name="connection_not_connected">"未连接"</string>
     <string name="connection_running_task_left">正在运行的测试：%s</string>
+    <string name="connection_test_servers_live">存活服务器：%1$d/%2$d</string>
 
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
