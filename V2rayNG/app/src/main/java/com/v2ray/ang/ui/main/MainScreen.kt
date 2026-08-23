@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -32,6 +33,7 @@ import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import com.v2ray.ang.extension.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,6 +55,7 @@ fun MainScreen(
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val dPadFocusTargets = remember { DPadFocusTargets() }
     var showSearch by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var showDelAllConfirm by remember { mutableStateOf(false) }
@@ -185,18 +188,35 @@ fun MainScreen(
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MainDrawerContent(
-                drawerState = drawerState,
-                onNavigate = { route ->
-                    scope.launch { drawerState.close() }
-                    onNavigate(route)
+    LaunchedEffect(drawerState) {
+        snapshotFlow { drawerState.targetValue == DrawerValue.Open }
+            .distinctUntilChanged()
+            .drop(1)
+            .collect { isOpen ->
+                if (isOpen) {
+                    for (i in 0 until 8) {
+                        delay(32)
+                        if (dPadFocusTargets.firstDrawerItem.tryRequestFocus()) break
+                    }
+                } else {
+                    dPadFocusTargets.menuButton.tryRequestFocus()
                 }
-            )
-        }
-    ) {
+            }
+    }
+
+    CompositionLocalProvider(LocalDPadFocusTargets provides dPadFocusTargets) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                MainDrawerContent(
+                    drawerState = drawerState,
+                    onNavigate = { route ->
+                        scope.launch { drawerState.close() }
+                        onNavigate(route)
+                    }
+                )
+            }
+        ) {
         Scaffold(
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
@@ -270,7 +290,7 @@ fun MainScreen(
                         state = pagerState,
                         modifier = Modifier.fillMaxSize(),
                         userScrollEnabled = true,
-                        beyondViewportPageCount = 1,
+                        beyondViewportPageCount = 0,
                         key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
                     ) { page ->
                         val group = groups.getOrNull(page) ?: return@HorizontalPager
@@ -304,5 +324,6 @@ fun MainScreen(
                 }
             }
         }
+    }
     }
 }

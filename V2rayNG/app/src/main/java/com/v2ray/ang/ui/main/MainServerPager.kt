@@ -143,13 +143,15 @@ private fun ServerListPage(
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->
+            itemsIndexed(items = servers, key = { _, item -> item.guid }) { index, serverCache ->
+                val isLastRow = isLastRowItem(index, servers.size, columns = 2)
                 val content: @Composable () -> Unit = {
                     ServerItemColumn(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
                         subscriptionId = subscriptionId,
                         doubleColumnDisplay = true,
+                        isLastRow = isLastRow,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
@@ -189,7 +191,8 @@ private fun ServerListPage(
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = servers, key = { _, item -> item.guid }) { _, serverCache ->
+            itemsIndexed(items = servers, key = { _, item -> item.guid }) { index, serverCache ->
+                val isLastRow = isLastRowItem(index, servers.size, columns = 1)
                 if (canReorder && reorderableState != null) {
                     ReorderableItem(
                         reorderableState,
@@ -203,6 +206,7 @@ private fun ServerListPage(
                                 serverCache = serverCache,
                                 selectedGuid = selectedGuid,
                                 subscriptionId = subscriptionId,
+                                isLastRow = isLastRow,
                                 onSelectServer = onSelectServer,
                                 onEditServer = onEditServer,
                                 onShareServer = onShareServer,
@@ -217,6 +221,7 @@ private fun ServerListPage(
                         serverCache = serverCache,
                         selectedGuid = selectedGuid,
                         subscriptionId = subscriptionId,
+                        isLastRow = isLastRow,
                         onSelectServer = onSelectServer,
                         onEditServer = onEditServer,
                         onShareServer = onShareServer,
@@ -235,6 +240,7 @@ private fun ServerItemRow(
     serverCache: ServersCache,
     selectedGuid: String?,
     subscriptionId: String,
+    isLastRow: Boolean,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
@@ -256,6 +262,7 @@ private fun ServerItemRow(
         isSelected = serverCache.guid == selectedGuid,
         subscriptionRemarks = subRemarks,
         doubleColumnDisplay = false,
+        isLastRow = isLastRow,
         onClick = { onSelectServer(serverCache.guid) },
         onShare = { onShareServer(serverCache.guid, profile) },
         onEdit = { onEditServer(serverCache.guid, profile) },
@@ -270,6 +277,7 @@ private fun ServerItemColumn(
     selectedGuid: String?,
     subscriptionId: String,
     doubleColumnDisplay: Boolean,
+    isLastRow: Boolean,
     onSelectServer: (String) -> Unit,
     onEditServer: (String, ProfileItem) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
@@ -289,6 +297,7 @@ private fun ServerItemColumn(
             isSelected = serverCache.guid == selectedGuid,
             subscriptionRemarks = subRemarks,
             doubleColumnDisplay = doubleColumnDisplay,
+            isLastRow = isLastRow,
             onClick = { onSelectServer(serverCache.guid) },
             onEdit = { onEditServer(serverCache.guid, profile) },
             onShare = { onShareServer(serverCache.guid, profile) },
@@ -308,6 +317,7 @@ fun ServerListItem(
     isSelected: Boolean,
     subscriptionRemarks: String,
     doubleColumnDisplay: Boolean,
+    isLastRow: Boolean = false,
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onShare: () -> Unit,
@@ -326,6 +336,9 @@ fun ServerListItem(
     } else {
         null
     }
+    val lastRowDown = Modifier.dPadDownTo(
+        if (isLastRow) LocalDPadFocusTargets.current?.fab else null
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -335,6 +348,7 @@ fun ServerListItem(
                     stateDescription = selectedStateDescription
                 }
             }
+            .then(lastRowDown)
             .clickable(onClick = onClick)
             .then(dragModifier)
     ) {
@@ -365,7 +379,7 @@ fun ServerListItem(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (doubleColumnDisplay) {
-                    IconButton(onClick = onMore, Modifier.size(36.dp)) {
+                    IconButton(onClick = onMore, Modifier.size(36.dp).then(lastRowDown)) {
                         Icon(
                             painterResource(R.drawable.ic_more_vert_24dp),
                             stringResource(R.string.acc_more),
@@ -373,21 +387,21 @@ fun ServerListItem(
                         )
                     }
                 } else {
-                    IconButton(onClick = onShare, Modifier.size(36.dp)) {
+                    IconButton(onClick = onShare, Modifier.size(36.dp).then(lastRowDown)) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
                             stringResource(R.string.title_configuration_share),
                             Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = onEdit, Modifier.size(36.dp)) {
+                    IconButton(onClick = onEdit, Modifier.size(36.dp).then(lastRowDown)) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
                             stringResource(R.string.acc_edit),
                             Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = onRemove, Modifier.size(36.dp)) {
+                    IconButton(onClick = onRemove, Modifier.size(36.dp).then(lastRowDown)) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
                             stringResource(R.string.acc_delete),

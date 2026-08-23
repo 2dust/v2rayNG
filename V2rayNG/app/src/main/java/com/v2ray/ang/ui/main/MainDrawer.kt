@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -66,6 +67,7 @@ private val drawerItems = primaryDrawerItems + listOf(
 @Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
     val drawerScrollState = rememberScrollState()
+    val focusTargets = LocalDPadFocusTargets.current
 
     ModalDrawerSheet(
         drawerState = drawerState,
@@ -114,7 +116,15 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     selected = false,
                     onClick = { onNavigate(item) },
                     icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    modifier = Modifier
+                        .padding(NavigationDrawerItemDefaults.ItemPadding)
+                        .then(
+                            if (index == 0 && focusTargets != null) {
+                                Modifier.focusRequester(focusTargets.firstDrawerItem)
+                            } else {
+                                Modifier
+                            }
+                        )
                 )
             }
         }
