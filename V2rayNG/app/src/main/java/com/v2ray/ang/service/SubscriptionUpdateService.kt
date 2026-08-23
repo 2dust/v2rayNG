@@ -13,6 +13,7 @@ import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
@@ -176,7 +177,9 @@ class SubscriptionUpdateService : Service() {
             content = sub.subscription.remarks
         )
 
-        val guids = MmkvManager.decodeServerList(subId)
+        val guids = MmkvManager.decodeServerList(subId).filterNot { guid ->
+            MmkvManager.decodeServerConfig(guid)?.configType == EConfigType.POLICYGROUP
+        }
         if (guids.isEmpty()) return true
 
         val deferred = CompletableDeferred<Boolean>()

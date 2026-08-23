@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
@@ -830,6 +831,7 @@ class MainViewModel(
     fun testAllRealPing(onlyTcp: Boolean = false) {
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
+        val hasKeywordFilter = keywordFilter.isNotEmpty()
         activeTestId = null
         canAdoptTestSession = false
         dataSource.cancelAllPing()
@@ -839,7 +841,11 @@ class MainViewModel(
             _uiState.update { it.copy(isTesting = false) }
             return
         }
+        val (policyGroups, probeServers) = servers.partition {
+            it.profile.configType == EConfigType.POLICYGROUP
+        }
         val serverGuids = servers.map { it.guid }
+        val probeGuids = probeServers.map { it.guid }
         val testId = UUID.randomUUID().toString()
         activeTestId = testId
         mutableServerGroupState(groupId).update { current ->
@@ -879,7 +885,8 @@ class MainViewModel(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     testId = testId,
                     subscriptionId = groupId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+                    serverGuids = probeGuids.takeIf { hasKeywordFilter },
+                    excludedServerGuids = policyGroups.map { it.guid },
                     onlyTcp = onlyTcp
                 )
             )

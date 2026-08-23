@@ -120,11 +120,13 @@ class CoreTestService : Service() {
         batchStarted = true
         activeMessage = message
 
-        val guids = when {
-            message.serverGuids.isNotEmpty() -> message.serverGuids
+        val requestedGuids = when {
+            message.serverGuids != null -> message.serverGuids
             message.subscriptionId.isNotEmpty() -> MmkvManager.decodeServerList(message.subscriptionId)
             else -> MmkvManager.decodeAllServerList()
-        }.distinct()
+        }
+        val excludedGuids = message.excludedServerGuids.toHashSet()
+        val guids = requestedGuids.distinct().filterNot(excludedGuids::contains)
 
         if (guids.isEmpty()) {
             sendSummary(
