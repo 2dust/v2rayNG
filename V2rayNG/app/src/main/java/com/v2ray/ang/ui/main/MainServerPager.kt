@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
@@ -69,6 +71,7 @@ fun GroupPagerPage(
     groupId: String,
     mainViewModel: MainViewModel,
     selectedGuid: String?,
+    locateTarget: LocateTarget?,
     doubleColumnDisplay: Boolean,
     confirmRemove: Boolean,
     searchQuery: String,
@@ -89,6 +92,7 @@ fun GroupPagerPage(
     ServerListPage(
         servers = servers,
         selectedGuid = selectedGuid,
+        locateTarget = locateTarget?.takeIf { it.groupId == groupId },
         canReorder = canReorder,
         doubleColumnDisplay = doubleColumnDisplay,
         subscriptionId = groupId,
@@ -101,6 +105,7 @@ fun GroupPagerPage(
         onShareServer = onShareServer,
         onMoreServer = onMoreServer,
         onRemoveServer = onRemoveServer,
+        onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
         onMoveServer = { fromIndex, toIndex -> mainViewModel.moveServer(groupId, fromIndex, toIndex) },
         contentPadding = contentPadding
     )
@@ -110,6 +115,7 @@ fun GroupPagerPage(
 private fun ServerListPage(
     servers: List<ServersCache>,
     selectedGuid: String?,
+    locateTarget: LocateTarget?,
     canReorder: Boolean,
     doubleColumnDisplay: Boolean,
     subscriptionId: String,
@@ -122,6 +128,7 @@ private fun ServerListPage(
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String) -> Unit,
+    onLocateHandled: () -> Unit,
     onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues
 ) {
@@ -134,6 +141,8 @@ private fun ServerListPage(
                 onMoveServer(from.index, to.index)
             }
         } else null
+
+        LocateTargetEffect(locateTarget, servers, gridState, onLocateHandled)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
@@ -182,6 +191,8 @@ private fun ServerListPage(
             }
         } else null
 
+        LocateTargetEffect(locateTarget, servers, listState, onLocateHandled)
+
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -227,6 +238,38 @@ private fun ServerListPage(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LocateTargetEffect(
+    target: LocateTarget?,
+    servers: List<ServersCache>,
+    state: LazyListState,
+    onHandled: () -> Unit,
+) {
+    if (target == null) return
+    LaunchedEffect(target, servers) {
+        val index = servers.indexOfFirst { it.guid == target.serverGuid }
+        if (index < 0) return@LaunchedEffect
+        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
+        onHandled()
+    }
+}
+
+@Composable
+private fun LocateTargetEffect(
+    target: LocateTarget?,
+    servers: List<ServersCache>,
+    state: LazyGridState,
+    onHandled: () -> Unit,
+) {
+    if (target == null) return
+    LaunchedEffect(target, servers) {
+        val index = servers.indexOfFirst { it.guid == target.serverGuid }
+        if (index < 0) return@LaunchedEffect
+        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
+        onHandled()
     }
 }
 

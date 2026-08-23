@@ -66,5 +66,5 @@ sealed interface MainAction {
 
     data class ImportBatchConfig(val configText: String) : MainAction
 
-    data class LocateHandled(val target: LocateTarget) : MainAction
+    data object LocateHandled : MainAction
 }
