@@ -93,6 +93,13 @@ internal data class TetheringUiState(
         get() = activeTetheringTypes >= 0
 }
 
+internal sealed interface ShizukuAction {
+    data object RequestPermission : ShizukuAction
+    data object Refresh : ShizukuAction
+    data object ToggleRouting : ShizukuAction
+    data object ToggleHotspot : ShizukuAction
+}
+
 internal enum class TetheringIpMode(val labelRes: Int) {
     IPV4_ONLY(R.string.shizuku_tethering_ip_mode_ipv4),
     DUAL_STACK(R.string.shizuku_tethering_ip_mode_dual_stack),
@@ -188,10 +195,7 @@ internal fun TetheringScreen(
     state: TetheringUiState,
     serviceConnected: Boolean,
     onBackClick: () -> Unit,
-    onRequestPermission: () -> Unit,
-    onRefresh: () -> Unit,
-    onToggleRouting: () -> Unit,
-    onToggleHotspot: () -> Unit,
+    onAction: (ShizukuAction) -> Unit,
 ) {
     val routingAction = routingAction(state, serviceConnected)
     val hotspotAction = hotspotAction(state, serviceConnected)
@@ -250,13 +254,13 @@ internal fun TetheringScreen(
                     text = stringResource(R.string.shizuku_request_permission),
                     enabled = state.shizukuStatus.canRequestPermission &&
                         !state.operation.isToggleInProgress,
-                    onClick = onRequestPermission,
+                    onClick = { onAction(ShizukuAction.RequestPermission) },
                     modifier = Modifier.weight(1f),
                 )
                 TetheringActionButton(
                     text = stringResource(R.string.shizuku_refresh_permission),
                     enabled = !state.operation.isToggleInProgress,
-                    onClick = onRefresh,
+                    onClick = { onAction(ShizukuAction.Refresh) },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -272,7 +276,7 @@ internal fun TetheringScreen(
                 ),
                 checked = state.routingSessionEnabled,
                 toggleEnabled = routingAction.enabled,
-                onToggle = onToggleRouting,
+                onToggle = { onAction(ShizukuAction.ToggleRouting) },
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -286,7 +290,7 @@ internal fun TetheringScreen(
                 ),
                 checked = state.hotspotEnabled,
                 toggleEnabled = hotspotAction.enabled,
-                onToggle = onToggleHotspot,
+                onToggle = { onAction(ShizukuAction.ToggleHotspot) },
             )
             Spacer(modifier = Modifier.height(16.dp))
         }

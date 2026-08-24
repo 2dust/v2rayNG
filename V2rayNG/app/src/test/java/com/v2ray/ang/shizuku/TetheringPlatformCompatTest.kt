@@ -8,6 +8,14 @@ import org.junit.Test
 class TetheringPlatformCompatTest {
 
     @Test
+    fun usesPublicTetheringApiStartingAtApi36() {
+        assertEquals(false, isPublicTetheringApiLevel(33))
+        assertEquals(false, isPublicTetheringApiLevel(35))
+        assertEquals(true, isPublicTetheringApiLevel(36))
+        assertEquals(true, isPublicTetheringApiLevel(37))
+    }
+
+    @Test
     fun infersKnownLegacyTetheringInterfaces() {
         assertEquals(
             ShizukuTetheringService.TETHERING_TYPE_WIFI,

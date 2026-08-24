@@ -7,7 +7,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.TetheringManager
 import android.os.Build
-import java.lang.reflect.Method
+import androidx.annotation.ChecksSdkIntAtLeast
 import java.lang.reflect.Proxy
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
@@ -16,32 +16,32 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
-/** Android 13+ tethering calls that are shared with, or hidden before, API 36. */
+/** TetheringManager compatibility for Android 13 through 15. */
 internal object TetheringPlatformCompat {
 
-    @SuppressLint("WrongConstant") // TRANSPORT_TEST is a hidden transport type.
+    // Remove WrongConstant only when TRANSPORT_TEST enters the public SDK, or when the protected
+    // upstream stops being an Android test network and this request is deleted with it.
+    @SuppressLint("WrongConstant")
     fun testNetworkRequest(): NetworkRequest = NetworkRequest.Builder()
         .addTransportType(TRANSPORT_TEST)
         .removeCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         .removeCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
         .build()
 
-    fun observeUpstream(
+    fun observeUpstreamLegacy(
         service: Any,
         connectivityManager: ConnectivityManager,
         executor: Executor,
         onChanged: () -> Unit,
     ): TetheringUpstreamMonitor {
-        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        // This callback exists on every supported release, but its type is hidden from the public
-        // SDK. Implement the runtime interface directly so fail-closed protection receives changes
-        // immediately without polling dumpsys or depending on OEM-specific diagnostic text.
+        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
+        // API 33-35 hide this callback and the downstream-state APIs used below. Delete this
+        // reflection branch only when the feature's minimum supported API becomes 36; API 36 made
+        // the required TetheringManager types public, but that does not help older installations.
         val callbackClass = Class.forName(TETHERING_EVENT_CALLBACK_CLASS)
         check(callbackClass.isInterface) { "Tethering event callback is not an interface" }
         val interfaceNames = AtomicReference<String?>(null)
-        val changeExecutor = Executors.newSingleThreadExecutor { command ->
-            Thread(command, UPSTREAM_MONITOR_THREAD).apply { isDaemon = true }
-        }
+        val changeExecutor = newTetheringChangeExecutor()
         val callback = Proxy.newProxyInstance(
             TetheringPlatformCompat::class.java.classLoader,
             arrayOf(callbackClass),
@@ -78,20 +78,11 @@ internal object TetheringPlatformCompat {
             throw error
         }
         return TetheringUpstreamMonitor(
-            service,
-            callback,
-            unregister,
-            changeExecutor,
             interfaceNames,
-        )
-    }
-
-    private fun upstreamInterfaceNames(
-        connectivityManager: ConnectivityManager,
-        network: Network?,
-    ): String {
-        val properties = network?.let(connectivityManager::getLinkProperties) ?: return ""
-        return properties.interfaceName.orEmpty()
+        ) {
+            runCatching { unregister.invoke(service, callback) }
+            changeExecutor.shutdownNow()
+        }
     }
 
     internal fun isProtectedUpstream(actual: String, expected: String): Boolean {
@@ -206,7 +197,6 @@ internal object TetheringPlatformCompat {
 
     private const val TETHERING_EVENT_CALLBACK_CLASS =
         "android.net.TetheringManager\$TetheringEventCallback"
-    private const val UPSTREAM_MONITOR_THREAD = "TetheringUpstreamMonitor"
     private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
     private const val LEGACY_TETHERING_TYPE_WIFI_P2P = 3
@@ -215,20 +205,29 @@ internal object TetheringPlatformCompat {
 }
 
 internal class TetheringUpstreamMonitor(
-    private val service: Any,
-    private val callback: Any,
-    private val unregister: Method,
-    private val changeExecutor: ExecutorService,
     private val interfaceNames: AtomicReference<String?>,
+    private val closeAction: () -> Unit,
 ) : AutoCloseable {
     val currentInterfaceNames: String?
         get() = interfaceNames.get()
 
-    override fun close() {
-        runCatching { unregister.invoke(service, callback) }
-        changeExecutor.shutdownNow()
-    }
+    override fun close() = closeAction()
 }
+
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.BAKLAVA)
+internal fun usesPublicTetheringApi(): Boolean = isPublicTetheringApiLevel(Build.VERSION.SDK_INT)
+
+internal fun isPublicTetheringApiLevel(sdkInt: Int): Boolean = sdkInt >= Build.VERSION_CODES.BAKLAVA
+
+internal fun upstreamInterfaceNames(connectivityManager: ConnectivityManager, network: Network?): String {
+    val properties = network?.let(connectivityManager::getLinkProperties) ?: return ""
+    return properties.interfaceName.orEmpty()
+}
+
+internal fun newTetheringChangeExecutor(): ExecutorService =
+    Executors.newSingleThreadExecutor { command ->
+        Thread(command, "TetheringUpstreamMonitor").apply { isDaemon = true }
+    }
 
 internal data class ActiveTetheringInterface(
     val type: Int,

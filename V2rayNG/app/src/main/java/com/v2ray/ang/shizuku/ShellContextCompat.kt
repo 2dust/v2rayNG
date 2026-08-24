@@ -8,7 +8,9 @@ import android.content.ContextWrapper
 internal object ShellContextCompat {
 
     // Android has no public API for changing a Context's Binder attribution package. The
-    // UserService runs as UID 2000, so framework calls must identify com.android.shell.
+    // UserService runs as UID 2000, so framework calls must identify com.android.shell. Remove this
+    // reflection only when Android or Shizuku supplies a public context factory whose op package is
+    // com.android.shell on every supported feature API; a plain UserService context is insufficient.
     @SuppressLint("PrivateApi", "DiscouragedPrivateApi")
     fun create(context: Context): Context {
         val baseContext = (context as? ContextWrapper)?.baseContext ?: context
