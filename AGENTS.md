@@ -69,7 +69,7 @@ incompatible actions; every other root rule remains active.
   predates the files, keep copied versions untracked or unstaged; acquire tracked copies only by
   merging or rebasing their upstream commit.
 - User-, machine-, worktree-, and temporary text is local-only. Put it in `AGENTS.md` between
-  visible lines `LOCAL ONLY - DO NOT COMMIT - START` and `LOCAL ONLY - DO NOT COMMIT - END`.
+  visible lines `LOCAL INSTRUCTIONS - START` and `LOCAL INSTRUCTIONS - END`.
   Unless the task targets agent instructions, treat every pre-existing instruction-file difference
   as local-only.
 - Keep local-only text unstaged and uncommitted. Never use `git add .`, `git add -A`, or
