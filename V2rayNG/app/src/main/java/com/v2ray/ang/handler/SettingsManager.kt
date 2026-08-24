@@ -34,6 +34,11 @@ import kotlin.random.Random
 
 object SettingsManager {
 
+    data class SubscriptionRemovalResult(
+        val removed: Boolean,
+        val defaultCreated: Boolean,
+    )
+
     @Volatile
     private var runtimeSocksPort: Int? = null
 
@@ -234,22 +239,27 @@ object SettingsManager {
      * Removes the subscription.
      * If there are no remaining subscriptions,
      * it creates a new default subscription to ensure that ungroup
-     **/
-    fun removeSubscriptionWithDefault(subid: String) {
-        SubscriptionUpdater.cancelOne(subId = subid)
+    **/
+    fun removeSubscriptionWithDefault(subid: String): SubscriptionRemovalResult {
         // Remove the subscription
-        removeSubscription(subid)
+        if (!removeSubscription(subid)) {
+            return SubscriptionRemovalResult(removed = false, defaultCreated = true)
+        }
+        SubscriptionUpdater.cancelOne(subId = subid)
 
         // After removal, check if there are any subscriptions left. If not, create a default subscription.
         val subsList2 = decodeSubsList()
         if (subsList2.isNotEmpty()) {
-            return
+            return SubscriptionRemovalResult(removed = true, defaultCreated = true)
         }
 
         val defaultSub = SubscriptionItem(
             remarks = "Default",
         )
-        encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
+        return SubscriptionRemovalResult(
+            removed = true,
+            defaultCreated = encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub) != null,
+        )
     }
 
     /**

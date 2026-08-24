@@ -155,7 +155,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         val savedGuid = MmkvManager.encodeServerConfig(
             editGuid,
             config
-        )
+        ) ?: run {
+            toast(R.string.toast_failure)
+            return false
+        }
 
         toastSuccess(R.string.toast_success)
 
@@ -179,7 +182,10 @@ class ServerGroupActivity : BaseComponentActivity() {
             return false
         }
 
-        MmkvManager.removeServer(editGuid)
+        if (!MmkvManager.removeServer(editGuid)) {
+            toast(R.string.toast_failure)
+            return false
+        }
 
         ProfileEditorResult.run {
             finishDeleted(editGuid)
