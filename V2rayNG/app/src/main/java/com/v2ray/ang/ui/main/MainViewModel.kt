@@ -526,10 +526,7 @@ class MainViewModel(
                             val guids = currentServers().map { it.guid }
                             guids.count { dataSource.removeServer(it) }
                         }
-                    viewModelScope.launch(ioDispatcher) {
-                        cacheMutex.withLock { groupDataCache.clear() }
-                    }
-                    setupGroupTab(forceRefresh = true)
+                    setupGroupTab(forceRefresh = true).join()
                     toast(dataSource.getString(R.string.title_del_config_count, count))
                 } catch (cancelled: CancellationException) {
                     throw cancelled
@@ -555,7 +552,7 @@ class MainViewModel(
                         }
                     }
                     val removedCount = duplicates.count { dataSource.removeServer(it) }
-                    setupGroupTab(forceRefresh = true)
+                    setupGroupTab(forceRefresh = true).join()
                     if (removedCount == duplicates.size) {
                         toast(dataSource.getString(R.string.title_del_duplicate_config_count, removedCount))
                     } else {
@@ -576,10 +573,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val count = removeInvalidServerInternal()
-                    viewModelScope.launch(ioDispatcher) {
-                        cacheMutex.withLock { groupDataCache.clear() }
-                        setupGroupTab(forceRefresh = true)
-                    }
+                    setupGroupTab(forceRefresh = true).join()
                     toast(dataSource.getString(R.string.title_del_config_count, count))
                 } catch (cancelled: CancellationException) {
                     throw cancelled
@@ -608,8 +602,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     sortByTestResultsInternal()
-                    cacheMutex.withLock { groupDataCache.clear() }
-                    setupGroupTab(forceRefresh = true)
+                    setupGroupTab(forceRefresh = true).join()
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
@@ -706,7 +699,6 @@ class MainViewModel(
                 toastError(R.string.toast_failure)
                 return@launch
             }
-            cacheMutex.withLock { groupDataCache.clear() }
             setupGroupTab(forceRefresh = true).join()
         }
     }
@@ -725,9 +717,6 @@ class MainViewModel(
             previousPersistenceJob?.join()
             if (dataSource.encodeServerList(guids, groupId)) {
                 cacheMutex.withLock { groupDataCache[groupId] = servers }
-                withContext(Dispatchers.Main) {
-                    mutableServersForGroup(groupId).value = servers
-                }
             } else {
                 cacheMutex.withLock { groupDataCache.remove(groupId) }
                 setupGroupTab(forceRefresh = true).join()

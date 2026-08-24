@@ -34,10 +34,11 @@ import kotlin.random.Random
 
 object SettingsManager {
 
-    data class SubscriptionRemovalResult(
-        val removed: Boolean,
-        val defaultCreated: Boolean,
-    )
+    enum class SubscriptionRemovalResult {
+        FAILED,
+        REMOVED,
+        REMOVED_WITHOUT_DEFAULT,
+    }
 
     @Volatile
     private var runtimeSocksPort: Int? = null
@@ -243,23 +244,24 @@ object SettingsManager {
     fun removeSubscriptionWithDefault(subid: String): SubscriptionRemovalResult {
         // Remove the subscription
         if (!removeSubscription(subid)) {
-            return SubscriptionRemovalResult(removed = false, defaultCreated = true)
+            return SubscriptionRemovalResult.FAILED
         }
         SubscriptionUpdater.cancelOne(subId = subid)
 
         // After removal, check if there are any subscriptions left. If not, create a default subscription.
         val subsList2 = decodeSubsList()
         if (subsList2.isNotEmpty()) {
-            return SubscriptionRemovalResult(removed = true, defaultCreated = true)
+            return SubscriptionRemovalResult.REMOVED
         }
 
         val defaultSub = SubscriptionItem(
             remarks = "Default",
         )
-        return SubscriptionRemovalResult(
-            removed = true,
-            defaultCreated = encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub) != null,
-        )
+        return if (encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub) != null) {
+            SubscriptionRemovalResult.REMOVED
+        } else {
+            SubscriptionRemovalResult.REMOVED_WITHOUT_DEFAULT
+        }
     }
 
     /**

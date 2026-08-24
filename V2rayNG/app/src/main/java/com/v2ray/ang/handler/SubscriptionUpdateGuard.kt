@@ -13,10 +13,6 @@ internal object SubscriptionUpdateGuard {
         current: SubscriptionItem?,
         expected: SubscriptionItem,
     ): Boolean {
-        return isIndexed && current != null && settingsOf(current) == settingsOf(expected)
-    }
-
-    private fun settingsOf(subscription: SubscriptionItem): SubscriptionItem {
-        return subscription.copy(lastUpdated = -1)
+        return isIndexed && current?.copy(lastUpdated = expected.lastUpdated) == expected
     }
 }
