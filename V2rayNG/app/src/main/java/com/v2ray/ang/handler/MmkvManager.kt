@@ -54,22 +54,6 @@ internal class StorageMutationTransaction {
         if (!change()) throw ProfileStorageException(failureMessage)
     }
 
-    /**
-     * Prepares a profile mutation and writes its authoritative index as the final step.
-     */
-    fun <T> prepareThenPublish(
-        prepare: StorageMutationTransaction.() -> T,
-        publish: StorageMutationTransaction.() -> Unit,
-    ): T {
-        val result = prepare()
-        publish()
-        return result
-    }
-
-    fun commit() {
-        rollbackActions.clear()
-    }
-
     fun rollback(failure: Throwable) {
         rollbackActions.asReversed().forEach { action ->
             try {
@@ -82,7 +66,6 @@ internal class StorageMutationTransaction {
                 failure.addSuppressed(rollbackFailure)
             }
         }
-        rollbackActions.clear()
     }
 }
 
@@ -91,7 +74,7 @@ internal fun <T> runStorageMutationTransaction(
 ): T {
     val transaction = StorageMutationTransaction()
     return try {
-        transaction.block().also { transaction.commit() }
+        transaction.block()
     } catch (failure: Throwable) {
         transaction.rollback(failure)
         throw failure
@@ -141,11 +124,6 @@ object MmkvManager {
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
-    private data class StoredString(
-        val isPresent: Boolean,
-        val value: String?,
-    )
-
     private inline fun <T> withProfileIndexLock(block: () -> T): T {
         return synchronized(mainStorage) {
             mainStorage.lock()
@@ -165,16 +143,15 @@ object MmkvManager {
         serverRawStorage.removeValuesForKeys(keys)
     }
 
-    private fun readStoredString(storage: MMKV, key: String, description: String): StoredString {
-        if (!storage.containsKey(key)) return StoredString(isPresent = false, value = null)
-        val value = storage.decodeString(key)
+    private fun readStoredString(storage: MMKV, key: String, description: String): String? {
+        if (!storage.containsKey(key)) return null
+        return storage.decodeString(key)
             ?: throw ProfileStorageException("Failed to read $description")
-        return StoredString(isPresent = true, value = value)
     }
 
-    private fun restoreStoredString(storage: MMKV, key: String, stored: StoredString): Boolean {
-        return if (stored.isPresent) {
-            storage.encode(key, stored.value!!)
+    private fun restoreStoredString(storage: MMKV, key: String, stored: String?): Boolean {
+        return if (stored != null) {
+            storage.encode(key, stored)
         } else {
             storage.remove(key)
             !storage.containsKey(key)
@@ -188,7 +165,7 @@ object MmkvManager {
         description: String,
     ) {
         val stored = readStoredString(storage, key, description)
-        if (stored.isPresent && stored.value == value) return
+        if (stored == value) return
         mutate(
             change = { storage.encode(key, value) },
             restore = { restoreStoredString(storage, key, stored) },
@@ -202,7 +179,7 @@ object MmkvManager {
         description: String,
     ) {
         val stored = readStoredString(storage, key, description)
-        if (!stored.isPresent) return
+        if (stored == null) return
         mutate(
             change = {
                 storage.remove(key)
@@ -213,28 +190,53 @@ object MmkvManager {
         )
     }
 
+    private fun StorageMutationTransaction.writeProfilePayload(guid: String, profile: ProfileItem) {
+        writeString(profileFullStorage, guid, JsonUtil.toJson(profile), "profile payload")
+    }
+
+    private fun StorageMutationTransaction.writeRawProfilePayload(guid: String, raw: String) {
+        writeString(serverRawStorage, guid, raw, "raw profile payload")
+    }
+
+    private fun StorageMutationTransaction.writeProfileIndex(
+        profileIndexKey: String,
+        serverList: List<String>,
+    ) {
+        writeString(mainStorage, profileIndexKey, JsonUtil.toJson(serverList), "profile index")
+    }
+
+    private fun StorageMutationTransaction.writeSelectedProfile(guid: String) {
+        writeString(mainStorage, KEY_SELECTED_SERVER, guid, "selected profile")
+    }
+
+    private fun StorageMutationTransaction.removeSelectedProfile() {
+        removeString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
+    }
+
+    private fun StorageMutationTransaction.writeSubscriptionPayload(
+        guid: String,
+        subscription: SubscriptionItem,
+    ) {
+        writeString(subStorage, guid, JsonUtil.toJson(subscription), "subscription payload")
+    }
+
+    private fun StorageMutationTransaction.writeSubscriptionIndex(subsList: List<String>) {
+        writeString(mainStorage, KEY_SUB_IDS, JsonUtil.toJson(subsList), "subscription index")
+    }
+
+    private fun decodeStringListForWrite(key: String, description: String): MutableList<String> {
+        val stored = readStoredString(mainStorage, key, description) ?: return mutableListOf()
+        if (stored.isBlank()) throw ProfileStorageException("Failed to decode $description")
+        return JsonUtil.fromJsonSafe(stored, Array<String>::class.java)?.toMutableList()
+            ?: throw ProfileStorageException("Failed to decode $description")
+    }
+
     private fun decodeServerListForWrite(subscriptionId: String): MutableList<String> {
-        val stored = readStoredString(
-            storage = mainStorage,
-            key = serverListKey(subscriptionId),
-            description = "profile index",
-        )
-        if (!stored.isPresent) return mutableListOf()
-        if (stored.value.isNullOrBlank()) {
-            throw ProfileStorageException("Failed to decode profile index")
-        }
-        return JsonUtil.fromJsonSafe(stored.value, Array<String>::class.java)?.toMutableList()
-            ?: throw ProfileStorageException("Failed to decode profile index")
+        return decodeStringListForWrite(serverListKey(subscriptionId), "profile index")
     }
 
     private fun decodeSubsListForWrite(): MutableList<String> {
-        val stored = readStoredString(mainStorage, KEY_SUB_IDS, "subscription index")
-        if (!stored.isPresent) return mutableListOf()
-        if (stored.value.isNullOrBlank()) {
-            throw ProfileStorageException("Failed to decode subscription index")
-        }
-        return JsonUtil.fromJsonSafe(stored.value, Array<String>::class.java)?.toMutableList()
-            ?: throw ProfileStorageException("Failed to decode subscription index")
+        return decodeStringListForWrite(KEY_SUB_IDS, "subscription index")
     }
 
     private fun serverListKey(subscriptionId: String): String {
@@ -281,28 +283,32 @@ object MmkvManager {
             protectedServer = null,
             serversReferencedByOtherGroups = referencedByOtherGroups,
         )
-        return prepareThenPublish(
-            prepare = {
-                val selectedServer = readStoredString(
-                    storage = mainStorage,
-                    key = KEY_SELECTED_SERVER,
-                    description = "selected profile",
-                )
-                if (selectedServer.value in removablePayloads) {
-                    removeString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
+        val selectedServer = readStoredString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
+        if (selectedServer != null && selectedServer in removablePayloads) {
+            removeSelectedProfile()
+        }
+        serverList.removeAll(removedServers)
+        writeProfileIndex(serverListKey(subscriptionId), serverList)
+        return removablePayloads
+    }
+
+    private fun removeProfiles(
+        requestedGuids: Set<String>?,
+        failureMessage: String,
+        resolveSubscriptionId: () -> String,
+    ): Boolean {
+        return try {
+            withProfileIndexLock {
+                val removablePayloads = runStorageMutationTransaction {
+                    removeProfilesFromGroup(resolveSubscriptionId(), requestedGuids)
                 }
-                removablePayloads
-            },
-            publish = {
-                serverList.removeAll(removedServers)
-                writeString(
-                    storage = mainStorage,
-                    key = serverListKey(subscriptionId),
-                    value = JsonUtil.toJson(serverList),
-                    description = "profile index",
-                )
-            },
-        )
+                removeProfilePayloads(removablePayloads)
+            }
+            true
+        } catch (e: Exception) {
+            LogUtil.e(TAG, failureMessage, e)
+            false
+        }
     }
 
     //endregion
@@ -374,12 +380,7 @@ object MmkvManager {
         return try {
             withProfileIndexLock {
                 runStorageMutationTransaction {
-                    writeString(
-                        storage = mainStorage,
-                        key = serverListKey(subscriptionId),
-                        value = JsonUtil.toJson(serverList),
-                        description = "profile index",
-                    )
+                    writeProfileIndex(serverListKey(subscriptionId), serverList)
                 }
             }
             true
@@ -469,54 +470,21 @@ object MmkvManager {
                 val serverList = decodeServerListForWrite(subId)
                 val needsIndexWrite = !serverList.contains(key)
                 val selectedServer = if (needsIndexWrite) {
-                    readStoredString(
-                        storage = mainStorage,
-                        key = KEY_SELECTED_SERVER,
-                        description = "selected profile",
-                    )
+                    readStoredString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
                 } else {
                     null
                 }
 
                 runStorageMutationTransaction {
-                    prepareThenPublish(
-                        prepare = {
-                            rawConfig?.let { raw ->
-                                writeString(
-                                    storage = serverRawStorage,
-                                    key = key,
-                                    value = raw,
-                                    description = "raw profile payload",
-                                )
-                            }
-                            writeString(
-                                storage = profileFullStorage,
-                                key = key,
-                                value = JsonUtil.toJson(config),
-                                description = "profile payload",
-                            )
-
-                            if (needsIndexWrite && selectedServer?.value.isNullOrBlank()) {
-                                writeString(
-                                    storage = mainStorage,
-                                    key = KEY_SELECTED_SERVER,
-                                    value = key,
-                                    description = "selected profile",
-                                )
-                            }
-                        },
-                        publish = {
-                            if (needsIndexWrite) {
-                                serverList.add(0, key)
-                                writeString(
-                                    storage = mainStorage,
-                                    key = serverListKey(subId),
-                                    value = JsonUtil.toJson(serverList),
-                                    description = "profile index",
-                                )
-                            }
-                        },
-                    )
+                    rawConfig?.let { writeRawProfilePayload(key, it) }
+                    writeProfilePayload(key, config)
+                    if (needsIndexWrite && selectedServer.isNullOrBlank()) {
+                        writeSelectedProfile(key)
+                    }
+                    if (needsIndexWrite) {
+                        serverList.add(0, key)
+                        writeProfileIndex(serverListKey(subId), serverList)
+                    }
                 }
             }
             key
@@ -561,11 +529,7 @@ object MmkvManager {
             } else {
                 decodeServerListForWrite(subscriptionId).toList()
             }
-            val previousSelection = readStoredString(
-                storage = mainStorage,
-                key = KEY_SELECTED_SERVER,
-                description = "selected profile",
-            ).value
+            val previousSelection = readStoredString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
             val selectedProfile = if (!append &&
                 previousSelection != null &&
                 previousSelection in replacedServers
@@ -593,60 +557,24 @@ object MmkvManager {
             }
 
             val removablePayloads = runStorageMutationTransaction {
-                prepareThenPublish(
-                    prepare = {
-                        rawConfigs.forEach { (guid, raw) ->
-                            writeString(
-                                storage = serverRawStorage,
-                                key = guid,
-                                value = raw,
-                                description = "raw profile payload",
-                            )
-                        }
-                        profiles.forEach { (guid, profile) ->
-                            writeString(
-                                storage = profileFullStorage,
-                                key = guid,
-                                value = JsonUtil.toJson(profile),
-                                description = "profile payload",
-                            )
-                        }
-                        subscriptionUpdate?.let { update ->
-                            writeString(
-                                storage = subStorage,
-                                key = subscriptionId,
-                                value = JsonUtil.toJson(update.replacement),
-                                description = "subscription payload",
-                            )
-                        }
-                        replacementSelection?.let { guid ->
-                            writeString(
-                                storage = mainStorage,
-                                key = KEY_SELECTED_SERVER,
-                                value = guid,
-                                description = "selected profile",
-                            )
-                        }
+                rawConfigs.forEach { (guid, raw) -> writeRawProfilePayload(guid, raw) }
+                profiles.forEach { (guid, profile) -> writeProfilePayload(guid, profile) }
+                subscriptionUpdate?.let { writeSubscriptionPayload(subscriptionId, it.replacement) }
+                replacementSelection?.let { writeSelectedProfile(it) }
 
-                        if (replacedServers.isEmpty()) return@prepareThenPublish emptySet()
-                        val protectedServer = replacementSelection ?: previousSelection
-                        val referencedByOtherGroups = decodeServersReferencedByOtherGroups(subscriptionId)
-                        ProfileReplacement.findRemovablePayloads(
-                            replacedServers = replacedServers,
-                            replacementServers = profiles.keys,
-                            protectedServer = protectedServer,
-                            serversReferencedByOtherGroups = referencedByOtherGroups,
-                        )
-                    },
-                    publish = {
-                        writeString(
-                            storage = mainStorage,
-                            key = serverListKey(subscriptionId),
-                            value = JsonUtil.toJson(serverList),
-                            description = "profile index",
-                        )
-                    },
-                )
+                val removable = if (replacedServers.isEmpty()) {
+                    emptySet()
+                } else {
+                    ProfileReplacement.findRemovablePayloads(
+                        replacedServers = replacedServers,
+                        replacementServers = profiles.keys,
+                        protectedServer = replacementSelection ?: previousSelection,
+                        serversReferencedByOtherGroups =
+                            decodeServersReferencedByOtherGroups(subscriptionId),
+                    )
+                }
+                writeProfileIndex(serverListKey(subscriptionId), serverList)
+                removable
             }
             removeProfilePayloads(removablePayloads)
         }
@@ -658,24 +586,9 @@ object MmkvManager {
      * @param guid The server GUID.
      */
     fun removeServer(guid: String): Boolean {
-        if (guid.isBlank()) {
-            return false
-        }
-
-        return try {
-            withProfileIndexLock {
-                // Get config to determine which subscription to update
-                val config = decodeServerConfig(guid)
-                val subId = getSubscriptionId(config?.subscriptionId)
-                val removablePayloads = runStorageMutationTransaction {
-                    removeProfilesFromGroup(subId, setOf(guid))
-                }
-                removeProfilePayloads(removablePayloads)
-            }
-            true
-        } catch (e: Exception) {
-            LogUtil.e(TAG, "Failed to remove profile $guid", e)
-            false
+        if (guid.isBlank()) return false
+        return removeProfiles(setOf(guid), "Failed to remove profile $guid") {
+            getSubscriptionId(decodeServerConfig(guid)?.subscriptionId)
         }
     }
 
@@ -686,18 +599,7 @@ object MmkvManager {
      */
     fun removeServerViaSubid(subscriptionId: String?): Boolean {
         val subId = getSubscriptionId(subscriptionId)
-        return try {
-            withProfileIndexLock {
-                val removablePayloads = runStorageMutationTransaction {
-                    removeProfilesFromGroup(subId, requestedGuids = null)
-                }
-                removeProfilePayloads(removablePayloads)
-            }
-            true
-        } catch (e: Exception) {
-            LogUtil.e(TAG, "Failed to remove profiles for group $subId", e)
-            false
-        }
+        return removeProfiles(null, "Failed to remove profiles for group $subId") { subId }
     }
 
     /**
@@ -709,18 +611,7 @@ object MmkvManager {
     fun removeServers(guids: List<String>, subscriptionId: String): Boolean {
         if (guids.isEmpty()) return true
         val subId = getSubscriptionId(subscriptionId)
-        return try {
-            withProfileIndexLock {
-                val removablePayloads = runStorageMutationTransaction {
-                    removeProfilesFromGroup(subId, guids.toSet())
-                }
-                removeProfilePayloads(removablePayloads)
-            }
-            true
-        } catch (e: Exception) {
-            LogUtil.e(TAG, "Failed to remove profiles for group $subId", e)
-            false
-        }
+        return removeProfiles(guids.toSet(), "Failed to remove profiles for group $subId") { subId }
     }
 
     /**
@@ -781,14 +672,9 @@ object MmkvManager {
                 .filter { key -> key.startsWith(KEY_SUB_SERVER_PREFIX) }
             runStorageMutationTransaction {
                 profileIndexKeys.forEach { key ->
-                    writeString(
-                        storage = mainStorage,
-                        key = key,
-                        value = JsonUtil.toJson(emptyList<String>()),
-                        description = "profile index",
-                    )
+                    writeProfileIndex(key, emptyList())
                 }
-                removeString(mainStorage, KEY_SELECTED_SERVER, "selected profile")
+                removeSelectedProfile()
             }
 
             profileFullStorage.clearAll()
@@ -938,12 +824,7 @@ object MmkvManager {
                     if (subsList.remove(subid)) {
                         // Unpublish first. A process stop after this write can leave only an
                         // unreachable payload, and every in-flight update guard rejects the ID.
-                        writeString(
-                            storage = mainStorage,
-                            key = KEY_SUB_IDS,
-                            value = JsonUtil.toJson(subsList),
-                            description = "subscription index",
-                        )
+                        writeSubscriptionIndex(subsList)
                     }
                 }
 
@@ -991,26 +872,8 @@ object MmkvManager {
                 if (needsIndexWrite) subsList.add(key)
 
                 runStorageMutationTransaction {
-                    prepareThenPublish(
-                        prepare = {
-                            writeString(
-                                storage = subStorage,
-                                key = key,
-                                value = JsonUtil.toJson(subItem),
-                                description = "subscription payload",
-                            )
-                        },
-                        publish = {
-                            if (needsIndexWrite) {
-                                writeString(
-                                    storage = mainStorage,
-                                    key = KEY_SUB_IDS,
-                                    value = JsonUtil.toJson(subsList),
-                                    description = "subscription index",
-                                )
-                            }
-                        },
-                    )
+                    writeSubscriptionPayload(key, subItem)
+                    if (needsIndexWrite) writeSubscriptionIndex(subsList)
                 }
             }
             key
@@ -1042,12 +905,7 @@ object MmkvManager {
                 }
 
                 runStorageMutationTransaction {
-                    writeString(
-                        storage = subStorage,
-                        key = guid,
-                        value = JsonUtil.toJson(replacement),
-                        description = "subscription payload",
-                    )
+                    writeSubscriptionPayload(guid, replacement)
                 }
             }
             true
@@ -1080,12 +938,7 @@ object MmkvManager {
         return try {
             withProfileIndexLock {
                 runStorageMutationTransaction {
-                    writeString(
-                        storage = mainStorage,
-                        key = KEY_SUB_IDS,
-                        value = JsonUtil.toJson(subsList),
-                        description = "subscription index",
-                    )
+                    writeSubscriptionIndex(subsList)
                 }
             }
             true

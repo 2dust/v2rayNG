@@ -17,33 +17,15 @@ class StorageMutationTransactionTest {
 
         expectFailure<ProfileStorageException> {
             runStorageMutationTransaction {
-                mutate(
-                    change = {
-                        values["first"] = "after-first"
-                        true
-                    },
-                    restore = {
-                        values["first"] = "before-first"
-                        true
-                    },
-                    failureMessage = "first write",
-                )
-                mutate(
-                    change = {
-                        values["second"] = "partial-second"
-                        false
-                    },
-                    restore = {
-                        values["second"] = "before-second"
-                        true
-                    },
-                    failureMessage = "second write",
-                )
+                write(values, "first", "after-first")
+                write(values, "second", "partial-second", succeeds = false)
             }
         }
 
-        assertEquals("before-first", values["first"])
-        assertEquals("before-second", values["second"])
+        assertEquals(
+            mapOf("first" to "before-first", "second" to "before-second"),
+            values,
+        )
     }
 
     @Test
@@ -52,16 +34,11 @@ class StorageMutationTransactionTest {
 
         expectFailure<IllegalArgumentException> {
             runStorageMutationTransaction {
-                mutate(
-                    change = {
-                        values["profile"] = "partial"
-                        throw IllegalArgumentException("write failed")
-                    },
-                    restore = {
-                        values["profile"] = "before"
-                        true
-                    },
-                    failureMessage = "profile write",
+                write(
+                    values,
+                    "profile",
+                    "partial",
+                    changeFailure = IllegalArgumentException("write failed"),
                 )
             }
         }
@@ -75,22 +52,8 @@ class StorageMutationTransactionTest {
 
         expectFailure<ProfileStorageException> {
             runStorageMutationTransaction {
-                mutate(
-                    change = {
-                        values["profile"] = "new"
-                        true
-                    },
-                    restore = {
-                        values.remove("profile")
-                        true
-                    },
-                    failureMessage = "profile write",
-                )
-                mutate(
-                    change = { false },
-                    restore = { true },
-                    failureMessage = "index write",
-                )
+                write(values, "profile", "new")
+                write(values, "index", "new", succeeds = false)
             }
         }
 
@@ -102,17 +65,7 @@ class StorageMutationTransactionTest {
         val values = mutableMapOf("profile" to "before")
 
         runStorageMutationTransaction {
-            mutate(
-                change = {
-                    values["profile"] = "after"
-                    true
-                },
-                restore = {
-                    values["profile"] = "before"
-                    true
-                },
-                failureMessage = "profile write",
-            )
+            write(values, "profile", "after")
         }
 
         assertEquals("after", values["profile"])
@@ -120,82 +73,46 @@ class StorageMutationTransactionTest {
 
     @Test
     fun `reports rollback failures without hiding the original failure`() {
+        val values = mutableMapOf("first" to "before")
+
         val failure = expectFailure<ProfileStorageException> {
             runStorageMutationTransaction {
-                mutate(
-                    change = { true },
-                    restore = { false },
-                    failureMessage = "first write",
-                )
-                mutate(
-                    change = { false },
-                    restore = { true },
-                    failureMessage = "second write",
-                )
+                write(values, "first", "after", restoreSucceeds = false)
+                write(values, "second", "after", succeeds = false)
             }
         }
 
         assertEquals("second write", failure.message)
         assertEquals(1, failure.suppressed.size)
         assertTrue(failure.suppressed.single().message.orEmpty().contains("first write"))
+        assertEquals("after", values["first"])
     }
 
-    @Test
-    fun `publishes the authoritative index after every preparation step`() {
-        val writes = mutableListOf<String>()
-
-        runStorageMutationTransaction {
-            prepareThenPublish(
-                prepare = {
-                    writes += "raw payload"
-                    writes += "profile payload"
-                    writes += "selected profile"
-                },
-                publish = { writes += "profile index" },
-            )
-        }
-
-        assertEquals(
-            listOf("raw payload", "profile payload", "selected profile", "profile index"),
-            writes,
+    private fun StorageMutationTransaction.write(
+        values: MutableMap<String, String>,
+        key: String,
+        value: String,
+        succeeds: Boolean = true,
+        restoreSucceeds: Boolean = true,
+        changeFailure: Throwable? = null,
+    ) {
+        val previous = values[key]
+        mutate(
+            change = {
+                values[key] = value
+                changeFailure?.let { throw it }
+                succeeds
+            },
+            restore = {
+                if (!restoreSucceeds) {
+                    false
+                } else {
+                    if (previous == null) values.remove(key) else values[key] = previous
+                    true
+                }
+            },
+            failureMessage = "$key write",
         )
-    }
-
-    @Test
-    fun `does not publish the index when preparation fails and rollback also fails`() {
-        val values = mutableMapOf(
-            "payload" to "old payload",
-            "index" to "old index",
-        )
-
-        val failure = expectFailure<ProfileStorageException> {
-            runStorageMutationTransaction {
-                prepareThenPublish(
-                    prepare = {
-                        mutate(
-                            change = {
-                                values["payload"] = "extra payload"
-                                true
-                            },
-                            restore = { false },
-                            failureMessage = "payload write",
-                        )
-                        mutate(
-                            change = { false },
-                            restore = { true },
-                            failureMessage = "metadata write",
-                        )
-                    },
-                    publish = {
-                        values["index"] = "new index"
-                    },
-                )
-            }
-        }
-
-        assertEquals("metadata write", failure.message)
-        assertEquals("extra payload", values["payload"])
-        assertEquals("old index", values["index"])
     }
 
     private inline fun <reified T : Throwable> expectFailure(block: () -> Unit): T {
