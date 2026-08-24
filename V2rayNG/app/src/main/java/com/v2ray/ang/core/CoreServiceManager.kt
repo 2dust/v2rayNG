@@ -40,6 +40,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +54,8 @@ object CoreServiceManager {
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val screenStateReceiver = ScreenStateReceiver()
+    private var urlDownloadScope: CoroutineScope? = null
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
@@ -119,11 +122,23 @@ object CoreServiceManager {
 
     @Throws(Exception::class)
     private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?) {
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        ContextCompat.registerReceiver(
+            service,
+            mMsgReceive,
+            IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        val screenStateFilter = IntentFilter(Intent.ACTION_SCREEN_ON).apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+        }
+        ContextCompat.registerReceiver(
+            service,
+            screenStateReceiver,
+            screenStateFilter,
+            Utils.receiverFlags(),
+        )
+        urlDownloadScope?.cancel()
+        urlDownloadScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
@@ -196,6 +211,8 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
+        urlDownloadScope?.cancel()
+        urlDownloadScope = null
         val service = getService() ?: return false
 
         networkMonitor?.unregister()
@@ -226,6 +243,11 @@ object CoreServiceManager {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
+        }
+        try {
+            service.unregisterReceiver(screenStateReceiver)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister screen receiver", e)
         }
 
         return true
@@ -499,12 +521,12 @@ object CoreServiceManager {
 
     /**
      * Broadcast receiver for handling messages sent to the service.
-     * Handles registration, service control, and screen events.
+     * Handles internal registration and service-control messages.
      */
     private class ReceiveMessageHandler : BroadcastReceiver() {
         /**
          * Handles received broadcast messages.
-         * Processes service control messages and screen state changes.
+         * Processes service-control messages from another process in this app.
          * @param ctx The context in which the receiver is running.
          * @param intent The intent being received.
          */
@@ -557,6 +579,7 @@ object CoreServiceManager {
 
                 AppConfig.MSG_DOWNLOAD_URL -> {
                     if (!isOrderedBroadcast) return
+                    val scope = urlDownloadScope ?: return
                     val request = intent.serializable<CoreUrlDownloadRequest>("content") ?: return
                     val resultReceiver = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         intent.getParcelableExtra(
@@ -568,12 +591,18 @@ object CoreServiceManager {
                         intent.getParcelableExtra(CoreUrlDownloadRequest.EXTRA_RESULT_RECEIVER)
                     } ?: return
                     resultCode = Activity.RESULT_OK
-                    CoroutineScope(Dispatchers.IO).launch {
-                        resultReceiver.send(downloadUrlThroughCore(request), null)
+                    scope.launch {
+                        val result = downloadUrlThroughCore(request)
+                        ensureActive()
+                        resultReceiver.send(result, null)
                     }
                 }
             }
+        }
+    }
 
+    private class ScreenStateReceiver : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")
