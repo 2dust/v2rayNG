@@ -29,31 +29,21 @@ class ZipUtilTest {
     @Test
     fun extractArchiveRejectsPathTraversal() {
         val archive = createArchive("../outside" to "overwrite".toByteArray())
-        val destination = File(temporaryFolder.root, "destination")
         val outside = File(temporaryFolder.root, "outside")
 
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(archive, destination, extractionLimits())
-        }
+        assertArchiveRejected(archive)
 
         assertFalse(outside.exists())
-        assertFalse(destination.exists())
     }
 
     @Test
     fun extractArchiveRejectsOversizedArchive() {
         val archive = createArchive("config" to byteArrayOf(1))
-        val destination = File(temporaryFolder.root, "destination")
 
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(
-                archive,
-                destination,
-                extractionLimits(maxArchiveBytes = archive.length() - 1),
-            )
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(
+            archive,
+            extractionLimits(maxArchiveBytes = archive.length() - 1),
+        )
     }
 
     @Test
@@ -62,33 +52,14 @@ class ZipUtilTest {
             "first" to byteArrayOf(1),
             "second" to byteArrayOf(2),
         )
-        val destination = File(temporaryFolder.root, "destination")
-
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(
-                archive,
-                destination,
-                extractionLimits(maxEntries = 1),
-            )
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(archive, extractionLimits(maxEntries = 1))
     }
 
     @Test
     fun extractArchiveRejectsOversizedEntry() {
         val archive = createArchive("config" to ByteArray(5))
-        val destination = File(temporaryFolder.root, "destination")
 
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(
-                archive,
-                destination,
-                extractionLimits(maxEntryBytes = 4),
-            )
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(archive, extractionLimits(maxEntryBytes = 4))
     }
 
     @Test
@@ -97,33 +68,14 @@ class ZipUtilTest {
             "first" to ByteArray(3),
             "second" to ByteArray(3),
         )
-        val destination = File(temporaryFolder.root, "destination")
-
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(
-                archive,
-                destination,
-                extractionLimits(maxTotalBytes = 5),
-            )
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(archive, extractionLimits(maxTotalBytes = 5))
     }
 
     @Test
     fun extractArchiveRejectsExcessiveCompressionRatio() {
         val archive = createArchive("config" to ByteArray(4096))
-        val destination = File(temporaryFolder.root, "destination")
 
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(
-                archive,
-                destination,
-                extractionLimits(maxCompressionRatio = 2.0),
-            )
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(archive, extractionLimits(maxCompressionRatio = 2.0))
     }
 
     @Test
@@ -132,13 +84,7 @@ class ZipUtilTest {
             "config" to byteArrayOf(1),
             "nested/../config" to byteArrayOf(2),
         )
-        val destination = File(temporaryFolder.root, "destination")
-
-        assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(archive, destination, extractionLimits())
-        }
-
-        assertFalse(destination.exists())
+        assertArchiveRejected(archive)
     }
 
     @Test
@@ -147,12 +93,17 @@ class ZipUtilTest {
             "parent" to byteArrayOf(1),
             "parent/child" to byteArrayOf(2),
         )
+        assertArchiveRejected(archive)
+    }
+
+    private fun assertArchiveRejected(
+        archive: File,
+        limits: ZipUtil.ExtractionLimits = extractionLimits(),
+    ) {
         val destination = File(temporaryFolder.root, "destination")
-
         assertThrows(ZipException::class.java) {
-            ZipUtil.extractArchive(archive, destination, extractionLimits())
+            ZipUtil.extractArchive(archive, destination, limits)
         }
-
         assertFalse(destination.exists())
     }
 

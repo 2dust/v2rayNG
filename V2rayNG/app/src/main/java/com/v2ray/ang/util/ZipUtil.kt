@@ -24,7 +24,7 @@ object ZipUtil {
         maxCompressionRatio = 1000.0,
     )
 
-    internal data class ExtractionLimits(
+    internal class ExtractionLimits(
         val maxArchiveBytes: Long,
         val maxEntries: Int,
         val maxEntryBytes: Long,
@@ -39,11 +39,6 @@ object ZipUtil {
             require(maxCompressionRatio >= 1.0)
         }
     }
-
-    private data class ValidatedEntry(
-        val entry: ZipEntry,
-        val target: File,
-    )
 
     /**
      * Zip the contents of a folder.
@@ -118,7 +113,6 @@ object ZipUtil {
         }
     }
 
-    @Throws(IOException::class)
     internal fun extractArchive(
         zipFile: File,
         destination: File,
@@ -142,19 +136,17 @@ object ZipUtil {
         }
     }
 
-    @Throws(IOException::class)
     private fun validateEntries(
         zip: ZipFile,
         root: File,
         limits: ExtractionLimits,
-    ): List<ValidatedEntry> {
-        val result = ArrayList<ValidatedEntry>()
-        val targets = HashMap<String, Boolean>()
+    ): Map<File, ZipEntry> {
+        val entriesByTarget = LinkedHashMap<File, ZipEntry>()
         var totalBytes = 0L
         val entries = zip.entries()
 
         while (entries.hasMoreElements()) {
-            if (result.size >= limits.maxEntries) {
+            if (entriesByTarget.size >= limits.maxEntries) {
                 throw ZipException("ZIP archive exceeds the entry-count limit")
             }
 
@@ -167,7 +159,7 @@ object ZipUtil {
             }
 
             val target = resolveEntryTarget(root, entry)
-            if (targets.put(target.path, entry.isDirectory) != null) {
+            if (entriesByTarget.put(target, entry) != null) {
                 throw ZipException("ZIP archive contains duplicate entry destinations")
             }
 
@@ -195,22 +187,20 @@ object ZipUtil {
             }
 
             totalBytes += entryBytes
-            result.add(ValidatedEntry(entry, target))
         }
 
-        result.forEach { validated ->
-            var parent = validated.target.parentFile
+        entriesByTarget.forEach { (target, _) ->
+            var parent = target.parentFile
             while (parent != null && parent != root) {
-                if (targets[parent.path] == false) {
+                if (entriesByTarget[parent]?.isDirectory == false) {
                     throw ZipException("ZIP archive places an entry below a file")
                 }
                 parent = parent.parentFile
             }
         }
-        return result
+        return entriesByTarget
     }
 
-    @Throws(IOException::class)
     private fun resolveEntryTarget(root: File, entry: ZipEntry): File {
         val target = File(root, entry.name).canonicalFile
         val rootPrefix = root.path + File.separator
@@ -220,7 +210,6 @@ object ZipUtil {
         return target
     }
 
-    @Throws(IOException::class)
     private fun prepareDestination(root: File): Boolean {
         if (root.exists()) {
             if (!root.isDirectory || root.listFiles()?.isNotEmpty() != false) {
@@ -234,16 +223,13 @@ object ZipUtil {
         return true
     }
 
-    @Throws(IOException::class)
     private fun extractEntries(
         zip: ZipFile,
-        entries: List<ValidatedEntry>,
+        entries: Map<File, ZipEntry>,
         limits: ExtractionLimits,
     ) {
         var totalBytes = 0L
-        entries.forEach { validated ->
-            val entry = validated.entry
-            val target = validated.target
+        entries.forEach { (target, entry) ->
             if (entry.isDirectory) {
                 if (!target.isDirectory && !target.mkdirs()) {
                     throw IOException("Unable to create ZIP entry directory")
@@ -268,7 +254,6 @@ object ZipUtil {
         }
     }
 
-    @Throws(IOException::class)
     private fun copyEntry(
         input: InputStream,
         output: BufferedOutputStream,
