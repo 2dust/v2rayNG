@@ -18,8 +18,8 @@ object ZipUtil {
 
     private val DEFAULT_EXTRACTION_LIMITS = ExtractionLimits(
         maxArchiveBytes = 128L * MEBIBYTE,
-        maxEntries = 256,
-        maxEntryBytes = 64L * MEBIBYTE,
+        maxEntries = 32,
+        maxEntryBytes = 128L * MEBIBYTE,
         maxTotalBytes = 256L * MEBIBYTE,
         maxCompressionRatio = 1000.0,
     )
