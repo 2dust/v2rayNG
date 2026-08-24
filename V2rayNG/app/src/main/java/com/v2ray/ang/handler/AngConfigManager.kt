@@ -182,13 +182,7 @@ object AngConfigManager {
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
         return try {
-            var count = parseBatchConfig(Utils.decode(server), subid, append)
-            if (count <= 0) {
-                count = parseBatchConfig(server, subid, append)
-            }
-            if (count <= 0) {
-                count = parseCustomConfigServer(server, subid, append)
-            }
+            val count = parseAndCommitProfiles(server, subid, append)
 
             var countSub = parseBatchSubscription(server)
             if (countSub <= 0) {
@@ -540,7 +534,7 @@ object AngConfigManager {
             val updatedSubscription = expectedSubscription.copy(
                 lastUpdated = System.currentTimeMillis(),
             )
-            val count = parseConfigViaSub(
+            val count = parseAndCommitProfiles(
                 server = configText,
                 subid = it.guid,
                 append = false,
@@ -604,14 +598,14 @@ object AngConfigManager {
     }
 
     /**
-     * Parses the configuration via a subscription.
+     * Parses and commits profiles from encoded, plain, or custom configuration text.
      *
      * @param server The server string.
      * @param subid The subscription ID.
      * @param append Whether to append the configurations.
      * @return The number of configurations parsed.
      */
-    private fun parseConfigViaSub(
+    private fun parseAndCommitProfiles(
         server: String?,
         subid: String,
         append: Boolean,

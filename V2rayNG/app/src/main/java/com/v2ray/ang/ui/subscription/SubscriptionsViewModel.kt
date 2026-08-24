@@ -22,80 +22,69 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
-    private val subscriptions: MutableList<SubscriptionCache> =
-        MmkvManager.decodeSubscriptions().toMutableList()
-
-    private val _subsFlow = MutableStateFlow(subscriptions.toList())
+    private val _subsFlow = MutableStateFlow(MmkvManager.decodeSubscriptions())
     val subsFlow: StateFlow<List<SubscriptionCache>> = _subsFlow.asStateFlow()
 
-    fun getAll(): List<SubscriptionCache> = subscriptions.toList()
-
     fun reload() {
-        subscriptions.clear()
-        subscriptions.addAll(MmkvManager.decodeSubscriptions())
-        _subsFlow.value = subscriptions.toList()
+        _subsFlow.value = MmkvManager.decodeSubscriptions()
     }
 
     fun remove(subId: String) {
         launchLoading {
             val (result, persistedSubscriptions) = withContext(Dispatchers.IO) {
                 val removal = SettingsManager.removeSubscriptionWithDefault(subId)
-                removal to if (removal.removed) {
+                removal to if (removal != SettingsManager.SubscriptionRemovalResult.FAILED) {
                     MmkvManager.decodeSubscriptions()
                 } else {
                     emptyList()
                 }
             }
-            if (!result.removed) {
+            if (result == SettingsManager.SubscriptionRemovalResult.FAILED) {
                 toastError(R.string.toast_failure)
                 return@launchLoading
             }
 
-            subscriptions.clear()
-            subscriptions.addAll(persistedSubscriptions)
+            _subsFlow.value = persistedSubscriptions
             SettingsChangeManager.makeSetupGroupTab()
-            _subsFlow.value = subscriptions.toList()
-            if (!result.defaultCreated) {
+            if (result == SettingsManager.SubscriptionRemovalResult.REMOVED_WITHOUT_DEFAULT) {
                 toastError(R.string.toast_failure)
             }
         }
     }
 
     fun update(subId: String, item: SubscriptionItem) {
-        val idx = subscriptions.indexOfFirst { it.guid == subId }
-        if (idx >= 0) {
-            val expected = subscriptions[idx].subscription.copy()
-            launchLoading {
-                val saved = withContext(Dispatchers.IO) {
-                    MmkvManager.updateSubscription(subId, expected, item)
-                }
-                if (!saved) {
-                    toastError(R.string.toast_failure)
-                    return@launchLoading
-                }
+        val expected = _subsFlow.value
+            .firstOrNull { it.guid == subId }
+            ?.subscription
+            ?.copy()
+            ?: return
+        launchLoading {
+            val saved = withContext(Dispatchers.IO) {
+                MmkvManager.updateSubscription(subId, expected, item)
+            }
+            if (!saved) {
+                toastError(R.string.toast_failure)
+                return@launchLoading
+            }
 
-                val currentIndex = subscriptions.indexOfFirst { it.guid == subId }
-                if (currentIndex >= 0) {
-                    subscriptions[currentIndex] = SubscriptionCache(subId, item)
-                    _subsFlow.value = subscriptions.toList()
-                }
+            val subscriptions = _subsFlow.value.toMutableList()
+            val currentIndex = subscriptions.indexOfFirst { it.guid == subId }
+            if (currentIndex >= 0) {
+                subscriptions[currentIndex] = SubscriptionCache(subId, item)
+                _subsFlow.value = subscriptions
             }
         }
     }
 
     fun move(fromPosition: Int, toPosition: Int) {
-        val previous = subscriptions.toList()
-        if (subscriptions.moveItem(fromPosition, toPosition)) {
-            val saved = MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
-            if (saved) {
-                SettingsChangeManager.makeSetupGroupTab()
-                _subsFlow.value = subscriptions.toList()
-            } else {
-                subscriptions.clear()
-                subscriptions.addAll(previous)
-                _subsFlow.value = subscriptions.toList()
-                toastError(R.string.toast_failure)
-            }
+        val subscriptions = _subsFlow.value.toMutableList()
+        if (!subscriptions.moveItem(fromPosition, toPosition)) return
+
+        if (MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })) {
+            SettingsChangeManager.makeSetupGroupTab()
+            _subsFlow.value = subscriptions
+        } else {
+            toastError(R.string.toast_failure)
         }
     }
 

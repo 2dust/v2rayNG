@@ -423,11 +423,11 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         return true
     }
 
-    protected fun saveServer(state: ServerUiState): Boolean {
-        if (!validateBasicConfig(state)) return false
+    protected fun saveServer(state: ServerUiState) {
+        if (!validateBasicConfig(state)) return
         val config = state.toProfileItem(initialConfig)
-        if (!validateCommonConfig(config)) return false
-        if (!validateProtocolConfig(config)) return false
+        if (!validateCommonConfig(config)) return
+        if (!validateProtocolConfig(config)) return
 
         config.description = AngConfigManager.generateDescription(config)
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
@@ -435,13 +435,12 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         val savedGuid = MmkvManager.encodeServerConfig(editGuid, config) ?: run {
             toast(R.string.toast_failure)
-            return false
+            return
         }
         toastSuccess(R.string.toast_success)
         ProfileEditorResult.run {
             finishSaved(savedGuid, isRunning)
         }
-        return true
     }
 
     @Composable

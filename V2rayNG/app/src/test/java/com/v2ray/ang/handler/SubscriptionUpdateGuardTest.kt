@@ -16,49 +16,36 @@ class SubscriptionUpdateGuardTest {
 
     @Test
     fun `rejects an update after its subscription was deleted`() {
-        assertFalse(
-            SubscriptionUpdateGuard.canCommit(
-                isIndexed = true,
-                current = null,
-                expected = expected,
-            )
-        )
+        assertFalse(canCommit(current = null))
     }
 
     @Test
     fun `rejects an update after the subscription was unpublished`() {
-        assertFalse(
-            SubscriptionUpdateGuard.canCommit(
-                isIndexed = false,
-                current = expected,
-                expected = expected,
-            )
-        )
+        assertFalse(canCommit(isIndexed = false))
     }
 
     @Test
     fun `rejects an update after subscription settings changed`() {
         val edited = expected.copy(url = "https://example.com/edited")
 
-        assertFalse(
-            SubscriptionUpdateGuard.canCommit(
-                isIndexed = true,
-                current = edited,
-                expected = expected,
-            )
-        )
+        assertFalse(canCommit(current = edited))
     }
 
     @Test
     fun `allows an update when only last updated metadata changed`() {
         val current = expected.copy(lastUpdated = 200)
 
-        assertTrue(
-            SubscriptionUpdateGuard.canCommit(
-                isIndexed = true,
-                current = current,
-                expected = expected,
-            )
+        assertTrue(canCommit(current = current))
+    }
+
+    private fun canCommit(
+        isIndexed: Boolean = true,
+        current: SubscriptionItem? = expected,
+    ): Boolean {
+        return SubscriptionUpdateGuard.canCommit(
+            isIndexed = isIndexed,
+            current = current,
+            expected = expected,
         )
     }
 }

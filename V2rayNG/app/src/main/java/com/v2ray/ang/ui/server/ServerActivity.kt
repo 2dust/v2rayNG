@@ -87,20 +87,20 @@ class ServerActivity : BaseComponentActivity() {
             initialConfig = initialConfig,
             isRunning = isRunning,
             onBackClick = { finish() },
-            onSave = { saveServer(it) },
-            onDelete = { deleteServer(editGuid, isRunning) }
+            onSave = ::saveServer,
+            onDelete = { deleteServer(editGuid) },
         )
     }
 
-    private fun saveServer(config: ProfileItem): Boolean {
+    private fun saveServer(config: ProfileItem) {
         if (config.remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
-            return false
+            return
         }
 
         if (config.server.isNullOrBlank()) {
             toast(R.string.server_lab_address)
-            return false
+            return
         }
 
         if (
@@ -108,7 +108,7 @@ class ServerActivity : BaseComponentActivity() {
             (config.serverPort?.toIntOrNull() ?: 0) <= 0
         ) {
             toast(R.string.server_lab_port)
-            return false
+            return
         }
 
         if (
@@ -124,7 +124,7 @@ class ServerActivity : BaseComponentActivity() {
                 else -> R.string.server_lab_id
             }
             toast(message)
-            return false
+            return
         }
 
         if (
@@ -132,7 +132,7 @@ class ServerActivity : BaseComponentActivity() {
             config.security.isNullOrBlank()
         ) {
             toast(R.string.server_lab_stream_security)
-            return false
+            return
         }
 
         if (
@@ -140,7 +140,7 @@ class ServerActivity : BaseComponentActivity() {
             JsonUtil.parseString(config.xhttpExtra) == null
         ) {
             toast(R.string.server_lab_xhttp_extra)
-            return false
+            return
         }
 
         if (
@@ -148,7 +148,7 @@ class ServerActivity : BaseComponentActivity() {
             JsonUtil.parseString(config.finalMask) == null
         ) {
             toast(R.string.server_lab_final_mask)
-            return false
+            return
         }
 
         config.description =
@@ -166,7 +166,7 @@ class ServerActivity : BaseComponentActivity() {
             config
         ) ?: run {
             toast(R.string.toast_failure)
-            return false
+            return
         }
 
         toastSuccess(R.string.toast_success)
@@ -177,14 +177,9 @@ class ServerActivity : BaseComponentActivity() {
                 restartService = isRunning
             )
         }
-
-        return true
     }
 
-    private fun deleteServer(
-        guid: String,
-        isRunning: Boolean
-    ) {
+    private fun deleteServer(guid: String) {
         if (
             guid.isEmpty() ||
             guid == MmkvManager.getSelectServer()
@@ -211,7 +206,7 @@ fun ServerScreen(
     initialConfig: ProfileItem,
     isRunning: Boolean,
     onBackClick: () -> Unit,
-    onSave: (ProfileItem) -> Boolean,
+    onSave: (ProfileItem) -> Unit,
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
