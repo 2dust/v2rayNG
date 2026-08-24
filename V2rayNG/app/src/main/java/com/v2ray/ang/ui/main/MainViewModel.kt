@@ -478,8 +478,7 @@ class MainViewModel(
                             dataSource.removeAllServer()
                         } else {
                             val guids = currentServers().map { it.guid }
-                            guids.forEach { dataSource.removeServer(it) }
-                            guids.size
+                            guids.count { dataSource.removeServer(it) }
                         }
                     viewModelScope.launch(ioDispatcher) {
                         cacheMutex.withLock { groupDataCache.clear() }
@@ -509,9 +508,13 @@ class MainViewModel(
                             if (!seen.add(identity)) duplicates += server.guid
                         }
                     }
-                    duplicates.forEach { dataSource.removeServer(it) }
+                    val removedCount = duplicates.count { dataSource.removeServer(it) }
                     setupGroupTab(forceRefresh = true)
-                    toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
+                    if (removedCount == duplicates.size) {
+                        toast(dataSource.getString(R.string.title_del_duplicate_config_count, removedCount))
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
@@ -653,7 +656,10 @@ class MainViewModel(
             return
         }
         viewModelScope.launch(ioDispatcher) {
-            dataSource.removeServer(guid)
+            if (!dataSource.removeServer(guid)) {
+                toastError(R.string.toast_failure)
+                return@launch
+            }
             cacheMutex.withLock { groupDataCache.clear() }
             setupGroupTab(forceRefresh = true).join()
         }
@@ -668,8 +674,16 @@ class MainViewModel(
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
         serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
             previousPersistenceJob?.join()
-            dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
+            if (dataSource.encodeServerList(guids, groupId)) {
+                cacheMutex.withLock { groupDataCache[groupId] = servers }
+                withContext(Dispatchers.Main) {
+                    mutableServersForGroup(groupId).value = servers
+                }
+            } else {
+                cacheMutex.withLock { groupDataCache.remove(groupId) }
+                setupGroupTab(forceRefresh = true).join()
+                toastError(R.string.toast_failure)
+            }
         }
     }
 

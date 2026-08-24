@@ -36,30 +36,66 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         _subsFlow.value = subscriptions.toList()
     }
 
-    fun remove(subId: String): Boolean {
-        val changed = subscriptions.removeAll { it.guid == subId }
-        if (changed) {
-            SettingsManager.removeSubscriptionWithDefault(subId)
+    fun remove(subId: String) {
+        launchLoading {
+            val (result, persistedSubscriptions) = withContext(Dispatchers.IO) {
+                val removal = SettingsManager.removeSubscriptionWithDefault(subId)
+                removal to if (removal.removed) {
+                    MmkvManager.decodeSubscriptions()
+                } else {
+                    emptyList()
+                }
+            }
+            if (!result.removed) {
+                toastError(R.string.toast_failure)
+                return@launchLoading
+            }
+
+            subscriptions.clear()
+            subscriptions.addAll(persistedSubscriptions)
             SettingsChangeManager.makeSetupGroupTab()
+            _subsFlow.value = subscriptions.toList()
+            if (!result.defaultCreated) {
+                toastError(R.string.toast_failure)
+            }
         }
-        _subsFlow.value = subscriptions.toList()
-        return changed
     }
 
     fun update(subId: String, item: SubscriptionItem) {
         val idx = subscriptions.indexOfFirst { it.guid == subId }
         if (idx >= 0) {
-            subscriptions[idx] = SubscriptionCache(subId, item)
-            MmkvManager.encodeSubscription(subId, item)
+            val expected = subscriptions[idx].subscription.copy()
+            launchLoading {
+                val saved = withContext(Dispatchers.IO) {
+                    MmkvManager.updateSubscription(subId, expected, item)
+                }
+                if (!saved) {
+                    toastError(R.string.toast_failure)
+                    return@launchLoading
+                }
+
+                val currentIndex = subscriptions.indexOfFirst { it.guid == subId }
+                if (currentIndex >= 0) {
+                    subscriptions[currentIndex] = SubscriptionCache(subId, item)
+                    _subsFlow.value = subscriptions.toList()
+                }
+            }
         }
-        _subsFlow.value = subscriptions.toList()
     }
 
     fun move(fromPosition: Int, toPosition: Int) {
+        val previous = subscriptions.toList()
         if (subscriptions.moveItem(fromPosition, toPosition)) {
-            MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
-            SettingsChangeManager.makeSetupGroupTab()
-            _subsFlow.value = subscriptions.toList()
+            val saved = MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
+            if (saved) {
+                SettingsChangeManager.makeSetupGroupTab()
+                _subsFlow.value = subscriptions.toList()
+            } else {
+                subscriptions.clear()
+                subscriptions.addAll(previous)
+                _subsFlow.value = subscriptions.toList()
+                toastError(R.string.toast_failure)
+            }
         }
     }
 

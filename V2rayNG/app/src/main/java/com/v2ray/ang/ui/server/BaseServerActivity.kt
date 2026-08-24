@@ -433,7 +433,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        val savedGuid = MmkvManager.encodeServerConfig(editGuid, config)
+        val savedGuid = MmkvManager.encodeServerConfig(editGuid, config) ?: run {
+            toast(R.string.toast_failure)
+            return false
+        }
         toastSuccess(R.string.toast_success)
         ProfileEditorResult.run {
             finishSaved(savedGuid, isRunning)
@@ -506,7 +509,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             toast(R.string.toast_action_not_allowed)
             return
         }
-        MmkvManager.removeServer(guid)
+        if (!MmkvManager.removeServer(guid)) {
+            toast(R.string.toast_failure)
+            return
+        }
         ProfileEditorResult.run {
             finishDeleted(guid)
         }

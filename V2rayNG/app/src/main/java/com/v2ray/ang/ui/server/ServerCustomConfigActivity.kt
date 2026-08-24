@@ -148,13 +148,12 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         val savedGuid = MmkvManager.encodeServerConfig(
             editGuid,
-            config
-        )
-
-        MmkvManager.encodeServerRaw(
-            savedGuid,
-            content
-        )
+            config,
+            rawConfig = content,
+        ) ?: run {
+            toast(R.string.toast_failure)
+            return false
+        }
 
         toastSuccess(R.string.toast_success)
 
@@ -178,7 +177,10 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             return false
         }
 
-        MmkvManager.removeServer(editGuid)
+        if (!MmkvManager.removeServer(editGuid)) {
+            toast(R.string.toast_failure)
+            return false
+        }
 
         ProfileEditorResult.run {
             finishDeleted(editGuid)

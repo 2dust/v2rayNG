@@ -47,6 +47,7 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SubEditActivity : BaseComponentActivity() {
     private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
@@ -102,8 +103,19 @@ class SubEditActivity : BaseComponentActivity() {
             return false
         }
 
-        MmkvManager.encodeSubscription(editSubId, subItem)
-        SubscriptionUpdater.syncOne(subId = editSubId)
+        val savedSubId = if (editSubId.isEmpty()) {
+            MmkvManager.encodeSubscription(editSubId, subItem)
+        } else if (MmkvManager.updateSubscription(editSubId, this.subItem, subItem)) {
+            editSubId
+        } else {
+            null
+        }
+        if (savedSubId == null) {
+            toast(R.string.toast_failure)
+            return false
+        }
+
+        SubscriptionUpdater.syncOne(subId = savedSubId)
         SettingsChangeManager.makeSetupGroupTab()
         toastSuccess(R.string.toast_success)
         finish()
@@ -112,10 +124,19 @@ class SubEditActivity : BaseComponentActivity() {
 
     private fun deleteServer(): Boolean {
         if (editSubId.isNotEmpty()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                SettingsManager.removeSubscriptionWithDefault(editSubId)
+            lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    SettingsManager.removeSubscriptionWithDefault(editSubId)
+                }
+                if (!result.removed) {
+                    toast(R.string.toast_failure)
+                    return@launch
+                }
                 SettingsChangeManager.makeSetupGroupTab()
-                launch(Dispatchers.Main) { finish() }
+                if (!result.defaultCreated) {
+                    toast(R.string.toast_failure)
+                }
+                finish()
             }
         }
         return true

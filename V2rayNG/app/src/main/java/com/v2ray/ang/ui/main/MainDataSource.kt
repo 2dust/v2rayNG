@@ -32,9 +32,9 @@ interface MainDataSource : Closeable {
     fun decodeServerConfig(guid: String): ProfileItem?
     fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo?
 
-    fun encodeServerList(guids: List<String>, groupId: String)
+    fun encodeServerList(guids: List<String>, groupId: String): Boolean
 
-    fun removeServer(guid: String)
+    fun removeServer(guid: String): Boolean
     fun removeAllServer(): Int
     fun removeInvalidServerByGuid(guid: String): Int
     fun removeInvalidServersInGroup(groupId: String): Int
