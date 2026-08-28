@@ -76,7 +76,11 @@
     "protocol": "freedom",
     "streamSettings": {
       "sockopt": {
-        "domainStrategy": "UseIP"
+        "domainStrategy": "UseIP",
+        "happyEyeballs": {
+          "tryDelayMs": 250,
+          "interleave": 2
+        }
       }
     },
     "tag": "direct"
