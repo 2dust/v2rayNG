@@ -226,7 +226,6 @@ fun MainScreen(
                             selectedGuid = selectedGuid,
                             locateTarget = uiState.locateTarget,
                             doubleColumnDisplay = doubleColumnDisplay,
-                            confirmRemove = confirmRemove,
                             searchQuery = searchQuery,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,

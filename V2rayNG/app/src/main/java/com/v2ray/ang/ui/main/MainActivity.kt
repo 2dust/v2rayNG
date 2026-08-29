@@ -77,7 +77,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 ProfileEditorResult.EXTRA_RESTART_SERVICE, false
             )
             val selectedProfileSaved = action == ProfileEditorResult.ACTION_SAVED &&
-                data.getStringExtra(ProfileEditorResult.EXTRA_GUID) == mainViewModel.uiState.value.selectedGuid
+                    data.getStringExtra(ProfileEditorResult.EXTRA_GUID) == mainViewModel.uiState.value.selectedGuid
             mainViewModel.onAction(MainAction.RefreshGroups)
             if (restartService || selectedProfileSaved) LauncherManager.restartService(this)
         }

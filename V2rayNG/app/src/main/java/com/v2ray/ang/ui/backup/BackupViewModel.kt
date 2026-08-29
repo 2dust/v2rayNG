@@ -185,17 +185,20 @@ class BackupViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    private fun performRestore(cacheDir: File, zipFile: File): Boolean {
-        val backupDir = cacheDir.absolutePath + "/${System.currentTimeMillis()}"
+    private suspend fun performRestore(cacheDir: File, zipFile: File): Boolean =
+        withContext(Dispatchers.IO) {
+            val backupDir = File(cacheDir, "restore_${System.nanoTime()}")
+            try {
+                if (!ZipUtil.unzipToFolder(zipFile, backupDir.absolutePath)) {
+                    return@withContext false
+                }
 
-        if (!ZipUtil.unzipToFolder(zipFile, backupDir)) {
-            return false
+                val count = MMKV.restoreAllFromDirectory(backupDir.absolutePath)
+                SettingsChangeManager.makeSetupGroupTab()
+                SettingsChangeManager.makeRestartService()
+                count > 0
+            } finally {
+                backupDir.deleteRecursively()
+            }
         }
-
-        val count = MMKV.restoreAllFromDirectory(backupDir)
-        SettingsChangeManager.makeSetupGroupTab()
-        SettingsChangeManager.makeRestartService()
-
-        return count > 0
-    }
 }
