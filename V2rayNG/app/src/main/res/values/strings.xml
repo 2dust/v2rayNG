@@ -532,6 +532,8 @@
     <string name="acc_turn_torch_off">Turn flashlight off</string>
     <string name="acc_select_image">Select image to scan</string>
     <string name="acc_locked">This rule is kept when importing presets</string>
+    <string name="acc_settings_group_expanded">Group is expanded</string>
+    <string name="acc_settings_group_collapsed">Group is collapsed</string>
     <string name="acc_open_menu">Open navigation menu</string>
     <string name="acc_edit">Edit</string>
     <string name="acc_delete">Delete</string>

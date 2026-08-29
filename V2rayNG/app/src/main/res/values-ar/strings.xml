@@ -532,6 +532,8 @@
     <string name="acc_turn_torch_off">إطفاء المصباح</string>
     <string name="acc_select_image">اختيار صورة لمسحها</string>
     <string name="acc_locked">يتم الاحتفاظ بالقاعدة عند استيراد الإعدادات المسبقة</string>
+    <string name="acc_settings_group_expanded">المجموعة موسّعة</string>
+    <string name="acc_settings_group_collapsed">المجموعة مطوية</string>
     <string name="acc_open_menu">فتح قائمة التنقل</string>
     <string name="acc_edit">تعديل</string>
     <string name="acc_delete">حذف</string>

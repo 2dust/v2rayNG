@@ -532,6 +532,8 @@
     <string name="acc_turn_torch_off">Выключить фонарик</string>
     <string name="acc_select_image">Выбрать изображение для сканирования</string>
     <string name="acc_locked">Правило сохраняется при импорте предустановок</string>
+    <string name="acc_settings_group_expanded">Группа развёрнута</string>
+    <string name="acc_settings_group_collapsed">Группа свёрнута</string>
     <string name="acc_open_menu">Открыть меню навигации</string>
     <string name="acc_edit">Изменить</string>
     <string name="acc_delete">Удалить</string>

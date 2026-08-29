@@ -532,6 +532,8 @@
     <string name="acc_turn_torch_off">Tắt đèn pin</string>
     <string name="acc_select_image">Chọn ảnh để quét</string>
     <string name="acc_locked">Giữ quy tắc khi nhập cài đặt sẵn</string>
+    <string name="acc_settings_group_expanded">Nhóm đang mở rộng</string>
+    <string name="acc_settings_group_collapsed">Nhóm đang thu gọn</string>
     <string name="acc_open_menu">Mở trình đơn điều hướng</string>
     <string name="acc_edit">Chỉnh sửa</string>
     <string name="acc_delete">Xóa</string>
