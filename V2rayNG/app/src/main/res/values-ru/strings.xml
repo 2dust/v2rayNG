@@ -49,6 +49,7 @@
     <string name="confirm_delete_policy_group">Удалить эту политику группы?</string>
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>
+    <string name="confirm_delete_routing_rule_named">Удалить это правило маршрутизации?\n%1$s</string>
     <string name="confirm_delete_subscription_group">Удалить эту подписку?</string>
     <string name="confirm_delete_asset_file">Удалить файл ресурсов «%1$s»?</string>
     <string name="confirm_delete_asset_source">Удалить этот источник ресурсов?</string>
@@ -515,6 +516,15 @@
     <string name="acc_copy_log">Копировать журнал</string>
     <string name="acc_clear_log">Очистить журнал</string>
     <string name="acc_add_rule">Добавить правило маршрутизации</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_blocked">заблокировано</string>
+    <string name="acc_routing_rule_routed_through">маршрутизируется через %1$s</string>
+    <string name="acc_routing_rule_routed_directly">маршрутизируется напрямую</string>
+    <string name="acc_routing_rule_enabled">Правило включено</string>
+    <string name="acc_routing_rule_disabled">Правило выключено</string>
+    <string name="acc_routing_rule_switch_label">Правило %1$s</string>
+    <string name="acc_edit_routing_rule_named">Изменить %1$s</string>
+    <string name="acc_delete_routing_rule_named">Удалить %1$s</string>
     <string name="acc_start">Запустить службу</string>
     <string name="acc_stop">Остановить службу</string>
     <string name="acc_back">Назад</string>

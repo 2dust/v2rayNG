@@ -49,6 +49,7 @@
     <string name="confirm_delete_policy_group">Bạn có chắc muốn xóa nhóm chính sách này không?</string>
     <string name="confirm_delete_proxy_chain_member">Bạn có chắc muốn xóa thành viên này khỏi chuỗi proxy không?</string>
     <string name="confirm_delete_routing_rule">Bạn có chắc muốn xóa quy tắc định tuyến này không?</string>
+    <string name="confirm_delete_routing_rule_named">Bạn có chắc muốn xóa quy tắc định tuyến này không?\n%1$s</string>
     <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không?</string>
     <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên \"%1$s\" không?</string>
     <string name="confirm_delete_asset_source">Bạn có chắc muốn xóa nguồn tài nguyên này không?</string>
@@ -515,6 +516,15 @@
     <string name="acc_copy_log">Sao chép nhật ký</string>
     <string name="acc_clear_log">Xóa nhật ký</string>
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_blocked">bị chặn</string>
+    <string name="acc_routing_rule_routed_through">được định tuyến qua %1$s</string>
+    <string name="acc_routing_rule_routed_directly">được định tuyến trực tiếp</string>
+    <string name="acc_routing_rule_enabled">Quy tắc đang bật</string>
+    <string name="acc_routing_rule_disabled">Quy tắc đang tắt</string>
+    <string name="acc_routing_rule_switch_label">Quy tắc %1$s</string>
+    <string name="acc_edit_routing_rule_named">Chỉnh sửa %1$s</string>
+    <string name="acc_delete_routing_rule_named">Xóa %1$s</string>
     <string name="acc_start">Khởi động dịch vụ</string>
     <string name="acc_stop">Dừng dịch vụ</string>
     <string name="acc_back">Quay lại</string>

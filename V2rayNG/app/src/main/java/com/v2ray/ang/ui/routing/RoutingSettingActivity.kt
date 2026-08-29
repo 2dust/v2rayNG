@@ -38,6 +38,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +57,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.ReorderableListItem
@@ -205,6 +210,7 @@ fun RoutingSettingScreen(
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
+    var deleteRuleId by remember { mutableStateOf<String?>(null) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
@@ -295,7 +301,8 @@ fun RoutingSettingScreen(
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
                                 viewModel.update(index, updated)
-                            }
+                            },
+                            onDelete = { deleteRuleId = ruleset.id }
                         )
                     }
                     ItemDivider()
@@ -304,6 +311,17 @@ fun RoutingSettingScreen(
         }
     }
 
+    deleteRuleId?.let { ruleId ->
+        val ruleName = rulesets.firstOrNull { it.id == ruleId }?.remarks.orEmpty()
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_routing_rule_named, ruleName),
+            onConfirm = {
+                viewModel.remove(ruleId)
+                deleteRuleId = null
+            },
+            onDismiss = { deleteRuleId = null }
+        )
+    }
 
     if (showPresetDialog) {
         SelectListDialog(
@@ -323,11 +341,37 @@ fun RoutingSettingScreen(
 private fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
-    onEnabledChange: (Boolean) -> Unit
+    onEnabledChange: (Boolean) -> Unit,
+    onDelete: () -> Unit
 ) {
+    val enabled = ruleset.enabled
+    val ruleName = ruleset.remarks.orEmpty()
+    val outboundTag = ruleset.outboundTag.ifBlank { AppConfig.TAG_PROXY }
+    val routeDescription = when {
+        outboundTag.equals(AppConfig.TAG_BLOCKED, ignoreCase = true) ->
+            stringResource(R.string.acc_routing_rule_blocked)
+
+        outboundTag.equals(AppConfig.TAG_DIRECT, ignoreCase = true) ->
+            stringResource(R.string.acc_routing_rule_routed_directly)
+
+        else -> stringResource(R.string.acc_routing_rule_routed_through, outboundTag)
+    }
+    val ruleState = stringResource(
+        if (enabled) R.string.acc_routing_rule_enabled else R.string.acc_routing_rule_disabled
+    )
+    val ruleSummary = stringResource(
+        R.string.acc_routing_rule_summary,
+        routeDescription,
+        ruleState
+    )
+    val ruleSwitchLabel = stringResource(R.string.acc_routing_rule_switch_label, ruleName)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                stateDescription = ruleSummary
+            }
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -343,7 +387,7 @@ private fun RoutingRulesetItem(
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         painter = painterResource(R.drawable.ic_lock_24dp),
-                        contentDescription = stringResource(R.string.acc_locked),
+                        contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -354,6 +398,7 @@ private fun RoutingRulesetItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = domainIpInfo,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -364,6 +409,7 @@ private fun RoutingRulesetItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = ruleset.outboundTag,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.labelMedium,
                     color = colorConfigType
                 )
@@ -374,17 +420,35 @@ private fun RoutingRulesetItem(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(start = 8.dp)
         ) {
-            IconButton(onClick = onEdit) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit)
-                )
+            Row {
+                IconButton(onClick = onEdit) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_edit_24dp),
+                        contentDescription = stringResource(
+                            R.string.acc_edit_routing_rule_named,
+                            ruleName
+                        )
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete_24dp),
+                        contentDescription = stringResource(
+                            R.string.acc_delete_routing_rule_named,
+                            ruleName
+                        )
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Switch(
-                checked = ruleset.enabled ?: false,
+                checked = enabled,
                 onCheckedChange = onEnabledChange,
-                modifier = Modifier.scale(0.7f),
+                modifier = Modifier
+                    .scale(0.7f)
+                    .semantics {
+                        contentDescription = ruleSwitchLabel
+                    },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary

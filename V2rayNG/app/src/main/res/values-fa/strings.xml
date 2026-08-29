@@ -49,6 +49,7 @@
     <string name="confirm_delete_policy_group">آیا مطمئن هستید که می‌خواهید این گروه سیاست را حذف کنید؟</string>
     <string name="confirm_delete_proxy_chain_member">آیا مطمئن هستید که می‌خواهید این عضو زنجیره پراکسی را حذف کنید؟</string>
     <string name="confirm_delete_routing_rule">آیا مطمئن هستید که می‌خواهید این قانون مسیریابی را حذف کنید؟</string>
+    <string name="confirm_delete_routing_rule_named">آیا مطمئن هستید که می‌خواهید این قانون مسیریابی را حذف کنید؟\n%1$s</string>
     <string name="confirm_delete_subscription_group">آیا مطمئن هستید که می‌خواهید این گروه اشتراک را حذف کنید؟</string>
     <string name="confirm_delete_asset_file">آیا مطمئن هستید که می‌خواهید فایل دارایی \"%1$s\" را حذف کنید؟</string>
     <string name="confirm_delete_asset_source">آیا مطمئن هستید که می‌خواهید این منبع دارایی را حذف کنید؟</string>
@@ -515,6 +516,15 @@
     <string name="acc_copy_log">کپی گزارش</string>
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
+    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
+    <string name="acc_routing_rule_blocked">مسدود است</string>
+    <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>
+    <string name="acc_routing_rule_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
+    <string name="acc_routing_rule_enabled">قانون روشن است</string>
+    <string name="acc_routing_rule_disabled">قانون خاموش است</string>
+    <string name="acc_routing_rule_switch_label">قانون %1$s</string>
+    <string name="acc_edit_routing_rule_named">ویرایش %1$s</string>
+    <string name="acc_delete_routing_rule_named">حذف %1$s</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
     <string name="acc_back">بازگشت</string>

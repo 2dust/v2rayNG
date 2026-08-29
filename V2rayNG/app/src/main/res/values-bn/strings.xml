@@ -49,6 +49,7 @@
     <string name="confirm_delete_policy_group">আপনি কি এই পলিসি গ্রুপটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_proxy_chain_member">আপনি কি এই প্রক্সি চেইন সদস্যটিকে মুছে ফেলতে চান?</string>
     <string name="confirm_delete_routing_rule">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_routing_rule_named">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?\n%1$s</string>
     <string name="confirm_delete_subscription_group">আপনি কি এই সাবস্ক্রিপশন গ্রুপটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_asset_file">আপনি কি \"%1$s\" অ্যাসেট ফাইলটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_asset_source">আপনি কি এই অ্যাসেট উৎসটি মুছে ফেলতে চান?</string>
@@ -515,6 +516,15 @@
     <string name="acc_copy_log">লগ কপি করুন</string>
     <string name="acc_clear_log">লগ মুছুন</string>
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
+    <string name="acc_routing_rule_summary">%1$s। %2$s</string>
+    <string name="acc_routing_rule_blocked">ব্লক করা হয়েছে</string>
+    <string name="acc_routing_rule_routed_through">%1$s-এর মাধ্যমে রাউট করা হয়েছে</string>
+    <string name="acc_routing_rule_routed_directly">সরাসরি রাউট করা হয়েছে</string>
+    <string name="acc_routing_rule_enabled">নিয়মটি চালু</string>
+    <string name="acc_routing_rule_disabled">নিয়মটি বন্ধ</string>
+    <string name="acc_routing_rule_switch_label">নিয়ম %1$s</string>
+    <string name="acc_edit_routing_rule_named">%1$s সম্পাদনা করুন</string>
+    <string name="acc_delete_routing_rule_named">%1$s মুছুন</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>
     <string name="acc_stop">সার্ভিস বন্ধ করুন</string>
     <string name="acc_back">ফিরে যান</string>

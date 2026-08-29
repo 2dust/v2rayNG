@@ -11,6 +11,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 
+internal data class RoutingRuleRemoval(
+    val position: Int,
+    val remainingRules: List<RulesetItem>
+)
+
+internal fun removeRoutingRule(
+    rules: List<RulesetItem>,
+    ruleId: String
+): RoutingRuleRemoval? {
+    val position = rules.indexOfFirst { it.id == ruleId }
+    if (position < 0) return null
+
+    return RoutingRuleRemoval(
+        position = position,
+        remainingRules = rules.toMutableList().apply { removeAt(position) }
+    )
+}
+
 class RoutingSettingsViewModel(application: Application) : BaseViewModel(application) {
     private val rulesets: MutableList<RulesetItem> = mutableListOf()
 
@@ -40,6 +58,14 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
             SettingsManager.saveRoutingRuleset(position, item)
             _rulesetsFlow.value = rulesets.toList()
         }
+    }
+
+    fun remove(ruleId: String) {
+        val removal = removeRoutingRule(rulesets, ruleId) ?: return
+        SettingsManager.removeRoutingRuleset(ruleId)
+        rulesets.clear()
+        rulesets.addAll(removal.remainingRules)
+        _rulesetsFlow.value = rulesets.toList()
     }
 
     fun move(fromPosition: Int, toPosition: Int) {

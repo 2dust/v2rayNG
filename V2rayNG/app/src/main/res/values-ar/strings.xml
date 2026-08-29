@@ -49,6 +49,7 @@
     <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟</string>
     <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟</string>
     <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟</string>
+    <string name="confirm_delete_routing_rule_named">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟\n%1$s</string>
     <string name="confirm_delete_subscription_group">هل أنت متأكد من أنك تريد حذف مجموعة الاشتراك هذه؟</string>
     <string name="confirm_delete_asset_file">هل أنت متأكد من أنك تريد حذف ملف الأصول \"%1$s\"؟</string>
     <string name="confirm_delete_asset_source">هل أنت متأكد من أنك تريد حذف مصدر الأصول هذا؟</string>
@@ -515,6 +516,15 @@
     <string name="acc_copy_log">نسخ السجل</string>
     <string name="acc_clear_log">مسح السجل</string>
     <string name="acc_add_rule">إضافة قاعدة توجيه</string>
+    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
+    <string name="acc_routing_rule_blocked">محظورة</string>
+    <string name="acc_routing_rule_routed_through">موجّهة عبر %1$s</string>
+    <string name="acc_routing_rule_routed_directly">موجّهة مباشرة</string>
+    <string name="acc_routing_rule_enabled">القاعدة مفعّلة</string>
+    <string name="acc_routing_rule_disabled">القاعدة غير مفعّلة</string>
+    <string name="acc_routing_rule_switch_label">القاعدة %1$s</string>
+    <string name="acc_edit_routing_rule_named">تعديل %1$s</string>
+    <string name="acc_delete_routing_rule_named">حذف %1$s</string>
     <string name="acc_start">بدء الخدمة</string>
     <string name="acc_stop">إيقاف الخدمة</string>
     <string name="acc_back">رجوع</string>
