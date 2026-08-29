@@ -40,6 +40,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -364,20 +368,28 @@ private fun UserAssetItem(
 ) {
     val context = LocalContext.current
     val locale = LocalConfiguration.current.locales[0]
-    val propertiesText = if (fileMetadata != null) {
-        val fileSize = Formatter.formatFileSize(context, fileMetadata.length)
+    val fileSize = fileMetadata?.let { Formatter.formatFileSize(context, it.length) }
+    val formattedDate = fileMetadata?.let {
         val skeleton = if (DateFormat.is24HourFormat(context)) "yMMMdHm" else "yMMMdhm"
-        val formattedDate = SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
-            .format(Date(fileMetadata.lastModified))
+        SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, skeleton), locale)
+            .format(Date(it.lastModified))
+    }
+    val propertiesText = if (fileSize != null && formattedDate != null) {
         "$fileSize  •  $formattedDate"
     } else {
         stringResource(R.string.msg_file_not_found)
+    }
+    val propertiesAccessibilityText = if (fileSize != null && formattedDate != null) {
+        stringResource(R.string.acc_asset_file_details, fileSize, formattedDate)
+    } else {
+        null
     }
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {}
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -395,6 +407,11 @@ private fun UserAssetItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = propertiesText,
+                modifier = propertiesAccessibilityText?.let { accessibilityText ->
+                    Modifier.clearAndSetSemantics {
+                        text = AnnotatedString(accessibilityText)
+                    }
+                } ?: Modifier,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -404,7 +421,10 @@ private fun UserAssetItem(
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit),
+                    contentDescription = stringResource(
+                        R.string.acc_edit_asset_named,
+                        item.assetUrl.remarks
+                    ),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -412,7 +432,10 @@ private fun UserAssetItem(
         IconButton(onClick = onDeleteClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = stringResource(R.string.acc_delete),
+                contentDescription = stringResource(
+                    R.string.acc_delete_asset_named,
+                    item.assetUrl.remarks
+                ),
                 modifier = Modifier.size(24.dp)
             )
         }
