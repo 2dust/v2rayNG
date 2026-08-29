@@ -77,15 +77,15 @@ These rules apply to the service and service-adjacent paths listed in the reposi
   failed operation, and exception. Apply the root guide's secret-redaction rule.
 - Move deterministic lifecycle decisions into pure helpers and add a JVM regression test
   for each changed decision. Apply this scenario mapping to service changes:
-  - Start dispatch, `onStartCommand`, or command deduplication: cold start and two
-    equivalent consecutive start commands.
-  - Foreground setup or setup-error handling: successful setup and failure after at
-    least one resource has been acquired.
-  - Stop or teardown: normal stop, repeated stop, and stop while setup is in flight.
-  - Restart or network handover: successful restart/handover and a stop racing the
-    pending restart/handover.
-  - Shared lifecycle code: run the mapped scenarios in VPN, proxy-only, and root modes.
-    Mode-owned code: run them in the owning mode.
+    - Start dispatch, `onStartCommand`, or command deduplication: cold start and two
+      equivalent consecutive start commands.
+    - Foreground setup or setup-error handling: successful setup and failure after at
+      least one resource has been acquired.
+    - Stop or teardown: normal stop, repeated stop, and stop while setup is in flight.
+    - Restart or network handover: successful restart/handover and a stop racing the
+      pending restart/handover.
+    - Shared lifecycle code: run the mapped scenarios in VPN, proxy-only, and root modes.
+      Mode-owned code: run them in the owning mode.
 - Every service lifecycle scenario above requires an emulator or physical device; a JVM
   test or assembled APK is not a substitute. Record each scenario that did not run under
   `Not run`, with the device requirement or blocker. Do not claim the service change is

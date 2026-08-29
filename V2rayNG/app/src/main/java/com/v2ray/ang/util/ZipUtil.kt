@@ -179,9 +179,9 @@ object ZipUtil {
             }
             if (
                 entryBytes > 0L && (
-                    compressedBytes == 0L ||
-                        entryBytes.toDouble() / compressedBytes > limits.maxCompressionRatio
-                )
+                        compressedBytes == 0L ||
+                                entryBytes.toDouble() / compressedBytes > limits.maxCompressionRatio
+                        )
             ) {
                 throw ZipException("ZIP archive entry exceeds the compression-ratio limit")
             }
