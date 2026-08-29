@@ -10,6 +10,7 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.shizuku.ShizukuForegroundRecovery
 import com.v2ray.ang.ui.compose.ThemeManager
 import rikka.shizuku.ShizukuProvider
 
@@ -53,5 +54,7 @@ class AngApplication : Application() {
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()
+
+        ShizukuForegroundRecovery.register(this)
     }
 }

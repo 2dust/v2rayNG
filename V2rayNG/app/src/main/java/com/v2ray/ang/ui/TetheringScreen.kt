@@ -1,6 +1,6 @@
 package com.v2ray.ang.ui
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,13 +25,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.shizuku.ShizukuTetheringService
+import com.v2ray.ang.shizuku.TetheringStatusSnapshot
 import com.v2ray.ang.shizuku.tetheringTypeBit
 import com.v2ray.ang.ui.compose.AppTopBar
 
@@ -80,6 +85,7 @@ internal data class TetheringUiState(
     val ipv6TetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
     val ipv6Enabled: Boolean = false,
     val coreRunning: Boolean = false,
+    val serviceConnected: Boolean = false,
 ) {
     val routingActive: Boolean
         get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
@@ -98,6 +104,52 @@ internal sealed interface ShizukuAction {
     data object Refresh : ShizukuAction
     data object ToggleRouting : ShizukuAction
     data object ToggleHotspot : ShizukuAction
+}
+
+internal fun TetheringUiState.withServiceConnection(connected: Boolean): TetheringUiState =
+    if (connected) {
+        copy(serviceConnected = true)
+    } else {
+        copy(
+            serviceConnected = false,
+            operation = TetheringOperation.NONE,
+            routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
+            routingDetail = "",
+            activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+            ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
+        )
+    }
+
+internal fun TetheringUiState.withCoreRunning(running: Boolean): TetheringUiState = copy(coreRunning = running)
+
+internal fun TetheringUiState.withCoreSnapshot(snapshot: HotspotRoutingSnapshot): TetheringUiState =
+    copy(coreRunning = snapshot.running)
+
+internal fun TetheringUiState.withTetheringStatus(
+    status: TetheringStatusSnapshot,
+    ipv6Enabled: Boolean,
+): TetheringUiState = copy(
+    operation = TetheringOperation.NONE,
+    routingState = status.routingState,
+    routingDetail = status.routingDetail,
+    activeTetheringTypes = status.activeTetheringTypes,
+    ipv6TetheringTypes = status.ipv6TetheringTypes,
+    ipv6Enabled = ipv6Enabled,
+)
+
+internal fun TetheringUiState.operationFor(action: ShizukuAction): TetheringOperation? = when (action) {
+    ShizukuAction.ToggleRouting -> if (routingSessionEnabled) {
+        TetheringOperation.STOPPING_ROUTING
+    } else {
+        TetheringOperation.STARTING_ROUTING
+    }
+    ShizukuAction.ToggleHotspot -> if (hotspotEnabled) {
+        TetheringOperation.STOPPING_HOTSPOT
+    } else {
+        TetheringOperation.STARTING_HOTSPOT
+    }
+    ShizukuAction.RequestPermission,
+    ShizukuAction.Refresh -> null
 }
 
 internal enum class TetheringIpMode(val labelRes: Int) {
@@ -124,14 +176,13 @@ internal data class TetheringControlState(
 
 internal fun routingAction(
     state: TetheringUiState,
-    serviceConnected: Boolean,
 ): TetheringControlState {
     val statusRes = when {
         state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_routing_status_connecting
         state.operation == TetheringOperation.CHECKING -> R.string.shizuku_routing_status_checking
         state.operation == TetheringOperation.STARTING_ROUTING -> R.string.shizuku_routing_status_starting
         state.operation == TetheringOperation.STOPPING_ROUTING -> R.string.shizuku_routing_status_stopping
-        !serviceConnected -> R.string.shizuku_routing_status_unavailable
+        !state.serviceConnected -> R.string.shizuku_routing_status_unavailable
         state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ->
             R.string.shizuku_routing_status_hev
         state.routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE ->
@@ -147,7 +198,7 @@ internal fun routingAction(
         state.coreRunning -> R.string.shizuku_routing_status_disabled
         else -> R.string.shizuku_routing_status_start_v2ray
     }
-    val enabled = serviceConnected &&
+    val enabled = state.serviceConnected &&
         state.operation == TetheringOperation.NONE &&
         when (state.routingState) {
             ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV,
@@ -165,14 +216,13 @@ internal fun routingAction(
 
 internal fun hotspotAction(
     state: TetheringUiState,
-    serviceConnected: Boolean,
 ): TetheringControlState {
     val statusRes = when {
         state.operation == TetheringOperation.CONNECTING -> R.string.shizuku_hotspot_status_connecting
         state.operation == TetheringOperation.CHECKING -> R.string.shizuku_hotspot_status_checking
         state.operation == TetheringOperation.STARTING_HOTSPOT -> R.string.shizuku_hotspot_status_starting
         state.operation == TetheringOperation.STOPPING_HOTSPOT -> R.string.shizuku_hotspot_status_stopping
-        !serviceConnected -> R.string.shizuku_hotspot_status_unavailable
+        !state.serviceConnected -> R.string.shizuku_hotspot_status_unavailable
         state.hotspotEnabled && state.routingActive -> R.string.shizuku_hotspot_status_enabled
         state.hotspotEnabled && state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
             R.string.shizuku_hotspot_status_waiting
@@ -182,7 +232,7 @@ internal fun hotspotAction(
     }
     return TetheringControlState(
         statusRes = statusRes,
-        enabled = serviceConnected &&
+        enabled = state.serviceConnected &&
             state.operation == TetheringOperation.NONE &&
             (state.hotspotEnabled ||
                 state.tetheringStateKnown &&
@@ -193,12 +243,11 @@ internal fun hotspotAction(
 @Composable
 internal fun TetheringScreen(
     state: TetheringUiState,
-    serviceConnected: Boolean,
     onBackClick: () -> Unit,
     onAction: (ShizukuAction) -> Unit,
 ) {
-    val routingAction = routingAction(state, serviceConnected)
-    val hotspotAction = hotspotAction(state, serviceConnected)
+    val routingAction = routingAction(state)
+    val hotspotAction = hotspotAction(state)
     val routingSummary = stringResource(R.string.shizuku_routing_summary)
     val usbStatus = stringResource(R.string.shizuku_usb_status_enabled)
     val usbActive = state.activeTetheringTypes >= 0 &&
@@ -308,16 +357,22 @@ private fun TetheringStatusSection(
     onToggle: (() -> Unit)? = null,
 ) {
     val toggleAction = onToggle?.takeIf { checked != null }
+    val toggleModifier = if (toggleAction != null && checked != null) {
+        Modifier
+            .toggleable(
+                value = checked,
+                enabled = toggleEnabled,
+                role = Role.Switch,
+                onValueChange = { toggleAction() },
+            )
+            .semantics(mergeDescendants = true) {}
+    } else {
+        Modifier
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .then(
-                if (toggleAction != null) {
-                    Modifier.clickable(enabled = toggleEnabled, onClick = toggleAction)
-                } else {
-                    Modifier
-                },
-            )
+            .then(toggleModifier)
             .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -337,12 +392,10 @@ private fun TetheringStatusSection(
             if (checked != null && toggleAction != null) {
                 Switch(
                     checked = checked,
-                    onCheckedChange = if (toggleEnabled) {
-                        { _ -> toggleAction() }
-                    } else {
-                        null
-                    },
-                    modifier = Modifier.scale(0.8f),
+                    onCheckedChange = null,
+                    modifier = Modifier
+                        .scale(0.8f)
+                        .clearAndSetSemantics {},
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                         checkedTrackColor = MaterialTheme.colorScheme.secondary,

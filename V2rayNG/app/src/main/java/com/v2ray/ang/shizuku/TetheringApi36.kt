@@ -73,6 +73,37 @@ internal object TetheringApi36 {
         }
     }
 
+    fun startTethering(
+        service: Any,
+        type: Int,
+        executor: Executor,
+        timeoutSeconds: Long,
+    ): Int {
+        val manager = service as TetheringManager
+        var result = ShizukuTetheringService.RESULT_INTERNAL_ERROR
+        val callbackReceived = CountDownLatch(1)
+        manager.startTethering(
+            TetheringManager.TetheringRequest.Builder(type).build(),
+            executor,
+            object : TetheringManager.StartTetheringCallback {
+                override fun onTetheringStarted() {
+                    result = ShizukuTetheringService.RESULT_OK
+                    callbackReceived.countDown()
+                }
+
+                override fun onTetheringFailed(error: Int) {
+                    result = error
+                    callbackReceived.countDown()
+                }
+            },
+        )
+        return if (callbackReceived.await(timeoutSeconds, TimeUnit.SECONDS)) {
+            result
+        } else {
+            ShizukuTetheringService.RESULT_INTERNAL_ERROR
+        }
+    }
+
     fun stopTethering(
         service: Any,
         type: Int,

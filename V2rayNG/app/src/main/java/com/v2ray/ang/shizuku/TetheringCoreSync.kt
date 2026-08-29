@@ -28,93 +28,133 @@ internal object TetheringCoreSync {
     private var snapshot = HotspotRoutingSnapshot()
     private val coreLease = CoreTetheringLease()
     private var watchingShizuku = false
-    @Volatile
-    private var recoverWhenShizukuReturns = false
-    @Volatile
-    private var foregroundRecoveryRequested = false
+    private val recoveryLock = Any()
+    private var recoveryState = TetheringRecoveryState()
+    private var activeProfileId = ""
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
-        if (!recoverWhenShizukuReturns) return@OnBinderReceivedListener
-        recoverWhenShizukuReturns = false
-        foregroundRecoveryRequested = false
+        if (transitionRecovery(TetheringRecoveryState::onBinderReceived) != TetheringRecoveryAction.RECOVER) {
+            return@OnBinderReceivedListener
+        }
         val currentSnapshot = snapshot.takeIf { it.running } ?: return@OnBinderReceivedListener
         LogUtil.i(AppConfig.TAG, "Shizuku restarted; recovering protected tethering")
-        send(AngApplication.application, HotspotRoutingSync.EVENT_CORE_STARTED, currentSnapshot)
+        safely("recover", activeProfileId) {
+            send(AngApplication.application, HotspotRoutingSync.EVENT_CORE_STARTED, currentSnapshot)
+        }
     }
 
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
-        recoverWhenShizukuReturns = snapshot.running
-        foregroundRecoveryRequested = false
+        updateRecovery(TetheringRecoveryState::onBinderDied)
     }
 
     fun onStarting() {
-        clearCoreState()
+        safely("start-preparation") { clearCoreState() }
     }
 
     fun onStarted(
         service: Service,
+        profileId: String,
         profileName: String,
         coreConfig: String,
         useHev: Boolean,
     ) {
-        if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return
-        val currentSnapshot = createSnapshot(service, profileName, useHev)
-        coreLease.attach(service, currentSnapshot, coreConfig)
-        snapshot = currentSnapshot
-        watchShizuku(service)
-        send(service, HotspotRoutingSync.EVENT_CORE_STARTED, snapshot)
+        safely("start", profileId) {
+            if (!service.resources.getBoolean(R.bool.shizuku_tethering_enabled)) return@safely
+            try {
+                val currentSnapshot = createSnapshot(service, profileName, useHev)
+                coreLease.attach(service, currentSnapshot, coreConfig)
+                snapshot = currentSnapshot
+                activeProfileId = profileId
+                updateRecovery(TetheringRecoveryState::onCoreStarted)
+                watchShizuku(service)
+                send(service, HotspotRoutingSync.EVENT_CORE_STARTED, snapshot)
+            } catch (error: Throwable) {
+                clearCoreState()
+                throw error
+            }
+        }
     }
 
     fun onStartFailed(service: Service, detail: String) {
-        send(service, HotspotRoutingSync.EVENT_CORE_START_FAILED, detail = detail)
+        safely("start-failure") {
+            try {
+                send(service, HotspotRoutingSync.EVENT_CORE_START_FAILED, detail = detail)
+            } finally {
+                clearCoreState()
+            }
+        }
     }
 
     fun onStopping(service: Service) {
-        send(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
-        clearCoreState()
+        safely("stop") {
+            try {
+                send(service, HotspotRoutingSync.EVENT_CORE_STOPPING)
+            } finally {
+                clearCoreState()
+            }
+        }
     }
 
-    fun clear() = clearCoreState()
+    fun clear() {
+        safely("clear") { clearCoreState() }
+    }
 
     fun onAppForegrounded(service: Service) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
-            !recoverWhenShizukuReturns || foregroundRecoveryRequested
-        ) return
+        val action = transitionRecovery { it.onAppForegrounded(Build.VERSION.SDK_INT) }
+        if (action != TetheringRecoveryAction.REQUEST_BINDER) return
 
         // Android 14+ queues Shizuku's cross-process Binder broadcast while the provider
         // process is cached. Once the UI foregrounds that process, explicitly ask it for the
         // replacement Binder so protected tethering can be restored without another user action.
-        foregroundRecoveryRequested = true
-        runCatching { ShizukuProvider.requestBinderForNonProviderProcess(service) }
+        // Remove this request with ShizukuForegroundRecovery under the condition documented there.
+        runCatching { ShizukuProvider.requestBinderForNonProviderProcess(service.applicationContext) }
             .onFailure {
-                foregroundRecoveryRequested = false
-                LogUtil.e(AppConfig.TAG, "Unable to request Shizuku recovery", it)
+                updateRecovery(TetheringRecoveryState::onForegroundRequestFailed)
+                logFailure("foreground-recovery", activeProfileId, it)
             }
     }
 
     private fun clearCoreState() {
         snapshot = HotspotRoutingSnapshot()
         coreLease.clearEngineConfig()
+        activeProfileId = ""
+        updateRecovery(TetheringRecoveryState::onCoreStopped)
     }
 
     private fun watchShizuku(service: Service) {
-        if (watchingShizuku) return
-        watchingShizuku = true
-        Shizuku.addBinderReceivedListener(binderReceivedListener)
-        Shizuku.addBinderDeadListener(binderDeadListener)
-        recoverWhenShizukuReturns = !Shizuku.pingBinder()
-        ShizukuProvider.requestBinderForNonProviderProcess(service)
+        if (!watchingShizuku) {
+            Shizuku.addBinderReceivedListener(binderReceivedListener)
+            try {
+                Shizuku.addBinderDeadListener(binderDeadListener)
+            } catch (error: Throwable) {
+                runCatching { Shizuku.removeBinderReceivedListener(binderReceivedListener) }
+                throw error
+            }
+            watchingShizuku = true
+        }
+        val binderAvailable = runCatching { Shizuku.pingBinder() }
+            .onFailure { logFailure("check-Shizuku", activeProfileId, it) }
+            .getOrDefault(false)
+        if (binderAvailable) return
+
+        updateRecovery(TetheringRecoveryState::onBinderDied)
+        // The request owns a receiver until Shizuku answers. Tie it to the application rather
+        // than the short-lived core Service, and do not register another when its Binder is live.
+        runCatching { ShizukuProvider.requestBinderForNonProviderProcess(service.applicationContext) }
+            .onFailure { logFailure("request-Binder", activeProfileId, it) }
     }
 
     fun sendCurrentSnapshot(service: Service, coreRunning: Boolean) {
-        val currentSnapshot = snapshot.takeIf { coreRunning } ?: HotspotRoutingSnapshot()
-        service.sendBroadcast(
-            Intent(AppConfig.BROADCAST_ACTION_ACTIVITY)
-                .setPackage(AppConfig.ANG_PACKAGE)
-                .putExtra("key", AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE)
-                .putExtra("content", currentSnapshot)
-                .withCoreLease(coreLease.takeIf { currentSnapshot.running }),
-        )
+        safely("snapshot", activeProfileId) {
+            val currentSnapshot = snapshot.takeIf { coreRunning } ?: HotspotRoutingSnapshot()
+            service.sendBroadcast(
+                Intent(AppConfig.BROADCAST_ACTION_ACTIVITY)
+                    .setPackage(AppConfig.ANG_PACKAGE)
+                    .putExtra("key", AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE)
+                    .putExtra("content", currentSnapshot)
+                    .withCoreLease(coreLease.takeIf { currentSnapshot.running }),
+            )
+        }
     }
 
     private fun createSnapshot(
@@ -161,10 +201,37 @@ internal object TetheringCoreSync {
         runCatching {
             context.sendBroadcast(
                 Intent(context, ShizukuRoutingSyncReceiver::class.java)
+                    .setPackage(AppConfig.ANG_PACKAGE)
                     .putExtra("content", HotspotRoutingSync(token, event, snapshot, detail))
                     .withCoreLease(coreLease.takeIf { snapshot != null }),
             )
         }.onFailure { LogUtil.e(AppConfig.TAG, "Unable to send tethering synchronization", it) }
+    }
+
+    private fun updateRecovery(update: (TetheringRecoveryState) -> TetheringRecoveryState) {
+        synchronized(recoveryLock) { recoveryState = update(recoveryState) }
+    }
+
+    private fun transitionRecovery(
+        update: (TetheringRecoveryState) -> TetheringRecoveryTransition,
+    ): TetheringRecoveryAction = synchronized(recoveryLock) {
+        val transition = update(recoveryState)
+        recoveryState = transition.state
+        transition.action
+    }
+
+    private fun safely(phase: String, profileId: String = activeProfileId, action: () -> Unit) {
+        runCoreSyncHook(action) { error -> logFailure(phase, profileId, error) }
+    }
+
+    private fun logFailure(phase: String, profileId: String, error: Throwable) {
+        runCatching {
+            LogUtil.e(
+                AppConfig.TAG,
+                "Tethering sync failed: mode=shared-core phase=$phase profileId=$profileId operation=Shizuku synchronization",
+                error,
+            )
+        }
     }
 }
 
@@ -175,6 +242,7 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
     private var routingSnapshot: HotspotRoutingSnapshot? = null
     private var coreConfig: String? = null
     private var assetDirectory: File? = null
+    private var configDirectory: File? = null
 
     @Synchronized
     fun attach(service: Service, snapshot: HotspotRoutingSnapshot, coreConfig: String) {
@@ -182,6 +250,7 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
         routingSnapshot = snapshot
         this.coreConfig = coreConfig
         assetDirectory = File(Utils.userAssetPath(service))
+        configDirectory = service.cacheDir
     }
 
     @Synchronized
@@ -189,27 +258,26 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
         routingSnapshot = null
         coreConfig = null
         assetDirectory = null
+        configDirectory = null
     }
 
     @Synchronized
     override fun openEngineConfig(): ParcelFileDescriptor {
         val snapshot = checkNotNull(routingSnapshot) { "Core routing snapshot is unavailable" }
         val rawConfig = checkNotNull(coreConfig) { "Core configuration is unavailable" }
-        val content = HotspotRoutingConfig.engineContentFromSnapshot(snapshot, rawConfig)
-        val (readSide, writeSide) = ParcelFileDescriptor.createReliablePipe()
-        // A writer thread is necessary because writing a large config before returning the read
-        // descriptor could fill the pipe and deadlock this Binder call.
-        Thread({
-            runCatching {
-                ParcelFileDescriptor.AutoCloseOutputStream(writeSide).use {
-                    it.write(content.toByteArray(Charsets.UTF_8))
-                }
-            }.onFailure { LogUtil.e(AppConfig.TAG, "Unable to stream tethering configuration", it) }
-        }, ENGINE_CONFIG_WRITER_NAME).apply {
-            isDaemon = true
-            start()
+        val directory = checkNotNull(configDirectory) { "Core cache directory is unavailable" }
+        val temporary = File.createTempFile(ENGINE_CONFIG_FILE_PREFIX, null, directory)
+        try {
+            temporary.writeText(
+                HotspotRoutingConfig.engineContentFromSnapshot(snapshot, rawConfig),
+                Charsets.UTF_8,
+            )
+            return ParcelFileDescriptor.open(temporary, ParcelFileDescriptor.MODE_READ_ONLY)
+        } finally {
+            // Unix keeps the opened inode alive for the Binder recipient while removing the
+            // credential-bearing configuration pathname immediately.
+            temporary.delete()
         }
-        return readSide
     }
 
     @Synchronized
@@ -260,7 +328,7 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
 }
 
 private const val EXTRA_CORE_LEASE = "core_tethering_lease"
-private const val ENGINE_CONFIG_WRITER_NAME = "TetheringConfigWriter"
+private const val ENGINE_CONFIG_FILE_PREFIX = "v2rayng-tethering-config-"
 
 private fun Intent.withCoreLease(lease: ICoreTetheringLease?): Intent = apply {
     lease ?: return@apply
@@ -270,3 +338,59 @@ private fun Intent.withCoreLease(lease: ICoreTetheringLease?): Intent = apply {
 internal fun Intent.coreTetheringLease(): ICoreTetheringLease? =
     getBundleExtra(EXTRA_CORE_LEASE)?.getBinder(EXTRA_CORE_LEASE)
         ?.let(ICoreTetheringLease.Stub::asInterface)
+
+internal enum class TetheringRecoveryAction {
+    NONE,
+    RECOVER,
+    REQUEST_BINDER,
+}
+
+internal data class TetheringRecoveryTransition(
+    val state: TetheringRecoveryState,
+    val action: TetheringRecoveryAction = TetheringRecoveryAction.NONE,
+)
+
+internal data class TetheringRecoveryState(
+    val coreRunning: Boolean = false,
+    val recoverWhenShizukuReturns: Boolean = false,
+    val foregroundRequestPending: Boolean = false,
+) {
+    fun onCoreStarted() = copy(coreRunning = true)
+
+    fun onCoreStopped() = TetheringRecoveryState()
+
+    fun onBinderDied() = copy(
+        recoverWhenShizukuReturns = coreRunning,
+        foregroundRequestPending = false,
+    )
+
+    fun onBinderReceived(): TetheringRecoveryTransition {
+        val recover = coreRunning && recoverWhenShizukuReturns
+        return TetheringRecoveryTransition(
+            state = copy(
+                recoverWhenShizukuReturns = false,
+                foregroundRequestPending = false,
+            ),
+            action = if (recover) TetheringRecoveryAction.RECOVER else TetheringRecoveryAction.NONE,
+        )
+    }
+
+    fun onAppForegrounded(sdkInt: Int): TetheringRecoveryTransition {
+        val requestBinder = sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+            recoverWhenShizukuReturns && !foregroundRequestPending
+        return TetheringRecoveryTransition(
+            state = if (requestBinder) copy(foregroundRequestPending = true) else this,
+            action = if (requestBinder) TetheringRecoveryAction.REQUEST_BINDER else TetheringRecoveryAction.NONE,
+        )
+    }
+
+    fun onForegroundRequestFailed() = copy(foregroundRequestPending = false)
+}
+
+internal fun runCoreSyncHook(action: () -> Unit, onFailure: (Throwable) -> Unit): Boolean = try {
+    action()
+    true
+} catch (error: Throwable) {
+    runCatching { onFailure(error) }
+    false
+}

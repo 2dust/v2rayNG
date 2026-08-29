@@ -14,7 +14,6 @@ class ShizukuActivity : BaseComponentActivity() {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         TetheringScreen(
             state = state,
-            serviceConnected = viewModel.serviceConnected,
             onBackClick = { finish() },
             onAction = viewModel::onAction,
         )

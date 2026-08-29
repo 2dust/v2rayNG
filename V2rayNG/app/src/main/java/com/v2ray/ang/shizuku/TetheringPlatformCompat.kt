@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.net.TetheringManager
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import java.lang.reflect.Proxy
@@ -93,32 +92,53 @@ internal object TetheringPlatformCompat {
         return interfaces.isNotEmpty() && interfaces.all { it == expected }
     }
 
-    @SuppressLint("NewApi")
     fun startTethering(
         service: Any,
         type: Int,
         executor: Executor,
         timeoutSeconds: Long,
     ): Int {
-        require(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        val manager = service as TetheringManager
+        require(Build.VERSION.SDK_INT in Build.VERSION_CODES.TIRAMISU until Build.VERSION_CODES.BAKLAVA)
+        // API 33-35 contain this callback API but keep all three participating types out of the
+        // public SDK. Reflection prevents those hidden types from leaking into the stable app
+        // contract. Delete this branch when the feature's minimum supported API becomes 36.
+        val requestClass = Class.forName(TETHERING_REQUEST_CLASS)
+        val requestBuilderClass = Class.forName(TETHERING_REQUEST_BUILDER_CLASS)
+        val callbackClass = Class.forName(START_TETHERING_CALLBACK_CLASS)
+        check(callbackClass.isInterface) { "Start tethering callback is not an interface" }
+        val request = requestBuilderClass.getConstructor(Integer.TYPE).newInstance(type).let { builder ->
+            requestBuilderClass.getMethod("build").invoke(builder)
+        }
         var result = ShizukuTetheringService.RESULT_INTERNAL_ERROR
         val callbackReceived = CountDownLatch(1)
-        manager.startTethering(
-            TetheringManager.TetheringRequest.Builder(type).build(),
-            executor,
-            object : TetheringManager.StartTetheringCallback {
-                override fun onTetheringStarted() {
+        val callback = Proxy.newProxyInstance(
+            TetheringPlatformCompat::class.java.classLoader,
+            arrayOf(callbackClass),
+        ) { proxy, method, arguments ->
+            when (method.name) {
+                "onTetheringStarted" -> {
                     result = ShizukuTetheringService.RESULT_OK
                     callbackReceived.countDown()
+                    null
                 }
-
-                override fun onTetheringFailed(error: Int) {
-                    result = error
+                "onTetheringFailed" -> {
+                    result = (arguments?.firstOrNull() as? Number)?.toInt()
+                        ?: ShizukuTetheringService.RESULT_INTERNAL_ERROR
                     callbackReceived.countDown()
+                    null
                 }
-            },
-        )
+                "equals" -> proxy === arguments?.firstOrNull()
+                "hashCode" -> System.identityHashCode(proxy)
+                "toString" -> "v2rayNG start tethering callback"
+                else -> null
+            }
+        }
+        val start = service.javaClass.methods.firstOrNull {
+            it.name == "startTethering" && it.parameterTypes.contentEquals(
+                arrayOf(requestClass, Executor::class.java, callbackClass),
+            )
+        } ?: error("TetheringManager.startTethering is unavailable")
+        start.invoke(service, request, executor, callback)
         return if (callbackReceived.await(timeoutSeconds, TimeUnit.SECONDS)) {
             result
         } else {
@@ -197,6 +217,11 @@ internal object TetheringPlatformCompat {
 
     private const val TETHERING_EVENT_CALLBACK_CLASS =
         "android.net.TetheringManager\$TetheringEventCallback"
+    private const val TETHERING_REQUEST_CLASS = "android.net.TetheringManager\$TetheringRequest"
+    private const val TETHERING_REQUEST_BUILDER_CLASS =
+        "android.net.TetheringManager\$TetheringRequest\$Builder"
+    private const val START_TETHERING_CALLBACK_CLASS =
+        "android.net.TetheringManager\$StartTetheringCallback"
     private const val TRANSPORT_TEST = 7
     private const val LEGACY_TETHERING_TYPE_BLUETOOTH = 2
     private const val LEGACY_TETHERING_TYPE_WIFI_P2P = 3

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
@@ -52,9 +53,6 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     private var statusRefreshPending = false
     private var snapshotWaiter: CompletableDeferred<CoreRoutingSnapshot>? = null
 
-    val serviceConnected: Boolean
-        get() = tetheringService != null
-
     private val userServiceArgs by lazy {
         ShizukuTetheringService.createUserServiceArgs()
     }
@@ -64,7 +62,8 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             viewModelScope.launch {
                 val service = IShizukuTetheringService.Stub.asInterface(binder)
                 tetheringService = service
-                runCatching { service.setStatusListener(statusListener) }
+                _uiState.update { it.withServiceConnection(true) }
+                callServiceUnit("register status listener") { service.setStatusListener(statusListener) }
                 refreshTetheringStatus()
             }
         }
@@ -109,18 +108,18 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             when (intent?.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING,
                 AppConfig.MSG_STATE_START_SUCCESS -> {
-                    _uiState.update { it.copy(coreRunning = true) }
+                    _uiState.update { it.withCoreRunning(true) }
                     requestCoreSnapshotAsync()
                 }
 
                 AppConfig.MSG_STATE_NOT_RUNNING,
                 AppConfig.MSG_STATE_STOP_SUCCESS,
-                AppConfig.MSG_STATE_START_FAILURE -> _uiState.update { it.copy(coreRunning = false) }
+                AppConfig.MSG_STATE_START_FAILURE -> _uiState.update { it.withCoreRunning(false) }
 
                 AppConfig.MSG_HOTSPOT_CONFIG_RESPONSE -> {
                     val snapshot = intent.serializable<HotspotRoutingSnapshot>("content")
                         ?: HotspotRoutingSnapshot()
-                    _uiState.update { it.copy(coreRunning = snapshot.running) }
+                    _uiState.update { it.withCoreSnapshot(snapshot) }
                     snapshotWaiter?.takeIf { !it.isCompleted }?.complete(
                         CoreRoutingSnapshot(snapshot, intent.coreTetheringLease()),
                     )
@@ -178,25 +177,24 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     }
 
     private suspend fun getShizukuStatus(): ShizukuStatus = withContext(Dispatchers.IO) {
-        if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) {
+        if (!shizukuCall("check Binder", false) { Shizuku.pingBinder() }) {
             return@withContext if (isPackageInstalled(ShizukuProvider.MANAGER_APPLICATION_ID)) {
                 ShizukuStatus.NOT_RUNNING
             } else {
                 ShizukuStatus.NOT_INSTALLED
             }
         }
-        if (runCatching { Shizuku.isPreV11() }.getOrDefault(true)) {
+        if (shizukuCall("check server version", true) { Shizuku.isPreV11() }) {
             return@withContext ShizukuStatus.UNSUPPORTED
         }
-        val permissionGranted = runCatching {
+        val permissionGranted = shizukuCall("check permission", false) {
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-        }.getOrDefault(false)
+        }
         if (permissionGranted) return@withContext ShizukuStatus.READY
 
-        if (runCatching {
+        if (shizukuCall("check permission rationale", false) {
                 Shizuku.shouldShowRequestPermissionRationale()
-            }.getOrDefault(false)
-        ) {
+            }) {
             ShizukuStatus.PERMISSION_DENIED
         } else {
             ShizukuStatus.PERMISSION_REQUIRED
@@ -209,7 +207,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
                 ShizukuStatus.PERMISSION_REQUIRED -> runCatching {
                     Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST_CODE)
                 }.onFailure {
-                    LogUtil.e(AppConfig.TAG, "Unable to request Shizuku permission", it)
+                    logUiFailure("permission", "request permission", it)
                     toastError(R.string.shizuku_operation_failed)
                     refreshShizukuStatus()
                 }
@@ -231,7 +229,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             Shizuku.bindUserService(userServiceArgs, userServiceConnection)
         }.onFailure {
             clearServiceState()
-            LogUtil.e(AppConfig.TAG, "Unable to bind Shizuku tethering service", it)
+            logUiFailure("connection", "bind UserService", it)
             toastError(R.string.shizuku_operation_failed)
         }
     }
@@ -250,29 +248,25 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         val generation = cancelCurrentOperation()
         _uiState.update { it.copy(operation = TetheringOperation.CHECKING) }
         operationJob = viewModelScope.launch {
-            val ipv6Enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true
-            val status = withContext(Dispatchers.IO) {
-                runCatching { service.getStatus(ipv6Enabled) }.getOrDefault(
+            val (ipv6Enabled, status) = withContext(Dispatchers.IO) {
+                val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true
+                enabled to try {
+                    service.getStatus(enabled)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Throwable) {
+                    logUiFailure("status", "read UserService status", error)
                     TetheringStatusSnapshot(
                         routingState = ShizukuTetheringService.ROUTING_STATE_ERROR,
                         routingDetail = "",
                         activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
                         ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
                         warning = ShizukuTetheringService.RESULT_OK,
-                    ),
-                )
+                    )
+                }
             }
             if (generation != operationGeneration) return@launch
-            _uiState.update {
-                it.copy(
-                    operation = TetheringOperation.NONE,
-                    routingState = status.routingState,
-                    routingDetail = status.routingDetail,
-                    activeTetheringTypes = status.activeTetheringTypes,
-                    ipv6TetheringTypes = status.ipv6TetheringTypes,
-                    ipv6Enabled = ipv6Enabled,
-                )
-            }
+            _uiState.update { it.withTetheringStatus(status, ipv6Enabled) }
             operationJob = null
             if (status.warning == ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
                 localizedContext.toastInfo(R.string.shizuku_tethering_wrong_upstream)
@@ -282,21 +276,19 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     }
 
     private fun toggleRouting() {
-        val enable = !_uiState.value.routingSessionEnabled
-        launchOperation(
-            if (enable) TetheringOperation.STARTING_ROUTING
-            else TetheringOperation.STOPPING_ROUTING
-        ) { service ->
+        val operation = _uiState.value.operationFor(ShizukuAction.ToggleRouting) ?: return
+        val enable = operation == TetheringOperation.STARTING_ROUTING
+        launchOperation(operation) { service ->
             val result = if (enable) {
                 startRouting(service)
             } else {
-                callService { service.stopRouting() }
+                callService("stop routing") { service.stopRouting() }
             }
             if (result != ShizukuTetheringService.RESULT_OK) {
                 showRoutingError(result)
                 return@launchOperation
             }
-            if (!enable) MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
+            if (!enable) writeSyncToken("")
             toastSuccess(
                 if (enable) R.string.shizuku_routing_enabled
                 else R.string.shizuku_routing_disabled
@@ -305,11 +297,9 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     }
 
     private fun toggleHotspot() {
-        val enable = !_uiState.value.hotspotEnabled
-        launchOperation(
-            if (enable) TetheringOperation.STARTING_HOTSPOT
-            else TetheringOperation.STOPPING_HOTSPOT
-        ) { service ->
+        val operation = _uiState.value.operationFor(ShizukuAction.ToggleHotspot) ?: return
+        val enable = operation == TetheringOperation.STARTING_HOTSPOT
+        launchOperation(operation) { service ->
             var routingStartedHere = false
             if (enable && !_uiState.value.routingActive) {
                 val routingResult = startRouting(service)
@@ -320,11 +310,13 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
                 routingStartedHere = true
             }
 
-            val result = callService { service.setWifiHotspotEnabled(enable) }
+            val result = callService("set Wi-Fi hotspot enabled=$enable") {
+                service.setWifiHotspotEnabled(enable)
+            }
             if (result != ShizukuTetheringService.RESULT_OK) {
                 if (routingStartedHere) {
-                    callService { service.stopRouting() }
-                    MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
+                    callService("roll back routing") { service.stopRouting() }
+                    writeSyncToken("")
                 }
                 if (result != ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
                     toastError(getString(R.string.shizuku_hotspot_operation_failed, result))
@@ -353,7 +345,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             } catch (error: CancellationException) {
                 throw error
             } catch (error: Throwable) {
-                LogUtil.e(AppConfig.TAG, "Shizuku tethering operation failed", error)
+                logUiFailure("operation", operation.name, error)
                 toastError(R.string.shizuku_operation_failed)
             } finally {
                 if (generation == operationGeneration) {
@@ -365,8 +357,25 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         }
     }
 
-    private suspend fun callService(action: () -> Int): Int = withContext(Dispatchers.IO) {
-        runCatching(action).getOrDefault(ShizukuTetheringService.RESULT_INTERNAL_ERROR)
+    private suspend fun callService(operation: String, action: () -> Int): Int = withContext(Dispatchers.IO) {
+        try {
+            action()
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            logUiFailure("Binder", operation, error)
+            ShizukuTetheringService.RESULT_INTERNAL_ERROR
+        }
+    }
+
+    private suspend fun callServiceUnit(operation: String, action: () -> Unit) = withContext(Dispatchers.IO) {
+        try {
+            action()
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Throwable) {
+            logUiFailure("Binder", operation, error)
+        }
     }
 
     private suspend fun startRouting(service: IShizukuTetheringService): Int {
@@ -382,7 +391,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         } catch (error: CancellationException) {
             throw error
         } catch (error: Throwable) {
-            LogUtil.e(AppConfig.TAG, "Unable to prepare Shizuku tethering configuration", error)
+            logUiFailure("configuration", "prepare tethering parameters", error)
             toastError(R.string.shizuku_routing_snapshot_timeout)
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
@@ -391,10 +400,10 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
-        val previousSyncToken = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN).orEmpty()
+        val previousSyncToken = readSyncToken()
         val syncToken = Utils.getUuid()
-        MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, syncToken)
-        val result = callService {
+        writeSyncToken(syncToken)
+        val result = callService("start routing") {
             service.startRouting(
                 parameters.useHev,
                 parameters.profileName,
@@ -406,9 +415,9 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             )
         }
         if (result != ShizukuTetheringService.RESULT_OK &&
-            MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN) == syncToken
+            readSyncToken() == syncToken
         ) {
-            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, previousSyncToken)
+            writeSyncToken(previousSyncToken)
         }
         return result
     }
@@ -443,39 +452,62 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         cancelCurrentOperation()
         statusRefreshPending = false
         tetheringService = null
-        _uiState.update {
-            it.copy(
-                operation = TetheringOperation.NONE,
-                routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
-                routingDetail = "",
-                activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
-                ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
-            )
-        }
+        _uiState.update { it.withServiceConnection(false) }
     }
 
-    @Suppress("DEPRECATION")
     private fun isPackageInstalled(packageName: String): Boolean = try {
-        app.packageManager.getApplicationInfo(packageName, 0)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
+        app.packageManager.getApplicationInfo(packageName, PackageManager.ApplicationInfoFlags.of(0))
         true
     } catch (_: PackageManager.NameNotFoundException) {
         false
+    } catch (error: Throwable) {
+        logUiFailure("status", "query Shizuku package", error)
+        false
+    }
+
+    private suspend fun readSyncToken(): String = withContext(Dispatchers.IO) {
+        MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN).orEmpty()
+    }
+
+    private suspend fun writeSyncToken(value: String) = withContext(Dispatchers.IO) {
+        MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, value)
+    }
+
+    private fun <T> shizukuCall(operation: String, default: T, action: () -> T): T = try {
+        action()
+    } catch (error: Throwable) {
+        logUiFailure("status", operation, error)
+        default
+    }
+
+    private fun logUiFailure(phase: String, operation: String, error: Throwable) {
+        LogUtil.e(
+            AppConfig.TAG,
+            "Shizuku tethering failure: component=ui phase=$phase operation=$operation",
+            error,
+        )
     }
 
     override fun onCleared() {
         cancelCurrentOperation()
         snapshotWaiter?.cancel()
         runCatching { app.unregisterReceiver(coreStateReceiver) }
-        Shizuku.removeBinderReceivedListener(binderReceivedListener)
-        Shizuku.removeBinderDeadListener(binderDeadListener)
-        Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+            .onFailure { logUiFailure("cleanup", "unregister core-state receiver", it) }
+        runCatching { Shizuku.removeBinderReceivedListener(binderReceivedListener) }
+            .onFailure { logUiFailure("cleanup", "remove Binder-received listener", it) }
+        runCatching { Shizuku.removeBinderDeadListener(binderDeadListener) }
+            .onFailure { logUiFailure("cleanup", "remove Binder-dead listener", it) }
+        runCatching { Shizuku.removeRequestPermissionResultListener(permissionResultListener) }
+            .onFailure { logUiFailure("cleanup", "remove permission listener", it) }
         runCatching { tetheringService?.setStatusListener(null) }
+            .onFailure { logUiFailure("cleanup", "clear status listener", it) }
         if (tetheringService != null || _uiState.value.operation == TetheringOperation.CONNECTING) {
             runCatching {
                 // The service owns the live TUN and tethering upstream. Screen teardown must
                 // never destroy it; only the explicit Disable action may stop the datapath.
                 Shizuku.unbindUserService(userServiceArgs, userServiceConnection, false)
-            }
+            }.onFailure { logUiFailure("cleanup", "unbind UserService", it) }
         }
         tetheringService = null
     }
