@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
@@ -34,8 +35,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -66,8 +71,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.DateFormat
-import java.util.Date
 
 private enum class AddAssetMenuAction(@StringRes val labelRes: Int) {
     File(R.string.menu_item_add_file),
@@ -353,19 +356,51 @@ private fun UserAssetItem(
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val propertiesText = if (fileMetadata != null) {
-        remember(fileMetadata) {
-            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-            "${fileMetadata.length.toTrafficString()}  •  ${dateFormat.format(Date(fileMetadata.lastModified))}"
+    val context = LocalContext.current
+    val formattedDate = fileMetadata?.let { metadata ->
+        remember(metadata.lastModified) {
+            DateUtils.formatDateTime(
+                context,
+                metadata.lastModified,
+                DateUtils.FORMAT_SHOW_DATE or
+                    DateUtils.FORMAT_SHOW_TIME or
+                    DateUtils.FORMAT_SHOW_YEAR,
+            )
         }
+    }.orEmpty()
+    val fileSize = fileMetadata?.length?.toTrafficString().orEmpty()
+    val propertiesText = if (fileMetadata != null) {
+        "$fileSize  •  $formattedDate"
     } else {
         stringResource(R.string.msg_file_not_found)
+    }
+    val assetAnnouncement = if (fileMetadata != null) {
+        val fileSizeDescription = stringResource(
+            R.string.acc_asset_file_size,
+            fileSize
+        )
+        val updatedOnDescription = stringResource(R.string.acc_asset_updated_on, formattedDate)
+        stringResource(
+            R.string.acc_asset_announcement,
+            item.assetUrl.remarks,
+            fileSizeDescription,
+            updatedOnDescription
+        )
+    } else {
+        stringResource(
+            R.string.acc_asset_announcement_missing,
+            item.assetUrl.remarks,
+            stringResource(R.string.msg_file_not_found)
+        )
     }
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = assetAnnouncement
+            }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -376,6 +411,7 @@ private fun UserAssetItem(
         ) {
             Text(
                 text = item.assetUrl.remarks,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -383,6 +419,7 @@ private fun UserAssetItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = propertiesText,
+                modifier = Modifier.clearAndSetSemantics {},
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -392,7 +429,10 @@ private fun UserAssetItem(
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit),
+                    contentDescription = stringResource(
+                        R.string.acc_edit_named,
+                        item.assetUrl.remarks
+                    ),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -400,7 +440,10 @@ private fun UserAssetItem(
         IconButton(onClick = onDeleteClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = stringResource(R.string.acc_delete),
+                contentDescription = stringResource(
+                    R.string.acc_delete_named,
+                    item.assetUrl.remarks
+                ),
                 modifier = Modifier.size(24.dp)
             )
         }

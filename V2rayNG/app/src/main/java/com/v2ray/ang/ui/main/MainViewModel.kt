@@ -17,6 +17,7 @@ import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.extension.toPluralQuantity
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -143,12 +144,35 @@ class MainViewModel(
             status.progress
         )
 
-        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result)
+        is MainStatus.ConnectionTest -> formatConnectionTestResult(status.result, accessible = false)
     }
 
-    private fun formatConnectionTestResult(result: ConnectionTestResult): String {
+    internal fun formatStatusForAccessibility(status: MainStatus, isRunning: Boolean): String =
+        when (status) {
+            is MainStatus.TestProgress -> formatStatus(
+                if (isRunning) MainStatus.Connected else MainStatus.Disconnected
+            )
+            is MainStatus.ConnectionTest -> formatConnectionTestResult(
+                status.result,
+                accessible = true,
+            )
+            else -> formatStatus(status)
+        }
+
+    private fun formatConnectionTestResult(
+        result: ConnectionTestResult,
+        accessible: Boolean,
+    ): String {
         val status = if (result.delayMillis >= 0) {
-            val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            val delay = if (accessible) {
+                dataSource.getQuantityString(
+                    R.plurals.server_test_delay_accessibility_value,
+                    result.delayMillis.toPluralQuantity(),
+                    result.delayMillis,
+                )
+            } else {
+                dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
+            }
             dataSource.getString(R.string.connection_test_available, delay)
         } else {
             val detail = result.errorMessage.ifBlank {

@@ -22,6 +22,22 @@
     <string name="toast_services_stop">Stopping service</string>
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisecond</item>
+        <item quantity="other">%1$d milliseconds</item>
+    </plurals>
+
+    <string name="acc_share_config_named">Share config %1$s</string>
+
+    <string name="acc_edit_config_named">Edit config %1$s</string>
+
+    <string name="acc_delete_config_named">Delete config %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="one">Group %1$s contains %2$d server</item>
+        <item quantity="other">Group %1$s contains %2$d servers</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">Config</string>
@@ -46,6 +62,7 @@
     <string name="confirm_delete_duplicate_profiles">Are you sure you want to delete all duplicate profiles currently shown?</string>
     <string name="confirm_delete_invalid_profiles">Please test the profiles first. Are you sure you want to delete all invalid profiles currently shown?</string>
     <string name="confirm_delete_profile">Are you sure you want to delete this profile?</string>
+    <string name="confirm_delete_profile_named">Are you sure you want to delete this profile?\n%1$s</string>
     <string name="confirm_delete_policy_group">Are you sure you want to delete this policy group?</string>
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
@@ -512,7 +529,7 @@
     <string name="acc_add_asset">Add asset source</string>
     <string name="acc_download_file">Download asset files</string>
     <string name="acc_qr_code">QR code</string>
-    <string name="acc_copy_log">Copy log</string>
+    <string name="acc_copy_log">Copy log to clipboard</string>
     <string name="acc_clear_log">Clear log</string>
     <string name="acc_add_rule">Add routing rule</string>
     <string name="acc_start">Start service</string>
@@ -521,8 +538,36 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
-    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
+    <string name="acc_last_updated">Last updated %1$s</string>
+    <string name="acc_subscription_announcement">%1$s, %2$s</string>
+    <string name="acc_subscription_update_label">%1$s update</string>
+    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">routed directly</string>
+    <string name="acc_app_routed_through">routed through the app</string>
+    <string name="acc_per_app_routing_disabled">per-app routing is not enabled</string>
+    <string name="acc_routing_rule_announcement">%1$s, %2$s, %3$s</string>
+    <string name="acc_routing_rule_blocked">is blocked</string>
+    <string name="acc_routing_rule_routed_through">routed through %1$s</string>
+    <string name="acc_routing_rule_routed_directly">routed directly</string>
+    <string name="acc_routing_rule_state">the rule is %1$s</string>
+    <string name="acc_routing_rule_switch_label">Rule %1$s</string>
+    <string name="acc_routing_rule_on">on</string>
+    <string name="acc_routing_rule_off">off</string>
+    <string name="acc_asset_announcement">%1$s. %2$s. %3$s</string>
+    <string name="acc_asset_file_size">file size %1$s</string>
+    <string name="acc_asset_updated_on">updated on %1$s</string>
+    <string name="acc_asset_announcement_missing">%1$s, %2$s</string>
+    <string name="acc_group_expanded">expanded</string>
+    <string name="acc_group_collapsed">collapsed</string>
+    <string name="acc_share_named">Share %1$s</string>
+    <string name="acc_edit_named">Edit %1$s</string>
+    <string name="acc_delete_named">Delete %1$s</string>
+    <string name="confirm_delete_policy_group_named">Are you sure you want to delete this policy group?\n%1$s</string>
+    <string name="confirm_delete_proxy_chain_member_named">Are you sure you want to delete this chain member?\n%1$s</string>
+    <string name="confirm_delete_routing_rule_named">Are you sure you want to delete this routing rule?\n%1$s</string>
+    <string name="confirm_delete_subscription_group_named">Are you sure you want to delete this subscription group? %1$s</string>
+    <string name="confirm_delete_asset_source_named">Are you sure you want to delete this asset source?\n%1$s</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
     <string name="acc_add_member">Add proxy chain member</string>

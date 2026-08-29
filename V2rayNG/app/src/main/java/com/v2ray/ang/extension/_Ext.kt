@@ -12,6 +12,9 @@ import kotlin.time.Duration.Companion.milliseconds
 const val THRESHOLD = 1000L
 const val DIVISOR = 1024.0
 
+internal fun Long.toPluralQuantity(): Int =
+    coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+
 /**
  * Converts a Long value to a speed string.
  *

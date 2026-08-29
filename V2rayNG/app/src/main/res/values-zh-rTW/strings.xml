@@ -22,6 +22,20 @@
     <string name="toast_services_stop">停止服務</string>
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
+    <!-- Compose accessibility resources -->
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+
+    <string name="acc_share_config_named">分享設定 %1$s</string>
+
+    <string name="acc_edit_config_named">編輯設定 %1$s</string>
+
+    <string name="acc_delete_config_named">刪除設定 %1$s</string>
+
+    <plurals name="acc_group_tab">
+        <item quantity="other">群組 %1$s 包含 %2$d 個伺服器</item>
+    </plurals>
 
     <!--ServerActivity-->
     <string name="title_server">設定檔</string>
@@ -46,6 +60,7 @@
     <string name="confirm_delete_duplicate_profiles">確定要刪除目前顯示的所有重複設定檔嗎？</string>
     <string name="confirm_delete_invalid_profiles">請先測試設定檔。確定要刪除目前顯示的所有無效設定檔嗎？</string>
     <string name="confirm_delete_profile">確定要刪除此設定檔嗎？</string>
+    <string name="confirm_delete_profile_named">確定要刪除此設定檔嗎？\n%1$s</string>
     <string name="confirm_delete_policy_group">確定要刪除此策略組嗎？</string>
     <string name="confirm_delete_proxy_chain_member">確定要刪除此代理鏈成員嗎？</string>
     <string name="confirm_delete_routing_rule">確定要刪除此路由規則嗎？</string>
@@ -512,7 +527,7 @@
     <string name="acc_add_asset">新增資源來源</string>
     <string name="acc_download_file">下載資源檔案</string>
     <string name="acc_qr_code">QR Code</string>
-    <string name="acc_copy_log">複製日誌</string>
+    <string name="acc_copy_log">將日誌複製到剪貼簿</string>
     <string name="acc_clear_log">清除日誌</string>
     <string name="acc_add_rule">新增路由規則</string>
     <string name="acc_start">啟動服務</string>
@@ -521,8 +536,36 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
-    <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
+    <string name="acc_last_updated">上次更新：%1$s</string>
+    <string name="acc_subscription_announcement">%1$s，%2$s</string>
+    <string name="acc_subscription_update_label">%1$s 更新</string>
+    <string name="acc_app_routing_announcement">%1$s。%2$s</string>
+    <string name="acc_app_routed_directly">直接路由</string>
+    <string name="acc_app_routed_through">透過應用程式路由</string>
+    <string name="acc_per_app_routing_disabled">未啟用個別應用程式路由</string>
+    <string name="acc_routing_rule_announcement">%1$s，%2$s，%3$s</string>
+    <string name="acc_routing_rule_blocked">已封鎖</string>
+    <string name="acc_routing_rule_routed_through">透過 %1$s 路由</string>
+    <string name="acc_routing_rule_routed_directly">直接路由</string>
+    <string name="acc_routing_rule_state">規則%1$s</string>
+    <string name="acc_routing_rule_switch_label">規則%1$s</string>
+    <string name="acc_routing_rule_on">開啟</string>
+    <string name="acc_routing_rule_off">關閉</string>
+    <string name="acc_asset_announcement">%1$s。%2$s。%3$s</string>
+    <string name="acc_asset_file_size">檔案大小 %1$s</string>
+    <string name="acc_asset_updated_on">更新於 %1$s</string>
+    <string name="acc_asset_announcement_missing">%1$s，%2$s</string>
+    <string name="acc_group_expanded">展開</string>
+    <string name="acc_group_collapsed">收合</string>
+    <string name="acc_share_named">分享%1$s</string>
+    <string name="acc_edit_named">編輯%1$s</string>
+    <string name="acc_delete_named">刪除%1$s</string>
+    <string name="confirm_delete_policy_group_named">確定要刪除此策略組嗎？\n%1$s</string>
+    <string name="confirm_delete_proxy_chain_member_named">確定要刪除此代理鏈成員嗎？\n%1$s</string>
+    <string name="confirm_delete_routing_rule_named">確定要刪除此路由規則嗎？\n%1$s</string>
+    <string name="confirm_delete_subscription_group_named">確定要刪除此訂閱群組嗎？%1$s</string>
+    <string name="confirm_delete_asset_source_named">確定要刪除此資源來源嗎？\n%1$s</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>
     <string name="acc_add_member">新增代理鏈成員</string>

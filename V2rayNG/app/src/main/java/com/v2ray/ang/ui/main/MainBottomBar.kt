@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -37,6 +38,7 @@ import com.v2ray.ang.ui.compose.colorFabInactiveLight
 @Composable
 fun MainBottomBar(
     displayText: String,
+    accessibilityText: String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
@@ -47,6 +49,9 @@ fun MainBottomBar(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
+                .semantics {
+                    contentDescription = accessibilityText
+                }
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             AppDivider()
@@ -60,10 +65,8 @@ fun MainBottomBar(
             ) {
                 Text(
                     text = displayText,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.semantics {
-                        contentDescription = displayText
-                    }
                 )
             }
         }

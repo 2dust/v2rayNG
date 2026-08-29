@@ -210,6 +210,7 @@ fun <T> SelectListDialog(
             LazyColumn {
                 items(options) { option ->
                     val isSelected = option == selectedOption
+                    val optionLabel = optionText(option)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,7 +232,7 @@ fun <T> SelectListDialog(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
-                            text = optionText(option),
+                            text = optionLabel,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )

@@ -42,6 +42,14 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         }
     }
 
+    fun remove(position: Int) {
+        if (position in rulesets.indices) {
+            SettingsManager.removeRoutingRuleset(position)
+            rulesets.removeAt(position)
+            _rulesetsFlow.value = rulesets.toList()
+        }
+    }
+
     fun move(fromPosition: Int, toPosition: Int) {
         if (rulesets.moveItem(fromPosition, toPosition)) {
             MmkvManager.encodeRoutingRulesets(rulesets)
