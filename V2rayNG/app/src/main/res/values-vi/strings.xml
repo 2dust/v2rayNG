@@ -50,6 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">Bạn có chắc muốn xóa thành viên này khỏi chuỗi proxy không?</string>
     <string name="confirm_delete_routing_rule">Bạn có chắc muốn xóa quy tắc định tuyến này không?</string>
     <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không?</string>
+    <string name="confirm_delete_subscription_group_named">Bạn có chắc muốn xóa nhóm đăng ký này không?\n%1$s</string>
     <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên \"%1$s\" không?</string>
     <string name="confirm_delete_asset_source">Bạn có chắc muốn xóa nguồn tài nguyên này không?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
@@ -523,6 +524,11 @@
     <string name="acc_more">Tùy chọn khác</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
+    <string name="acc_last_updated">Cập nhật lần cuối vào %1$s</string>
+    <string name="acc_subscription_update_label">Cập nhật %1$s</string>
+    <string name="acc_share_named">Chia sẻ %1$s</string>
+    <string name="acc_edit_named">Chỉnh sửa %1$s</string>
+    <string name="acc_delete_named">Xóa %1$s</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
     <string name="acc_add_member">Thêm thành viên vào chuỗi proxy</string>

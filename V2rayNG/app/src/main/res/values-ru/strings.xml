@@ -50,6 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>
     <string name="confirm_delete_subscription_group">Удалить эту подписку?</string>
+    <string name="confirm_delete_subscription_group_named">Удалить эту подписку?\n%1$s</string>
     <string name="confirm_delete_asset_file">Удалить файл ресурсов «%1$s»?</string>
     <string name="confirm_delete_asset_source">Удалить этот источник ресурсов?</string>
     <string name="server_lab_remarks">Название</string>
@@ -523,6 +524,11 @@
     <string name="acc_more">Дополнительные параметры</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
+    <string name="acc_last_updated">Последнее обновление: %1$s</string>
+    <string name="acc_subscription_update_label">Обновление %1$s</string>
+    <string name="acc_share_named">Поделиться: %1$s</string>
+    <string name="acc_edit_named">Изменить: %1$s</string>
+    <string name="acc_delete_named">Удалить: %1$s</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>
     <string name="acc_add_member">Добавить участника цепочки прокси</string>

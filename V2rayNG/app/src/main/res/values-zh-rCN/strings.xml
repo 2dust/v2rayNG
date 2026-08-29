@@ -50,6 +50,7 @@
     <string name="confirm_delete_proxy_chain_member">确定要删除此代理链成员吗？</string>
     <string name="confirm_delete_routing_rule">确定要删除此路由规则吗？</string>
     <string name="confirm_delete_subscription_group">确定要删除此订阅组吗？</string>
+    <string name="confirm_delete_subscription_group_named">确定要删除此订阅组吗？\n%1$s</string>
     <string name="confirm_delete_asset_file">确定要删除资源文件“%1$s”吗？</string>
     <string name="confirm_delete_asset_source">确定要删除此资源来源吗？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
@@ -523,6 +524,11 @@
     <string name="acc_more">更多选项</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享订阅链接</string>
+    <string name="acc_last_updated">上次更新：%1$s</string>
+    <string name="acc_subscription_update_label">%1$s 更新</string>
+    <string name="acc_share_named">分享%1$s</string>
+    <string name="acc_edit_named">编辑%1$s</string>
+    <string name="acc_delete_named">删除%1$s</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>
     <string name="acc_add_member">添加代理链成员</string>

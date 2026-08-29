@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.subscription
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
@@ -33,8 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +68,11 @@ private enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
     QRCode(R.string.share_subscription_qrcode),
     Clipboard(R.string.share_subscription_clipboard)
 }
+
+private data class SubscriptionDeleteTarget(
+    val guid: String,
+    val name: String
+)
 
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
@@ -115,13 +126,14 @@ fun SubSettingScreen(
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
-    var removeTarget by remember { mutableStateOf<String?>(null) }
+    var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
     var shareTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     var showQRCodeBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         viewModel.move(from.index, to.index)
     }
@@ -156,6 +168,25 @@ fun SubSettingScreen(
                 items = subscriptions,
                 key = { _, item -> item.guid }
             ) { _, subCache ->
+                val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
+                val lastUpdatedAccessibility = if (lastUpdated.isNotEmpty()) {
+                    stringResource(
+                        R.string.acc_last_updated,
+                        DateUtils.formatDateTime(
+                            context,
+                            subCache.subscription.lastUpdated,
+                            DateUtils.FORMAT_SHOW_DATE or
+                                DateUtils.FORMAT_SHOW_TIME or
+                                DateUtils.FORMAT_SHOW_YEAR
+                        )
+                    )
+                } else {
+                    ""
+                }
+                val subscriptionUpdateLabel = stringResource(
+                    R.string.acc_subscription_update_label,
+                    subCache.subscription.remarks,
+                )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
                     ReorderableListItem(
                         scope = this,
@@ -164,6 +195,7 @@ fun SubSettingScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .semantics(mergeDescendants = true) {}
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -178,18 +210,24 @@ fun SubSettingScreen(
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         text = subCache.subscription.url,
+                                        modifier = Modifier.semantics { hideFromAccessibility() },
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                if (lastUpdated.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = lastUpdated,
+                                        modifier = Modifier.clearAndSetSemantics {
+                                            contentDescription = lastUpdatedAccessibility
+                                        },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
 
                             Column(
@@ -203,23 +241,37 @@ fun SubSettingScreen(
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
-                                                contentDescription = stringResource(R.string.acc_share_subscription)
+                                                contentDescription = stringResource(
+                                                    R.string.acc_share_named,
+                                                    subCache.subscription.remarks
+                                                )
                                             )
                                         }
                                     }
                                     IconButton(onClick = { onEditSub(subCache.guid) }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_edit_24dp),
-                                            contentDescription = stringResource(R.string.acc_edit)
+                                            contentDescription = stringResource(
+                                                R.string.acc_edit_named,
+                                                subCache.subscription.remarks
+                                            )
                                         )
                                     }
                                     IconButton(onClick = {
-                                        if (confirmRemove) removeTarget = subCache.guid
+                                        if (confirmRemove) {
+                                            removeTarget = SubscriptionDeleteTarget(
+                                                guid = subCache.guid,
+                                                name = subCache.subscription.remarks
+                                            )
+                                        }
                                         else onRemoveSub(subCache.guid)
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_delete_24dp),
-                                            contentDescription = stringResource(R.string.acc_delete)
+                                            contentDescription = stringResource(
+                                                R.string.acc_delete_named,
+                                                subCache.subscription.remarks
+                                            )
                                         )
                                     }
                                 }
@@ -231,7 +283,11 @@ fun SubSettingScreen(
                                         updated.enabled = checked
                                         viewModel.update(subCache.guid, updated)
                                     },
-                                    modifier = Modifier.scale(0.7f),
+                                    modifier = Modifier
+                                        .scale(0.7f)
+                                        .semantics {
+                                            contentDescription = subscriptionUpdateLabel
+                                        },
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                         checkedTrackColor = MaterialTheme.colorScheme.secondary
@@ -270,11 +326,15 @@ fun SubSettingScreen(
         )
     }
 
-    if (removeTarget != null) {
+    val deleteTarget = removeTarget
+    if (deleteTarget != null) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_subscription_group),
+            message = stringResource(
+                R.string.confirm_delete_subscription_group_named,
+                deleteTarget.name
+            ),
             onConfirm = {
-                onRemoveSub(removeTarget!!)
+                onRemoveSub(deleteTarget.guid)
                 removeTarget = null
             },
             onDismiss = { removeTarget = null }
