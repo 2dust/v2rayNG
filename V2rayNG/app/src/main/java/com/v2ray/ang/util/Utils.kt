@@ -16,7 +16,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import java.io.IOException
-import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.URI
 import java.net.URLDecoder
@@ -213,8 +212,10 @@ object Utils {
      */
     private fun isIpv6Address(value: String): Boolean {
         var addr = value
-        if (addr.startsWith("[") && addr.endsWith("]")) {
-            addr = addr.drop(1).dropLast(1)
+        if (addr.startsWith("[")) {
+            val closingBracket = addr.lastIndexOf(']')
+            if (closingBracket <= 1) return false
+            addr = addr.substring(1, closingBracket)
         }
         return IPV6_REGEX.matches(addr)
     }
@@ -460,48 +461,23 @@ object Utils {
     fun isXray(): Boolean = BuildConfig.APPLICATION_ID.startsWith("com.v2ray.ang")
 
     /**
-     * Converts an InetAddress to its long representation
+     * Check if an IPv4 address is within an IPv4 CIDR range
      *
-     * @param ip The InetAddress to convert
-     * @return The long representation of the IP address
-     */
-    private fun inetAddressToLong(ip: InetAddress): Long {
-        val bytes = ip.address
-        var result: Long = 0
-        for (i in bytes.indices) {
-            result = result shl 8 or (bytes[i].toInt() and 0xff).toLong()
-        }
-        return result
-    }
-
-    /**
-     * Check if an IP address is within a CIDR range
-     *
-     * @param ip The IP address to check
-     * @param cidr The CIDR notation range (e.g., "192.168.1.0/24")
+     * @param ip The IPv4 address to check
+     * @param cidr The IPv4 CIDR range (e.g., "192.168.1.0/24")
      * @return True if the IP is within the CIDR range, false otherwise
      */
     fun isIpInCidr(ip: String, cidr: String): Boolean {
-        try {
-            if (!isIpAddress(ip)) return false
+        val parts = cidr.split('/')
+        if (parts.size != 2 || !isIpv4Address(ip) || !isIpv4Address(parts[0])) return false
 
-            // Parse CIDR (e.g., "192.168.1.0/24")
-            val (cidrIp, prefixLen) = cidr.split("/")
-            val prefixLength = prefixLen.toInt()
+        val prefixLength = parts[1].toIntOrNull()?.takeIf { it in 0..32 } ?: return false
+        val mask = if (prefixLength == 0) 0L else (-1L shl (32 - prefixLength))
+        return (ipv4ToLong(ip) and mask) == (ipv4ToLong(parts[0]) and mask)
+    }
 
-            // Convert IP and CIDR's IP portion to Long
-            val ipLong = inetAddressToLong(InetAddress.getByName(ip))
-            val cidrIpLong = inetAddressToLong(InetAddress.getByName(cidrIp))
-
-            // Calculate subnet mask (e.g., /24 → 0xFFFFFF00)
-            val mask = if (prefixLength == 0) 0L else (-1L shl (32 - prefixLength))
-
-            // Check if they're in the same subnet
-            return (ipLong and mask) == (cidrIpLong and mask)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to check if IP is in CIDR", e)
-            return false
-        }
+    private fun ipv4ToLong(ip: String): Long {
+        return ip.split('.').fold(0L) { result, octet -> (result shl 8) or octet.toLong() }
     }
 
     /**

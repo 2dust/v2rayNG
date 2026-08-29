@@ -1,9 +1,9 @@
 package com.v2ray.ang.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,12 +46,20 @@ class AboutActivity : BaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        AboutScreen(onBackClick = { finish() })
+        AboutScreen(
+            onBackClick = { finish() },
+            onTranslatorsClick = {
+                startActivity(Intent(this, TranslatorsActivity::class.java))
+            }
+        )
     }
 }
 
 @Composable
-fun AboutScreen(onBackClick: () -> Unit) {
+fun AboutScreen(
+    onBackClick: () -> Unit,
+    onTranslatorsClick: () -> Unit
+) {
     val context = LocalContext.current
     var showOssDialog by remember { mutableStateOf(false) }
 
@@ -83,6 +91,11 @@ fun AboutScreen(onBackClick: () -> Unit) {
                 icon = painterResource(R.drawable.license_24px),
                 title = stringResource(R.string.title_oss_license),
                 onClick = { showOssDialog = true }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_translate_24dp),
+                title = stringResource(R.string.title_translators),
+                onClick = onTranslatorsClick
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_feedback_24dp),

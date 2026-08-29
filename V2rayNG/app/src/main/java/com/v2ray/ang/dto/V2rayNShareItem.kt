@@ -7,7 +7,7 @@ import com.v2ray.ang.enums.NetworkType
 
 @Suppress("PropertyName")
 data class V2rayNShareItem(
-    // val IndexId: String?,
+    val IndexId: String?,
     val ConfigType: Int?,
     // val CoreType: Int?,
     val ConfigVersion: Int?,
