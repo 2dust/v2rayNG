@@ -524,7 +524,7 @@
     <string name="acc_more">Дополнительные параметры</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
-    <string name="acc_last_updated">Последнее обновление: %1$s</string>
+    <string name="acc_last_updated">Последний раз обновлено %1$s</string>
     <string name="acc_subscription_update_label">Обновление %1$s</string>
     <string name="acc_share_named">Поделиться: %1$s</string>
     <string name="acc_edit_named">Изменить: %1$s</string>

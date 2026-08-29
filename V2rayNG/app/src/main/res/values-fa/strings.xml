@@ -524,7 +524,7 @@
     <string name="acc_more">گزینه‌های بیشتر</string>
     <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
-    <string name="acc_last_updated">آخرین به‌روزرسانی %1$s</string>
+    <string name="acc_last_updated">آخرین بار در %1$s به‌روزرسانی شد</string>
     <string name="acc_subscription_update_label">به‌روزرسانی %1$s</string>
     <string name="acc_share_named">اشتراک‌گذاری %1$s</string>
     <string name="acc_edit_named">ویرایش %1$s</string>

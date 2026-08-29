@@ -524,7 +524,7 @@
     <string name="acc_more">امکووݩا بؽتر</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
-    <string name="acc_last_updated">ورۊ رسۊوی نهایی %1$s</string>
+    <string name="acc_last_updated">ورۊ رسۊوی نهایی من %1$s</string>
     <string name="acc_subscription_update_label">ورۊ کردن %1$s</string>
     <string name="acc_share_named">یک رسۊوی %1$s</string>
     <string name="acc_edit_named">آلشتکاری %1$s</string>

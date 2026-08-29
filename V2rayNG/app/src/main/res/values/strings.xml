@@ -524,7 +524,7 @@
     <string name="acc_more">More options</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
-    <string name="acc_last_updated">Last updated %1$s</string>
+    <string name="acc_last_updated">Last updated on %1$s</string>
     <string name="acc_subscription_update_label">%1$s update</string>
     <string name="acc_share_named">Share %1$s</string>
     <string name="acc_edit_named">Edit %1$s</string>
