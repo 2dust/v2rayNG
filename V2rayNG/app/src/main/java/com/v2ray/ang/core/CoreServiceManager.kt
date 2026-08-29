@@ -62,6 +62,7 @@ object CoreServiceManager {
     // replacement start mutually ordered.
     private val restartLock = Any()
     private var restartJob: Job? = null
+    private val restartFeedback = ServiceRestartFeedback()
 
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
@@ -112,7 +113,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            reportStartFailure(service, message)
             NotificationManager.cancelNotification()
             return false
         }
@@ -184,7 +185,8 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+            val restarted = synchronized(restartLock) { restartFeedback.complete() }
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, restarted)
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -219,7 +221,9 @@ object CoreServiceManager {
             browserDialer = null
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        if (!synchronized(restartLock) { restartFeedback.isRestarting }) {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        }
         NotificationManager.cancelNotification()
 
         try {
@@ -366,9 +370,25 @@ object CoreServiceManager {
 
     private fun cancelPendingRestart() {
         val owner = synchronized(restartLock) {
-            restartJob.also { restartJob = null }
+            restartJob.also {
+                restartJob = null
+                restartFeedback.cancel()
+            }
         }
         owner?.cancel()
+    }
+
+    /** Clears restart feedback state and reports a terminal service-start failure to the UI. */
+    internal fun reportStartFailure(service: Service, message: String) {
+        synchronized(restartLock) { restartFeedback.cancel() }
+        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+    }
+
+    private fun reportRestartFailure(service: Service, message: String) {
+        val wasRestarting = synchronized(restartLock) { restartFeedback.complete() }
+        if (wasRestarting) {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+        }
     }
 
     private suspend fun waitForCoreToStop(): Boolean = waitForCoreToStop(
@@ -495,12 +515,20 @@ object CoreServiceManager {
                     val pendingResult = goAsync()
                     val owner = synchronized(restartLock) {
                         if (hasActiveRestart(restartJob)) null
-                        else SupervisorJob().also { restartJob = it }
+                        else SupervisorJob().also {
+                            restartJob = it
+                            restartFeedback.begin()
+                        }
                     }
                     if (owner == null) {
                         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Restart already in progress")
                         pendingResult.finish()
                     } else {
+                        MessageHelper.sendMsg2UI(
+                            serviceControl.getService(),
+                            AppConfig.MSG_STATE_RESTART,
+                            "",
+                        )
                         CoroutineScope(
                             owner + Dispatchers.Default + CoroutineName("CoreServiceRestart")
                         ).launch {
@@ -508,16 +536,24 @@ object CoreServiceManager {
                                 val service = serviceControl.getService()
                                 serviceControl.stopService()
                                 if (!waitForCoreToStop()) {
+                                    val message = "Timed out waiting for core to stop"
                                     LogUtil.e(
                                         AppConfig.TAG,
                                         "StartCore-Manager: Restart timed out waiting for core to stop, " +
                                             "mode=${service::class.java.simpleName}, " +
                                             "profile=${MmkvManager.getSelectServer().orEmpty()}",
                                     )
+                                    reportRestartFailure(service, message)
                                 } else {
                                     synchronized(restartLock) {
                                         if (canStartReplacement(restartJob, owner)) {
-                                            LauncherManager.startService(service)
+                                            val startRequested =
+                                                LauncherManager.startServiceAfterRestart(
+                                                    service
+                                                )
+                                            if (!startRequested) {
+                                                reportRestartFailure(service, "")
+                                            }
                                         }
                                     }
                                 }
@@ -526,6 +562,8 @@ object CoreServiceManager {
                                 throw e
                             } catch (e: Exception) {
                                 val service = serviceControl.getService()
+                                val message = e.message?.takeUnless { it.isBlank() }
+                                    ?: e.javaClass.simpleName
                                 LogUtil.e(
                                     AppConfig.TAG,
                                     "StartCore-Manager: Restart failed, " +
@@ -533,6 +571,7 @@ object CoreServiceManager {
                                         "profile=${MmkvManager.getSelectServer().orEmpty()}",
                                     e,
                                 )
+                                reportRestartFailure(service, message)
                             } finally {
                                 synchronized(restartLock) {
                                     if (restartJob === owner) restartJob = null
