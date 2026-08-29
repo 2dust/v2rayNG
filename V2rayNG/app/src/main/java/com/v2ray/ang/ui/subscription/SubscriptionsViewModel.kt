@@ -78,6 +78,10 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     fun updateSubscriptionsOnly() {
         launchLoading {
             try {
+                val subscriptionIds = subscriptions.asSequence()
+                    .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
+                    .map { it.guid }
+                    .toList()
                 val result = withContext(Dispatchers.IO) {
                     AngConfigManager.updateConfigViaSubAll()
                 }
@@ -93,6 +97,9 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
                         toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
                 }
                 reload()
+                if (result.configCount > 0) {
+                    MessageHelper.sendSubscriptionDataChanged(app, subscriptionIds)
+                }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
@@ -103,7 +110,6 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     }
 
     fun updateSubscriptionsMore() {
-        SettingsChangeManager.makeSetupGroupTab()
         val subIds = MmkvManager.decodeSubscriptions()
             .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
             .map { it.guid }

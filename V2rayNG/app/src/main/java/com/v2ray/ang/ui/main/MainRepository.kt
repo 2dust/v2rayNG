@@ -70,6 +70,13 @@ class MainRepository(
                     safeIntent.getStringExtra("content")
                 )
 
+                AppConfig.MSG_SUB_UPDATE_DATA_CHANGED -> safeIntent
+                    .serializable<ArrayList<String>>("content")
+                    ?.filter { it.isNotBlank() }
+                    ?.distinct()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let(MainServiceEvent::SubscriptionDataChanged)
+
                 else -> null
             }
             event?.let { _mainServiceEvent.tryEmit(it) }

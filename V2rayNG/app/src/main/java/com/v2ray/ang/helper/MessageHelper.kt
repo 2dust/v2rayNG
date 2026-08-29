@@ -71,6 +71,13 @@ object MessageHelper {
         sendMsg(ctx, AppConfig.BROADCAST_ACTION_ACTIVITY, what, content)
     }
 
+    fun sendSubscriptionDataChanged(ctx: Context, subscriptionIds: Collection<String>) {
+        val changedIds = ArrayList(subscriptionIds.filter { it.isNotBlank() }.distinct())
+        if (changedIds.isNotEmpty()) {
+            sendMsg2UI(ctx, AppConfig.MSG_SUB_UPDATE_DATA_CHANGED, changedIds)
+        }
+    }
+
     /**
      * Sends a message to the test service.
      *

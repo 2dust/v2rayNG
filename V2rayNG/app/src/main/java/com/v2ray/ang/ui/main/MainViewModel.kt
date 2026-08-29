@@ -42,7 +42,8 @@ import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource
+    private val dataSource: MainDataSource,
+    private val serviceEventDispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
 ) : BaseViewModel(application) {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -90,7 +91,7 @@ class MainViewModel(
     }
 
     private fun collectServiceEvents() {
-        viewModelScope.launch {
+        viewModelScope.launch(serviceEventDispatcher) {
             dataSource.mainServiceEvent.collect { event ->
                 handleServiceEvent(event)
             }
@@ -131,6 +132,16 @@ class MainViewModel(
             is MainServiceEvent.MeasureConfigFinish -> {
                 onTestsFinished()
             }
+
+            is MainServiceEvent.SubscriptionDataChanged -> {
+                refreshSubscriptionGroupData(event.subscriptionIds)
+            }
+        }
+    }
+
+    private fun refreshSubscriptionGroupData(subscriptionIds: Collection<String>) {
+        viewModelScope.launch(preloadDispatcher) {
+            populateSubscriptionGroupData(subscriptionIds)
         }
     }
 
@@ -470,8 +481,12 @@ class MainViewModel(
                             toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
                     }
                     if (result.configCount > 0) {
-                        setupGroupTab(forceRefresh = true)
-                        refreshSelectedGuid()
+                        val changedSubscriptionIds = if (subId.isEmpty()) {
+                            uiState.value.groups.map { it.id }.filter { it.isNotEmpty() }
+                        } else {
+                            listOf(subId)
+                        }
+                        populateSubscriptionGroupData(changedSubscriptionIds)
                     }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
@@ -663,6 +678,25 @@ class MainViewModel(
         }
     }
 
+    internal suspend fun populateSubscriptionGroupData(subscriptionIds: Collection<String>) {
+        initialPageReady.await()
+        val refreshOrder = subscriptionGroupRefreshOrder(
+            visibleGroupIds = uiState.value.groups.map { it.id },
+            selectedGroupId = uiState.value.selectedGroupId,
+            changedSubscriptionIds = subscriptionIds,
+        )
+        refreshOrder.forEach { groupId ->
+            try {
+                updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to refresh subscription group: $groupId", error)
+            }
+        }
+        refreshSelectedGuid()
+    }
+
     fun filterConfig(keyword: String) {
         if (keyword == keywordFilter) return
         keywordFilter = keyword
@@ -841,5 +875,25 @@ class MainViewModel(
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
+    }
+}
+
+internal fun subscriptionGroupRefreshOrder(
+    visibleGroupIds: List<String>,
+    selectedGroupId: String,
+    changedSubscriptionIds: Collection<String>,
+): List<String> {
+    val changedIds = changedSubscriptionIds.filterTo(LinkedHashSet()) { it.isNotEmpty() }
+    if (changedIds.isEmpty()) return emptyList()
+
+    val affectedIds = visibleGroupIds.filterTo(LinkedHashSet()) {
+        it.isNotEmpty() && it in changedIds
+    }
+    if (visibleGroupIds.any { it.isEmpty() }) affectedIds += ""
+    if (affectedIds.isEmpty()) return emptyList()
+
+    return buildList(affectedIds.size) {
+        if (selectedGroupId in affectedIds) add(selectedGroupId)
+        addAll(affectedIds.filter { it != selectedGroupId })
     }
 }
