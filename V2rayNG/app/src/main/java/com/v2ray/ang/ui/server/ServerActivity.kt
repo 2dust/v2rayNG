@@ -39,6 +39,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
@@ -94,12 +95,18 @@ class ServerActivity : BaseComponentActivity() {
 
     private fun saveServer(config: ProfileItem): Boolean {
         if (config.remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(
+                R.string.server_lab_remarks,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
         if (config.server.isNullOrBlank()) {
-            toast(R.string.server_lab_address)
+            toast(
+                R.string.server_lab_address,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -107,7 +114,10 @@ class ServerActivity : BaseComponentActivity() {
             config.configType != EConfigType.HYSTERIA2 &&
             (config.serverPort?.toIntOrNull() ?: 0) <= 0
         ) {
-            toast(R.string.server_lab_port)
+            toast(
+                R.string.server_lab_port,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -123,7 +133,7 @@ class ServerActivity : BaseComponentActivity() {
 
                 else -> R.string.server_lab_id
             }
-            toast(message)
+            toast(message, liveRegionMode = AccessibilityLiveRegionMode.POLITE)
             return false
         }
 
@@ -131,7 +141,10 @@ class ServerActivity : BaseComponentActivity() {
             config.configType == EConfigType.TROJAN &&
             config.security.isNullOrBlank()
         ) {
-            toast(R.string.server_lab_stream_security)
+            toast(
+                R.string.server_lab_stream_security,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -139,7 +152,10 @@ class ServerActivity : BaseComponentActivity() {
             !config.xhttpExtra.isNullOrBlank() &&
             JsonUtil.parseString(config.xhttpExtra) == null
         ) {
-            toast(R.string.server_lab_xhttp_extra)
+            toast(
+                R.string.server_lab_xhttp_extra,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -147,7 +163,10 @@ class ServerActivity : BaseComponentActivity() {
             !config.finalMask.isNullOrBlank() &&
             JsonUtil.parseString(config.finalMask) == null
         ) {
-            toast(R.string.server_lab_final_mask)
+            toast(
+                R.string.server_lab_final_mask,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -186,7 +205,10 @@ class ServerActivity : BaseComponentActivity() {
             guid.isEmpty() ||
             guid == MmkvManager.getSelectServer()
         ) {
-            toast(R.string.toast_action_not_allowed)
+            toast(
+                R.string.toast_action_not_allowed,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return
         }
 
@@ -484,17 +506,28 @@ fun ServerScreen(
                         Button(
                             onClick = {
                                 if (address.isBlank()) {
-                                    context.toast(R.string.server_lab_address); return@Button
+                                    context.toast(
+                                        R.string.server_lab_address,
+                                        liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                                    )
+                                    return@Button
                                 }
                                 if (configType != EConfigType.HYSTERIA2 && (port.toIntOrNull() ?: 0) <= 0) {
-                                    context.toast(R.string.server_lab_port); return@Button
+                                    context.toast(
+                                        R.string.server_lab_port,
+                                        liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                                    )
+                                    return@Button
                                 }
                                 val temp = buildProfileItem()
                                 scope.launch {
                                     isFetchingCert = true
                                     try {
                                         val sha256 = withContext(Dispatchers.IO) { CertificateFingerprintManager.fetchForManualFill(temp) }
-                                        if (sha256.isNullOrBlank()) context.toast(R.string.toast_fetch_cert_sha256_failed) else {
+                                        if (sha256.isNullOrBlank()) context.toast(
+                                            R.string.toast_fetch_cert_sha256_failed,
+                                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                                        ) else {
                                             pinnedCA256 = sha256
                                             context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
                                         }

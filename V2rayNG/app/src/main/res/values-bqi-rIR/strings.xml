@@ -19,7 +19,7 @@
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
     <string name="notification_action_more">سی دووسمندیا قلوه کیلیک کوݩ</string>
     <string name="toast_services_start">ره وستن سرویس</string>
-    <string name="toast_services_stop">واڌاشتن سرویس</string>
+    <string name="toast_services_stop">واڌاشتن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 

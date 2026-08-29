@@ -57,6 +57,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
@@ -109,7 +110,10 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         content: String
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(
+                R.string.server_lab_remarks,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -128,7 +132,8 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                     getString(R.string.toast_malformed_json)
                 } else {
                     getString(R.string.toast_malformed_json_detail, detail)
-                }
+                },
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
             )
             return false
         }
@@ -173,7 +178,10 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(
+                R.string.toast_action_not_allowed,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 

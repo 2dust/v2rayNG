@@ -29,6 +29,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
@@ -116,7 +117,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         fallbackTag: String,
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
+            toast(
+                R.string.server_lab_remarks,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 
@@ -175,7 +179,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
+            toast(
+                R.string.toast_action_not_allowed,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 

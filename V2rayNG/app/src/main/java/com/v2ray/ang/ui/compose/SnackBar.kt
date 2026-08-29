@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.compose
 
+import android.os.SystemClock
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,18 +21,33 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.delay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,6 +63,7 @@ data class AppSnackbarMessage(
     val message: CharSequence,
     val type: ToastType = ToastType.NORMAL,
     val long: Boolean = false,
+    val liveRegionMode: AccessibilityLiveRegionMode? = null,
 )
 
 object AppSnackbarManager {
@@ -62,13 +80,15 @@ object AppSnackbarManager {
         message: CharSequence,
         type: ToastType = ToastType.NORMAL,
         long: Boolean = false,
+        liveRegionMode: AccessibilityLiveRegionMode? = null,
     ): Boolean {
         if (!hasActiveHost()) return false
         return _messages.tryEmit(
             AppSnackbarMessage(
                 message = message,
                 type = type,
-                long = long
+                long = long,
+                liveRegionMode = liveRegionMode,
             )
         )
     }
@@ -135,6 +155,8 @@ fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val liveRegionMessageTracker = remember { LiveRegionMessageTracker() }
+    var liveRegionMessage by remember { mutableStateOf<LiveRegionMessage?>(null) }
 
     LaunchedEffect(controller, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -144,9 +166,81 @@ fun AppSnackbarBridge(
                     type = event.type,
                     long = event.long
                 )
+                liveRegionMessageTracker.next(event)?.let { liveRegionMessage = it }
             }
         }
     }
+
+    LaunchedEffect(liveRegionMessage?.id) {
+        val id = liveRegionMessage?.id ?: return@LaunchedEffect
+        delay(LiveRegionMessageLifetimeMs)
+        if (liveRegionMessage?.id == id) liveRegionMessage = null
+    }
+
+    AccessibilityLiveRegion(liveRegionMessage)
+}
+
+internal data class LiveRegionMessage(
+    val id: Long,
+    val text: String,
+    val mode: AccessibilityLiveRegionMode,
+)
+
+internal class LiveRegionMessageTracker(
+    private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
+) {
+    private var nextId = 0L
+    private var lastMessage: String? = null
+    private var lastMode: AccessibilityLiveRegionMode? = null
+    private var lastUpdateAt = 0L
+
+    fun next(event: AppSnackbarMessage): LiveRegionMessage? {
+        val mode = event.liveRegionMode ?: return null
+        val text = event.message.toString()
+        if (text.isBlank()) return null
+
+        val now = elapsedRealtime()
+        val duplicate = text == lastMessage && mode == lastMode &&
+            now - lastUpdateAt < DuplicateLiveRegionMessageWindowMs
+        if (duplicate) return null
+
+        lastMessage = text
+        lastMode = mode
+        lastUpdateAt = now
+        return LiveRegionMessage(
+            id = ++nextId,
+            text = text,
+            mode = mode,
+        )
+    }
+}
+
+@Composable
+private fun AccessibilityLiveRegion(message: LiveRegionMessage?) {
+    val text = message?.text.orEmpty()
+    val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
+    val localizedMessage = remember(text, languageTag) {
+        buildAnnotatedString {
+            withStyle(SpanStyle(localeList = LocaleList(Locale(languageTag)))) {
+                append(text)
+            }
+        }
+    }
+    val liveRegionMode = when (message?.mode) {
+        AccessibilityLiveRegionMode.ASSERTIVE -> LiveRegionMode.Assertive
+        AccessibilityLiveRegionMode.POLITE, null -> LiveRegionMode.Polite
+    }
+
+    // The live region mirrors opted-in transient text without exposing the visual Snackbar.
+    Text(
+        text = localizedMessage,
+        color = Color.Transparent,
+        fontSize = 1.sp,
+        maxLines = 1,
+        modifier = Modifier
+            .size(1.dp)
+            .semantics { liveRegion = liveRegionMode },
+    )
 }
 
 private val ToastCornerRadius = 24.dp
@@ -156,13 +250,15 @@ private const val ToastMaxLines = 8
 private const val ToastMaxWidthFraction = 0.75f
 private val ToastBottomOffset = 100.dp
 private const val SnackbarThrottleMs = 2000L
+internal const val DuplicateLiveRegionMessageWindowMs = 1000L
+private const val LiveRegionMessageLifetimeMs = 1000L
 
 @Composable
 fun AppSnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(modifier = modifier) {
+    BoxWithConstraints(modifier = modifier.clearAndSetSemantics { }) {
         val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
         val density = LocalDensity.current
         val navigationBarHeight = with(density) {
