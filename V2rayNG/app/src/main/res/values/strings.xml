@@ -19,7 +19,7 @@
     <string name="toast_permission_denied_notification">Notification permission denied</string>
     <string name="notification_action_more">Tap for more</string>
     <string name="toast_services_start">Starting service</string>
-    <string name="toast_services_stop">Stopping service</string>
+    <string name="toast_services_stop">Service stopped</string>
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
 
@@ -348,8 +348,14 @@
     <string name="title_del_config_count">Delete %d configs</string>
     <string name="title_import_config_count">Import %d configs</string>
     <string name="title_export_config_count">Export %d configs</string>
-    <string name="title_update_config_count">Update %d configs</string>
-    <string name="title_update_asset_count">Updated %d asset files</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">Updated %1$d config</item>
+        <item quantity="other">Updated %1$d configs</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Updated %1$d asset file</item>
+        <item quantity="other">Updated %1$d asset files</item>
+    </plurals>
     <string name="title_update_subscription_result">Updated %1$d configs (%2$d success, %3$d failed, %4$d skipped)</string>
     <string name="title_update_subscription_no_subscription">No subscriptions</string>
     <string name="toast_server_not_found_in_group">Selected server not found in current group</string>

@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.PermissionType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 
 /**
@@ -40,7 +41,10 @@ class PermissionHelper(private val activity: ComponentActivity) {
                         R.string.toast_permission_denied_for,
                         activity.getString(permissionType.getLabelRes())
                     )
-                    activity.toast(message)
+                    activity.toast(
+                        message,
+                        liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                    )
                 }
             }
             permissionLauncher.launch(permission)

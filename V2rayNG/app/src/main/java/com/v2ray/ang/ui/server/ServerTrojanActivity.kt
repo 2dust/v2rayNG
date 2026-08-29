@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.compose.FormTextField
 
@@ -44,11 +45,17 @@ class ServerTrojanActivity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(R.string.server_lab_id3)
+            toast(
+                R.string.server_lab_id3,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
         if (config.security.isNullOrBlank()) {
-            toast(R.string.server_lab_stream_security)
+            toast(
+                R.string.server_lab_stream_security,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
         return true

@@ -28,6 +28,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
@@ -80,16 +81,25 @@ class SubEditActivity : BaseComponentActivity() {
     private fun saveServer(subItem: SubscriptionItem): Boolean {
 
         if (TextUtils.isEmpty(subItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
+            toast(
+                R.string.sub_setting_remarks,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
         if (subItem.url.isNotEmpty()) {
             if (!Utils.isValidUrl(subItem.url)) {
-                toast(R.string.toast_invalid_url)
+                toast(
+                    R.string.toast_invalid_url,
+                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                )
                 return false
             }
             if (!Utils.isValidSubUrl(subItem.url)) {
-                toast(R.string.toast_insecure_url_protocol)
+                toast(
+                    R.string.toast_insecure_url_protocol,
+                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                )
                 if (!subItem.allowInsecureUrl) {
                     return false
                 }
@@ -97,7 +107,10 @@ class SubEditActivity : BaseComponentActivity() {
         }
 
         if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-            toast(R.string.toast_invalid_update_interval)
+            toast(
+                R.string.toast_invalid_update_interval,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 

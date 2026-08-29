@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.AssetUrlItem
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -102,15 +103,24 @@ class UserAssetUrlActivity : BaseComponentActivity() {
 
         val assetList = MmkvManager.decodeAssetUrls()
         if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-            toast(R.string.msg_remark_is_duplicate)
+            toast(
+                R.string.msg_remark_is_duplicate,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
         if (TextUtils.isEmpty(assetItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
+            toast(
+                R.string.sub_setting_remarks,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
         if (TextUtils.isEmpty(assetItem.url)) {
-            toast(R.string.title_url)
+            toast(
+                R.string.title_url,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return false
         }
 

@@ -13,6 +13,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
@@ -102,16 +103,28 @@ class MainViewModel(
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
+                toastSuccess(
+                    R.string.toast_services_success,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                )
                 updateRunningState(true)
             }
 
             MainServiceEvent.StateStartFailure -> {
-                toastError(R.string.toast_services_failure)
+                toastError(
+                    R.string.toast_services_failure,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                )
                 updateRunningState(false)
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                toastSuccess(
+                    R.string.toast_services_stop,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                )
+                updateRunningState(false)
+            }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -461,13 +474,32 @@ class MainViewModel(
                     }
                     when {
                         result.successCount + result.failureCount + result.skipCount == 0 ->
-                            toast(R.string.title_update_subscription_no_subscription)
+                            toast(
+                                R.string.title_update_subscription_no_subscription,
+                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                            )
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                            toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+                            toast(
+                                getQuantityString(
+                                    R.plurals.title_update_config_count,
+                                    result.configCount,
+                                    result.configCount,
+                                ),
+                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                            )
 
                         else ->
-                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                            toast(
+                                dataSource.getString(
+                                    R.string.title_update_subscription_result,
+                                    result.configCount,
+                                    result.successCount,
+                                    result.failureCount,
+                                    result.skipCount,
+                                ),
+                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                            )
                     }
                     if (result.configCount > 0) {
                         setupGroupTab(forceRefresh = true)
@@ -689,7 +721,10 @@ class MainViewModel(
 
     fun removeServerAndRefresh(guid: String) {
         if (guid == uiState.value.selectedGuid) {
-            toast(R.string.toast_action_not_allowed)
+            toast(
+                R.string.toast_action_not_allowed,
+                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+            )
             return
         }
         viewModelScope.launch(ioDispatcher) {

@@ -6,6 +6,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -84,13 +85,32 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
 
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
-                        toast(R.string.title_update_subscription_no_subscription)
+                        toast(
+                            R.string.title_update_subscription_no_subscription,
+                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                        )
 
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                        toast(getString(R.string.title_update_config_count, result.configCount))
+                        toast(
+                            getQuantityString(
+                                R.plurals.title_update_config_count,
+                                result.configCount,
+                                result.configCount,
+                            ),
+                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                        )
 
                     else ->
-                        toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                        toast(
+                            getString(
+                                R.string.title_update_subscription_result,
+                                result.configCount,
+                                result.successCount,
+                                result.failureCount,
+                                result.skipCount,
+                            ),
+                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                        )
                 }
                 reload()
             } catch (cancelled: CancellationException) {
