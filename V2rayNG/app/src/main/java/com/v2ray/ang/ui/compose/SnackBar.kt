@@ -76,21 +76,9 @@ object AppSnackbarManager {
 
     fun hasActiveHost(): Boolean = _messages.subscriptionCount.value > 0
 
-    fun show(
-        message: CharSequence,
-        type: ToastType = ToastType.NORMAL,
-        long: Boolean = false,
-        liveRegionMode: AccessibilityLiveRegionMode? = null,
-    ): Boolean {
+    fun show(message: AppSnackbarMessage): Boolean {
         if (!hasActiveHost()) return false
-        return _messages.tryEmit(
-            AppSnackbarMessage(
-                message = message,
-                type = type,
-                long = long,
-                liveRegionMode = liveRegionMode,
-            )
-        )
+        return _messages.tryEmit(message)
     }
 }
 

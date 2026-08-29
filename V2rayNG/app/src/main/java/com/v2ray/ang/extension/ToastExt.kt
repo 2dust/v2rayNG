@@ -1,15 +1,8 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
-import android.os.Handler
-import android.os.Looper
-import android.view.Gravity
-import android.view.View
-import android.view.accessibility.AccessibilityEvent
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatTextView
+import com.v2ray.ang.helper.NotificationHelper
+import com.v2ray.ang.ui.compose.AppSnackbarMessage
 import com.v2ray.ang.ui.compose.AppSnackbarManager
 import com.v2ray.ang.ui.compose.ToastType
 
@@ -112,63 +105,40 @@ fun Context.toastInfo(message: CharSequence) {
     dispatchMessage(message, ToastType.INFO, liveRegionMode = null)
 }
 
-private inline fun runOnMain(crossinline block: () -> Unit) {
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-        block()
-    } else {
-        Handler(Looper.getMainLooper()).post { block() }
-    }
-}
-
 private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
     liveRegionMode: AccessibilityLiveRegionMode?,
     long: Boolean = false,
 ) {
-    val handledBySnackbar = AppSnackbarManager.show(
+    val event = AppSnackbarMessage(
         message = message,
         type = type,
         long = long,
-        liveRegionMode = liveRegionMode,
+        liveRegionMode = liveRegionMode
     )
-    if (!handledBySnackbar) {
-        runOnMain { showAccessibilitySilentToast(message, long) }
-    }
+    deliverTransientMessage(
+        event = event,
+        foregroundDelivery = AppSnackbarManager::show,
+        backgroundDelivery = { NotificationHelper.notifyTransientMessage(this, it.message) }
+    )
 }
 
-/**
- * Android text Toasts emit their own accessibility event and can move TalkBack focus. The custom
- * fallback remains visible while exposing no accessibility node; foreground activities announce
- * opted-in messages through [AppSnackbarManager]. Remove this compatibility path when every
- * message source is guaranteed to have an active Compose Snackbar host.
- */
-@Suppress("DEPRECATION")
-private fun Context.showAccessibilitySilentToast(message: CharSequence, long: Boolean) {
-    val density = resources.displayMetrics.density
-    val horizontalPadding = (16 * density).toInt()
-    val verticalPadding = (12 * density).toInt()
-    val bottomOffset = (100 * density).toInt()
-    val background = GradientDrawable().apply {
-        setColor(Color.argb(235, 48, 48, 48))
-        cornerRadius = 24 * density
-    }
-    val content = object : AppCompatTextView(this) {
-        override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent): Boolean = true
-    }.apply {
-        text = message
-        setTextColor(Color.WHITE)
-        textSize = 14f
-        gravity = Gravity.CENTER
-        maxLines = 8
-        setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-        this.background = background
-        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-    }
+internal enum class TransientMessageDelivery {
+    FOREGROUND_SNACKBAR,
+    BACKGROUND_NOTIFICATION,
+    UNAVAILABLE,
+}
 
-    Toast(this).apply {
-        duration = if (long) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-        view = content
-        setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, bottomOffset)
-    }.show()
+internal fun deliverTransientMessage(
+    event: AppSnackbarMessage,
+    foregroundDelivery: (AppSnackbarMessage) -> Boolean,
+    backgroundDelivery: (AppSnackbarMessage) -> Boolean,
+): TransientMessageDelivery {
+    if (foregroundDelivery(event)) return TransientMessageDelivery.FOREGROUND_SNACKBAR
+    return if (backgroundDelivery(event)) {
+        TransientMessageDelivery.BACKGROUND_NOTIFICATION
+    } else {
+        TransientMessageDelivery.UNAVAILABLE
+    }
 }
