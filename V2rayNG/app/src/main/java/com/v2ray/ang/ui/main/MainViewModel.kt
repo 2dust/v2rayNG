@@ -57,7 +57,7 @@ private fun applyTestDelayResults(
     }
 }
 
-private fun applyTestDelayResults(
+private fun applyTestDelayResultsToRows(
     rows: List<ServerRowUiModel>,
     updates: Map<String, Long>,
 ): List<ServerRowUiModel> = rows.map { row ->
@@ -212,7 +212,7 @@ class MainViewModel(
         mutableServerGroupState(groupId).update { current ->
             current.copy(
                 servers = applyTestDelayResults(current.servers, updates),
-                rows = applyTestDelayResults(current.rows, updates),
+                rows = applyTestDelayResultsToRows(current.rows, updates),
             )
         }
     }
