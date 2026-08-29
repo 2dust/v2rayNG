@@ -1,14 +1,22 @@
 package com.v2ray.ang.helper
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.NotificationChannelType
+import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.util.LogUtil
 
 /**
  * Unified notification helper for different notification channels.
@@ -41,6 +49,53 @@ object NotificationHelper {
         val notificationManager = getNotificationManager(context)
         val builder = buildNotificationBuilder(channelType, context, title, content)
         notificationManager.notify(channelType.notificationId, builder.build())
+    }
+
+    /**
+     * Posts transient feedback when there is no active in-app Snackbar host.
+     *
+     * Android recommends notifications for relevant background feedback. The notification is
+     * skipped when the user has disabled notifications or denied the runtime permission.
+     * https://developer.android.com/guide/topics/ui/notifiers/toasts#Alternatives
+     */
+    fun notifyTransientMessage(context: Context, content: CharSequence): Boolean {
+        if (content.isBlank()) return false
+
+        val appContext = context.applicationContext
+        if (!canPostNotifications(appContext)) return false
+
+        val channelType = NotificationChannelType.TRANSIENT_MESSAGE
+        return try {
+            ensureChannelCreated(channelType, appContext)
+            val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val contentIntent = PendingIntent.getActivity(
+                appContext,
+                channelType.notificationId,
+                Intent(appContext, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                },
+                flags
+            )
+            val builder = buildNotificationBuilder(
+                channelType = channelType,
+                context = appContext,
+                title = appContext.getString(R.string.app_name),
+                content = content.toString()
+            ).setAutoCancel(true)
+                .setContentIntent(contentIntent)
+                .setOnlyAlertOnce(false)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(content))
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+
+            getNotificationManager(appContext).notify(channelType.notificationId, builder.build())
+            true
+        } catch (e: SecurityException) {
+            LogUtil.w(
+                message = "NotificationHelper: failed to post transient message",
+                throwable = e
+            )
+            false
+        }
     }
 
     /**
@@ -132,8 +187,8 @@ object NotificationHelper {
 
         val channel = NotificationChannel(
             channelType.channelId,
-            channelType.channelName,
-            NotificationManager.IMPORTANCE_LOW
+            context.getString(channelType.channelNameRes),
+            channelType.importance
         ).apply {
             lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         }
@@ -160,8 +215,26 @@ object NotificationHelper {
             .setContentText(content)
             .setOngoing(false)
             .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(channelType.priority)
+            .setCategory(channelType.category)
             .apply { action?.let(::addAction) }
     }
+
+    private fun canPostNotifications(context: Context): Boolean {
+        val notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+        val permissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        val permissionGranted = !permissionRequired || ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        return canPostNotification(notificationsEnabled, permissionRequired, permissionGranted)
+    }
+}
+
+internal fun canPostNotification(
+    notificationsEnabled: Boolean,
+    permissionRequired: Boolean,
+    permissionGranted: Boolean,
+): Boolean {
+    return notificationsEnabled && (!permissionRequired || permissionGranted)
 }
