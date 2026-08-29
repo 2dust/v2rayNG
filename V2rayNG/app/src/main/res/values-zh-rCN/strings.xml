@@ -52,6 +52,7 @@
     <string name="confirm_delete_subscription_group">确定要删除此订阅组吗？</string>
     <string name="confirm_delete_asset_file">确定要删除资源文件“%1$s”吗？</string>
     <string name="confirm_delete_asset_source">确定要删除此资源来源吗？</string>
+    <string name="confirm_delete_asset_source_named">确定要删除此资源来源吗？\n%1$s</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
     <string name="server_lab_address">地址 (address)</string>
     <string name="server_lab_port">端口 (port)</string>
@@ -511,6 +512,9 @@
     <string name="toast_malformed_json_detail">配置格式无效：%1$s</string>
     <string name="acc_add_asset">添加资源来源</string>
     <string name="acc_download_file">下载资源文件</string>
+    <string name="acc_asset_file_details">文件大小：%1$s。更新于%2$s</string>
+    <string name="acc_edit_asset_named">编辑%1$s</string>
+    <string name="acc_delete_asset_named">删除%1$s</string>
     <string name="acc_qr_code">二维码</string>
     <string name="acc_copy_log">复制日志</string>
     <string name="acc_clear_log">清除日志</string>

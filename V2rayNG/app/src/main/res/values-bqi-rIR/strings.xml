@@ -52,6 +52,7 @@
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_asset_file">فایل بونچک جغرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_asset_source">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_source_named">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -511,6 +512,9 @@
     <string name="toast_malformed_json_detail">کانفیگ نا موئتبر هڌ: %1$s</string>
     <string name="acc_add_asset">ٱووردن بونچک فایلا جغرافیایی</string>
     <string name="acc_download_file">دانلود فایلا بونچک جغرافیایی</string>
+    <string name="acc_asset_file_details">هجم فایل %1$s. ورۊ وابیڌه من %2$s</string>
+    <string name="acc_edit_asset_named">آلشتکاری %1$s</string>
+    <string name="acc_delete_asset_named">پاک کردن %1$s</string>
     <string name="acc_qr_code">کود QR</string>
     <string name="acc_copy_log">لف گیری گوزارش</string>
     <string name="acc_clear_log">روفتن گوزارش</string>

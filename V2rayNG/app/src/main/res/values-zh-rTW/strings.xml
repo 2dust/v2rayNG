@@ -52,6 +52,7 @@
     <string name="confirm_delete_subscription_group">確定要刪除此訂閱群組嗎？</string>
     <string name="confirm_delete_asset_file">確定要刪除資源檔案「%1$s」嗎？</string>
     <string name="confirm_delete_asset_source">確定要刪除此資源來源嗎？</string>
+    <string name="confirm_delete_asset_source_named">確定要刪除此資源來源嗎？\n%1$s</string>
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
     <string name="server_lab_port">埠</string>
@@ -511,6 +512,9 @@
     <string name="toast_malformed_json_detail">設定檔格式不正確：%1$s</string>
     <string name="acc_add_asset">新增資源來源</string>
     <string name="acc_download_file">下載資源檔案</string>
+    <string name="acc_asset_file_details">檔案大小：%1$s。更新於%2$s</string>
+    <string name="acc_edit_asset_named">編輯%1$s</string>
+    <string name="acc_delete_asset_named">刪除%1$s</string>
     <string name="acc_qr_code">QR Code</string>
     <string name="acc_copy_log">複製日誌</string>
     <string name="acc_clear_log">清除日誌</string>

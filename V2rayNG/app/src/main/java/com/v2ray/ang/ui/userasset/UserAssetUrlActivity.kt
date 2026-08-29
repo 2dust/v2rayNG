@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -153,7 +157,10 @@ fun UserAssetUrlScreen(
                         IconButton(onClick = { showDeleteConfirm = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = stringResource(R.string.acc_delete)
+                                contentDescription = stringResource(
+                                    R.string.acc_delete_asset_named,
+                                    initialRemarks
+                                )
                             )
                         }
                     }
@@ -171,6 +178,9 @@ fun UserAssetUrlScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(vertical = 8.dp)
         ) {
             FormTextField(
@@ -189,7 +199,7 @@ fun UserAssetUrlScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_asset_source),
+            message = stringResource(R.string.confirm_delete_asset_source_named, initialRemarks),
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )

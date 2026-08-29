@@ -52,6 +52,7 @@
     <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group?</string>
     <string name="confirm_delete_asset_file">Are you sure you want to delete the asset file \"%1$s\"?</string>
     <string name="confirm_delete_asset_source">Are you sure you want to delete this asset source?</string>
+    <string name="confirm_delete_asset_source_named">Are you sure you want to delete this asset source?\n%1$s</string>
     <string name="server_lab_remarks">remarks</string>
     <string name="server_lab_address">address</string>
     <string name="server_lab_port">port</string>
@@ -511,6 +512,9 @@
     <string name="toast_malformed_json_detail">Invalid configuration: %1$s</string>
     <string name="acc_add_asset">Add asset source</string>
     <string name="acc_download_file">Download asset files</string>
+    <string name="acc_asset_file_details">File size %1$s. Updated on %2$s</string>
+    <string name="acc_edit_asset_named">Edit %1$s</string>
+    <string name="acc_delete_asset_named">Delete %1$s</string>
     <string name="acc_qr_code">QR code</string>
     <string name="acc_copy_log">Copy log</string>
     <string name="acc_clear_log">Clear log</string>

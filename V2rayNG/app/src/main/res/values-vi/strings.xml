@@ -52,6 +52,7 @@
     <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không?</string>
     <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên \"%1$s\" không?</string>
     <string name="confirm_delete_asset_source">Bạn có chắc muốn xóa nguồn tài nguyên này không?</string>
+    <string name="confirm_delete_asset_source_named">Bạn có chắc muốn xóa nguồn tài nguyên này không?\n%1$s</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
     <string name="server_lab_address">Địa chỉ</string>
     <string name="server_lab_port">Cổng</string>
@@ -511,6 +512,9 @@
     <string name="toast_malformed_json_detail">Cấu hình không hợp lệ: %1$s</string>
     <string name="acc_add_asset">Thêm nguồn tệp tài nguyên</string>
     <string name="acc_download_file">Tải xuống tệp tài nguyên</string>
+    <string name="acc_asset_file_details">Kích thước tệp %1$s. Đã cập nhật vào %2$s</string>
+    <string name="acc_edit_asset_named">Chỉnh sửa %1$s</string>
+    <string name="acc_delete_asset_named">Xóa %1$s</string>
     <string name="acc_qr_code">Mã QR</string>
     <string name="acc_copy_log">Sao chép nhật ký</string>
     <string name="acc_clear_log">Xóa nhật ký</string>
