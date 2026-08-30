@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -361,6 +360,7 @@ private fun RoutingRulesetItem(
     )
     val ruleSummary = stringResource(
         R.string.acc_routing_rule_summary,
+        ruleName,
         routeDescription,
         ruleState
     )
@@ -370,7 +370,7 @@ private fun RoutingRulesetItem(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                stateDescription = ruleSummary
+                contentDescription = ruleSummary
             }
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -379,6 +379,7 @@ private fun RoutingRulesetItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = ruleset.remarks ?: "",
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
