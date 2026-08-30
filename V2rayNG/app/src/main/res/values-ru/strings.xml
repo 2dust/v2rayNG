@@ -390,7 +390,7 @@
     <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Соединение установлено за %1$s</string>
     <plurals name="connection_test_delay_accessibility_value">
-        <item quantity="one">%1$d миллисекунда</item>
+        <item quantity="one">%1$d миллисекунду</item>
         <item quantity="few">%1$d миллисекунды</item>
         <item quantity="many">%1$d миллисекунд</item>
         <item quantity="other">%1$d миллисекунды</item>
