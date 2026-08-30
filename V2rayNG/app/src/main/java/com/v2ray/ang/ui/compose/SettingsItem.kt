@@ -28,9 +28,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -54,16 +54,16 @@ fun CollapsiblePreferenceGroupHeader(
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val groupState = stringResource(
+    val groupDescription = stringResource(
         if (expanded) R.string.acc_settings_group_expanded
-        else R.string.acc_settings_group_collapsed
+        else R.string.acc_settings_group_collapsed,
+        title,
     )
     Row(
         modifier = modifier
             .fillMaxWidth()
             .semantics {
-                contentDescription = title
-                stateDescription = groupState
+                contentDescription = groupDescription
             }
             .clickable(role = Role.Button) { onExpandedChange(!expanded) }
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -73,7 +73,8 @@ fun CollapsiblePreferenceGroupHeader(
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.weight(1f)
+            // The button label already includes the title and its disclosure state.
+            modifier = Modifier.weight(1f).clearAndSetSemantics { }
         )
         Icon(
             painter = painterResource(R.drawable.ic_expand_more_24dp),

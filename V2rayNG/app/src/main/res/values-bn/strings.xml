@@ -532,8 +532,8 @@
     <string name="acc_turn_torch_off">ফ্ল্যাশলাইট বন্ধ করুন</string>
     <string name="acc_select_image">স্ক্যান করার জন্য ছবি নির্বাচন করুন</string>
     <string name="acc_locked">প্রিসেট আমদানি করলে নিয়মটি রাখা হবে</string>
-    <string name="acc_settings_group_expanded">গ্রুপটি প্রসারিত</string>
-    <string name="acc_settings_group_collapsed">গ্রুপটি সংকুচিত</string>
+    <string name="acc_settings_group_expanded">%1$s। গ্রুপটি প্রসারিত</string>
+    <string name="acc_settings_group_collapsed">%1$s। গ্রুপটি সংকুচিত</string>
     <string name="acc_open_menu">নেভিগেশন মেনু খুলুন</string>
     <string name="acc_edit">সম্পাদনা করুন</string>
     <string name="acc_delete">মুছুন</string>
