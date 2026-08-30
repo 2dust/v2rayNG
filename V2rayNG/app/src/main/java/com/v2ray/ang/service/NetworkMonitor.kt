@@ -5,12 +5,12 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.extension.delay
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import com.v2ray.ang.extension.delay
 import kotlinx.coroutines.launch
 
 /**
