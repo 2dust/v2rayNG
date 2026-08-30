@@ -364,13 +364,18 @@ private fun RoutingRulesetItem(
         routeDescription,
         ruleState
     )
+    val accessibilitySummary = if (ruleset.locked == true) {
+        stringResource(R.string.acc_routing_rule_locked_summary, ruleSummary)
+    } else {
+        ruleSummary
+    }
     val ruleSwitchLabel = stringResource(R.string.acc_routing_rule_switch_label, ruleName)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = ruleSummary
+                contentDescription = accessibilitySummary
             }
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically

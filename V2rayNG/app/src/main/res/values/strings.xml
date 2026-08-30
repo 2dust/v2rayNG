@@ -517,6 +517,7 @@
     <string name="acc_clear_log">Clear log</string>
     <string name="acc_add_rule">Add routing rule</string>
     <string name="acc_routing_rule_summary">%1$s. %2$s. %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Locked</string>
     <string name="acc_routing_rule_blocked">is blocked</string>
     <string name="acc_routing_rule_routed_through">routed through %1$s</string>
     <string name="acc_routing_rule_routed_directly">routed directly</string>

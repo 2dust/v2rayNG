@@ -517,6 +517,7 @@
     <string name="acc_clear_log">লগ মুছুন</string>
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
     <string name="acc_routing_rule_summary">%1$s। %2$s। %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s। লক করা</string>
     <string name="acc_routing_rule_blocked">ব্লক করা হয়েছে</string>
     <string name="acc_routing_rule_routed_through">%1$s-এর মাধ্যমে রাউট করা হয়েছে</string>
     <string name="acc_routing_rule_routed_directly">সরাসরি রাউট করা হয়েছে</string>

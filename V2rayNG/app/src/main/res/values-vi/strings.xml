@@ -517,6 +517,7 @@
     <string name="acc_clear_log">Xóa nhật ký</string>
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
     <string name="acc_routing_rule_summary">%1$s. %2$s. %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Đã khóa</string>
     <string name="acc_routing_rule_blocked">bị chặn</string>
     <string name="acc_routing_rule_routed_through">được định tuyến qua %1$s</string>
     <string name="acc_routing_rule_routed_directly">được định tuyến trực tiếp</string>

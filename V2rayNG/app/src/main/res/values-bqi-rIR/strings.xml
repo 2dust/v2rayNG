@@ -517,6 +517,7 @@
     <string name="acc_clear_log">روفتن گوزارش</string>
     <string name="acc_add_rule">ٱووردن قانووݩ</string>
     <string name="acc_routing_rule_summary">%1$s، %2$s، %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s، چفت هڌ</string>
     <string name="acc_routing_rule_blocked">مسدود هڌ</string>
     <string name="acc_routing_rule_routed_through">وا %1$s ره اڌه</string>
     <string name="acc_routing_rule_routed_directly">موستقیم ره اڌه</string>

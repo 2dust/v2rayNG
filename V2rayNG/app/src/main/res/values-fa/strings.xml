@@ -517,6 +517,7 @@
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
     <string name="acc_routing_rule_summary">%1$s، %2$s، %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s، قفل است</string>
     <string name="acc_routing_rule_blocked">مسدود است</string>
     <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>
     <string name="acc_routing_rule_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>

@@ -517,6 +517,7 @@
     <string name="acc_clear_log">مسح السجل</string>
     <string name="acc_add_rule">إضافة قاعدة توجيه</string>
     <string name="acc_routing_rule_summary">%1$s، %2$s، %3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s، مقفلة</string>
     <string name="acc_routing_rule_blocked">محظورة</string>
     <string name="acc_routing_rule_routed_through">موجّهة عبر %1$s</string>
     <string name="acc_routing_rule_routed_directly">موجّهة مباشرة</string>

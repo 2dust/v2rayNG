@@ -517,6 +517,7 @@
     <string name="acc_clear_log">清除日志</string>
     <string name="acc_add_rule">添加路由规则</string>
     <string name="acc_routing_rule_summary">%1$s。%2$s。%3$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s。已锁定</string>
     <string name="acc_routing_rule_blocked">已拦截</string>
     <string name="acc_routing_rule_routed_through">通过%1$s路由</string>
     <string name="acc_routing_rule_routed_directly">直接路由</string>
