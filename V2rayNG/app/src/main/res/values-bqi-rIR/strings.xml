@@ -81,7 +81,7 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">جا کلک</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
-    <string name="server_lab_allow_insecure">تئیڌ گوواهی ن ناڌیڌه بگرین (allowInsecure)</string>
+    <string name="server_lab_allow_insecure">تئیڌ گوواهی ن نیڌه بگرین (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشۊوی</string>
     <string name="server_lab_port3">پورت</string>
