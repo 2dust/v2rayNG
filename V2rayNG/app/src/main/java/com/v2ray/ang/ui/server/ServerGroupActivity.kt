@@ -305,7 +305,7 @@ fun ServerGroupScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_policy_group),
+            message = stringResource(R.string.confirm_delete_policy_group_named, initialRemarks),
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )
