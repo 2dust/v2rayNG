@@ -538,6 +538,10 @@
     <string name="acc_save">Сохранить</string>
     <string name="acc_update_subscriptions">Обновить подписки</string>
     <string name="acc_per_app_proxy_information">Сведения о прокси для приложений</string>
+    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">маршрутизируется напрямую</string>
+    <string name="acc_app_routed_through">маршрутизируется через приложение</string>
+    <string name="acc_per_app_routing_disabled">маршрутизация по приложениям не включена</string>
     <string name="permission_camera">Камера</string>
     <string name="permission_notification">Уведомления</string>
     <string name="permission_local_network">Локальная сеть</string>

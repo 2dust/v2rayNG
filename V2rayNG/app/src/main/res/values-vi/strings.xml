@@ -538,6 +538,10 @@
     <string name="acc_save">Lưu</string>
     <string name="acc_update_subscriptions">Cập nhật các gói đăng ký</string>
     <string name="acc_per_app_proxy_information">Thông tin proxy theo ứng dụng</string>
+    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">được định tuyến trực tiếp</string>
+    <string name="acc_app_routed_through">được định tuyến qua ứng dụng</string>
+    <string name="acc_per_app_routing_disabled">định tuyến theo ứng dụng chưa được bật</string>
     <string name="permission_camera">Máy ảnh</string>
     <string name="permission_notification">Thông báo</string>
     <string name="permission_local_network">Mạng cục bộ</string>

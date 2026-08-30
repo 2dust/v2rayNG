@@ -538,6 +538,10 @@
     <string name="acc_save">儲存</string>
     <string name="acc_update_subscriptions">更新訂閱</string>
     <string name="acc_per_app_proxy_information">個別應用程式代理資訊</string>
+    <string name="acc_app_routing_announcement">%1$s。%2$s</string>
+    <string name="acc_app_routed_directly">直接路由</string>
+    <string name="acc_app_routed_through">透過應用程式路由</string>
+    <string name="acc_per_app_routing_disabled">未啟用個別應用程式路由</string>
     <string name="permission_camera">相機</string>
     <string name="permission_notification">通知</string>
     <string name="permission_local_network">區域網路</string>

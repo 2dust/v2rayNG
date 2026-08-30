@@ -538,6 +538,10 @@
     <string name="acc_save">ذخیره</string>
     <string name="acc_update_subscriptions">به‌روزرسانی اشتراک‌ها</string>
     <string name="acc_per_app_proxy_information">اطلاعات پروکسی به تفکیک برنامه</string>
+    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
+    <string name="acc_app_routed_through">از طریق برنامه مسیریابی می‌شود</string>
+    <string name="acc_per_app_routing_disabled">مسیریابی به تفکیک برنامه فعال نیست</string>
     <string name="permission_camera">دوربین</string>
     <string name="permission_notification">اعلان</string>
     <string name="permission_local_network">شبکه محلی</string>

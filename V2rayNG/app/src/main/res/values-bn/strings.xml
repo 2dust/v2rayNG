@@ -538,6 +538,10 @@
     <string name="acc_save">সংরক্ষণ করুন</string>
     <string name="acc_update_subscriptions">সাবস্ক্রিপশন আপডেট করুন</string>
     <string name="acc_per_app_proxy_information">প্রতি-অ্যাপ প্রক্সির তথ্য</string>
+    <string name="acc_app_routing_announcement">%1$s। %2$s</string>
+    <string name="acc_app_routed_directly">সরাসরি রাউট করা হয়েছে</string>
+    <string name="acc_app_routed_through">অ্যাপের মাধ্যমে রাউট করা হয়েছে</string>
+    <string name="acc_per_app_routing_disabled">অ্যাপভিত্তিক রাউটিং চালু নেই</string>
     <string name="permission_camera">ক্যামেরা</string>
     <string name="permission_notification">বিজ্ঞপ্তি</string>
     <string name="permission_local_network">স্থানীয় নেটওয়ার্ক</string>

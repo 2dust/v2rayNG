@@ -538,6 +538,10 @@
     <string name="acc_save">حفظ</string>
     <string name="acc_update_subscriptions">تحديث الاشتراكات</string>
     <string name="acc_per_app_proxy_information">معلومات الوكيل لكل تطبيق</string>
+    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">موجّه مباشرةً</string>
+    <string name="acc_app_routed_through">موجّه عبر التطبيق</string>
+    <string name="acc_per_app_routing_disabled">التوجيه حسب التطبيق غير مفعّل</string>
     <string name="permission_camera">الكاميرا</string>
     <string name="permission_notification">الإشعارات</string>
     <string name="permission_local_network">الشبكة المحلية</string>
