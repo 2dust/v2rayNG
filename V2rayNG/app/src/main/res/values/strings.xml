@@ -512,13 +512,14 @@
     <string name="acc_add_asset">Add asset source</string>
     <string name="acc_download_file">Download asset files</string>
     <string name="acc_qr_code">QR code</string>
-    <string name="acc_copy_log">Copy log</string>
+    <string name="acc_copy_log">Copy log to clipboard</string>
     <string name="acc_clear_log">Clear log</string>
     <string name="acc_add_rule">Add routing rule</string>
     <string name="acc_start">Start service</string>
     <string name="acc_stop">Stop service</string>
     <string name="acc_back">Back</string>
     <string name="acc_search">Search</string>
+    <string name="acc_clear_search">Clear search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
     <string name="acc_selected_server">Selected</string>

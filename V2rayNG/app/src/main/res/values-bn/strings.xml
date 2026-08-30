@@ -512,13 +512,14 @@
     <string name="acc_add_asset">অ্যাসেট উৎস যোগ করুন</string>
     <string name="acc_download_file">অ্যাসেট ফাইল ডাউনলোড করুন</string>
     <string name="acc_qr_code">QR কোড</string>
-    <string name="acc_copy_log">লগ কপি করুন</string>
+    <string name="acc_copy_log">ক্লিপবোর্ডে লগ কপি করুন</string>
     <string name="acc_clear_log">লগ মুছুন</string>
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>
     <string name="acc_stop">সার্ভিস বন্ধ করুন</string>
     <string name="acc_back">ফিরে যান</string>
     <string name="acc_search">অনুসন্ধান করুন</string>
+    <string name="acc_clear_search">অনুসন্ধান মুছুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
     <string name="acc_selected_server">Selected</string>

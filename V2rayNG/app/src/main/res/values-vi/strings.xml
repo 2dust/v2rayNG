@@ -512,13 +512,14 @@
     <string name="acc_add_asset">Thêm nguồn tệp tài nguyên</string>
     <string name="acc_download_file">Tải xuống tệp tài nguyên</string>
     <string name="acc_qr_code">Mã QR</string>
-    <string name="acc_copy_log">Sao chép nhật ký</string>
+    <string name="acc_copy_log">Sao chép nhật ký vào bộ nhớ tạm</string>
     <string name="acc_clear_log">Xóa nhật ký</string>
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
     <string name="acc_start">Khởi động dịch vụ</string>
     <string name="acc_stop">Dừng dịch vụ</string>
     <string name="acc_back">Quay lại</string>
     <string name="acc_search">Tìm kiếm</string>
+    <string name="acc_clear_search">Xóa tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
     <string name="acc_selected_server">Selected</string>

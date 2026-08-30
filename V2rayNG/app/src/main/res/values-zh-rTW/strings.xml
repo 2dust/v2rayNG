@@ -512,13 +512,14 @@
     <string name="acc_add_asset">新增資源來源</string>
     <string name="acc_download_file">下載資源檔案</string>
     <string name="acc_qr_code">QR Code</string>
-    <string name="acc_copy_log">複製日誌</string>
+    <string name="acc_copy_log">將日誌複製到剪貼簿</string>
     <string name="acc_clear_log">清除日誌</string>
     <string name="acc_add_rule">新增路由規則</string>
     <string name="acc_start">啟動服務</string>
     <string name="acc_stop">停止服務</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜尋</string>
+    <string name="acc_clear_search">清除搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
     <string name="acc_selected_server">Selected</string>
