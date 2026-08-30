@@ -8,10 +8,14 @@ import org.junit.Test
 class LiveRegionMessageTrackerTest {
 
     @Test
-    fun ignoresMessagesWithoutLiveRegionMode() {
-        val tracker = LiveRegionMessageTracker { 0L }
+    fun mirrorsEveryMessageTypeToAPoliteLiveRegionByDefault() {
+        for (type in ToastType.entries) {
+            val tracker = LiveRegionMessageTracker { 0L }
+            val announcement = tracker.next(AppSnackbarMessage(message = "Message", type = type))
 
-        assertNull(tracker.next(AppSnackbarMessage(message = "Visible only")))
+            assertEquals("Message", announcement?.text)
+            assertEquals(AccessibilityLiveRegionMode.POLITE, announcement?.mode)
+        }
     }
 
     @Test

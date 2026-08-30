@@ -44,14 +44,14 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     /**
      * Send neutral toast event (Resource ID).
      */
-    fun toast(resId: Int, liveRegionMode: AccessibilityLiveRegionMode? = null) {
+    fun toast(resId: Int, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
         localizedContext.toast(resId, liveRegionMode)
     }
 
     /**
      * Send neutral toast event (String).
      */
-    fun toast(message: String, liveRegionMode: AccessibilityLiveRegionMode? = null) {
+    fun toast(message: String, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
         app.toast(message, liveRegionMode)
     }
 
@@ -60,7 +60,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      */
     fun toastSuccess(
         resId: Int,
-        liveRegionMode: AccessibilityLiveRegionMode? = null,
+        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
         accessibilityMessage: String? = null,
     ) {
         localizedContext.toastSuccess(resId, liveRegionMode, accessibilityMessage)
@@ -71,7 +71,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      */
     fun toastSuccess(
         message: String,
-        liveRegionMode: AccessibilityLiveRegionMode? = null,
+        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
         accessibilityMessage: String? = null,
     ) {
         app.toastSuccess(message, liveRegionMode, accessibilityMessage)

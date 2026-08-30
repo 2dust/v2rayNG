@@ -102,16 +102,11 @@ class MainViewModel(
         when (event) {
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
-            MainServiceEvent.StateStartSuccess -> {
-                val serverName = dataSource.getSelectServer()
-                    ?.let(dataSource::decodeServerConfig)
-                    ?.remarks
-                    ?.trim()
-                    ?.takeIf(String::isNotEmpty)
+            is MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(
                     R.string.toast_services_success,
                     liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
-                    accessibilityMessage = serverName?.let {
+                    accessibilityMessage = event.accessibilityMessage {
                         getString(R.string.acc_service_started_connected_to, it)
                     },
                 )

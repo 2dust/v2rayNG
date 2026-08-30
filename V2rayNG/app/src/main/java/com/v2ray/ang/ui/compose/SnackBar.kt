@@ -65,7 +65,7 @@ data class AppSnackbarMessage(
     val message: CharSequence,
     val type: ToastType = ToastType.NORMAL,
     val long: Boolean = false,
-    val liveRegionMode: AccessibilityLiveRegionMode? = null,
+    val liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     val accessibilityMessage: CharSequence? = null,
 )
 
@@ -186,7 +186,7 @@ internal class LiveRegionMessageTracker(
     private var lastUpdateAt = 0L
 
     fun next(event: AppSnackbarMessage): LiveRegionMessage? {
-        val mode = event.liveRegionMode ?: return null
+        val mode = event.liveRegionMode
         val text = (event.accessibilityMessage ?: event.message).toString()
         if (text.isBlank()) return null
 
