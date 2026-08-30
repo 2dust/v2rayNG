@@ -23,6 +23,10 @@
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="other">%1$s。包含%2$d个服务器</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">配置项</string>
     <string name="menu_item_add_config">添加配置</string>

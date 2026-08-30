@@ -23,6 +23,11 @@
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. %2$d سرور منس هڌ</item>
+        <item quantity="other">%1$s. %2$d سرور منس هڌ</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">ٱووردن کانفیگ</string>

@@ -23,6 +23,13 @@
     <string name="toast_services_success">Службы успешно запущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. Содержит %2$d сервер</item>
+        <item quantity="few">%1$s. Содержит %2$d сервера</item>
+        <item quantity="many">%1$s. Содержит %2$d серверов</item>
+        <item quantity="other">%1$s. Содержит %2$d серверов</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">Профиль</string>
     <string name="menu_item_add_config">Добавить профиль</string>

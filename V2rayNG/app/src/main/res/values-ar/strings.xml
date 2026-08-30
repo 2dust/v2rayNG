@@ -23,6 +23,15 @@
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="zero">%1$s. لا تحتوي على أي خوادم</item>
+        <item quantity="one">%1$s. تحتوي على خادم واحد</item>
+        <item quantity="two">%1$s. تحتوي على خادمين</item>
+        <item quantity="few">%1$s. تحتوي على %2$d خوادم</item>
+        <item quantity="many">%1$s. تحتوي على %2$d خادمًا</item>
+        <item quantity="other">%1$s. تحتوي على %2$d خادم</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>
     <string name="menu_item_add_config">إضافة تكوين</string>
