@@ -198,9 +198,9 @@ fun AppTheme(
             colorScheme = colorScheme
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                AppSnackbarBridge(controller = snackbarController)
                 content()
                 AppSnackbarHost(hostState = snackbarController.hostState)
+                AppSnackbarBridge(controller = snackbarController)
             }
         }
     }
