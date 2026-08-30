@@ -22,9 +22,14 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.ui.compose.AppDivider
@@ -86,6 +91,12 @@ private fun GroupTabItem(
     onClick: () -> Unit
 ) {
     val servers by serverFlow.collectAsStateWithLifecycle()
+    val accessibilityLabel = pluralStringResource(
+        R.plurals.acc_group_tab,
+        servers.size,
+        group.remarks,
+        servers.size,
+    )
     val text = if (group.id.isEmpty()) {
         group.remarks
     } else {
@@ -112,10 +123,13 @@ private fun GroupTabItem(
         Tab(
             selected = selected,
             onClick = onClick,
-            modifier = Modifier.heightIn(min = 48.dp),
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+                .semantics { contentDescription = accessibilityLabel },
             text = {
                 Text(
                     text = text,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     maxLines = 1,
                     softWrap = false,
                     overflow = TextOverflow.Ellipsis

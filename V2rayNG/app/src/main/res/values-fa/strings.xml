@@ -23,6 +23,11 @@
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. شامل %2$d سرور است</item>
+        <item quantity="other">%1$s. شامل %2$d سرور است</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">افزودن کانفیگ</string>

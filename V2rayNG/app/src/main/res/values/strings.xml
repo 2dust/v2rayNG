@@ -23,6 +23,11 @@
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. Contains %2$d server</item>
+        <item quantity="other">%1$s. Contains %2$d servers</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">Config</string>
     <string name="menu_item_add_config">Add config</string>
