@@ -521,7 +521,12 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_selected_server">Selected</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d mili giây</item>
+    </plurals>
+    <string name="acc_share_config_named">Chia sẻ cấu hình %1$s</string>
+    <string name="acc_edit_config_named">Chỉnh sửa cấu hình %1$s</string>
+    <string name="acc_delete_config_named">Xóa cấu hình %1$s</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

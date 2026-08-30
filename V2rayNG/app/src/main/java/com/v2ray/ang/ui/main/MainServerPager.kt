@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,9 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -156,6 +159,7 @@ private fun ServerListPage(
             state = gridState,
             modifier = Modifier
                 .fillMaxSize()
+                .selectableGroup()
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
@@ -199,6 +203,7 @@ private fun ServerListPage(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
+                .selectableGroup()
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
@@ -309,21 +314,35 @@ private fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, row.testDelayMillis)
     }
-    val selectedStateDescription = if (isSelected) {
-        stringResource(R.string.acc_selected_server)
+    val testResultAccessibility = if (row.testDelayMillis == 0L) {
+        ""
     } else {
-        null
+        pluralStringResource(
+            R.plurals.server_test_delay_accessibility_value,
+            row.testDelayMillis.coerceIn(
+                Int.MIN_VALUE.toLong(),
+                Int.MAX_VALUE.toLong(),
+            ).toInt(),
+            row.testDelayMillis,
+        )
+    }
+    val testResultModifier = if (testResultAccessibility.isEmpty()) {
+        Modifier
+    } else {
+        Modifier.semantics {
+            contentDescription = testResultAccessibility
+        }
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .semantics {
-                if (selectedStateDescription != null) {
-                    stateDescription = selectedStateDescription
-                }
-            }
-            .clickable { actions.select(row.guid) }
+            .semantics(mergeDescendants = true) {}
+            .selectable(
+                selected = isSelected,
+                onClick = { actions.select(row.guid) },
+                role = Role.RadioButton,
+            )
     ) {
         Box(
             Modifier
@@ -363,21 +382,21 @@ private fun ServerListItem(
                     IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
-                            stringResource(R.string.title_configuration_share),
+                            stringResource(R.string.acc_share_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
                     IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
-                            stringResource(R.string.acc_edit),
+                            stringResource(R.string.acc_edit_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
                     IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
-                            stringResource(R.string.acc_delete),
+                            stringResource(R.string.acc_delete_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
@@ -407,7 +426,7 @@ private fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(row.typeDescription, style = MaterialTheme.typography.bodySmall, color = colorConfigType, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(testResult, style = MaterialTheme.typography.bodySmall, color = if (row.testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(testResult, testResultModifier, style = MaterialTheme.typography.bodySmall, color = if (row.testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

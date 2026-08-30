@@ -521,7 +521,12 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
-    <string name="acc_selected_server">Selected</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+    <string name="acc_share_config_named">分享設定 %1$s</string>
+    <string name="acc_edit_config_named">編輯設定 %1$s</string>
+    <string name="acc_delete_config_named">刪除設定 %1$s</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>
