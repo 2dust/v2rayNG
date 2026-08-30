@@ -386,13 +386,19 @@
 
     <string name="connection_test_pending">Check connectivity</string>
     <string name="connection_test_testing">Testing…</string>
+    <string name="connection_test_complete">Testing complete</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>
     <string name="connection_test_available">Connection succeeded in %1$s</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisecond</item>
+        <item quantity="other">%1$d milliseconds</item>
+    </plurals>
     <string name="server_test_delay_value">%1$d ms</string>
     <string name="connection_test_error">Connection test failed: %s</string>
     <string name="connection_test_fail">Internet unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
     <string name="connection_connected">Connected. Tap to check connection.</string>
+    <string name="connection_connected_accessibility">Connected</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
 

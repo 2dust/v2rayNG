@@ -386,13 +386,23 @@
 
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
+    <string name="connection_test_complete">اكتمل الاختبار</string>
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
     <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="zero">%1$d مللي ثانية</item>
+        <item quantity="one">مللي ثانية واحدة</item>
+        <item quantity="two">مللي ثانيتان</item>
+        <item quantity="few">%1$d مللي ثوانٍ</item>
+        <item quantity="many">%1$d مللي ثانية</item>
+        <item quantity="other">%1$d مللي ثانية</item>
+    </plurals>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل. اضغط للتحقق من الاتصال.</string>
+    <string name="connection_connected_accessibility">متصل</string>
     <string name="connection_not_connected">غير متصل</string>
     <string name="connection_running_task_left">الاختبارات قيد التشغيل: %s</string>
 

@@ -44,6 +44,7 @@ fun MainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
     val displayText = mainViewModel.formatStatus(uiState.status)
+    val accessibilityText = mainViewModel.formatConnectionStatusForAccessibility(isRunning)
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -180,6 +181,9 @@ fun MainScreen(
             bottomBar = {
                 MainBottomBar(
                     displayText = displayText,
+                    accessibilityText = accessibilityText,
+                    testAnnouncements = mainViewModel.testAnnouncements,
+                    formatTestAnnouncement = mainViewModel::formatTestAnnouncement,
                     isRunning = isRunning,
                     isDarkTheme = isDarkTheme,
                     onAction = onAction
