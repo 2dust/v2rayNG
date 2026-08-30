@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,10 +33,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.intl.Locale
@@ -137,24 +140,36 @@ private fun AssertiveTestLiveRegion(
     eventId: Long?,
     text: String,
 ) {
-    var liveRegionEventId by remember { mutableStateOf<Long?>(null) }
-    var liveRegionText by remember { mutableStateOf("") }
+    var armed by remember { mutableStateOf(false) }
+    var announcedText by remember { mutableStateOf("") }
 
     LaunchedEffect(eventId, text) {
-        if (eventId == null || text.isBlank()) return@LaunchedEffect
-        liveRegionEventId = eventId
-        liveRegionText = text
+        if (eventId == null || text.isBlank()) {
+            armed = false
+            announcedText = ""
+            return@LaunchedEffect
+        }
+
+        announcedText = ""
+        armed = true
+
+        // Establish the live region before publishing its message, then hide it after the
+        // announcement so it never remains as an empty navigation target.
+        withFrameNanos { }
+        withFrameNanos { }
+        announcedText = text
         delay(TestLiveRegionLifetimeMs)
-        if (liveRegionEventId == eventId) liveRegionText = ""
+        armed = false
+        announcedText = ""
     }
 
     val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
-    val localizedText = remember(liveRegionText, languageTag) {
+    val localizedText = remember(announcedText, languageTag) {
         buildAnnotatedString {
             withStyle(
                 SpanStyle(localeList = LocaleList(Locale(languageTag)))
             ) {
-                append(liveRegionText)
+                append(announcedText)
             }
         }
     }
@@ -166,7 +181,14 @@ private fun AssertiveTestLiveRegion(
         maxLines = 1,
         modifier = Modifier
             .size(1.dp)
-            .semantics { liveRegion = LiveRegionMode.Assertive },
+            .clearAndSetSemantics {
+                if (!armed) {
+                    hideFromAccessibility()
+                } else {
+                    liveRegion = LiveRegionMode.Assertive
+                    if (localizedText.isNotEmpty()) this.text = localizedText
+                }
+            },
     )
 }
 
