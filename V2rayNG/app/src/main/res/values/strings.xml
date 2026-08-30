@@ -18,6 +18,9 @@
     <string name="toast_permission_denied">Permission denied</string>
     <string name="toast_permission_denied_notification">Notification permission denied</string>
     <string name="notification_channel_service">v2rayNG service</string>
+    <string name="notification_channel_subscription_updates">Subscription updates</string>
+    <string name="notification_channel_connection_checks">Connection checks</string>
+    <string name="notification_channel_other">Other notifications</string>
     <string name="notification_action_more">Tap for more</string>
     <string name="toast_services_start">Starting service</string>
     <string name="toast_services_stop">Service stopped</string>

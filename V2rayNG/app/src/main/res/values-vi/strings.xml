@@ -18,6 +18,9 @@
     <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
     <string name="notification_channel_service">Dịch vụ v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
+    <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
+    <string name="notification_channel_other">Thông báo khác</string>
     <string name="notification_action_more">Nhấn để biết thêm…</string>
     <string name="toast_services_start">Đang khởi động v2rayNG…</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
