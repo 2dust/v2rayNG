@@ -18,6 +18,9 @@
     <string name="toast_permission_denied">Разрешение не получено</string>
     <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
     <string name="notification_channel_service">Служба v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Обновления подписок</string>
+    <string name="notification_channel_connection_checks">Проверки соединения</string>
+    <string name="notification_channel_other">Другие уведомления</string>
     <string name="notification_action_more">Ещё…</string>
     <string name="toast_services_start">Запуск служб</string>
     <string name="toast_services_stop">Служба остановлена</string>

@@ -19,17 +19,17 @@ enum class NotificationChannelType(
 ) {
     SUBSCRIPTION_UPDATE(
         channelId = "subscription_update_channel",
-        channelNameRes = R.string.title_sub_update,
+        channelNameRes = R.string.notification_channel_subscription_updates,
         notificationId = 13
     ),
     CORE_TEST(
         channelId = "core_test_channel",
-        channelNameRes = R.string.connection_test_pending,
+        channelNameRes = R.string.notification_channel_connection_checks,
         notificationId = 12
     ),
     TRANSIENT_MESSAGE(
         channelId = "transient_message_channel",
-        channelNameRes = R.string.permission_notification,
+        channelNameRes = R.string.notification_channel_other,
         notificationId = 14,
         category = NotificationCompat.CATEGORY_STATUS,
     )
