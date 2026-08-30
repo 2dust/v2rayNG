@@ -360,7 +360,7 @@ private fun UserAssetItem(
     val fileSize = fileMetadata?.length?.toTrafficString()
     val formattedDate = fileMetadata?.let { metadata ->
         remember(metadata.lastModified) {
-            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
+            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
                 .format(Date(metadata.lastModified))
         }
     }
