@@ -303,7 +303,6 @@ fun PerAppProxyScreen(
 
     if (showInfoDialog) {
         ConfirmDialog(
-            title = stringResource(R.string.acc_per_app_proxy_information),
             message = stringResource(R.string.summary_pref_per_app_proxy),
             dismissText = null,
             onConfirm = {},
