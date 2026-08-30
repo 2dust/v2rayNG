@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -213,7 +213,7 @@ fun LogcatScreen(
                     .verticalScrollbar(listState),
                 contentPadding = NavigationBarsBottomPadding()
             ) {
-                itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
+                items(items = logs, key = { it }) { log ->
                     LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
                     ItemDivider()
                 }
