@@ -175,7 +175,7 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
-            reportStartSuccess(service)
+            reportStartSuccess(service, config.remarks)
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -277,15 +277,15 @@ object CoreServiceManager {
         }
     }
 
-    private fun reportStartSuccess(service: Service) {
+    private fun reportStartSuccess(service: Service, serverName: String) {
         val localizedContext = AppLocaleManager.localizedContext(service)
-        val serverName = currentConfig?.remarks?.trim().orEmpty()
-        val message = if (serverName.isEmpty()) {
+        val startedServerName = serverName.trim()
+        val message = if (startedServerName.isEmpty()) {
             localizedContext.getString(R.string.toast_services_success)
         } else {
-            localizedContext.getString(R.string.acc_service_started_connected_to, serverName)
+            localizedContext.getString(R.string.acc_service_started_connected_to, startedServerName)
         }
-        reportServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS, "", message)
+        reportServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS, startedServerName, message)
     }
 
     internal fun reportStartFailure(service: Service, detail: String) {

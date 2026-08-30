@@ -18,7 +18,7 @@ enum class AccessibilityLiveRegionMode {
  */
 fun Context.toast(
     message: Int,
-    liveRegionMode: AccessibilityLiveRegionMode? = null,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
     val text = getString(message)
     dispatchMessage(text, ToastType.NORMAL, liveRegionMode)
@@ -31,7 +31,7 @@ fun Context.toast(
  */
 fun Context.toast(
     message: CharSequence,
-    liveRegionMode: AccessibilityLiveRegionMode? = null,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
     dispatchMessage(message, ToastType.NORMAL, liveRegionMode)
 }
@@ -43,7 +43,7 @@ fun Context.toast(
  */
 fun Context.toastSuccess(
     message: Int,
-    liveRegionMode: AccessibilityLiveRegionMode? = null,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     accessibilityMessage: CharSequence? = null,
 ) {
     val text = getString(message)
@@ -57,7 +57,7 @@ fun Context.toastSuccess(
  */
 fun Context.toastSuccess(
     message: CharSequence,
-    liveRegionMode: AccessibilityLiveRegionMode? = null,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     accessibilityMessage: CharSequence? = null,
 ) {
     dispatchMessage(message, ToastType.SUCCESS, liveRegionMode, accessibilityMessage)
@@ -95,7 +95,7 @@ fun Context.toastError(
  */
 fun Context.toastInfo(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.INFO, liveRegionMode = null)
+    dispatchMessage(text, ToastType.INFO, AccessibilityLiveRegionMode.POLITE)
 }
 
 /**
@@ -104,13 +104,13 @@ fun Context.toastInfo(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO, liveRegionMode = null)
+    dispatchMessage(message, ToastType.INFO, AccessibilityLiveRegionMode.POLITE)
 }
 
 private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
-    liveRegionMode: AccessibilityLiveRegionMode?,
+    liveRegionMode: AccessibilityLiveRegionMode,
     accessibilityMessage: CharSequence? = null,
     long: Boolean = false,
 ) {

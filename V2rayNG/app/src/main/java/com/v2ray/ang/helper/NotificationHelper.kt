@@ -196,9 +196,7 @@ object NotificationHelper {
             channelId = channelType.channelId,
             channelNameRes = channelType.channelNameRes,
             importance = channelType.importance,
-        ) {
-            lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        }
+        )
 
     /**
      * Creates a channel or updates only its localized name.
@@ -220,7 +218,10 @@ object NotificationHelper {
         val existingChannel = notificationManager.getNotificationChannel(channelId)
         if (existingChannel == null) {
             NotificationChannel(channelId, localizedName, importance)
-                .apply(configureNewChannel)
+                .apply {
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                    configureNewChannel()
+                }
                 .also(notificationManager::createNotificationChannel)
         } else if (notificationChannelNameNeedsUpdate(existingChannel.name, localizedName)) {
             existingChannel.name = localizedName
