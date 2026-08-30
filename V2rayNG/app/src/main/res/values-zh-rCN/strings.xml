@@ -21,6 +21,7 @@
     <string name="toast_services_start">启动服务</string>
     <string name="toast_services_stop">服务已停止</string>
     <string name="toast_services_success">启动服务成功</string>
+    <string name="acc_service_started_connected_to">服务已成功启动。现在已连接到%1$s。</string>
     <string name="toast_services_failure">启动服务失败</string>
 
     <!--ServerActivity-->

@@ -21,6 +21,7 @@
     <string name="toast_services_start">ره وستن سرویس</string>
     <string name="toast_services_stop">واڌاشتن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
+    <string name="acc_service_started_connected_to">ره وستن سرویس وا مووفقیت ٱنجوم وابی. هیم سکو وا %1$s منپیز هڌ.</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 
     <!--ServerActivity-->
