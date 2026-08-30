@@ -510,8 +510,8 @@
     <string name="toast_permission_denied_for">گرؽڌن موجوز مومکن نؽڌ: %1$s</string>
     <string name="acc_add_subscription">ٱووردن اشتراک</string>
     <string name="toast_malformed_json_detail">کانفیگ نا موئتبر هڌ: %1$s</string>
-    <string name="acc_add_asset">ٱووردن بونچک فایلا جغرافیایی</string>
-    <string name="acc_download_file">دانلود فایلا بونچک جغرافیایی</string>
+    <string name="acc_add_asset">ٱووردن بونچک فایلا جوقرافیایی</string>
+    <string name="acc_download_file">دانلود فایلا بونچک جوقرافیایی</string>
     <string name="acc_asset_file_details">هجم فایل %1$s. ورۊ وابیڌه من %2$s</string>
     <string name="acc_edit_asset_named">آلشتکاری %1$s</string>
     <string name="acc_delete_asset_named">پاک کردن %1$s</string>
