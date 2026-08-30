@@ -49,4 +49,11 @@ class NotificationHelperTest {
             )
         )
     }
+
+    @Test
+    fun `channel name updates only when the localized text changes`() {
+        assertFalse(notificationChannelNameNeedsUpdate("Service", "Service"))
+        assertTrue(notificationChannelNameNeedsUpdate("Service", "Служба"))
+        assertTrue(notificationChannelNameNeedsUpdate(null, "Service"))
+    }
 }
