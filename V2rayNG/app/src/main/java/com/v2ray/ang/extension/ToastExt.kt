@@ -123,8 +123,15 @@ private fun Context.dispatchMessage(
     )
     deliverTransientMessage(
         event = event,
-        foregroundDelivery = AppSnackbarManager::show,
-        backgroundDelivery = { NotificationHelper.notifyTransientMessage(this, it.message) }
+        foregroundDelivery = {
+            AppSnackbarManager.show(it).also { delivered ->
+                if (delivered) NotificationHelper.cancelTransientMessage(this)
+            }
+        },
+        backgroundDelivery = {
+            val notificationMessage = it.accessibilityMessage ?: it.message
+            NotificationHelper.notifyTransientMessage(this, notificationMessage)
+        }
     )
 }
 

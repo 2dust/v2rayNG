@@ -12,6 +12,7 @@ import android.os.ParcelFileDescriptor
 import android.system.OsConstants
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ConnectionTestResult
@@ -20,11 +21,13 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
@@ -100,7 +103,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            reportStartFailure(service, message)
             NotificationManager.cancelNotification()
             return false
         }
@@ -172,7 +175,7 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+            reportStartSuccess(service)
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -185,12 +188,13 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
+        val wasRunning = isRunning()
 
         networkMonitor?.unregister()
         networkMonitor = null
         currentVpnInterface = null
 
-        if (isRunning()) {
+        if (wasRunning) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     coreController.stopLoop()
@@ -207,7 +211,9 @@ object CoreServiceManager {
             browserDialer = null
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        if (wasRunning) {
+            reportStopSuccess(service)
+        }
         NotificationManager.cancelNotification()
 
         try {
@@ -264,10 +270,51 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            reportStartFailure(service, message)
             false
         } finally {
             isReloading = false
+        }
+    }
+
+    private fun reportStartSuccess(service: Service) {
+        val localizedContext = AppLocaleManager.localizedContext(service)
+        val serverName = currentConfig?.remarks?.trim().orEmpty()
+        val message = if (serverName.isEmpty()) {
+            localizedContext.getString(R.string.toast_services_success)
+        } else {
+            localizedContext.getString(R.string.acc_service_started_connected_to, serverName)
+        }
+        reportServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS, "", message)
+    }
+
+    internal fun reportStartFailure(service: Service, detail: String) {
+        val message = AppLocaleManager.localizedContext(service)
+            .getString(R.string.toast_services_failure)
+        reportServiceEvent(
+            service = service,
+            what = AppConfig.MSG_STATE_START_FAILURE,
+            content = detail,
+            fallbackMessage = message,
+        )
+    }
+
+    private fun reportStopSuccess(service: Service) {
+        val message = AppLocaleManager.localizedContext(service)
+            .getString(R.string.toast_services_stop)
+        reportServiceEvent(service, AppConfig.MSG_STATE_STOP_SUCCESS, "", message)
+    }
+
+    private fun reportServiceEvent(
+        service: Service,
+        what: Int,
+        content: String,
+        fallbackMessage: String,
+    ) {
+        MessageHelper.sendMsg2UIForResult(service, what, content) { handled ->
+            if (!handled) {
+                NotificationHelper.notifyTransientMessage(service, fallbackMessage)
+            }
         }
     }
 

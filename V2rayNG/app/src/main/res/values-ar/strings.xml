@@ -17,6 +17,7 @@
     <string name="notification_action_stop_v2ray">إيقاف</string>
     <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
     <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
+    <string name="notification_channel_service">خدمة v2rayNG</string>
     <string name="notification_action_more">انقر للمزيد</string>
     <string name="toast_services_start">بدء الخدمات</string>
     <string name="toast_services_stop">تم إيقاف الخدمة</string>
