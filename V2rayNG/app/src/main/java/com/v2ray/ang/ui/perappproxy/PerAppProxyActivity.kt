@@ -173,6 +173,7 @@ fun PerAppProxyScreen(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
+    val onInfoClick = { showInfoDialog = true }
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
@@ -264,7 +265,7 @@ fun PerAppProxyScreen(
                         onCheckedChange = onBypassAppsChanged,
                         modifier = Modifier.weight(1f),
                     )
-                    IconButton(onClick = { showInfoDialog = true }) {
+                    IconButton(onClick = onInfoClick) {
                         Icon(
                             painter = painterResource(R.drawable.ic_about_24dp),
                             contentDescription = stringResource(R.string.acc_per_app_proxy_information),
