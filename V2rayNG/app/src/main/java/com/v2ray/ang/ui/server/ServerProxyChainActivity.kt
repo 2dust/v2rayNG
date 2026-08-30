@@ -336,14 +336,15 @@ fun ProxyChainScreen(
 
     if (showProfileDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile),
+            message = stringResource(R.string.confirm_delete_profile_named, remarks),
             onConfirm = { showProfileDeleteConfirm = false; onDelete() },
             onDismiss = { showProfileDeleteConfirm = false }
         )
     }
     memberToDeleteKey?.let { memberKey ->
+        val memberName = members.getOrNull(memberKeys.indexOf(memberKey)).orEmpty()
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_proxy_chain_member),
+            message = stringResource(R.string.confirm_delete_proxy_chain_member_named, memberName),
             onConfirm = {
                 val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
                 members = remainingMembers
