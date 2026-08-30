@@ -66,6 +66,7 @@ data class AppSnackbarMessage(
     val type: ToastType = ToastType.NORMAL,
     val long: Boolean = false,
     val liveRegionMode: AccessibilityLiveRegionMode? = null,
+    val accessibilityMessage: CharSequence? = null,
 )
 
 object AppSnackbarManager {
@@ -186,7 +187,7 @@ internal class LiveRegionMessageTracker(
 
     fun next(event: AppSnackbarMessage): LiveRegionMessage? {
         val mode = event.liveRegionMode ?: return null
-        val text = event.message.toString()
+        val text = (event.accessibilityMessage ?: event.message).toString()
         if (text.isBlank()) return null
 
         val now = elapsedRealtime()

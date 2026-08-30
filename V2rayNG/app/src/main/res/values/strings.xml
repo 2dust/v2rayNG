@@ -21,6 +21,7 @@
     <string name="toast_services_start">Starting service</string>
     <string name="toast_services_stop">Service stopped</string>
     <string name="toast_services_success">Service started successfully</string>
+    <string name="acc_service_started_connected_to">Service started successfully. Now connected to %1$s.</string>
     <string name="toast_services_failure">Failed to start service</string>
 
     <!--ServerActivity-->

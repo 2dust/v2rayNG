@@ -58,15 +58,23 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     /**
      * Send success toast event (Resource ID).
      */
-    fun toastSuccess(resId: Int, liveRegionMode: AccessibilityLiveRegionMode? = null) {
-        localizedContext.toastSuccess(resId, liveRegionMode)
+    fun toastSuccess(
+        resId: Int,
+        liveRegionMode: AccessibilityLiveRegionMode? = null,
+        accessibilityMessage: String? = null,
+    ) {
+        localizedContext.toastSuccess(resId, liveRegionMode, accessibilityMessage)
     }
 
     /**
      * Send success toast event (String).
      */
-    fun toastSuccess(message: String, liveRegionMode: AccessibilityLiveRegionMode? = null) {
-        app.toastSuccess(message, liveRegionMode)
+    fun toastSuccess(
+        message: String,
+        liveRegionMode: AccessibilityLiveRegionMode? = null,
+        accessibilityMessage: String? = null,
+    ) {
+        app.toastSuccess(message, liveRegionMode, accessibilityMessage)
     }
 
     /**

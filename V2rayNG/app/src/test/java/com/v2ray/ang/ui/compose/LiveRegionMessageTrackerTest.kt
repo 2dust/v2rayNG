@@ -46,4 +46,20 @@ class LiveRegionMessageTrackerTest {
         now += DuplicateLiveRegionMessageWindowMs
         assertEquals(3L, tracker.next(assertive)?.id)
     }
+
+    @Test
+    fun usesTheAccessibilityMessageWithoutChangingTheVisibleMessage() {
+        val tracker = LiveRegionMessageTracker { 0L }
+        val event = AppSnackbarMessage(
+            message = "Service started successfully",
+            liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+            accessibilityMessage = "Service started successfully. Now connected to Lab.",
+        )
+
+        assertEquals(
+            "Service started successfully. Now connected to Lab.",
+            tracker.next(event)?.text,
+        )
+        assertEquals("Service started successfully", event.message)
+    }
 }

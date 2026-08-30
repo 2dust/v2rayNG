@@ -21,6 +21,7 @@
     <string name="toast_services_start">شروع خدمات</string>
     <string name="toast_services_stop">سرویس متوقف شد</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
+    <string name="acc_service_started_connected_to">سرویس با موفقیت شروع شد. اکنون به %1$s متصل هستید.</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
     <!--ServerActivity-->

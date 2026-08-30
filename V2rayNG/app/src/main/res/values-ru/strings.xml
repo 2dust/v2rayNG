@@ -21,6 +21,7 @@
     <string name="toast_services_start">Запуск служб</string>
     <string name="toast_services_stop">Служба остановлена</string>
     <string name="toast_services_success">Службы успешно запущены</string>
+    <string name="acc_service_started_connected_to">Службы успешно запущены. Установлено подключение к серверу «%1$s».</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->

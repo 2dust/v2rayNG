@@ -44,9 +44,10 @@ fun Context.toast(
 fun Context.toastSuccess(
     message: Int,
     liveRegionMode: AccessibilityLiveRegionMode? = null,
+    accessibilityMessage: CharSequence? = null,
 ) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.SUCCESS, liveRegionMode)
+    dispatchMessage(text, ToastType.SUCCESS, liveRegionMode, accessibilityMessage)
 }
 
 /**
@@ -57,8 +58,9 @@ fun Context.toastSuccess(
 fun Context.toastSuccess(
     message: CharSequence,
     liveRegionMode: AccessibilityLiveRegionMode? = null,
+    accessibilityMessage: CharSequence? = null,
 ) {
-    dispatchMessage(message, ToastType.SUCCESS, liveRegionMode)
+    dispatchMessage(message, ToastType.SUCCESS, liveRegionMode, accessibilityMessage)
 }
 
 /**
@@ -109,13 +111,15 @@ private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
     liveRegionMode: AccessibilityLiveRegionMode?,
+    accessibilityMessage: CharSequence? = null,
     long: Boolean = false,
 ) {
     val event = AppSnackbarMessage(
         message = message,
         type = type,
         long = long,
-        liveRegionMode = liveRegionMode
+        liveRegionMode = liveRegionMode,
+        accessibilityMessage = accessibilityMessage,
     )
     deliverTransientMessage(
         event = event,
