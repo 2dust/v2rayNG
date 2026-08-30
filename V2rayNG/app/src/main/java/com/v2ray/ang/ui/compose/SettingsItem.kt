@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.VisualTransformation
@@ -60,7 +61,10 @@ fun CollapsiblePreferenceGroupHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .semantics { stateDescription = groupState }
+            .semantics {
+                contentDescription = title
+                stateDescription = groupState
+            }
             .clickable(role = Role.Button) { onExpandedChange(!expanded) }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
