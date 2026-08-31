@@ -381,7 +381,7 @@
     <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network" translatable="false">network</string>
-    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
+    <string name="routing_settings_outbound_tag_hint">پروکسی / موستقیم / مسدۊد / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
@@ -396,22 +396,22 @@
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
 
-    <string name="import_subscription_success">اشتراک وا مووفقیت و من ٱووڌه وابی</string>
+    <string name="import_subscription_success">اشتراک وا مووفقیت و من ٱوورده وابی</string>
     <string name="import_subscription_failure">و من ٱووردن اشتراک مووفق نبی</string>
     <string name="title_fragment_settings">سامووا فرگمنت (Fragment)</string>
     <string name="title_pref_fragment_packets">کتنا فرگمنت</string>
-    <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (هدقل-هدکسر)</string>
+    <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
-    <string name="title_pref_fragment_maxsplit">حداکثر تقسیم فرگمنت</string>
+    <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
     <string name="title_observatory_settings">سامووا واجۊری منپیز (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>
-    <string name="title_pref_observatory_least_load_method">روش HTTP سی leastLoad</string>
-    <string name="title_pref_observatory_least_load_sampling">نمونه گیری leastLoad</string>
-    <string name="title_pref_observatory_least_load_timeout">مهلت leastLoad</string>
-    <string name="toast_invalid_observatory_duration">زمووݩ نا موئتبر هڌ. ارزشی و ری 3m یا 30s ن و کار بگیرین.</string>
-    <string name="toast_invalid_observatory_sampling">نمونه گیری نا موئتبر هڌ. شوماره ی مثبت ن و کار بگیرین.</string>
+    <string name="title_pref_observatory_least_load_method">بارت HTTP سی leastLoad</string>
+    <string name="title_pref_observatory_least_load_sampling">نمووه گیری leastLoad</string>
+    <string name="title_pref_observatory_least_load_timeout">موهلت leastLoad</string>
+    <string name="toast_invalid_observatory_duration">زمووݩ نا موئتبر هڌ. ٱرزشی و ری 3m یا 30s ن و کار بگیرین.</string>
+    <string name="toast_invalid_observatory_sampling">نمووه گیری نا موئتبر هڌ. شوماره ای موسبت ن و کار بگیرین.</string>
 
     <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
     <string name="update_already_latest_version">سکو نوسخه دیندایی پۊرنیڌه هڌ</string>
@@ -424,12 +424,12 @@
     <string name="title_policy_group_subscription_id">ز بونکۊ اشتراک</string>
     <string name="title_policy_group_subscription_filter">فیلتر نیشتنا وا regex</string>
     <string name="title_policy_group_test_outbounds">آزمایش بارتا (outbounds)</string>
-    <string name="title_policy_group_fallback">بارت جایگزین (outbound، اختیاری)</string>
+    <string name="title_policy_group_fallback">بارت جایگۊزین (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
     <string name="server_proxy_chain_member_unselected">ی عوزو پسند کۊنین</string>
-    <string name="server_proxy_chain_members_unselected">سی هر ردیف زنجیره ی عوزو پسند کۊنین</string>
+    <string name="server_proxy_chain_members_unselected">سی هر ردیف زنجیره، ی عوزو پسند کۊنین</string>
     <string name="server_proxy_chain_members_insufficient">تعداڌ ٱئزا بس نؽ</string>
     <string name="server_proxy_chain_members_invalid">ٱئزا نا موئتبر زنجیره: %1$s</string>
 
@@ -437,11 +437,11 @@
     <string name="title_configuration_backup_restore">لادراری گرؽڌن &amp; وورگندن</string>
     <string name="title_configuration_backup">لادراری گرؽڌن ز کانفیگ</string>
     <string name="title_configuration_restore">وورگندن کانفیگ</string>
-    <string name="title_profile_storage_cleanup">جۊر کردن داڌه یل کانفیگا</string>
-    <string name="summary_profile_storage_cleanup">پاک کردن داڌه یل کانفیگا ک دی و کار نؽن</string>
-    <string name="message_profile_storage_cleanup">داڌه یل کانفیگا ک دی من هیچ بونکۊی و کار نؽن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ کانفیگا پسند وابیڌه وو داڌه یلی ک نتری وا موتمعنی بفهمی دی و کار نؽن پاک نابۊن.</string>
-    <string name="toast_profile_storage_cleanup">کانفیگا ک دی و کار نؽن پاک وابیڌن: %1$d</string>
-    <string name="toast_profile_storage_cleanup_skipped">نتری وا موتمعنی بفهمی ک کۊی داڌه یل کانفیگا دی و کار نؽن. هیچ داده ای پاک نوابی.</string>
+    <string name="title_profile_storage_cleanup">ترمیم جاگه زفت کردن پوروفایلا</string>
+    <string name="summary_profile_storage_cleanup">پاک کردن داده یل پوروفایلایی ک دی و کار گرؽڌه نؽبۊن</string>
+    <string name="message_profile_storage_cleanup">داده یل پوروفایلایی ک دی من هیچ بونکۊیی و کار گرؽڌه نؽبۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ پوروفایل پسند وابیڌه وو داده یلی ک نتری وا موتمعنی بفهمی دی و کار گرؽڌه نؽبۊن پاک نؽبۊن.</string>
+    <string name="toast_profile_storage_cleanup">پوروفایلایی ک دی و کار گرؽڌه نؽبۊن پاک وابیڌن: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">نترست وا موتمعنی بفهمه ک کۊیکی ز داده یل پوروفایلا دی و کار گرؽڌه نؽبۊن. هیچ داده ای پاک نوابی.</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
     <string name="title_webdav_config_setting">WebDAV سامووا</string>
     <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>
@@ -451,7 +451,7 @@
     <string name="title_webdav_remote_path">دایرکتوری ره دیر (اختیاری)</string>
 
     <string name="share_method_qrcode">کود QR</string>
-    <string name="share_method_clipboard">لف گیری لینک کانفیگ</string>
+    <string name="share_method_clipboard">لف گیری لینگ کانفیگ</string>
     <string name="share_method_full_content">لف گیری پوی کانفیگ</string>
     <string name="action_edit">آلشتکاری</string>
     <string name="action_delete">پاک کردن</string>
@@ -466,7 +466,7 @@
     </string-array>
 
     <string-array name="browser_dialer_mode">
-        <item>خامۊش</item>
+        <item>کۊر</item>
         <item>OkHttp</item>
         <item>WebView</item>
     </string-array>
@@ -491,8 +491,8 @@
 
     <string-array name="outbound_domain_resolve_method">
         <item>هل وو فسل مکۊنین</item>
-        <item>هل وو ٱووردن و میزبووݩ یل دامنه DNS</item>
-        <item>هل وو جایونی دامنه</item>
+        <item>هل وو فسل وو ٱووردن و هاستا دامنه DNS</item>
+        <item>هل وو فسل وو جایگۊزینی دامنه</item>
     </string-array>
 
     <string-array name="policy_group_type">
@@ -517,20 +517,20 @@
     <string name="acc_add_rule">ٱووردن قانووݩ</string>
     <string name="acc_start">ره وستن سرویس</string>
     <string name="acc_stop">واڌاشتن سرویس</string>
-    <string name="acc_back">برگشت</string>
+    <string name="acc_back">وورگشتن</string>
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
-    <string name="acc_more">امکووݩا بؽتر</string>
-    <string name="acc_selected_server">Selected</string>
-    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
+    <string name="acc_more">گۊزینه یل قلوه</string>
+    <string name="acc_selected_server">پسند وابیڌه</string>
+    <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
     <string name="acc_add_member">ٱووردن عوزو زنجیره پروکسی</string>
     <string name="acc_start_scanner">ره وستن اسکنر QR</string>
     <string name="acc_stop_scanner">واڌاشتن اسکنر QR</string>
-    <string name="acc_turn_torch_on">روشن کردن چراغ</string>
-    <string name="acc_turn_torch_off">خاموش کردن چراغ</string>
-    <string name="acc_select_image">پسند ٱکس سی اسکن</string>
+    <string name="acc_turn_torch_on">رۊشن کردن لیت</string>
+    <string name="acc_turn_torch_off">کۊر کردن لیت</string>
+    <string name="acc_select_image">پسند شؽوات سی اسکن</string>
     <string name="acc_locked">ای قانووݩ مجال و من ٱووردن ز پؽش سامووا زفت ابۊ</string>
     <string name="acc_open_menu">گۊشیڌن نومگه کشاری</string>
     <string name="acc_edit">آلشتکاری</string>
@@ -538,7 +538,7 @@
     <string name="acc_save">زفت کردن</string>
     <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
     <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>
-    <string name="permission_camera">دوربیݩ</string>
+    <string name="permission_camera">شؽواتگر</string>
     <string name="permission_notification">وارسۊوی</string>
     <string name="permission_local_network">شبکه مهلی</string>
     <string name="subscription_update_updating">اشتراک %1$s هونی ورۊ ابۊ</string>
@@ -546,6 +546,6 @@
     <string name="tasker_blurb_start">ره وستن %1$s</string>
     <string name="tasker_blurb_stop">واڌاشتن %1$s</string>
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
-    <string name="value_unknown">نا مؽخص</string>
+    <string name="value_unknown">نا موشخس</string>
 
 </resources>
