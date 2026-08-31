@@ -99,29 +99,29 @@
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
-    <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرض 1420)</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرض هسته 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرض هسته 50)</string>
+    <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرز 1420)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرز هسته 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرز هسته 50)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
-    <string name="toast_none_data">هیچ داڌه ای وۊجۊڌ نڌاره</string>
+    <string name="toast_none_data">هیچ داده ای وۊجۊڌ نڌاره</string>
     <string name="toast_incorrect_protocol">پوروتوکول نادوروست</string>
     <string name="toast_decoding_failed">رزم گوشایی ٱنجوم نوابی</string>
     <string name="title_file_chooser">پسند فایل کانفیگ</string>
     <string name="toast_require_file_manager">ی برنومه دؽوۉداری فایل بپۊرنین.</string>
     <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ نا موئتبر هڌ</string>
-    <string name="server_lab_content">محتوا</string>
-    <string name="toast_none_data_clipboard">هیچ داڌه ای من کلیپ بورد وۊجۊڌ نڌاره</string>
+    <string name="server_lab_content">موئتوا</string>
+    <string name="toast_none_data_clipboard">هیچ داده ای من کلیپ بورد وۊجۊڌ نڌاره</string>
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
     <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
-    <string name="server_lab_need_inbound">موطمئن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
+    <string name="server_lab_need_inbound">موتمعن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
     <string name="toast_malformed_json">کانفیگ نا موئتبر هڌ</string>
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
-    <string name="server_lab_port_hop">پورت گوم (درگا سرورن ز نۊ هؽل اکونه)</string>
-    <string name="server_lab_port_hop_interval">فاصله پورت گوم (ثانیه)</string>
+    <string name="server_lab_port_hop">گوم پورت (پورت سرورن ز نۊ هؽل اکونه)</string>
+    <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
     <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
@@ -130,9 +130,9 @@
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
     <string name="server_lab_pinned_ca256">جا کلک گوواهی (SHA-256)</string>
-    <string name="server_lab_browser_dialer">Browser Dialer ن ره وستین</string>
-    <string name="server_lab_browser_dialer_tip">تینا وۊرۊیا xhttp (packet-up) وو ws ن پوشتؽووی اکونه؛ گاشڌ سامووا وابسته و TLS ناڌیڌه گرفته ابۊن یا وا همن جۊر نین</string>
-    <string name="toast_allow_insecure_deprecated">ای گر ز منپیز بی رمزنگاری کار اگیره. گاشڌ منپیزا شمو و دست دسگایل میووݩ شبکه ک و دست دولتا استبداڌی کنتورول ابۊن موستقیمن دیڌه ابۊ.\nسی ٱمنیت، ای جۊر گر یل وا هسته Xray نوسخه 26.2.6+ منپیز نابۊن.\nٱر گر خوتووݩ هڌ، رمزنگاری ٱمنی وری TLS ن ره وستین یا اثر انگشت گوواهی pinnedCA256 ن چفت کۊنین.\nٱر گر مال سرویس ڌهنده هڌ، ز سرویس ڌهنده بخواین ٱرتقا فنی ن ٱنجوم بڌه. ٱر همکاری نکونه، بئتره سرویس ڌهنده ی ک ب ٱمنیت کارورووݩ بؽتر اهمیت اڌه پسند کۊنین.\nسی دووسته بؽتر ورین و https://github.com/2dust/v2rayN/discussions/9460</string>
+    <string name="server_lab_browser_dialer">Browser Dialer ره وندن</string>
+    <string name="server_lab_browser_dialer_tip">تینا خۊرۊجیا xhttp (packet-up) وو ws لادراری ابۊن؛ سامووا وابسته و TLS گاشڌ نیڌه گرؽڌه بۊن یا تداخول داشته بۊ</string>
+    <string name="toast_allow_insecure_deprecated">گره هیم سکویی منپیز رزم نگاری نوابیڌه ن و کار اگره. زؽرساختا منجا شبکه ک من کونتورول هۊکۊمتا اقتدارگرا هڌن گاشڌ ارتباتا ایسا ن موستقیمن بنیرن.\nسی دلیلا ٱمنیتی، منپیز و ای گره هایی ک وا هسته Xray نوسخه 26.2.6 وو روء تر امکووݩ پزیر نؽڌ.\nٱر گره ن خوتووݩ ره وندین، رزم نگاری ٱمنی جۊر TLS ن ره ونین یا جا کلک گوواهی pinnedCA256 ن پین کۊنین.\nٱر گره ز ارائه کون خدمات هڌ، سی ارتقای فنی بسووݩ زنگ بزݩ. ٱر ارائه کون واتووݩ هیاری نکرد، پؽشنهاڌ ابۊ و ارائه کونی ریوین ک سی ٱمنیت منتورووݩ ٱهمیت قلوه ای اده.\nسی دووسمندیا قلوه و https://github.com/2dust/v2rayN/discussions/9460 سر بزنین.</string>
     <string name="pinned_ca256_action_fetch">گرؽڌن وو پور کردن جا کلک گوواهی</string>
     <string name="toast_fetch_cert_sha256_success">جا کلک گوواهی وا مووفقیت گرؽڌه وابی</string>
     <string name="toast_fetch_cert_sha256_failed">گرؽڌن جا کلک گوواهی مووفق نبی</string>
@@ -158,12 +158,12 @@
     <string name="msg_enter_keywords">کلمه یل کلیڌی ن بزنین</string>
     <string name="switch_bypass_apps_mode">هالت دور زیڌن</string>
     <string name="menu_item_select_proxy_app">پسند خوتکار برنومه یلی ک پروکسی اخون</string>
-    <string name="msg_downloading_content">محتوا هونی دانلود ابۊن…</string>
+    <string name="msg_downloading_content">موئتوا هونی دانلود ابۊ…</string>
     <string name="menu_item_export_proxy_app">و در کشیڌن من کلیپ بورد</string>
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
     <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>
     <string name="per_app_proxy_settings_enable">ره وندن ب تفکیک برنومه</string>
-    <string name="app_picker_unknown_app">برنومه ناناس (UID ناساڌه)</string>
+    <string name="app_picker_unknown_app">برنومه ناشناس (UID شناسایی نوابیڌه)</string>
 
     <!-- Preferences -->
     <string name="title_settings">سامووا</string>
@@ -176,7 +176,7 @@
     <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
 
 
-    <string name="subscription_updater_job_tips">وزیفه من پس زمینه کار اکونه وو ایلاعات پؽشرفت من اعلان نشووݩ داڌه ابۊ.</string>
+    <string name="subscription_updater_job_tips">ای کار من پس زمینه ره اوۊفته وو پؽش رئڌن هو منه وارسۊوی نشووݩ داڌه ابۊ.</string>
     <string name="title_pref_auto_test_after_update_subscription">تست خوتکار بئڌ و رۊز کۊنی اشتراک</string>
     <string name="summary_pref_auto_test_after_update_subscription">تست خوتکار زمووݩ زیاڌی ابره. ٱر ره وست بۊ، وزیفه من پس زمینه کار اکونه؛ وگرنه من همین بلگه کار اکونه.</string>
     <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگا نا موئتبر بئڌ پینگ</string>
@@ -186,7 +186,7 @@
 
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ره وندن Mux</string>
-    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قط بۊ\nدؽوۉداری TCP، UDP وو QUIC ن ای لم سفارشی کۊنین.</string>
+    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ\nدؽوۉداری TCP، UDP وو QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurrency">منپیزا TCP (تلایه منجا -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurrency">منپیزا XUDP (تلایه منجا -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
@@ -200,7 +200,7 @@
     <string name="summary_pref_speed_enabled">سورعت هیم سکویی من وارسۊوی نشووݩ داڌه ابۊ.\nنماڌ نشووݩ اڌه ک ترافیک پروکسی یا موستقیم بؽتره.</string>
 
     <string name="title_pref_sniffing_enabled">ره وندن در کشیڌن نوم دامنه موورد نظر (Sniffing)</string>
-    <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرض رۊشن هڌ)</string>
+    <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
     <string name="title_pref_route_only_enabled">ره وندن تینا تور جوستن routeOnly</string>
     <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نظرن و عونوان نشۊوی IP ووردارین.</string>
 
@@ -224,7 +224,7 @@
 
     <string name="title_pref_vpn_interface_address">نشۊوی رابت VPN</string>
 
-    <string name="title_pref_vpn_mtu">VPN MTU (پؽش فرض 1500)</string>
+    <string name="title_pref_vpn_mtu">VPN MTU (پؽش فرز 1500)</string>
 
 
     <string name="title_pref_domestic_dns">DNS موستقیم (اختیاری)</string>
@@ -242,7 +242,7 @@
 
     <string name="title_pref_proxy_sharing_enabled">یک رسۊوی پروکسی من شبکه مهلی LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">پوی دسگایل ترن وا نشۊوی IP ایسا، ز ره socks/http و پروکسی منپیز بۊن، تینا من شبکه قابل ائتماڌ ره ونده بۊ تا ز منپیز غیر موجاز جلو گری بۊ.</string>
-    <string name="toast_warning_pref_proxysharing_short">یک رسۊوی من شبکه مهلی ره وست؛ موطمئن بۊین ک من ی شبکه  ٱمن هڌین.</string>
+    <string name="toast_warning_pref_proxysharing_short">یک رسۊوی من شبکه مهلی ره وست؛ موتمعن بۊین ک من ی شبکه  ٱمن هڌین.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی مهلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی مهلی</string>
@@ -268,7 +268,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موستقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه کانفیگا من دو ستۊݩ نشووݩ داڌه ابۊ تا محتوا بؽتری من بلگه جا بگره.</string>
+    <string name="summary_pref_double_column_display">نومگه کانفیگا من دو ستۊݩ نشووݩ داڌه ابۊ تا موئتوا بؽتری من بلگه جا بگره.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن بلگه «پوی»</string>
     <string name="summary_pref_group_all_display">نشووݩ داڌن پوروفایلا پوی بونکۊیل اشتراک من ی بلگه.</string>
@@ -289,8 +289,8 @@
     <string name="title_pref_promotion">تبلیقات</string>
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
-    <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاصله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
-    <string name="title_pref_auto_update_interval">فاصله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
+    <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
+    <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری (outbound)</string>
@@ -300,11 +300,11 @@
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_dynamic_color">ره وندن رنگ پۊیا</string>
-    <string name="summary_pref_dynamic_color">فقط روی اندروید ۱۲+ کار می‌کند</string>
+    <string name="summary_pref_dynamic_color">فقت روی اندروید ۱۲+ کار می‌کند</string>
     <string name="title_pref_use_hev_tunnel">و کار گرؽڌن ویژیی Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱر ره نوۊفته بۊ، همو xray-core ن و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN سئت گوزارشا</string>
-    <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev TUN (ثانیه؛ پؽش‌فرض TCP/UDP: 300/60)</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">زمووݩ مندیر بیڌن خوندن/هؽل کردن Hev TUN (سانیه؛ پؽش‌فرز TCP/UDP: 300/60)</string>
     <string name="title_mode_settings">سامووا هالت</string>
     <string name="title_root_mode_enabled">هالت رۊت ره وست (منتورووݩ رۊت)</string>
     <string name="summary_root_mode_enabled">ره وستن پروکسی شفاف سئت بلم وا امتیازا ریشه. ای هالت، VPN استاندارد سیستوم ٱندروید ن دور ازنه تا موستقیمن پوی ترافیک شبکه لمی ن وا دست بگره. بئڌ ره وندن، هالت معمۊلی ٱسلی، تور جۊری هر برنومه وو سامووا VPN مربۊته کاملن نا موئتبر ابۊن.</string>
@@ -332,10 +332,10 @@
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>
     <string name="sub_setting_pre_profile">پروکسی وۊرۊی</string>
     <string name="sub_setting_next_profile">پروکسی دری</string>
-    <string name="sub_setting_pre_profile_tip">موطمئن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
-    <string name="sub_setting_entry_proxy_tip">ای پروکسی پؽش ز هر کانفیگ من ای اشتراک، وری ٱول عوزو زنجیره پروکسی ازاف ابۊ.</string>
-    <string name="sub_setting_exit_proxy_tip">ای پروکسی بئڌ ز هر کانفیگ من ای اشتراک، وری آخر عوزو زنجیره پروکسی ازاف ابۊ.</string>
-    <string name="toast_invalid_update_interval">فاصله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
+    <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
+    <string name="sub_setting_entry_proxy_tip">پروکسی پسند وابیڌه پؽش ز هر کانفیگ من ای اشتراک، و عونوان عوزو نیایی زنجیره پروکسی ازاف ابۊ.</string>
+    <string name="sub_setting_exit_proxy_tip">پروکسی پسند وابیڌه بئڌ ز هر کانفیگ من ای اشتراک، و عونوان عوزو دیندایی زنجیره پروکسی ازاف ابۊ.</string>
+    <string name="toast_invalid_update_interval">فاسله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تئخیر واقعی</string>
@@ -361,7 +361,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">نشقه دامنه</string>
     <string name="routing_settings_title">سامووا تور جوستن</string>
-    <string name="routing_settings_tips">پوی شرطا سئت بیڌه بایڌ هوم زمووی جور ابۊن (AND). قانووݩ یل ز سر و ته وارس ابۊن؛ ٱولی قانووݩ جور وابیڌه و کار ابسته ابۊ.</string>
+    <string name="routing_settings_tips">ی قانووݩ تینا زمووی ائمال ابۊ ک پوی شرتا ی جۊر بیڌه و من ٱووڌه هوم زمووݩ برقرار بۊن  (AND). قانووا ز روء و بلم واجۊری ابۊن وو ٱولین قانووݩ ی جۊر، ائمال ابۊ.</string>
     <string name="routing_settings_comma_tip">چنتا مقدار ن وا کاما (,) ز یک جوڌا کۊنین.</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
@@ -387,11 +387,11 @@
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
-    <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
-    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <string name="connection_test_available">مووفق بی: منپیز %1$s تۊل کشی</string>
+    <string name="server_test_delay_value">%1$d میلی‌سانیه</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
-    <string name="connection_test_error_status_code">کود خطا: #%d</string>
+    <string name="connection_test_error_status_code">کود ختا: #%d</string>
     <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
@@ -400,17 +400,17 @@
     <string name="import_subscription_failure">و من ٱووردن اشتراک مووفق نبی</string>
     <string name="title_fragment_settings">سامووا فرگمنت (Fragment)</string>
     <string name="title_pref_fragment_packets">کتنا فرگمنت</string>
-    <string name="title_pref_fragment_length">طۊل کتنا فرگمنت (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_interval">فاصله منجا کتنا فرگمنت (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_length">تۊل کتنا فرگمنت (حداقل-حداکثر)</string>
+    <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">حداکثر تقسیم فرگمنت</string>
     <string name="title_observatory_settings">سامووا واجۊری منپیز (Observatory)</string>
-    <string name="title_pref_observatory_least_ping_interval">فاصله leastPing</string>
-    <string name="title_pref_observatory_least_load_interval">فاصله leastLoad</string>
+    <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
+    <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>
     <string name="title_pref_observatory_least_load_method">روش HTTP سی leastLoad</string>
     <string name="title_pref_observatory_least_load_sampling">نمونه گیری leastLoad</string>
     <string name="title_pref_observatory_least_load_timeout">مهلت leastLoad</string>
-    <string name="toast_invalid_observatory_duration">زمووݩ نا موئتبر هڌ. ارزشی وری 3m یا 30s ن و کار بگیرین.</string>
+    <string name="toast_invalid_observatory_duration">زمووݩ نا موئتبر هڌ. ارزشی و ری 3m یا 30s ن و کار بگیرین.</string>
     <string name="toast_invalid_observatory_sampling">نمونه گیری نا موئتبر هڌ. شوماره ی مثبت ن و کار بگیرین.</string>
 
     <string name="update_check_for_update">واجۊری سی ورۊ رسۊوی</string>
@@ -439,9 +439,9 @@
     <string name="title_configuration_restore">وورگندن کانفیگ</string>
     <string name="title_profile_storage_cleanup">جۊر کردن داڌه یل کانفیگا</string>
     <string name="summary_profile_storage_cleanup">پاک کردن داڌه یل کانفیگا ک دی و کار نؽن</string>
-    <string name="message_profile_storage_cleanup">داڌه یل کانفیگا ک دی من هیچ بونکۊی و کار نؽن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ کانفیگا پسند وابیڌه وو داڌه یلی ک نتری وا موطمئنی بفهمی دی و کار نؽن پاک نابۊن.</string>
+    <string name="message_profile_storage_cleanup">داڌه یل کانفیگا ک دی من هیچ بونکۊی و کار نؽن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟ کانفیگا پسند وابیڌه وو داڌه یلی ک نتری وا موتمعنی بفهمی دی و کار نؽن پاک نابۊن.</string>
     <string name="toast_profile_storage_cleanup">کانفیگا ک دی و کار نؽن پاک وابیڌن: %1$d</string>
-    <string name="toast_profile_storage_cleanup_skipped">نتری وا موطمئنی بفهمی ک کۊی داڌه یل کانفیگا دی و کار نؽن. هیچ داڌه ای پاک نوابی.</string>
+    <string name="toast_profile_storage_cleanup_skipped">نتری وا موتمعنی بفهمی ک کۊی داڌه یل کانفیگا دی و کار نؽن. هیچ داده ای پاک نوابی.</string>
     <string name="title_configuration_share">یک رسۊوی کانفیگ</string>
     <string name="title_webdav_config_setting">WebDAV سامووا</string>
     <string name="title_webdav_config_setting_unknown">ٱول WebDAV ن کانفیگ کۊنین</string>
@@ -484,7 +484,7 @@
     <string name="routing_preset_russia_whitelist">نومگه اسبؽڌ رۊسیه</string>
 
     <string-array name="vpn_bypass_lan">
-        <item>پؽش فرض کانفیگ</item>
+        <item>پؽش فرز کانفیگ</item>
         <item>دور زیڌه بۊ</item>
         <item>دور زیڌه نبۊ</item>
     </string-array>
