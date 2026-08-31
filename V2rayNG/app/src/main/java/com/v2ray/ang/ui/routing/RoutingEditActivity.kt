@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,17 +32,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.apppicker.AppPickerActivity
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.base.BaseViewModelEvent
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
@@ -49,73 +51,42 @@ import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
 
 private val ROUTING_NETWORK_OPTIONS = listOf("tcp", "udp", "tcp,udp")
 
 class RoutingEditActivity : BaseComponentActivity() {
-    private val rulesetId by lazy { intent.getStringExtra("ruleset_id") }
-
-    private var initial: RulesetItem? = null
-    private lateinit var outboundSuggestions: List<String>
-    private var canUseProcess: Boolean = false
+    private val viewModel: RoutingEditViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initial = rulesetId?.let { SettingsManager.getRoutingRuleset(it) }
-        if (initial == null) {
-            finish()
-            return
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    if (event == BaseViewModelEvent.FinishActivity) finish()
+                }
+            }
         }
-        val profileRemarks = SettingsManager.getProfileRemarks()
-        outboundSuggestions = (BUILTIN_OUTBOUND_TAGS.toList() + profileRemarks).distinct()
-        canUseProcess = SettingsManager.canUseProcessRouting()
+        viewModel.initialize(intent.getStringExtra("ruleset_id"))
     }
 
     @Composable
     override fun ScreenContent() {
+        val state by viewModel.state.collectAsStateWithLifecycle()
+        val loaded = state ?: return
         RoutingEditScreen(
-            rulesetId = rulesetId,
-            initial = initial,
-            outboundSuggestions = outboundSuggestions,
-            canUseProcess = canUseProcess,
+            initial = loaded.initial,
+            outboundSuggestions = loaded.outboundSuggestions,
+            canUseProcess = loaded.canUseProcess,
             onBackClick = { finish() },
-            onSave = { saveServer(it) },
-            onDelete = { deleteServer() }
+            onSave = viewModel::save,
+            onDelete = viewModel::delete
         )
-    }
-
-    private fun saveServer(rulesetItem: RulesetItem): Boolean {
-        if (rulesetItem.remarks.isNullOrEmpty()) {
-            toast(R.string.sub_setting_remarks)
-            return false
-        }
-        if (rulesetItem.id.isEmpty()) {
-            rulesetItem.id = UUID.randomUUID().toString()
-        }
-        SettingsManager.saveRoutingRuleset(rulesetId, rulesetItem)
-        toastSuccess(R.string.toast_success)
-        finish()
-        return true
-    }
-
-    private fun deleteServer(): Boolean {
-        if (!rulesetId.isNullOrEmpty()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                SettingsManager.removeRoutingRuleset(rulesetId)
-                withContext(Dispatchers.Main) { finish() }
-            }
-        }
-        return true
     }
 }
 
 @Composable
 fun RoutingEditScreen(
-    rulesetId: String?,
     initial: RulesetItem?,
     outboundSuggestions: List<String>,
     canUseProcess: Boolean,
@@ -151,7 +122,7 @@ fun RoutingEditScreen(
     }
 
     fun buildRuleset(): RulesetItem {
-        val rulesetItem = SettingsManager.getRoutingRuleset(rulesetId) ?: RulesetItem()
+        val rulesetItem = initial?.copy() ?: RulesetItem()
         rulesetItem.apply {
             this.remarks = remarks
             this.locked = locked

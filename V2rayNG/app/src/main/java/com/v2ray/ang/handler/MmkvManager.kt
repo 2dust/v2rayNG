@@ -30,8 +30,28 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import java.util.UUID
 
 internal class ProfileStorageException(message: String) : IllegalStateException(message)
+
+/** Keep the first occurrence of an ID; repair only missing or colliding identities, never rule contents. */
+internal fun ensureRoutingRulesetIds(rulesets: List<RulesetItem>): Boolean {
+    val reserved = rulesets.mapTo(mutableSetOf()) { it.id }
+    val seen = mutableSetOf<String>()
+    var changed = false
+    for (ruleset in rulesets) {
+        if (ruleset.id.isNullOrBlank() || !seen.add(ruleset.id)) {
+            var id: String
+            do {
+                id = UUID.randomUUID().toString()
+            } while (!reserved.add(id))
+            ruleset.id = id
+            seen.add(id)
+            changed = true
+        }
+    }
+    return changed
+}
 
 object MmkvManager {
 
@@ -786,7 +806,12 @@ object MmkvManager {
     fun decodeRoutingRulesets(): MutableList<RulesetItem>? {
         val ruleset = settingsStorage.decodeString(PREF_ROUTING_RULESET)
         if (ruleset.isNullOrEmpty()) return null
-        return JsonUtil.fromJsonSafe(ruleset, Array<RulesetItem>::class.java)?.toMutableList() ?: mutableListOf()
+        val rulesets = JsonUtil.fromJsonSafe(ruleset, Array<RulesetItem>::class.java)?.toMutableList() ?: mutableListOf()
+        // Repair older imports before any caller uses IDs for editing or Compose keys.
+        if (ensureRoutingRulesetIds(rulesets)) {
+            check(encodeRoutingRulesets(rulesets)) { "Failed to persist routing rule IDs" }
+        }
+        return rulesets
     }
 
     /**
@@ -794,11 +819,10 @@ object MmkvManager {
      *
      * @param rulesetList The list of routing rulesets.
      */
-    fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?) {
-        if (rulesetList.isNullOrEmpty())
-            encodeSettings(PREF_ROUTING_RULESET, "")
-        else
-            encodeSettings(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
+    fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?): Boolean {
+        rulesetList?.let { ensureRoutingRulesetIds(it) }
+        val content = if (rulesetList.isNullOrEmpty()) "" else JsonUtil.toJson(rulesetList)
+        return encodeSettings(PREF_ROUTING_RULESET, content)
     }
 
     //endregion

@@ -111,15 +111,16 @@ object SettingsManager {
      * @param rulesetList The list of rulesets.
      */
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
-        val rulesetNew: MutableList<RulesetItem> = mutableListOf()
-        MmkvManager.decodeRoutingRulesets()?.forEach { key ->
-            if (key.locked == true) {
-                rulesetNew.add(key)
-            }
-        }
-
-        rulesetNew.addAll(rulesetList)
+        val rulesetNew = mergeRoutingRulesets(MmkvManager.decodeRoutingRulesets().orEmpty(), rulesetList)
         MmkvManager.encodeRoutingRulesets(rulesetNew)
+    }
+
+    internal fun mergeRoutingRulesets(current: List<RulesetItem>, imported: List<RulesetItem>): MutableList<RulesetItem> {
+        val locked = current.filter { it.locked == true }
+        // An exported copy of a retained locked rule must not be appended again. Different
+        // rules (even with the same ID or title) are kept; storage repairs colliding IDs.
+        val retained = locked.toSet()
+        return (locked + imported.filterNot { it in retained }).toMutableList()
     }
 
     /**

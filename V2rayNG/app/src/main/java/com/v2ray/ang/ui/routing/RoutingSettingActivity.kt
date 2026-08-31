@@ -263,7 +263,8 @@ fun RoutingSettingScreen(
                 .verticalScrollbar(lazyListState),
             contentPadding = NavigationBarsBottomPadding()
         ) {
-            item(key = "domain_strategy") {
+            // Rule IDs are strings, so the header cannot collide with an imported ID.
+            item(key = 0) {
                 SettingsListItem(
                     title = stringResource(R.string.routing_settings_domain_strategy),
                     entries = domainStrategies,
