@@ -548,4 +548,6 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
+    <string name="sub_import_name">সাবস্ক্রিপশনের নাম</string>
+    <string name="sub_import_default_name">আমদানি করা সাবস্ক্রিপশন</string>
 </resources>

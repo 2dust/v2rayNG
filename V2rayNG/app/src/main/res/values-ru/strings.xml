@@ -548,4 +548,6 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="sub_import_name">Название подписки</string>
+    <string name="sub_import_default_name">Импортированная подписка</string>
 </resources>

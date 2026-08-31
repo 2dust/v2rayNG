@@ -548,4 +548,6 @@
     <string name="connection_test_empty_message">không có thông tin chi tiết</string>
     <string name="value_unknown">không xác định</string>
 
+    <string name="sub_import_name">Tên đăng ký</string>
+    <string name="sub_import_default_name">Đăng ký đã nhập</string>
 </resources>

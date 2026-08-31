@@ -548,4 +548,6 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+    <string name="sub_import_name">نوم اشتراک</string>
+    <string name="sub_import_default_name">اشتراک وارد وابیده</string>
 </resources>

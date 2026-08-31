@@ -184,8 +184,9 @@ class MainRepository(
     override suspend fun importBatchConfig(
         server: String?,
         subscriptionId: String,
-        updateUI: Boolean
-    ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI)
+        updateUI: Boolean,
+        requestSubscriptionName: suspend (String?, Set<String>) -> String?
+    ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI, requestSubscriptionName)
 
     override fun updateConfigViaSubAll(): SubscriptionUpdateResult =
         AngConfigManager.updateConfigViaSubAll()

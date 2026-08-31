@@ -26,7 +26,8 @@ data class MainUiState(
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
-    val shareQRCodeBitmap: android.graphics.Bitmap? = null
+    val shareQRCodeBitmap: android.graphics.Bitmap? = null,
+    val subscriptionImportName: String? = null
 )
 
 /**
@@ -64,7 +65,14 @@ sealed interface MainAction {
     data class ShareFullContent(val guid: String) : MainAction
     data object DismissQRCodeDialog : MainAction
 
-    data class ImportBatchConfig(val configText: String) : MainAction
+    data class ImportBatchConfig(
+        val configText: String,
+        val subscriptionId: String? = null,
+        val append: Boolean = true
+    ) : MainAction
+    data class ChangeSubscriptionImportName(val name: String) : MainAction
+    data object ConfirmSubscriptionImport : MainAction
+    data object CancelSubscriptionImport : MainAction
 
     data object LocateHandled : MainAction
 }

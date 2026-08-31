@@ -115,6 +115,10 @@ fun MainScreen(
         onConfirmRemove = { guid -> showRemoveConfirm = null; onAction(MainAction.RemoveServer(guid)) }
     )
 
+    uiState.subscriptionImportName?.let { name ->
+        SubscriptionImportDialog(name = name, onAction = onAction)
+    }
+
     if (shareTarget != null) {
         val (guid, profile, more) = shareTarget!!
         ShareMethodDialog(

@@ -26,6 +26,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CancellationException
 import java.net.URI
 
 object AngConfigManager {
@@ -177,9 +178,16 @@ object AngConfigManager {
      * @param server The server string.
      * @param subid The subscription ID.
      * @param append Whether to append the configurations.
+     * @param requestSubscriptionName Optional confirmation before saving each new subscription;
+     * receives its suggested name and existing names, and returns null to skip it.
      * @return A pair containing the number of configurations and subscriptions imported.
      */
-    fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
+    suspend fun importBatchConfig(
+        server: String?,
+        subid: String,
+        append: Boolean,
+        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)? = null
+    ): Pair<Int, Int> {
         return try {
             var count = parseBatchConfig(Utils.decode(server), subid, append)
             if (count <= 0) {
@@ -189,9 +197,9 @@ object AngConfigManager {
                 count = parseCustomConfigServer(server, subid, append)
             }
 
-            var countSub = parseBatchSubscription(server)
+            var countSub = parseBatchSubscription(server, requestSubscriptionName)
             if (countSub <= 0) {
-                countSub = parseBatchSubscription(Utils.decode(server))
+                countSub = parseBatchSubscription(Utils.decode(server), requestSubscriptionName)
             }
             if (countSub > 0) {
                 updateConfigViaSubAll()
@@ -210,7 +218,10 @@ object AngConfigManager {
      * @param servers The servers string.
      * @return The number of subscriptions parsed.
      */
-    private fun parseBatchSubscription(servers: String?): Int {
+    private suspend fun parseBatchSubscription(
+        servers: String?,
+        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
+    ): Int {
         try {
             if (servers == null) {
                 return 0
@@ -221,10 +232,12 @@ object AngConfigManager {
                 .distinct()
                 .forEach { str ->
                     if (Utils.isValidSubUrl(str)) {
-                        count += importUrlAsSubscription(str)
+                        count += importUrlAsSubscription(str, requestSubscriptionName)
                     }
                 }
             return count
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to parse batch subscription", e)
         }
@@ -602,7 +615,10 @@ object AngConfigManager {
      * @param url The URL.
      * @return The number of subscriptions imported.
      */
-    private fun importUrlAsSubscription(url: String): Int {
+    private suspend fun importUrlAsSubscription(
+        url: String,
+        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
+    ): Int {
         val subscriptions = MmkvManager.decodeSubscriptions()
         subscriptions.forEach {
             if (it.subscription.url == url) {
@@ -610,8 +626,16 @@ object AngConfigManager {
             }
         }
         val uri = URI(Utils.fixIllegalUrl(url))
+        val remarks = if (requestSubscriptionName == null) {
+            uri.fragment ?: "import sub"
+        } else {
+            requestSubscriptionName(uri.fragment, subscriptions.map { it.subscription.remarks }.toSet())
+                ?.trim()?.takeIf { it.isNotEmpty() } ?: return 0
+        }
+        // Another import may have saved this URL while the naming dialog was open.
+        if (MmkvManager.decodeSubscriptions().any { it.subscription.url == url }) return 0
         val subItem = SubscriptionItem()
-        subItem.remarks = uri.fragment ?: "import sub"
+        subItem.remarks = remarks
         subItem.url = url
         MmkvManager.encodeSubscription("", subItem)
         return 1

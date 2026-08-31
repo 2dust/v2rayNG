@@ -40,6 +40,15 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
+internal fun uniqueSubscriptionName(baseName: String, existingNames: Set<String>): String {
+    var name = baseName
+    var suffix = 2
+    while (name in existingNames) {
+        name = "$baseName ${suffix++}"
+    }
+    return name
+}
+
 class MainViewModel(
     application: Application,
     private val dataSource: MainDataSource
@@ -77,6 +86,8 @@ class MainViewModel(
     private var preloadJob: Job? = null
     private var selectedGroupLoadJob: Job? = null
     private var reloadJob: Job? = null
+    private val importMutex = Mutex()
+    private var subscriptionNameResult: CompletableDeferred<String?>? = null
 
     @Volatile
     private var testingGroupId: String? = null
@@ -205,7 +216,18 @@ class MainViewModel(
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
-            is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
+            is MainAction.ImportBatchConfig -> importBatchConfig(action)
+            is MainAction.ChangeSubscriptionImportName -> {
+                _uiState.update {
+                    if (it.subscriptionImportName == null) it else it.copy(subscriptionImportName = action.name)
+                }
+            }
+            MainAction.ConfirmSubscriptionImport -> {
+                uiState.value.subscriptionImportName?.trim()?.takeIf { it.isNotEmpty() }?.let {
+                    subscriptionNameResult?.complete(it)
+                }
+            }
+            MainAction.CancelSubscriptionImport -> subscriptionNameResult?.complete(null)
             MainAction.LocateHandled -> consumeLocateTarget()
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
@@ -422,31 +444,59 @@ class MainViewModel(
     }
 
     // ---------- Business actions (coroutine-based) ----------
-    private fun importBatchConfig(configText: String) {
+    private fun importBatchConfig(action: MainAction.ImportBatchConfig) {
+        if (!importMutex.tryLock()) return
+        val subscriptionId = action.subscriptionId ?: uiState.value.selectedGroupId
         launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val (count, countSub) = dataSource.importBatchConfig(
-                        configText, uiState.value.selectedGroupId, true
-                    )
-                    when {
-                        count > 0 -> {
-                            toast(dataSource.getString(R.string.title_import_config_count, count))
-                            setupGroupTab(forceRefresh = true)
+            try {
+                withContext(ioDispatcher) {
+                    try {
+                        var cancelledSubscription = false
+                        val (count, countSub) = dataSource.importBatchConfig(
+                            action.configText, subscriptionId, action.append
+                        ) { suggestedName, existingNames ->
+                            requestSubscriptionName(suggestedName, existingNames).also {
+                                if (it == null) cancelledSubscription = true
+                            }
                         }
+                        when {
+                            count > 0 -> {
+                                toast(dataSource.getString(R.string.title_import_config_count, count))
+                                setupGroupTab(forceRefresh = true)
+                            }
 
-                        countSub > 0 -> setupGroupTab(forceRefresh = true)
-                        else -> toastError(R.string.toast_failure)
+                            countSub > 0 -> setupGroupTab(forceRefresh = true)
+                            !cancelledSubscription -> toastError(R.string.toast_failure)
+                        }
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
+                        toastError(R.string.toast_failure)
                     }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                    toastError(R.string.toast_failure)
                 }
+            } finally {
+                importMutex.unlock()
             }
         }
     }
+
+    private suspend fun requestSubscriptionName(suggestedName: String?, existingNames: Set<String>): String? =
+        withContext(Dispatchers.Main.immediate) {
+            val result = CompletableDeferred<String?>()
+            subscriptionNameResult = result
+            val baseName = suggestedName?.takeIf { it.isNotBlank() }
+                ?: dataSource.getString(R.string.sub_import_default_name)
+            _uiState.update {
+                it.copy(subscriptionImportName = uniqueSubscriptionName(baseName, existingNames))
+            }
+            try {
+                result.await()
+            } finally {
+                subscriptionNameResult = null
+                _uiState.update { it.copy(subscriptionImportName = null) }
+            }
+        }
 
     private fun importConfigViaSub() {
         val subId = uiState.value.selectedGroupId
