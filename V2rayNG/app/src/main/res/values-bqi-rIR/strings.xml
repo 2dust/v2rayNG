@@ -199,10 +199,10 @@
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
     <string name="summary_pref_speed_enabled">سورعت هیم سکویی من وارسۊوی نشووݩ داڌه ابۊ.\nنماڌ نشووݩ اده ک ترافیک پروکسی قلوه هڌ یا ترافیک موستقیم.</string>
 
-    <string name="title_pref_sniffing_enabled">ره وندن در کشیڌن نوم دامنه موورد نظر (Sniffing)</string>
+    <string name="title_pref_sniffing_enabled">ره وندن و در کشیڌن نوم دامنه موورد نزر (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
     <string name="title_pref_route_only_enabled">ره وندن تینا تور جوستن routeOnly</string>
-    <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نظرن و عونوان نشۊوی IP ووردارین.</string>
+    <string name="summary_pref_route_only_enabled">نوم دامنه sniffed ن تینا سی تور جوستن و کار بگیرین وو نشۊوی موورد نزرن و عونوان نشۊوی IP ووردارین.</string>
 
     <string name="title_pref_local_dns_enabled">ره وندن DNS مهلی</string>
     <string name="summary_pref_local_dns_enabled">درخاستا DNS و هسته و من ایان وو و دست ماژول DNS پردازشت ابۊن (پؽشنهاڌ ابۊ ٱر لنگ تور جوستن سی دور زیڌن نشۊویا LAN وو وولات ٱسلی هڌین ره ونده بۊ)</string>
@@ -268,7 +268,7 @@
     <string name="summary_pref_append_http_proxy">پروکسی HTTP ن موستقیمن ز (مۊرۊرگر/ی قرد ز برنومه یل لادراری بیڌه)، بؽ استفاڌه ز دسگا NIC مجازی (Android 10+) استفاڌه ابۊ.</string>
 
     <string name="title_pref_double_column_display">ره وندن نشووݩ داڌن دو سۊتۊنی</string>
-    <string name="summary_pref_double_column_display">نومگه کانفیگا من دو ستۊݩ نشووݩ داڌه ابۊ تا موئتوا بؽتری من بلگه جا بگره.</string>
+    <string name="summary_pref_double_column_display">نومگه کانفیگا من دو سۊتۊن نشووݩ داڌه ابۊ تا موئتوا قلوه ای من بلگه جا بگره.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن بلگه «پوی»</string>
     <string name="summary_pref_group_all_display">نشووݩ داڌن پوروفایلا پوی بونکۊیل اشتراک من ی بلگه.</string>
@@ -278,7 +278,7 @@
     <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من GitHub</string>
     <string name="summary_pref_tg_group">ٱووڌن من بونکۊ تلگرام</string>
     <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
-    <string name="title_privacy_policy">حریم سیخومی</string>
+    <string name="title_privacy_policy">هریم سیخومی</string>
     <string name="title_qr_code">کود QR</string>
     <string name="title_about">زبار</string>
     <string name="title_source_code">کود بونچک</string>
@@ -289,8 +289,8 @@
     <string name="title_pref_promotion">تبلیقات</string>
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
-    <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ همیشه کار نکونه</string>
-    <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (اقلن وا 15 دؽقه بۊ)</string>
+    <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ هی کار نکونه</string>
+    <string name="title_pref_auto_update_interval">فاسله ورۊ کردن خوتکار (ٱقلن وا 15 دؽقه بۊ)</string>
 
     <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری (outbound)</string>
@@ -300,7 +300,7 @@
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_dynamic_color">ره وندن رنگ پۊیا</string>
-    <string name="summary_pref_dynamic_color">فقت روی اندروید ۱۲+ کار می‌کند</string>
+    <string name="summary_pref_dynamic_color">فقت ری ٱندروید 12+ کار اکونه</string>
     <string name="title_pref_use_hev_tunnel">و کار گرؽڌن ویژیی Hev TUN</string>
     <string name="summary_pref_use_hev_tunnel">مجالی ک ره ونده بۊ، TUN ایا hev-socks5-tunnel ن و کار اگره؛ ٱر ره نوۊفته بۊ، همو xray-core ن و کار اگره.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev TUN سئت گوزارشا</string>
@@ -330,9 +330,9 @@
     <string name="sub_setting_enable">ره وندن ورۊ کردن</string>
     <string name="sub_auto_update">ره وندن ورۊ کردن خوتکار</string>
     <string name="sub_allow_insecure_url">موجاز کردن نشۊوی HTTP نا ٱمن</string>
-    <string name="sub_setting_pre_profile">پروکسی وۊرۊی</string>
+    <string name="sub_setting_pre_profile">پروکسی منی</string>
     <string name="sub_setting_next_profile">پروکسی دری</string>
-    <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نیشتنا هڌس وو جۊرس نی</string>
+    <string name="sub_setting_pre_profile_tip">موتمعن بۊ ک نوم موستعار ن هڌس وو جۊرس نی</string>
     <string name="sub_setting_entry_proxy_tip">پروکسی پسند وابیڌه پؽش ز هر کانفیگ من ای اشتراک، و عونوان عوزو نیایی زنجیره پروکسی ازاف ابۊ.</string>
     <string name="sub_setting_exit_proxy_tip">پروکسی پسند وابیڌه بئڌ ز هر کانفیگ من ای اشتراک، و عونوان عوزو دیندایی زنجیره پروکسی ازاف ابۊ.</string>
     <string name="toast_invalid_update_interval">فاسله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
@@ -343,7 +343,7 @@
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
     <string name="filter_config_all">پوی</string>
-    <string name="summary_scan_qrcode">سی وا کردن دوربیݩ وو ٱسکووݩ، و ری بلگه بزنین</string>
+    <string name="summary_scan_qrcode">سی گۊشیڌن شؽواتگر وو اسکن، و ری بلگه بزنین</string>
     <string name="title_del_duplicate_config_count">پاک کردن %d کانفیگ تکراری</string>
     <string name="title_del_config_count">پاک کردن %d کانفیگ</string>
     <string name="title_import_config_count">و من ٱووردن %d کانفیگ</string>
@@ -371,11 +371,11 @@
     <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسووݩ پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">و من ٱووردن قانووا ز کلیپ بورد</string>
     <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز کود QR</string>
-    <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت من کلیپ بورد</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت کردن من کلیپ بورد</string>
     <string name="routing_settings_locked">چفت هڌ، ای قانووݩ ن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
-    <string name="routing_settings_process">process (نوم بسته — تینا مجال کار بوردن Xray TUN، ره بیڌن routeOnly وو Android 10+ پوشتؽووی ابۊ)</string>
+    <string name="routing_settings_process">process (نوم بسته — تینا مجال و کار گرؽڌن Xray TUN، ره وسته بیڌن routeOnly وو ٱندروید 10+ لادراری ابۊ)</string>
     <string name="routing_settings_process_select">نوم بسته ن پسند کۊنین</string>
     <string name="routing_settings_port" translatable="false">port</string>
     <string name="routing_settings_protocol" translatable="false">protocol</string>
