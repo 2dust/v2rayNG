@@ -538,7 +538,9 @@
     <string name="acc_save">সংরক্ষণ করুন</string>
     <string name="acc_update_subscriptions">সাবস্ক্রিপশন আপডেট করুন</string>
     <string name="acc_per_app_proxy_information">প্রতি-অ্যাপ প্রক্সির তথ্য</string>
-    <string name="acc_app_routing_announcement">%1$s। %2$s</string>
+    <string name="acc_app_checked">চিহ্নিত</string>
+    <string name="acc_app_not_checked">চিহ্নিত নয়</string>
+    <string name="acc_app_routing_state">%1$s। %2$s</string>
     <string name="acc_app_routed_directly">সরাসরি রাউট করা হয়েছে</string>
     <string name="acc_app_routed_through">অ্যাপের মাধ্যমে রাউট করা হয়েছে</string>
     <string name="acc_per_app_routing_disabled">অ্যাপভিত্তিক রাউটিং চালু নেই</string>
@@ -552,4 +554,6 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
+    <string name="acc_toggle_on">চালু</string>
+    <string name="acc_toggle_off">বন্ধ</string>
 </resources>

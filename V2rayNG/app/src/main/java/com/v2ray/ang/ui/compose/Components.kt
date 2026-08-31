@@ -54,6 +54,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -172,9 +173,10 @@ fun AppListItem(
     routingDescription: String? = null
 ) {
     val context = LocalContext.current
-    val accessibilityLabel = routingDescription?.let {
-        stringResource(R.string.acc_app_routing_announcement, appName, it)
-    } ?: appName
+    val checkedDescription = stringResource(if (checked) R.string.acc_app_checked else R.string.acc_app_not_checked)
+    val accessibilityState = routingDescription?.let {
+        stringResource(R.string.acc_app_routing_state, checkedDescription, it)
+    } ?: checkedDescription
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -184,7 +186,8 @@ fun AppListItem(
                 onValueChange = onCheckedChange,
             )
             .semantics(mergeDescendants = true) {
-                contentDescription = accessibilityLabel
+                contentDescription = appName
+                stateDescription = accessibilityState
             }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically

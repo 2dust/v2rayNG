@@ -538,7 +538,9 @@
     <string name="acc_save">保存</string>
     <string name="acc_update_subscriptions">更新订阅</string>
     <string name="acc_per_app_proxy_information">分应用代理信息</string>
-    <string name="acc_app_routing_announcement">%1$s。%2$s</string>
+    <string name="acc_app_checked">已勾选</string>
+    <string name="acc_app_not_checked">未勾选</string>
+    <string name="acc_app_routing_state">%1$s。%2$s</string>
     <string name="acc_app_routed_directly">直接路由</string>
     <string name="acc_app_routed_through">通过应用路由</string>
     <string name="acc_per_app_routing_disabled">未启用分应用路由</string>
@@ -552,4 +554,6 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+    <string name="acc_toggle_on">开启</string>
+    <string name="acc_toggle_off">关闭</string>
 </resources>

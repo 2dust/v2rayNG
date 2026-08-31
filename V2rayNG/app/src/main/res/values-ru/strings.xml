@@ -538,7 +538,9 @@
     <string name="acc_save">Сохранить</string>
     <string name="acc_update_subscriptions">Обновить подписки</string>
     <string name="acc_per_app_proxy_information">Сведения о прокси для приложений</string>
-    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_checked">Отмечено</string>
+    <string name="acc_app_not_checked">Не отмечено</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
     <string name="acc_app_routed_directly">маршрутизируется напрямую</string>
     <string name="acc_app_routed_through">маршрутизируется через приложение</string>
     <string name="acc_per_app_routing_disabled">маршрутизация по приложениям не включена</string>
@@ -552,4 +554,6 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="acc_toggle_on">Включено</string>
+    <string name="acc_toggle_off">Выключено</string>
 </resources>

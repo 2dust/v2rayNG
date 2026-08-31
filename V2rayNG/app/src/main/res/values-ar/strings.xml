@@ -538,7 +538,9 @@
     <string name="acc_save">حفظ</string>
     <string name="acc_update_subscriptions">تحديث الاشتراكات</string>
     <string name="acc_per_app_proxy_information">معلومات الوكيل لكل تطبيق</string>
-    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_checked">محدّد</string>
+    <string name="acc_app_not_checked">غير محدّد</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
     <string name="acc_app_routed_directly">موجّه مباشرةً</string>
     <string name="acc_app_routed_through">موجّه عبر التطبيق</string>
     <string name="acc_per_app_routing_disabled">التوجيه حسب التطبيق غير مفعّل</string>
@@ -552,4 +554,6 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="acc_toggle_on">مفعّل</string>
+    <string name="acc_toggle_off">غير مفعّل</string>
 </resources>

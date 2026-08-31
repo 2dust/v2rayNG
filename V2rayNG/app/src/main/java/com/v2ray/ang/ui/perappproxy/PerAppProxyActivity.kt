@@ -39,6 +39,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
@@ -75,19 +77,25 @@ internal fun perAppRoutingDescriptionRes(
 }
 
 @Composable
-private fun PerAppSwitch(
+internal fun PerAppSwitch(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val checkedDescription = stringResource(if (checked) R.string.acc_toggle_on else R.string.acc_toggle_off)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.toggleable(
-            value = checked,
-            role = Role.Switch,
-            onValueChange = onCheckedChange,
-        ),
+        // An observable description also emits STATE_DESCRIPTION with Compose 1.11,
+        // for TalkBack versions that do not announce its native CHECKED event.
+        // Remove when implicit switch state changes deliver feedback on those versions.
+        modifier = modifier
+            .semantics { stateDescription = checkedDescription }
+            .toggleable(
+                value = checked,
+                role = Role.Switch,
+                onValueChange = onCheckedChange,
+            ),
     ) {
         Text(
             text = label,

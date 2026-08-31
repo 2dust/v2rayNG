@@ -538,7 +538,9 @@
     <string name="acc_save">زفت کردن</string>
     <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
     <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>
-    <string name="acc_app_routing_announcement">%1$s. %2$s</string>
+    <string name="acc_app_checked">پسند وابیڌه</string>
+    <string name="acc_app_not_checked">پسند نوابیڌه</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
     <string name="acc_app_routed_directly">موستقیم ره اڌه</string>
     <string name="acc_app_routed_through">وا برنومه ره اڌه</string>
     <string name="acc_per_app_routing_disabled">ره وندن و ری برنومه روون نید</string>
@@ -552,4 +554,6 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
 </resources>
