@@ -526,6 +526,7 @@
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_last_updated">Последний раз обновлено %1$s</string>
     <string name="acc_subscription_update_label">Обновление %1$s</string>
+    <string name="acc_unnamed_subscription">Без названия.</string>
     <string name="acc_share_named">Поделиться: %1$s</string>
     <string name="acc_edit_named">Изменить: %1$s</string>
     <string name="acc_delete_named">Удалить: %1$s</string>

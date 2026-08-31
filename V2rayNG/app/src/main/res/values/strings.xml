@@ -526,6 +526,7 @@
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_last_updated">Last updated on %1$s</string>
     <string name="acc_subscription_update_label">%1$s update</string>
+    <string name="acc_unnamed_subscription">Unnamed.</string>
     <string name="acc_share_named">Share %1$s</string>
     <string name="acc_edit_named">Edit %1$s</string>
     <string name="acc_delete_named">Delete %1$s</string>

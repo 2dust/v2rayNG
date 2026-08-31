@@ -168,6 +168,9 @@ fun SubSettingScreen(
                 items = subscriptions,
                 key = { _, item -> item.guid }
             ) { _, subCache ->
+                val subscriptionName = subscriptionAccessibilityName(
+                    subCache.subscription.remarks, subCache.subscription.url, stringResource(R.string.acc_unnamed_subscription)
+                )
                 val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
                 val lastUpdatedAccessibility = if (lastUpdated.isNotEmpty()) {
                     stringResource(
@@ -185,7 +188,7 @@ fun SubSettingScreen(
                 }
                 val subscriptionUpdateLabel = stringResource(
                     R.string.acc_subscription_update_label,
-                    subCache.subscription.remarks,
+                    subscriptionName,
                 )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
                     ReorderableListItem(
@@ -195,13 +198,14 @@ fun SubSettingScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .semantics(mergeDescendants = true) {}
+                                .semantics(mergeDescendants = true) { contentDescription = subscriptionName }
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = subCache.subscription.remarks,
+                                    modifier = Modifier.clearAndSetSemantics {},
                                     style = MaterialTheme.typography.bodyLarge,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -243,7 +247,7 @@ fun SubSettingScreen(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
                                                 contentDescription = stringResource(
                                                     R.string.acc_share_named,
-                                                    subCache.subscription.remarks
+                                                    subscriptionName
                                                 )
                                             )
                                         }
@@ -253,7 +257,7 @@ fun SubSettingScreen(
                                             painter = painterResource(R.drawable.ic_edit_24dp),
                                             contentDescription = stringResource(
                                                 R.string.acc_edit_named,
-                                                subCache.subscription.remarks
+                                                subscriptionName
                                             )
                                         )
                                     }
@@ -261,7 +265,7 @@ fun SubSettingScreen(
                                         if (confirmRemove) {
                                             removeTarget = SubscriptionDeleteTarget(
                                                 guid = subCache.guid,
-                                                name = subCache.subscription.remarks
+                                                name = subscriptionName
                                             )
                                         }
                                         else onRemoveSub(subCache.guid)
@@ -270,7 +274,7 @@ fun SubSettingScreen(
                                             painter = painterResource(R.drawable.ic_delete_24dp),
                                             contentDescription = stringResource(
                                                 R.string.acc_delete_named,
-                                                subCache.subscription.remarks
+                                                subscriptionName
                                             )
                                         )
                                     }
