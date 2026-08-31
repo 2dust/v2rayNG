@@ -1,6 +1,7 @@
 package com.v2ray.ang.handler
 
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.IPAPIInfo
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.util.HttpUtil
@@ -51,6 +52,16 @@ object SpeedtestManager {
             }
         }
         return -1
+    }
+
+    /** Enrich a successful test once, before publishing its complete result to the UI. */
+    internal fun buildConnectionTestResult(
+        delayMillis: Long,
+        errorMessage: String,
+        fetchEndpoint: () -> RemoteEndpointInfo?,
+    ): ConnectionTestResult {
+        val endpoint = if (delayMillis >= 0) fetchEndpoint() else null
+        return ConnectionTestResult(delayMillis, errorMessage, endpoint?.country, endpoint?.ipAddress)
     }
 
     fun getRemoteIPInfo(fetchViaCore: ((String) -> String?)? = null): RemoteEndpointInfo? {

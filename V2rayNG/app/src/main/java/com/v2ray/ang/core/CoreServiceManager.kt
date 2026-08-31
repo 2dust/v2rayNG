@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
-import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.CoreUrlDownloadRequest
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -372,7 +371,7 @@ object CoreServiceManager {
             }
 
             ensureActive()
-            val endpoint = if (time >= 0) {
+            val result = SpeedtestManager.buildConnectionTestResult(time, errorStr) {
                 val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
                     { url: String ->
                         coreController.getUrlContent(url, currentOutboundTag())
@@ -381,13 +380,7 @@ object CoreServiceManager {
                     null
                 }
                 SpeedtestManager.getRemoteIPInfo(fetchViaCore)
-            } else null
-            val result = ConnectionTestResult(
-                delayMillis = time,
-                errorMessage = errorStr,
-                country = endpoint?.country,
-                ipAddress = endpoint?.ipAddress,
-            )
+            }
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
