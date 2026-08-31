@@ -58,6 +58,9 @@ internal fun serverMenuActions(
     (includeManagementActions || action.isShareAction) && (!isComplexProfile || action.supportsComplexProfiles)
 }
 
+internal fun serverAccessibilityActions(isComplexProfile: Boolean): List<ServerMenuAction> =
+    serverMenuActions(isComplexProfile, includeManagementActions = true).sortedBy { it.isShareAction }
+
 internal fun ServerMenuAction.perform(
     guid: String,
     profile: ProfileItem,
