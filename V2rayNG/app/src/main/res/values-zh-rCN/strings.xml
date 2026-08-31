@@ -516,14 +516,13 @@
     <string name="acc_copy_log">复制日志</string>
     <string name="acc_clear_log">清除日志</string>
     <string name="acc_add_rule">添加路由规则</string>
-    <string name="acc_routing_rule_summary">%1$s。%2$s。%3$s</string>
+    <string name="acc_routing_rule_summary">%1$s。%2$s</string>
     <string name="acc_routing_rule_locked_summary">%1$s。已锁定</string>
     <string name="acc_routing_rule_blocked">已拦截</string>
     <string name="acc_routing_rule_routed_through">通过%1$s路由</string>
     <string name="acc_routing_rule_routed_directly">直接路由</string>
     <string name="acc_routing_rule_enabled">规则已开启</string>
     <string name="acc_routing_rule_disabled">规则已关闭</string>
-    <string name="acc_routing_rule_switch_label">规则%1$s</string>
     <string name="acc_edit_routing_rule_named">编辑%1$s</string>
     <string name="acc_delete_routing_rule_named">删除%1$s</string>
     <string name="acc_start">启动服务</string>

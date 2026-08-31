@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,9 +39,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -337,7 +340,7 @@ fun RoutingSettingScreen(
 }
 
 @Composable
-private fun RoutingRulesetItem(
+internal fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
     onEnabledChange: (Boolean) -> Unit,
@@ -361,22 +364,22 @@ private fun RoutingRulesetItem(
     val ruleSummary = stringResource(
         R.string.acc_routing_rule_summary,
         ruleName,
-        routeDescription,
-        ruleState
+        routeDescription
     )
     val accessibilitySummary = if (ruleset.locked == true) {
         stringResource(R.string.acc_routing_rule_locked_summary, ruleSummary)
     } else {
         ruleSummary
     }
-    val ruleSwitchLabel = stringResource(R.string.acc_routing_rule_switch_label, ruleName)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
                 contentDescription = accessibilitySummary
+                stateDescription = ruleState
             }
+            .toggleable(value = enabled, role = Role.Switch, onValueChange = onEnabledChange)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -449,12 +452,8 @@ private fun RoutingRulesetItem(
             Spacer(modifier = Modifier.height(4.dp))
             Switch(
                 checked = enabled,
-                onCheckedChange = onEnabledChange,
-                modifier = Modifier
-                    .scale(0.7f)
-                    .semantics {
-                        contentDescription = ruleSwitchLabel
-                    },
+                onCheckedChange = null,
+                modifier = Modifier.scale(0.7f),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary

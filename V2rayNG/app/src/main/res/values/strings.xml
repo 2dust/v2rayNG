@@ -516,14 +516,13 @@
     <string name="acc_copy_log">Copy log</string>
     <string name="acc_clear_log">Clear log</string>
     <string name="acc_add_rule">Add routing rule</string>
-    <string name="acc_routing_rule_summary">%1$s. %2$s. %3$s</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
     <string name="acc_routing_rule_locked_summary">%1$s. Locked</string>
     <string name="acc_routing_rule_blocked">is blocked</string>
     <string name="acc_routing_rule_routed_through">routed through %1$s</string>
     <string name="acc_routing_rule_routed_directly">routed directly</string>
     <string name="acc_routing_rule_enabled">The rule is on</string>
     <string name="acc_routing_rule_disabled">The rule is off</string>
-    <string name="acc_routing_rule_switch_label">Rule %1$s</string>
     <string name="acc_edit_routing_rule_named">Edit %1$s</string>
     <string name="acc_delete_routing_rule_named">Delete %1$s</string>
     <string name="acc_start">Start service</string>
