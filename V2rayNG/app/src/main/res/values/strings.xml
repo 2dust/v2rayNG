@@ -550,4 +550,6 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="acc_toggle_on">On</string>
+    <string name="acc_toggle_off">Off</string>
 </resources>

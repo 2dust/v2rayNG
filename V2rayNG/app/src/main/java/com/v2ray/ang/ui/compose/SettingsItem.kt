@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -253,17 +254,23 @@ fun SettingsSwitchItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val checkedDescription = stringResource(if (checked) R.string.acc_toggle_on else R.string.acc_toggle_off)
     SettingsItemRow(
         icon = icon,
         title = title,
         description = summary,
         enabled = enabled,
-        interactionModifier = Modifier.toggleable(
-            value = checked,
-            enabled = enabled,
-            role = Role.Switch,
-            onValueChange = onCheckedChange
-        ),
+        // Compose 1.11 emits only CHECKED for an implicit switch state. TalkBack versions
+        // expecting STATE_DESCRIPTION miss that change. Keep this observable description
+        // until the native toggle event delivers feedback on those TalkBack versions.
+        interactionModifier = Modifier
+            .semantics { stateDescription = checkedDescription }
+            .toggleable(
+                value = checked,
+                enabled = enabled,
+                role = Role.Switch,
+                onValueChange = onCheckedChange
+            ),
         modifier = modifier,
         trailing = {
             Switch(

@@ -550,4 +550,6 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="acc_toggle_on">مفعّل</string>
+    <string name="acc_toggle_off">غير مفعّل</string>
 </resources>

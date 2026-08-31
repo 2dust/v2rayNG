@@ -550,4 +550,6 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="acc_toggle_on">Включено</string>
+    <string name="acc_toggle_off">Выключено</string>
 </resources>

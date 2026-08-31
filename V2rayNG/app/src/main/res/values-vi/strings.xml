@@ -550,4 +550,6 @@
     <string name="connection_test_empty_message">không có thông tin chi tiết</string>
     <string name="value_unknown">không xác định</string>
 
+    <string name="acc_toggle_on">Bật</string>
+    <string name="acc_toggle_off">Tắt</string>
 </resources>

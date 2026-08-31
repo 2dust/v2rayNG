@@ -550,4 +550,6 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+    <string name="acc_toggle_on">开启</string>
+    <string name="acc_toggle_off">关闭</string>
 </resources>
