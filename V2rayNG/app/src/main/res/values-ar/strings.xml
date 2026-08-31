@@ -548,6 +548,7 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="sub_import_title">تسمية مجموعة الاشتراك</string>
     <string name="sub_import_name">اسم الاشتراك</string>
     <string name="sub_import_default_name">اشتراك مستورد</string>
 </resources>

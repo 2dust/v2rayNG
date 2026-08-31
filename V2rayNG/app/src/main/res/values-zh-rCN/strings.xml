@@ -548,6 +548,7 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+    <string name="sub_import_title">为订阅分组命名</string>
     <string name="sub_import_name">订阅名称</string>
     <string name="sub_import_default_name">导入订阅</string>
 </resources>

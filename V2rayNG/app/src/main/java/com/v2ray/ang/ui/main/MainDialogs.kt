@@ -29,7 +29,7 @@ fun SubscriptionImportDialog(name: String, onAction: (MainAction) -> Unit) {
 
     AlertDialog(
         onDismissRequest = { onAction(MainAction.CancelSubscriptionImport) },
-        title = { Text(stringResource(R.string.title_sub_setting)) },
+        title = { Text(stringResource(R.string.sub_import_title)) },
         text = {
             Column(
                 Modifier
