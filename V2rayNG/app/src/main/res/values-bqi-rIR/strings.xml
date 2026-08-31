@@ -6,11 +6,11 @@
     <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
     <string name="navigation_drawer_open">گۊشیڌن نومگه کشاری</string>
     <string name="navigation_drawer_close">بستن نومگه کشاری</string>
-    <string name="migration_success">جاگورویی داڌه یل وا مووفقیت ٱنجوم وابی!</string>
+    <string name="migration_success">جاگورویی داده یل وا مووفقیت ٱنجوم وابی!</string>
     <string name="action_stop_service">واڌاشتن سرویس</string>
     <string name="action_ok">قوۊل</string>
     <string name="action_cancel">لقو</string>
-    <string name="migration_fail">جاگورویی داڌه یل شکست خرد!</string>
+    <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
