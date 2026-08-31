@@ -177,8 +177,8 @@
 
 
     <string name="subscription_updater_job_tips">ای کار من پس زمینه ره اوۊفته وو پؽش رئڌن هو منه وارسۊوی نشووݩ داڌه ابۊ.</string>
-    <string name="title_pref_auto_test_after_update_subscription">تست خوتکار بئڌ و رۊز کۊنی اشتراک</string>
-    <string name="summary_pref_auto_test_after_update_subscription">تست خوتکار زمووݩ زیاڌی ابره. ٱر ره وست بۊ، وزیفه من پس زمینه کار اکونه؛ وگرنه من همین بلگه کار اکونه.</string>
+    <string name="title_pref_auto_test_after_update_subscription">تست خوتکار بئڌ ورۊ رسۊوی کردن اشتراک</string>
+    <string name="summary_pref_auto_test_after_update_subscription">تست خوتکار زمووݩ زیاڌی ابره. ٱر ره وسته بۊوه، وزیفه من پس زمینه کار اکونه؛ ٱندی من هیم بلگه کار اکونه.</string>
     <string name="title_pref_auto_remove_invalid_after_test">پاک کردن خوتکار کانفیگا نا موئتبر بئڌ پینگ</string>
     <string name="summary_pref_auto_remove_invalid_after_test">نتیجه یل پینگ گاشڌ دییق نبۊن؛ کانفیگا پاک وابیڌه ن نتری وورگنی.</string>
     <string name="title_pref_auto_sort_after_test">ترتیب خوتکار بئڌ پینگ گرؽڌن</string>
@@ -186,7 +186,7 @@
 
     <string name="title_mux_settings">سامووا Mux</string>
     <string name="title_pref_mux_enabled">ره وندن Mux</string>
-    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ\nدؽوۉداری TCP، UDP وو QUIC ن ای لم سفارشی کۊنین.</string>
+    <string name="summary_pref_mux_enabled">زل تر، ٱما گاشڌ منپیز زی قت بۊ\nدؽوۉداری TCP ،UDP وو QUIC ن ای لم سفارشی کۊنین.</string>
     <string name="title_pref_mux_concurrency">منپیزا TCP (تلایه منجا -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_concurrency">منپیزا XUDP (تلایه منجا -1 تا 1024)</string>
     <string name="title_pref_mux_xudp_quic">دؽوۉداری QUIC من تۊنل mux</string>
@@ -197,7 +197,7 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">ره وندن نشووݩ داڌن سورعت</string>
-    <string name="summary_pref_speed_enabled">سورعت هیم سکویی من وارسۊوی نشووݩ داڌه ابۊ.\nنماڌ نشووݩ اڌه ک ترافیک پروکسی یا موستقیم بؽتره.</string>
+    <string name="summary_pref_speed_enabled">سورعت هیم سکویی من وارسۊوی نشووݩ داڌه ابۊ.\nنماڌ نشووݩ اده ک ترافیک پروکسی قلوه هڌ یا ترافیک موستقیم.</string>
 
     <string name="title_pref_sniffing_enabled">ره وندن در کشیڌن نوم دامنه موورد نظر (Sniffing)</string>
     <string name="summary_pref_sniffing_enabled">قپ ریت سی و در کشیڌن نوم دامنه واقعی ز کتنا (پؽش فرز رۊشن هڌ)</string>
