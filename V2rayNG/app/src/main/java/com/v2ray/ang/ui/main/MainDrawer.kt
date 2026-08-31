@@ -83,6 +83,8 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
+                    // The decorative Surface must not become an empty accessibility stop.
+                    .semantics { hideFromAccessibility() }
             ) {
                 Column(
                     modifier = Modifier
