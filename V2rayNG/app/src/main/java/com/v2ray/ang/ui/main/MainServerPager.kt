@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +24,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,9 +39,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
@@ -69,13 +70,14 @@ fun GroupPagerPage(
     groupId: String,
     mainViewModel: MainViewModel,
     selectedGuid: String?,
+    isRunning: Boolean,
     locateTarget: LocateTarget?,
     doubleColumnDisplay: Boolean,
     searchQuery: String,
     lazyListStates: MutableMap<String, LazyListState>,
     lazyGridStates: MutableMap<String, LazyGridState>,
     onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
+    onAction: (MainAction) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String, String) -> Unit,
@@ -88,14 +90,14 @@ fun GroupPagerPage(
     val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
     val actions = remember(
         onSelectServer,
-        onEditServer,
+        onAction,
         onShareServer,
         onMoreServer,
         onRemoveServer,
     ) {
         ServerRowActions(
             select = onSelectServer,
-            edit = onEditServer,
+            onAction = onAction,
             share = onShareServer,
             more = onMoreServer,
             remove = onRemoveServer,
@@ -104,6 +106,7 @@ fun GroupPagerPage(
     ServerListPage(
         rows = groupState.rows,
         selectedGuid = selectedGuid,
+        isRunning = isRunning,
         locateTarget = locateTarget?.takeIf { it.groupId == groupId },
         canReorder = canReorder,
         doubleColumnDisplay = doubleColumnDisplay,
@@ -119,18 +122,23 @@ fun GroupPagerPage(
     )
 }
 
-private class ServerRowActions(
+internal class ServerRowActions(
     val select: (String) -> Unit,
-    val edit: (String, ProfileItem) -> Unit,
+    val onAction: (MainAction) -> Unit,
     val share: (String, ProfileItem) -> Unit,
     val more: (String, ProfileItem) -> Unit,
     val remove: (String, String) -> Unit,
-)
+) {
+    fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
+        action.perform(row.guid, row.profile, onAction, remove)
+    }
+}
 
 @Composable
 private fun ServerListPage(
     rows: List<ServerRowUiModel>,
     selectedGuid: String?,
+    isRunning: Boolean,
     locateTarget: LocateTarget?,
     canReorder: Boolean,
     doubleColumnDisplay: Boolean,
@@ -159,7 +167,6 @@ private fun ServerListPage(
             state = gridState,
             modifier = Modifier
                 .fillMaxSize()
-                .selectableGroup()
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
@@ -168,6 +175,7 @@ private fun ServerListPage(
                     ServerItemColumn(
                         row = row,
                         isSelected = row.guid == selectedGuid,
+                        isRunning = isRunning,
                         doubleColumnDisplay = true,
                         actions = actions
                     )
@@ -203,7 +211,6 @@ private fun ServerListPage(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .selectableGroup()
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
@@ -220,6 +227,7 @@ private fun ServerListPage(
                             ServerItemRow(
                                 row = row,
                                 isSelected = row.guid == selectedGuid,
+                                isRunning = isRunning,
                                 actions = actions
                             )
                         }
@@ -229,6 +237,7 @@ private fun ServerListPage(
                     ServerItemRow(
                         row = row,
                         isSelected = row.guid == selectedGuid,
+                        isRunning = isRunning,
                         actions = actions
                     )
                     ItemDivider()
@@ -274,11 +283,13 @@ private fun LocateTargetEffect(
 private fun ServerItemRow(
     row: ServerRowUiModel,
     isSelected: Boolean,
+    isRunning: Boolean,
     actions: ServerRowActions
 ) {
     ServerListItem(
         row = row,
         isSelected = isSelected,
+        isRunning = isRunning,
         doubleColumnDisplay = false,
         actions = actions
     )
@@ -288,6 +299,7 @@ private fun ServerItemRow(
 private fun ServerItemColumn(
     row: ServerRowUiModel,
     isSelected: Boolean,
+    isRunning: Boolean,
     doubleColumnDisplay: Boolean,
     actions: ServerRowActions
 ) {
@@ -295,6 +307,7 @@ private fun ServerItemColumn(
         ServerListItem(
             row = row,
             isSelected = isSelected,
+            isRunning = isRunning,
             doubleColumnDisplay = doubleColumnDisplay,
             actions = actions
         )
@@ -303,9 +316,10 @@ private fun ServerItemColumn(
 }
 
 @Composable
-private fun ServerListItem(
+internal fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
+    isRunning: Boolean,
     doubleColumnDisplay: Boolean,
     actions: ServerRowActions
 ) {
@@ -326,23 +340,31 @@ private fun ServerListItem(
             row.testDelayMillis,
         )
     }
-    val testResultModifier = if (testResultAccessibility.isEmpty()) {
-        Modifier
-    } else {
-        Modifier.semantics {
-            contentDescription = testResultAccessibility
+    val description = row.accessibilityDescription(
+        testResult = testResultAccessibility,
+        activePrefix = if (isSelected && isRunning) stringResource(R.string.acc_active_server) else null,
+    )
+    val accessibilityActions = serverAccessibilityActions(row.profile.configType.isComplexType()).map { action ->
+        val label = when (action) {
+            ServerMenuAction.Edit -> stringResource(R.string.acc_edit_config_named, row.remarks)
+            ServerMenuAction.Delete -> stringResource(R.string.acc_delete_config_named, row.remarks)
+            else -> stringResource(action.labelRes)
+        }
+        CustomAccessibilityAction(label) {
+            actions.perform(action, row)
+            true
         }
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .semantics(mergeDescendants = true) {}
-            .selectable(
-                selected = isSelected,
-                onClick = { actions.select(row.guid) },
-                role = Role.RadioButton,
-            )
+            .clickable { actions.select(row.guid) }
+            // Keep native activation, but move the child buttons into the row's action menu.
+            .clearAndSetSemantics {
+                contentDescription = description
+                customActions = accessibilityActions
+            }
     ) {
         Box(
             Modifier
@@ -386,7 +408,7 @@ private fun ServerListItem(
                             Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                    IconButton(onClick = { actions.perform(ServerMenuAction.Edit, row) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
                             stringResource(R.string.acc_edit_config_named, row.remarks),
@@ -426,7 +448,7 @@ private fun ServerListItem(
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(row.typeDescription, style = MaterialTheme.typography.bodySmall, color = colorConfigType, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(testResult, testResultModifier, style = MaterialTheme.typography.bodySmall, color = if (row.testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(testResult, style = MaterialTheme.typography.bodySmall, color = if (row.testDelayMillis < 0L) colorPingRed else colorPing, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

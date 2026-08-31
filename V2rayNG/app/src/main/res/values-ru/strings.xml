@@ -528,6 +528,7 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
+    <string name="acc_active_server">Активный сервер</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d миллисекунда</item>
         <item quantity="few">%1$d миллисекунды</item>

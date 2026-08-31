@@ -224,13 +224,14 @@ fun MainScreen(
                             groupId = group.id,
                             mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
+                            isRunning = isRunning,
                             locateTarget = uiState.locateTarget,
                             doubleColumnDisplay = doubleColumnDisplay,
                             searchQuery = searchQuery,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
                             onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                            onAction = onAction,
                             onShareServer = { guid, profile ->
                                 shareTarget = Triple(guid, profile, false)
                             },

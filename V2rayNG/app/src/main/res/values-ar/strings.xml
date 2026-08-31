@@ -530,6 +530,7 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
+    <string name="acc_active_server">الخادم النشط</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="zero">%1$d مللي ثانية</item>
         <item quantity="one">مللي ثانية واحدة</item>

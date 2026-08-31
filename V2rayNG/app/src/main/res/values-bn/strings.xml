@@ -526,6 +526,7 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
+    <string name="acc_active_server">সক্রিয় সার্ভার</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d মিলিসেকেন্ড</item>
         <item quantity="other">%1$d মিলিসেকেন্ড</item>

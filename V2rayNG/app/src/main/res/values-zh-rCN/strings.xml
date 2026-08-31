@@ -525,6 +525,7 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
+    <string name="acc_active_server">当前使用的服务器</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d 毫秒</item>
     </plurals>
