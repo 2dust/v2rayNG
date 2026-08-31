@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.intl.Locale
@@ -58,17 +59,26 @@ import kotlinx.coroutines.flow.Flow
 fun MainBottomBar(
     displayText: String,
     accessibilityText: String,
+    status: MainStatus,
     testAnnouncements: Flow<MainTestAnnouncement>,
-    formatTestAnnouncement: (MainTestAnnouncement) -> String,
+    formatTestAnnouncement: (MainStatus) -> String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit
 ) {
     var testAnnouncement by remember { mutableStateOf<MainTestAnnouncement?>(null) }
+    var completedAnnouncementId by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(testAnnouncements) {
-        testAnnouncements.collect { testAnnouncement = it }
+        testAnnouncements.collect {
+            completedAnnouncementId = null
+            testAnnouncement = it
+        }
     }
+
+    val announcementText = localizedTestText(testAnnouncement?.status?.let(formatTestAnnouncement).orEmpty())
+    val exposeTestResult = status.canExposeTestResult(isRunning, testAnnouncement, completedAnnouncementId)
+    val resultText = localizedTestText(if (exposeTestResult) formatTestAnnouncement(status) else "")
 
     val checkConnectionLabel = stringResource(R.string.connection_test_pending)
     val connectionActionModifier = if (isRunning) {
@@ -103,13 +113,20 @@ fun MainBottomBar(
                 Text(
                     text = displayText,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.semantics { hideFromAccessibility() }
+                    modifier = Modifier.clearAndSetSemantics {
+                        if (exposeTestResult) {
+                            text = resultText
+                        } else {
+                            hideFromAccessibility()
+                        }
+                    }
                 )
             }
         }
         AssertiveTestLiveRegion(
             eventId = testAnnouncement?.id,
-            text = testAnnouncement?.let(formatTestAnnouncement).orEmpty(),
+            text = announcementText,
+            onFinished = { completedAnnouncementId = it },
         )
         FloatingActionButton(
             onClick = { onAction(MainAction.ToggleService) },
@@ -138,19 +155,20 @@ fun MainBottomBar(
 @Composable
 private fun AssertiveTestLiveRegion(
     eventId: Long?,
-    text: String,
+    text: AnnotatedString,
+    onFinished: (Long) -> Unit,
 ) {
     var armed by remember { mutableStateOf(false) }
-    var announcedText by remember { mutableStateOf("") }
+    var announcedText by remember { mutableStateOf(AnnotatedString("")) }
 
     LaunchedEffect(eventId, text) {
         if (eventId == null || text.isBlank()) {
             armed = false
-            announcedText = ""
+            announcedText = AnnotatedString("")
             return@LaunchedEffect
         }
 
-        announcedText = ""
+        announcedText = AnnotatedString("")
         armed = true
 
         // Establish the live region before publishing its message, then hide it after the
@@ -160,22 +178,13 @@ private fun AssertiveTestLiveRegion(
         announcedText = text
         delay(TestLiveRegionLifetimeMs)
         armed = false
-        announcedText = ""
-    }
-
-    val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
-    val localizedText = remember(announcedText, languageTag) {
-        buildAnnotatedString {
-            withStyle(
-                SpanStyle(localeList = LocaleList(Locale(languageTag)))
-            ) {
-                append(announcedText)
-            }
-        }
+        announcedText = AnnotatedString("")
+        // Reveal the retained result only after retiring this event's live-region node.
+        onFinished(eventId)
     }
 
     Text(
-        text = localizedText,
+        text = announcedText,
         color = Color.Transparent,
         fontSize = 1.sp,
         maxLines = 1,
@@ -186,10 +195,22 @@ private fun AssertiveTestLiveRegion(
                     hideFromAccessibility()
                 } else {
                     liveRegion = LiveRegionMode.Assertive
-                    if (localizedText.isNotEmpty()) this.text = localizedText
+                    if (announcedText.isNotEmpty()) this.text = announcedText
                 }
             },
     )
+}
+
+@Composable
+private fun localizedTestText(text: String): AnnotatedString {
+    val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
+    return remember(text, languageTag) {
+        buildAnnotatedString {
+            withStyle(SpanStyle(localeList = LocaleList(Locale(languageTag)))) {
+                append(text)
+            }
+        }
+    }
 }
 
 private const val TestLiveRegionLifetimeMs = 1000L

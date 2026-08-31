@@ -167,12 +167,12 @@ class MainViewModel(
             else -> error("Unexpected connection status")
         }
 
-    internal fun formatTestAnnouncement(announcement: MainTestAnnouncement): String {
-        check(announcement.status.isTestAnnouncement())
-        return if (announcement.status is MainStatus.ConnectionTest) {
-            formatConnectionTestResult(announcement.status.result, accessible = true)
+    internal fun formatTestAnnouncement(status: MainStatus): String {
+        check(status.isTestAnnouncement())
+        return if (status is MainStatus.ConnectionTest) {
+            formatConnectionTestResult(status.result, accessible = true)
         } else {
-            formatStatus(announcement.status)
+            formatStatus(status)
         }
     }
 

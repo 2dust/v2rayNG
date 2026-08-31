@@ -27,6 +27,13 @@ internal fun MainStatus.isTestAnnouncement(): Boolean =
 internal fun accessibilityConnectionStatus(isRunning: Boolean): MainStatus =
     if (isRunning) MainStatus.Connected else MainStatus.Disconnected
 
+internal fun MainStatus.canExposeTestResult(
+    isRunning: Boolean,
+    announcement: MainTestAnnouncement?,
+    completedAnnouncementId: Long?,
+): Boolean = isRunning && this is MainStatus.ConnectionTest &&
+    (announcement == null || (announcement.status == this && announcement.id == completedAnnouncementId))
+
 /**
  * Main UI state
  */
