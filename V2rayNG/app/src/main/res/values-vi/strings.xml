@@ -525,7 +525,8 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_last_updated">Cập nhật lần cuối vào %1$s</string>
-    <string name="acc_subscription_update_label">Cập nhật %1$s</string>
+    <string name="acc_subscription_update_on">Cập nhật đang bật</string>
+    <string name="acc_subscription_update_off">Cập nhật đang tắt</string>
     <string name="acc_unnamed_subscription">Chưa đặt tên.</string>
     <string name="acc_share_named">Chia sẻ %1$s</string>
     <string name="acc_edit_named">Chỉnh sửa %1$s</string>

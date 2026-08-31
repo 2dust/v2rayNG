@@ -525,7 +525,8 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_last_updated">上次更新于%1$s</string>
-    <string name="acc_subscription_update_label">%1$s 更新</string>
+    <string name="acc_subscription_update_on">更新已开启</string>
+    <string name="acc_subscription_update_off">更新已关闭</string>
     <string name="acc_unnamed_subscription">未命名。</string>
     <string name="acc_share_named">分享%1$s</string>
     <string name="acc_edit_named">编辑%1$s</string>

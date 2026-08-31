@@ -525,7 +525,8 @@
     <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_last_updated">آخرین بار در %1$s به‌روزرسانی شد</string>
-    <string name="acc_subscription_update_label">به‌روزرسانی %1$s</string>
+    <string name="acc_subscription_update_on">به‌روزرسانی روشن است</string>
+    <string name="acc_subscription_update_off">به‌روزرسانی خاموش است</string>
     <string name="acc_unnamed_subscription">بی‌نام.</string>
     <string name="acc_share_named">اشتراک‌گذاری %1$s</string>
     <string name="acc_edit_named">ویرایش %1$s</string>

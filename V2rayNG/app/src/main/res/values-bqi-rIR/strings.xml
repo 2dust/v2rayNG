@@ -525,7 +525,8 @@
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_last_updated">ورۊ رسۊوی نهایی من %1$s</string>
-    <string name="acc_subscription_update_label">ورۊ کردن %1$s</string>
+    <string name="acc_subscription_update_on">ورۊ کردن روشن هڌ</string>
+    <string name="acc_subscription_update_off">ورۊ کردن خاموش هڌ</string>
     <string name="acc_unnamed_subscription">بی‌نوم.</string>
     <string name="acc_share_named">یک رسۊوی %1$s</string>
     <string name="acc_edit_named">آلشتکاری %1$s</string>

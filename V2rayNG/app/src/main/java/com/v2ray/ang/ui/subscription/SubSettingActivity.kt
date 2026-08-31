@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,10 +38,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -186,9 +189,9 @@ fun SubSettingScreen(
                 } else {
                     ""
                 }
-                val subscriptionUpdateLabel = stringResource(
-                    R.string.acc_subscription_update_label,
-                    subscriptionName,
+                val subscriptionUpdateState = stringResource(
+                    if (subCache.subscription.enabled) R.string.acc_subscription_update_on
+                    else R.string.acc_subscription_update_off,
                 )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
                     ReorderableListItem(
@@ -198,7 +201,17 @@ fun SubSettingScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .semantics(mergeDescendants = true) { contentDescription = subscriptionName }
+                                .semantics(mergeDescendants = true) {
+                                    contentDescription = subscriptionName
+                                    stateDescription = subscriptionUpdateState
+                                }
+                                .toggleable(
+                                    value = subCache.subscription.enabled,
+                                    role = Role.Switch,
+                                    onValueChange = { checked ->
+                                        viewModel.update(subCache.guid, subCache.subscription.copy(enabled = checked))
+                                    },
+                                )
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -282,16 +295,8 @@ fun SubSettingScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Switch(
                                     checked = subCache.subscription.enabled,
-                                    onCheckedChange = { checked ->
-                                        val updated = subCache.subscription.copy()
-                                        updated.enabled = checked
-                                        viewModel.update(subCache.guid, updated)
-                                    },
-                                    modifier = Modifier
-                                        .scale(0.7f)
-                                        .semantics {
-                                            contentDescription = subscriptionUpdateLabel
-                                        },
+                                    onCheckedChange = null,
+                                    modifier = Modifier.scale(0.7f),
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                                         checkedTrackColor = MaterialTheme.colorScheme.secondary
