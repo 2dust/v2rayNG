@@ -35,6 +35,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -50,6 +55,8 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.ReorderCommand
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
@@ -207,6 +214,37 @@ fun ProxyChainScreen(
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val lazyListState = rememberLazyListState()
+    val moveMember: (String, ReorderCommand) -> Boolean = { memberKey, command ->
+        val fromIndex = memberKeys.indexOf(memberKey)
+        val toIndex = command.targetIndex(fromIndex, memberKeys.size)
+        if (toIndex == null) {
+            false
+        } else {
+            val reordered = members.toMutableList()
+            val reorderedKeys = memberKeys.toMutableList()
+            if (reordered.moveItem(fromIndex, toIndex) && reorderedKeys.moveItem(fromIndex, toIndex)) {
+                members = reordered
+                memberKeys = reorderedKeys
+                true
+            } else {
+                false
+            }
+        }
+    }
+    val requestMemberRemoval: (String) -> Boolean = { memberKey ->
+        val index = memberKeys.indexOf(memberKey)
+        if (index < 0) {
+            false
+        } else if (members[index].isBlank()) {
+            val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
+            members = remainingMembers
+            memberKeys = remainingKeys
+            true
+        } else {
+            memberToDeleteKey = memberKey
+            true
+        }
+    }
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         val fromIndex = memberKeys.indexOf(from.key)
         val toIndex = memberKeys.indexOf(to.key)
@@ -286,6 +324,14 @@ fun ProxyChainScreen(
 
             itemsIndexed(items = members, key = { index, _ -> memberKeys[index] }) { index, member ->
                 val memberKey = memberKeys[index]
+                val accessibilityActions = listOf(
+                    CustomAccessibilityAction(
+                        label = stringResource(R.string.acc_remove),
+                        action = { requestMemberRemoval(memberKey) },
+                    )
+                ) + reorderAccessibilityActions(index, members.size) { command ->
+                    moveMember(memberKey, command)
+                }
                 ReorderableItem(reorderableState, key = memberKey) { isDragging ->
                     val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
                     Surface(shadowElevation = elevation) {
@@ -301,6 +347,7 @@ fun ProxyChainScreen(
                                 modifier = Modifier
                                     .padding(start = 16.dp)
                                     .width(10.dp)
+                                    .semantics { hideFromAccessibility() }
                             )
                             FormDropdownField(
                                 label = stringResource(R.string.server_lab_remarks),
@@ -311,17 +358,15 @@ fun ProxyChainScreen(
                                     members = members.toMutableList().also { it[index] = newVal }
                                 },
                                 editable = true,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                fieldModifier = Modifier.semantics {
+                                    customActions = accessibilityActions
+                                },
                             )
-                            IconButton(onClick = {
-                                if (member.isBlank()) {
-                                    val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                                    members = remainingMembers
-                                    memberKeys = remainingKeys
-                                } else {
-                                    memberToDeleteKey = memberKey
-                                }
-                            }) {
+                            IconButton(
+                                onClick = { requestMemberRemoval(memberKey) },
+                                modifier = Modifier.clearAndSetSemantics {},
+                            ) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
                                     contentDescription = stringResource(R.string.acc_remove)
