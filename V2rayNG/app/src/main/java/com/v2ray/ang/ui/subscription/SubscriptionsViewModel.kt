@@ -13,6 +13,7 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -55,12 +56,20 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         _subsFlow.value = subscriptions.toList()
     }
 
-    fun move(fromPosition: Int, toPosition: Int) {
+    fun move(fromPosition: Int, toPosition: Int): Boolean {
         if (subscriptions.moveItem(fromPosition, toPosition)) {
             MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
             SettingsChangeManager.makeSetupGroupTab()
             _subsFlow.value = subscriptions.toList()
+            return true
         }
+        return false
+    }
+
+    internal fun move(subId: String, command: ReorderCommand): Boolean {
+        val fromPosition = subscriptions.indexOfFirst { it.guid == subId }
+        val toPosition = command.targetIndex(fromPosition, subscriptions.size) ?: return false
+        return move(fromPosition, toPosition)
     }
 
     fun updateSubscriptions() {

@@ -38,9 +38,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -61,6 +63,7 @@ import com.v2ray.ang.ui.compose.QRCodeDialog
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
@@ -170,7 +173,7 @@ fun SubSettingScreen(
             itemsIndexed(
                 items = subscriptions,
                 key = { _, item -> item.guid }
-            ) { _, subCache ->
+            ) { index, subCache ->
                 val subscriptionName = subscriptionAccessibilityName(
                     subCache.subscription.remarks, subCache.subscription.url, stringResource(R.string.acc_unnamed_subscription)
                 )
@@ -193,6 +196,47 @@ fun SubSettingScreen(
                     if (subCache.subscription.enabled) R.string.acc_subscription_update_on
                     else R.string.acc_subscription_update_off,
                 )
+                val requestDelete = {
+                    if (confirmRemove) {
+                        removeTarget = SubscriptionDeleteTarget(
+                            guid = subCache.guid,
+                            name = subscriptionName
+                        )
+                    } else {
+                        onRemoveSub(subCache.guid)
+                    }
+                }
+                val itemActions = buildList {
+                    add(CustomAccessibilityAction(
+                        label = stringResource(R.string.acc_edit_named, subscriptionName),
+                        action = { onEditSub(subCache.guid); true },
+                    ))
+                    add(CustomAccessibilityAction(
+                        label = stringResource(R.string.acc_delete_named, subscriptionName),
+                        action = { requestDelete(); true },
+                    ))
+                    if (subCache.subscription.url.isNotEmpty()) {
+                        add(CustomAccessibilityAction(
+                            label = stringResource(SubscriptionShareAction.QRCode.labelRes),
+                            action = {
+                                showQRCodeBitmap = onShareQRCode(subCache.subscription.url)
+                                true
+                            },
+                        ))
+                        add(CustomAccessibilityAction(
+                            label = stringResource(SubscriptionShareAction.Clipboard.labelRes),
+                            action = {
+                                onShareClipboard(subCache.subscription.url)
+                                true
+                            },
+                        ))
+                    }
+                }
+                val accessibilityActions = itemActions + reorderAccessibilityActions(
+                    currentIndex = index,
+                    itemCount = subscriptions.size,
+                    onMove = { command -> viewModel.move(subCache.guid, command) },
+                )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
                     ReorderableListItem(
                         scope = this,
@@ -204,6 +248,7 @@ fun SubSettingScreen(
                                 .semantics(mergeDescendants = true) {
                                     contentDescription = subscriptionName
                                     stateDescription = subscriptionUpdateState
+                                    customActions = accessibilityActions
                                 }
                                 .toggleable(
                                     value = subCache.subscription.enabled,
@@ -253,9 +298,10 @@ fun SubSettingScreen(
                             ) {
                                 Row {
                                     if (subCache.subscription.url.isNotEmpty()) {
-                                        IconButton(onClick = {
-                                            shareTarget = Pair(subCache.guid, subCache.subscription.url)
-                                        }) {
+                                        IconButton(
+                                            onClick = { shareTarget = Pair(subCache.guid, subCache.subscription.url) },
+                                            modifier = Modifier.clearAndSetSemantics {},
+                                        ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
                                                 contentDescription = stringResource(
@@ -265,7 +311,10 @@ fun SubSettingScreen(
                                             )
                                         }
                                     }
-                                    IconButton(onClick = { onEditSub(subCache.guid) }) {
+                                    IconButton(
+                                        onClick = { onEditSub(subCache.guid) },
+                                        modifier = Modifier.clearAndSetSemantics {},
+                                    ) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_edit_24dp),
                                             contentDescription = stringResource(
@@ -274,15 +323,10 @@ fun SubSettingScreen(
                                             )
                                         )
                                     }
-                                    IconButton(onClick = {
-                                        if (confirmRemove) {
-                                            removeTarget = SubscriptionDeleteTarget(
-                                                guid = subCache.guid,
-                                                name = subscriptionName
-                                            )
-                                        }
-                                        else onRemoveSub(subCache.guid)
-                                    }) {
+                                    IconButton(
+                                        onClick = requestDelete,
+                                        modifier = Modifier.clearAndSetSemantics {},
+                                    ) {
                                         Icon(
                                             painter = painterResource(R.drawable.ic_delete_24dp),
                                             contentDescription = stringResource(

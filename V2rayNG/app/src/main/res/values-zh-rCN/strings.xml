@@ -522,6 +522,10 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
+    <string name="acc_move_to_top">移至列表顶部</string>
+    <string name="acc_move_up">上移</string>
+    <string name="acc_move_down">下移</string>
+    <string name="acc_move_to_bottom">移至列表底部</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_last_updated">上次更新于%1$s</string>

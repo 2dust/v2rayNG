@@ -522,6 +522,10 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
+    <string name="acc_move_to_top">Chuyển lên đầu danh sách</string>
+    <string name="acc_move_up">Chuyển lên</string>
+    <string name="acc_move_down">Chuyển xuống</string>
+    <string name="acc_move_to_bottom">Chuyển xuống cuối danh sách</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_last_updated">Cập nhật lần cuối vào %1$s</string>

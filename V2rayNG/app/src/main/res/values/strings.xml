@@ -522,6 +522,10 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
+    <string name="acc_move_to_top">Move to top</string>
+    <string name="acc_move_up">Move up</string>
+    <string name="acc_move_down">Move down</string>
+    <string name="acc_move_to_bottom">Move to bottom</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_last_updated">Last updated on %1$s</string>
