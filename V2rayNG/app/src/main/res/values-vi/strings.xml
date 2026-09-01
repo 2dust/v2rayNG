@@ -525,7 +525,7 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_active_server">Máy chủ đang hoạt động</string>
+    <string name="acc_selected_server">Đã chọn</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d mili giây</item>
     </plurals>

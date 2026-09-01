@@ -224,7 +224,6 @@ fun MainScreen(
                             groupId = group.id,
                             mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
-                            isRunning = isRunning,
                             locateTarget = uiState.locateTarget,
                             doubleColumnDisplay = doubleColumnDisplay,
                             searchQuery = searchQuery,

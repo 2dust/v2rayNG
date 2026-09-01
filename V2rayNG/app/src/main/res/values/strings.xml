@@ -526,7 +526,7 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
-    <string name="acc_active_server">Active server</string>
+    <string name="acc_selected_server">Selected</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d millisecond</item>
         <item quantity="other">%1$d milliseconds</item>

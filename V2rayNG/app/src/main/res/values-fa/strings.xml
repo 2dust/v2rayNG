@@ -526,7 +526,7 @@
     <string name="acc_search">جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
-    <string name="acc_active_server">سرور فعال</string>
+    <string name="acc_selected_server">انتخاب‌شده</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d میلی‌ثانیه</item>
         <item quantity="other">%1$d میلی‌ثانیه</item>
