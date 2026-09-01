@@ -358,8 +358,8 @@
         <item quantity="other">%1$d کانفیگ ورۊ وابی</item>
     </plurals>
     <plurals name="title_update_asset_count">
-        <item quantity="one">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
-        <item quantity="other">%1$d فایل بونچک جغرافیایی ورۊ وابی</item>
+        <item quantity="one">%1$d فایل بونچک جوقرافیایی ورۊ وابی</item>
+        <item quantity="other">%1$d فایل بونچک جوقرافیایی ورۊ وابی</item>
     </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
