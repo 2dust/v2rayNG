@@ -19,6 +19,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.compose.ReorderCommand
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -37,6 +38,7 @@ class ServerRowAccessibilityTest {
     private val selectedGuids = mutableListOf<String>()
     private val removalRequests = mutableListOf<Pair<String, String>>()
     private val menus = mutableListOf<String>()
+    private val moves = mutableListOf<Pair<String, ReorderCommand>>()
     private val guid = "accessibility-fixture-guid"
     private val name = "Accessibility fixture"
 
@@ -61,12 +63,15 @@ class ServerRowAccessibilityTest {
                                     ),
                                     isSelected = selected.value,
                                     doubleColumnDisplay = doubleColumn.value,
+                                    reorderIndex = 1,
+                                    itemCount = 3,
                                     actions = ServerRowActions(
                                         select = selectedGuids::add,
                                         onAction = dispatched::add,
                                         share = { _, _ -> menus.add("share") },
                                         more = { _, _ -> menus.add("more") },
                                         remove = { id, memberName -> removalRequests.add(id to memberName) },
+                                        move = { itemGuid, command -> moves.add(itemGuid to command) },
                                     ),
                                 )
                             }
@@ -138,6 +143,7 @@ class ServerRowAccessibilityTest {
         assertEquals(guid, (dispatched[3] as MainAction.ShareFullContent).guid)
         assertTrue(selectedGuids.isEmpty())
         assertTrue(menus.isEmpty())
+        assertEquals(ReorderCommand.entries.map { guid to it }, moves)
     }
 
     @Test
@@ -196,6 +202,7 @@ class ServerRowAccessibilityTest {
                 add(getString(R.string.share_method_clipboard))
             }
             add(getString(R.string.share_method_full_content))
+            addAll(ReorderCommand.entries.map { getString(it.labelRes) })
         }
     }
 
