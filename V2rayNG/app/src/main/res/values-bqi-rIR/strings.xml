@@ -51,8 +51,8 @@
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_subscription_group_named">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
-    <string name="confirm_delete_asset_file">فایل بونچک جغرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_source">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_file">فایل بونچک جوقرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_source">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -521,13 +521,13 @@
     <string name="acc_back">برگشت</string>
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
-    <string name="acc_more">امکووݩا بؽتر</string>
+    <string name="acc_more">گۊزینه یل قلوه</string>
     <string name="acc_move_to_top">آلشت و سر نومگه</string>
     <string name="acc_move_up">آلشت و روء</string>
     <string name="acc_move_down">آلشت و بلم</string>
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
-    <string name="acc_selected_server">پسند وابی</string>
-    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
+    <string name="acc_selected_server">پسند وابیڌه</string>
+    <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_last_updated">ورۊ رسۊوی نهایی من %1$s</string>
     <string name="acc_subscription_update_on">ورۊ کردن روشن هڌ</string>
     <string name="acc_subscription_update_off">ورۊ کردن خاموش هڌ</string>
