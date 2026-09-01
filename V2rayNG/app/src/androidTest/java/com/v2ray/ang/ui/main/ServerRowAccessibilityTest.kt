@@ -31,7 +31,6 @@ class ServerRowAccessibilityTest {
     private val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
     private lateinit var scenario: ActivityScenario<MainActivity>
     private val selected = mutableStateOf(false)
-    private val running = mutableStateOf(false)
     private val doubleColumn = mutableStateOf(false)
     private val profileType = mutableStateOf(EConfigType.VMESS)
     private val dispatched = mutableListOf<MainAction>()
@@ -61,7 +60,6 @@ class ServerRowAccessibilityTest {
                                         subscriptionBadge = "",
                                     ),
                                     isSelected = selected.value,
-                                    isRunning = running.value,
                                     doubleColumnDisplay = doubleColumn.value,
                                     actions = ServerRowActions(
                                         select = selectedGuids::add,
@@ -102,21 +100,19 @@ class ServerRowAccessibilityTest {
     }
 
     @Test
-    fun prefixFollowsExistingSelectionAndRunningStateWithoutReplacingNode() {
+    fun selectedPrefixDoesNotDependOnConnectionStateAndKeepsNodeIdentity() {
         val original = awaitRow()
         assertTrue(original.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS))
-        assertFalse(original.contentDescription.toString().startsWith(activePrefix()))
+        assertFalse(original.contentDescription.toString().startsWith(selectedPrefix()))
         update { selected.value = true }
-        assertFalse(awaitRow().contentDescription.toString().startsWith(activePrefix()))
-        update { running.value = true }
-        awaitRow { it.contentDescription.toString().startsWith("${activePrefix()}. $name") }
+        awaitRow { it.contentDescription.toString().startsWith("${selectedPrefix()}. $name") }
         assertEquals(original, awaitRow())
         assertTrue(awaitRow().isAccessibilityFocused)
         SystemClock.sleep(1000)
         update { selected.value = false }
-        awaitRow { !it.contentDescription.toString().startsWith(activePrefix()) }
-        update { selected.value = true; running.value = false }
-        awaitRow { !it.contentDescription.toString().startsWith(activePrefix()) }
+        awaitRow { !it.contentDescription.toString().startsWith(selectedPrefix()) }
+        update { selected.value = true }
+        awaitRow { it.contentDescription.toString().startsWith("${selectedPrefix()}. $name") }
     }
 
     @Test
@@ -189,7 +185,7 @@ class ServerRowAccessibilityTest {
         assertEquals(List(5) { guid }, selectedGuids)
     }
 
-    private fun activePrefix() = instrumentation.targetContext.getString(R.string.acc_active_server)
+    private fun selectedPrefix() = instrumentation.targetContext.getString(R.string.acc_selected_server)
 
     private fun expectedLabels(complex: Boolean): List<String> = with(instrumentation.targetContext) {
         buildList {
