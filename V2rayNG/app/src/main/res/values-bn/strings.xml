@@ -531,6 +531,10 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
+    <string name="acc_move_to_top">তালিকার শুরুতে সরান</string>
+    <string name="acc_move_up">উপরে সরান</string>
+    <string name="acc_move_down">নিচে সরান</string>
+    <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>

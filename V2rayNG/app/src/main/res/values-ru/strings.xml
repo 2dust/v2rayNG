@@ -531,6 +531,10 @@
     <string name="acc_search">Поиск</string>
     <string name="acc_add">Добавить профиль</string>
     <string name="acc_more">Дополнительные параметры</string>
+    <string name="acc_move_to_top">Переместить в начало</string>
+    <string name="acc_move_up">Переместить выше</string>
+    <string name="acc_move_down">Переместить ниже</string>
+    <string name="acc_move_to_bottom">Переместить в конец</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>

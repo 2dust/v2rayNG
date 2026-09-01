@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.compose
 
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class RoutingToggleFeedbackTest {
     @Test
-    fun rowOwnsToggleWhileEditAndDeleteRemainIndependent() {
+    fun rowOwnsToggleAndSecondaryActions() {
         val probe = ToggleFeedbackProbe()
         val rule = mutableStateOf(RulesetItem(id = "feedback-rule", remarks = "Feedback test rule",
             outboundTag = AppConfig.TAG_DIRECT, enabled = false, locked = true))
@@ -44,7 +43,7 @@ class RoutingToggleFeedbackTest {
             }
             val row = probe.row("Feedback test rule")
             probe.assertSingleToggle(row)
-            assertEquals(3, probe.nodes(row).count { it.isClickable })
+            assertEquals(1, probe.nodes(row).count { it.isClickable })
             probe.focus(row)
             val label = probe.label(row)
             probe.toggle(row, true)
@@ -52,12 +51,16 @@ class RoutingToggleFeedbackTest {
             assertEquals(label, probe.label(row))
             probe.verifyInputModes(row)
             assertEquals(10, changes)
-            for (resource in listOf(R.string.acc_edit_routing_rule_named, R.string.acc_delete_routing_rule_named)) {
-                var actionLabel = ""
-                scenario.onActivity { actionLabel = it.getString(resource, "Feedback test rule") }
-                val action = probe.awaitNode { it.isClickable && probe.label(it) == actionLabel }
-                assertTrue(action.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+            var expectedActions = emptyList<String>()
+            scenario.onActivity { activity ->
+                expectedActions = listOf(
+                    activity.getString(R.string.acc_edit_routing_rule_named, "Feedback test rule"),
+                    activity.getString(R.string.acc_delete_routing_rule_named, "Feedback test rule"),
+                )
             }
+            val actions = row.actionList.filter { it.label != null }
+            assertEquals(expectedActions, actions.map { it.label.toString() })
+            actions.forEach { assertTrue(row.performAction(it.id)) }
             assertEquals(1, edits)
             assertEquals(1, deletes)
             assertEquals(10, changes)

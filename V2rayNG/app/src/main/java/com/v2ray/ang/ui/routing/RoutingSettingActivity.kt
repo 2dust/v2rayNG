@@ -39,8 +39,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -62,10 +65,12 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -302,9 +307,12 @@ fun RoutingSettingScreen(
                             onEdit = { onEditRule(ruleset.id) },
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
-                                viewModel.update(index, updated)
+                                viewModel.update(ruleset.id, updated)
                             },
-                            onDelete = { deleteRuleId = ruleset.id }
+                            onDelete = { deleteRuleId = ruleset.id },
+                            reorderIndex = index,
+                            itemCount = rulesets.size,
+                            onMove = { command -> viewModel.move(ruleset.id, command) },
                         )
                     }
                     ItemDivider()
@@ -344,7 +352,10 @@ internal fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
     onEnabledChange: (Boolean) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    reorderIndex: Int? = null,
+    itemCount: Int = 0,
+    onMove: (ReorderCommand) -> Boolean = { false },
 ) {
     val enabled = ruleset.enabled
     val ruleName = ruleset.remarks.orEmpty()
@@ -371,6 +382,21 @@ internal fun RoutingRulesetItem(
     } else {
         ruleSummary
     }
+    val itemActions = listOf(
+        CustomAccessibilityAction(
+            label = stringResource(R.string.acc_edit_routing_rule_named, ruleName),
+            action = { onEdit(); true },
+        ),
+        CustomAccessibilityAction(
+            label = stringResource(R.string.acc_delete_routing_rule_named, ruleName),
+            action = { onDelete(); true },
+        ),
+    )
+    val accessibilityActions = itemActions + if (reorderIndex != null) {
+        reorderAccessibilityActions(reorderIndex, itemCount, onMove)
+    } else {
+        emptyList()
+    }
 
     Row(
         modifier = Modifier
@@ -378,6 +404,7 @@ internal fun RoutingRulesetItem(
             .semantics(mergeDescendants = true) {
                 contentDescription = accessibilitySummary
                 stateDescription = ruleState
+                customActions = accessibilityActions
             }
             .toggleable(value = enabled, role = Role.Switch, onValueChange = onEnabledChange)
             .padding(horizontal = 16.dp),
@@ -430,7 +457,10 @@ internal fun RoutingRulesetItem(
             modifier = Modifier.padding(start = 8.dp)
         ) {
             Row {
-                IconButton(onClick = onEdit) {
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.clearAndSetSemantics {},
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_edit_24dp),
                         contentDescription = stringResource(
@@ -439,7 +469,10 @@ internal fun RoutingRulesetItem(
                         )
                     )
                 }
-                IconButton(onClick = onDelete) {
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.clearAndSetSemantics {},
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_delete_24dp),
                         contentDescription = stringResource(

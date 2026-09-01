@@ -531,6 +531,10 @@
     <string name="acc_search">جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
+    <string name="acc_move_to_top">انتقال به ابتدای فهرست</string>
+    <string name="acc_move_up">انتقال به بالا</string>
+    <string name="acc_move_down">انتقال به پایین</string>
+    <string name="acc_move_to_bottom">انتقال به انتهای فهرست</string>
     <string name="acc_selected_server">انتخاب شده</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
