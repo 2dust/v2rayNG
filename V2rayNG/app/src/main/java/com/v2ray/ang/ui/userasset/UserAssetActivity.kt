@@ -36,7 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
@@ -351,7 +353,7 @@ internal fun UserAssetScreen(
 }
 
 @Composable
-private fun UserAssetItem(
+internal fun UserAssetItem(
     item: AssetUrlCache,
     fileMetadata: AssetFileMetadata?,
     onEdit: () -> Unit,
@@ -375,11 +377,25 @@ private fun UserAssetItem(
         null
     }
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
+    val accessibilityActions = buildList {
+        if (showEditButton) {
+            add(CustomAccessibilityAction(
+                label = stringResource(R.string.acc_edit_asset_named, item.assetUrl.remarks),
+                action = { onEdit(); true },
+            ))
+        }
+        add(CustomAccessibilityAction(
+            label = stringResource(R.string.acc_delete_asset_named, item.assetUrl.remarks),
+            action = { onDeleteClick(); true },
+        ))
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .semantics(mergeDescendants = true) {}
+            .semantics(mergeDescendants = true) {
+                customActions = accessibilityActions
+            }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -408,7 +424,10 @@ private fun UserAssetItem(
             )
         }
         if (showEditButton) {
-            IconButton(onClick = onEdit) {
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.clearAndSetSemantics {},
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
                     contentDescription = stringResource(
@@ -419,7 +438,10 @@ private fun UserAssetItem(
                 )
             }
         }
-        IconButton(onClick = onDeleteClick) {
+        IconButton(
+            onClick = onDeleteClick,
+            modifier = Modifier.clearAndSetSemantics {},
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
                 contentDescription = stringResource(
