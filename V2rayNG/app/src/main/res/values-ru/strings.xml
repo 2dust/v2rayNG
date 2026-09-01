@@ -396,6 +396,15 @@
     <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Соединение установлено за %1$s</string>
     <string name="server_test_delay_value">%1$d мс</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d миллисекунда</item>
+        <item quantity="few">%1$d миллисекунды</item>
+        <item quantity="many">%1$d миллисекунд</item>
+        <item quantity="other">%1$d миллисекунды</item>
+    </plurals>
+    <string name="acc_share_config_named">Поделиться конфигурацией %1$s</string>
+    <string name="acc_edit_config_named">Изменить конфигурацию %1$s</string>
+    <string name="acc_delete_config_named">Удалить конфигурацию %1$s</string>
     <string name="connection_test_error">Ошибка проверки соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
@@ -533,15 +542,6 @@
     <string name="acc_move_down">Переместить ниже</string>
     <string name="acc_move_to_bottom">Переместить в конец</string>
     <string name="acc_selected_server">Выбрано</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d миллисекунда</item>
-        <item quantity="few">%1$d миллисекунды</item>
-        <item quantity="many">%1$d миллисекунд</item>
-        <item quantity="other">%1$d миллисекунды</item>
-    </plurals>
-    <string name="acc_share_config_named">Поделиться конфигурацией %1$s</string>
-    <string name="acc_edit_config_named">Изменить конфигурацию %1$s</string>
-    <string name="acc_delete_config_named">Удалить конфигурацию %1$s</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>
     <string name="acc_remove">Удалить участника цепочки прокси</string>

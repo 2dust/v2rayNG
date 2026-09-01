@@ -393,6 +393,12 @@
     <string name="connection_test_testing_count">测试 %d 个配置中…</string>
     <string name="connection_test_available">"连接成功：延时 %1$s"</string>
     <string name="server_test_delay_value">%1$d ms</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+    <string name="acc_share_config_named">分享配置 %1$s</string>
+    <string name="acc_edit_config_named">编辑配置 %1$s</string>
+    <string name="acc_delete_config_named">删除配置 %1$s</string>
     <string name="connection_test_error">连接测试失败：%s</string>
     <string name="connection_test_fail">无法访问互联网</string>
     <string name="connection_test_error_status_code">错误码：#%d</string>
@@ -530,12 +536,6 @@
     <string name="acc_move_down">下移</string>
     <string name="acc_move_to_bottom">移至列表底部</string>
     <string name="acc_selected_server">已选择</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="other">%1$d 毫秒</item>
-    </plurals>
-    <string name="acc_share_config_named">分享配置 %1$s</string>
-    <string name="acc_edit_config_named">编辑配置 %1$s</string>
-    <string name="acc_delete_config_named">删除配置 %1$s</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>

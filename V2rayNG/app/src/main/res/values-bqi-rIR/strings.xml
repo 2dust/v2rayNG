@@ -394,6 +394,13 @@
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
     <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
@@ -531,13 +538,6 @@
     <string name="acc_move_down">آلشت و بلم</string>
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
     <string name="acc_selected_server">پسند وابی</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d میلی‌ثانیه</item>
-        <item quantity="other">%1$d میلی‌ثانیه</item>
-    </plurals>
-    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
-    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
-    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
