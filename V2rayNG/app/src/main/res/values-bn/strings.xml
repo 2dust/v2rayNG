@@ -535,7 +535,7 @@
     <string name="acc_move_up">উপরে সরান</string>
     <string name="acc_move_down">নিচে সরান</string>
     <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">নির্বাচিত</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

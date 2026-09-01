@@ -535,7 +535,7 @@
     <string name="acc_move_up">Chuyển lên</string>
     <string name="acc_move_down">Chuyển xuống</string>
     <string name="acc_move_to_bottom">Chuyển xuống cuối danh sách</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">Đã chọn</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>
