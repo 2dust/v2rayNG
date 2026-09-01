@@ -526,7 +526,7 @@
     <string name="acc_move_up">Переместить выше</string>
     <string name="acc_move_down">Переместить ниже</string>
     <string name="acc_move_to_bottom">Переместить в конец</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_selected_server">Выбрано</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_last_updated">Последний раз обновлено %1$s</string>
     <string name="acc_subscription_update_on">Обновление включено</string>
