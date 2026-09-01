@@ -31,7 +31,7 @@
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز کود QR</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
-    <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز مهلی</string>
+    <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز ویرگه مهلی</string>
     <string name="menu_item_import_config_policy_group">ٱووردن [بونکۊ سیاست]</string>
     <string name="menu_item_import_config_proxy_chain">ٱووردن [زنجیره پروکسی]</string>
     <string name="menu_item_import_config_manually_vmess">ٱووردن [VMess]</string>
@@ -51,7 +51,7 @@
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_asset_file">فایل بونچک جوقرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_source">ای بونچک فایلا جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_source">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
