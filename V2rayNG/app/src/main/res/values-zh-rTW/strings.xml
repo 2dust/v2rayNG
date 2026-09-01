@@ -525,6 +525,10 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
+    <string name="acc_move_to_top">移至清單頂端</string>
+    <string name="acc_move_up">上移</string>
+    <string name="acc_move_down">下移</string>
+    <string name="acc_move_to_bottom">移至清單底端</string>
     <string name="acc_selected_server">已選取</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d 毫秒</item>

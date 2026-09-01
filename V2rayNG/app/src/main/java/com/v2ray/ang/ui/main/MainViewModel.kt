@@ -18,6 +18,7 @@ import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -699,12 +700,12 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
+    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Boolean {
         val groupState = mutableServerGroupState(groupId).value
         val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return
+        if (!servers.moveItem(fromPosition, toPosition)) return false
         val rows = groupState.rows.toMutableList()
-        rows.moveItem(fromPosition, toPosition)
+        if (!rows.moveItem(fromPosition, toPosition)) return false
         val guids = servers.map { it.guid }
         mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
@@ -714,6 +715,14 @@ class MainViewModel(
             dataSource.encodeServerList(guids, groupId)
             cacheMutex.withLock { groupDataCache[groupId] = servers }
         }
+        return true
+    }
+
+    internal fun moveServer(groupId: String, guid: String, command: ReorderCommand): Boolean {
+        val servers = mutableServerGroupState(groupId).value.servers
+        val fromPosition = servers.indexOfFirst { it.guid == guid }
+        val toPosition = command.targetIndex(fromPosition, servers.size) ?: return false
+        return moveServer(groupId, fromPosition, toPosition)
     }
 
     // ---------- Testing ----------

@@ -526,6 +526,10 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
+    <string name="acc_move_to_top">তালিকার শুরুতে সরান</string>
+    <string name="acc_move_up">উপরে সরান</string>
+    <string name="acc_move_down">নিচে সরান</string>
+    <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
     <string name="acc_selected_server">নির্বাচিত</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d মিলিসেকেন্ড</item>

@@ -54,11 +54,13 @@ import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -93,6 +95,8 @@ fun GroupPagerPage(
         onShareServer,
         onMoreServer,
         onRemoveServer,
+        groupId,
+        mainViewModel,
     ) {
         ServerRowActions(
             select = onSelectServer,
@@ -100,6 +104,7 @@ fun GroupPagerPage(
             share = onShareServer,
             more = onMoreServer,
             remove = onRemoveServer,
+            move = { guid, command -> mainViewModel.moveServer(groupId, guid, command) },
         )
     }
     ServerListPage(
@@ -126,6 +131,7 @@ internal class ServerRowActions(
     val share: (String, ProfileItem) -> Unit,
     val more: (String, ProfileItem) -> Unit,
     val remove: (String, String) -> Unit,
+    val move: (String, ReorderCommand) -> Boolean,
 ) {
     fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
         action.perform(row.guid, row.profile, onAction, remove)
@@ -167,12 +173,14 @@ private fun ServerListPage(
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { index, row ->
                 val content: @Composable () -> Unit = {
                     ServerItemColumn(
                         row = row,
                         isSelected = row.guid == selectedGuid,
                         doubleColumnDisplay = true,
+                        reorderIndex = index.takeIf { canReorder },
+                        itemCount = rows.size,
                         actions = actions
                     )
                 }
@@ -210,7 +218,7 @@ private fun ServerListPage(
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { index, row ->
                 if (canReorder && reorderableState != null) {
                     ReorderableItem(
                         reorderableState,
@@ -223,6 +231,8 @@ private fun ServerListPage(
                             ServerItemRow(
                                 row = row,
                                 isSelected = row.guid == selectedGuid,
+                                reorderIndex = index,
+                                itemCount = rows.size,
                                 actions = actions
                             )
                         }
@@ -232,6 +242,8 @@ private fun ServerListPage(
                     ServerItemRow(
                         row = row,
                         isSelected = row.guid == selectedGuid,
+                        reorderIndex = null,
+                        itemCount = rows.size,
                         actions = actions
                     )
                     ItemDivider()
@@ -277,12 +289,16 @@ private fun LocateTargetEffect(
 private fun ServerItemRow(
     row: ServerRowUiModel,
     isSelected: Boolean,
+    reorderIndex: Int?,
+    itemCount: Int,
     actions: ServerRowActions
 ) {
     ServerListItem(
         row = row,
         isSelected = isSelected,
         doubleColumnDisplay = false,
+        reorderIndex = reorderIndex,
+        itemCount = itemCount,
         actions = actions
     )
 }
@@ -292,6 +308,8 @@ private fun ServerItemColumn(
     row: ServerRowUiModel,
     isSelected: Boolean,
     doubleColumnDisplay: Boolean,
+    reorderIndex: Int?,
+    itemCount: Int,
     actions: ServerRowActions
 ) {
     Column {
@@ -299,6 +317,8 @@ private fun ServerItemColumn(
             row = row,
             isSelected = isSelected,
             doubleColumnDisplay = doubleColumnDisplay,
+            reorderIndex = reorderIndex,
+            itemCount = itemCount,
             actions = actions
         )
         ItemDivider()
@@ -310,6 +330,8 @@ internal fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
     doubleColumnDisplay: Boolean,
+    reorderIndex: Int?,
+    itemCount: Int,
     actions: ServerRowActions
 ) {
     val testResult = if (row.testDelayMillis == 0L) {
@@ -333,7 +355,7 @@ internal fun ServerListItem(
         testResult = testResultAccessibility,
         prefix = if (isSelected) stringResource(R.string.acc_selected_server) else null,
     )
-    val accessibilityActions = serverAccessibilityActions(row.profile.configType.isComplexType()).map { action ->
+    val itemActions = serverAccessibilityActions(row.profile.configType.isComplexType()).map { action ->
         val label = when (action) {
             ServerMenuAction.Edit -> stringResource(R.string.acc_edit_config_named, row.remarks)
             ServerMenuAction.Delete -> stringResource(R.string.acc_delete_config_named, row.remarks)
@@ -343,6 +365,13 @@ internal fun ServerListItem(
             actions.perform(action, row)
             true
         }
+    }
+    val accessibilityActions = itemActions + if (reorderIndex != null) {
+        reorderAccessibilityActions(reorderIndex, itemCount) { command ->
+            actions.move(row.guid, command)
+        }
+    } else {
+        emptyList()
     }
     Row(
         modifier = Modifier
