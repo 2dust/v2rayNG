@@ -29,7 +29,7 @@ class SubscriptionToggleFeedbackTest {
             ActivityScenario.launch(SubSettingActivity::class.java).use { scenario ->
                 val row = probe.row(name)
                 probe.assertSingleToggle(row)
-                assertEquals(4, probe.nodes(row).count { it.isClickable })
+                assertEquals(1, probe.nodes(row).count { it.isClickable })
                 val label = probe.label(row)
                 assertTrue(label.contains(name))
                 assertTrue(!label.contains("example.invalid"))
@@ -40,11 +40,16 @@ class SubscriptionToggleFeedbackTest {
                 assertEquals(false, MmkvManager.decodeSubscription(id)?.enabled)
                 assertEquals(label, probe.label(row))
                 probe.verifyInputModes(row)
-                for (resource in listOf(R.string.acc_share_named, R.string.acc_edit_named, R.string.acc_delete_named)) {
-                    var actionLabel = ""
-                    scenario.onActivity { actionLabel = it.getString(resource, name) }
-                    probe.awaitNode { it.isClickable && probe.label(it) == actionLabel }
+                var expectedActions = emptyList<String>()
+                scenario.onActivity { activity ->
+                    expectedActions = listOf(
+                        activity.getString(R.string.acc_edit_named, name),
+                        activity.getString(R.string.acc_delete_named, name),
+                        activity.getString(R.string.share_subscription_qrcode),
+                        activity.getString(R.string.share_subscription_clipboard),
+                    )
                 }
+                assertEquals(expectedActions, row.actionList.mapNotNull { it.label?.toString() }.take(4))
                 scenario.recreate()
                 val restored = probe.row(name)
                 probe.focus(restored)
