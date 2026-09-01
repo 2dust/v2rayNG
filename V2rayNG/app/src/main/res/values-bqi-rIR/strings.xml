@@ -544,7 +544,7 @@
     <string name="acc_app_routed_directly">موستقیم ره اڌه</string>
     <string name="acc_app_routed_through">وا برنومه ره اڌه</string>
     <string name="acc_per_app_routing_disabled">ره وندن و ری برنومه روون نید</string>
-    <string name="permission_camera">دوربیݩ</string>
+    <string name="permission_camera">شؽواتگر</string>
     <string name="permission_notification">وارسۊوی</string>
     <string name="permission_local_network">شبکه محلی</string>
     <string name="subscription_update_updating">اشتراک %1$s هونی ورۊ ابۊ</string>
