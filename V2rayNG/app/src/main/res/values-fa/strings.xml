@@ -517,6 +517,8 @@
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
+    <string name="acc_connect">اتصال</string>
+    <string name="acc_disconnect">قطع اتصال</string>
     <string name="acc_back">بازگشت</string>
     <string name="acc_search">جستجو</string>
     <string name="acc_clear_search">پاک کردن جستجو</string>

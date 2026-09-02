@@ -517,6 +517,8 @@
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
     <string name="acc_start">Khởi động dịch vụ</string>
     <string name="acc_stop">Dừng dịch vụ</string>
+    <string name="acc_connect">Kết nối</string>
+    <string name="acc_disconnect">Ngắt kết nối</string>
     <string name="acc_back">Quay lại</string>
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_clear_search">Xóa tìm kiếm</string>

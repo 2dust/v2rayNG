@@ -517,6 +517,8 @@
     <string name="acc_add_rule">Добавить правило маршрутизации</string>
     <string name="acc_start">Запустить службу</string>
     <string name="acc_stop">Остановить службу</string>
+    <string name="acc_connect">Подключиться</string>
+    <string name="acc_disconnect">Отключиться</string>
     <string name="acc_back">Назад</string>
     <string name="acc_search">Поиск</string>
     <string name="acc_clear_search">Очистить поиск</string>

@@ -517,6 +517,8 @@
     <string name="acc_add_rule">Add routing rule</string>
     <string name="acc_start">Start service</string>
     <string name="acc_stop">Stop service</string>
+    <string name="acc_connect">Connect</string>
+    <string name="acc_disconnect">Disconnect</string>
     <string name="acc_back">Back</string>
     <string name="acc_search">Search</string>
     <string name="acc_clear_search">Clear search</string>

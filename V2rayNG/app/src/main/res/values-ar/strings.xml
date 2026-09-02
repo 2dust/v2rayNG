@@ -517,6 +517,8 @@
     <string name="acc_add_rule">إضافة قاعدة توجيه</string>
     <string name="acc_start">بدء الخدمة</string>
     <string name="acc_stop">إيقاف الخدمة</string>
+    <string name="acc_connect">اتصال</string>
+    <string name="acc_disconnect">قطع الاتصال</string>
     <string name="acc_back">رجوع</string>
     <string name="acc_search">بحث</string>
     <string name="acc_clear_search">مسح البحث</string>

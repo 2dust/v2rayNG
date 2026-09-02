@@ -517,6 +517,8 @@
     <string name="acc_add_rule">新增路由規則</string>
     <string name="acc_start">啟動服務</string>
     <string name="acc_stop">停止服務</string>
+    <string name="acc_connect">連線</string>
+    <string name="acc_disconnect">中斷連線</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜尋</string>
     <string name="acc_clear_search">清除搜尋</string>

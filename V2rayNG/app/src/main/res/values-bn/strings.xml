@@ -517,6 +517,8 @@
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>
     <string name="acc_stop">সার্ভিস বন্ধ করুন</string>
+    <string name="acc_connect">সংযোগ করুন</string>
+    <string name="acc_disconnect">সংযোগ বিচ্ছিন্ন করুন</string>
     <string name="acc_back">ফিরে যান</string>
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_clear_search">অনুসন্ধান মুছুন</string>
