@@ -52,7 +52,6 @@
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_asset_file">فایل بونچک جوقرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_asset_source">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_source_named">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -150,6 +149,7 @@
     <string name="msg_file_not_found">فایلن نجوست</string>
     <string name="msg_remark_is_duplicate">ای نوم ز زیتر بیڌس</string>
     <string name="asset_geo_files_sources">بونچک فایلا جغرافیایی (اختیاری)</string>
+    <string name="confirm_delete_asset_source_named">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">هونی بار ونی ابۊ…</string>
