@@ -329,6 +329,12 @@
     <string name="acc_last_updated">ورۊ رسۊوی نهایی من %1$s</string>
     <string name="acc_subscription_update_on">ورۊ کردن روشن هڌ</string>
     <string name="acc_subscription_update_off">ورۊ کردن خاموش هڌ</string>
+    <string name="acc_enable_subscription_update">روشن کردن ورۊ کردن</string>
+    <string name="acc_disable_subscription_update">خاموش کردن ورۊ کردن</string>
+    <string name="acc_enable_subscription_auto_update">روشن کردن ورۊ کردن خوتکار وا فاصله زمۊوی</string>
+    <string name="acc_disable_subscription_auto_update">خاموش کردن ورۊ کردن خوتکار وا فاصله زمۊوی</string>
+    <string name="acc_subscription_auto_update_enabled">ورۊ کردن خوتکار وا فاصله زمۊوی روشن هڌ</string>
+    <string name="acc_subscription_auto_update_disabled">ورۊ کردن خوتکار وا فاصله زمۊوی خاموش هڌ</string>
     <string name="acc_unnamed_subscription">بی‌نوم.</string>
     <string name="acc_share_named">یک رسۊوی %1$s</string>
     <string name="acc_edit_named">آلشتکاری %1$s</string>
@@ -533,6 +539,7 @@
     <string name="acc_move_up">آلشت و روء</string>
     <string name="acc_move_down">آلشت و بلم</string>
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
+    <string name="acc_moved">آلشت وابید</string>
     <string name="acc_selected_server">پسند وابیڌه</string>
     <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
