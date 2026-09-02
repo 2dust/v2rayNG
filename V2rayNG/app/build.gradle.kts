@@ -1,3 +1,4 @@
+import com.android.build.api.variant.BuildConfigField
 import com.android.build.api.variant.FilterConfiguration
 
 plugins {
@@ -9,6 +10,8 @@ plugins {
 android {
     namespace = "com.v2ray.ang"
     compileSdk = 37
+
+    providers.gradleProperty("NDK_VERSION").orNull?.let { ndkVersion = it }
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
@@ -54,11 +57,9 @@ android {
         create("fdroid") {
             dimension = "distribution"
             applicationIdSuffix = ".fdroid"
-            buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }
         create("playstore") {
             dimension = "distribution"
-            buildConfigField("String", "DISTRIBUTION", "\"Play Store\"")
         }
     }
 
@@ -111,6 +112,11 @@ kotlin {
 androidComponents {
     onVariants { variant ->
         val isFdroid = variant.productFlavors.any { it.first == "distribution" && it.second == "fdroid" }
+        val distribution = if (isFdroid) "F-Droid" else "Play Store"
+        checkNotNull(variant.buildConfigFields) { "BuildConfig must be enabled for ${variant.name}" }.put(
+            "DISTRIBUTION",
+            BuildConfigField("String", "\"$distribution\"", null)
+        )
         val distributionSuffix = if (isFdroid) "-fdroid" else ""
         val abiVersionCodes = mapOf(
             "armeabi-v7a" to 2, "arm64-v8a" to 1, "x86" to 4, "x86_64" to 3, "universal" to 0
