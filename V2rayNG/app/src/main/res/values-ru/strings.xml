@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">маршрутизируется напрямую</string>
     <string name="acc_routing_rule_enabled">Правило включено</string>
     <string name="acc_routing_rule_disabled">Правило выключено</string>
+    <string name="acc_enable_routing_rule">Включить правило</string>
+    <string name="acc_disable_routing_rule">Выключить правило</string>
     <string name="acc_edit_routing_rule_named">Изменить %1$s</string>
     <string name="acc_delete_routing_rule_named">Удалить %1$s</string>
     <string name="acc_start">Запустить службу</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">Переместить выше</string>
     <string name="acc_move_down">Переместить ниже</string>
     <string name="acc_move_to_bottom">Переместить в конец</string>
+    <string name="acc_moved">Перемещено</string>
     <string name="acc_selected_server">Выбрано</string>
     <string name="acc_share_subscription">Поделиться ссылкой на подписку</string>
     <string name="acc_share_log">Поделиться журналом</string>

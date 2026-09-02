@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">được định tuyến trực tiếp</string>
     <string name="acc_routing_rule_enabled">Quy tắc đang bật</string>
     <string name="acc_routing_rule_disabled">Quy tắc đang tắt</string>
+    <string name="acc_enable_routing_rule">Bật quy tắc</string>
+    <string name="acc_disable_routing_rule">Tắt quy tắc</string>
     <string name="acc_edit_routing_rule_named">Chỉnh sửa %1$s</string>
     <string name="acc_delete_routing_rule_named">Xóa %1$s</string>
     <string name="acc_start">Khởi động dịch vụ</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">Chuyển lên</string>
     <string name="acc_move_down">Chuyển xuống</string>
     <string name="acc_move_to_bottom">Chuyển xuống cuối danh sách</string>
+    <string name="acc_moved">Đã di chuyển</string>
     <string name="acc_selected_server">Đã chọn</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>

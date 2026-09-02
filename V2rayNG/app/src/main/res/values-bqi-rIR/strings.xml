@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">موستقیم ره اڌه</string>
     <string name="acc_routing_rule_enabled">ای قانووݩ روشن هڌ</string>
     <string name="acc_routing_rule_disabled">ای قانووݩ خاموش هڌ</string>
+    <string name="acc_enable_routing_rule">روشن کردن قانووݩ</string>
+    <string name="acc_disable_routing_rule">خاموش کردن قانووݩ</string>
     <string name="acc_edit_routing_rule_named">آلشتکاری %1$s</string>
     <string name="acc_delete_routing_rule_named">پاک کردن %1$s</string>
     <string name="acc_start">ره وستن سرویس</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">آلشت و روء</string>
     <string name="acc_move_down">آلشت و بلم</string>
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
+    <string name="acc_moved">آلشت وابید</string>
     <string name="acc_selected_server">پسند وابیڌه</string>
     <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>

@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.compose
 
+import android.view.accessibility.AccessibilityNodeInfo
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -46,7 +47,12 @@ class RoutingToggleFeedbackTest {
             assertEquals(1, probe.nodes(row).count { it.isClickable })
             probe.focus(row)
             val label = probe.label(row)
+            val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+            assertEquals(context.getString(R.string.acc_enable_routing_rule),
+                row.actionList.single { it.id == AccessibilityNodeInfo.ACTION_CLICK }.label)
             probe.toggle(row, true)
+            assertEquals(context.getString(R.string.acc_disable_routing_rule),
+                row.actionList.single { it.id == AccessibilityNodeInfo.ACTION_CLICK }.label)
             probe.toggle(row, false)
             assertEquals(label, probe.label(row))
             probe.verifyInputModes(row)
@@ -58,7 +64,7 @@ class RoutingToggleFeedbackTest {
                     activity.getString(R.string.acc_delete_routing_rule_named, "Feedback test rule"),
                 )
             }
-            val actions = row.actionList.filter { it.label != null }
+            val actions = row.actionList.filter { it.label != null && it.id != AccessibilityNodeInfo.ACTION_CLICK }
             assertEquals(expectedActions, actions.map { it.label.toString() })
             actions.forEach { assertTrue(row.performAction(it.id)) }
             assertEquals(1, edits)

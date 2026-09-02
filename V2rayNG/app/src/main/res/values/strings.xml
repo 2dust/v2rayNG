@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">routed directly</string>
     <string name="acc_routing_rule_enabled">The rule is on</string>
     <string name="acc_routing_rule_disabled">The rule is off</string>
+    <string name="acc_enable_routing_rule">Enable rule</string>
+    <string name="acc_disable_routing_rule">Disable rule</string>
     <string name="acc_edit_routing_rule_named">Edit %1$s</string>
     <string name="acc_delete_routing_rule_named">Delete %1$s</string>
     <string name="acc_start">Start service</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">Move up</string>
     <string name="acc_move_down">Move down</string>
     <string name="acc_move_to_bottom">Move to bottom</string>
+    <string name="acc_moved">Moved</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>

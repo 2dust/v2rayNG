@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">直接路由</string>
     <string name="acc_routing_rule_enabled">规则已开启</string>
     <string name="acc_routing_rule_disabled">规则已关闭</string>
+    <string name="acc_enable_routing_rule">启用规则</string>
+    <string name="acc_disable_routing_rule">禁用规则</string>
     <string name="acc_edit_routing_rule_named">编辑%1$s</string>
     <string name="acc_delete_routing_rule_named">删除%1$s</string>
     <string name="acc_start">启动服务</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">上移</string>
     <string name="acc_move_down">下移</string>
     <string name="acc_move_to_bottom">移至列表底部</string>
+    <string name="acc_moved">已移动</string>
     <string name="acc_selected_server">已选择</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>

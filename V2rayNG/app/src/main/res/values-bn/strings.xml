@@ -523,6 +523,8 @@
     <string name="acc_routing_rule_routed_directly">সরাসরি রাউট করা হয়েছে</string>
     <string name="acc_routing_rule_enabled">নিয়মটি চালু</string>
     <string name="acc_routing_rule_disabled">নিয়মটি বন্ধ</string>
+    <string name="acc_enable_routing_rule">নিয়ম চালু করুন</string>
+    <string name="acc_disable_routing_rule">নিয়ম বন্ধ করুন</string>
     <string name="acc_edit_routing_rule_named">%1$s সম্পাদনা করুন</string>
     <string name="acc_delete_routing_rule_named">%1$s মুছুন</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>
@@ -535,6 +537,7 @@
     <string name="acc_move_up">উপরে সরান</string>
     <string name="acc_move_down">নিচে সরান</string>
     <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
+    <string name="acc_moved">সরানো হয়েছে</string>
     <string name="acc_selected_server">নির্বাচিত</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>

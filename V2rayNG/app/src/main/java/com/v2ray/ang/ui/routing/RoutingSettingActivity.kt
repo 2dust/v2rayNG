@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,6 +72,7 @@ import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -221,6 +223,7 @@ fun RoutingSettingScreen(
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
+    val actionFeedback = rememberAccessibilityActionFeedback()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
         val fromIndex = rulesets.indexOfFirst { it.id == from.key }
@@ -313,6 +316,7 @@ fun RoutingSettingScreen(
                             reorderIndex = index,
                             itemCount = rulesets.size,
                             onMove = { command -> viewModel.move(ruleset.id, command) },
+                            onFeedback = actionFeedback,
                         )
                     }
                     ItemDivider()
@@ -356,8 +360,12 @@ internal fun RoutingRulesetItem(
     reorderIndex: Int? = null,
     itemCount: Int = 0,
     onMove: (ReorderCommand) -> Boolean = { false },
+    onFeedback: (String) -> Unit = {},
 ) {
     val enabled = ruleset.enabled
+    val toggleLabel = stringResource(
+        if (enabled) R.string.acc_disable_routing_rule else R.string.acc_enable_routing_rule
+    )
     val ruleName = ruleset.remarks.orEmpty()
     val outboundTag = ruleset.outboundTag.ifBlank { AppConfig.TAG_PROXY }
     val routeDescription = when {
@@ -393,7 +401,7 @@ internal fun RoutingRulesetItem(
         ),
     )
     val accessibilityActions = itemActions + if (reorderIndex != null) {
-        reorderAccessibilityActions(reorderIndex, itemCount, onMove)
+        reorderAccessibilityActions(reorderIndex, itemCount, onFeedback, onMove)
     } else {
         emptyList()
     }
@@ -405,6 +413,7 @@ internal fun RoutingRulesetItem(
                 contentDescription = accessibilitySummary
                 stateDescription = ruleState
                 customActions = accessibilityActions
+                onClick(label = toggleLabel, action = null)
             }
             .toggleable(value = enabled, role = Role.Switch, onValueChange = onEnabledChange)
             .padding(horizontal = 16.dp),
