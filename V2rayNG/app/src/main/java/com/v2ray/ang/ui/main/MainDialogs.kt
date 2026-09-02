@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
@@ -49,8 +48,6 @@ fun SubscriptionImportDialog(url: String, name: String, onAction: (MainAction) -
     AlertDialog(
         onDismissRequest = { onAction(MainAction.CancelSubscriptionImport) },
         modifier = Modifier.semantics { paneTitle = title },
-        // The pane announces the title, leaving the URL message as the first focus target.
-        title = { Text(title, modifier = Modifier.clearAndSetSemantics {}) },
         text = {
             Column(
                 Modifier
