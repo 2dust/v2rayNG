@@ -33,10 +33,14 @@ internal enum class ReorderCommand(@StringRes val labelRes: Int) {
 internal fun reorderAccessibilityActions(
     currentIndex: Int,
     itemCount: Int,
+    onFeedback: (String) -> Unit,
     onMove: (ReorderCommand) -> Boolean,
-): List<CustomAccessibilityAction> = ReorderCommand.availableAt(currentIndex, itemCount).map { command ->
-    CustomAccessibilityAction(
-        label = stringResource(command.labelRes),
-        action = { onMove(command) },
-    )
+): List<CustomAccessibilityAction> {
+    val moved = stringResource(R.string.acc_moved)
+    return ReorderCommand.availableAt(currentIndex, itemCount).map { command ->
+        CustomAccessibilityAction(
+            label = stringResource(command.labelRes),
+            action = { onMove(command).also { changed -> if (changed) onFeedback(moved) } },
+        )
+    }
 }

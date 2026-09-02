@@ -61,6 +61,7 @@ import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -89,8 +90,10 @@ fun GroupPagerPage(
     }
     val groupState by groupStateFlow.collectAsStateWithLifecycle()
     val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+    val actionFeedback = rememberAccessibilityActionFeedback()
     val actions = remember(
         onSelectServer,
+        actionFeedback,
         onAction,
         onShareServer,
         onMoreServer,
@@ -105,6 +108,7 @@ fun GroupPagerPage(
             more = onMoreServer,
             remove = onRemoveServer,
             move = { guid, command -> mainViewModel.moveServer(groupId, guid, command) },
+            feedback = actionFeedback,
         )
     }
     ServerListPage(
@@ -132,6 +136,7 @@ internal class ServerRowActions(
     val more: (String, ProfileItem) -> Unit,
     val remove: (String, String) -> Unit,
     val move: (String, ReorderCommand) -> Boolean,
+    val feedback: (String) -> Unit = {},
 ) {
     fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
         action.perform(row.guid, row.profile, onAction, remove)
@@ -367,7 +372,7 @@ internal fun ServerListItem(
         }
     }
     val accessibilityActions = itemActions + if (reorderIndex != null) {
-        reorderAccessibilityActions(reorderIndex, itemCount) { command ->
+        reorderAccessibilityActions(reorderIndex, itemCount, actions.feedback) { command ->
             actions.move(row.guid, command)
         }
     } else {
@@ -377,7 +382,7 @@ internal fun ServerListItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .clickable { actions.select(row.guid) }
+            .clickable(onClickLabel = stringResource(R.string.acc_select_server)) { actions.select(row.guid) }
             // Keep native activation, but move the child buttons into the row's action menu.
             .clearAndSetSemantics {
                 contentDescription = description

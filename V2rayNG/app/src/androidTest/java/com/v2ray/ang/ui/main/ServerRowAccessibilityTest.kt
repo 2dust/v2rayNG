@@ -94,12 +94,16 @@ class ServerRowAccessibilityTest {
             update { doubleColumn.value = columns }
             val node = awaitRow()
             assertTrue(node.isClickable)
+            assertEquals(
+                instrumentation.targetContext.getString(R.string.acc_select_server),
+                node.actionList.single { it.id == AccessibilityNodeInfo.ACTION_CLICK }.label?.toString(),
+            )
             assertFalse(node.isCheckable)
             assertFalse(node.isSelected)
             assertEquals("android.view.View", node.className.toString())
             assertNull(AccessibilityNodeInfoCompat.wrap(node).stateDescription)
             assertEquals(0, node.childCount)
-            assertEquals(expectedLabels(complex = false), node.actionList.mapNotNull { it.label?.toString() })
+            assertEquals(expectedLabels(complex = false), node.actionList.filter { it.id != AccessibilityNodeInfo.ACTION_CLICK }.mapNotNull { it.label?.toString() })
             assertEquals(1, nodes().count { it.contentDescription?.contains(name) == true })
         }
     }
@@ -107,7 +111,8 @@ class ServerRowAccessibilityTest {
     @Test
     fun selectedPrefixDoesNotDependOnConnectionStateAndKeepsNodeIdentity() {
         val original = awaitRow()
-        assertTrue(original.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS))
+        original.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS)
+        awaitRow { it.isAccessibilityFocused }
         assertFalse(original.contentDescription.toString().startsWith(selectedPrefix()))
         update { selected.value = true }
         awaitRow { it.contentDescription.toString().startsWith("${selectedPrefix()}. $name") }
@@ -123,7 +128,7 @@ class ServerRowAccessibilityTest {
     @Test
     fun customActionsDispatchOriginalOperationsByGuid() {
         val node = awaitRow()
-        node.actionList.filter { it.label != null }.forEach {
+        node.actionList.filter { it.id != AccessibilityNodeInfo.ACTION_CLICK && it.label != null }.forEach {
             assertTrue(node.performAction(it.id))
             instrumentation.waitForIdleSync()
         }
@@ -150,7 +155,7 @@ class ServerRowAccessibilityTest {
     fun complexProfilesExposeOnlySupportedActions() {
         for (type in listOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN)) {
             update { profileType.value = type }
-            awaitRow { it.actionList.mapNotNull { action -> action.label?.toString() } == expectedLabels(complex = true) }
+            awaitRow { it.actionList.filter { action -> action.id != AccessibilityNodeInfo.ACTION_CLICK }.mapNotNull { action -> action.label?.toString() } == expectedLabels(complex = true) }
         }
     }
 

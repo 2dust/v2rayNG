@@ -4,7 +4,7 @@ import android.app.UiAutomation
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
+import com.v2ray.ang.ui.compose.AppTheme
 import androidx.compose.material3.Surface
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,7 +26,7 @@ class ProxyChainMemberAccessibilityTest {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
                 activity.setContent {
-                    MaterialTheme {
+                    AppTheme {
                         Surface {
                             ProxyChainScreen(
                                 editGuid = "",
