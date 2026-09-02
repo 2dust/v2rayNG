@@ -27,6 +27,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +44,15 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
@@ -63,6 +68,7 @@ import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
@@ -138,6 +144,20 @@ fun SubSettingScreen(
 
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
+    val actionFeedback = rememberAccessibilityActionFeedback()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel, lifecycleOwner, context, actionFeedback) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.viewModelEvent.collect { event ->
+                if (event is SubscriptionAutoUpdateChanged) {
+                    actionFeedback(context.getString(
+                        if (event.enabled) R.string.acc_subscription_auto_update_enabled
+                        else R.string.acc_subscription_auto_update_disabled
+                    ))
+                }
+            }
+        }
+    }
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         viewModel.move(from.index, to.index)
     }
@@ -194,6 +214,10 @@ fun SubSettingScreen(
                     if (subCache.subscription.enabled) R.string.acc_subscription_update_on
                     else R.string.acc_subscription_update_off,
                 )
+                val updateActionLabel = stringResource(
+                    if (subCache.subscription.enabled) R.string.acc_disable_subscription_update
+                    else R.string.acc_enable_subscription_update
+                )
                 val requestDelete = {
                     if (confirmRemove) {
                         removeTarget = SubscriptionDeleteTarget(
@@ -215,6 +239,15 @@ fun SubSettingScreen(
                     ))
                     if (subCache.subscription.url.isNotEmpty()) {
                         add(CustomAccessibilityAction(
+                            label = stringResource(
+                                if (subCache.subscription.autoUpdate) R.string.acc_disable_subscription_auto_update
+                                else R.string.acc_enable_subscription_auto_update
+                            ),
+                            action = {
+                                viewModel.setAutoUpdate(subCache.guid, !subCache.subscription.autoUpdate)
+                            },
+                        ))
+                        add(CustomAccessibilityAction(
                             label = stringResource(SubscriptionShareAction.QRCode.labelRes),
                             action = {
                                 showQRCodeBitmap = onShareQRCode(subCache.subscription.url)
@@ -233,6 +266,7 @@ fun SubSettingScreen(
                 val accessibilityActions = itemActions + reorderAccessibilityActions(
                     currentIndex = index,
                     itemCount = subscriptions.size,
+                    onFeedback = actionFeedback,
                     onMove = { command -> viewModel.move(subCache.guid, command) },
                 )
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
@@ -247,6 +281,7 @@ fun SubSettingScreen(
                                     contentDescription = subscriptionName
                                     stateDescription = subscriptionUpdateState
                                     customActions = accessibilityActions
+                                    onClick(label = updateActionLabel, action = null)
                                 }
                                 .toggleable(
                                     value = subCache.subscription.enabled,
