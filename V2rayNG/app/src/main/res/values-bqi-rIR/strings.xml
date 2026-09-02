@@ -174,9 +174,9 @@
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ.\nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ.\nپسند خوتکار برنومه یلی ک وا ی پروکسی منپیز ابۊن من نومگه امکووݩ پذیر هڌ.</string>
     <string name="title_pref_is_booted">منپیز بئڌ ره وندن دسگا</string>
     <string name="summary_pref_is_booted">بئڌ ره وندن دسگا، خوساخوس و سرور پسند بیڌه منپیز ابۊ. Android گاشڌ ره وندن من پس زمینه ن مئدۊد کونه.</string>
-    <string name="title_system_vpn_settings">سامووا VPN سیستم</string>
+    <string name="title_system_vpn_settings">سامووا VPN سیستوم</string>
     <string name="summary_system_vpn_settings">سامووا VPN من Android ن وا کۊنین سی ساموو کردن VPN همیشه ره وست، ٱر دسگا زس پشتیبانی اکونه.</string>
-    <string name="toast_system_vpn_settings_unavailable">سامووا VPN سیستم من دسرس نین.</string>
+    <string name="toast_system_vpn_settings_unavailable">سامووا VPN سیستوم من دسرس نین.</string>
 
 
     <string name="subscription_updater_job_tips">وزیفه من پس زمینه کار اکونه وو ایلاعات پؽشرفت من اعلان نشووݩ داڌه ابۊ.</string>
