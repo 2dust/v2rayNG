@@ -57,6 +57,7 @@ import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
@@ -214,6 +215,7 @@ fun ProxyChainScreen(
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val lazyListState = rememberLazyListState()
+    val actionFeedback = rememberAccessibilityActionFeedback()
     val moveMember: (String, ReorderCommand) -> Boolean = { memberKey, command ->
         val fromIndex = memberKeys.indexOf(memberKey)
         val toIndex = command.targetIndex(fromIndex, memberKeys.size)
@@ -329,7 +331,7 @@ fun ProxyChainScreen(
                         label = stringResource(R.string.acc_remove),
                         action = { requestMemberRemoval(memberKey) },
                     )
-                ) + reorderAccessibilityActions(index, members.size) { command ->
+                ) + reorderAccessibilityActions(index, members.size, actionFeedback) { command ->
                     moveMember(memberKey, command)
                 }
                 ReorderableItem(reorderableState, key = memberKey) { isDragging ->

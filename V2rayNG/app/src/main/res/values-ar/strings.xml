@@ -545,7 +545,9 @@
     <string name="acc_move_up">نقل إلى أعلى</string>
     <string name="acc_move_down">نقل إلى أسفل</string>
     <string name="acc_move_to_bottom">نقل إلى أسفل القائمة</string>
+    <string name="acc_moved">تم النقل</string>
     <string name="acc_selected_server">محدّد</string>
+    <string name="acc_select_server">اختيار</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

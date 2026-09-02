@@ -537,7 +537,9 @@
     <string name="acc_move_up">انتقال به بالا</string>
     <string name="acc_move_down">انتقال به پایین</string>
     <string name="acc_move_to_bottom">انتقال به انتهای فهرست</string>
+    <string name="acc_moved">جابه‌جا شد</string>
     <string name="acc_selected_server">انتخاب‌شده</string>
+    <string name="acc_select_server">انتخاب</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>
