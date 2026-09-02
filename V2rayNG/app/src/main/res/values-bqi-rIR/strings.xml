@@ -62,6 +62,13 @@
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">نوم منتوری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌سانیه</item>
+        <item quantity="other">%1$d میلی‌سانیه</item>
+    </plurals>
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="server_lab_security">ٱمنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">جاگورو</string>
@@ -394,13 +401,6 @@
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
     <string name="connection_test_available">مووفق بی: منپیز %1$s تۊل کشی</string>
     <string name="server_test_delay_value">%1$d میلی‌سانیه</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d میلی‌سانیه</item>
-        <item quantity="other">%1$d میلی‌سانیه</item>
-    </plurals>
-    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
-    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
-    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
