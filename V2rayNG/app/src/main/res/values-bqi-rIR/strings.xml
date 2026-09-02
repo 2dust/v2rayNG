@@ -551,4 +551,8 @@
     <string name="sub_import_title">نوم‌گذاری گروه اشتراک</string>
     <string name="sub_import_name">نوم اشتراک</string>
     <string name="sub_import_default_name">اشتراک وارد وابیده</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="one">ای اشتراک ز زیتر بیڌس</item>
+        <item quantity="other">ای اشتراکا ز زیتر بیڌن</item>
+    </plurals>
 </resources>

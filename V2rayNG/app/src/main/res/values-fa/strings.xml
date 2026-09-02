@@ -551,4 +551,8 @@
     <string name="sub_import_title">نام‌گذاری گروه اشتراک</string>
     <string name="sub_import_name">نام اشتراک</string>
     <string name="sub_import_default_name">اشتراک واردشده</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="one">این اشتراک از قبل وجود دارد.</item>
+        <item quantity="other">این اشتراک‌ها از قبل وجود دارند.</item>
+    </plurals>
 </resources>

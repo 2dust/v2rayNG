@@ -551,4 +551,10 @@
     <string name="sub_import_title">Назовите группу подписки</string>
     <string name="sub_import_name">Название подписки</string>
     <string name="sub_import_default_name">Импортированная подписка</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="one">Эта подписка уже существует.</item>
+        <item quantity="few">Эти подписки уже существуют.</item>
+        <item quantity="many">Эти подписки уже существуют.</item>
+        <item quantity="other">Эти подписки уже существуют.</item>
+    </plurals>
 </resources>

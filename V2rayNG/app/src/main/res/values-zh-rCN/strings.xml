@@ -551,4 +551,7 @@
     <string name="sub_import_title">为订阅分组命名</string>
     <string name="sub_import_name">订阅名称</string>
     <string name="sub_import_default_name">导入订阅</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="other">订阅已存在。</item>
+    </plurals>
 </resources>

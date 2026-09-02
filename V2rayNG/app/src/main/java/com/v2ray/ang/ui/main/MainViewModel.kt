@@ -452,7 +452,7 @@ class MainViewModel(
                 withContext(ioDispatcher) {
                     try {
                         var cancelledSubscription = false
-                        val (count, countSub) = dataSource.importBatchConfig(
+                        val (count, countSub, duplicateCount) = dataSource.importBatchConfig(
                             action.configText, subscriptionId, action.append
                         ) { suggestedName, existingNames ->
                             requestSubscriptionName(suggestedName, existingNames).also {
@@ -466,6 +466,11 @@ class MainViewModel(
                             }
 
                             countSub > 0 -> setupGroupTab(forceRefresh = true)
+                            duplicateCount > 0 -> toastError(
+                                localizedContext.resources.getQuantityString(
+                                    R.plurals.import_subscription_duplicate, duplicateCount
+                                )
+                            )
                             !cancelledSubscription -> toastError(R.string.toast_failure)
                         }
                     } catch (cancelled: CancellationException) {

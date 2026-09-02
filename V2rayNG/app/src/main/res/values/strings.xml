@@ -551,4 +551,8 @@
     <string name="sub_import_title">Name subscription group</string>
     <string name="sub_import_name">Subscription name</string>
     <string name="sub_import_default_name">import sub</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="one">This subscription already exists.</item>
+        <item quantity="other">These subscriptions already exist.</item>
+    </plurals>
 </resources>

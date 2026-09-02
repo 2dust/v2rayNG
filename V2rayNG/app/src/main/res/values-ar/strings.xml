@@ -551,4 +551,12 @@
     <string name="sub_import_title">تسمية مجموعة الاشتراك</string>
     <string name="sub_import_name">اسم الاشتراك</string>
     <string name="sub_import_default_name">اشتراك مستورد</string>
+    <plurals name="import_subscription_duplicate">
+        <item quantity="zero">هذه الاشتراكات موجودة بالفعل.</item>
+        <item quantity="one">هذا الاشتراك موجود بالفعل.</item>
+        <item quantity="two">هذان الاشتراكان موجودان بالفعل.</item>
+        <item quantity="few">هذه الاشتراكات موجودة بالفعل.</item>
+        <item quantity="many">هذه الاشتراكات موجودة بالفعل.</item>
+        <item quantity="other">هذه الاشتراكات موجودة بالفعل.</item>
+    </plurals>
 </resources>

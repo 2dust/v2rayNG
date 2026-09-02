@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import com.v2ray.ang.dto.ConfigImportResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -48,7 +49,7 @@ interface MainDataSource : Closeable {
         subscriptionId: String,
         updateUI: Boolean,
         requestSubscriptionName: suspend (String?, Set<String>) -> String?
-    ): Pair<Int, Int>
+    ): ConfigImportResult
 
     fun updateConfigViaSubAll(): SubscriptionUpdateResult
     fun updateConfigViaSub(subscriptionCache: SubscriptionCache): SubscriptionUpdateResult

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
+import com.v2ray.ang.dto.ConfigImportResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -30,6 +31,8 @@ import kotlinx.coroutines.CancellationException
 import java.net.URI
 
 object AngConfigManager {
+
+    private enum class SubscriptionImportOutcome { Imported, Duplicate, Cancelled }
 
     private data class ParsedProfile(
         val profile: ProfileItem,
@@ -180,14 +183,14 @@ object AngConfigManager {
      * @param append Whether to append the configurations.
      * @param requestSubscriptionName Optional confirmation before saving each new subscription;
      * receives its suggested name and existing names, and returns null to skip it.
-     * @return A pair containing the number of configurations and subscriptions imported.
+     * @return Imported configuration/subscription counts and duplicate subscription count.
      */
     suspend fun importBatchConfig(
         server: String?,
         subid: String,
         append: Boolean,
         requestSubscriptionName: (suspend (String?, Set<String>) -> String?)? = null
-    ): Pair<Int, Int> {
+    ): ConfigImportResult {
         return try {
             var count = parseBatchConfig(Utils.decode(server), subid, append)
             if (count <= 0) {
@@ -197,18 +200,18 @@ object AngConfigManager {
                 count = parseCustomConfigServer(server, subid, append)
             }
 
-            var countSub = parseBatchSubscription(server, requestSubscriptionName)
-            if (countSub <= 0) {
-                countSub = parseBatchSubscription(Utils.decode(server), requestSubscriptionName)
+            var subscriptions = parseBatchSubscription(server, requestSubscriptionName)
+            if (subscriptions.subscriptionCount == 0 && subscriptions.duplicateSubscriptionCount == 0) {
+                subscriptions = parseBatchSubscription(Utils.decode(server), requestSubscriptionName)
             }
-            if (countSub > 0) {
+            if (subscriptions.subscriptionCount > 0) {
                 updateConfigViaSubAll()
             }
 
-            count to countSub
+            subscriptions.copy(configCount = count)
         } catch (e: ProfileStorageException) {
             LogUtil.e(AppConfig.TAG, "Failed to store imported profiles", e)
-            0 to 0
+            ConfigImportResult()
         }
     }
 
@@ -216,32 +219,37 @@ object AngConfigManager {
      * Parses a batch of subscriptions.
      *
      * @param servers The servers string.
-     * @return The number of subscriptions parsed.
+     * @return Imported and duplicate subscription counts.
      */
     private suspend fun parseBatchSubscription(
         servers: String?,
         requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
-    ): Int {
+    ): ConfigImportResult {
         try {
             if (servers == null) {
-                return 0
+                return ConfigImportResult()
             }
 
             var count = 0
+            var duplicates = 0
             servers.lines()
                 .distinct()
                 .forEach { str ->
                     if (Utils.isValidSubUrl(str)) {
-                        count += importUrlAsSubscription(str, requestSubscriptionName)
+                        when (importUrlAsSubscription(str, requestSubscriptionName)) {
+                            SubscriptionImportOutcome.Imported -> count++
+                            SubscriptionImportOutcome.Duplicate -> duplicates++
+                            SubscriptionImportOutcome.Cancelled -> Unit
+                        }
                     }
                 }
-            return count
+            return ConfigImportResult(subscriptionCount = count, duplicateSubscriptionCount = duplicates)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to parse batch subscription", e)
         }
-        return 0
+        return ConfigImportResult()
     }
 
     /**
@@ -613,16 +621,16 @@ object AngConfigManager {
      * Imports a URL as a subscription.
      *
      * @param url The URL.
-     * @return The number of subscriptions imported.
+     * @return Whether the subscription was imported, already present, or cancelled.
      */
     private suspend fun importUrlAsSubscription(
         url: String,
         requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
-    ): Int {
+    ): SubscriptionImportOutcome {
         val subscriptions = MmkvManager.decodeSubscriptions()
         subscriptions.forEach {
             if (it.subscription.url == url) {
-                return 0
+                return SubscriptionImportOutcome.Duplicate
             }
         }
         val uri = URI(Utils.fixIllegalUrl(url))
@@ -630,15 +638,17 @@ object AngConfigManager {
             uri.fragment ?: "import sub"
         } else {
             requestSubscriptionName(uri.fragment, subscriptions.map { it.subscription.remarks }.toSet())
-                ?.trim()?.takeIf { it.isNotEmpty() } ?: return 0
+                ?.trim()?.takeIf { it.isNotEmpty() } ?: return SubscriptionImportOutcome.Cancelled
         }
         // Another import may have saved this URL while the naming dialog was open.
-        if (MmkvManager.decodeSubscriptions().any { it.subscription.url == url }) return 0
+        if (MmkvManager.decodeSubscriptions().any { it.subscription.url == url }) {
+            return SubscriptionImportOutcome.Duplicate
+        }
         val subItem = SubscriptionItem()
         subItem.remarks = remarks
         subItem.url = url
         MmkvManager.encodeSubscription("", subItem)
-        return 1
+        return SubscriptionImportOutcome.Imported
     }
 
     /** Generates a description for the profile.

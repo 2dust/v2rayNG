@@ -9,6 +9,7 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConnectionTestResult
+import com.v2ray.ang.dto.ConfigImportResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -186,7 +187,7 @@ class MainRepository(
         subscriptionId: String,
         updateUI: Boolean,
         requestSubscriptionName: suspend (String?, Set<String>) -> String?
-    ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI, requestSubscriptionName)
+    ): ConfigImportResult = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI, requestSubscriptionName)
 
     override fun updateConfigViaSubAll(): SubscriptionUpdateResult =
         AngConfigManager.updateConfigViaSubAll()

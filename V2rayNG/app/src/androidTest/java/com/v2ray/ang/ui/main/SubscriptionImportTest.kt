@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import android.app.UiAutomation
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
@@ -10,6 +11,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ConfigImportResult
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -23,6 +25,7 @@ import java.util.UUID
 @RunWith(AndroidJUnit4::class)
 class SubscriptionImportTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    private val automation = instrumentation.getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
     private val prefix = "http://127.0.0.1:1/${UUID.randomUUID()}"
 
     @Test
@@ -100,7 +103,7 @@ class SubscriptionImportTest {
                 fail("A proxy profile must not open the subscription naming dialog")
                 null
             }
-            assertEquals(1 to 0, result)
+            assertEquals(ConfigImportResult(configCount = 1), result)
             assertTrue(MmkvManager.decodeAllServerList().any { MmkvManager.decodeServerConfig(it)?.remarks == name })
         } finally {
             MmkvManager.decodeAllServerList()
@@ -120,14 +123,15 @@ class SubscriptionImportTest {
                 suggestions += suggested
                 if (suggested == null) null else "Chosen name"
             }
-            assertEquals(0 to 1, result)
+            assertEquals(ConfigImportResult(subscriptionCount = 1), result)
             assertEquals(listOf("Provided name", null), suggestions)
             assertEquals("Chosen name", saved(first)?.subscription?.remarks)
             assertNull(saved(second))
-            AngConfigManager.importBatchConfig(first, "", true) { _, _ ->
+            val duplicate = AngConfigManager.importBatchConfig(first, "", true) { _, _ ->
                 fail("An existing URL must not prompt again")
                 null
             }
+            assertEquals(ConfigImportResult(duplicateSubscriptionCount = 1), duplicate)
             try {
                 AngConfigManager.importBatchConfig("$prefix/interrupted", "", true) { _, _ ->
                     throw CancellationException("Test owner ended")
@@ -136,6 +140,55 @@ class SubscriptionImportTest {
             } catch (_: CancellationException) {
                 assertNull(saved("$prefix/interrupted"))
             }
+        } finally {
+            removeTestGroups()
+        }
+    }
+
+    @Test
+    fun duplicateImportExplainsWhyNothingWasAdded() = withMain { _, viewModel ->
+        val url = "$prefix/duplicate"
+        MmkvManager.encodeSubscription("", SubscriptionItem(remarks = "Existing", url = url, enabled = false))
+        val message = instrumentation.targetContext.resources.getQuantityString(
+            R.plurals.import_subscription_duplicate, 1
+        )
+
+        action(viewModel, MainAction.ImportBatchConfig(url))
+        waitUntil {
+            findNode(automation.rootInActiveWindow) {
+                it.text?.toString() == message
+            } != null
+        }
+        assertNull(viewModel.uiState.value.subscriptionImportName)
+        assertEquals(1, MmkvManager.decodeSubscriptions().count { it.subscription.url == url })
+    }
+
+    @Test
+    fun encodedDuplicatesAndConcurrentImportKeepTheirReason() = runBlocking {
+        try {
+            val first = "$prefix/duplicate-first"
+            val second = "$prefix/duplicate-second"
+            listOf(first, second).forEach { url ->
+                MmkvManager.encodeSubscription("", SubscriptionItem(remarks = "Existing", url = url, enabled = false))
+            }
+            val encoded = Base64.encodeToString("$first\n$second\n$first".toByteArray(), Base64.NO_WRAP)
+            assertEquals(
+                ConfigImportResult(duplicateSubscriptionCount = 2),
+                AngConfigManager.importBatchConfig(encoded, "", true) { _, _ ->
+                    fail("Existing subscriptions must not prompt for names")
+                    null
+                }
+            )
+
+            val concurrent = "$prefix/concurrent"
+            val result = AngConfigManager.importBatchConfig(concurrent, "", true) { _, _ ->
+                MmkvManager.encodeSubscription("", SubscriptionItem(remarks = "Other import", url = concurrent, enabled = false))
+                "Confirmed name"
+            }
+            assertEquals(ConfigImportResult(duplicateSubscriptionCount = 1), result)
+            assertEquals("Other import", saved(concurrent)?.subscription?.remarks)
+            assertEquals(1, MmkvManager.decodeSubscriptions().count { it.subscription.url == concurrent })
+            assertEquals(ConfigImportResult(), AngConfigManager.importBatchConfig("not a subscription", "", true))
         } finally {
             removeTestGroups()
         }
@@ -181,7 +234,7 @@ class SubscriptionImportTest {
 
     private fun setDialogText(value: String) {
         waitUntil {
-            findNode(instrumentation.uiAutomation.rootInActiveWindow) { it.isEditable }
+            findNode(automation.rootInActiveWindow) { it.isEditable }
                 ?.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
                     putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value)
                 }) == true
@@ -190,7 +243,7 @@ class SubscriptionImportTest {
 
     private fun clickText(text: String) {
         waitUntil {
-            var node = findNode(instrumentation.uiAutomation.rootInActiveWindow) {
+            var node = findNode(automation.rootInActiveWindow) {
                 it.text?.toString() == text || it.contentDescription?.toString() == text
             }
             while (node != null && !node.isClickable) node = node.parent
