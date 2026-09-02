@@ -246,7 +246,7 @@
 
     <string name="title_pref_socks_port">Cổng proxy cục bộ</string>
     <string name="title_pref_enable_local_proxy">Bật proxy cục bộ</string>
-    <string name="summary_pref_enable_local_proxy">Khi tắt, proxy SOCKS sẽ không khả dụng nên việc cập nhật đăng ký và các thao tác tương tự không thể dùng proxy</string>
+    <string name="summary_pref_enable_local_proxy">Khi tắt, việc cập nhật đăng ký và các thao tác tương tự sẽ sử dụng đường hầm VPN đang hoạt động</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">Xác thực SOCKS5 không hoàn toàn an toàn khi sử dụng UDP.</string>
     <string name="summary_pref_socks_port">Cổng proxy cục bộ</string>

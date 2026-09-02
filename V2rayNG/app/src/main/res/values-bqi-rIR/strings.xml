@@ -246,7 +246,7 @@
 
     <string name="title_pref_socks_port">پورت پروکسی محلی</string>
     <string name="title_pref_enable_local_proxy">ره وندن پروکسی محلی</string>
-    <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، هیچ پروکسی SOCKS من دسرس نؽ، سی دل هیمو کارایی جۊر ورۊ رسۊوی یل اشتراک نترن پروکسی ن و کار گرن.</string>
+    <string name="summary_pref_enable_local_proxy">هرسا ره نوسته بۊ، ورۊ رسۊوی یل اشتراک وو کارایی جۊر هیمو تونل VPN فعال ن و کار اگرن.</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">ائراز هۊویت SOCKS5 مجال استفاڌه ز UDP کاملن ایمن نؽ.</string>
     <string name="summary_pref_socks_port">پورت پروکسی محلی</string>

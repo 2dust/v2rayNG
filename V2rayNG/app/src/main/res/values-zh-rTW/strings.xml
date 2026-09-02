@@ -246,7 +246,7 @@
 
     <string name="title_pref_socks_port">本機代理埠</string>
     <string name="title_pref_enable_local_proxy">啟用本機代理</string>
-    <string name="summary_pref_enable_local_proxy">停用時不會提供 SOCKS 代理，因此訂閱更新等操作無法使用代理。</string>
+    <string name="summary_pref_enable_local_proxy">停用時，訂閱更新等操作會使用目前連線的 VPN 通道。</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">使用 UDP 時，SOCKS5 驗證並不完全安全。</string>
     <string name="summary_pref_socks_port">本機代理埠</string>

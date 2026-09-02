@@ -246,7 +246,7 @@
 
     <string name="title_pref_socks_port">স্থানীয় প্রক্সি পোর্ট</string>
     <string name="title_pref_enable_local_proxy">লোকাল প্রক্সি সক্ষম করুন</string>
-    <string name="summary_pref_enable_local_proxy">বন্ধ থাকলে কোনো SOCKS প্রক্সি পাওয়া যাবে না, তাই সাবস্ক্রিপশন আপডেট ও অনুরূপ কাজ প্রক্সি ব্যবহার করতে পারবে না</string>
+    <string name="summary_pref_enable_local_proxy">বন্ধ থাকলে, সাবস্ক্রিপশন আপডেট ও অনুরূপ কাজ সক্রিয় VPN টানেল ব্যবহার করবে</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">UDP ব্যবহার করার সময় SOCKS5 প্রমাণীকরণ সম্পূর্ণরূপে নিরাপদ নয়।</string>
     <string name="summary_pref_socks_port">স্থানীয় প্রক্সি পোর্ট</string>

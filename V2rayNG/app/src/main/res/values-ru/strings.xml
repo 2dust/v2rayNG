@@ -246,7 +246,7 @@
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
     <string name="title_pref_enable_local_proxy">Использовать локальный прокси</string>
-    <string name="summary_pref_enable_local_proxy">Если отключено, SOCKS-прокси недоступен, поэтому обновления подписки и подобные действия не смогут использовать прокси</string>
+    <string name="summary_pref_enable_local_proxy">Если отключено, обновления подписок и подобные действия используют активный VPN-туннель</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">Аутентификация SOCKS5 не полностью безопасна при использовании UDP</string>
     <string name="summary_pref_socks_port">Порт локального прокси</string>
