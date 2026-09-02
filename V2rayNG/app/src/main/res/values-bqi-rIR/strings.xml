@@ -381,7 +381,7 @@
     <string name="routing_settings_protocol" translatable="false">protocol</string>
     <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
     <string name="routing_settings_network" translatable="false">network</string>
-    <string name="routing_settings_outbound_tag_hint">پروکسی / موستقیم / مسدۊد / &lt;%1$s&gt;</string>
+    <string name="routing_settings_outbound_tag_hint" translatable="false">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
