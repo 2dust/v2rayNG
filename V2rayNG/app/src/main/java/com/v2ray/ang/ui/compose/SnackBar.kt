@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,23 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.hideFromAccessibility
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -214,54 +202,10 @@ private fun AccessibilityLiveRegion(message: LiveRegionMessage?) {
         AccessibilityLiveRegionMode.POLITE, null -> LiveRegionMode.Polite
     }
 
-    var armed by remember { mutableStateOf(false) }
-    var announcedText by remember { mutableStateOf("") }
-    var announcedMode by remember { mutableStateOf(liveRegionMode) }
-
-    LaunchedEffect(message?.id, text, liveRegionMode) {
-        if (message == null || text.isEmpty()) {
-            armed = false
-            announcedText = ""
-            return@LaunchedEffect
-        }
-
-        announcedMode = liveRegionMode
-        announcedText = ""
-        armed = true
-
-        // First expose the empty live region, then publish its text after that semantics state has
-        // reached Android. This creates a genuine text change after other controls have settled
-        // without leaving an idle accessibility node.
-        withFrameNanos { }
-        withFrameNanos { }
-        announcedText = text
-    }
-
-    val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
-    val localizedText = remember(announcedText, languageTag) {
-        buildAnnotatedString {
-            withStyle(SpanStyle(localeList = LocaleList(Locale(languageTag)))) {
-                append(announcedText)
-            }
-        }
-    }
-
-    // Keep the underlying layout node stable, but hide it from navigation between messages.
-    Text(
-        text = localizedText,
-        color = Color.Transparent,
-        fontSize = 1.sp,
-        maxLines = 1,
-        modifier = Modifier
-            .size(1.dp)
-            .clearAndSetSemantics {
-                if (!armed) {
-                    hideFromAccessibility()
-                } else {
-                    liveRegion = announcedMode
-                    if (localizedText.isNotEmpty()) this.text = localizedText
-                }
-            },
+    AccessibilityLiveRegionText(
+        eventId = message?.id,
+        text = text,
+        mode = liveRegionMode,
     )
 }
 
