@@ -549,6 +549,7 @@
     <string name="value_unknown">未知</string>
 
     <string name="sub_import_title">為訂閱群組命名</string>
+    <string name="sub_import_message">請為訂閱群組命名：%1$s。</string>
     <string name="sub_import_name">訂閱名稱</string>
     <string name="sub_import_default_name">匯入訂閱</string>
     <plurals name="import_subscription_duplicate">

@@ -16,6 +16,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -115,8 +116,10 @@ fun MainScreen(
         onConfirmRemove = { guid -> showRemoveConfirm = null; onAction(MainAction.RemoveServer(guid)) }
     )
 
-    uiState.subscriptionImportName?.let { name ->
-        SubscriptionImportDialog(name = name, onAction = onAction)
+    uiState.subscriptionImport?.let { pending ->
+        key(pending.url) {
+            SubscriptionImportDialog(url = pending.url, name = pending.name, onAction = onAction)
+        }
     }
 
     if (shareTarget != null) {

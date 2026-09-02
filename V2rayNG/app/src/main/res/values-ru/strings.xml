@@ -549,6 +549,7 @@
     <string name="value_unknown">неизвестно</string>
 
     <string name="sub_import_title">Назовите группу подписки</string>
+    <string name="sub_import_message">Укажите название группы подписки: %1$s.</string>
     <string name="sub_import_name">Название подписки</string>
     <string name="sub_import_default_name">Импортированная подписка</string>
     <plurals name="import_subscription_duplicate">

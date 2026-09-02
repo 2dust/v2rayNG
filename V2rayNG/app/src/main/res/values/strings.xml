@@ -549,6 +549,7 @@
     <string name="value_unknown">unknown</string>
 
     <string name="sub_import_title">Name subscription group</string>
+    <string name="sub_import_message">Provide the name for the subscription group: %1$s.</string>
     <string name="sub_import_name">Subscription name</string>
     <string name="sub_import_default_name">import sub</string>
     <plurals name="import_subscription_duplicate">

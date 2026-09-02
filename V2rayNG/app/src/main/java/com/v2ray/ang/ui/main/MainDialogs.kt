@@ -1,5 +1,7 @@
 package com.v2ray.ang.ui.main
 
+import android.view.accessibility.AccessibilityManager
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -18,25 +20,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.core.text.BidiFormatter
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 
 @Composable
-fun SubscriptionImportDialog(name: String, onAction: (MainAction) -> Unit) {
+fun SubscriptionImportDialog(url: String, name: String, onAction: (MainAction) -> Unit) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    val context = LocalContext.current
+    val title = stringResource(R.string.sub_import_title)
+    val displayUrl = BidiFormatter.getInstance(LocalLayoutDirection.current == LayoutDirection.Rtl).unicodeWrap(url)
+    val touchExplorationEnabled = remember(url, context) {
+        context.getSystemService(AccessibilityManager::class.java).isTouchExplorationEnabled
+    }
+    LaunchedEffect(url) {
+        // Leave TalkBack on the first readable item; other users can start typing immediately.
+        if (!touchExplorationEnabled) focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = { onAction(MainAction.CancelSubscriptionImport) },
-        title = { Text(stringResource(R.string.sub_import_title)) },
+        modifier = Modifier.semantics { paneTitle = title },
+        // The pane announces the title, leaving the URL message as the first focus target.
+        title = { Text(title, modifier = Modifier.clearAndSetSemantics {}) },
         text = {
             Column(
                 Modifier
                     .consumeWindowInsets(WindowInsets.navigationBars)
                     .imePadding()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                Text(
+                    text = stringResource(R.string.sub_import_message, displayUrl)
+                )
                 OutlinedTextField(
                     value = name,
                     onValueChange = { onAction(MainAction.ChangeSubscriptionImportName(it)) },

@@ -549,6 +549,7 @@
     <string name="value_unknown">অজানা</string>
 
     <string name="sub_import_title">সাবস্ক্রিপশন গ্রুপের নাম দিন</string>
+    <string name="sub_import_message">সাবস্ক্রিপশন গ্রুপের নাম দিন: %1$s।</string>
     <string name="sub_import_name">সাবস্ক্রিপশনের নাম</string>
     <string name="sub_import_default_name">আমদানি করা সাবস্ক্রিপশন</string>
     <plurals name="import_subscription_duplicate">

@@ -549,6 +549,7 @@
     <string name="value_unknown">không xác định</string>
 
     <string name="sub_import_title">Đặt tên nhóm đăng ký</string>
+    <string name="sub_import_message">Nhập tên cho nhóm đăng ký: %1$s.</string>
     <string name="sub_import_name">Tên đăng ký</string>
     <string name="sub_import_default_name">Đăng ký đã nhập</string>
     <plurals name="import_subscription_duplicate">

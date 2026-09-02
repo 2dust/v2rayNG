@@ -5,7 +5,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
+import android.view.View
+import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.text.BidiFormatter
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,6 +34,50 @@ class SubscriptionImportTest {
     private val prefix = "http://127.0.0.1:1/${UUID.randomUUID()}"
 
     @Test
+    fun batchShowsEachUrlAndRestartsInitialFocus() = withMain { scenario, viewModel ->
+        val urls = listOf("$prefix/first", "$prefix/skipped", "$prefix/last?token=test&source=clipboard")
+        val base = instrumentation.targetContext.getString(R.string.sub_import_default_name)
+        val talkBack = instrumentation.targetContext.getSystemService(AccessibilityManager::class.java)
+            .isTouchExplorationEnabled
+        scenario.onActivity {
+            it.getSystemService(ClipboardManager::class.java)
+                .setPrimaryClip(ClipData.newPlainText("subscriptions", urls.joinToString("\n")))
+        }
+        clickText(instrumentation.targetContext.getString(R.string.acc_add))
+        clickText(instrumentation.targetContext.getString(R.string.menu_item_import_config_clipboard))
+
+        urls.forEachIndexed { index, url ->
+            waitUntil { viewModel.uiState.value.subscriptionImport?.url == url }
+            assertEquals(if (index == 0) base else "$base 2", viewModel.uiState.value.subscriptionImport?.name)
+            assertNull(saved(url))
+            val context = instrumentation.targetContext
+            val displayUrl = BidiFormatter.getInstance(context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL)
+                .unicodeWrap(url)
+            val expectedMessage = context.getString(R.string.sub_import_message, displayUrl)
+            waitUntil {
+                val root = automation.rootInActiveWindow
+                val message = findNode(root) { it.text?.toString() == expectedMessage }
+                message != null && if (talkBack) message.isAccessibilityFocused
+                else findNode(root) { it.isEditable }?.isFocused == true
+            }
+            val message = findNode(automation.rootInActiveWindow) { it.text?.contains(url) == true }!!
+            assertEquals(expectedMessage, message.text.toString())
+            assertNotNull(findNode(automation.rootInActiveWindow) {
+                AccessibilityNodeInfoCompat.wrap(it).paneTitle?.toString() == context.getString(R.string.sub_import_title)
+            })
+            Log.i("SubscriptionImportTest", "Initial focus: talkBack=$talkBack, message=${message.text}")
+            clickText(instrumentation.targetContext.getString(
+                if (index == 1) R.string.action_cancel else R.string.action_ok
+            ))
+        }
+        waitUntil { !viewModel.isLoading.value }
+        assertEquals(base, saved(urls[0])?.subscription?.remarks)
+        assertNull(saved(urls[1]))
+        assertEquals("$base 2", saved(urls[2])?.subscription?.remarks)
+        assertNull(viewModel.uiState.value.subscriptionImport)
+    }
+
+    @Test
     fun confirmationPreservesDraftOnRecreationAndSavesOnlyAfterOk() = withMain { scenario, viewModel ->
         val url = "$prefix/confirm"
         scenario.onActivity {
@@ -36,24 +85,27 @@ class SubscriptionImportTest {
         }
         clickText(instrumentation.targetContext.getString(R.string.acc_add))
         clickText(instrumentation.targetContext.getString(R.string.menu_item_import_config_clipboard))
-        waitUntil { viewModel.uiState.value.subscriptionImportName != null }
+        waitUntil { viewModel.uiState.value.subscriptionImport?.name != null }
         assertNull(saved(url))
+        assertEquals(url, viewModel.uiState.value.subscriptionImport?.url)
 
         action(viewModel, MainAction.ChangeSubscriptionImportName("  "))
         action(viewModel, MainAction.ConfirmSubscriptionImport)
         assertNull(saved(url))
-        assertEquals("  ", viewModel.uiState.value.subscriptionImportName)
+        assertEquals("  ", viewModel.uiState.value.subscriptionImport?.name)
 
         setDialogText("Travel subscription")
         scenario.recreate()
-        waitUntil { viewModel.uiState.value.subscriptionImportName == "Travel subscription" }
+        waitUntil { viewModel.uiState.value.subscriptionImport?.name == "Travel subscription" }
+        assertEquals(url, viewModel.uiState.value.subscriptionImport?.url)
+        waitUntil { findNode(automation.rootInActiveWindow) { it.text?.contains(url) == true } != null }
         clickText(instrumentation.targetContext.getString(R.string.action_ok))
         waitUntil { !viewModel.isLoading.value }
         val group = saved(url)!!
         assertEquals("Travel subscription", group.subscription.remarks)
         scenario.recreate()
         assertEquals("Travel subscription", MmkvManager.decodeSubscription(group.guid)?.remarks)
-        assertNull(viewModel.uiState.value.subscriptionImportName)
+        assertNull(viewModel.uiState.value.subscriptionImport?.name)
     }
 
     @Test
@@ -68,23 +120,23 @@ class SubscriptionImportTest {
             }
             val url = "$prefix/cancel"
             action(viewModel, MainAction.ImportBatchConfig(url))
-            waitUntil { viewModel.uiState.value.subscriptionImportName != null }
-            assertEquals("$base 3", viewModel.uiState.value.subscriptionImportName)
+            waitUntil { viewModel.uiState.value.subscriptionImport?.name != null }
+            assertEquals("$base 3", viewModel.uiState.value.subscriptionImport?.name)
             clickText(instrumentation.targetContext.getString(R.string.action_cancel))
             waitUntil { !viewModel.isLoading.value }
             assertNull(saved(url))
-            assertNull(viewModel.uiState.value.subscriptionImportName)
+            assertNull(viewModel.uiState.value.subscriptionImport?.name)
 
             action(viewModel, MainAction.ImportBatchConfig(url))
-            waitUntil { viewModel.uiState.value.subscriptionImportName != null }
-            assertEquals("$base 3", viewModel.uiState.value.subscriptionImportName)
+            waitUntil { viewModel.uiState.value.subscriptionImport?.name != null }
+            assertEquals("$base 3", viewModel.uiState.value.subscriptionImport?.name)
             clickText(instrumentation.targetContext.getString(R.string.action_ok))
             waitUntil { !viewModel.isLoading.value }
             assertEquals("$base 3", saved(url)?.subscription?.remarks)
 
             action(viewModel, MainAction.ImportBatchConfig("$prefix/next"))
-            waitUntil { viewModel.uiState.value.subscriptionImportName != null }
-            assertEquals("$base 4", viewModel.uiState.value.subscriptionImportName)
+            waitUntil { viewModel.uiState.value.subscriptionImport?.name != null }
+            assertEquals("$base 4", viewModel.uiState.value.subscriptionImport?.name)
             action(viewModel, MainAction.CancelSubscriptionImport)
             waitUntil { !viewModel.isLoading.value }
             assertNull(saved("$prefix/next"))
@@ -99,7 +151,7 @@ class SubscriptionImportTest {
         try {
             val result = AngConfigManager.importBatchConfig(
                 "vless://${UUID.randomUUID()}@127.0.0.1:443?security=none#$name", "", true
-            ) { _, _ ->
+            ) { _, _, _ ->
                 fail("A proxy profile must not open the subscription naming dialog")
                 null
             }
@@ -119,21 +171,24 @@ class SubscriptionImportTest {
             val second = "$prefix/second"
             val encoded = Base64.encodeToString("$first\n$first\n$second".toByteArray(), Base64.NO_WRAP)
             val suggestions = mutableListOf<String?>()
-            val result = AngConfigManager.importBatchConfig(encoded, "", true) { suggested, _ ->
+            val urls = mutableListOf<String>()
+            val result = AngConfigManager.importBatchConfig(encoded, "", true) { url, suggested, _ ->
                 suggestions += suggested
+                urls += url
                 if (suggested == null) null else "Chosen name"
             }
             assertEquals(ConfigImportResult(subscriptionCount = 1), result)
             assertEquals(listOf("Provided name", null), suggestions)
+            assertEquals(listOf(first, second), urls)
             assertEquals("Chosen name", saved(first)?.subscription?.remarks)
             assertNull(saved(second))
-            val duplicate = AngConfigManager.importBatchConfig(first, "", true) { _, _ ->
+            val duplicate = AngConfigManager.importBatchConfig(first, "", true) { _, _, _ ->
                 fail("An existing URL must not prompt again")
                 null
             }
             assertEquals(ConfigImportResult(duplicateSubscriptionCount = 1), duplicate)
             try {
-                AngConfigManager.importBatchConfig("$prefix/interrupted", "", true) { _, _ ->
+                AngConfigManager.importBatchConfig("$prefix/interrupted", "", true) { _, _, _ ->
                     throw CancellationException("Test owner ended")
                 }
                 fail("Cancellation must propagate")
@@ -159,7 +214,7 @@ class SubscriptionImportTest {
                 it.text?.toString() == message
             } != null
         }
-        assertNull(viewModel.uiState.value.subscriptionImportName)
+        assertNull(viewModel.uiState.value.subscriptionImport?.name)
         assertEquals(1, MmkvManager.decodeSubscriptions().count { it.subscription.url == url })
     }
 
@@ -174,14 +229,14 @@ class SubscriptionImportTest {
             val encoded = Base64.encodeToString("$first\n$second\n$first".toByteArray(), Base64.NO_WRAP)
             assertEquals(
                 ConfigImportResult(duplicateSubscriptionCount = 2),
-                AngConfigManager.importBatchConfig(encoded, "", true) { _, _ ->
+                AngConfigManager.importBatchConfig(encoded, "", true) { _, _, _ ->
                     fail("Existing subscriptions must not prompt for names")
                     null
                 }
             )
 
             val concurrent = "$prefix/concurrent"
-            val result = AngConfigManager.importBatchConfig(concurrent, "", true) { _, _ ->
+            val result = AngConfigManager.importBatchConfig(concurrent, "", true) { _, _, _ ->
                 MmkvManager.encodeSubscription("", SubscriptionItem(remarks = "Other import", url = concurrent, enabled = false))
                 "Confirmed name"
             }
@@ -199,7 +254,7 @@ class SubscriptionImportTest {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 lateinit var viewModel: MainViewModel
                 scenario.onActivity { viewModel = ViewModelProvider(it)[MainViewModel::class.java] }
-                assertNull(viewModel.uiState.value.subscriptionImportName)
+                assertNull(viewModel.uiState.value.subscriptionImport?.name)
                 block(scenario, viewModel)
             }
         } finally {

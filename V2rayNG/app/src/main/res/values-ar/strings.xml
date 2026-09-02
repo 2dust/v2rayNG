@@ -549,6 +549,7 @@
     <string name="value_unknown">غير معروف</string>
 
     <string name="sub_import_title">تسمية مجموعة الاشتراك</string>
+    <string name="sub_import_message">أدخل اسمًا لمجموعة الاشتراك: %1$s.</string>
     <string name="sub_import_name">اسم الاشتراك</string>
     <string name="sub_import_default_name">اشتراك مستورد</string>
     <plurals name="import_subscription_duplicate">

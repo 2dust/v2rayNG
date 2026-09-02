@@ -48,7 +48,7 @@ interface MainDataSource : Closeable {
         server: String?,
         subscriptionId: String,
         updateUI: Boolean,
-        requestSubscriptionName: suspend (String?, Set<String>) -> String?
+        requestSubscriptionName: suspend (String, String?, Set<String>) -> String?
     ): ConfigImportResult
 
     fun updateConfigViaSubAll(): SubscriptionUpdateResult

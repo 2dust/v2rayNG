@@ -27,8 +27,10 @@ data class MainUiState(
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
     val shareQRCodeBitmap: android.graphics.Bitmap? = null,
-    val subscriptionImportName: String? = null
+    val subscriptionImport: SubscriptionImportState? = null
 )
+
+data class SubscriptionImportState(val url: String, val name: String)
 
 /**
  * All possible user interaction intents

@@ -219,11 +219,11 @@ class MainViewModel(
             is MainAction.ImportBatchConfig -> importBatchConfig(action)
             is MainAction.ChangeSubscriptionImportName -> {
                 _uiState.update {
-                    if (it.subscriptionImportName == null) it else it.copy(subscriptionImportName = action.name)
+                    it.copy(subscriptionImport = it.subscriptionImport?.copy(name = action.name))
                 }
             }
             MainAction.ConfirmSubscriptionImport -> {
-                uiState.value.subscriptionImportName?.trim()?.takeIf { it.isNotEmpty() }?.let {
+                uiState.value.subscriptionImport?.name?.trim()?.takeIf { it.isNotEmpty() }?.let {
                     subscriptionNameResult?.complete(it)
                 }
             }
@@ -454,8 +454,8 @@ class MainViewModel(
                         var cancelledSubscription = false
                         val (count, countSub, duplicateCount) = dataSource.importBatchConfig(
                             action.configText, subscriptionId, action.append
-                        ) { suggestedName, existingNames ->
-                            requestSubscriptionName(suggestedName, existingNames).also {
+                        ) { url, suggestedName, existingNames ->
+                            requestSubscriptionName(url, suggestedName, existingNames).also {
                                 if (it == null) cancelledSubscription = true
                             }
                         }
@@ -486,20 +486,20 @@ class MainViewModel(
         }
     }
 
-    private suspend fun requestSubscriptionName(suggestedName: String?, existingNames: Set<String>): String? =
+    private suspend fun requestSubscriptionName(url: String, suggestedName: String?, existingNames: Set<String>): String? =
         withContext(Dispatchers.Main.immediate) {
             val result = CompletableDeferred<String?>()
             subscriptionNameResult = result
             val baseName = suggestedName?.takeIf { it.isNotBlank() }
                 ?: dataSource.getString(R.string.sub_import_default_name)
             _uiState.update {
-                it.copy(subscriptionImportName = uniqueSubscriptionName(baseName, existingNames))
+                it.copy(subscriptionImport = SubscriptionImportState(url, uniqueSubscriptionName(baseName, existingNames)))
             }
             try {
                 result.await()
             } finally {
                 subscriptionNameResult = null
-                _uiState.update { it.copy(subscriptionImportName = null) }
+                _uiState.update { it.copy(subscriptionImport = null) }
             }
         }
 

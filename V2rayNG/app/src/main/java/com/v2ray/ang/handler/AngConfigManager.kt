@@ -182,14 +182,14 @@ object AngConfigManager {
      * @param subid The subscription ID.
      * @param append Whether to append the configurations.
      * @param requestSubscriptionName Optional confirmation before saving each new subscription;
-     * receives its suggested name and existing names, and returns null to skip it.
+     * receives its URL, suggested name and existing names, and returns null to skip it.
      * @return Imported configuration/subscription counts and duplicate subscription count.
      */
     suspend fun importBatchConfig(
         server: String?,
         subid: String,
         append: Boolean,
-        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)? = null
+        requestSubscriptionName: (suspend (String, String?, Set<String>) -> String?)? = null
     ): ConfigImportResult {
         return try {
             var count = parseBatchConfig(Utils.decode(server), subid, append)
@@ -223,7 +223,7 @@ object AngConfigManager {
      */
     private suspend fun parseBatchSubscription(
         servers: String?,
-        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
+        requestSubscriptionName: (suspend (String, String?, Set<String>) -> String?)?
     ): ConfigImportResult {
         try {
             if (servers == null) {
@@ -625,7 +625,7 @@ object AngConfigManager {
      */
     private suspend fun importUrlAsSubscription(
         url: String,
-        requestSubscriptionName: (suspend (String?, Set<String>) -> String?)?
+        requestSubscriptionName: (suspend (String, String?, Set<String>) -> String?)?
     ): SubscriptionImportOutcome {
         val subscriptions = MmkvManager.decodeSubscriptions()
         subscriptions.forEach {
@@ -637,7 +637,7 @@ object AngConfigManager {
         val remarks = if (requestSubscriptionName == null) {
             uri.fragment ?: "import sub"
         } else {
-            requestSubscriptionName(uri.fragment, subscriptions.map { it.subscription.remarks }.toSet())
+            requestSubscriptionName(url, uri.fragment, subscriptions.map { it.subscription.remarks }.toSet())
                 ?.trim()?.takeIf { it.isNotEmpty() } ?: return SubscriptionImportOutcome.Cancelled
         }
         // Another import may have saved this URL while the naming dialog was open.
