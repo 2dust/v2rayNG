@@ -121,7 +121,7 @@
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
     <string name="server_lab_port_hop">گوم پورت (پورت سرورن ز نۊ هؽل اکونه)</string>
-    <string name="server_lab_port_hop_interval">فاسله پورت گوم (سانیه)</string>
+    <string name="server_lab_port_hop_interval">فاسله گوم پورت (سانیه)</string>
     <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
