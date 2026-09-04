@@ -28,6 +28,7 @@ import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
+import com.v2ray.ang.shizuku.TetheringCoreSync
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -38,15 +39,22 @@ import libv2ray.CoreController
 import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 object CoreServiceManager {
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val tetheringMsgReceive = TetheringMessageHandler()
     private var currentConfig: ProfileItem? = null
+    private var currentProfileId = ""
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
+    private val teardownLock = Any()
+    private var teardownExecutor: ExecutorService? = null
+    private var receiversRegistered = false
 
     @Volatile
     private var isReloading = false
@@ -94,12 +102,15 @@ object CoreServiceManager {
             return false
         }
 
+        TetheringCoreSync.onStarting()
         try {
             doStartCoreLoop(service, vpnInterface)
             return true
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
+            TetheringCoreSync.onStartFailed(service, message)
+            cleanupFailedStart(service)
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
@@ -108,11 +119,7 @@ object CoreServiceManager {
 
     @Throws(Exception::class)
     private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?) {
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        registerCoreReceivers(service)
 
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
@@ -123,6 +130,7 @@ object CoreServiceManager {
     private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
         val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
+        currentProfileId = guid
 
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
         val result = CoreConfigManager.getV2rayConfig(service, guid)
@@ -132,6 +140,7 @@ object CoreServiceManager {
         }
 
         currentConfig = config
+        val usesHevTun = SettingsManager.isUsingHevTun()
         var tunFd = vpnInterface?.fd ?: 0
         val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
         val dialerAddr = if (dialerMode != null) {
@@ -139,7 +148,7 @@ object CoreServiceManager {
         } else {
             ""
         }
-        if (SettingsManager.isUsingHevTun()) {
+        if (usesHevTun) {
             tunFd = 0
         }
 
@@ -171,6 +180,13 @@ object CoreServiceManager {
             else -> {}
         }
 
+        TetheringCoreSync.onStarted(
+            service,
+            guid,
+            getRunningServerName(),
+            result.content,
+            usesHevTun,
+        )
         if (!isReload) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         }
@@ -184,21 +200,18 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
-        val service = getService() ?: return false
+        val service = getService()
+        if (service == null) {
+            TetheringCoreSync.clear()
+            return false
+        }
+        TetheringCoreSync.onStopping(service)
 
         networkMonitor?.unregister()
         networkMonitor = null
         currentVpnInterface = null
 
-        if (isRunning()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    coreController.stopLoop()
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop V2Ray loop", e)
-                }
-            }
-        }
+        stopNativeCoreAsync(service, "stop")
 
         // Close existing browser dialer
         CoreNativeManager.reconcileBrowserDialer("")
@@ -210,13 +223,107 @@ object CoreServiceManager {
         MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
         NotificationManager.cancelNotification()
 
-        try {
-            service.unregisterReceiver(mMsgReceive)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
-        }
+        unregisterCoreReceivers(service)
 
         return true
+    }
+
+    private fun registerCoreReceivers(service: Service) {
+        if (receiversRegistered) return
+        val coreFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE).apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_USER_PRESENT)
+        }
+        ContextCompat.registerReceiver(service, mMsgReceive, coreFilter, Utils.receiverFlags())
+        try {
+            ContextCompat.registerReceiver(
+                service,
+                tetheringMsgReceive,
+                IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
+                Utils.receiverFlags(),
+            )
+            receiversRegistered = true
+        } catch (error: Throwable) {
+            runCatching { service.unregisterReceiver(mMsgReceive) }
+            throw error
+        }
+    }
+
+    private fun unregisterCoreReceivers(service: Service) {
+        if (!receiversRegistered) return
+        receiversRegistered = false
+        listOf(mMsgReceive, tetheringMsgReceive).forEach { receiver ->
+            runCatching { service.unregisterReceiver(receiver) }
+                .onFailure {
+                    LogUtil.e(
+                        AppConfig.TAG,
+                        "Core lifecycle failure: mode=${service.javaClass.simpleName} phase=stop " +
+                            "profileId=$currentProfileId operation=unregister receiver",
+                        it,
+                    )
+                }
+        }
+    }
+
+    private fun cleanupFailedStart(service: Service) {
+        networkMonitor?.unregister()
+        networkMonitor = null
+        currentVpnInterface = null
+        stopNativeCoreAsync(service, "start-failure")
+        CoreNativeManager.reconcileBrowserDialer("")
+        runCatching { browserDialer?.stop() }
+            .onFailure {
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Core lifecycle failure: mode=${service.javaClass.simpleName} phase=start-failure " +
+                        "profileId=$currentProfileId operation=stop browser dialer",
+                    it,
+                )
+            }
+        browserDialer = null
+        unregisterCoreReceivers(service)
+    }
+
+    /** Runs native teardown in one operation-owned scope and coalesces repeated stop requests. */
+    private fun stopNativeCoreAsync(service: Service, phase: String) {
+        synchronized(teardownLock) {
+            if (!shouldScheduleCoreTeardown(isRunning(), teardownExecutor != null)) return
+            val profileId = currentProfileId
+            val mode = service.javaClass.simpleName
+            val executor = Executors.newSingleThreadExecutor { command ->
+                Thread(command, "CoreTeardown").apply { isDaemon = true }
+            }
+            teardownExecutor = executor
+            try {
+                executor.execute {
+                    try {
+                        coreController.stopLoop()
+                    } catch (error: Throwable) {
+                        LogUtil.e(
+                            AppConfig.TAG,
+                            "Core lifecycle failure: mode=$mode phase=$phase profileId=$profileId " +
+                                "operation=stop native core",
+                            error,
+                        )
+                    } finally {
+                        synchronized(teardownLock) {
+                            if (teardownExecutor === executor) teardownExecutor = null
+                        }
+                        executor.shutdown()
+                    }
+                }
+            } catch (error: Throwable) {
+                teardownExecutor = null
+                executor.shutdownNow()
+                LogUtil.e(
+                    AppConfig.TAG,
+                    "Core lifecycle failure: mode=$mode phase=$phase profileId=$profileId " +
+                        "operation=schedule native core stop",
+                    error,
+                )
+            }
+        }
     }
 
     /**
@@ -256,6 +363,7 @@ object CoreServiceManager {
             isReloading = true
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
 
+            TetheringCoreSync.onStopping(service)
             coreController.stopLoop()
             launchCore(service, tunFd, isReload = true)
 
@@ -264,6 +372,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
+            TetheringCoreSync.onStartFailed(service, message)
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
             false
         } finally {
@@ -495,4 +604,18 @@ object CoreServiceManager {
             }
         }
     }
+
+    private class TetheringMessageHandler : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val service = serviceControl?.get()?.getService() ?: return
+            when (intent?.getIntExtra("key", 0)) {
+                AppConfig.MSG_QUERY_HOTSPOT_CONFIG ->
+                    TetheringCoreSync.sendCurrentSnapshot(service, coreController.isRunning)
+                AppConfig.MSG_SHIZUKU_APP_FOREGROUND -> TetheringCoreSync.onAppForegrounded(service)
+            }
+        }
+    }
 }
+
+internal fun shouldScheduleCoreTeardown(coreRunning: Boolean, teardownActive: Boolean): Boolean =
+    coreRunning && !teardownActive
