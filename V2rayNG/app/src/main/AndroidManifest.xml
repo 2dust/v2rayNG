@@ -173,6 +173,7 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:process=":RunSoLibV2RayDaemon"
+            android:taskAffinity=""
             android:theme="@style/AppThemeDayNight.NoActionBar.Translucent" />
         <activity
             android:name=".ui.shortcut.ScStopActivity"
@@ -285,6 +286,13 @@
                 android:resource="@xml/app_widget_provider" />
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receiver.LauncherWidgetUpdateReceiver"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
                 <action android:name="${applicationId}.action.activity" />
             </intent-filter>
         </receiver>

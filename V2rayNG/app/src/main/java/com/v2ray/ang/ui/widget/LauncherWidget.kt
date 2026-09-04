@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.widget
 
-import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -14,7 +13,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.ColorFilter
@@ -68,15 +66,11 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.core.LauncherManager
-import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.helper.MessageHelper
-import com.v2ray.ang.receiver.WidgetProvider
 import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.ui.shortcut.ScStartActivity
 
-private val COMPACT_SIZE = DpSize(48.dp, 48.dp)
-private val MEDIUM_SIZE = DpSize(110.dp, 48.dp)
-private val WIDE_SIZE = DpSize(240.dp, 48.dp)
-private val EXTRA_WIDE_SIZE = DpSize(320.dp, 48.dp)
 private val HORIZONTAL_WIDGET_HEIGHT = 64.dp
 private val ACTION_BUTTON_SIZE = 48.dp
 private val ACTION_EDGE_GAP = 8.dp
@@ -89,8 +83,9 @@ private val ICON_COLOR = ColorProvider(Color.White)
 
 class LauncherWidget : MultiProcessGlanceAppWidget() {
     override val sizeMode = SizeMode.Responsive(
-        setOf(COMPACT_SIZE, MEDIUM_SIZE, WIDE_SIZE, EXTRA_WIDE_SIZE)
+        LauncherWidgetLayout.entries.map { it.size }.toSet()
     )
+    override val stateDefinition = null
 
     override fun getMultiProcessConfig(context: Context) = MultiProcessConfig(
         remoteWorkerService = ComponentName(context, LauncherWidgetWorkerService::class.java),
@@ -103,6 +98,10 @@ class LauncherWidget : MultiProcessGlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val repository = LauncherWidgetStateRepository.instance
+        val initialState = repository.refresh()
+        val states = repository.states
+        val localizedContext = AppLocaleManager.localizedContext(context)
         val openAppAction = actionStartActivity(
             Intent(context, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -111,34 +110,13 @@ class LauncherWidget : MultiProcessGlanceAppWidget() {
 
         provideContent {
             GlanceTheme {
-                val stateRevision by LauncherWidgetStateRepository.stateRevision.collectAsState()
-                val uiState = remember(stateRevision) {
-                    LauncherWidgetStateRepository.loadUiState(
-                        context = context,
-                        coreIsRunning = CoreServiceManager.isRunning(),
-                    )
-                }
+                // Glance owns this composition's lifetime; it has no Activity LifecycleOwner.
+                val state by states.collectAsState(initialState)
                 LauncherWidgetContent(
-                    uiState = uiState,
+                    uiState = state.present(localizedContext),
                     openAppAction = openAppAction,
                 )
             }
-        }
-    }
-
-    companion object {
-        fun requestUpdate(context: Context) {
-            val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(
-                ComponentName(context, WidgetProvider::class.java)
-            )
-            if (ids.isEmpty()) return
-
-            context.sendBroadcast(
-                Intent(context, WidgetProvider::class.java)
-                    .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-                    .setPackage(context.packageName)
-                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-            )
         }
     }
 }
@@ -149,7 +127,7 @@ private fun LauncherWidgetContent(
     openAppAction: Action,
 ) {
     val textMetrics = launcherWidgetTextMetrics(rememberFontScale())
-    val layout = launcherWidgetLayoutForWidth(LocalSize.current.width.value)
+    val layout = LauncherWidgetLayout.forWidth(LocalSize.current.width.value)
     when (layout) {
         LauncherWidgetLayout.COMPACT -> CompactWidget(uiState)
         LauncherWidgetLayout.MEDIUM,
@@ -191,7 +169,7 @@ private fun CompactWidget(uiState: LauncherWidgetUiState) {
     Scaffold(
         modifier = GlanceModifier
             .fillMaxSize()
-            .clickable(actionRunCallback<ToggleLauncherWidgetAction>())
+            .clickable(serviceAction(uiState.isRunning))
             .semantics {
                 contentDescription = if (uiState.isRunning) uiState.stopActionLabel
                 else uiState.startActionLabel
@@ -306,7 +284,7 @@ private fun HorizontalWidget(
                     else R.drawable.ic_play_24dp,
                     contentDescription = if (uiState.isRunning) uiState.stopActionLabel
                     else uiState.startActionLabel,
-                    action = actionRunCallback<ToggleLauncherWidgetAction>(),
+                    action = serviceAction(uiState.isRunning),
                     isPrimary = true,
                     isActive = uiState.isRunning,
                 )
@@ -402,18 +380,18 @@ private fun WidgetActionButton(
     }
 }
 
-class ToggleLauncherWidgetAction : ActionCallback {
+@Composable
+private fun serviceAction(isRunning: Boolean): Action =
+    if (isRunning) actionRunCallback<StopLauncherWidgetAction>()
+    else actionStartActivity(Intent(LocalContext.current, ScStartActivity::class.java))
+
+class StopLauncherWidgetAction : ActionCallback {
     override suspend fun onAction(
         context: Context,
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        if (CoreServiceManager.isRunning()) {
-            LauncherManager.stopService(context)
-        } else if (LauncherManager.startServiceFromToggle(context)) {
-            LauncherWidgetStateRepository.clearTestState()
-            LauncherWidget().update(context, glanceId)
-        }
+        LauncherManager.stopService(context)
     }
 }
 
@@ -423,10 +401,7 @@ class RestartLauncherWidgetAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        if (!CoreServiceManager.isRunning()) return
-
-        LauncherWidgetStateRepository.clearTestState()
-        LauncherWidget().update(context, glanceId)
+        if (!CoreServiceManager.connectionState.value.isRunning) return
         LauncherManager.restartService(context)
     }
 }
@@ -437,11 +412,6 @@ class TestLauncherWidgetAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        if (!CoreServiceManager.isRunning()) return
-
-        val profileGuid = MmkvManager.getSelectServer() ?: return
-        LauncherWidgetStateRepository.startTesting(profileGuid)
-        LauncherWidget().update(context, glanceId)
         MessageHelper.sendMsg2Service(context, AppConfig.MSG_MEASURE_DELAY, "")
     }
 }
