@@ -99,7 +99,6 @@ object AppConfig {
     /** Broadcast actions. */
     const val BROADCAST_ACTION_SERVICE = "$ANG_PACKAGE.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "$ANG_PACKAGE.action.activity"
-    const val BROADCAST_ACTION_WIDGET_CLICK = "$ANG_PACKAGE.action.widget.click"
 
     /** Tasker extras. */
     const val TASKER_EXTRA_BUNDLE = "com.twofortyfouram.locale.intent.extra.BUNDLE"
@@ -181,6 +180,7 @@ object AppConfig {
     const val MSG_STATE_RESTART = 5
     const val MSG_MEASURE_DELAY = 6
     const val MSG_MEASURE_DELAY_RESULT = 61
+    const val MSG_SELECTED_PROFILE_CHANGED = 62
     const val MSG_MEASURE_CONFIG_START = 7
     const val MSG_MEASURE_CONFIG_CANCEL = 71
     const val MSG_MEASURE_CONFIG_SUCCESS = 72

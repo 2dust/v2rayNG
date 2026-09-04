@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/widget_switch"
-    android:minWidth="20dp"
-    android:minHeight="20dp"
-    android:widgetCategory="home_screen|keyguard" />
+    xmlns:tools="http://schemas.android.com/tools"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="68dp"
+    android:minHeight="68dp"
+    android:minResizeWidth="68dp"
+    android:minResizeHeight="68dp"
+    android:resizeMode="horizontal"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen"
+    tools:targetApi="s" />

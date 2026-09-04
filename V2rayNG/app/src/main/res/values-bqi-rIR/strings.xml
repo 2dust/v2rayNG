@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">منپیز v2rayNG</string>
+    <string name="widget_description">کنتورول کانفیگ پسند وابیڌه وو واجۊری منپیزش</string>
+    <string name="widget_no_profile">هیچ کانفیگی پسند نوابی</string>
+    <string name="widget_status_disconnected">منپیز نؽڌ</string>
+    <string name="widget_status_connected">منپیز هڌ</string>
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>

@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">v2rayNG সংযোগ</string>
+    <string name="widget_description">নির্বাচিত প্রোফাইল নিয়ন্ত্রণ করুন এবং এর সংযোগ পরীক্ষা করুন</string>
+    <string name="widget_no_profile">কোনো প্রোফাইল নির্বাচিত নয়</string>
+    <string name="widget_status_disconnected">সংযোগ বিচ্ছিন্ন</string>
+    <string name="widget_status_connected">সংযুক্ত</string>
     <string name="connection_test_pending">সংযোগ পরীক্ষা করুন</string>
     <string name="connection_test_testing">পরীক্ষা চলছে…</string>
     <string name="connection_test_testing_count">%dটি কনফিগারেশন পরীক্ষা করা হচ্ছে…</string>

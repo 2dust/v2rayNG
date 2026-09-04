@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">v2rayNG connection</string>
+    <string name="widget_description">Control the selected profile and test its connection</string>
+    <string name="widget_no_profile">No profile selected</string>
+    <string name="widget_status_disconnected">Disconnected</string>
+    <string name="widget_status_connected">Connected</string>
     <string name="connection_test_pending">Check connectivity</string>
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_testing_count">Testing %d configs…</string>

@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">اتصال v2rayNG</string>
+    <string name="widget_description">کنترل نمایه انتخاب‌شده و آزمایش اتصال آن</string>
+    <string name="widget_no_profile">نمایه‌ای انتخاب نشده است</string>
+    <string name="widget_status_disconnected">قطع اتصال</string>
+    <string name="widget_status_connected">متصل</string>
     <string name="connection_test_pending">اتصال را بررسی کنید</string>
     <string name="connection_test_testing">در حال آزمایش…</string>
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>

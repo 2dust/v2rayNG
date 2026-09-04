@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">اتصال v2rayNG</string>
+    <string name="widget_description">التحكم في الملف الشخصي المحدد واختبار اتصاله</string>
+    <string name="widget_no_profile">لم يتم تحديد ملف شخصي</string>
+    <string name="widget_status_disconnected">غير متصل</string>
+    <string name="widget_status_connected">متصل</string>
     <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
