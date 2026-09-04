@@ -278,16 +278,57 @@
         <receiver
             android:name=".receiver.WidgetProvider"
             android:exported="true"
+            android:label="@string/widget_name"
             android:process=":RunSoLibV2RayDaemon">
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/app_widget_provider" />
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="${applicationId}.action.widget.click" />
                 <action android:name="${applicationId}.action.activity" />
             </intent-filter>
         </receiver>
+
+        <!-- Glance renders and dispatches this widget beside the daemon state authority. -->
+        <activity
+            android:name=".ui.widget.LauncherWidgetActionActivity"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon"
+            android:theme="@android:style/Theme.NoDisplay" />
+        <activity
+            android:name=".ui.widget.LauncherWidgetInvisibleActionActivity"
+            android:enabled="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:process=":RunSoLibV2RayDaemon"
+            android:taskAffinity="androidx.glance.appwidget.ListAdapterCallbackTrampoline"
+            android:theme="@style/Widget.Glance.AppWidget.CallbackTrampoline" />
+        <receiver
+            android:name=".ui.widget.LauncherWidgetActionReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon" />
+        <receiver
+            android:name=".ui.widget.LauncherWidgetPackageReplacedReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".ui.widget.LauncherWidgetRemoteViewsService"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:process=":RunSoLibV2RayDaemon" />
+        <service
+            android:name=".ui.widget.LauncherWidgetWorkerService"
+            android:exported="false"
+            android:process=":RunSoLibV2RayDaemon" />
         <receiver
             android:name=".receiver.BootReceiver"
             android:exported="true"

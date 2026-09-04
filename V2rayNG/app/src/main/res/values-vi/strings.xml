@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">Kết nối v2rayNG</string>
+    <string name="widget_description">Điều khiển cấu hình đã chọn và kiểm tra kết nối</string>
+    <string name="widget_no_profile">Chưa chọn cấu hình</string>
+    <string name="widget_status_disconnected">Đã ngắt kết nối</string>
+    <string name="widget_status_connected">Đã kết nối</string>
     <string name="connection_test_pending">Kiểm tra kết nối</string>
     <string name="connection_test_testing">Đang kiểm tra kết nối mạng…</string>
     <string name="connection_test_testing_count">Đang kiểm tra %d cấu hình…</string>

@@ -1,96 +1,70 @@
 package com.v2ray.ang.receiver
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.widget.RemoteViews
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.updateAll
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.core.LauncherManager
+import com.v2ray.ang.dto.ConnectionTestResult
+import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.ui.widget.LauncherWidget
+import com.v2ray.ang.ui.widget.LauncherWidgetStateRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class WidgetProvider : AppWidgetProvider() {
-    /**
-     * This method is called every time the widget is updated.
-     * It updates the widget background based on the V2Ray service running state.
-     *
-     * @param context The Context in which the receiver is running.
-     * @param appWidgetManager The AppWidgetManager instance.
-     * @param appWidgetIds The appWidgetIds for which an update is needed.
-     */
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+class WidgetProvider : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = LauncherWidget()
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+    ) {
+        LauncherWidgetStateRepository.recordServiceState(CoreServiceManager.isRunning())
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        updateWidgetBackground(context, appWidgetManager, appWidgetIds, CoreServiceManager.isRunning())
     }
 
-    /**
-     * Updates the widget background based on whether the V2Ray service is running.
-     *
-     * @param context The Context in which the receiver is running.
-     * @param appWidgetManager The AppWidgetManager instance.
-     * @param appWidgetIds The appWidgetIds for which an update is needed.
-     * @param isRunning Boolean indicating if the V2Ray service is running.
-     */
-    private fun updateWidgetBackground(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, isRunning: Boolean) {
-        val remoteViews = RemoteViews(context.packageName, R.layout.widget_switch)
-        val intent = Intent(context, WidgetProvider::class.java)
-        intent.action = AppConfig.BROADCAST_ACTION_WIDGET_CLICK
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            R.id.layout_switch,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        remoteViews.setOnClickPendingIntent(R.id.layout_switch, pendingIntent)
-        if (isRunning) {
-            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_stop_24dp)
-            remoteViews.setInt(R.id.layout_background, "setBackgroundResource", R.drawable.ic_rounded_corner_active)
-        } else {
-            remoteViews.setInt(R.id.image_switch, "setImageResource", R.drawable.ic_play_24dp)
-            remoteViews.setInt(R.id.layout_background, "setBackgroundResource", R.drawable.ic_rounded_corner_inactive)
-        }
-
-        for (appWidgetId in appWidgetIds) {
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-        }
-    }
-
-    /**
-     * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-     * It handles widget click actions and updates the widget background based on the V2Ray service state.
-     *
-     * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
-     */
     override fun onReceive(context: Context, intent: Intent) {
+        val key = intent.getIntExtra("key", 0)
+        val shouldUpdate = intent.action == AppConfig.BROADCAST_ACTION_ACTIVITY &&
+                handleServiceEvent(key, intent)
         super.onReceive(context, intent)
-        if (AppConfig.BROADCAST_ACTION_WIDGET_CLICK == intent.action) {
-            if (CoreServiceManager.isRunning()) {
-                LauncherManager.stopService(context)
-            } else {
-                LauncherManager.startServiceFromToggle(context)
-            }
-        } else if (AppConfig.BROADCAST_ACTION_ACTIVITY == intent.action) {
-            AppWidgetManager.getInstance(context)?.let { manager ->
-                when (intent.getIntExtra("key", 0)) {
-                    AppConfig.MSG_STATE_RUNNING, AppConfig.MSG_STATE_START_SUCCESS -> {
-                        updateWidgetBackground(
-                            context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
-                            true
-                        )
-                    }
-
-                    AppConfig.MSG_STATE_NOT_RUNNING, AppConfig.MSG_STATE_START_FAILURE, AppConfig.MSG_STATE_STOP_SUCCESS -> {
-                        updateWidgetBackground(
-                            context, manager, manager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java)),
-                            false
-                        )
-                    }
+        if (shouldUpdate) {
+            val pendingResult = goAsync()
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    glanceAppWidget.updateAll(context.applicationContext)
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }
+    }
+
+    private fun handleServiceEvent(key: Int, intent: Intent): Boolean = when (key) {
+        AppConfig.MSG_STATE_START_SUCCESS,
+        AppConfig.MSG_STATE_RUNNING -> {
+            LauncherWidgetStateRepository.recordServiceState(isRunning = true)
+            true
+        }
+
+        AppConfig.MSG_STATE_NOT_RUNNING,
+        AppConfig.MSG_STATE_START_FAILURE,
+        AppConfig.MSG_STATE_STOP_SUCCESS -> {
+            LauncherWidgetStateRepository.recordServiceState(isRunning = false)
+            true
+        }
+
+        AppConfig.MSG_MEASURE_DELAY_RESULT -> {
+            val result = intent.serializable<ConnectionTestResult>("content") ?: return false
+            LauncherWidgetStateRepository.storeResult(result, MmkvManager.getSelectServer())
+            true
+        }
+
+        else -> false
     }
 }

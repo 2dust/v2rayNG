@@ -384,6 +384,11 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">v2rayNG 連線</string>
+    <string name="widget_description">控制所選設定檔並測試其連線</string>
+    <string name="widget_no_profile">未選擇設定檔</string>
+    <string name="widget_status_disconnected">未連線</string>
+    <string name="widget_status_connected">已連線</string>
     <string name="connection_test_pending">"測試連線能力"</string>
     <string name="connection_test_testing">"測試中……"</string>
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
