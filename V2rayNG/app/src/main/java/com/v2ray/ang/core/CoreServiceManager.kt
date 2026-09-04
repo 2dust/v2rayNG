@@ -30,8 +30,13 @@ import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
@@ -47,6 +52,10 @@ object CoreServiceManager {
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
+    private val connectionTests = ConnectionTestSession()
+    internal val connectionState = connectionTests.state
+    private var connectionTestScope: CoroutineScope? = null
+    private var connectionTestJob: Job? = null
 
     @Volatile
     private var isReloading = false
@@ -172,7 +181,14 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
+            connectionTestScope?.cancel()
+            connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        }
+        connectionTests.started(guid)
+        if (!isReload) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+        } else {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_RUNNING, "")
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -184,6 +200,10 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        connectionTests.stopped()
+        connectionTestScope?.cancel()
+        connectionTestScope = null
+        connectionTestJob = null
         val service = getService() ?: return false
 
         networkMonitor?.unregister()
@@ -256,6 +276,8 @@ object CoreServiceManager {
             isReloading = true
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
 
+            connectionTests.stopped()
+            connectionTestJob?.cancel()
             coreController.stopLoop()
             launchCore(service, tunFd, isReload = true)
 
@@ -309,38 +331,56 @@ object CoreServiceManager {
      * Also fetches remote IP information if the delay test was successful.
      */
     private fun measureV2rayDelay() {
-        if (!isRunning()) {
-            return
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val service = getService() ?: return@launch
+        val service = getService() ?: return
+        val scope = connectionTestScope ?: return
+        val request = connectionTests.beginTest() ?: return
+        connectionTestJob?.cancel()
+        MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY, "")
+        connectionTestJob = scope.launch {
             var time = -1L
             var errorStr = ""
 
             try {
                 time = coreController.measureDelay(SettingsManager.getDelayTestUrl())
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
+                LogUtil.e(AppConfig.TAG, "CoreServiceManager: Primary delay test failed for ${request.profileGuid}", e)
                 errorStr = e.message?.substringAfter("\":").orEmpty()
             }
+            ensureActive()
             if (time == -1L) {
                 try {
                     time = coreController.measureDelay(SettingsManager.getDelayTestUrl(true))
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to measure delay", e)
+                    LogUtil.e(AppConfig.TAG, "CoreServiceManager: Fallback delay test failed for ${request.profileGuid}", e)
                     errorStr = e.message?.substringAfter("\":").orEmpty()
                 }
             }
 
-            val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
+            ensureActive()
+            val endpoint = if (time >= 0) {
+                try {
+                    SpeedtestManager.getRemoteIPInfo()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "CoreServiceManager: Endpoint lookup failed for ${request.profileGuid}", e)
+                    null
+                }
+            } else null
+            ensureActive()
             val result = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
                 country = endpoint?.country,
                 ipAddress = endpoint?.ipAddress,
             )
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result)
+            if (connectionTests.complete(request, result)) {
+                MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result)
+            }
         }
     }
 
