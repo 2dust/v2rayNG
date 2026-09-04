@@ -14,6 +14,20 @@ import org.junit.Test
 class TetheringUiStateTest {
 
     @Test
+    fun failedShutdownRetainsStopEvenWhenMainCoreIsStopped() {
+        val state = TetheringUiState(
+            serviceConnected = true,
+            hasRoutingSession = true,
+            routingState = ShizukuTetheringService.ROUTING_STATE_ERROR,
+            coreRunning = false,
+        )
+        assertTrue(state.routingSessionEnabled)
+        assertTrue(routingAction(state).enabled)
+        assertEquals(TetheringOperation.STOPPING_ROUTING, state.operationFor(ShizukuAction.ToggleRouting))
+        assertFalse(state.withServiceConnection(false).hasRoutingSession)
+    }
+
+    @Test
     fun hotspotStateIsDerivedFromTheActiveTetheringMask() {
         val unknown = TetheringUiState()
         assertFalse(unknown.tetheringStateKnown)

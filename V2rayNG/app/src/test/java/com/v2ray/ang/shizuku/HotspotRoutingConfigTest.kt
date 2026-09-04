@@ -6,9 +6,16 @@ import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class HotspotRoutingConfigTest {
+
+    @Test
+    fun oldSnapshotsWithoutLaunchIdentityCannotAuthorizeAnEngine() {
+        val snapshot = HotspotRoutingSnapshot(running = true, vpnMode = true)
+        assertThrows(IllegalArgumentException::class.java) { HotspotRoutingConfig.parametersFromSnapshot(snapshot) }
+    }
 
     @Test
     fun nativeEngineKeepsOnlyTheTunInbound() {

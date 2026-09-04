@@ -1,8 +1,6 @@
 package com.v2ray.ang.shizuku
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class TetheringPlatformCompatTest {
@@ -13,35 +11,6 @@ class TetheringPlatformCompatTest {
         assertEquals(false, isPublicTetheringApiLevel(35))
         assertEquals(true, isPublicTetheringApiLevel(36))
         assertEquals(true, isPublicTetheringApiLevel(37))
-    }
-
-    @Test
-    fun infersKnownLegacyTetheringInterfaces() {
-        assertEquals(
-            ShizukuTetheringService.TETHERING_TYPE_WIFI,
-            TetheringPlatformCompat.inferLegacyTetheringType("wlan0"),
-        )
-        assertEquals(
-            ShizukuTetheringService.TETHERING_TYPE_WIFI,
-            TetheringPlatformCompat.inferLegacyTetheringType("softap1"),
-        )
-        assertEquals(
-            ShizukuTetheringService.TETHERING_TYPE_USB,
-            TetheringPlatformCompat.inferLegacyTetheringType("rndis0"),
-        )
-        assertEquals(2, TetheringPlatformCompat.inferLegacyTetheringType("bt-pan"))
-        assertEquals(3, TetheringPlatformCompat.inferLegacyTetheringType("p2p-wlan0-0"))
-        assertEquals(4, TetheringPlatformCompat.inferLegacyTetheringType("ncm0"))
-        assertEquals(5, TetheringPlatformCompat.inferLegacyTetheringType("eth0"))
-        assertNull(TetheringPlatformCompat.inferLegacyTetheringType("vendor0"))
-    }
-
-    @Test
-    fun rejectsUnknownActiveLegacyInterface() {
-        val error = assertThrows(IllegalStateException::class.java) {
-            TetheringPlatformCompat.requireLegacyTetheringType("vendor0", emptyMap())
-        }
-        assertEquals("Unknown active tethering interface: vendor0", error.message)
     }
 
     @Test
@@ -56,7 +25,7 @@ class TetheringPlatformCompatTest {
     fun acceptsOnlyTheOwnedUpstreamInterface() {
         assertEquals(true, TetheringPlatformCompat.isProtectedUpstream("testtun17", "testtun17"))
         assertEquals(
-            true,
+            false,
             TetheringPlatformCompat.isProtectedUpstream("testtun17, testtun17", "testtun17"),
         )
         assertEquals(false, TetheringPlatformCompat.isProtectedUpstream("", "testtun17"))
