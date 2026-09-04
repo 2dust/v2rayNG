@@ -23,6 +23,7 @@ internal data class HotspotRoutingLaunchConfig(
 )
 
 internal data class HotspotRoutingParameters(
+    val launchId: String,
     val useHev: Boolean,
     val profileName: String,
     val dnsServers: List<String>,
@@ -36,6 +37,7 @@ internal object HotspotRoutingConfig {
     fun parametersFromSnapshot(snapshot: HotspotRoutingSnapshot): HotspotRoutingParameters {
         requireRoutableSnapshot(snapshot)
         return HotspotRoutingParameters(
+            launchId = requireNotNull(snapshot.launchId) { "Core launch identity is unavailable" },
             useHev = snapshot.useHev,
             profileName = snapshot.profileName,
             dnsServers = snapshot.vpnDnsServers,

@@ -4,7 +4,8 @@ import android.os.ParcelFileDescriptor;
 
 /** Exposes private core inputs and keeps the protected test network alive. */
 interface ICoreTetheringLease {
-    ParcelFileDescriptor openEngineConfig();
+    ParcelFileDescriptor openEngineConfig(String launchId);
+    boolean isCurrentLaunch(String launchId);
     void holdTestNetwork(in ParcelFileDescriptor tun);
     void releaseTestNetwork();
     String assetFingerprint();

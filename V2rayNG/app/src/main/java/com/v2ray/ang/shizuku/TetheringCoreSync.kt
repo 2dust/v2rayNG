@@ -178,6 +178,7 @@ internal object TetheringCoreSync {
             hevTcpTimeoutSeconds = hevSettings.tcpTimeoutSeconds,
             hevUdpTimeoutSeconds = hevSettings.udpTimeoutSeconds,
             hevLogLevel = hevSettings.logLevel,
+            launchId = Utils.getUuid(),
         )
     }
 
@@ -239,37 +240,40 @@ private class CoreTetheringLease : ICoreTetheringLease.Stub() {
     private var connectivityManager: ConnectivityManager? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var tun: ParcelFileDescriptor? = null
-    private var routingSnapshot: HotspotRoutingSnapshot? = null
-    private var coreConfig: String? = null
+    private data class Launch(val snapshot: HotspotRoutingSnapshot, val config: String)
+    @Volatile private var launch: Launch? = null
     private var assetDirectory: File? = null
     private var configDirectory: File? = null
 
     @Synchronized
     fun attach(service: Service, snapshot: HotspotRoutingSnapshot, coreConfig: String) {
         connectivityManager = service.getSystemService(ConnectivityManager::class.java)
-        routingSnapshot = snapshot
-        this.coreConfig = coreConfig
+        launch = Launch(snapshot, coreConfig)
         assetDirectory = File(Utils.userAssetPath(service))
         configDirectory = service.cacheDir
     }
 
     @Synchronized
     fun clearEngineConfig() {
-        routingSnapshot = null
-        coreConfig = null
+        launch = null
         assetDirectory = null
         configDirectory = null
     }
 
-    @Synchronized
-    override fun openEngineConfig(): ParcelFileDescriptor {
-        val snapshot = checkNotNull(routingSnapshot) { "Core routing snapshot is unavailable" }
-        val rawConfig = checkNotNull(coreConfig) { "Core configuration is unavailable" }
-        val directory = checkNotNull(configDirectory) { "Core cache directory is unavailable" }
+    override fun isCurrentLaunch(launchId: String): Boolean = launch?.snapshot?.launchId == launchId
+
+    override fun openEngineConfig(launchId: String): ParcelFileDescriptor {
+        val (current, directory) = synchronized(this) {
+            val current = checkNotNull(launch) { "Core routing snapshot is unavailable" }
+            check(current.snapshot.launchId == launchId) { "Core launch was superseded" }
+            current to checkNotNull(configDirectory) { "Core cache directory is unavailable" }
+        }
+        // Capture one immutable launch, then do parsing/file I/O outside the lifecycle lock.
+        // A delayed Binder request must never combine old metadata with a newer configuration.
         val temporary = File.createTempFile(ENGINE_CONFIG_FILE_PREFIX, null, directory)
         try {
             temporary.writeText(
-                HotspotRoutingConfig.engineContentFromSnapshot(snapshot, rawConfig),
+                HotspotRoutingConfig.engineContentFromSnapshot(current.snapshot, current.config),
                 Charsets.UTF_8,
             )
             return ParcelFileDescriptor.open(temporary, ParcelFileDescriptor.MODE_READ_ONLY)

@@ -10,6 +10,7 @@ data class TetheringStatusSnapshot(
     val activeTetheringTypes: Int,
     val ipv6TetheringTypes: Int,
     val warning: Int,
+    val hasRoutingSession: Boolean = false,
 ) : Parcelable {
     private constructor(parcel: Parcel) : this(
         routingState = parcel.readInt(),
@@ -17,6 +18,7 @@ data class TetheringStatusSnapshot(
         activeTetheringTypes = parcel.readInt(),
         ipv6TetheringTypes = parcel.readInt(),
         warning = parcel.readInt(),
+        hasRoutingSession = parcel.readInt() != 0,
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -25,6 +27,7 @@ data class TetheringStatusSnapshot(
         parcel.writeInt(activeTetheringTypes)
         parcel.writeInt(ipv6TetheringTypes)
         parcel.writeInt(warning)
+        parcel.writeInt(if (hasRoutingSession) 1 else 0)
     }
 
     override fun describeContents(): Int = 0

@@ -38,7 +38,7 @@ class ShizukuRoutingSyncReceiver : BroadcastReceiver() {
 
 /** Keeps updates ordered across the normal core's stop/start process boundary. */
 private object ShizukuRoutingSyncDispatcher {
-    private const val BIND_TIMEOUT_MS = 10_000L
+    private const val BIND_TIMEOUT_MS = 5_000L
 
     private data class PendingUpdate(
         val context: Context,
@@ -132,7 +132,10 @@ private object ShizukuRoutingSyncDispatcher {
 
     private fun forward(service: IShizukuTetheringService, pending: PendingUpdate) {
         val update = pending.update
-        val result = when (update.event) {
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN) != update.token) return
+        // These are one-way calls. The UserService owns the lengthy work; finish this broadcast
+        // after handoff rather than holding PendingResult across native startup and Android retries.
+        when (update.event) {
             HotspotRoutingSync.EVENT_CORE_STOPPING -> service.notifyCoreStopping(update.token)
             HotspotRoutingSync.EVENT_CORE_STARTED -> {
                 val snapshot = requireNotNull(update.snapshot) { "Core-start update has no snapshot" }
@@ -140,54 +143,27 @@ private object ShizukuRoutingSyncDispatcher {
                     "Core-start update has no protected-network lease"
                 }
                 val parameters = HotspotRoutingConfig.parametersFromSnapshot(snapshot)
-                val syncResult = service.synchronizeRouting(
+                service.synchronizeRouting(
                     update.token,
                     parameters.useHev,
                     parameters.profileName,
                     parameters.dnsServers.toTypedArray(),
                     parameters.ipv6Enabled,
+                    parameters.xudpKey,
+                    parameters.launchId,
                     coreLease,
                 )
-                if (syncResult != ShizukuTetheringService.RESULT_INVALID_SESSION) {
-                    syncResult
-                } else {
-                    LogUtil.i(TAG, "Recreating Shizuku tethering after its UserService was lost")
-                    service.startRouting(
-                        parameters.useHev,
-                        parameters.profileName,
-                        parameters.dnsServers.toTypedArray(),
-                        parameters.ipv6Enabled,
-                        parameters.xudpKey,
-                        update.token,
-                        coreLease,
-                    )
-                }
             }
             HotspotRoutingSync.EVENT_CORE_START_FAILED -> {
                 service.notifyCoreStartFailed(update.token, update.detail)
             }
             else -> error("Unknown hotspot synchronization event ${update.event}")
         }
-        if (result == ShizukuTetheringService.RESULT_INVALID_SESSION) {
-            clearSyncTokenIfCurrent(update.token)
-            LogUtil.w(TAG, "Dropped stale Shizuku tethering synchronization session")
-            return
-        }
-        check(result == ShizukuTetheringService.RESULT_OK) {
-            "Shizuku tethering service rejected synchronization with result $result"
-        }
-        LogUtil.i(TAG, "Forwarded hotspot sync event ${update.event}")
-    }
-
-    private fun clearSyncTokenIfCurrent(token: String) {
-        if (MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN) == token) {
-            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
-        }
+        LogUtil.i(TAG, "Handed off hotspot sync event ${update.event}")
     }
 
     private fun failAll(message: String) {
         if (queue.isNotEmpty()) LogUtil.w(TAG, message)
         while (queue.isNotEmpty()) queue.removeFirst().finish()
-        inFlight = false
     }
 }

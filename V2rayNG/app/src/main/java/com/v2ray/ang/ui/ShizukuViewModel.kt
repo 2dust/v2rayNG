@@ -33,6 +33,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +53,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     private var operationGeneration = 0L
     private var statusRefreshPending = false
     private var snapshotWaiter: CompletableDeferred<CoreRoutingSnapshot>? = null
+    private var bindingTimeout: Job? = null
 
     private val userServiceArgs by lazy {
         ShizukuTetheringService.createUserServiceArgs()
@@ -60,10 +62,14 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     private val userServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
             viewModelScope.launch {
+                bindingTimeout?.cancel()
+                bindingTimeout = null
                 val service = IShizukuTetheringService.Stub.asInterface(binder)
                 tetheringService = service
                 _uiState.update { it.withServiceConnection(true) }
-                callServiceUnit("register status listener") { service.setStatusListener(statusListener) }
+                withContext(Dispatchers.IO) {
+                    shizukuCall("register status listener", Unit) { service.setStatusListener(statusListener) }
+                }
                 refreshTetheringStatus()
             }
         }
@@ -227,6 +233,15 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
 
         runCatching {
             Shizuku.bindUserService(userServiceArgs, userServiceConnection)
+            bindingTimeout = viewModelScope.launch {
+                delay(USER_SERVICE_BIND_TIMEOUT_MS)
+                if (tetheringService == null) {
+                    runCatching { Shizuku.unbindUserService(userServiceArgs, userServiceConnection, false) }
+                        .onFailure { logUiFailure("connection", "unbind timed-out UserService", it) }
+                    clearServiceState()
+                    toastError(R.string.shizuku_operation_failed)
+                }
+            }
         }.onFailure {
             clearServiceState()
             logUiFailure("connection", "bind UserService", it)
@@ -282,13 +297,12 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             val result = if (enable) {
                 startRouting(service)
             } else {
-                callService("stop routing") { service.stopRouting() }
+                stopRouting(service)
             }
             if (result != ShizukuTetheringService.RESULT_OK) {
                 showRoutingError(result)
                 return@launchOperation
             }
-            if (!enable) writeSyncToken("")
             toastSuccess(
                 if (enable) R.string.shizuku_routing_enabled
                 else R.string.shizuku_routing_disabled
@@ -315,8 +329,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             }
             if (result != ShizukuTetheringService.RESULT_OK) {
                 if (routingStartedHere) {
-                    callService("roll back routing") { service.stopRouting() }
-                    writeSyncToken("")
+                    stopRouting(service)
                 }
                 if (result != ShizukuTetheringService.RESULT_UNPROTECTED_UPSTREAM) {
                     toastError(getString(R.string.shizuku_hotspot_operation_failed, result))
@@ -358,23 +371,17 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     }
 
     private suspend fun callService(operation: String, action: () -> Int): Int = withContext(Dispatchers.IO) {
-        try {
-            action()
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Throwable) {
-            logUiFailure("Binder", operation, error)
-            ShizukuTetheringService.RESULT_INTERNAL_ERROR
-        }
-    }
-
-    private suspend fun callServiceUnit(operation: String, action: () -> Unit) = withContext(Dispatchers.IO) {
-        try {
-            action()
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Throwable) {
-            logUiFailure("Binder", operation, error)
+        // A reopened screen must not overtake an old screen's pending remote operation and its
+        // token bookkeeping. This process-wide ordering never blocks the UI thread.
+        synchronized(serviceOperationLock) {
+            try {
+                action()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                logUiFailure("Binder", operation, error)
+                ShizukuTetheringService.RESULT_INTERNAL_ERROR
+            }
         }
     }
 
@@ -400,26 +407,30 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
             return ShizukuTetheringService.RESULT_ROUTING_FAILED
         }
 
-        val previousSyncToken = readSyncToken()
-        val syncToken = Utils.getUuid()
-        writeSyncToken(syncToken)
-        val result = callService("start routing") {
-            service.startRouting(
-                parameters.useHev,
-                parameters.profileName,
-                parameters.dnsServers.toTypedArray(),
-                parameters.ipv6Enabled,
-                parameters.xudpKey,
-                syncToken,
-                coreLease,
-            )
+        return callService("start routing") {
+            val previousToken = MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN).orEmpty()
+            val token = Utils.getUuid()
+            MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, token)
+            var started = false
+            try {
+                service.startRouting(
+                    parameters.useHev, parameters.profileName, parameters.dnsServers.toTypedArray(),
+                    parameters.ipv6Enabled, parameters.xudpKey, token, parameters.launchId, coreLease,
+                ).also { started = it == ShizukuTetheringService.RESULT_OK }
+            } finally {
+                if (!started) {
+                    MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, previousToken)
+                }
+            }
         }
-        if (result != ShizukuTetheringService.RESULT_OK &&
-            readSyncToken() == syncToken
-        ) {
-            writeSyncToken(previousSyncToken)
+    }
+
+    private suspend fun stopRouting(service: IShizukuTetheringService): Int = callService("stop routing") {
+        // Binder calls cannot be cancelled once submitted. Commit their bookkeeping in the same
+        // IO block, before dispatching back to a ViewModel which may already have been cleared.
+        service.stopRouting().also { result ->
+            if (result == ShizukuTetheringService.RESULT_OK) MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, "")
         }
-        return result
     }
 
     private suspend fun requestCoreSnapshot(): CoreRoutingSnapshot? {
@@ -449,6 +460,8 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     }
 
     private fun clearServiceState() {
+        bindingTimeout?.cancel()
+        bindingTimeout = null
         cancelCurrentOperation()
         statusRefreshPending = false
         tetheringService = null
@@ -464,14 +477,6 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     } catch (error: Throwable) {
         logUiFailure("status", "query Shizuku package", error)
         false
-    }
-
-    private suspend fun readSyncToken(): String = withContext(Dispatchers.IO) {
-        MmkvManager.decodeSettingsString(AppConfig.PREF_SHIZUKU_SYNC_TOKEN).orEmpty()
-    }
-
-    private suspend fun writeSyncToken(value: String) = withContext(Dispatchers.IO) {
-        MmkvManager.encodeSettings(AppConfig.PREF_SHIZUKU_SYNC_TOKEN, value)
     }
 
     private fun <T> shizukuCall(operation: String, default: T, action: () -> T): T = try {
@@ -518,7 +523,9 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
     )
 
     companion object {
+        private val serviceOperationLock = Any()
         private const val SHIZUKU_PERMISSION_REQUEST_CODE = 1001
         private const val CORE_SNAPSHOT_TIMEOUT_MS = 5_000L
+        private const val USER_SERVICE_BIND_TIMEOUT_MS = 5_000L
     }
 }

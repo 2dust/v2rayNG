@@ -26,6 +26,10 @@ data class HotspotRoutingSnapshot(
     val hevTcpTimeoutSeconds: Int = 0,
     val hevUdpTimeoutSeconds: Int = 0,
     val hevLogLevel: String = "warn",
+    // Unlike the tethering session token, this identity changes on every main-core launch.
+    // Nullable for broadcasts from an older app process during an APK update. Such snapshots
+    // cannot authorize a new engine; request fresh launch metadata instead.
+    val launchId: String? = null,
 ) : Serializable {
     companion object {
         private const val serialVersionUID = 5L

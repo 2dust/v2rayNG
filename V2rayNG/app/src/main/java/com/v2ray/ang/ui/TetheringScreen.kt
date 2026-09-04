@@ -86,12 +86,13 @@ internal data class TetheringUiState(
     val ipv6Enabled: Boolean = false,
     val coreRunning: Boolean = false,
     val serviceConnected: Boolean = false,
+    val hasRoutingSession: Boolean = false,
 ) {
     val routingActive: Boolean
         get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
             routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
     val routingSessionEnabled: Boolean
-        get() = routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
+        get() = hasRoutingSession || routingActive || routingState == ShizukuTetheringService.ROUTING_STATE_WAITING
     val hotspotEnabled: Boolean
         get() = activeTetheringTypes >= 0 &&
             activeTetheringTypes and tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_WIFI) != 0
@@ -115,6 +116,7 @@ internal fun TetheringUiState.withServiceConnection(connected: Boolean): Tetheri
             operation = TetheringOperation.NONE,
             routingState = ShizukuTetheringService.ROUTING_STATE_DISABLED,
             routingDetail = "",
+            hasRoutingSession = false,
             activeTetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
             ipv6TetheringTypes = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
         )
@@ -135,6 +137,7 @@ internal fun TetheringUiState.withTetheringStatus(
     activeTetheringTypes = status.activeTetheringTypes,
     ipv6TetheringTypes = status.ipv6TetheringTypes,
     ipv6Enabled = ipv6Enabled,
+    hasRoutingSession = status.hasRoutingSession,
 )
 
 internal fun TetheringUiState.operationFor(action: ShizukuAction): TetheringOperation? = when (action) {
@@ -205,7 +208,7 @@ internal fun routingAction(
             ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE,
             ShizukuTetheringService.ROUTING_STATE_WAITING -> true
             ShizukuTetheringService.ROUTING_STATE_ERROR,
-            ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.coreRunning
+            ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.routingSessionEnabled || state.coreRunning
             else -> false
         }
     return TetheringControlState(
