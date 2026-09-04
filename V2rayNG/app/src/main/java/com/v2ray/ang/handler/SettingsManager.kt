@@ -30,6 +30,7 @@ import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 import kotlin.random.Random
 
 object SettingsManager {
@@ -70,6 +71,7 @@ object SettingsManager {
         }
 
         return JsonUtil.fromJsonSafe(assets, Array<RulesetItem>::class.java)?.toMutableList()
+            ?.also { ensureRoutingRulesetIds(it) }
     }
 
     /**
@@ -119,68 +121,78 @@ object SettingsManager {
         }
 
         rulesetNew.addAll(rulesetList)
+        ensureRoutingRulesetIds(rulesetNew)
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
     /**
-      * Get a routing ruleset by id.
-      * @param id The id of the ruleset.
-      * @return The RulesetItem.
-      */
-    fun getRoutingRuleset(index: String?): RulesetItem? {
-       if (index.isNullOrEmpty()) return null
+     * Ensure every routing ruleset carries a unique id.
+     * Legacy or imported rulesets may have no id, and an exported list that is imported again
+     * next to the locked rulesets it was exported with repeats their ids. Both break the id-based
+     * edit and delete flows as well as the keyed list on the routing screen.
+     * @param rulesetList The list of rulesets, fixed in place.
+     * @return True if any id was assigned, false otherwise.
+     */
+    fun ensureRoutingRulesetIds(rulesetList: MutableList<RulesetItem>): Boolean {
+        val seenIds = mutableSetOf<String>()
+        var changed = false
+        rulesetList.forEach { ruleset ->
+            if (ruleset.id.isBlank() || !seenIds.add(ruleset.id)) {
+                ruleset.id = UUID.randomUUID().toString()
+                seenIds.add(ruleset.id)
+                changed = true
+            }
+        }
+        return changed
+    }
 
-       return MmkvManager.decodeRoutingRulesets()?.firstOrNull { it.id == index }
+    /**
+     * Get a routing ruleset by id.
+     * @param id The id of the ruleset.
+     * @return The RulesetItem, or null if there is no ruleset with that id.
+     */
+    fun getRoutingRuleset(id: String?): RulesetItem? {
+        if (id.isNullOrEmpty()) return null
+
+        return MmkvManager.decodeRoutingRulesets()?.firstOrNull { it.id == id }
     }
 
     /**
      * Save a routing ruleset.
-     * @param index The index of the ruleset.
+     * @param id The id of the ruleset to replace, or null to add a new ruleset.
      * @param ruleset The RulesetItem to save.
      */
-    fun saveRoutingRuleset(index: Int, ruleset: RulesetItem?) {
-       if (ruleset == null) return
-
-       var rulesetList = MmkvManager.decodeRoutingRulesets()
-       if (rulesetList.isNullOrEmpty()) {
-           rulesetList = mutableListOf()
+    fun saveRoutingRuleset(id: String?, ruleset: RulesetItem?) {
+        if (ruleset == null) return
+        if (ruleset.id.isBlank()) {
+            ruleset.id = UUID.randomUUID().toString()
         }
 
-       if (index < 0 || index >= rulesetList.count()) {
-           rulesetList.add(0, ruleset)
-       } else {
-           rulesetList[index] = ruleset
-       }
-       MmkvManager.encodeRoutingRulesets(rulesetList)
+        val rulesetList = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+        val targetId = if (id.isNullOrEmpty()) ruleset.id else id
+        val targetIndex = rulesetList.indexOfFirst { it.id == targetId }
+
+        if (targetIndex >= 0) {
+            rulesetList[targetIndex] = ruleset
+        } else {
+            rulesetList.add(0, ruleset)
+        }
+        MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
-    fun saveRoutingRuleset(index: String?, ruleset: RulesetItem?) {
-       if (ruleset == null) return
-       if (ruleset.id.isBlank()) {
-           ruleset.id = java.util.UUID.randomUUID().toString()
-       }
+    /**
+     * Remove a routing ruleset by id.
+     * @param id The id of the ruleset.
+     */
+    fun removeRoutingRuleset(id: String?) {
+        if (id.isNullOrEmpty()) return
 
-       val rulesetList = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-       val targetId = if (index.isNullOrEmpty()) ruleset.id else index
-       val index = rulesetList.indexOfFirst { it.id == targetId }
+        val rulesetList = MmkvManager.decodeRoutingRulesets() ?: return
+        val targetIndex = rulesetList.indexOfFirst { it.id == id }
+        if (targetIndex < 0) return
 
-       if (index >= 0) {
-           rulesetList[index] = ruleset
-       } else {
-           rulesetList.add(0, ruleset)
-       }
-       MmkvManager.encodeRoutingRulesets(rulesetList)
-    }
-
-    fun removeRoutingRuleset(index: String?) {
-       if (index.isNullOrEmpty()) return
-
-       val rulesetList = MmkvManager.decodeRoutingRulesets() ?: return
-       val targetIndex = rulesetList.indexOfFirst { it.id == index }
-       if (targetIndex < 0) return
-
-       rulesetList.removeAt(targetIndex)
-       MmkvManager.encodeRoutingRulesets(rulesetList)
+        rulesetList.removeAt(targetIndex)
+        MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
     /**
