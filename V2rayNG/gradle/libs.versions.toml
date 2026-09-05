@@ -18,7 +18,7 @@ workRuntimeKtx = "2.11.2"
 lifecycleViewmodelKtx = "2.11.0"
 mockitoMockitoInline = "5.2.0"
 camerax = "1.6.1"
-composeBom = "2026.06.01"
+composeBom = "2026.08.00"
 reorderable = "3.1.0"
 coil = "2.7.0"
 [libraries]
@@ -52,7 +52,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
-androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version = "1.5.0-alpha26" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
