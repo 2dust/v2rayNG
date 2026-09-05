@@ -116,7 +116,6 @@ val toastNormalBgLight = Color(0xB3353A3E) // Dark Gray
 val toastNormalBgDark = Color(0xB34A4F54) // Darker Gray
 val toastSuccessBg = Color(0xB3388E3C) // Green
 val toastErrorBg = Color(0xB3D50000) // Red
-val toastInfoBg = Color(0xB33F51B5) // Indigo Blue
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
 val toastTextColor = Color.White // White
 
@@ -192,7 +191,6 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
-        LocalAppSnackbar provides snackbarController
     ) {
         MaterialTheme(
             colorScheme = colorScheme
@@ -200,7 +198,7 @@ fun AppTheme(
             Box(modifier = Modifier.fillMaxSize()) {
                 AppSnackbarBridge(controller = snackbarController)
                 content()
-                AppSnackbarHost(hostState = snackbarController.hostState)
+                AppSnackbarHost(controller = snackbarController)
             }
         }
     }

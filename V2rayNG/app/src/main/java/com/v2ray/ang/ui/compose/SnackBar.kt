@@ -25,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -46,13 +45,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 enum class ToastType {
-    NORMAL, SUCCESS, ERROR, INFO
+    NORMAL, SUCCESS, ERROR
 }
 
 data class AppSnackbarMessage(
     val message: CharSequence,
     val type: ToastType = ToastType.NORMAL,
-    val long: Boolean = false,
     val liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     val accessibilityMessage: CharSequence? = null,
 )
@@ -81,7 +79,7 @@ class AppSnackbarController(
     private var currentId = 0
     private var currentShowTime = 0L
 
-    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
+    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL) {
         val id = ++currentId
         scope.launch {
             if (currentShowTime != 0L) {
@@ -98,7 +96,6 @@ class AppSnackbarController(
                     AppSnackbarVisuals(
                         message = message.toString(),
                         type = type,
-                        duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short
                     )
                 )
                 if (id == currentId) {
@@ -114,14 +111,10 @@ class AppSnackbarController(
 private data class AppSnackbarVisuals(
     override val message: String,
     val type: ToastType,
-    override val duration: SnackbarDuration,
+    override val duration: SnackbarDuration = SnackbarDuration.Short,
     override val actionLabel: String? = null,
     override val withDismissAction: Boolean = false
 ) : SnackbarVisuals
-
-val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
-    error("AppSnackbarController not provided. Wrap your content in AppTheme.")
-}
 
 @Composable
 fun rememberAppSnackbarController(): AppSnackbarController {
@@ -144,7 +137,6 @@ fun AppSnackbarBridge(
                     controller.show(
                         message = event.message,
                         type = event.type,
-                        long = event.long
                     )
                     liveRegionMessages.offer(event)
                 }
@@ -194,13 +186,11 @@ internal class LiveRegionMessageState(
         if (current == null) current = message else pending.addLast(message)
     }
 
-    // Hold each update for its semantics lifetime rather than cancelling publication when another
-    // message arrives. Urgent pending results go first; the accessibility service still owns speech.
+    // Hold each update for its semantics lifetime and preserve event order (e.g. starting, started).
+    // The live-region mode controls speech urgency, not the order in which we publish state changes.
     fun advance(id: Long) {
         if (current?.id != id) return
-        current = pending.firstOrNull { it.mode == AccessibilityLiveRegionMode.ASSERTIVE }
-            ?: pending.firstOrNull()
-        current?.let(pending::remove)
+        current = pending.removeFirstOrNull()
     }
 
     fun clear() {
@@ -239,10 +229,10 @@ private const val LiveRegionMessageLifetimeMs = 1000L
 
 @Composable
 fun AppSnackbarHost(
-    hostState: SnackbarHostState,
+    controller: AppSnackbarController,
     modifier: Modifier = Modifier
 ) {
-    val liveRegionMessages = LocalAppSnackbar.current.liveRegionMessages
+    val liveRegionMessages = controller.liveRegionMessages
     val liveRegionMessage = liveRegionMessages.current
     LaunchedEffect(liveRegionMessage?.id) {
         val id = liveRegionMessage?.id ?: return@LaunchedEffect
@@ -258,7 +248,7 @@ fun AppSnackbarHost(
         }
 
         SnackbarHost(
-            hostState = hostState,
+            hostState = controller.hostState,
             modifier = Modifier.fillMaxSize()
         ) { data ->
             val type = (data.visuals as? AppSnackbarVisuals)?.type ?: ToastType.NORMAL
@@ -268,7 +258,6 @@ fun AppSnackbarHost(
                 ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
                 ToastType.SUCCESS -> toastSuccessBg
                 ToastType.ERROR -> toastErrorBg
-                ToastType.INFO -> toastInfoBg
             }
 
             Box(

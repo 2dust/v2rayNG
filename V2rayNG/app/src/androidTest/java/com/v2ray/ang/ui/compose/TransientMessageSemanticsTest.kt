@@ -27,7 +27,7 @@ class TransientMessageSemanticsTest {
     val compose = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun burstPublishesAssertiveResultBeforePoliteFeedbackAndKeepsSnackbarInert() {
+    fun burstPreservesTheCurrentResultAndKeepsSnackbarInert() {
         val automation = InstrumentationRegistry.getInstrumentation()
             .getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
         compose.mainClock.autoAdvance = false
@@ -64,6 +64,30 @@ class TransientMessageSemanticsTest {
 
         compose.mainClock.advanceTimeBy(1100)
         compose.onNodeWithText("Copied").assertDoesNotExist()
+    }
+
+    @Test
+    fun queuedStartAcknowledgementIsPublishedBeforeTheAssertiveResult() {
+        compose.mainClock.autoAdvance = false
+        compose.runOnIdle {
+            compose.activity.toast("Copied")
+            compose.activity.toast("Starting service")
+            compose.activity.toastSuccess("Connected", AccessibilityLiveRegionMode.ASSERTIVE)
+        }
+        compose.mainClock.advanceTimeBy(200)
+        compose.onNodeWithText("Copied").assertExists()
+        compose.onNodeWithText("Starting service").assertDoesNotExist()
+        compose.onNodeWithText("Connected").assertDoesNotExist()
+
+        compose.mainClock.advanceTimeBy(1100)
+        compose.onNodeWithText("Starting service")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
+        compose.onNodeWithText("Connected").assertDoesNotExist()
+
+        compose.mainClock.advanceTimeBy(1100)
+        compose.onNodeWithText("Connected")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Assertive))
+        compose.onNodeWithText("Starting service").assertDoesNotExist()
     }
 
     @Test

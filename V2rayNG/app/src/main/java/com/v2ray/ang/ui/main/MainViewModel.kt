@@ -18,6 +18,7 @@ import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.extension.serviceStartedMessage
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -106,9 +107,7 @@ class MainViewModel(
                 toastSuccess(
                     R.string.toast_services_success,
                     liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
-                    accessibilityMessage = event.accessibilityMessage {
-                        getString(R.string.acc_service_started_connected_to, it)
-                    },
+                    accessibilityMessage = localizedContext.serviceStartedMessage(event.serverName),
                 )
                 updateRunningState(true)
             }

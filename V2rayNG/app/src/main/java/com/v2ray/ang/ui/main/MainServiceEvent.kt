@@ -14,7 +14,3 @@ sealed class MainServiceEvent {
     data class MeasureConfigNotify(val progress: String) : MainServiceEvent()
     data class MeasureConfigFinish(val finishedCount: String?) : MainServiceEvent()
 }
-
-internal fun MainServiceEvent.StateStartSuccess.accessibilityMessage(
-    formatConnectedTo: (String) -> String,
-): String? = serverName.trim().takeIf(String::isNotEmpty)?.let(formatConnectedTo)
