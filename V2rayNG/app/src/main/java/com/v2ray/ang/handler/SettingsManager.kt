@@ -47,7 +47,7 @@ object SettingsManager {
         ensureDefaultSettings()
         //ensureDefaultSubscription()
         initRoutingRulesets(context)
-        migrateServerListToSubscriptions()
+        if (!migrateServerListToSubscriptions()) return
         migrateHysteria2PinSHA256()
     }
 
@@ -503,10 +503,9 @@ object SettingsManager {
             return
         }
 
-        val serverList = decodeAllServerList()
+        val profiles = readMigrationProfiles() ?: return
 
-        for (guid in serverList) {
-            val profile = decodeServerConfig(guid) ?: continue
+        for ((guid, profile) in profiles) {
             if (profile.configType != EConfigType.HYSTERIA2) {
                 continue
             }
@@ -515,7 +514,8 @@ object SettingsManager {
             }
             profile.pinnedCA256 = profile.pinSHA256
             profile.pinSHA256 = null
-            MmkvManager.encodeServerConfig(guid, profile)
+            // Leave the migration pending if even one profile could not be saved.
+            if (MmkvManager.encodeServerConfig(guid, profile) == null) return
         }
 
         MmkvManager.encodeSettings(migrationKey, true)
@@ -526,36 +526,24 @@ object SettingsManager {
      * This method should be called once during app initialization after the storage structure change.
      * Servers are grouped by their subscriptionId into respective subscription's serverList.
      * Servers without subscription are moved to the default subscription.
-     * After migration, KEY_ANG_CONFIGS is removed.
+     * Retains the legacy index; the completion flag prevents repeating a successful migration.
      */
-    private fun migrateServerListToSubscriptions() {
+    private fun migrateServerListToSubscriptions(): Boolean {
+        if (!MmkvManager.migrateSubscriptionIndex()) return false
         // Check if migration has already been done
         val migrationKey = "server_list_to_subscriptions_migrated"
         if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
-            return
+            return true
         }
 
         // Ensure default subscription exists before migration
-        ensureDefaultSubscription()
+        if (!ensureDefaultSubscription()) return false
 
-        // Read existing server list from legacy KEY_ANG_CONFIGS
-        val oldJson = MmkvManager.readLegacyServerList()
-        if (oldJson.isNullOrBlank()) {
-            // No data to migrate, mark as done
-            MmkvManager.encodeSettings(migrationKey, true)
-            return
-        }
-
-        val guids = JsonUtil.fromJsonSafe(oldJson, Array<String>::class.java) ?: run {
-            MmkvManager.encodeSettings(migrationKey, true)
-            return
-        }
-
+        val profiles = readMigrationProfiles(legacy = true) ?: return false
         val subscriptionServerMap = mutableMapOf<String, MutableList<String>>()
 
         // Group servers by subscription (use default subscription for empty subscriptionId)
-        guids.forEach { guid ->
-            val config = decodeServerConfig(guid) ?: return@forEach
+        profiles.forEach { (guid, config) ->
             val subId = config.subscriptionId.ifEmpty { DEFAULT_SUBSCRIPTION_ID }
 
             subscriptionServerMap.getOrPut(subId) { mutableListOf() }.add(guid)
@@ -563,32 +551,41 @@ object SettingsManager {
 
         // Update each subscription's serverList (including default subscription)
         subscriptionServerMap.forEach { (subId, serverGuids) ->
-            MmkvManager.encodeServerList(serverGuids, subId)
+            if (!MmkvManager.migrateServerList(serverGuids, subId)) return false
         }
 
 
         // Mark migration as complete
-        MmkvManager.encodeSettings(migrationKey, true)
+        return MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    private fun readMigrationProfiles(legacy: Boolean = false): Map<String, ProfileItem>? {
+        return try {
+            MmkvManager.readProfilesForMigration(legacy)
+        } catch (e: ProfileStorageException) {
+            LogUtil.e(AppConfig.TAG, "Failed to read migration profiles (legacy=$legacy); migration remains pending", e)
+            null
+        }
     }
 
     /**
      * Ensures the default subscription exists for ungrouped servers.
      * This subscription is used internally to store servers without a subscription.
-     * Made public for migration in SettingsManager.
      */
-    private fun ensureDefaultSubscription() {
+    private fun ensureDefaultSubscription(): Boolean {
         if (decodeSubscription(DEFAULT_SUBSCRIPTION_ID) == null) {
             val defaultSub = SubscriptionItem(
                 remarks = "Default",
             )
-            encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub)
+            if (encodeSubscription(DEFAULT_SUBSCRIPTION_ID, defaultSub) == null) return false
 
             // Move to the top
             val subsList = decodeSubsList()
             if (subsList.moveItem(subsList.lastIndex, 0)) {
-                MmkvManager.encodeSubsList(subsList)
+                return MmkvManager.reorderSubscriptions(subsList)
             }
         }
+        return true
     }
 
 }

@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.subscription
 
 import android.app.Application
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
@@ -15,36 +16,50 @@ import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
-    private val _subsFlow = MutableStateFlow(MmkvManager.decodeSubscriptions())
+class SubscriptionsViewModel @JvmOverloads constructor(
+    application: Application,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : BaseViewModel(application) {
+    private val _subsFlow = MutableStateFlow<List<SubscriptionCache>>(emptyList())
     val subsFlow: StateFlow<List<SubscriptionCache>> = _subsFlow.asStateFlow()
+    private var orderPersistenceJob: Job? = null
+    private var reloadJob: Job? = null
+
+    init {
+        reload()
+    }
 
     fun reload() {
-        _subsFlow.value = MmkvManager.decodeSubscriptions()
+        reloadJob?.cancel()
+        reloadJob = viewModelScope.launch {
+            orderPersistenceJob?.join()
+            val observedOrderJob = orderPersistenceJob
+            val persisted = withContext(ioDispatcher) { MmkvManager.decodeSubscriptions() }
+            if (orderPersistenceJob === observedOrderJob) _subsFlow.value = persisted
+        }
     }
 
     fun remove(subId: String) {
         launchLoading {
-            val (result, persistedSubscriptions) = withContext(Dispatchers.IO) {
-                val removal = SettingsManager.removeSubscriptionWithDefault(subId)
-                removal to if (removal != SettingsManager.SubscriptionRemovalResult.FAILED) {
-                    MmkvManager.decodeSubscriptions()
-                } else {
-                    emptyList()
-                }
+            val result = withContext(ioDispatcher) {
+                SettingsManager.removeSubscriptionWithDefault(subId)
             }
             if (result == SettingsManager.SubscriptionRemovalResult.FAILED) {
                 toastError(R.string.toast_failure)
                 return@launchLoading
             }
 
-            _subsFlow.value = persistedSubscriptions
+            reload()
             SettingsChangeManager.makeSetupGroupTab()
             if (result == SettingsManager.SubscriptionRemovalResult.REMOVED_WITHOUT_DEFAULT) {
                 toastError(R.string.toast_failure)
@@ -59,20 +74,11 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
             ?.copy()
             ?: return
         launchLoading {
-            val saved = withContext(Dispatchers.IO) {
+            val saved = withContext(ioDispatcher) {
                 MmkvManager.updateSubscription(subId, expected, item)
             }
-            if (!saved) {
-                toastError(R.string.toast_failure)
-                return@launchLoading
-            }
-
-            val subscriptions = _subsFlow.value.toMutableList()
-            val currentIndex = subscriptions.indexOfFirst { it.guid == subId }
-            if (currentIndex >= 0) {
-                subscriptions[currentIndex] = SubscriptionCache(subId, item)
-                _subsFlow.value = subscriptions
-            }
+            if (!saved) toastError(R.string.toast_failure)
+            reload()
         }
     }
 
@@ -80,11 +86,19 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         val subscriptions = _subsFlow.value.toMutableList()
         if (!subscriptions.moveItem(fromPosition, toPosition)) return
 
-        if (MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })) {
-            SettingsChangeManager.makeSetupGroupTab()
-            _subsFlow.value = subscriptions
-        } else {
-            toastError(R.string.toast_failure)
+        _subsFlow.value = subscriptions
+        val previous = orderPersistenceJob
+        orderPersistenceJob = viewModelScope.launch {
+            previous?.join()
+            val saved = withContext(ioDispatcher) {
+                MmkvManager.reorderSubscriptions(subscriptions.map { it.guid })
+            }
+            if (saved) SettingsChangeManager.makeSetupGroupTab() else toastError(R.string.toast_failure)
+            val thisJob = currentCoroutineContext()[Job]
+            if (orderPersistenceJob === thisJob) {
+                orderPersistenceJob = null
+                reload()
+            }
         }
     }
 
