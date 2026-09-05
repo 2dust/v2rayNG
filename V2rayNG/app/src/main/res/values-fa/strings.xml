@@ -515,13 +515,16 @@
     <string name="acc_add_asset">افزودن منبع فایل‌های جغرافیایی</string>
     <string name="acc_download_file">دانلود فایل‌های منبع</string>
     <string name="acc_qr_code">کد QR</string>
-    <string name="acc_copy_log">کپی گزارش</string>
+    <string name="acc_copy_log">کپی گزارش در کلیپ‌بورد</string>
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
+    <string name="acc_connect">اتصال</string>
+    <string name="acc_disconnect">قطع اتصال</string>
     <string name="acc_back">بازگشت</string>
     <string name="acc_search">جستجو</string>
+    <string name="acc_clear_search">پاک کردن جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
     <string name="acc_selected_server">انتخاب شده</string>

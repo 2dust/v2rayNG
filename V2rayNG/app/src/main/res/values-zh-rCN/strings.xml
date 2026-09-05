@@ -515,13 +515,16 @@
     <string name="acc_add_asset">添加资源来源</string>
     <string name="acc_download_file">下载资源文件</string>
     <string name="acc_qr_code">二维码</string>
-    <string name="acc_copy_log">复制日志</string>
+    <string name="acc_copy_log">将日志复制到剪贴板</string>
     <string name="acc_clear_log">清除日志</string>
     <string name="acc_add_rule">添加路由规则</string>
     <string name="acc_start">启动服务</string>
     <string name="acc_stop">停止服务</string>
+    <string name="acc_connect">连接</string>
+    <string name="acc_disconnect">断开连接</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜索</string>
+    <string name="acc_clear_search">清除搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
     <string name="acc_selected_server">Selected</string>

@@ -515,13 +515,16 @@
     <string name="acc_add_asset">ٱووردن بونچک فایلا جغرافیایی</string>
     <string name="acc_download_file">دانلود فایلا بونچک جغرافیایی</string>
     <string name="acc_qr_code">کود QR</string>
-    <string name="acc_copy_log">لف گیری گوزارش</string>
+    <string name="acc_copy_log">لف گیری گوزارش من ویرگا</string>
     <string name="acc_clear_log">روفتن گوزارش</string>
     <string name="acc_add_rule">ٱووردن قانووݩ</string>
     <string name="acc_start">ره وستن سرویس</string>
     <string name="acc_stop">واڌاشتن سرویس</string>
+    <string name="acc_connect">منپیز کردن</string>
+    <string name="acc_disconnect">واڌاشتن منپیز</string>
     <string name="acc_back">برگشت</string>
     <string name="acc_search">پیتینیڌن</string>
+    <string name="acc_clear_search">روفتن پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
     <string name="acc_more">امکووݩا بؽتر</string>
     <string name="acc_selected_server">Selected</string>
