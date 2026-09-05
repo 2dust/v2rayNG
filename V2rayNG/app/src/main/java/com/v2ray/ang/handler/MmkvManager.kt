@@ -12,6 +12,7 @@ import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVHandler
 import com.tencent.mmkv.MMKVLogLevel
 import com.tencent.mmkv.MMKVRecoverStrategic
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
@@ -77,12 +78,9 @@ object MmkvManager {
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
-    private var applicationContext: Context? = null
 
     private fun notifySelectedProfileChanged() {
-        applicationContext?.let {
-            MessageHelper.sendMsg2UI(it, AppConfig.MSG_SELECTED_PROFILE_CHANGED, "")
-        }
+        MessageHelper.sendMsg2UI(AngApplication.application, AppConfig.MSG_SELECTED_PROFILE_CHANGED, "")
     }
 
     private inline fun <T> withProfileIndexLock(block: () -> T): T {
@@ -143,7 +141,6 @@ object MmkvManager {
      * Initializes MMKV with best-effort recovery so a damaged store is not silently discarded.
      */
     fun initialize(context: Context) {
-        applicationContext = context.applicationContext
         val logLevel = if (BuildConfig.DEBUG) {
             MMKVLogLevel.LevelDebug
         } else {
