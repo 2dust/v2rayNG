@@ -1,143 +1,173 @@
 package com.v2ray.ang.ui.userasset
 
-import android.app.Application
-import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.UrlContentRequest
-import com.v2ray.ang.dto.entities.AssetUrlCache
-import com.v2ray.ang.dto.entities.AssetUrlItem
-import com.v2ray.ang.extension.concatUrl
-import com.v2ray.ang.handler.MmkvManager
+import android.net.Uri
+import com.v2ray.ang.R
+import com.v2ray.ang.repository.AssetImportResult
+import com.v2ray.ang.repository.UserAssetRepository
+import com.v2ray.ang.ui.AppRoute
+import com.v2ray.ang.ui.base.BaseResult
+import com.v2ray.ang.ui.base.BaseText
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import java.io.File
 
-internal data class AssetFileMetadata(val length: Long, val lastModified: Long)
+/**
+ * Geo-file downloads run with a determinate top-bar progress and a final result toast.
+ */
+class UserAssetViewModel(
+    private val repo: UserAssetRepository
+) : BaseViewModel<UserAssetUiState, UserAssetAction>(UserAssetUiState()) {
 
-internal data class UserAssetUiState(
-    val assets: List<AssetUrlCache> = emptyList(),
-    val fileMetadata: Map<String, AssetFileMetadata> = emptyMap()
-)
+    /** Only decides which [BaseResult] Back answers with. */
+    private var changed = false
 
-class UserAssetViewModel(application: Application) : BaseViewModel(application) {
-    private val builtInGeoFiles = listOf(AppConfig.GEOSITE_DAT, AppConfig.GEOIP_DAT, AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT)
+    /** Back can be pressed again before the Activity actually finishes. */
+    private var finishing = false
 
-    private val _uiState = MutableStateFlow(UserAssetUiState())
-    internal val uiState: StateFlow<UserAssetUiState> = _uiState.asStateFlow()
-    private var reloadJob: Job? = null
+    private val _downloadProgress = MutableStateFlow<AssetDownloadProgress?>(null)
 
-    fun reload(geoFilesSource: String, extDir: File): Job {
-        reloadJob?.cancel()
-        return viewModelScope.launch(Dispatchers.IO) {
-            val snapshot = buildAssetList(MmkvManager.decodeAssetUrls(), geoFilesSource)
-            val files = extDir.listFiles().orEmpty().associateBy { it.name }
-            val metadata = snapshot.mapNotNull { asset ->
-                files[asset.assetUrl.remarks]?.let { file ->
-                    asset.guid to AssetFileMetadata(file.length(), file.lastModified())
-                }
-            }.toMap()
-            ensureActive()
-            _uiState.value = UserAssetUiState(snapshot, metadata)
-        }.also { reloadJob = it }
+    /**
+     * Read-only state slice. Progress ticks once per file.
+     */
+    val downloadProgress: StateFlow<AssetDownloadProgress?> = _downloadProgress.asStateFlow()
+
+    init {
+        refresh()
     }
 
-    private fun buildAssetList(
-        decodedAssets: List<AssetUrlCache>?,
-        geoFilesSource: String
-    ): List<AssetUrlCache> {
-        val savedAssets = decodedAssets ?: emptyList()
-        val builtInItems = builtInGeoFiles
-            .filter { geoFile -> savedAssets.none { it.assetUrl.remarks == geoFile } }
-            .map {
-                AssetUrlCache(
-                    Utils.getUuid(),
-                    AssetUrlItem(
-                        it,
-                        String.format(AppConfig.GITHUB_DOWNLOAD_URL, geoFilesSource).concatUrl(it),
-                        locked = true
-                    )
-                )
-            }
-        // Force update URL for geoip-only-cn-private.dat
-        return (builtInItems + savedAssets).map { cache ->
-            if (cache.assetUrl.remarks == AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT) {
-                cache.copy(
-                    assetUrl = cache.assetUrl.copy(
-                        url = AppConfig.GEOIP_ONLY_CN_PRIVATE_URL
-                    )
-                )
-            } else {
-                cache
+    override fun onAction(action: UserAssetAction) {
+        when (action) {
+            UserAssetAction.Back -> finish()
+
+            is UserAssetAction.GeoSourceSelected -> selectGeoSource(action.value)
+
+            UserAssetAction.AddFileClicked -> platform(UserAssetEvent.PickFile)
+            UserAssetAction.ScanQrCodeClicked -> platform(UserAssetEvent.ScanQrCode)
+            UserAssetAction.AddUrlClicked -> navigate(AppRoute.UserAssetUrl())
+
+            // A null uri means the picker was dismissed, which is not a failure worth reporting.
+            is UserAssetAction.FileSelected -> action.uri?.let(::importFile)
+            is UserAssetAction.QrCodeScanned -> importFromQrCode(action.text)
+
+            UserAssetAction.DownloadClicked -> download()
+
+            is UserAssetAction.Edit -> navigate(AppRoute.UserAssetUrl(assetId = action.guid))
+
+            is UserAssetAction.RemoveClicked -> askRemove(action.guid)
+
+            UserAssetAction.DialogConfirm -> confirmDialog()
+            UserAssetAction.DialogDismiss -> setState { copy(dialog = null) }
+
+            is UserAssetAction.ResultReceived -> if (action.result.isOk) {
+                changed = true
+                refresh()
             }
         }
     }
 
-    fun downloadGeoFiles(
-        extDir: File,
-        httpPort: Int,
-        proxyUsername: String? = null,
-        proxyPassword: String? = null
-    ): GeoDownloadResult {
-        val snapshot = uiState.value.assets
-        var successCount = 0
-        val failures = mutableListOf<String>()
+    // ===== Loading =====
 
-        snapshot.forEach { cache ->
-            val item = cache.assetUrl
-            val portsToTry = if (httpPort == 0) listOf(0) else listOf(httpPort, 0)
-            if (portsToTry.any { tryDownload(item, extDir, it, proxyUsername, proxyPassword) }) {
-                successCount++
-            } else {
-                failures.add(item.remarks)
-            }
+    private fun refresh() = launch(loading = true) { reload() }
+
+    private suspend fun reload() {
+        val snapshot = repo.loadSnapshot()
+        val rows = snapshot.files.toAssetRows()
+        setState {
+            copy(
+                assets = rows,
+                geoSources = snapshot.geoSources,
+                geoSource = snapshot.geoSource
+            )
         }
-
-        return GeoDownloadResult(successCount, failures.size, failures)
     }
 
-    private fun tryDownload(
-        item: AssetUrlItem,
-        extDir: File,
-        httpPort: Int,
-        proxyUsername: String? = null,
-        proxyPassword: String? = null
-    ): Boolean {
-        val targetTemp = File(extDir, item.remarks + "_temp")
-        val target = File(extDir, item.remarks)
-        try {
-            if (
-                HttpUtil.downloadToFile(
-                    UrlContentRequest(
-                        url = item.url,
-                        timeout = 15000,
-                        httpPort = httpPort,
-                        proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
-                    ),
-                    targetTemp
-                )
-            ) {
-                targetTemp.renameTo(target)
-                return true
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
+    private fun selectGeoSource(value: String) {
+        if (value == state.geoSource) return
+        launch(loading = true) {
+            repo.setGeoSource(value)
+            changed = true
+            reload()
         }
-        return false
     }
 
-    data class GeoDownloadResult(
-        val successCount: Int,
-        val failureCount: Int,
-        val failedAssets: List<String>
-    )
+    // ===== Import =====
+
+    private fun importFile(uri: Uri) = launch(loading = true) {
+        when (repo.importFile(uri)) {
+            AssetImportResult.SUCCESS -> {
+                changed = true
+                reload()
+                toastSuccess()
+            }
+
+            AssetImportResult.DUPLICATE -> toastError(R.string.msg_remark_is_duplicate)
+            AssetImportResult.FAILURE -> toastError(R.string.toast_asset_copy_failed)
+        }
+    }
+
+    private fun importFromQrCode(text: String?) {
+        if (!Utils.isValidUrl(text)) {
+            toastError(R.string.toast_invalid_url)
+            return
+        }
+        navigate(AppRoute.UserAssetUrl(qrCodeUrl = text.orEmpty()))
+    }
+
+    // ===== Delete =====
+
+    private fun askRemove(guid: String) {
+        val target = state.assets.firstOrNull { it.guid == guid } ?: return
+        setState { copy(dialog = UserAssetDialog.ConfirmRemove(target.guid, target.remarks)) }
+    }
+
+    private fun confirmDialog() {
+        when (val dialog = state.dialog) {
+            is UserAssetDialog.ConfirmRemove -> {
+                setState { copy(dialog = null) }
+                remove(dialog.guid, dialog.remarks)
+            }
+
+            null -> Unit
+        }
+    }
+
+    private fun remove(guid: String, remarks: String) = launch(loading = true) {
+        repo.removeAssetWithFile(guid, remarks)
+        changed = true
+        reload()
+        toastSuccess()
+    }
+
+    // ===== Download =====
+
+    private fun download() = launch(loading = true) {
+        toastInfo(R.string.msg_downloading_content)
+        val success = try {
+            repo.downloadAll { done, total ->
+                _downloadProgress.value = AssetDownloadProgress(done, total)
+            }
+        } finally {
+            // Must clear on failure and on cancellation too, or the bar stays stuck at the last tick.
+            _downloadProgress.value = null
+        }
+        if (success > 0) {
+            changed = true
+            toast(BaseText.of(R.string.title_update_asset_count, success))
+        } else {
+            toastError()
+        }
+        reload()
+    }
+
+    // ===== Finishing =====
+
+    private fun finish() {
+        if (finishing) return
+        finishing = true
+        finishWith(
+            if (changed) BaseResult.Changed(refreshList = true) else BaseResult.Cancelled
+        )
+    }
 }
