@@ -1,5 +1,7 @@
 package com.v2ray.ang.ui.compose
 
+import android.content.res.Configuration
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -18,27 +21,50 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
+private val ItemPad = 16.dp
+private val GroupHeaderTopPad = 16.dp
+private val GroupHeaderBottomPad = 8.dp
+private val HeaderVerticalPad = 12.dp
+private val IconSize = 24.dp
+private val TitleGap = 4.dp
+private const val DisabledAlpha = 0.38f
+private const val SwitchScale = 0.8f
+private const val MaskedValue = "******"
+
 @Composable
-fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
+fun PreferenceGroupHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.secondary,
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+            .padding(
+                start = ItemPad,
+                end = ItemPad,
+                top = GroupHeaderTopPad,
+                bottom = GroupHeaderBottomPad
+            )
     )
 }
 
@@ -47,13 +73,17 @@ fun CollapsiblePreferenceGroupHeader(
     title: String,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "GroupHeaderChevron"
+    )
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onExpandedChange(!expanded) }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = ItemPad, vertical = HeaderVerticalPad),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -67,8 +97,8 @@ fun CollapsiblePreferenceGroupHeader(
             contentDescription = null,
             tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
-                .size(24.dp)
-                .rotate(if (expanded) 180f else 0f)
+                .size(IconSize)
+                .graphicsLayer { rotationZ = rotation }
         )
     }
 }
@@ -83,35 +113,33 @@ private fun SettingsItemRow(
     modifier: Modifier = Modifier,
     trailing: @Composable (() -> Unit)? = null
 ) {
-    val titleColor = if (enabled) MaterialTheme.colorScheme.onSurface
-    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
-    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-
+    val titleColor = MaterialTheme.colorScheme.onSurface
+        .let { if (enabled) it else it.copy(alpha = DisabledAlpha) }
+    val descriptionColor = MaterialTheme.colorScheme.onSurfaceVariant
+        .let { if (enabled) it else it.copy(alpha = DisabledAlpha) }
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
-            .padding(16.dp),
+            .then(
+                if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
+                else Modifier
+            )
+            .padding(ItemPad),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
             Icon(
                 painter = icon,
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(IconSize),
                 tint = titleColor
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(ItemPad))
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = titleColor
-            )
+            Text(text = title, style = MaterialTheme.typography.bodyLarge, color = titleColor)
             if (!description.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(TitleGap))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
@@ -132,14 +160,11 @@ fun SettingsEditItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isPassword: Boolean = false,
-    keyboardNumber: Boolean = false
+    keyboardNumber: Boolean = false,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-    val description = if (isPassword) {
-        if (value.isEmpty()) null else "******"
-    } else {
-        value.ifEmpty { null }
-    }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var text by remember(value) { mutableStateOf(value) }
+    val description = value.ifEmpty { null }?.let { if (isPassword) MaskedValue else it }
 
     SettingsItemRow(
         icon = icon,
@@ -147,23 +172,31 @@ fun SettingsEditItem(
         description = description,
         enabled = enabled,
         onClick = if (enabled) {
-            { showDialog = true }
-        } else null,
-        modifier = modifier
+            { text = value; showDialog = true }
+        } else {
+            null
+        },
+        modifier = modifier,
     )
-
     if (showDialog) {
-        var text by remember { mutableStateOf(value) }
-        InputDialog(
-            title = title,
-            fields = listOf(
+        val fields = remember(text, title, isPassword, keyboardNumber) {
+            listOf(
                 InputField(
                     label = title,
                     value = text,
-                    visualTransformation = VisualTransformation.None
+                    keyboardType = if (keyboardNumber) KeyboardType.Number else KeyboardType.Text,
+                    visualTransformation = if (isPassword) {
+                        PasswordVisualTransformation()
+                    } else {
+                        VisualTransformation.None
+                    },
+                    onValueChange = { text = it }
                 )
-            ),
-            onFieldChange = { _, v -> text = v },
+            )
+        }
+        InputDialog(
+            title = title,
+            fields = fields,
             confirmText = stringResource(R.string.action_ok),
             dismissText = stringResource(R.string.action_cancel),
             onConfirm = { showDialog = false; onValueChanged(text) },
@@ -176,39 +209,38 @@ fun SettingsEditItem(
 fun SettingsListItem(
     icon: Painter? = null,
     title: String,
-    entries: List<String>,
-    values: List<String>,
+    entries: StringOptions,
+    values: StringOptions,
     selectedValue: String,
     onSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-    val options = entries.zip(values)
-    val selectedOption = options.find { it.second == selectedValue } ?: options.firstOrNull()
-    val summary = selectedOption?.first.orEmpty()
-
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    val options = remember(entries, values) { entries.values.zip(values.values) }
+    val selectedOption = remember(options, selectedValue) {
+        options.find { it.second == selectedValue } ?: options.firstOrNull()
+    }
     SettingsItemRow(
         icon = icon,
         title = title,
-        description = summary.ifEmpty { null },
+        description = selectedOption?.first?.ifEmpty { null },
         enabled = enabled,
         onClick = if (enabled) {
             { showDialog = true }
-        } else null,
-        modifier = modifier
+        } else {
+            null
+        },
+        modifier = modifier,
     )
-
     if (showDialog) {
         SelectListDialog(
             title = title,
             options = options,
             optionText = { it.first },
+            optionKey = { it.second },
             selectedOption = selectedOption,
-            onSelected = { option ->
-                showDialog = false
-                onSelected(option.second)
-            },
+            onSelected = { option -> showDialog = false; onSelected(option.second) },
             onDismiss = { showDialog = false },
             showRadio = true
         )
@@ -221,42 +253,46 @@ fun SettingsMenuItem(
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    subtitle: String? = null
-) {
-    SettingsItemRow(
-        icon = icon,
-        title = title,
-        description = subtitle,
-        enabled = true,
-        onClick = onClick,
-        modifier = modifier
-    )
-}
+    subtitle: String? = null,
+) = SettingsItemRow(
+    icon = icon,
+    title = title,
+    description = subtitle,
+    enabled = true,
+    onClick = onClick,
+    modifier = modifier,
+)
 
 @Composable
 fun SettingsSwitchItem(
     icon: Painter? = null,
     title: String,
-    summary: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    summary: String? = null,
+    enabled: Boolean = true,
 ) {
     SettingsItemRow(
         icon = icon,
         title = title,
         description = summary,
         enabled = enabled,
-        onClick = if (enabled) {
-            { onCheckedChange(!checked) }
-        } else null,
-        modifier = modifier,
+        onClick = null,
+        modifier = modifier
+            .then(
+                Modifier.toggleable(
+                    value = checked,
+                    onValueChange = onCheckedChange,
+                    enabled = enabled,
+                    role = Role.Switch
+                )
+            ),
         trailing = {
             Switch(
                 checked = checked,
-                onCheckedChange = if (enabled) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                onCheckedChange = null,
+                modifier = Modifier.scale(SwitchScale),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
@@ -264,5 +300,74 @@ fun SettingsSwitchItem(
                 enabled = enabled
             )
         }
+    )
+}
+
+// ===== previews =====
+
+@Preview(showBackground = true)
+@Composable
+private fun PreferenceGroupHeaderPreview() = AppTheme {
+    PreferenceGroupHeader(title = "VPN")
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CollapsiblePreferenceGroupHeaderPreview() = AppTheme {
+    Column {
+        CollapsiblePreferenceGroupHeader(title = "Core", expanded = true, onExpandedChange = {})
+        CollapsiblePreferenceGroupHeader(title = "Mux", expanded = false, onExpandedChange = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SettingsSwitchItemPreview() = AppTheme {
+    Column {
+        SettingsSwitchItem(
+            title = "Enable local proxy",
+            summary = "A very long summary that has to stay readable and get truncated politely",
+            checked = true,
+            onCheckedChange = {}
+        )
+        SettingsSwitchItem(
+            title = "Disabled",
+            checked = false,
+            enabled = false,
+            onCheckedChange = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsEditItemPreview() = AppTheme {
+    Column {
+        SettingsEditItem(
+            title = "Socks port",
+            value = "10808",
+            keyboardNumber = true,
+            onValueChanged = {}
+        )
+        SettingsEditItem(
+            title = "Socks password",
+            value = "secret",
+            isPassword = true,
+            onValueChanged = {}
+        )
+        SettingsMenuItem(title = "Mode help", onClick = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SettingsListItemPreview() = AppTheme {
+    SettingsListItem(
+        title = "Log level",
+        entries = listOf("warning", "debug").toStringOptions(),
+        values = listOf("warning", "debug").toStringOptions(),
+        selectedValue = "warning",
+        onSelected = {}
     )
 }

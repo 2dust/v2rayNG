@@ -9,12 +9,14 @@ import androidx.compose.ui.res.stringResource
 fun <T> AppDropdownMenuItems(
     items: List<T>,
     labelRes: (T) -> Int,
-    onSelected: (T) -> Unit
+    onSelected: (T) -> Unit,
+    enabled: (T) -> Boolean = { true }
 ) {
     items.forEach { item ->
         DropdownMenuItem(
             text = { Text(stringResource(labelRes(item))) },
-            onClick = { onSelected(item) }
+            onClick = { onSelected(item) },
+            enabled = enabled(item)
         )
     }
 }

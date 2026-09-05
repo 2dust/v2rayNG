@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.compose
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
@@ -19,8 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,12 +31,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,49 +44,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.v2ray.ang.R
 import com.v2ray.ang.util.AppIconFetcher
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
+private val DividerThickness = 1.dp
+private val DividerInset = 12.dp
+private val AppIconSize = 40.dp
+private val IconSize = 24.dp
+private val ItemHorizontalPad = 16.dp
+private val ItemVerticalPad = 12.dp
+private val DragElevation = 4.dp
+
+@Immutable
+data class AppSearchState(
+    val isActive: Boolean = false,
+    val query: String = "",
+    val placeholder: String? = null
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     title: String,
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isLoading: Boolean = false,
-    isSearchActive: Boolean = false,
-    searchQuery: String = "",
+    progress: Float? = null,
+    searchState: AppSearchState? = null,
     onSearchQueryChange: (String) -> Unit = {},
     onSearchClose: () -> Unit = {},
-    searchPlaceholder: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    Column {
+    val isSearchActive = searchState?.isActive == true
+
+    Column(modifier = modifier) {
         TopAppBar(
             title = {
                 if (isSearchActive) {
                     SearchInputField(
-                        query = searchQuery,
+                        query = searchState?.query ?: "",
                         onQueryChange = onSearchQueryChange,
-                        placeholder = searchPlaceholder
+                        placeholder = searchState?.placeholder
                     )
                 } else {
-                    Text(text = title)
+                    Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             },
             navigationIcon = {
@@ -113,7 +131,18 @@ fun AppTopBar(
             enter = expandVertically(),
             exit = shrinkVertically()
         ) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.secondary)
+            if (progress == null) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
     }
 }
@@ -125,25 +154,23 @@ private fun SearchInputField(
     placeholder: String?
 ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    LaunchedEffect(Unit) { runCatching { focusRequester.requestFocus() } }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp),
-            placeholder = { if (placeholder != null) Text(placeholder, style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.secondary,
-                selectionColors = TextSelectionColors(
-                    handleColor = MaterialTheme.colorScheme.secondary,
-                    backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
-                )
-            ),
+            textStyle = MaterialTheme.typography.bodyLarge,
+            placeholder = placeholder?.let {
+                {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            colors = appFieldColors(borderless = true),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             modifier = Modifier
                 .weight(1f)
@@ -151,7 +178,10 @@ private fun SearchInputField(
         )
         if (query.isNotEmpty()) {
             IconButton(onClick = { onQueryChange("") }) {
-                Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), "Clear")
+                Icon(
+                    painter = painterResource(R.drawable.ic_clear_24dp),
+                    contentDescription = stringResource(R.string.action_close)
+                )
             }
         }
     }
@@ -164,37 +194,36 @@ fun AppListItem(
     icon: Any?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val model = remember(icon, packageName, context) {
+        icon ?: ImageRequest.Builder(context)
+            .data("appicon:$packageName")
+            .fetcherFactory(AppIconFetcher.Factory(context))
+            .build()
+    }
+    val placeholder = painterResource(R.drawable.ic_image_24dp)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .toggleable(
+                value = checked,
+                onValueChange = onCheckedChange,
+                role = Role.Checkbox
+            )
+            .padding(horizontal = ItemHorizontalPad, vertical = ItemVerticalPad),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val model = remember(icon, packageName) {
-            if (icon != null) {
-                icon
-            } else {
-                val data = "appicon:$packageName"
-                ImageRequest.Builder(context)
-                    .data(data)
-                    .fetcherFactory(AppIconFetcher.Factory(context))
-                    .build()
-            }
-        }
-
         AsyncImage(
             model = model,
             contentDescription = null,
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(AppIconSize),
             contentScale = ContentScale.Fit,
-            error = painterResource(R.drawable.ic_image_24dp),
-            fallback = painterResource(R.drawable.ic_image_24dp)
+            error = placeholder,
+            fallback = placeholder
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(ItemHorizontalPad))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = appName,
@@ -202,7 +231,6 @@ fun AppListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = packageName,
                 style = MaterialTheme.typography.bodySmall,
@@ -213,44 +241,36 @@ fun AppListItem(
         }
         Checkbox(
             checked = checked,
-            onCheckedChange = onCheckedChange,
+            onCheckedChange = null,
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.secondary)
         )
     }
 }
 
 @Composable
-fun ItemDivider() {
-    AppDivider(modifier = Modifier.padding(horizontal = 12.dp))
+fun ItemDivider(modifier: Modifier = Modifier) {
+    AppDivider(modifier = modifier.padding(horizontal = DividerInset))
 }
 
 @Composable
 fun AppDivider(modifier: Modifier = Modifier) {
-    val color = if (LocalDarkTheme.current) dividerColorDark else dividerColorLight
-    HorizontalDivider(modifier = modifier.fillMaxWidth(), thickness = 1.dp, color = color)
-}
-
-@Composable
-fun NavigationBarsSpacer(modifier: Modifier = Modifier) {
-    Spacer(modifier = modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-}
-
-@Composable
-fun NavigationBarsBottomPadding(): PaddingValues {
-    val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    return PaddingValues(bottom = bottom)
+    HorizontalDivider(
+        modifier = modifier.fillMaxWidth(),
+        thickness = DividerThickness,
+        color = LocalAppColors.current.divider
+    )
 }
 
 @Composable
 fun VersionInfoBlock(
     versionText: String,
     appIdText: String? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(ItemHorizontalPad),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = versionText, style = MaterialTheme.typography.bodySmall)
@@ -262,18 +282,11 @@ fun VersionInfoBlock(
 }
 
 @Composable
-private fun reorderableElevation(isDragging: Boolean) = animateDpAsState(
-    targetValue = if (isDragging) 4.dp else 0.dp,
-    label = "ReorderableElevation"
-)
-
-@Composable
-fun ReorderableCollectionItemScope.reorderableDragHandle(): Modifier {
-    val hapticFeedback = LocalHapticFeedback.current
+private fun ReorderableCollectionItemScope.dragHandle(): Modifier {
+    val haptics = LocalHapticFeedback.current
     return Modifier.longPressDraggableHandle(
         onDragStarted = {
-            // Platform haptics honor the user's touch-feedback setting.
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+            haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
         }
     )
 }
@@ -282,17 +295,18 @@ fun ReorderableCollectionItemScope.reorderableDragHandle(): Modifier {
 fun ReorderableListItem(
     scope: ReorderableCollectionItemScope,
     isDragging: Boolean,
+    modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
-    val elevation by reorderableElevation(isDragging)
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shadowElevation = elevation
-    ) {
+    val elevation by animateDpAsState(
+        targetValue = if (isDragging) DragElevation else 0.dp,
+        label = "ReorderableElevation"
+    )
+    Surface(modifier = modifier.fillMaxWidth(), shadowElevation = elevation) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(with(scope) { reorderableDragHandle() }),
+                .then(with(scope) { dragHandle() }),
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -303,15 +317,71 @@ fun ReorderableListItem(
 fun ReorderableGridItem(
     scope: ReorderableCollectionItemScope,
     isDragging: Boolean,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val elevation by reorderableElevation(isDragging)
+    val elevation by animateDpAsState(
+        targetValue = if (isDragging) DragElevation else 0.dp,
+        label = "ReorderableElevation"
+    )
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .then(with(scope) { reorderableDragHandle() }),
+            .then(with(scope) { dragHandle() }),
         shadowElevation = elevation
     ) {
         content()
+    }
+}
+
+@Composable
+fun NavigationBarsSpacer(modifier: Modifier = Modifier) {
+    Spacer(modifier = modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+}
+
+@Composable
+fun NavigationBarsBottomPadding(extra: Dp = 0.dp): PaddingValues {
+    val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    return PaddingValues(bottom = bottom + extra)
+}
+
+// ===== previews =====
+
+@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AppTopBarPreview() = AppTheme {
+    Column {
+        AppTopBar(title = "Settings", onBackClick = {})
+        AppTopBar(title = "Loading", onBackClick = {}, isLoading = true)
+        AppTopBar(
+            title = "A title long enough that it has to be truncated at the end",
+            onBackClick = {},
+            progress = 0.4f,
+            isLoading = true
+        )
+        AppTopBar(
+            title = "Searchable",
+            onBackClick = {},
+            searchState = AppSearchState(isActive = true, query = "v2ray"),
+            onSearchQueryChange = {},
+            onSearchClose = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AppListItemPreview() = AppTheme {
+    Column {
+        AppListItem(
+            appName = "A very long application name that must be ellipsized",
+            packageName = "com.example.some.very.long.package.name",
+            icon = null,
+            checked = true,
+            onCheckedChange = {}
+        )
+        AppDivider()
+        VersionInfoBlock(versionText = "1.0.0 (100)", appIdText = "com.v2ray.ang")
     }
 }
