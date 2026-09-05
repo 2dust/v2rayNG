@@ -168,6 +168,13 @@ object AppConfig {
     const val WIREGUARD_LOCAL_MTU = "1420"
     const val LOOPBACK = "127.0.0.1"
 
+    /** Shared defaults for settings shown in the UI and consumed by config generation. */
+    const val DEFAULT_SOCKS_ENABLE_UDP = true
+    const val DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD = "1"
+    const val DEFAULT_VPN_BYPASS_LAN = "1"
+    const val DEFAULT_HEV_TUNNEL_LOGLEVEL = "warn"
+    const val DEFAULT_MUX_XUDP_CONCURRENCY = "8"
+
     /** Message constants for communication. */
     const val MSG_REGISTER_CLIENT = 1
     const val MSG_STATE_RUNNING = 11
