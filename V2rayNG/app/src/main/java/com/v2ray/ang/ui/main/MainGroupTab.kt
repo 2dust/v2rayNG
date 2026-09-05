@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -34,6 +36,7 @@ import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.ui.compose.AppDivider
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun GroupTabBar(
@@ -44,11 +47,21 @@ fun GroupTabBar(
     modifier: Modifier = Modifier
 ) {
     val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
+    val selectedGroupId = groups[selectedIndex].id
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = selectedIndex)
 
-    LaunchedEffect(selectedIndex) {
-        if (listState.layoutInfo.visibleItemsInfo.none { it.index == selectedIndex }) {
+    // React to selection, not scroll changes: browsing other tabs must not snap back.
+    LaunchedEffect(selectedGroupId, selectedIndex, groups.size) {
+        val layout = snapshotFlow { listState.layoutInfo }.first {
+            it.totalItemsCount == groups.size && it.viewportSize.width > 0
+        }
+        val item = layout.visibleItemsInfo.firstOrNull { it.key == selectedGroupId }
+        if (item == null) {
             listState.animateScrollToItem(selectedIndex)
+        } else {
+            listState.animateScrollBy(
+                groupTabScrollDistance(item.offset, item.size, layout.viewportStartOffset, layout.viewportEndOffset).toFloat()
+            )
         }
     }
 
@@ -81,6 +94,13 @@ fun GroupTabBar(
             }
         }
     }
+}
+
+/** Reveal a clipped tab; align an oversized tab's start instead of hiding its name. */
+internal fun groupTabScrollDistance(start: Int, size: Int, viewportStart: Int, viewportEnd: Int): Int = when {
+    start < viewportStart -> start - viewportStart
+    start + size > viewportEnd -> minOf(start - viewportStart, start + size - viewportEnd)
+    else -> 0
 }
 
 @Composable

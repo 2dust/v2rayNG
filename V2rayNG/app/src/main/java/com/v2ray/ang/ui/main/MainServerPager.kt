@@ -129,14 +129,14 @@ fun GroupPagerPage(
     )
 }
 
-internal class ServerRowActions(
+private class ServerRowActions(
     val select: (String) -> Unit,
     val onAction: (MainAction) -> Unit,
     val share: (String, ProfileItem) -> Unit,
     val more: (String, ProfileItem) -> Unit,
     val remove: (String, String) -> Unit,
     val move: (String, ReorderCommand) -> Boolean,
-    val feedback: (String) -> Unit = {},
+    val feedback: (String) -> Unit,
 ) {
     fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
         action.perform(row.guid, row.profile, onAction, remove)
@@ -183,7 +183,6 @@ private fun ServerListPage(
                     ServerItemColumn(
                         row = row,
                         isSelected = row.guid == selectedGuid,
-                        doubleColumnDisplay = true,
                         reorderIndex = index.takeIf { canReorder },
                         itemCount = rows.size,
                         actions = actions
@@ -233,9 +232,10 @@ private fun ServerListPage(
                             scope = this,
                             isDragging = isDragging
                         ) {
-                            ServerItemRow(
+                            ServerListItem(
                                 row = row,
                                 isSelected = row.guid == selectedGuid,
+                                doubleColumnDisplay = false,
                                 reorderIndex = index,
                                 itemCount = rows.size,
                                 actions = actions
@@ -244,9 +244,10 @@ private fun ServerListPage(
                         ItemDivider()
                     }
                 } else {
-                    ServerItemRow(
+                    ServerListItem(
                         row = row,
                         isSelected = row.guid == selectedGuid,
+                        doubleColumnDisplay = false,
                         reorderIndex = null,
                         itemCount = rows.size,
                         actions = actions
@@ -291,28 +292,9 @@ private fun LocateTargetEffect(
 }
 
 @Composable
-private fun ServerItemRow(
-    row: ServerRowUiModel,
-    isSelected: Boolean,
-    reorderIndex: Int?,
-    itemCount: Int,
-    actions: ServerRowActions
-) {
-    ServerListItem(
-        row = row,
-        isSelected = isSelected,
-        doubleColumnDisplay = false,
-        reorderIndex = reorderIndex,
-        itemCount = itemCount,
-        actions = actions
-    )
-}
-
-@Composable
 private fun ServerItemColumn(
     row: ServerRowUiModel,
     isSelected: Boolean,
-    doubleColumnDisplay: Boolean,
     reorderIndex: Int?,
     itemCount: Int,
     actions: ServerRowActions
@@ -321,7 +303,7 @@ private fun ServerItemColumn(
         ServerListItem(
             row = row,
             isSelected = isSelected,
-            doubleColumnDisplay = doubleColumnDisplay,
+            doubleColumnDisplay = true,
             reorderIndex = reorderIndex,
             itemCount = itemCount,
             actions = actions
@@ -331,7 +313,7 @@ private fun ServerItemColumn(
 }
 
 @Composable
-internal fun ServerListItem(
+private fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
     doubleColumnDisplay: Boolean,
@@ -344,15 +326,12 @@ internal fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, row.testDelayMillis)
     }
-    val testResultAccessibility = if (row.testDelayMillis == 0L) {
-        ""
-    } else {
-        pluralStringResource(
+    val testResultAccessibility = when {
+        row.testDelayMillis < 0L -> stringResource(R.string.acc_server_test_failed)
+        row.testDelayMillis == 0L -> ""
+        else -> pluralStringResource(
             R.plurals.server_test_delay_accessibility_value,
-            row.testDelayMillis.coerceIn(
-                Int.MIN_VALUE.toLong(),
-                Int.MAX_VALUE.toLong(),
-            ).toInt(),
+            row.testDelayMillis.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
             row.testDelayMillis,
         )
     }

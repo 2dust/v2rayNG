@@ -415,6 +415,7 @@
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
     <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
+    <string name="acc_server_test_failed">فشل اختبار الاتصال</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="zero">%1$d مللي ثانية</item>
         <item quantity="one">مللي ثانية واحدة</item>

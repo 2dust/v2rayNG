@@ -400,6 +400,7 @@
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
     <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
     <string name="server_test_delay_value">%1$d ms</string>
+    <string name="acc_server_test_failed">連線測試失敗</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="other">%1$d 毫秒</item>
     </plurals>

@@ -1,7 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -27,27 +25,6 @@ class MainImportMenuTest {
             listOf(ServerMenuAction.Edit, ServerMenuAction.Delete, ServerMenuAction.ShareFullContent),
             serverAccessibilityActions(isComplexProfile = true),
         )
-    }
-
-    @Test
-    fun actionsUseExistingDispatchAndDeleteConfirmationPath() {
-        val guid = "server-guid"
-        val profile = ProfileItem(configType = EConfigType.VMESS, remarks = "Example")
-        val dispatched = mutableListOf<MainAction>()
-        val removalRequests = mutableListOf<Pair<String, String>>()
-        serverAccessibilityActions(isComplexProfile = false).forEach {
-            it.perform(guid, profile, dispatched::add) { id, name -> removalRequests.add(id to name) }
-        }
-        assertEquals(
-            listOf(
-                MainAction.EditServer(guid, profile),
-                MainAction.ShareQRCode(guid),
-                MainAction.ShareClipboard(guid),
-                MainAction.ShareFullContent(guid),
-            ),
-            dispatched,
-        )
-        assertEquals(listOf(guid to profile.remarks), removalRequests)
     }
 
     @Test

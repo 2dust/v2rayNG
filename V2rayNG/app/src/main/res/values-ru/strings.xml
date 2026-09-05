@@ -409,6 +409,7 @@
     <string name="connection_test_testing_count">Проверка профилей (%d)…</string>
     <string name="connection_test_available">Соединение установлено за %1$s</string>
     <string name="server_test_delay_value">%1$d мс</string>
+    <string name="acc_server_test_failed">Проверка соединения не удалась</string>
     <plurals name="server_test_delay_accessibility_value">
         <item quantity="one">%1$d миллисекунда</item>
         <item quantity="few">%1$d миллисекунды</item>

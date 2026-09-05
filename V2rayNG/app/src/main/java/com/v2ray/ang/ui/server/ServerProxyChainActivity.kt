@@ -45,7 +45,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -55,7 +54,6 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.reorderableDragHandle
@@ -216,21 +214,14 @@ fun ProxyChainScreen(
 
     val lazyListState = rememberLazyListState()
     val actionFeedback = rememberAccessibilityActionFeedback()
-    val moveMember: (String, ReorderCommand) -> Boolean = { memberKey, command ->
-        val fromIndex = memberKeys.indexOf(memberKey)
-        val toIndex = command.targetIndex(fromIndex, memberKeys.size)
-        if (toIndex == null) {
+    val moveMember: (String, String) -> Boolean = { fromKey, toKey ->
+        val reordered = moveProxyChainMember(members, memberKeys, fromKey, toKey)
+        if (reordered == null) {
             false
         } else {
-            val reordered = members.toMutableList()
-            val reorderedKeys = memberKeys.toMutableList()
-            if (reordered.moveItem(fromIndex, toIndex) && reorderedKeys.moveItem(fromIndex, toIndex)) {
-                members = reordered
-                memberKeys = reorderedKeys
-                true
-            } else {
-                false
-            }
+            members = reordered.first
+            memberKeys = reordered.second
+            true
         }
     }
     val requestMemberRemoval: (String) -> Boolean = { memberKey ->
@@ -248,16 +239,10 @@ fun ProxyChainScreen(
         }
     }
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val fromIndex = memberKeys.indexOf(from.key)
-        val toIndex = memberKeys.indexOf(to.key)
-        if (fromIndex != -1 && toIndex != -1) {
-            val reordered = members.toMutableList()
-            val reorderedKeys = memberKeys.toMutableList()
-            if (reordered.moveItem(fromIndex, toIndex)) {
-                reorderedKeys.moveItem(fromIndex, toIndex)
-                members = reordered
-                memberKeys = reorderedKeys
-            }
+        val fromKey = from.key as? String
+        val toKey = to.key as? String
+        if (fromKey != null && toKey != null) {
+            moveMember(fromKey, toKey)
         }
     }
 
@@ -332,7 +317,8 @@ fun ProxyChainScreen(
                         action = { requestMemberRemoval(memberKey) },
                     )
                 ) + reorderAccessibilityActions(index, members.size, actionFeedback) { command ->
-                    moveMember(memberKey, command)
+                    val targetIndex = command.targetIndex(memberKeys.indexOf(memberKey), memberKeys.size)
+                    targetIndex != null && moveMember(memberKey, memberKeys[targetIndex])
                 }
                 ReorderableItem(reorderableState, key = memberKey) { isDragging ->
                     val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
