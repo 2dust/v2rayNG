@@ -1,14 +1,17 @@
 package com.v2ray.ang.ui.base
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.ui.compose.AppTheme
 
-abstract class BaseComponentActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,7 +19,11 @@ abstract class BaseComponentActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                ScreenContent()
+                CompositionLocalProvider(
+                    LocalPlatformActions provides (this as? PlatformActions ?: NoPlatformActions)
+                ) {
+                    ScreenContent()
+                }
             }
         }
     }
