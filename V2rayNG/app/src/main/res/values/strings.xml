@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">Password</string>
     <string name="title_webdav_remote_path">Remote directory (optional)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">QR code</string>
     <string name="share_method_clipboard">Copy profile link</string>
     <string name="share_method_full_content">Copy full configuration</string>

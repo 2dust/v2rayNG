@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">Пароль</string>
     <string name="title_webdav_remote_path">Удалённый путь (необязательно)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">QR-код</string>
     <string name="share_method_clipboard">Копировать ссылку профиля</string>
     <string name="share_method_full_content">Копировать полную конфигурацию</string>

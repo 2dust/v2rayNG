@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">كلمة المرور</string>
     <string name="title_webdav_remote_path">الدليل البعيد (اختياري)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">رمز QR</string>
     <string name="share_method_clipboard">نسخ رابط التكوين</string>
     <string name="share_method_full_content">نسخ التكوين الكامل</string>

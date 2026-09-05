@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">رزم</string>
     <string name="title_webdav_remote_path">دایرکتوری ره دیر (اختیاری)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">کود QR</string>
     <string name="share_method_clipboard">لف گیری لینک کانفیگ</string>
     <string name="share_method_full_content">لف گیری پوی کانفیگ</string>

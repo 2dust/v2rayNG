@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">পাসওয়ার্ড</string>
     <string name="title_webdav_remote_path">দূরবর্তী ডিরেক্টরি (ঐচ্ছিক)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">QR কোড</string>
     <string name="share_method_clipboard">প্রোফাইল লিংক কপি করুন</string>
     <string name="share_method_full_content">পূর্ণ কনফিগারেশন কপি করুন</string>

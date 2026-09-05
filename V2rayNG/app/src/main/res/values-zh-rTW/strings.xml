@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">密碼</string>
     <string name="title_webdav_remote_path">遠端目錄（可選）</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">請選擇一個配置</string>
+    <string name="toast_field_required">請填寫：%1$s</string>
+
     <string name="share_method_qrcode">QR Code</string>
     <string name="share_method_clipboard">複製設定連結</string>
     <string name="share_method_full_content">複製完整設定</string>

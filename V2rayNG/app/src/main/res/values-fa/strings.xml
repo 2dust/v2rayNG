@@ -450,6 +450,10 @@
     <string name="title_webdav_pass">رمز عبور</string>
     <string name="title_webdav_remote_path">دایرکتوری راه دور (اختیاری)</string>
 
+    <string name="tasker_default_profile">Default</string>
+    <string name="toast_tasker_select_profile">Select a profile first</string>
+    <string name="toast_field_required">Please fill in: %1$s</string>
+
     <string name="share_method_qrcode">کد QR</string>
     <string name="share_method_clipboard">کپی لینک کانفیگ</string>
     <string name="share_method_full_content">کپی کانفیگ کامل</string>
