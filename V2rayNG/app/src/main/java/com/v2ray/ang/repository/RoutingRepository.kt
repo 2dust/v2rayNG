@@ -12,56 +12,38 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicLong
 
 open class RoutingRepository(private val app: Application) : BaseRepository() {
 
-    private val outboundMutex = Mutex()
-    private val outboundEpoch = AtomicLong(0L)
-    @Volatile private var outboundCache: List<String>? = null
-
     // ----- Rule loading with id deduplication -----
 
-    open suspend fun loadRulesets(): List<RulesetItem> = runIO(emptyList()) {
-        val list = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        var patched = false
-        val seen = HashSet<String>(list.size)
-        list.forEach { item ->
-            if (item.id.isEmpty() || !seen.add(item.id)) {
-                item.id = UUID.randomUUID().toString()
-                seen.add(item.id)
-                patched = true
-            }
-        }
-        if (patched) {
-            withContext(NonCancellable) { MmkvManager.encodeRoutingRulesets(ArrayList(list)) }
-        }
-        list
-    }
+    open suspend fun loadRulesets(): List<RulesetItem> = runIO(emptyList()) { repairedRulesets() }
 
     open suspend fun loadRuleRows(): List<RoutingRuleRow> = runIO(emptyList()) {
-        loadRulesets().toRuleRows()
+        repairedRulesets().toRuleRows()
     }
 
-    open suspend fun loadEditData(ruleId: String): RoutingEditData = runIO(
-        RoutingEditData(ruleset = null, canUseProcess = false)
-    ) {
-        val rules = loadRulesets()
-        val item = rules.find { it.id == ruleId }
+    /**
+     * One IO pass for the whole edit screen so the ViewModel can publish a single state.
+     *
+     * Goes through [repairedRulesets] on purpose: [updateRule] re-assigns duplicated ids, an
+     * editor holding a pre-repair id could later update the wrong rule or fail to find it.
+     * Throws on storage failure - the caller must distinguish "not found" from "cannot read".
+     */
+    open suspend fun loadEditData(ruleId: String): RoutingEditData = withIO {
         RoutingEditData(
-            ruleset = item,
+            ruleset = if (ruleId.isEmpty()) null else repairedRulesets().find { it.id == ruleId },
             canUseProcess = SettingsManager.canUseProcessRouting(),
+            outboundOptions = buildOutboundOptions(),
         )
     }
 
     // ----- Insert / update / remove by id (atomic) -----
 
     open suspend fun insertRule(item: RulesetItem): String = runIO("") {
-        val list = loadRulesets().toMutableList()
+        val list = repairedRulesets().toMutableList()
         if (item.id.isEmpty()) item.id = UUID.randomUUID().toString()
         list.add(0, item)
         withContext(NonCancellable) { MmkvManager.encodeRoutingRulesets(ArrayList(list)) }
@@ -69,7 +51,7 @@ open class RoutingRepository(private val app: Application) : BaseRepository() {
     }
 
     open suspend fun updateRule(item: RulesetItem): Boolean = runIO(false) {
-        val list = loadRulesets().toMutableList()
+        val list = repairedRulesets().toMutableList()
         val index = list.indexOfFirst { it.id == item.id }
         if (index < 0) return@runIO false
         list[index] = item
@@ -78,7 +60,7 @@ open class RoutingRepository(private val app: Application) : BaseRepository() {
     }
 
     open suspend fun removeRule(ruleId: String): Boolean = runIO(false) {
-        val list = loadRulesets().toMutableList()
+        val list = repairedRulesets().toMutableList()
         if (!list.removeAll { it.id == ruleId }) return@runIO false
         withContext(NonCancellable) { MmkvManager.encodeRoutingRulesets(ArrayList(list)) }
         true
@@ -95,7 +77,9 @@ open class RoutingRepository(private val app: Application) : BaseRepository() {
     }
 
     open suspend fun setDomainStrategy(value: String) = runIO(Unit) {
-        withContext(NonCancellable) { MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value) }
+        withContext(NonCancellable) {
+            MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
+        }
     }
 
     // ----- Preset / import / export -----
@@ -109,9 +93,7 @@ open class RoutingRepository(private val app: Application) : BaseRepository() {
         SettingsManager.resetRoutingRulesets(text)
     }
 
-    open suspend fun readClipboard(): String = runIO("") {
-        Utils.getClipboard(app)
-    }
+    open suspend fun readClipboard(): String = runIO("") { Utils.getClipboard(app) }
 
     open suspend fun exportToClipboard(): Boolean = runIO(false) {
         val json = MmkvManager.decodeRoutingRulesets()
@@ -122,36 +104,34 @@ open class RoutingRepository(private val app: Application) : BaseRepository() {
         true
     }
 
-    // ----- Outbound options cache with epoch guard -----
+    // ----- Internals -----
 
-    open suspend fun outboundOptions(): List<String> {
-        outboundCache?.let { return it }
-        return outboundMutex.withLock {
-            outboundCache?.let { return@withLock it }
-            val epoch = outboundEpoch.get()
-            val loaded = runIO(emptyList()) {
-                val builtin = AppConfig.BUILTIN_OUTBOUND_TAGS.toList()
-                val remarks = SettingsManager.getProfileRemarks()
-                    .asSequence()
-                    .filterNot { it in builtin }
-                    .distinct()
-                    .sortedWith(String.CASE_INSENSITIVE_ORDER)
-                    .toList()
-                builtin + remarks
+    /** Reads the rulesets, giving every item a unique id */
+    private suspend fun repairedRulesets(): List<RulesetItem> {
+        val list = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
+        var patched = false
+        val seen = HashSet<String>(list.size)
+        list.forEach { item ->
+            if (item.id.isEmpty() || !seen.add(item.id)) {
+                item.id = UUID.randomUUID().toString()
+                seen.add(item.id)
+                patched = true
             }
-            if (outboundEpoch.get() == epoch) {
-                outboundCache = loaded
-            }
-            loaded
         }
+        if (patched) {
+            withContext(NonCancellable) { MmkvManager.encodeRoutingRulesets(ArrayList(list)) }
+        }
+        return list
     }
 
-    open fun invalidateOutboundOptions() {
-        outboundEpoch.incrementAndGet()
-        outboundCache = null
-    }
-
-    open suspend fun canUseProcessRouting(): Boolean = runIO(false) {
-        SettingsManager.canUseProcessRouting()
+    private fun buildOutboundOptions(): List<String> {
+        val builtin = AppConfig.BUILTIN_OUTBOUND_TAGS.toList()
+        val remarks = SettingsManager.getProfileRemarks()
+            .asSequence()
+            .filterNot { it in builtin }
+            .distinct()
+            .sortedWith(String.CASE_INSENSITIVE_ORDER)
+            .toList()
+        return builtin + remarks
     }
 }

@@ -77,7 +77,6 @@ fun RoutingRuleList(
 
     val callbacks = remember(onAction) { RoutingRowCallbacks(onAction) }
 
-    // 直接创建 SwitchColors（此时在 @Composable 上下文中，无需 remember）
     val switchColors = SwitchDefaults.colors(
         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
         checkedTrackColor = MaterialTheme.colorScheme.secondary,
