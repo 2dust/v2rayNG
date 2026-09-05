@@ -138,10 +138,7 @@ internal object CoreDownloadManager {
         }
     }
 
-    private fun shouldUseCore(): Boolean =
-        SettingsManager.isVpnMode() &&
-            !SettingsManager.isUsingHevTun() &&
-            !MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+    private fun shouldUseCore(): Boolean = SettingsManager.shouldUseCoreForAppRequests()
 
     private fun cleanupStaleFiles(directory: File?) {
         val staleBefore = System.currentTimeMillis() - STALE_FILE_AGE_MILLIS
