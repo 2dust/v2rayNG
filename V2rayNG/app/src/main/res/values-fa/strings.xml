@@ -535,6 +535,8 @@
     <string name="acc_turn_torch_off">خاموش کردن چراغ‌قوه</string>
     <string name="acc_select_image">انتخاب تصویر برای اسکن</string>
     <string name="acc_locked">این قانون هنگام وارد کردن تنظیمات از پیش تعیین‌شده حفظ می‌شود</string>
+    <string name="acc_settings_group_expanded">%1$s، گروه باز است</string>
+    <string name="acc_settings_group_collapsed">%1$s، گروه بسته است</string>
     <string name="acc_open_menu">باز کردن منوی پیمایش</string>
     <string name="acc_edit">ویرایش</string>
     <string name="acc_delete">حذف</string>
@@ -551,4 +553,6 @@
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
 
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
 </resources>

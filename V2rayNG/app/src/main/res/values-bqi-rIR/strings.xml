@@ -535,6 +535,8 @@
     <string name="acc_turn_torch_off">خاموش کردن چراغ</string>
     <string name="acc_select_image">پسند ٱکس سی اسکن</string>
     <string name="acc_locked">ای قانووݩ مجال و من ٱووردن ز پؽش سامووا زفت ابۊ</string>
+    <string name="acc_settings_group_expanded">%1$s. بونکۊ وا وابیڌه هڌ</string>
+    <string name="acc_settings_group_collapsed">%1$s. بونکۊ بسته وابیڌه هڌ</string>
     <string name="acc_open_menu">گۊشیڌن نومگه کشاری</string>
     <string name="acc_edit">آلشتکاری</string>
     <string name="acc_delete">پاک کردن</string>
@@ -551,4 +553,6 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
 </resources>

@@ -535,6 +535,8 @@
     <string name="acc_turn_torch_off">关闭手电筒</string>
     <string name="acc_select_image">选择要扫描的图片</string>
     <string name="acc_locked">导入预设时保留此规则</string>
+    <string name="acc_settings_group_expanded">%1$s。分组已展开</string>
+    <string name="acc_settings_group_collapsed">%1$s。分组已折叠</string>
     <string name="acc_open_menu">打开导航菜单</string>
     <string name="acc_edit">编辑</string>
     <string name="acc_delete">删除</string>
@@ -551,4 +553,6 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+    <string name="acc_toggle_on">开启</string>
+    <string name="acc_toggle_off">关闭</string>
 </resources>

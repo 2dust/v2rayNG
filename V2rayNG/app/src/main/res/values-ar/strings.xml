@@ -535,6 +535,8 @@
     <string name="acc_turn_torch_off">إطفاء المصباح</string>
     <string name="acc_select_image">اختيار صورة لمسحها</string>
     <string name="acc_locked">يتم الاحتفاظ بالقاعدة عند استيراد الإعدادات المسبقة</string>
+    <string name="acc_settings_group_expanded">%1$s، المجموعة موسّعة</string>
+    <string name="acc_settings_group_collapsed">%1$s، المجموعة مطوية</string>
     <string name="acc_open_menu">فتح قائمة التنقل</string>
     <string name="acc_edit">تعديل</string>
     <string name="acc_delete">حذف</string>
@@ -551,4 +553,6 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="acc_toggle_on">مفعّل</string>
+    <string name="acc_toggle_off">غير مفعّل</string>
 </resources>
