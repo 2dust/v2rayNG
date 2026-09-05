@@ -36,6 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -347,25 +353,49 @@ internal fun UserAssetScreen(
 }
 
 @Composable
-private fun UserAssetItem(
+internal fun UserAssetItem(
     item: AssetUrlCache,
     fileMetadata: AssetFileMetadata?,
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    val propertiesText = if (fileMetadata != null) {
-        remember(fileMetadata) {
-            val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-            "${fileMetadata.length.toTrafficString()}  •  ${dateFormat.format(Date(fileMetadata.lastModified))}"
+    val fileSize = fileMetadata?.length?.toTrafficString()
+    val formattedDate = fileMetadata?.let { metadata ->
+        remember(metadata.lastModified) {
+            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+                .format(Date(metadata.lastModified))
         }
+    }
+    val propertiesText = if (fileSize != null && formattedDate != null) {
+        "$fileSize  •  $formattedDate"
     } else {
         stringResource(R.string.msg_file_not_found)
     }
+    val propertiesAccessibilityText = if (fileSize != null && formattedDate != null) {
+        stringResource(R.string.acc_asset_file_details, fileSize, formattedDate)
+    } else {
+        null
+    }
     val showEditButton = item.assetUrl.locked != true && item.assetUrl.url != "file"
+    val accessibilityActions = buildList {
+        if (showEditButton) {
+            add(CustomAccessibilityAction(
+                label = stringResource(R.string.acc_edit_asset_named, item.assetUrl.remarks),
+                action = { onEdit(); true },
+            ))
+        }
+        add(CustomAccessibilityAction(
+            label = stringResource(R.string.acc_delete_asset_named, item.assetUrl.remarks),
+            action = { onDeleteClick(); true },
+        ))
+    }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                customActions = accessibilityActions
+            }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -383,24 +413,41 @@ private fun UserAssetItem(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = propertiesText,
+                modifier = propertiesAccessibilityText?.let { accessibilityText ->
+                    Modifier.clearAndSetSemantics {
+                        text = AnnotatedString(accessibilityText)
+                    }
+                } ?: Modifier,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         if (showEditButton) {
-            IconButton(onClick = onEdit) {
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.clearAndSetSemantics {},
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit),
+                    contentDescription = stringResource(
+                        R.string.acc_edit_asset_named,
+                        item.assetUrl.remarks
+                    ),
                     modifier = Modifier.size(24.dp)
                 )
             }
         }
-        IconButton(onClick = onDeleteClick) {
+        IconButton(
+            onClick = onDeleteClick,
+            modifier = Modifier.clearAndSetSemantics {},
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = stringResource(R.string.acc_delete),
+                contentDescription = stringResource(
+                    R.string.acc_delete_asset_named,
+                    item.assetUrl.remarks
+                ),
                 modifier = Modifier.size(24.dp)
             )
         }
