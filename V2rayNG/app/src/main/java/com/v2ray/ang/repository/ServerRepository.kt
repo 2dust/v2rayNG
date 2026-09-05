@@ -3,6 +3,7 @@ package com.v2ray.ang.repository
 import android.app.Application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.ServerEditData
 import com.v2ray.ang.dto.SubscriptionOption
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -14,12 +15,35 @@ import com.v2ray.ang.handler.SettingsManager
 
 open class ServerRepository(private val app: Application) : BaseRepository() {
 
-    open suspend fun loadProfile(guid: String, fallbackType: EConfigType): ProfileItem = withIO {
-        MmkvManager.decodeServerConfig(guid) ?: ProfileItem.create(fallbackType)
-    }
+    open suspend fun loadEdit(guid: String, fallbackType: EConfigType): ServerEditData = withIO {
+        val stored = if (guid.isEmpty()) null else MmkvManager.decodeServerConfig(guid)
+        if (guid.isNotEmpty() && stored == null) return@withIO ServerEditData(profile = null)
 
-    open suspend fun loadRawConfig(guid: String): String = withIO {
-        MmkvManager.decodeServerRaw(guid).orEmpty()
+        val configType = stored?.configType ?: fallbackType
+        val isSelected = guid.isNotEmpty() && guid == MmkvManager.getSelectServer()
+
+        when (configType) {
+            EConfigType.CUSTOM -> ServerEditData(
+                profile = stored,
+                isSelected = isSelected,
+                rawContent = if (guid.isEmpty()) "" else MmkvManager.decodeServerRaw(guid).orEmpty(),
+            )
+
+            EConfigType.POLICYGROUP -> ServerEditData(
+                profile = stored,
+                isSelected = isSelected,
+                subscriptions = buildSubscriptions(),
+                fallbackTags = buildFallbackTags(),
+            )
+
+            EConfigType.PROXYCHAIN -> ServerEditData(
+                profile = stored,
+                isSelected = isSelected,
+                profileRemarks = buildChainCandidates(),
+            )
+
+            else -> ServerEditData(profile = stored, isSelected = isSelected)
+        }
     }
 
     open suspend fun saveProfile(guid: String, profile: ProfileItem): String = withIO {
@@ -54,36 +78,6 @@ open class ServerRepository(private val app: Application) : BaseRepository() {
         SettingsManager.getServerViaRemarks(remarks)
     }
 
-    open suspend fun loadSubscriptions(): List<SubscriptionOption> = withIO {
-        buildList {
-            add(SubscriptionOption(id = "", name = ""))
-            MmkvManager.decodeSubscriptions().forEach { cache ->
-                add(
-                    SubscriptionOption(
-                        id = cache.guid,
-                        name = cache.subscription.remarks.ifBlank { cache.guid },
-                    )
-                )
-            }
-        }
-    }
-
-    open suspend fun loadChainCandidates(): List<String> = withIO {
-        SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
-    }
-
-    open suspend fun loadFallbackTags(): List<String> = withIO {
-        (AppConfig.BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
-        )).filter { it != AppConfig.TAG_PROXY }
-    }
-
     open suspend fun buildPolicyGroupDescription(
         typeIndex: Int,
         subId: String,
@@ -98,4 +92,31 @@ open class ServerRepository(private val app: Application) : BaseRepository() {
         }
         "$typeName - $subName - $filter"
     }
+
+    // ----- Internals -----
+
+    private fun buildSubscriptions(): List<SubscriptionOption> = buildList {
+        add(SubscriptionOption(id = "", name = ""))
+        MmkvManager.decodeSubscriptions().forEach { cache ->
+            add(
+                SubscriptionOption(
+                    id = cache.guid,
+                    name = cache.subscription.remarks.ifBlank { cache.guid },
+                )
+            )
+        }
+    }
+
+    private fun buildChainCandidates(): List<String> = SettingsManager.getProfileRemarks(
+        excludeConfigTypes = setOf(
+            EConfigType.CUSTOM,
+            EConfigType.POLICYGROUP,
+            EConfigType.PROXYCHAIN,
+        )
+    )
+
+    private fun buildFallbackTags(): List<String> =
+        (AppConfig.BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
+            excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
+        )).filter { it != AppConfig.TAG_PROXY }
 }

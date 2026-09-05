@@ -1,7 +1,5 @@
 package com.v2ray.ang.ui.server
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
@@ -14,8 +12,10 @@ import com.v2ray.ang.ui.AppRoute
 import com.v2ray.ang.ui.base.BaseEditViewModel
 import com.v2ray.ang.ui.base.BaseResult
 import com.v2ray.ang.ui.base.BaseText
+import com.v2ray.ang.ui.base.EditFormSaver
 import com.v2ray.ang.ui.compose.ToastType
 import com.v2ray.ang.util.JsonUtil
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -23,12 +23,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class ServerEditViewModel(
-    private val handle: SavedStateHandle,
+    handle: SavedStateHandle,
     private val repository: ServerRepository,
 ) : BaseEditViewModel<ServerUiState, ServerAction>(initialState(handle)) {
 
-    private val subscriptionId: String =
-        handle.get<String>(AppRoute.EXTRA_SUB_ID).orEmpty()
+    private val subscriptionId: String = handle.get<String>(AppRoute.EXTRA_SUB_ID).orEmpty()
+
+    private val saver = EditFormSaver(handle, KEY_SAVED)
 
     val header: StateFlow<ServerHeader> = uiState
         .map { it.header }
@@ -36,41 +37,63 @@ class ServerEditViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), state.header)
 
     private var initialProfile: ProfileItem = ProfileItem.create(state.configType)
+    private var loadFailed = false
+    private var loadJob: Job? = null
 
     init {
-        handle.setSavedStateProvider(KEY_SAVED) {
-            bundleOf(
-                KEY_FORM to JsonUtil.toJson(state.form),
-                KEY_RAW to state.rawContent,
-            )
+        saver.restore()?.let { restored ->
+            val form = restored.getString(KEY_FORM)
+                ?.let { JsonUtil.fromJsonSafe(it, ServerForm::class.java) }
+            val raw = restored.getString(KEY_RAW)
+            if (form != null || raw != null) {
+                saver.markDirty()
+                setState { copy(form = form ?: this.form, rawContent = raw ?: rawContent) }
+            }
         }
-        load()
+        saver.register { bundle ->
+            bundle.putString(KEY_FORM, JsonUtil.toJson(state.form))
+            bundle.putString(KEY_RAW, state.rawContent)
+        }
+        loadJob = load()
     }
 
-    private fun load() = launch {
+    private fun load(): Job = launch(onError = { loadFailed = true; toastError() }) {
         val guid = state.guid
-        val profile = repository.loadProfile(guid, state.configType)
-        initialProfile = profile
+        val data = repository.loadEdit(guid, state.configType)
 
-        val configType = if (guid.isEmpty()) state.configType else profile.configType
-        val isRunning = state.isRunning && repository.isSelectedServer(guid)
-        val options = loadOptions(configType)
+        if (guid.isNotEmpty() && data.profile == null) {
+            loadFailed = true
+            toastError(R.string.toast_failure)
+            return@launch
+        }
 
-        val restored = handle.get<Bundle>(KEY_SAVED)
-        val form = restored?.getString(KEY_FORM)
-            ?.let { JsonUtil.fromJsonSafe(it, ServerForm::class.java) }
-            ?: if (guid.isEmpty()) ServerForm() else ServerForm.from(profile)
+        val configType = data.profile?.configType ?: state.configType
+        initialProfile = data.profile ?: ProfileItem.create(configType)
 
-        val rawContent = if (configType == EConfigType.CUSTOM) {
-            restored?.getString(KEY_RAW) ?: repository.loadRawConfig(guid)
-        } else {
-            state.rawContent
+        val options = when (configType) {
+            EConfigType.POLICYGROUP -> ServerOptions(
+                subscriptions = data.subscriptions,
+                fallbackTags = data.fallbackTags,
+            )
+
+            EConfigType.PROXYCHAIN -> ServerOptions(profileRemarks = data.profileRemarks)
+            else -> ServerOptions()
+        }
+        val form = when {
+            saver.dirty -> state.form
+            data.profile == null -> ServerForm()
+            else -> ServerForm.from(data.profile)
+        }
+        val rawContent = when {
+            configType != EConfigType.CUSTOM -> ""
+            saver.dirty -> state.rawContent
+            else -> data.rawContent
         }
 
         setState {
             copy(
                 configType = configType,
-                isRunning = isRunning,
+                isRunning = isRunning && data.isSelected,
                 form = form,
                 options = options,
                 rawContent = rawContent,
@@ -78,53 +101,50 @@ class ServerEditViewModel(
         }
     }
 
-    private suspend fun loadOptions(configType: EConfigType): ServerOptions = when (configType) {
-        EConfigType.POLICYGROUP -> ServerOptions(
-            subscriptions = repository.loadSubscriptions(),
-            fallbackTags = repository.loadFallbackTags(),
-        )
-
-        EConfigType.PROXYCHAIN -> ServerOptions(
-            profileRemarks = repository.loadChainCandidates(),
-        )
-
-        else -> ServerOptions()
-    }
-
     override fun onAction(action: ServerAction) {
         when (action) {
-            is ServerAction.TextChanged ->
+            is ServerAction.TextChanged -> {
+                saver.markDirty()
                 setState { copy(form = action.field.set(form, action.value)) }
+            }
 
-            is ServerAction.FlagChanged ->
+            is ServerAction.FlagChanged -> {
+                saver.markDirty()
                 setState { copy(form = action.flag.set(form, action.value)) }
+            }
 
-            is ServerAction.RawContentChanged ->
+            is ServerAction.RawContentChanged -> {
+                saver.markDirty()
                 setState { copy(rawContent = action.value) }
+            }
 
             ServerAction.Save -> save()
             ServerAction.Back -> cancel()
 
-            ServerAction.DeleteClicked ->
-                platform(ServerEvent.ConfirmDeleteProfile)
-
+            ServerAction.DeleteClicked -> platform(ServerEvent.ConfirmDeleteProfile)
             ServerAction.ConfirmDeleteProfile -> delete()
             is ServerAction.ConfirmRemoveChainMember -> removeChainMember(action.id)
 
             ServerAction.FetchCertificate -> fetchCertificate()
 
-            ServerAction.AddChainMember -> setState {
-                copy(form = form.copy(chainMembers = form.chainMembers + ChainMember()))
+            ServerAction.AddChainMember -> {
+                saver.markDirty()
+                setState {
+                    copy(form = form.copy(chainMembers = form.chainMembers + ChainMember()))
+                }
             }
 
-            is ServerAction.ChainMemberChanged -> setState {
-                copy(
-                    form = form.copy(
-                        chainMembers = form.chainMembers.map {
-                            if (it.id == action.id) it.copy(remarks = action.value) else it
-                        }
+            is ServerAction.ChainMemberChanged -> {
+                saver.markDirty()
+                setState {
+                    copy(
+                        form = form.copy(
+                            chainMembers = form.chainMembers.map {
+                                if (it.id == action.id) it.copy(remarks = action.value) else it
+                            }
+                        )
                     )
-                )
+                }
             }
 
             is ServerAction.ChainMemberRemoveClicked -> {
@@ -137,8 +157,11 @@ class ServerEditViewModel(
         }
     }
 
-    private fun removeChainMember(id: String) = setState {
-        copy(form = form.copy(chainMembers = form.chainMembers.filterNot { it.id == id }))
+    private fun removeChainMember(id: String) {
+        saver.markDirty()
+        setState {
+            copy(form = form.copy(chainMembers = form.chainMembers.filterNot { it.id == id }))
+        }
     }
 
     private fun moveChainMember(fromId: String, toId: String) {
@@ -147,6 +170,7 @@ class ServerEditViewModel(
         val to = list.indexOfFirst { it.id == toId }
         if (from < 0 || to < 0 || from == to) return
         list.add(to, list.removeAt(from))
+        saver.markDirty()
         setState { copy(form = form.copy(chainMembers = list)) }
     }
 
@@ -169,6 +193,7 @@ class ServerEditViewModel(
         }
 
         launch(onError = { toastError(R.string.toast_fetch_cert_sha256_failed) }) {
+            if (!awaitLoad()) return@launch
             setState { copy(isFetchingCert = true) }
             try {
                 val sha256 = repository.fetchCertSha256(
@@ -177,6 +202,7 @@ class ServerEditViewModel(
                 if (sha256.isNullOrBlank()) {
                     toastError(R.string.toast_fetch_cert_sha256_failed)
                 } else {
+                    saver.markDirty()
                     setState { copy(form = form.copy(pinnedCA256 = sha256)) }
                     toastSuccess(R.string.toast_fetch_cert_sha256_success)
                 }
@@ -186,14 +212,18 @@ class ServerEditViewModel(
         }
     }
 
-    override suspend fun doSave(): BaseResult? = when (state.configType) {
-        EConfigType.CUSTOM -> saveCustom()
-        EConfigType.POLICYGROUP -> savePolicyGroup()
-        EConfigType.PROXYCHAIN -> saveProxyChain()
-        else -> saveStandard()
+    override suspend fun doSave(): BaseResult? {
+        if (!awaitLoad()) return null
+        return when (state.configType) {
+            EConfigType.CUSTOM -> saveCustom()
+            EConfigType.POLICYGROUP -> savePolicyGroup()
+            EConfigType.PROXYCHAIN -> saveProxyChain()
+            else -> saveStandard()
+        }
     }
 
     override suspend fun doDelete(): BaseResult? {
+        if (!awaitLoad()) return null
         val guid = state.guid
         if (guid.isEmpty() || repository.isSelectedServer(guid)) {
             toastError(R.string.toast_action_not_allowed)
@@ -312,6 +342,12 @@ class ServerEditViewModel(
         }
     }
 
+    private suspend fun awaitLoad(): Boolean {
+        loadJob?.join()
+        if (loadFailed) toastError(R.string.toast_failure)
+        return !loadFailed
+    }
+
     private fun fail(text: BaseText): BaseResult? {
         toast(text, ToastType.ERROR)
         return null
@@ -328,7 +364,8 @@ class ServerEditViewModel(
             return ServerUiState(
                 configType = EConfigType.fromInt(typeValue) ?: EConfigType.VMESS,
                 guid = guid,
-                isRunning = (handle.get<Boolean>(AppRoute.EXTRA_RUNNING) ?: false) && guid.isNotEmpty(),
+                isRunning = (handle.get<Boolean>(AppRoute.EXTRA_RUNNING) ?: false) &&
+                        guid.isNotEmpty(),
             )
         }
     }
