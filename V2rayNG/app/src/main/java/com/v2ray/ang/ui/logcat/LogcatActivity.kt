@@ -132,7 +132,7 @@ fun LogcatScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val logs by viewModel.filteredLogs.collectAsStateWithLifecycle()
+    val logs by viewModel.logEntries.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
@@ -215,8 +215,8 @@ fun LogcatScreen(
                     .verticalScrollbar(listState),
                 contentPadding = NavigationBarsBottomPadding()
             ) {
-                items(items = logs, key = { it }) { log ->
-                    LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
+                items(items = logs, key = { it.key }) { log ->
+                    LogcatItem(log = log.text, onLongClick = { Utils.setClipboard(context, log.text) })
                     ItemDivider()
                 }
             }
