@@ -60,7 +60,7 @@ fun MainScreen(
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    val removeServer: (String) -> Unit = { guid ->
+    val removeServer: (String, String) -> Unit = { guid, _ ->
         if (confirmRemove) showRemoveConfirm = guid else onAction(MainAction.RemoveServer(guid))
     }
 
@@ -230,7 +230,7 @@ fun MainScreen(
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
                             onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                            onAction = onAction,
                             onShareServer = { guid, profile ->
                                 shareTarget = Triple(guid, profile, false)
                             },

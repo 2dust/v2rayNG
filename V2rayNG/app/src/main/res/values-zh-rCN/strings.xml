@@ -23,6 +23,10 @@
     <string name="toast_services_success">启动服务成功</string>
     <string name="toast_services_failure">启动服务失败</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="other">%1$s。包含%2$d个服务器</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">配置项</string>
     <string name="menu_item_add_config">添加配置</string>
@@ -392,6 +396,12 @@
     <string name="connection_test_testing_count">测试 %d 个配置中…</string>
     <string name="connection_test_available">"连接成功：延时 %1$s"</string>
     <string name="server_test_delay_value">%1$d ms</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+    <string name="acc_share_config_named">分享配置 %1$s</string>
+    <string name="acc_edit_config_named">编辑配置 %1$s</string>
+    <string name="acc_delete_config_named">删除配置 %1$s</string>
     <string name="connection_test_error">连接测试失败：%s</string>
     <string name="connection_test_fail">无法访问互联网</string>
     <string name="connection_test_error_status_code">错误码：#%d</string>
@@ -524,7 +534,13 @@
     <string name="acc_search">搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_move_to_top">移至列表顶部</string>
+    <string name="acc_move_up">上移</string>
+    <string name="acc_move_down">下移</string>
+    <string name="acc_move_to_bottom">移至列表底部</string>
+    <string name="acc_moved">已移动</string>
+    <string name="acc_selected_server">已选择</string>
+    <string name="acc_select_server">选择</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>

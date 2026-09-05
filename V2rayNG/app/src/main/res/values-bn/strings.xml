@@ -23,6 +23,11 @@
     <string name="toast_services_success">সার্ভিস সফলভাবে শুরু হয়েছে</string>
     <string name="toast_services_failure">সার্ভিস শুরু হতে ব্যর্থ হয়েছে</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s। এতে %2$dটি সার্ভার রয়েছে</item>
+        <item quantity="other">%1$s। এতে %2$dটি সার্ভার রয়েছে</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">কনফিগারেশন ফাইল</string>
     <string name="menu_item_add_config">কনফিগারেশন যোগ করুন</string>
@@ -392,6 +397,13 @@
     <string name="connection_test_testing_count">%dটি কনফিগারেশন পরীক্ষা করা হচ্ছে…</string>
     <string name="connection_test_available">সংযোগ সফল হয়েছে; সময় লেগেছে %1$s</string>
     <string name="server_test_delay_value">%1$d মিলিসেকেন্ড</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d মিলিসেকেন্ড</item>
+        <item quantity="other">%1$d মিলিসেকেন্ড</item>
+    </plurals>
+    <string name="acc_share_config_named">%1$s কনফিগারেশন শেয়ার করুন</string>
+    <string name="acc_edit_config_named">%1$s কনফিগারেশন সম্পাদনা করুন</string>
+    <string name="acc_delete_config_named">%1$s কনফিগারেশন মুছুন</string>
     <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
@@ -524,7 +536,13 @@
     <string name="acc_search">অনুসন্ধান করুন</string>
     <string name="acc_add">কনফিগারেশন যোগ করুন</string>
     <string name="acc_more">আরও বিকল্প</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_move_to_top">তালিকার শুরুতে সরান</string>
+    <string name="acc_move_up">উপরে সরান</string>
+    <string name="acc_move_down">নিচে সরান</string>
+    <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
+    <string name="acc_moved">সরানো হয়েছে</string>
+    <string name="acc_selected_server">নির্বাচিত</string>
+    <string name="acc_select_server">নির্বাচন করুন</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

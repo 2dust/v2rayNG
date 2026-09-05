@@ -23,6 +23,11 @@
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. شامل %2$d سرور است</item>
+        <item quantity="other">%1$s. شامل %2$d سرور است</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">افزودن کانفیگ</string>
@@ -392,6 +397,13 @@
     <string name="connection_test_testing_count">تست کردن %d کانفیگ…</string>
     <string name="connection_test_available">اتصال در %1$s با موفقیت برقرار شد</string>
     <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
+    <string name="acc_share_config_named">اشتراک‌گذاری پیکربندی %1$s</string>
+    <string name="acc_edit_config_named">ویرایش پیکربندی %1$s</string>
+    <string name="acc_delete_config_named">حذف پیکربندی %1$s</string>
     <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
@@ -524,7 +536,13 @@
     <string name="acc_search">جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
-    <string name="acc_selected_server">انتخاب شده</string>
+    <string name="acc_move_to_top">انتقال به ابتدای فهرست</string>
+    <string name="acc_move_up">انتقال به بالا</string>
+    <string name="acc_move_down">انتقال به پایین</string>
+    <string name="acc_move_to_bottom">انتقال به انتهای فهرست</string>
+    <string name="acc_moved">جابه‌جا شد</string>
+    <string name="acc_selected_server">انتخاب‌شده</string>
+    <string name="acc_select_server">انتخاب</string>
     <string name="acc_share_subscription">اشتراک‌گذاری لینک اشتراک</string>
     <string name="acc_share_log">اشتراک‌گذاری گزارش</string>
     <string name="acc_remove">حذف عضو زنجیره پروکسی</string>

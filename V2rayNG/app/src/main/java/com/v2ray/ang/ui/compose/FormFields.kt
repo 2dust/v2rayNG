@@ -79,6 +79,7 @@ fun FormDropdownField(
     enabled: Boolean = true,
     placeholder: String? = null,
     supportingText: String? = null,
+    fieldModifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val menuScrollState = rememberScrollState()
@@ -116,7 +117,7 @@ fun FormDropdownField(
                     backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
                 )
             ),
-            modifier = Modifier
+            modifier = fieldModifier
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable

@@ -23,6 +23,10 @@
     <string name="toast_services_success">啟動服務成功</string>
     <string name="toast_services_failure">啟動服務失敗</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="other">%1$s。包含%2$d個伺服器</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">設定檔</string>
     <string name="menu_item_add_config">新增設定</string>
@@ -392,6 +396,12 @@
     <string name="connection_test_testing_count">正在測試 %d 個設定…</string>
     <string name="connection_test_available">"連線成功：延遲 %1$s"</string>
     <string name="server_test_delay_value">%1$d ms</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+    <string name="acc_share_config_named">分享設定 %1$s</string>
+    <string name="acc_edit_config_named">編輯設定 %1$s</string>
+    <string name="acc_delete_config_named">刪除設定 %1$s</string>
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
@@ -524,7 +534,13 @@
     <string name="acc_search">搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_move_to_top">移至清單頂端</string>
+    <string name="acc_move_up">上移</string>
+    <string name="acc_move_down">下移</string>
+    <string name="acc_move_to_bottom">移至清單底端</string>
+    <string name="acc_moved">已移動</string>
+    <string name="acc_selected_server">已選取</string>
+    <string name="acc_select_server">選取</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>

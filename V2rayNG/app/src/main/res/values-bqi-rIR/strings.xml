@@ -23,6 +23,11 @@
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. %2$d سرور منس هڌ</item>
+        <item quantity="other">%1$s. %2$d سرور منس هڌ</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">ٱووردن کانفیگ</string>
@@ -57,6 +62,13 @@
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">نوم منتوری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌سانیه</item>
+        <item quantity="other">%1$d میلی‌سانیه</item>
+    </plurals>
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="server_lab_security">ٱمنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">جاگورو</string>
@@ -390,8 +402,8 @@
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
-    <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
-    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <string name="connection_test_available">مووفق بی: منپیز %1$s تۊل کشی</string>
+    <string name="server_test_delay_value">%1$d میلی‌سانیه</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
@@ -523,9 +535,15 @@
     <string name="acc_back">برگشت</string>
     <string name="acc_search">پیتینیڌن</string>
     <string name="acc_add">ٱووردن کانفیگ</string>
-    <string name="acc_more">امکووݩا بؽتر</string>
-    <string name="acc_selected_server">Selected</string>
-    <string name="acc_share_subscription">یک رسۊوی لینک اشتراک</string>
+    <string name="acc_more">گۊزینه یل قلوه</string>
+    <string name="acc_move_to_top">آلشت و سر نومگه</string>
+    <string name="acc_move_up">آلشت و روء</string>
+    <string name="acc_move_down">آلشت و بلم</string>
+    <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
+    <string name="acc_moved">آلشت وابید</string>
+    <string name="acc_selected_server">پسند وابیڌه</string>
+    <string name="acc_select_server">پسند کردن</string>
+    <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
     <string name="acc_add_member">ٱووردن عوزو زنجیره پروکسی</string>

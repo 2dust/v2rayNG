@@ -23,6 +23,15 @@
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="zero">%1$s. لا تحتوي على أي خوادم</item>
+        <item quantity="one">%1$s. تحتوي على خادم واحد</item>
+        <item quantity="two">%1$s. تحتوي على خادمين</item>
+        <item quantity="few">%1$s. تحتوي على %2$d خوادم</item>
+        <item quantity="many">%1$s. تحتوي على %2$d خادمًا</item>
+        <item quantity="other">%1$s. تحتوي على %2$d خادم</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>
     <string name="menu_item_add_config">إضافة تكوين</string>
@@ -392,6 +401,17 @@
     <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
     <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="zero">%1$d مللي ثانية</item>
+        <item quantity="one">مللي ثانية واحدة</item>
+        <item quantity="two">مللي ثانيتان</item>
+        <item quantity="few">%1$d مللي ثوانٍ</item>
+        <item quantity="many">%1$d مللي ثانية</item>
+        <item quantity="other">%1$d مللي ثانية</item>
+    </plurals>
+    <string name="acc_share_config_named">مشاركة التكوين %1$s</string>
+    <string name="acc_edit_config_named">تعديل التكوين %1$s</string>
+    <string name="acc_delete_config_named">حذف التكوين %1$s</string>
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
@@ -524,7 +544,13 @@
     <string name="acc_search">بحث</string>
     <string name="acc_add">إضافة تكوين</string>
     <string name="acc_more">المزيد من الخيارات</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_move_to_top">نقل إلى أعلى القائمة</string>
+    <string name="acc_move_up">نقل إلى أعلى</string>
+    <string name="acc_move_down">نقل إلى أسفل</string>
+    <string name="acc_move_to_bottom">نقل إلى أسفل القائمة</string>
+    <string name="acc_moved">تم النقل</string>
+    <string name="acc_selected_server">محدّد</string>
+    <string name="acc_select_server">اختيار</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_share_log">مشاركة السجل</string>
     <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>

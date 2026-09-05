@@ -23,6 +23,11 @@
     <string name="toast_services_success">Service started successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
 
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. Contains %2$d server</item>
+        <item quantity="other">%1$s. Contains %2$d servers</item>
+    </plurals>
+
     <!--ServerActivity-->
     <string name="title_server">Config</string>
     <string name="menu_item_add_config">Add config</string>
@@ -392,6 +397,13 @@
     <string name="connection_test_testing_count">Testing %d configs…</string>
     <string name="connection_test_available">Connection succeeded in %1$s</string>
     <string name="server_test_delay_value">%1$d ms</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisecond</item>
+        <item quantity="other">%1$d milliseconds</item>
+    </plurals>
+    <string name="acc_share_config_named">Share config %1$s</string>
+    <string name="acc_edit_config_named">Edit config %1$s</string>
+    <string name="acc_delete_config_named">Delete config %1$s</string>
     <string name="connection_test_error">Connection test failed: %s</string>
     <string name="connection_test_fail">Internet unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
@@ -524,7 +536,13 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
+    <string name="acc_move_to_top">Move to top</string>
+    <string name="acc_move_up">Move up</string>
+    <string name="acc_move_down">Move down</string>
+    <string name="acc_move_to_bottom">Move to bottom</string>
+    <string name="acc_moved">Moved</string>
     <string name="acc_selected_server">Selected</string>
+    <string name="acc_select_server">Select</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
