@@ -123,14 +123,17 @@ object SettingsManager {
     }
 
     /**
-      * Get a routing ruleset by id.
-      * @param id The id of the ruleset.
-      * @return The RulesetItem.
-      */
-    fun getRoutingRuleset(index: String?): RulesetItem? {
-       if (index.isNullOrEmpty()) return null
+     * Get a routing ruleset by index.
+     * @param index The index of the ruleset.
+     * @return The RulesetItem.
+     */
+    fun getRoutingRuleset(index: Int): RulesetItem? {
+        if (index < 0) return null
 
-       return MmkvManager.decodeRoutingRulesets()?.firstOrNull { it.id == index }
+        val rulesetList = MmkvManager.decodeRoutingRulesets()
+        if (rulesetList.isNullOrEmpty()) return null
+
+        return rulesetList[index]
     }
 
     /**
@@ -139,48 +142,33 @@ object SettingsManager {
      * @param ruleset The RulesetItem to save.
      */
     fun saveRoutingRuleset(index: Int, ruleset: RulesetItem?) {
-       if (ruleset == null) return
+        if (ruleset == null) return
 
-       var rulesetList = MmkvManager.decodeRoutingRulesets()
-       if (rulesetList.isNullOrEmpty()) {
-           rulesetList = mutableListOf()
+        var rulesetList = MmkvManager.decodeRoutingRulesets()
+        if (rulesetList.isNullOrEmpty()) {
+            rulesetList = mutableListOf()
         }
 
-       if (index < 0 || index >= rulesetList.count()) {
-           rulesetList.add(0, ruleset)
-       } else {
-           rulesetList[index] = ruleset
-       }
-       MmkvManager.encodeRoutingRulesets(rulesetList)
+        if (index < 0 || index >= rulesetList.count()) {
+            rulesetList.add(0, ruleset)
+        } else {
+            rulesetList[index] = ruleset
+        }
+        MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
-    fun saveRoutingRuleset(index: String?, ruleset: RulesetItem?) {
-       if (ruleset == null) return
-       if (ruleset.id.isBlank()) {
-           ruleset.id = java.util.UUID.randomUUID().toString()
-       }
+    /**
+     * Remove a routing ruleset by index.
+     * @param index The index of the ruleset.
+     */
+    fun removeRoutingRuleset(index: Int) {
+        if (index < 0) return
 
-       val rulesetList = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-       val targetId = if (index.isNullOrEmpty()) ruleset.id else index
-       val index = rulesetList.indexOfFirst { it.id == targetId }
+        val rulesetList = MmkvManager.decodeRoutingRulesets()
+        if (rulesetList.isNullOrEmpty()) return
 
-       if (index >= 0) {
-           rulesetList[index] = ruleset
-       } else {
-           rulesetList.add(0, ruleset)
-       }
-       MmkvManager.encodeRoutingRulesets(rulesetList)
-    }
-
-    fun removeRoutingRuleset(index: String?) {
-       if (index.isNullOrEmpty()) return
-
-       val rulesetList = MmkvManager.decodeRoutingRulesets() ?: return
-       val targetIndex = rulesetList.indexOfFirst { it.id == index }
-       if (targetIndex < 0) return
-
-       rulesetList.removeAt(targetIndex)
-       MmkvManager.encodeRoutingRulesets(rulesetList)
+        rulesetList.removeAt(index)
+        MmkvManager.encodeRoutingRulesets(rulesetList)
     }
 
     /**
