@@ -77,7 +77,6 @@ fun AppTopBar(
 ) {
     Column {
         TopAppBar(
-            modifier = Modifier.accessibilityTraversalGroup(),
             title = {
                 if (isSearchActive) {
                     SearchInputField(
