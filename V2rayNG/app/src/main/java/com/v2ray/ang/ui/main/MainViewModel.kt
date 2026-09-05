@@ -13,10 +13,12 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.extension.serviceStartedMessage
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -101,17 +103,30 @@ class MainViewModel(
         when (event) {
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
-            MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
+            is MainServiceEvent.StateStartSuccess -> {
+                toastSuccess(
+                    R.string.toast_services_success,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                    accessibilityMessage = localizedContext.serviceStartedMessage(event.serverName),
+                )
                 updateRunningState(true)
             }
 
             MainServiceEvent.StateStartFailure -> {
-                toastError(R.string.toast_services_failure)
+                toastError(
+                    R.string.toast_services_failure,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                )
                 updateRunningState(false)
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                toastSuccess(
+                    R.string.toast_services_stop,
+                    liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
+                )
+                updateRunningState(false)
+            }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -464,10 +479,24 @@ class MainViewModel(
                             toast(R.string.title_update_subscription_no_subscription)
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                            toast(dataSource.getString(R.string.title_update_config_count, result.configCount))
+                            toast(
+                                getQuantityString(
+                                    R.plurals.title_update_config_count,
+                                    result.configCount,
+                                    result.configCount,
+                                ),
+                            )
 
                         else ->
-                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                            toast(
+                                dataSource.getString(
+                                    R.string.title_update_subscription_result,
+                                    result.configCount,
+                                    result.successCount,
+                                    result.failureCount,
+                                    result.skipCount,
+                                ),
+                            )
                     }
                     if (result.configCount > 0) {
                         setupGroupTab(forceRefresh = true)

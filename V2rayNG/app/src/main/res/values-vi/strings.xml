@@ -17,10 +17,15 @@
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
+    <string name="notification_channel_service">Dịch vụ v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
+    <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
+    <string name="notification_channel_other">Thông báo khác</string>
     <string name="notification_action_more">Nhấn để biết thêm…</string>
     <string name="toast_services_start">Đang khởi động v2rayNG…</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
     <string name="toast_services_success">Đã khởi động v2rayNG!</string>
+    <string name="acc_service_started_connected_to">Đã khởi động v2rayNG! Hiện đã kết nối với %1$s.</string>
     <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
 
     <!--ServerActivity-->
@@ -351,8 +356,12 @@
     <string name="title_del_config_count">Xóa %d cấu hình</string>
     <string name="title_import_config_count">Nhập %d cấu hình</string>
     <string name="title_export_config_count">Xuất %d cấu hình</string>
-    <string name="title_update_config_count">Cập nhật %d cấu hình</string>
-    <string name="title_update_asset_count">Đã cập nhật %d tệp tài nguyên</string>
+    <plurals name="title_update_config_count">
+        <item quantity="other">Đã cập nhật %1$d cấu hình</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="other">Đã cập nhật %1$d tệp tài nguyên</item>
+    </plurals>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>

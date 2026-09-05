@@ -17,10 +17,15 @@
     <string name="notification_action_stop_v2ray">Остановить</string>
     <string name="toast_permission_denied">Разрешение не получено</string>
     <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
+    <string name="notification_channel_service">Служба v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Обновления подписок</string>
+    <string name="notification_channel_connection_checks">Проверки соединения</string>
+    <string name="notification_channel_other">Другие уведомления</string>
     <string name="notification_action_more">Ещё…</string>
     <string name="toast_services_start">Запуск служб</string>
-    <string name="toast_services_stop">Остановка служб</string>
+    <string name="toast_services_stop">Служба остановлена</string>
     <string name="toast_services_success">Службы успешно запущены</string>
+    <string name="acc_service_started_connected_to">Службы успешно запущены. Установлено подключение к серверу «%1$s».</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->
@@ -351,8 +356,18 @@
     <string name="title_del_config_count">Удалено профилей: %d</string>
     <string name="title_import_config_count">Импортировано профилей: %d</string>
     <string name="title_export_config_count">Экспортировано профилей: %d</string>
-    <string name="title_update_config_count">Обновлено профилей: %d</string>
-    <string name="title_update_asset_count">Обновлено файлов ресурсов: %d</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">Обновлён %1$d профиль</item>
+        <item quantity="few">Обновлено %1$d профиля</item>
+        <item quantity="many">Обновлено %1$d профилей</item>
+        <item quantity="other">Обновлено %1$d профиля</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">Обновлён %1$d файл ресурсов</item>
+        <item quantity="few">Обновлено %1$d файла ресурсов</item>
+        <item quantity="many">Обновлено %1$d файлов ресурсов</item>
+        <item quantity="other">Обновлено %1$d файла ресурсов</item>
+    </plurals>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
     <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>

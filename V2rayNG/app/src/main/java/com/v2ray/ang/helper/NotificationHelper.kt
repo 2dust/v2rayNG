@@ -1,14 +1,24 @@
 package com.v2ray.ang.helper
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.NotificationChannelType
+import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.util.LogUtil
 
 /**
  * Unified notification helper for different notification channels.
@@ -41,6 +51,60 @@ object NotificationHelper {
         val notificationManager = getNotificationManager(context)
         val builder = buildNotificationBuilder(channelType, context, title, content)
         notificationManager.notify(channelType.notificationId, builder.build())
+    }
+
+    /**
+     * Posts transient feedback when there is no active in-app Snackbar host.
+     * All fallback messages share one notification ID, so new feedback replaces the old message.
+     *
+     * Android recommends notifications for relevant background feedback. The notification is
+     * skipped when the user has disabled notifications or denied the runtime permission.
+     * https://developer.android.com/guide/topics/ui/notifiers/toasts#Alternatives
+     */
+    fun notifyTransientMessage(context: Context, content: CharSequence) {
+        if (content.isBlank()) return
+
+        val appContext = context.applicationContext
+        if (!canPostNotifications(appContext)) return
+        val localizedContext = AppLocaleManager.localizedContext(appContext)
+
+        val channelType = NotificationChannelType.TRANSIENT_MESSAGE
+        try {
+            ensureChannelCreated(channelType, localizedContext)
+            val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val contentIntent = PendingIntent.getActivity(
+                appContext,
+                channelType.notificationId,
+                Intent(appContext, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                },
+                flags
+            )
+            val builder = buildNotificationBuilder(
+                channelType = channelType,
+                context = appContext,
+                title = localizedContext.getString(R.string.app_name),
+                content = content.toString()
+            ).setAutoCancel(true)
+                .setContentIntent(contentIntent)
+                .setOnlyAlertOnce(false)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(content))
+                .setTimeoutAfter(TRANSIENT_MESSAGE_TIMEOUT_MS)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+
+            getNotificationManager(appContext).notify(channelType.notificationId, builder.build())
+        } catch (e: SecurityException) {
+            LogUtil.w(
+                message = "NotificationHelper: failed to post transient message",
+                throwable = e
+            )
+        }
+    }
+
+    /** Removes stale background feedback once the same event is delivered in the foreground. */
+    fun cancelTransientMessage(context: Context) {
+        getNotificationManager(context.applicationContext)
+            .cancel(NotificationChannelType.TRANSIENT_MESSAGE.notificationId)
     }
 
     /**
@@ -124,20 +188,43 @@ object NotificationHelper {
         return cachedNotificationManager!!
     }
 
-    private fun ensureChannelCreated(channelType: NotificationChannelType, context: Context) {
+    private fun ensureChannelCreated(channelType: NotificationChannelType, context: Context) =
+        ensureNotificationChannel(
+            context = context,
+            channelId = channelType.channelId,
+            channelNameRes = channelType.channelNameRes,
+            importance = NotificationManager.IMPORTANCE_LOW,
+        )
+
+    /**
+     * Creates a channel or updates only its localized name.
+     *
+     * Android lets apps rename an existing channel, while its behavior remains under user control.
+     */
+    internal fun ensureNotificationChannel(
+        context: Context,
+        channelId: String,
+        @StringRes channelNameRes: Int,
+        importance: Int,
+        configureNewChannel: NotificationChannel.() -> Unit = {},
+    ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (notificationManager.getNotificationChannel(channelType.channelId) != null) return
-
-        val channel = NotificationChannel(
-            channelType.channelId,
-            channelType.channelName,
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val localizedName = AppLocaleManager.localizedContext(context).getString(channelNameRes)
+        val existingChannel = notificationManager.getNotificationChannel(channelId)
+        if (existingChannel == null) {
+            NotificationChannel(channelId, localizedName, importance)
+                .apply {
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                    configureNewChannel()
+                }
+                .also(notificationManager::createNotificationChannel)
+        } else if (existingChannel.name.toString() != localizedName) {
+            existingChannel.name = localizedName
+            notificationManager.createNotificationChannel(existingChannel)
         }
-        notificationManager.createNotificationChannel(channel)
     }
 
     private fun buildNotificationBuilder(
@@ -153,7 +240,9 @@ object NotificationHelper {
             ""
         }
 
-        val displayTitle = title.ifEmpty { context.getString(R.string.app_name) }
+        val displayTitle = title.ifEmpty {
+            AppLocaleManager.localizedContext(context).getString(R.string.app_name)
+        }
         return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(displayTitle)
@@ -161,7 +250,19 @@ object NotificationHelper {
             .setOngoing(false)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setCategory(channelType.category)
             .apply { action?.let(::addAction) }
     }
+
+    private fun canPostNotifications(context: Context): Boolean {
+        val notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+        val permissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        val permissionGranted = !permissionRequired || ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        return notificationsEnabled && permissionGranted
+    }
 }
+
+private const val TRANSIENT_MESSAGE_TIMEOUT_MS = 10_000L

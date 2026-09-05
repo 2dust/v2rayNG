@@ -219,9 +219,15 @@ class UserAssetActivity : HelperBaseComponentActivity() {
                 viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
             }
             if (result.successCount > 0) {
-                toast(getString(R.string.title_update_asset_count, result.successCount))
+                toast(
+                    resources.getQuantityString(
+                        R.plurals.title_update_asset_count,
+                        result.successCount,
+                        result.successCount,
+                    ),
+                )
             } else {
-                toast(getString(R.string.toast_failure))
+                toastError(R.string.toast_failure)
             }
             refreshData().join()
             isLoadingState.value = false

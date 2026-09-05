@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -53,7 +54,9 @@ class MainRepository(
             val event = when (safeIntent.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
                 AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
-                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
+                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess(
+                    safeIntent.getStringExtra("content").orEmpty()
+                )
                 AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
@@ -72,7 +75,13 @@ class MainRepository(
 
                 else -> null
             }
-            event?.let { _mainServiceEvent.tryEmit(it) }
+            val accepted = event?.let {
+                _mainServiceEvent.subscriptionCount.value > 0 &&
+                    _mainServiceEvent.tryEmit(it)
+            } == true
+            if (isOrderedBroadcast && accepted) {
+                resultCode = Activity.RESULT_OK
+            }
         }
     }
 

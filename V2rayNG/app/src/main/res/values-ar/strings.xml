@@ -17,10 +17,15 @@
     <string name="notification_action_stop_v2ray">إيقاف</string>
     <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
     <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
+    <string name="notification_channel_service">خدمة v2rayNG</string>
+    <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
+    <string name="notification_channel_connection_checks">فحوص الاتصال</string>
+    <string name="notification_channel_other">الإشعارات الأخرى</string>
     <string name="notification_action_more">انقر للمزيد</string>
     <string name="toast_services_start">بدء الخدمات</string>
-    <string name="toast_services_stop">إيقاف الخدمات</string>
+    <string name="toast_services_stop">تم إيقاف الخدمة</string>
     <string name="toast_services_success">نجاح بدء الخدمات</string>
+    <string name="acc_service_started_connected_to">تم تشغيل الخدمة بنجاح. أنت متصل الآن بـ %1$s.</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
 
     <!--ServerActivity-->
@@ -351,8 +356,22 @@
     <string name="title_del_config_count">حذف %d من التكوينات</string>
     <string name="title_import_config_count">استيراد %d من التكوينات</string>
     <string name="title_export_config_count">تصدير %d من التكوينات</string>
-    <string name="title_update_config_count">تحديث %d من التكوينات</string>
-    <string name="title_update_asset_count">تم تحديث %d من ملفات الأصول</string>
+    <plurals name="title_update_config_count">
+        <item quantity="zero">لم يتم تحديث أي تكوينات</item>
+        <item quantity="one">تم تحديث تكوين واحد</item>
+        <item quantity="two">تم تحديث تكوينين</item>
+        <item quantity="few">تم تحديث %1$d تكوينات</item>
+        <item quantity="many">تم تحديث %1$d تكوينًا</item>
+        <item quantity="other">تم تحديث %1$d تكوين</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="zero">لم يتم تحديث أي ملفات أصول</item>
+        <item quantity="one">تم تحديث ملف أصول واحد</item>
+        <item quantity="two">تم تحديث ملفي أصول</item>
+        <item quantity="few">تم تحديث %1$d ملفات أصول</item>
+        <item quantity="many">تم تحديث %1$d ملف أصول</item>
+        <item quantity="other">تم تحديث %1$d ملف أصول</item>
+    </plurals>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
