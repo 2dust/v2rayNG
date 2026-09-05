@@ -87,8 +87,16 @@ class CoreVpnService : VpnService(), ServiceControl {
             return START_NOT_STICKY
         }
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
-        if (!setupVpnService()) {
+        val setupFailure = try {
+            if (setupVpnService()) null else "VPN setup failed"
+        } catch (e: Exception) {
+            val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: $message", e)
+            message
+        }
+        if (setupFailure != null) {
             unlockStart()
+            CoreServiceManager.reportStartFailure(this, setupFailure)
             // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
             stopSelf()
             return START_NOT_STICKY

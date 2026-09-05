@@ -21,22 +21,22 @@ import com.v2ray.ang.util.Utils
 
 object LauncherManager {
 
-    fun startServiceFromToggle(context: Context): Boolean {
-        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(R.string.app_tile_first_use)
-            return false
-        }
-        try {
-            startContextService(context)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
-            return false
-        }
-        return true
-    }
+    fun startServiceFromToggle(context: Context): Boolean =
+        requestServiceStart(context, guid = null, showLifecycleFeedback = true)
 
     fun startService(context: Context, guid: String? = null) {
+        requestServiceStart(context, guid, showLifecycleFeedback = true)
+    }
+
+    /** Starts the replacement service after a daemon-managed restart. */
+    internal fun startServiceAfterRestart(context: Context): Boolean =
+        requestServiceStart(context, guid = null, showLifecycleFeedback = false)
+
+    private fun requestServiceStart(
+        context: Context,
+        guid: String?,
+        showLifecycleFeedback: Boolean,
+    ): Boolean {
         LogUtil.i(AppConfig.TAG, "LauncherManager: startService from ${context::class.java.simpleName}")
 
         if (guid != null) {
@@ -44,10 +44,14 @@ object LauncherManager {
         }
 
         try {
-            startContextService(context)
+            startContextService(context, showLifecycleFeedback)
+            return true
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            if (showLifecycleFeedback) {
+                context.toast(e.message ?: e.javaClass.simpleName)
+            }
+            return false
         }
     }
 
@@ -61,19 +65,29 @@ object LauncherManager {
         MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_RESTART, "")
     }
 
+    /** Restarts the active daemon and reports whether one accepted the request. */
+    internal fun restartService(context: Context, onResult: (handled: Boolean) -> Unit) {
+        MessageHelper.sendMsg2ServiceForResult(
+            context,
+            AppConfig.MSG_STATE_RESTART,
+            "",
+            onResult,
+        )
+    }
+
     /** Restarts the active daemon, or delegates to the caller's permission-aware start flow. */
     fun restartServiceOrStart(context: Context, startIfStopped: () -> Unit) {
-        MessageHelper.sendMsg2ServiceForResult(context, AppConfig.MSG_STATE_RESTART, "") { handled ->
+        restartService(context) { handled ->
             if (!handled) startIfStopped()
         }
     }
 
     @Throws(Exception::class)
-    private fun startContextService(context: Context) {
+    private fun startContextService(context: Context, showLifecycleFeedback: Boolean) {
         // Note: isRunning check is removed here to avoid loading Native libraries in the UI process.
         // The check is performed in CoreServiceManager when the service starts in the daemon process.
 
-        val guid = MmkvManager.getSelectServer()
+        val guid = MmkvManager.getSelectServer()?.takeIf { it.isNotEmpty() }
             ?: run {
                 LogUtil.e(AppConfig.TAG, "LauncherManager: No server selected")
                 error(context.getString(R.string.app_tile_first_use))
@@ -100,10 +114,12 @@ object LauncherManager {
             Utils.setClipboard(context, context.getString(R.string.toast_allow_insecure_deprecated))
         }
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
-            context.toast(R.string.toast_warning_pref_proxysharing_short)
-        } else {
-            context.toast(R.string.toast_services_start)
+        if (showLifecycleFeedback) {
+            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
+                context.toast(R.string.toast_warning_pref_proxysharing_short)
+            } else {
+                context.toast(R.string.toast_services_start)
+            }
         }
 
         val isRootMode = SettingsManager.isRootMode()

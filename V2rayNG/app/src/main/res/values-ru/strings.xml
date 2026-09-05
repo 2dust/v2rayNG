@@ -19,8 +19,9 @@
     <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
     <string name="notification_action_more">Ещё…</string>
     <string name="toast_services_start">Запуск служб</string>
-    <string name="toast_services_stop">Остановка служб</string>
+    <string name="toast_services_stop">Служба остановлена</string>
     <string name="toast_services_success">Службы успешно запущены</string>
+    <string name="toast_services_restart_success">Службы успешно перезапущены</string>
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->

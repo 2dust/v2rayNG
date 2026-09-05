@@ -19,8 +19,9 @@
     <string name="toast_permission_denied_notification">Notification permission denied</string>
     <string name="notification_action_more">Tap for more</string>
     <string name="toast_services_start">Starting service</string>
-    <string name="toast_services_stop">Stopping service</string>
+    <string name="toast_services_stop">Service stopped</string>
     <string name="toast_services_success">Service started successfully</string>
+    <string name="toast_services_restart_success">Service restarted successfully</string>
     <string name="toast_services_failure">Failed to start service</string>
 
     <!--ServerActivity-->

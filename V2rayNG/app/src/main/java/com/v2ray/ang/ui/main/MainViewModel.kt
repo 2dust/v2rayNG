@@ -81,6 +81,8 @@ class MainViewModel(
     @Volatile
     private var testingGroupId: String? = null
 
+    private val restartTracker = MainRestartTracker()
+
     private val initialPageReady = CompletableDeferred<Unit>()
 
     // ---------- Service events ----------
@@ -99,19 +101,52 @@ class MainViewModel(
 
     private fun handleServiceEvent(event: MainServiceEvent) {
         when (event) {
-            MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
-            MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
-            MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
-                updateRunningState(true)
+            MainServiceEvent.StateRunning -> {
+                if (restartTracker.isIdle) {
+                    updateRunningState(true, clearTestingText = false)
+                }
+            }
+            MainServiceEvent.StateNotRunning -> {
+                if (restartTracker.isIdle) {
+                    updateRunningState(false, clearTestingText = false)
+                }
+            }
+            MainServiceEvent.StateRestarting -> {
+                restartTracker.onRestarting()
+            }
+            is MainServiceEvent.StateStartSuccess -> {
+                val activatedGuid = restartTracker.complete()
+                toastSuccess(
+                    if (event.restarted) R.string.toast_services_restart_success
+                    else R.string.toast_services_success
+                )
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = activatedGuid ?: it.selectedGuid,
+                        isRunning = true,
+                        status = MainStatus.Connected,
+                    )
+                }
             }
 
             MainServiceEvent.StateStartFailure -> {
+                val requestedGuid = restartTracker.complete()
                 toastError(R.string.toast_services_failure)
-                updateRunningState(false)
+                _uiState.update {
+                    it.copy(
+                        selectedGuid = requestedGuid ?: it.selectedGuid,
+                        isRunning = false,
+                        status = MainStatus.Disconnected,
+                    )
+                }
             }
 
-            MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+            MainServiceEvent.StateStopSuccess -> {
+                if (restartTracker.isIdle) {
+                    toastSuccess(R.string.toast_services_stop)
+                    updateRunningState(false)
+                }
+            }
             is MainServiceEvent.MeasureDelayResult -> {
                 _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
             }
@@ -202,7 +237,6 @@ class MainViewModel(
             MainAction.UpdateSubscriptions -> importConfigViaSub()
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
-            is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
@@ -224,6 +258,7 @@ class MainViewModel(
             is MainAction.ImportManually,
             MainAction.RestartService,
             MainAction.LocateSelectedServer,
+            is MainAction.SelectServer,
             is MainAction.EditServer,
             is MainAction.ShareClipboard,
             is MainAction.ShareFullContent -> {
@@ -678,13 +713,28 @@ class MainViewModel(
         }
     }
 
-    fun updateSelectedGuid(guid: String) {
+    /** Persists a new selection and waits for the daemon to accept or decline its restart. */
+    internal fun selectServerForActivation(guid: String): Boolean {
+        if (!restartTracker.beginServerChange(uiState.value.selectedGuid, guid)) return false
         dataSource.setSelectServer(guid)
-        _uiState.update { it.copy(selectedGuid = guid) }
+        return true
+    }
+
+    internal fun onServerRestartRequestResult(guid: String, handled: Boolean) {
+        if (!restartTracker.completeUnhandledServerChange(guid, handled)) return
+        _uiState.update {
+            it.copy(
+                selectedGuid = guid,
+                isRunning = false,
+                status = MainStatus.Disconnected,
+            )
+        }
     }
 
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        if (!restartTracker.hasPendingServerChange) {
+            _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        }
     }
 
     fun removeServerAndRefresh(guid: String) {
