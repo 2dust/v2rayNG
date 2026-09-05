@@ -32,55 +32,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 
-internal open class ProfileStorageException(message: String) : IllegalStateException(message)
-
-internal class SubscriptionUpdateAbortedException :
-    ProfileStorageException("Subscription changed while its update was running")
-
-internal class StorageMutationTransaction {
-    private data class RollbackAction(
-        val restore: () -> Boolean,
-        val failureMessage: String,
-    )
-
-    private val rollbackActions = mutableListOf<RollbackAction>()
-
-    fun mutate(
-        change: () -> Boolean,
-        restore: () -> Boolean,
-        failureMessage: String,
-    ) {
-        rollbackActions.add(RollbackAction(restore, failureMessage))
-        if (!change()) throw ProfileStorageException(failureMessage)
-    }
-
-    fun rollback(failure: Throwable) {
-        rollbackActions.asReversed().forEach { action ->
-            try {
-                if (!action.restore()) {
-                    failure.addSuppressed(
-                        ProfileStorageException("Rollback failed: ${action.failureMessage}"),
-                    )
-                }
-            } catch (rollbackFailure: Throwable) {
-                failure.addSuppressed(rollbackFailure)
-            }
-        }
-    }
-}
-
-internal fun <T> runStorageMutationTransaction(
-    block: StorageMutationTransaction.() -> T,
-): T {
-    val transaction = StorageMutationTransaction()
-    return try {
-        transaction.block()
-    } catch (failure: Throwable) {
-        transaction.rollback(failure)
-        throw failure
-    }
-}
-
 object MmkvManager {
 
     //region private
@@ -543,7 +494,7 @@ object MmkvManager {
 
         withProfileIndexLock {
             val updatedSubscription = subscriptionUpdate?.let { update ->
-                mergeSubscriptionUpdate(subscriptionId, update.expected, update.replacement, update.replacement.lastUpdated)
+                prepareSubscriptionUpdate(subscriptionId, update.expected, update.replacement, update.replacement.lastUpdated)
             }
             val replacedServers = if (append) {
                 emptyList()
@@ -920,7 +871,7 @@ object MmkvManager {
     ): Boolean {
         return try {
             withProfileIndexLock {
-                val updated = mergeSubscriptionUpdate(guid, expected, replacement, updatedAt)
+                val updated = prepareSubscriptionUpdate(guid, expected, replacement, updatedAt)
                 runStorageMutationTransaction {
                     writeSubscriptionPayload(guid, updated)
                 }
@@ -936,21 +887,19 @@ object MmkvManager {
     }
 
     // Caller holds the profile index lock across validation and persistence.
-    private fun mergeSubscriptionUpdate(
+    private fun prepareSubscriptionUpdate(
         guid: String,
         expected: SubscriptionItem,
         replacement: SubscriptionItem,
         updatedAt: Long?,
     ): SubscriptionItem {
-        val current = decodeSubscription(guid) ?: throw SubscriptionUpdateAbortedException()
-        if (!SubscriptionUpdateGuard.canCommit(guid in decodeSubsListForWrite(), current, expected) ||
-            (updatedAt != null && current.lastUpdated != expected.lastUpdated)
-        ) {
-            throw SubscriptionUpdateAbortedException()
-        }
-        // Wall-clock time may move backwards. Reject stale refreshes by their expected state,
-        // not by ordering timestamps; a settings edit never owns this metadata.
-        return replacement.copy(lastUpdated = updatedAt ?: current.lastUpdated)
+        return SubscriptionUpdateGuard.prepare(
+            isIndexed = guid in decodeSubsListForWrite(),
+            current = decodeSubscription(guid),
+            expected = expected,
+            replacement = replacement,
+            updatedAt = updatedAt,
+        ) ?: throw SubscriptionUpdateAbortedException()
     }
 
     /**
