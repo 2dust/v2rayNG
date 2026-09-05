@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.VisualTransformation
@@ -64,6 +66,7 @@ fun CollapsiblePreferenceGroupHeader(
         modifier = modifier
             .fillMaxWidth()
             .semantics {
+                heading()
                 contentDescription = groupDescription
             }
             .clickable(role = Role.Button) { onExpandedChange(!expanded) }
@@ -260,9 +263,7 @@ fun SettingsSwitchItem(
         title = title,
         description = summary,
         enabled = enabled,
-        // Compose 1.11 emits only CHECKED for an implicit switch state. TalkBack versions
-        // expecting STATE_DESCRIPTION miss that change. Keep this observable description
-        // until the native toggle event delivers feedback on those TalkBack versions.
+        // An observable state description provides native feedback without moving focus.
         interactionModifier = Modifier
             .semantics { stateDescription = checkedDescription }
             .toggleable(
@@ -276,7 +277,9 @@ fun SettingsSwitchItem(
             Switch(
                 checked = checked,
                 onCheckedChange = null,
-                modifier = Modifier.scale(0.8f),
+                // Preserve the previous switch footprint while the row owns its input.
+                modifier = Modifier.scale(0.8f)
+                    .then(if (enabled) Modifier.minimumInteractiveComponentSize() else Modifier),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
