@@ -431,6 +431,30 @@ object SettingsManager {
     }
 
     /**
+     * Whether app-owned HTTP requests must use the running Xray core because no
+     * local proxy is available. Root modes retain their forced local proxy path.
+     */
+    fun shouldUseCoreForAppRequests(): Boolean = shouldUseCoreForAppRequests(
+        vpnMode = isVpnMode(),
+        usingHevTun = isUsingHevTun(),
+        rootMode = isRootMode(),
+        rootLanSharing = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING, false),
+        localProxyEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true),
+    )
+
+    internal fun shouldUseCoreForAppRequests(
+        vpnMode: Boolean,
+        usingHevTun: Boolean,
+        rootMode: Boolean,
+        rootLanSharing: Boolean,
+        localProxyEnabled: Boolean,
+    ): Boolean = vpnMode &&
+        !usingHevTun &&
+        !rootMode &&
+        !rootLanSharing &&
+        !localProxyEnabled
+
+    /**
      *  Check if process routing can be used.
      */
     fun canUseProcessRouting(): Boolean {

@@ -363,7 +363,7 @@ object CoreServiceManager {
 
             ensureActive()
             val result = SpeedtestManager.buildConnectionTestResult(time, errorStr) {
-                val fetchViaCore = if (SettingsManager.isVpnMode() && !SettingsManager.isUsingHevTun()) {
+                val fetchViaCore = if (SettingsManager.shouldUseCoreForAppRequests()) {
                     { url: String ->
                         coreController.getUrlContent(url, currentOutboundTag())
                     }
@@ -387,9 +387,7 @@ object CoreServiceManager {
     private fun downloadUrlThroughCore(request: CoreUrlDownloadRequest): Int {
         if (
             !isRunning() ||
-            !SettingsManager.isVpnMode() ||
-            SettingsManager.isUsingHevTun() ||
-            MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+            !SettingsManager.shouldUseCoreForAppRequests()
         ) {
             return Activity.RESULT_CANCELED
         }
