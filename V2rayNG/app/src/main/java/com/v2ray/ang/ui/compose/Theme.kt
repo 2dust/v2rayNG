@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.enums.AppThemeMode
 import com.v2ray.ang.repository.ThemeRepository
 import kotlinx.coroutines.flow.StateFlow
 
@@ -153,19 +154,6 @@ val toastTextColor = Color.White
 // Composition locals
 val LocalAppColors = staticCompositionLocalOf { LightSemanticColors }
 val LocalDarkTheme = staticCompositionLocalOf { false }
-
-/**
- * App theme mode enumeration
- */
-enum class AppThemeMode(val value: String) {
-    System("0"),
-    Light("1"),
-    Dark("2");
-
-    companion object {
-        fun from(raw: String?): AppThemeMode = entries.firstOrNull { it.value == raw } ?: System
-    }
-}
 
 /**
  * UI-facing facade over [ThemeRepository], which owns the single source of truth for theming.

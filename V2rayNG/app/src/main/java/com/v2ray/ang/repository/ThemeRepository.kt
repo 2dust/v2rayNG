@@ -2,8 +2,8 @@ package com.v2ray.ang.repository
 
 import android.os.Build
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.enums.AppThemeMode
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.compose.AppThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

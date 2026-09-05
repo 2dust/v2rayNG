@@ -21,7 +21,13 @@ object SettingsChangeManager {
         AppConfig.PREF_UI_MODE_NIGHT,
         AppConfig.PREF_DYNAMIC_COLOR,
         AppConfig.PREF_IS_BOOTED,
+        AppConfig.PREF_DELAY_TEST_URL,
+        AppConfig.PREF_REAL_PING_CONCURRENCY,
+        AppConfig.PREF_IP_API_URL
     )
+
+    /** Whether the given key only affects UI and never requires a core restart. */
+    fun isUiOnly(key: String): Boolean = key in uiOnlyKeys
 
     /**
      * Called when a setting value changes.
