@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +78,7 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -115,8 +117,20 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             domainStrategyState = domainStrategyState,
             onBackClick = { finish() },
             onAddRule = { startActivity(Intent(this, RoutingEditActivity::class.java)) },
-            onEditRule = { rulesetId ->
-                startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("ruleset_id", rulesetId))
+            onEditRule = { position ->
+                startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
+            },
+            onRemoveRule = { ruleId ->
+                lifecycleScope.launch {
+                    try {
+                        viewModel.remove(ruleId)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "Failed to delete routing rule $ruleId", e)
+                        toastError(R.string.toast_failure)
+                    }
+                }
             },
             onDomainStrategySelected = { value ->
                 MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
@@ -208,7 +222,8 @@ fun RoutingSettingScreen(
     domainStrategyState: MutableStateFlow<String>,
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
-    onEditRule: (String) -> Unit,
+    onEditRule: (Int) -> Unit,
+    onRemoveRule: (String) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
     onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
@@ -219,7 +234,7 @@ fun RoutingSettingScreen(
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
-    var deleteRuleId by remember { mutableStateOf<String?>(null) }
+    var deleteRuleId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
@@ -307,7 +322,10 @@ fun RoutingSettingScreen(
                     ) {
                         RoutingRulesetItem(
                             ruleset = ruleset,
-                            onEdit = { onEditRule(ruleset.id) },
+                            onEdit = {
+                                val position = viewModel.getAll().indexOfFirst { it.id == ruleset.id }
+                                if (position >= 0) onEditRule(position)
+                            },
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
                                 viewModel.update(ruleset.id, updated)
@@ -325,13 +343,12 @@ fun RoutingSettingScreen(
         }
     }
 
-    deleteRuleId?.let { ruleId ->
-        val ruleName = rulesets.firstOrNull { it.id == ruleId }?.remarks.orEmpty()
+    rulesets.firstOrNull { it.id == deleteRuleId }?.let { rule ->
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_routing_rule_named, ruleName),
+            message = stringResource(R.string.confirm_delete_routing_rule_named, rule.remarks.orEmpty()),
             onConfirm = {
-                viewModel.remove(ruleId)
                 deleteRuleId = null
+                onRemoveRule(rule.id)
             },
             onDismiss = { deleteRuleId = null }
         )
@@ -352,15 +369,15 @@ fun RoutingSettingScreen(
 }
 
 @Composable
-internal fun RoutingRulesetItem(
+private fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
     onEnabledChange: (Boolean) -> Unit,
     onDelete: () -> Unit,
-    reorderIndex: Int? = null,
-    itemCount: Int = 0,
-    onMove: (ReorderCommand) -> Boolean = { false },
-    onFeedback: (String) -> Unit = {},
+    reorderIndex: Int,
+    itemCount: Int,
+    onMove: (ReorderCommand) -> Boolean,
+    onFeedback: (String) -> Unit,
 ) {
     val enabled = ruleset.enabled
     val toggleLabel = stringResource(
@@ -368,11 +385,11 @@ internal fun RoutingRulesetItem(
     )
     val ruleName = ruleset.remarks.orEmpty()
     val outboundTag = ruleset.outboundTag.ifBlank { AppConfig.TAG_PROXY }
-    val routeDescription = when {
-        outboundTag.equals(AppConfig.TAG_BLOCKED, ignoreCase = true) ->
+    val routeDescription = when (outboundTag) {
+        AppConfig.TAG_BLOCKED ->
             stringResource(R.string.acc_routing_rule_blocked)
 
-        outboundTag.equals(AppConfig.TAG_DIRECT, ignoreCase = true) ->
+        AppConfig.TAG_DIRECT ->
             stringResource(R.string.acc_routing_rule_routed_directly)
 
         else -> stringResource(R.string.acc_routing_rule_routed_through, outboundTag)
@@ -400,11 +417,8 @@ internal fun RoutingRulesetItem(
             action = { onDelete(); true },
         ),
     )
-    val accessibilityActions = itemActions + if (reorderIndex != null) {
+    val accessibilityActions = itemActions +
         reorderAccessibilityActions(reorderIndex, itemCount, onFeedback, onMove)
-    } else {
-        emptyList()
-    }
 
     Row(
         modifier = Modifier
@@ -472,10 +486,7 @@ internal fun RoutingRulesetItem(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_edit_24dp),
-                        contentDescription = stringResource(
-                            R.string.acc_edit_routing_rule_named,
-                            ruleName
-                        )
+                        contentDescription = null
                     )
                 }
                 IconButton(
@@ -484,10 +495,7 @@ internal fun RoutingRulesetItem(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_delete_24dp),
-                        contentDescription = stringResource(
-                            R.string.acc_delete_routing_rule_named,
-                            ruleName
-                        )
+                        contentDescription = null
                     )
                 }
             }
