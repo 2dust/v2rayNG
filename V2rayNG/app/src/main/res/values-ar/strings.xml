@@ -249,7 +249,7 @@
 
     <string name="title_pref_socks_port">منفذ البروكسي المحلي</string>
     <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
-    <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
+    <string name="summary_pref_enable_local_proxy">عند التعطيل، تستخدم تحديثات الاشتراكات والإجراءات المشابهة نفق VPN النشط</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">مصادقة SOCKS5 ليست آمنة تمامًا عند استخدام UDP.</string>
     <string name="summary_pref_socks_port">منفذ البروكسي المحلي</string>

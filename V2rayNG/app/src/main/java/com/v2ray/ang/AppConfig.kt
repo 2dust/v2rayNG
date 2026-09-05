@@ -196,6 +196,7 @@ object AppConfig {
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
+    const val MSG_DOWNLOAD_URL = 9
 
     /** Notification channel IDs and names. */
     // Use a new ID because Android does not let an app raise an existing channel's importance.

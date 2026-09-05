@@ -6,8 +6,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.ResultReceiver
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.CoreUrlDownloadRequest
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.service.CoreTestService
@@ -39,6 +41,25 @@ object MessageHelper {
         content: Serializable,
         onResult: (handled: Boolean) -> Unit,
     ) {
+        sendOrderedMsg2Service(ctx, messageIntent(AppConfig.BROADCAST_ACTION_SERVICE, what, content), onResult)
+    }
+
+    internal fun sendCoreUrlDownloadRequest(
+        ctx: Context,
+        request: CoreUrlDownloadRequest,
+        resultReceiver: ResultReceiver,
+        onResult: (accepted: Boolean) -> Unit,
+    ) {
+        val intent = messageIntent(AppConfig.BROADCAST_ACTION_SERVICE, AppConfig.MSG_DOWNLOAD_URL, request)
+            .putExtra(CoreUrlDownloadRequest.EXTRA_RESULT_RECEIVER, resultReceiver)
+        sendOrderedMsg2Service(ctx, intent, onResult)
+    }
+
+    private fun sendOrderedMsg2Service(
+        ctx: Context,
+        intent: Intent,
+        onResult: (handled: Boolean) -> Unit,
+    ) {
         val resultReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 onResult(resultCode == Activity.RESULT_OK)
@@ -46,7 +67,7 @@ object MessageHelper {
         }
         try {
             ctx.sendOrderedBroadcast(
-                messageIntent(AppConfig.BROADCAST_ACTION_SERVICE, what, content),
+                intent,
                 null,
                 resultReceiver,
                 null,

@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.dto.SubscriptionUpdateResult
@@ -488,37 +489,17 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
-            var configText = try {
-                val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(
-                    UrlContentRequest(
-                        url = url,
-                        userAgent = userAgent,
-                        requestHeaders = requestHeaders,
-                        timeout = 15000,
-                        httpPort = httpPort,
-                        proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
-                    )
+            val configText = downloadSubscription(
+                UrlContentRequest(
+                    url = url,
+                    userAgent = userAgent,
+                    requestHeaders = requestHeaders,
+                    timeout = 15000,
+                    httpPort = SettingsManager.getHttpPort(),
+                    proxyUsername = proxyUsername,
+                    proxyPassword = proxyPassword,
                 )
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
-                ""
-            }
-            if (configText.isEmpty()) {
-                configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(
-                        UrlContentRequest(
-                            url = url,
-                            userAgent = userAgent,
-                            requestHeaders = requestHeaders
-                        )
-                    )
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
-                    ""
-                }
-            }
+            )
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
@@ -540,6 +521,40 @@ object AngConfigManager {
             LogUtil.e(AppConfig.TAG, "Failed to update config via subscription", e)
             return SubscriptionUpdateResult(failureCount = 1)
         }
+    }
+
+    private fun downloadSubscription(request: UrlContentRequest): String {
+        val directRequest = request.copy(
+            httpPort = 0,
+            proxyUsername = null,
+            proxyPassword = null,
+        )
+        val fallbackRequests = when (
+            val result = CoreDownloadManager.fetchText(
+                AngApplication.application,
+                request,
+                includeDefaultUserAgent = true,
+            )
+        ) {
+            is CoreFetchResult.Success -> return result.value
+            CoreFetchResult.Failed -> return ""
+            CoreFetchResult.Unavailable -> listOf(directRequest)
+            CoreFetchResult.NotApplicable -> if (request.httpPort == 0) {
+                listOf(request)
+            } else {
+                listOf(request, directRequest)
+            }
+        }
+
+        for (candidate in fallbackRequests) {
+            try {
+                val content = HttpUtil.getUrlContentWithUserAgent(candidate)
+                if (content.isNotEmpty()) return content
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content", e)
+            }
+        }
+        return ""
     }
 
     /**
