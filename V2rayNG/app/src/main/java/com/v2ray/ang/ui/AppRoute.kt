@@ -102,11 +102,13 @@ sealed interface AppRoute : BaseRoute {
                 .putExtra(EXTRA_RUNNING, isRunning)
     }
 
-    /** Routing rule editor; [position] < 0 creates a new rule. */
-    data class RoutingEdit(val position: Int = -1) : AppRoute {
+    /**
+     * Routing rule editor. Empty [ruleId] creates a new rule.
+     */
+    data class RoutingEdit(val ruleId: String = "") : AppRoute {
         override fun intent(context: Context) =
             Intent(context, RoutingEditActivity::class.java)
-                .putExtra(EXTRA_POSITION, position)
+                .putExtra(EXTRA_RULE_ID, ruleId)
     }
 
     /** Subscription editor; empty [subId] creates a new subscription. */
@@ -167,8 +169,8 @@ sealed interface AppRoute : BaseRoute {
         /** Whether the edited profile is currently active. */
         const val EXTRA_RUNNING = "isRunning"
 
-        /** Routing ruleset index. */
-        const val EXTRA_POSITION = "position"
+        /** Routing rule identifier. */
+        const val EXTRA_RULE_ID = "ruleId"
 
         /** Subscription id being edited. */
         const val EXTRA_SUB_GUID = "subId"

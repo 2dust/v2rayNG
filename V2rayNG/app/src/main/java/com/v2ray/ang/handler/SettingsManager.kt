@@ -76,10 +76,12 @@ object SettingsManager {
      * Reset routing rulesets from presets.
      * @param context The application context.
      * @param type The routing preset type.
+     * @return true if successful, false if preset file not found.
      */
-    fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType) {
-        val rulesetList = getPresetRoutingRulesets(context, type) ?: return
+    fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType): Boolean {
+        val rulesetList = getPresetRoutingRulesets(context, type) ?: return false
         resetRoutingRulesetsCommon(rulesetList)
+        return true
     }
 
     /**
@@ -590,5 +592,4 @@ object SettingsManager {
             }
         }
     }
-
 }
