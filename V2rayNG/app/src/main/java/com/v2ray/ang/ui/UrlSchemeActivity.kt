@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
@@ -82,10 +81,7 @@ class UrlSchemeActivity : BaseComponentActivity() {
                     if (count + countSub > 0) {
                         toast(R.string.import_subscription_success)
                     } else {
-                        toast(
-                            R.string.import_subscription_failure,
-                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                        )
+                        toast(R.string.import_subscription_failure)
                     }
                 }
             }

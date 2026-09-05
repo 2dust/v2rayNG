@@ -77,6 +77,7 @@ class AppSnackbarController(
     val hostState: SnackbarHostState,
     private val scope: CoroutineScope,
 ) {
+    internal val liveRegionMessages = LiveRegionMessageState()
     private var currentId = 0
     private var currentShowTime = 0L
 
@@ -134,29 +135,24 @@ fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val liveRegionMessageTracker = remember { LiveRegionMessageTracker() }
-    var liveRegionMessage by remember { mutableStateOf<LiveRegionMessage?>(null) }
+    val liveRegionMessages = controller.liveRegionMessages
 
     LaunchedEffect(controller, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            AppSnackbarManager.messages.collect { event ->
-                controller.show(
-                    message = event.message,
-                    type = event.type,
-                    long = event.long
-                )
-                liveRegionMessageTracker.next(event)?.let { liveRegionMessage = it }
+            try {
+                AppSnackbarManager.messages.collect { event ->
+                    controller.show(
+                        message = event.message,
+                        type = event.type,
+                        long = event.long
+                    )
+                    liveRegionMessages.offer(event)
+                }
+            } finally {
+                liveRegionMessages.clear()
             }
         }
     }
-
-    LaunchedEffect(liveRegionMessage?.id) {
-        val id = liveRegionMessage?.id ?: return@LaunchedEffect
-        delay(LiveRegionMessageLifetimeMs)
-        if (liveRegionMessage?.id == id) liveRegionMessage = null
-    }
-
-    AccessibilityLiveRegion(liveRegionMessage)
 }
 
 internal data class LiveRegionMessage(
@@ -165,32 +161,54 @@ internal data class LiveRegionMessage(
     val mode: AccessibilityLiveRegionMode,
 )
 
-internal class LiveRegionMessageTracker(
+internal class LiveRegionMessageState(
     private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
 ) {
+    var current by mutableStateOf<LiveRegionMessage?>(null)
+        private set
+
+    private val pending = ArrayDeque<LiveRegionMessage>()
     private var nextId = 0L
     private var lastMessage: String? = null
     private var lastMode: AccessibilityLiveRegionMode? = null
     private var lastUpdateAt = 0L
 
-    fun next(event: AppSnackbarMessage): LiveRegionMessage? {
+    fun offer(event: AppSnackbarMessage) {
         val mode = event.liveRegionMode
         val text = (event.accessibilityMessage ?: event.message).toString()
-        if (text.isBlank()) return null
+        if (text.isBlank()) return
 
         val now = elapsedRealtime()
         val duplicate = text == lastMessage && mode == lastMode &&
             now - lastUpdateAt < DuplicateLiveRegionMessageWindowMs
-        if (duplicate) return null
+        if (duplicate) return
 
         lastMessage = text
         lastMode = mode
         lastUpdateAt = now
-        return LiveRegionMessage(
+        val message = LiveRegionMessage(
             id = ++nextId,
             text = text,
             mode = mode,
         )
+        if (current == null) current = message else pending.addLast(message)
+    }
+
+    // Hold each update for its semantics lifetime rather than cancelling publication when another
+    // message arrives. Urgent pending results go first; the accessibility service still owns speech.
+    fun advance(id: Long) {
+        if (current?.id != id) return
+        current = pending.firstOrNull { it.mode == AccessibilityLiveRegionMode.ASSERTIVE }
+            ?: pending.firstOrNull()
+        current?.let(pending::remove)
+    }
+
+    fun clear() {
+        current = null
+        pending.clear()
+        lastMessage = null
+        lastMode = null
+        lastUpdateAt = 0L
     }
 }
 
@@ -224,6 +242,14 @@ fun AppSnackbarHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
+    val liveRegionMessages = LocalAppSnackbar.current.liveRegionMessages
+    val liveRegionMessage = liveRegionMessages.current
+    LaunchedEffect(liveRegionMessage?.id) {
+        val id = liveRegionMessage?.id ?: return@LaunchedEffect
+        delay(LiveRegionMessageLifetimeMs)
+        liveRegionMessages.advance(id)
+    }
+
     BoxWithConstraints(modifier = modifier.clearAndSetSemantics { }) {
         val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
         val density = LocalDensity.current
@@ -280,4 +306,5 @@ fun AppSnackbarHost(
             }
         }
     }
+    AccessibilityLiveRegion(liveRegionMessage)
 }

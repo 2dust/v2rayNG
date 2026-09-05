@@ -8,7 +8,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
@@ -40,10 +39,7 @@ class ServerHysteria2Activity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(
-                R.string.server_lab_id3,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_id3)
             return false
         }
         if (config.security.isNullOrBlank()) {

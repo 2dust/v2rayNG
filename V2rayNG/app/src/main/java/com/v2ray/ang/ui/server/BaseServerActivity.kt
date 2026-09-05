@@ -34,7 +34,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
@@ -307,20 +306,14 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 Button(
                     onClick = {
                         if (state.address.isBlank()) {
-                            context.toast(
-                                R.string.server_lab_address,
-                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                            )
+                            context.toast(R.string.server_lab_address)
                             return@Button
                         }
                         if (
                             state.configType != EConfigType.HYSTERIA2 &&
                             (state.port.toIntOrNull() ?: 0) <= 0
                         ) {
-                            context.toast(
-                                R.string.server_lab_port,
-                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                            )
+                            context.toast(R.string.server_lab_port)
                             return@Button
                         }
                         val temp = buildProfileItem()
@@ -331,10 +324,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                                     CertificateFingerprintManager.fetchForManualFill(temp)
                                 }
                                 if (sha256.isNullOrBlank()) {
-                                    context.toast(
-                                        R.string.toast_fetch_cert_sha256_failed,
-                                        liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                                    )
+                                    context.toast(R.string.toast_fetch_cert_sha256_failed)
                                 } else {
                                     state.pinnedCA256 = sha256
                                     context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
@@ -376,27 +366,18 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     protected fun validateBasicConfig(state: ServerUiState): Boolean {
         if (state.remarks.isBlank()) {
-            toast(
-                R.string.server_lab_remarks,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_remarks)
             return false
         }
         if (state.address.isBlank()) {
-            toast(
-                R.string.server_lab_address,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_address)
             return false
         }
         if (
             state.configType != EConfigType.HYSTERIA2 &&
             (state.port.toIntOrNull() ?: 0) <= 0
         ) {
-            toast(
-                R.string.server_lab_port,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_port)
             return false
         }
         return true
@@ -410,10 +391,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             if (config.configType == EConfigType.VMESS ||
                 config.configType == EConfigType.VLESS
             ) {
-                toast(
-                    R.string.server_lab_id,
-                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                )
+                toast(R.string.server_lab_id)
                 return false
             }
 
@@ -421,10 +399,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 config.configType == EConfigType.SHADOWSOCKS ||
                 config.configType == EConfigType.HYSTERIA2
             ) {
-                toast(
-                    R.string.server_lab_id3,
-                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                )
+                toast(R.string.server_lab_id3)
                 return false
             }
         }
@@ -433,24 +408,15 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             config.configType == EConfigType.TROJAN &&
             config.security.isNullOrBlank()
         ) {
-            toast(
-                R.string.server_lab_stream_security,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_stream_security)
             return false
         }
         if (!config.xhttpExtra.isNullOrBlank() && JsonUtil.parseString(config.xhttpExtra) == null) {
-            toast(
-                R.string.server_lab_xhttp_extra,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_xhttp_extra)
             return false
         }
         if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
-            toast(
-                R.string.server_lab_final_mask,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_final_mask)
             return false
         }
         return true
@@ -536,10 +502,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     private fun deleteServer(guid: String) {
         if (guid.isEmpty() || guid == MmkvManager.getSelectServer()) {
-            toast(
-                R.string.toast_action_not_allowed,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.toast_action_not_allowed)
             return
         }
         MmkvManager.removeServer(guid)

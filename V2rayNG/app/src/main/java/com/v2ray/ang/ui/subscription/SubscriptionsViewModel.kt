@@ -6,7 +6,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
@@ -85,10 +84,7 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
 
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
-                        toast(
-                            R.string.title_update_subscription_no_subscription,
-                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                        )
+                        toast(R.string.title_update_subscription_no_subscription)
 
                     result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
                         toast(
@@ -97,7 +93,6 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
                                 result.configCount,
                                 result.configCount,
                             ),
-                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
                         )
 
                     else ->
@@ -109,7 +104,6 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
                                 result.failureCount,
                                 result.skipCount,
                             ),
-                            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
                         )
                 }
                 reload()

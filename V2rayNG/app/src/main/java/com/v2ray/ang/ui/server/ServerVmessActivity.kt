@@ -8,7 +8,6 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
@@ -48,10 +47,7 @@ class ServerVmessActivity : BaseServerActivity() {
 
     override fun validateProtocolConfig(config: ProfileItem): Boolean {
         if (config.password.isNullOrBlank()) {
-            toast(
-                R.string.server_lab_id,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_id)
             return false
         }
         return true

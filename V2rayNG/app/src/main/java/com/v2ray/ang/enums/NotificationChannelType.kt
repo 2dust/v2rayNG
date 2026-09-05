@@ -1,6 +1,5 @@
 package com.v2ray.ang.enums
 
-import android.app.NotificationManager
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.v2ray.ang.R
@@ -13,8 +12,6 @@ enum class NotificationChannelType(
     val channelId: String,
     @StringRes val channelNameRes: Int,
     val notificationId: Int,
-    val importance: Int = NotificationManager.IMPORTANCE_LOW,
-    val priority: Int = NotificationCompat.PRIORITY_LOW,
     val category: String = NotificationCompat.CATEGORY_SERVICE,
 ) {
     SUBSCRIPTION_UPDATE(

@@ -61,15 +61,15 @@ object NotificationHelper {
      * skipped when the user has disabled notifications or denied the runtime permission.
      * https://developer.android.com/guide/topics/ui/notifiers/toasts#Alternatives
      */
-    fun notifyTransientMessage(context: Context, content: CharSequence): Boolean {
-        if (content.isBlank()) return false
+    fun notifyTransientMessage(context: Context, content: CharSequence) {
+        if (content.isBlank()) return
 
         val appContext = context.applicationContext
-        if (!canPostNotifications(appContext)) return false
+        if (!canPostNotifications(appContext)) return
         val localizedContext = AppLocaleManager.localizedContext(appContext)
 
         val channelType = NotificationChannelType.TRANSIENT_MESSAGE
-        return try {
+        try {
             ensureChannelCreated(channelType, localizedContext)
             val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val contentIntent = PendingIntent.getActivity(
@@ -93,13 +93,11 @@ object NotificationHelper {
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
 
             getNotificationManager(appContext).notify(channelType.notificationId, builder.build())
-            true
         } catch (e: SecurityException) {
             LogUtil.w(
                 message = "NotificationHelper: failed to post transient message",
                 throwable = e
             )
-            false
         }
     }
 
@@ -195,7 +193,7 @@ object NotificationHelper {
             context = context,
             channelId = channelType.channelId,
             channelNameRes = channelType.channelNameRes,
-            importance = channelType.importance,
+            importance = NotificationManager.IMPORTANCE_LOW,
         )
 
     /**
@@ -223,7 +221,7 @@ object NotificationHelper {
                     configureNewChannel()
                 }
                 .also(notificationManager::createNotificationChannel)
-        } else if (notificationChannelNameNeedsUpdate(existingChannel.name, localizedName)) {
+        } else if (existingChannel.name.toString() != localizedName) {
             existingChannel.name = localizedName
             notificationManager.createNotificationChannel(existingChannel)
         }
@@ -251,7 +249,7 @@ object NotificationHelper {
             .setContentText(content)
             .setOngoing(false)
             .setOnlyAlertOnce(true)
-            .setPriority(channelType.priority)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(channelType.category)
             .apply { action?.let(::addAction) }
     }
@@ -263,21 +261,8 @@ object NotificationHelper {
             context,
             Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
-        return canPostNotification(notificationsEnabled, permissionRequired, permissionGranted)
+        return notificationsEnabled && permissionGranted
     }
 }
-
-internal fun canPostNotification(
-    notificationsEnabled: Boolean,
-    permissionRequired: Boolean,
-    permissionGranted: Boolean,
-): Boolean {
-    return notificationsEnabled && (!permissionRequired || permissionGranted)
-}
-
-internal fun notificationChannelNameNeedsUpdate(
-    existingName: CharSequence?,
-    localizedName: String,
-): Boolean = existingName?.toString() != localizedName
 
 private const val TRANSIENT_MESSAGE_TIMEOUT_MS = 10_000L
