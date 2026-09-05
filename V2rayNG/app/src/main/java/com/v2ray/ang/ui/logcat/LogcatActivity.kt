@@ -12,9 +12,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -131,7 +132,7 @@ fun LogcatScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val logs by viewModel.filteredLogs.collectAsStateWithLifecycle()
+    val logs by viewModel.logEntries.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
@@ -191,9 +192,10 @@ fun LogcatScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                viewModel.loadLogcat()
-            }) {
+            FloatingActionButton(
+                onClick = { viewModel.loadLogcat() },
+                modifier = Modifier.navigationBarsPadding()
+            ) {
                 Icon(
                     painterResource(R.drawable.ic_restore_24dp),
                     contentDescription = stringResource(R.string.acc_refresh)
@@ -213,8 +215,8 @@ fun LogcatScreen(
                     .verticalScrollbar(listState),
                 contentPadding = NavigationBarsBottomPadding()
             ) {
-                itemsIndexed(items = logs, key = { index, _ -> index }) { _, log ->
-                    LogcatItem(log = log, onLongClick = { Utils.setClipboard(context, log) })
+                items(items = logs, key = { it.key }) { log ->
+                    LogcatItem(log = log.text, onLongClick = { Utils.setClipboard(context, log.text) })
                     ItemDivider()
                 }
             }

@@ -100,8 +100,8 @@
     <string name="server_lab_reserved">Reserved (không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6 không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_mtu">MTU (không bắt buộc, mặc định 1420)</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU (không bắt buộc, mặc định của core là 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (không bắt buộc, mặc định của core là 50)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (không bắt buộc, mặc định 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (không bắt buộc, mặc định 50 ms)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
     <string name="toast_none_data">Không có gì ở đây!</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">Cài đặt VPN</string>
     <string name="title_pref_per_app_proxy">Proxy theo từng ứng dụng</string>
     <string name="summary_pref_per_app_proxy">Thông thường: ứng dụng đã chọn dùng proxy, ứng dụng chưa chọn kết nối trực tiếp;\nChế độ bỏ qua: ứng dụng đã chọn kết nối trực tiếp, ứng dụng chưa chọn dùng proxy.\nTrong trình đơn có tùy chọn tự động chọn các ứng dụng sẽ dùng proxy.</string>
-    <string name="title_pref_is_booted">Tự động kết nối khi khởi động</string>
-    <string name="summary_pref_is_booted">Tự động kết nối với máy chủ đã chọn khi khởi động; thao tác này có thể không thành công</string>
+    <string name="title_pref_is_booted">Kết nối sau khi thiết bị khởi động</string>
+    <string name="summary_pref_is_booted">Tự động kết nối với máy chủ đã chọn sau khi thiết bị khởi động. Android có thể hạn chế khởi chạy trong nền.</string>
+    <string name="title_system_vpn_settings">Cài đặt VPN hệ thống</string>
+    <string name="summary_system_vpn_settings">Mở cài đặt VPN của Android để cấu hình VPN luôn bật, nếu thiết bị này hỗ trợ.</string>
+    <string name="toast_system_vpn_settings_unavailable">Không có cài đặt VPN hệ thống.</string>
 
 
     <string name="subscription_updater_job_tips">Tác vụ sẽ chạy trong nền và thông tin tiến độ sẽ hiển thị trong thông báo.</string>

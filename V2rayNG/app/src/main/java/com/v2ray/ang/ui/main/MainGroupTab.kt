@@ -1,9 +1,11 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
@@ -11,10 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
@@ -28,32 +29,28 @@ fun GroupTabBar(
     onTabClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    PrimaryScrollableTabRow(
-        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
-        modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-        contentColor = MaterialTheme.colorScheme.onSurface,
+    val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
+    ScrollableTabRow(
+        selectedTabIndex = selectedIndex,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
         edgePadding = 16.dp,
-        minTabWidth = 56.dp,
-        indicator = {
-            TabRowDefaults.PrimaryIndicator(
-                modifier = Modifier
-                    .tabIndicatorOffset(
-                        selectedTabIndex = selectedTabIndex.coerceIn(0, groups.lastIndex),
-                        matchContentSize = true
-                    )
-                    .clip(RoundedCornerShape(3.dp)),
-                width = Dp.Unspecified,
+        indicator = { tabPositions ->
+            TabRowDefaults.SecondaryIndicator(
+                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
                 color = MaterialTheme.colorScheme.secondary
             )
-        },
-        divider = {}
+        }
     ) {
         groups.forEachIndexed { index, group ->
+            val serverFlow = remember(group.id, mainViewModel) {
+                mainViewModel.serversForGroup(group.id)
+            }
             GroupTabItem(
                 group = group,
-                selected = index == selectedTabIndex,
-                serverFlowProvider = { mainViewModel.serversForGroup(group.id) },
+                selected = index == selectedIndex,
+                serverFlow = serverFlow,
                 onClick = { onTabClick(index) }
             )
         }
@@ -64,20 +61,23 @@ fun GroupTabBar(
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
-    serverFlowProvider: () -> StateFlow<List<ServersCache>>,
+    serverFlow: StateFlow<List<ServersCache>>,
     onClick: () -> Unit
 ) {
-    val serverFlow = remember(group.id) { serverFlowProvider() }
     val servers by serverFlow.collectAsStateWithLifecycle()
+    val text = if (group.id.isEmpty()) {
+        group.remarks
+    } else {
+        "${group.remarks} (${servers.size})"
+    }
+
     Tab(
         selected = selected,
         onClick = onClick,
+        modifier = Modifier
+            .widthIn(min = 56.dp)
+            .heightIn(min = 48.dp),
         text = {
-            val text = if (group.id.isEmpty()) {
-                group.remarks
-            } else {
-                "${group.remarks} (${servers.size})"
-            }
             Text(
                 text = text,
                 maxLines = 1,

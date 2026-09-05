@@ -100,8 +100,8 @@
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی محلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرض 1420)</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرض هسته 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرض هسته 50)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرض 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرض 50 میلی‌ثانیه)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
     <string name="toast_none_data">هیچ داڌه ای وۊجۊڌ نڌاره</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">سامووا VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی و ری برنومه</string>
     <string name="summary_pref_per_app_proxy">پوی وولاتی: برنومه پسند وابیڌه وا ی پروکسی منپیز ابۊ، برنومه پسند نوابیڌه موستقیمن منپیز ابۊ.\nحالت دور زیڌن: برنومه پسند وابیڌه موستقیمن منپیز ابۊ، برنومه پسند نوابیڌه وا ی پروکسی منپیز ابۊ.\nپسند خوتکار برنومه یلی ک وا ی پروکسی منپیز ابۊن من نومگه امکووݩ پذیر هڌ.</string>
-    <string name="title_pref_is_booted">منپیز خوتکار مجال ره ونی</string>
-    <string name="summary_pref_is_booted">مجال ره وندن، خوساخوس و سرور پسند بیڌه منپیز ابۊ که گاشڌ نا مووفق بۊ.</string>
+    <string name="title_pref_is_booted">منپیز بئڌ ره وندن دسگا</string>
+    <string name="summary_pref_is_booted">بئڌ ره وندن دسگا، خوساخوس و سرور پسند بیڌه منپیز ابۊ. Android گاشڌ ره وندن من پس زمینه ن مئدۊد کونه.</string>
+    <string name="title_system_vpn_settings">سامووا VPN سیستوم</string>
+    <string name="summary_system_vpn_settings">سامووا VPN من Android ن وا کۊنین سی ساموو کردن VPN همیشه ره وست، ٱر دسگا زس پشتیبانی اکونه.</string>
+    <string name="toast_system_vpn_settings_unavailable">سامووا VPN سیستوم من دسرس نین.</string>
 
 
     <string name="subscription_updater_job_tips">وزیفه من پس زمینه کار اکونه وو ایلاعات پؽشرفت من اعلان نشووݩ داڌه ابۊ.</string>

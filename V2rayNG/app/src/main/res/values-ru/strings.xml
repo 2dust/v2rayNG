@@ -101,7 +101,7 @@
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (необязательно, по умолчанию 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50 мс)</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
     <string name="toast_none_data">Ничего нет</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">Настройки VPN</string>
     <string name="title_pref_per_app_proxy">Прокси для выбранных приложений</string>
     <string name="summary_pref_per_app_proxy">Основной: выбранное приложение соединяется через прокси, не выбранное — напрямую;\nРежим обхода: выбранное приложение соединяется напрямую, не выбранное — через прокси.\nВ меню можно автоматически выбрать приложения, которые должны использовать прокси.</string>
-    <string name="title_pref_is_booted">Автоподключение при запуске</string>
-    <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу при запуске приложения (может оказаться неудачным)</string>
+    <string name="title_pref_is_booted">Подключаться после загрузки устройства</string>
+    <string name="summary_pref_is_booted">Автоматически подключаться к выбранному серверу после загрузки устройства. Android может ограничивать запуск в фоне.</string>
+    <string name="title_system_vpn_settings">Системные настройки VPN</string>
+    <string name="summary_system_vpn_settings">Открыть настройки VPN в Android для включения постоянного VPN-подключения, если устройство его поддерживает.</string>
+    <string name="toast_system_vpn_settings_unavailable">Системные настройки VPN недоступны.</string>
 
 
     <string name="subscription_updater_job_tips">Задача будет выполняться в фоновом режиме, информация о ходе выполнения будет отображаться в уведомлении.</string>

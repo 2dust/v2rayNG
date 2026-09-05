@@ -113,7 +113,13 @@ object CoreConfigManager {
             }
         } else {
             json.remove("stats")
-            json.remove("policy")
+            // Keep user-defined policy levels, only strip the stats-related system block
+            json.get("policy")?.takeIf { it.isJsonObject }?.asJsonObject?.let { policy ->
+                policy.remove("system")
+                if (policy.entrySet().isEmpty()) {
+                    json.remove("policy")
+                }
+            }
         }
 
         if (!needTun()) {
@@ -511,7 +517,7 @@ object CoreConfigManager {
             inbound1.listen = AppConfig.LOOPBACK
         }
         inbound1.port = socksPort
-        inbound1.settings?.udp = MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_ENABLE_UDP, true)
+        inbound1.settings?.udp = MmkvManager.decodeSettingsBool(AppConfig.PREF_SOCKS_ENABLE_UDP, AppConfig.DEFAULT_SOCKS_ENABLE_UDP)
         if (socksUsername != null && socksPassword != null) {
             inbound1.settings?.auth = "password"
             inbound1.settings?.accounts = listOf(
@@ -709,7 +715,7 @@ object CoreConfigManager {
     private fun applySpeedDisabled(v2rayConfig: V2rayConfig) {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) {
             v2rayConfig.stats = null
-            v2rayConfig.policy = null
+            v2rayConfig.policy?.system = null
         }
     }
 
@@ -1052,7 +1058,7 @@ object CoreConfigManager {
      * Resolve outbound domains to IPs and write resolved hosts to DNS map.
      */
     private fun resolveOutboundDomainsToHosts(v2rayConfig: V2rayConfig) {
-        if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, "1") != "1") {
+        if (MmkvManager.decodeSettingsString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, AppConfig.DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD) != "1") {
             return
         }
 

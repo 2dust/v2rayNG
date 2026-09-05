@@ -100,8 +100,8 @@
     <string name="server_lab_reserved">Reserved (可选，逗号隔开)</string>
     <string name="server_lab_local_address">本地地址 (可选 IPv4/IPv6，逗号隔开)</string>
     <string name="server_lab_local_mtu">MTU（可选，默认 1420）</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU（可选，核心默认 1350）</string>
-    <string name="server_lab_kcp_tti">mKCP TTI（可选，核心默认 50）</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU（可选，默认 1350）</string>
+    <string name="server_lab_kcp_tti">mKCP TTI（可选，默认 50 毫秒）</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
     <string name="toast_none_data">没有数据</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">VPN 设置</string>
     <string name="title_pref_per_app_proxy">分应用代理</string>
     <string name="summary_pref_per_app_proxy">常规：勾选的应用使用代理，未勾选的应用直连；\n绕行模式：勾选的应用直连，未勾选的应用使用代理。\n菜单中可自动选择需要使用代理的应用。</string>
-    <string name="title_pref_is_booted">开机时自动连接</string>
-    <string name="summary_pref_is_booted">开机时自动连接选择的服务器，可能会不成功</string>
+    <string name="title_pref_is_booted">设备启动后自动连接</string>
+    <string name="summary_pref_is_booted">设备启动后自动连接到所选服务器。Android 可能会限制后台启动。</string>
+    <string name="title_system_vpn_settings">系统 VPN 设置</string>
+    <string name="summary_system_vpn_settings">打开 Android VPN 设置，配置始终开启的 VPN（如果此设备支持）。</string>
+    <string name="toast_system_vpn_settings_unavailable">系统 VPN 设置不可用。</string>
 
 
     <string name="subscription_updater_job_tips">任务将在后台运行，在通知中会显示进度信息</string>

@@ -97,7 +97,7 @@ class TProxyService(
             appendLine("misc:")
             appendLine("  tcp-read-write-timeout: ${tcpTimeout * 1000}")
             appendLine("  udp-read-write-timeout: ${udpTimeout * 1000}")
-            appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) ?: "warn"}")
+            appendLine("  log-level: ${MmkvManager.decodeSettingsString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL, AppConfig.DEFAULT_HEV_TUNNEL_LOGLEVEL)}")
         }
     }
 

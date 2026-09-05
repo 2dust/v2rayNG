@@ -100,8 +100,8 @@
     <string name="server_lab_reserved">Reserved (optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
     <string name="server_lab_local_mtu">MTU (optional, default 1420)</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU (optional, core default 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (optional, core default 50)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (optional, default 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (optional, default 50 ms)</string>
     <string name="toast_success">Success</string>
     <string name="toast_failure">Failure</string>
     <string name="toast_none_data">No data available</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">General: checked apps use the proxy, and unchecked apps connect directly;\nBypass mode: checked apps connect directly, and unchecked apps use the proxy.\nThe option to automatically select apps that should use the proxy is in the menu.</string>
-    <string name="title_pref_is_booted">Auto connect at startup</string>
-    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_is_booted">Connect after device boot</string>
+    <string name="summary_pref_is_booted">Automatically connect to the selected server after the device starts. Android may restrict background starts.</string>
+    <string name="title_system_vpn_settings">System VPN settings</string>
+    <string name="summary_system_vpn_settings">Open Android VPN settings to configure Always-on VPN, if supported by this device.</string>
+    <string name="toast_system_vpn_settings_unavailable">System VPN settings are unavailable.</string>
 
 
     <string name="subscription_updater_job_tips">The task will run in the background, and progress information will be displayed in the notification.</string>

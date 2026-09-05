@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -97,7 +98,12 @@ class MainReorderTest {
         verify(source, never()).reorderServerList(any(), any())
     }
 
-    private fun visible() = viewModel.serversForGroup("s").value.map { it.guid }
+    private fun visible(groupId: String = "s"): List<String> {
+        val state = viewModel.serverGroupState(groupId).value
+        assertEquals(state.servers.map { it.guid }, state.rows.map { it.guid })
+        assertEquals(state.servers.map { it.profile.remarks }, state.rows.map { it.remarks })
+        return state.servers.map { it.guid }
+    }
 
     @Test fun `repeated group selection uses its populated cache`() = runTest(dispatcher) {
         advanceUntilIdle()
@@ -108,6 +114,22 @@ class MainReorderTest {
         assertEquals(persisted, visible())
         verify(source, times(1)).getServerGuidList("s")
         verify(source, times(1)).decodeServerConfig("a")
+    }
+
+    @Test fun `collected tab servers follow reconciled row state`() = runTest(dispatcher) {
+        val tabServers = viewModel.serversForGroup("s")
+        val collection = backgroundScope.launch { tabServers.collect {} }
+        advanceUntilIdle()
+        assertEquals(visible(), tabServers.value.map { it.guid })
+        whenever(source.reorderServerList(any(), any())).thenAnswer {
+            persisted = listOf("c", "a", "new")
+            true
+        }
+        viewModel.moveServer("s", 2, 0)
+        advanceUntilIdle()
+        assertEquals(persisted, visible())
+        assertEquals(visible(), tabServers.value.map { it.guid })
+        collection.cancel()
     }
 
     @Test fun `empty groups are cached and explicit refresh bypasses cache`() = runTest(dispatcher) {
@@ -128,12 +150,12 @@ class MainReorderTest {
         whenever(source.getServerGuidList("")).thenAnswer { persisted }
         viewModel.setupGroupTab()
         advanceUntilIdle()
-        assertEquals(persisted, viewModel.serversForGroup("").value.map { it.guid })
+        assertEquals(persisted, visible(""))
         viewModel.moveServer("s", 0, 2)
         advanceUntilIdle()
         viewModel.subscriptionIdChanged("")
         advanceUntilIdle()
-        assertEquals(listOf("b", "c", "a"), viewModel.serversForGroup("").value.map { it.guid })
+        assertEquals(listOf("b", "c", "a"), visible(""))
         viewModel.subscriptionIdChanged("s")
         advanceUntilIdle()
         assertEquals(persisted, visible())
@@ -154,7 +176,8 @@ class MainReorderTest {
         advanceUntilIdle()
         viewModel.subscriptionIdChanged("shared")
         advanceUntilIdle()
-        assertEquals("edited", viewModel.serversForGroup("shared").value.single().profile.remarks)
+        assertEquals(listOf("b"), visible("shared"))
+        assertEquals("edited", viewModel.serverGroupState("shared").value.rows.single().remarks)
         viewModel.subscriptionIdChanged("unrelated")
         advanceUntilIdle()
         verify(source, times(2)).getServerGuidList("shared")
