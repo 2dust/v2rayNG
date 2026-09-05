@@ -1,147 +1,163 @@
 package com.v2ray.ang.ui.apppicker
 
-import android.app.Application
-import android.content.Context
+import android.os.Bundle
+import androidx.lifecycle.SavedStateHandle
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.ui.AppSelection
+import com.v2ray.ang.repository.AppListRepository
+import com.v2ray.ang.ui.AppRoute
+import com.v2ray.ang.ui.base.BaseResult
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.AppManagerUtil
-import com.v2ray.ang.util.LogUtil
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.withContext
-import java.text.Collator
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
-/**
- * ViewModel for AppPicker screen.
- */
-class AppPickerViewModel(application: Application) : BaseViewModel(application) {
+class AppPickerViewModel(
+    private val repo: AppListRepository,
+    private val handle: SavedStateHandle
+) : BaseViewModel<AppPickerUiState, AppPickerAction>(initialState(handle)) {
 
-    private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
-    val selectedPackages: StateFlow<Set<String>> = _selectedPackages.asStateFlow()
+    /** Unfiltered list; the state only ever exposes the filtered view of it. */
+    private var allApps: List<AppInfo> = emptyList()
 
-    private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
-    val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
+    /**
+     * Taken from the Intent before [restoreSavedState] runs, hence the entry state to diff the
+     * result against. Declared above `init` on purpose: property initializers run first.
+     */
+    private val initialSelected: Set<String> = state.selected
 
-    private var allApps: List<AppInfo>? = null
-    private var currentQuery: String = ""
-    private var selectedSnapshot: Set<String> = emptySet()
-    private var initialized = false
-    private var isAppListLoading = false
+    /** Held so a new keystroke cancels the pending filter instead of queueing another one. */
+    private var queryJob: Job? = null
 
-    fun initialize(initialSelected: Collection<String>) {
-        if (initialized) return
-        initialized = true
-        _selectedPackages.value = initialSelected.toSet()
+    init {
+        restoreSavedState()
+        handle.setSavedStateProvider(KEY_SAVED) {
+            Bundle().apply {
+                putStringArrayList(KEY_SELECTED, ArrayList(state.selected))
+                putString(KEY_QUERY, state.query)
+            }
+        }
+        load()
     }
 
-    fun loadApps(context: Context) {
-        allApps?.let { apps ->
-            val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
-            val updatedApps = apps.map { appInfo ->
-                if (appInfo.packageName == AppConfig.UNIDENTIFIED_PACKAGE) {
-                    appInfo.copy(appName = localizedUnknownApp)
-                } else {
-                    appInfo
-                }
-            }
-            allApps = sortApps(updatedApps)
-            _displayedApps.value = applyFilter(currentQuery)
+    override fun onAction(action: AppPickerAction) {
+        when (action) {
+            AppPickerAction.Back -> back()
+
+            is AppPickerAction.ToggleApp -> toggle(action.packageName)
+
+            AppPickerAction.SearchOpen -> setState { copy(searchActive = true) }
+            AppPickerAction.SearchClose -> closeSearch()
+            is AppPickerAction.QueryChanged ->
+                applyQuery(action.value, searchActive = true, debounce = true)
+
+            AppPickerAction.SelectAll -> mutateSelection(repo::selectAll)
+            AppPickerAction.InvertSelection -> mutateSelection(repo::invert)
+        }
+    }
+
+    // ===== loading =====
+
+    /**
+     * Loads the list ordered against the selection the screen started with.
+     */
+    private fun load() = launch(loading = true, context = Dispatchers.Default) {
+        val snapshot = state.selected
+        allApps = repo.loadApps(selectedSnapshot = snapshot)
+        republish()
+    }
+
+    private fun restoreSavedState() {
+        val saved = handle.get<Bundle>(KEY_SAVED) ?: return
+        val selected = saved.getStringArrayList(KEY_SELECTED)?.toSet() ?: return
+        val query = saved.getString(KEY_QUERY).orEmpty()
+        setState { copy(selected = selected, query = query, searchActive = query.isNotEmpty()) }
+    }
+
+    // ===== search =====
+
+    private fun applyQuery(query: String, searchActive: Boolean, debounce: Boolean) {
+        setState { copy(query = query, searchActive = searchActive) }
+        queryJob?.cancel()
+        queryJob = launch(context = Dispatchers.Default) {
+            if (debounce) delay(SEARCH_DEBOUNCE_MS)
+            publishRows(repo.filter(allApps, query))
+        }
+    }
+
+    private fun closeSearch() = applyQuery("", searchActive = false, debounce = false)
+
+    /**
+     * Cancels a filter that may still be holding the pre-load (empty) list, so the load is always
+     * the last publisher and the screen cannot be left showing an empty result.
+     */
+    private fun republish() {
+        queryJob?.cancel()
+        publishRows(repo.filter(allApps, state.query))
+    }
+
+    // ===== selection =====
+
+    private fun toggle(packageName: String) {
+        val current = state.selected
+        val next = if (packageName in current) current - packageName else current + packageName
+        setState { copy(selected = next) }
+    }
+
+    /** Bulk actions act on the visible rows only, so a filter narrows their scope as expected. */
+    private fun mutateSelection(operation: (Set<String>, Collection<String>) -> Set<String>) {
+        val visible = state.apps.map { it.packageName }
+        if (visible.isEmpty()) return
+        val next = operation(state.selected, visible)
+        setState { copy(selected = next) }
+    }
+
+    // ===== exit =====
+
+    private fun back() {
+        if (state.searchActive) {
+            closeSearch()
             return
         }
-        if (isAppListLoading) return
-
-        val applicationContext = context.applicationContext
-        val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
-        isAppListLoading = true
-        launchLoading {
-            try {
-                selectedSnapshot = _selectedPackages.value
-                val apps = withContext(Dispatchers.IO) {
-                    val list = AppManagerUtil.loadNetworkAppList(applicationContext)
-                    val special = createSpecialItemUnidentified(localizedUnknownApp)
-                    sortApps(list + special)
-                }
-                allApps = apps
-                _displayedApps.value = applyFilter(currentQuery)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                LogUtil.e("AppPickerViewModel", "Failed to load app list", e)
-                toastError(R.string.toast_failure)
-            } finally {
-                isAppListLoading = false
-            }
-        }
-    }
-
-    fun filterApps(query: String) {
-        currentQuery = query
-        _displayedApps.value = applyFilter(query)
-    }
-
-    fun toggleApp(packageName: String) {
-        val current = _selectedPackages.value
-        _selectedPackages.value = if (current.contains(packageName)) {
-            current - packageName
-        } else {
-            current + packageName
-        }
-    }
-
-    fun selectAll() {
-        val displayedApps = _displayedApps.value
-        val currentSelection = _selectedPackages.value
-        _selectedPackages.value = buildSet(currentSelection.size + displayedApps.size) {
-            addAll(currentSelection)
-            displayedApps.forEach { add(it.packageName) }
-        }
-    }
-
-    fun invertSelection() {
-        val packageNames = _displayedApps.value.map { it.packageName }
-        _selectedPackages.value = AppSelection.invert(_selectedPackages.value, packageNames)
-    }
-
-    fun getSelectedPackages(): List<String> = _selectedPackages.value.sorted()
-
-    private fun applyFilter(query: String): List<AppInfo> {
-        val apps = allApps ?: return emptyList()
-        if (query.isBlank()) return apps
-
-        return apps.filter {
-            it.appName.contains(query, ignoreCase = true) ||
-                    it.packageName.contains(query, ignoreCase = true)
-        }
-    }
-
-    private fun sortApps(apps: List<AppInfo>): List<AppInfo> {
-        val collator = Collator.getInstance()
-        val snapshot = selectedSnapshot
-        return apps.sortedWith { p1, p2 ->
-            val p1Selected = snapshot.contains(p1.packageName)
-            val p2Selected = snapshot.contains(p2.packageName)
-            when {
-                p1Selected && !p2Selected -> -1
-                !p1Selected && p2Selected -> 1
-                p1.isSystemApp && !p2.isSystemApp -> 1
-                !p1.isSystemApp && p2.isSystemApp -> -1
-                else -> collator.compare(p1.appName, p2.appName)
-            }
-        }
-    }
-
-    private fun createSpecialItemUnidentified(appName: String): AppInfo {
-        return AppInfo(
-            appName = appName,
-            packageName = AppConfig.UNIDENTIFIED_PACKAGE,
-            isSystemApp = false,
-            isSelected = 0
+        finishWith(
+            if (state.selected == initialSelected) BaseResult.Cancelled
+            else BaseResult.Selected(state.selected.sorted())
         )
     }
+
+    // ===== reduction helpers =====
+
+    /** Mapping happens once per list change, never per frame and never inside the reducer. */
+    private fun publishRows(apps: List<AppInfo>) {
+        val rows = apps.map { it.toRow() }
+        setState { copy(apps = rows) }
+    }
+
+    private fun AppInfo.toRow() = AppRow(
+        packageName = packageName,
+        appName = appName,
+        isUnidentified = packageName == AppConfig.UNIDENTIFIED_PACKAGE
+    )
+
+    override fun onCleared() {
+        queryJob = null
+        allApps = emptyList()
+        super.onCleared()
+    }
+
+    private companion object {
+        const val SEARCH_DEBOUNCE_MS = 300L
+        const val KEY_SAVED = "app_picker_saved_state"
+        const val KEY_SELECTED = "selected"
+        const val KEY_QUERY = "query"
+    }
 }
+
+/**
+ * Seeds the state from the Intent arguments.
+ */
+private fun initialState(handle: SavedStateHandle) = AppPickerUiState(
+    titleRes = handle.get<Int>(AppRoute.EXTRA_PICKER_TITLE_RES)?.takeIf { it != 0 }
+        ?: AppPickerUiState.DEFAULT_TITLE_RES,
+    selected = handle.get<ArrayList<String>>(AppRoute.EXTRA_PICKER_SELECTED)?.toSet().orEmpty()
+)
