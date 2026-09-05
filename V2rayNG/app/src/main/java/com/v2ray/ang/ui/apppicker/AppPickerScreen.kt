@@ -64,7 +64,6 @@ fun AppPickerScreen(viewModel: AppPickerViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         topBar = {
             AppPickerTopBar(
                 titleResProvider = titleResProvider,

@@ -58,7 +58,6 @@ fun SubSettingScreen(viewModel: SubSettingViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 SubEvent.ShowUpdateOptions -> {

@@ -61,7 +61,7 @@ class ShortcutViewModel(
             finishWith()
             return
         }
-        launch(loading = true, onError = { reportFailureAndClose() }) {
+        launch(onError = { reportFailureAndClose() }) {
             val imported = repo.importBatchConfig(text)
             if (imported <= 0) {
                 toastError(R.string.toast_none_data)

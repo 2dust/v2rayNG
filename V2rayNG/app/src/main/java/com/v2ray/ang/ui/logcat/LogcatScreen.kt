@@ -73,7 +73,6 @@ fun LogcatScreen(
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 is LogcatEvent -> onPlatformEvent(event)

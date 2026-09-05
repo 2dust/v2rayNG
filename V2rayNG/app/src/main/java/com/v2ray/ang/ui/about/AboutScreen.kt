@@ -105,7 +105,6 @@ fun AboutScreen(viewModel: AboutViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 AboutEvent.ShowOssLicense -> {

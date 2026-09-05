@@ -92,7 +92,6 @@ fun PerAppProxyScreen(viewModel: PerAppProxyViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         topBar = {
             PerAppProxyTopBar(
                 isLoadingProvider = loadingProvider,

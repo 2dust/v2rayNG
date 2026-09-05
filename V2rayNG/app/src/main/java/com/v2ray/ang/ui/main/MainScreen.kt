@@ -78,7 +78,6 @@ fun MainScreen(
     ) {
         BaseScreen(
             viewModel = viewModel,
-            showLoading = false,
             onEvent = { event ->
                 when (event) {
                     is MainEvent.ShowQrCode -> { dialogs.show(MainDialog.QrCode(event.bitmap)); true }

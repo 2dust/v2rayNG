@@ -45,7 +45,6 @@ fun SettingsScreen(
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event -> event is SettingsEvent && onPlatformEvent(event) },
         topBar = {
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()

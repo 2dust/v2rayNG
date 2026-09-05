@@ -47,7 +47,7 @@ class ServerEditViewModel(
         load()
     }
 
-    private fun load() = launch(loading = true) {
+    private fun load() = launch {
         val guid = state.guid
         val profile = repository.loadProfile(guid, state.configType)
         initialProfile = profile

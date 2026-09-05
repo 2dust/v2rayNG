@@ -50,7 +50,6 @@ fun BackupScreen(
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 is BackupEvent.ShowChannelPicker -> {

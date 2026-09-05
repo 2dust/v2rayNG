@@ -66,7 +66,6 @@ fun RoutingSettingScreen(
     BaseScreen(
         viewModel = viewModel,
         modifier = modifier,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 is RoutingEvent.ShowDialog -> {

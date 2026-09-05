@@ -60,7 +60,6 @@ fun TaskerScreen(
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = onEvent,
         topBar = {
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()

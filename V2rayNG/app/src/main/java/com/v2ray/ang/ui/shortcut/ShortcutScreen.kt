@@ -3,12 +3,9 @@ package com.v2ray.ang.ui.shortcut
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.ui.base.BaseEvent
 import com.v2ray.ang.ui.base.BaseEventEffect
-import com.v2ray.ang.ui.base.BaseLoading
 import com.v2ray.ang.ui.base.BaseMessage
 import com.v2ray.ang.ui.base.asString
 
@@ -39,9 +36,6 @@ fun ShortcutScreen(
             else -> false
         }
     }
-
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    if (isLoading) BaseLoading()
 }
 
 /**

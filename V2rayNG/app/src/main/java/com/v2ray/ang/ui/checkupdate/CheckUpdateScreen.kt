@@ -57,7 +57,6 @@ fun CheckUpdateScreen(viewModel: CheckUpdateViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = { event ->
             when (event) {
                 is CheckUpdateEvent.UpdateAvailable -> {

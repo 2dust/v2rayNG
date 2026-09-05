@@ -86,7 +86,6 @@ fun UserAssetScreen(viewModel: UserAssetViewModel) {
 
     BaseScreen(
         viewModel = viewModel,
-        showLoading = false,
         onEvent = onEvent,
         onResult = { result -> onAction(UserAssetAction.ResultReceived(result)) },
         topBar = {

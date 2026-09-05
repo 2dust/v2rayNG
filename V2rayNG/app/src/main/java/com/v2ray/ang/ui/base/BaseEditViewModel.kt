@@ -1,5 +1,7 @@
 package com.v2ray.ang.ui.base
 
+import kotlinx.coroutines.Job
+
 /**
  * Parent of every editor screen (Server*, SubEdit, RoutingEdit, UserAssetUrl…).
  *
@@ -14,15 +16,29 @@ abstract class BaseEditViewModel<S : BaseUiState, A : BaseAction>(
     initialState: S,
 ) : BaseViewModel<S, A>(initialState) {
 
+    private var mutationJob: Job? = null
+
     /** Validate and persist. Return `null` to keep the screen open. */
     protected abstract suspend fun doSave(): BaseResult?
 
     /** Delete the edited entity. Returns `null` by default (screen has no delete action). */
     protected open suspend fun doDelete(): BaseResult? = null
 
-    protected fun save() = launch(loading = true) { doSave()?.let(::finishWith) }
+    protected fun save() = mutate { doSave() }
+    protected fun delete() = mutate { doDelete() }
 
-    protected fun delete() = launch(loading = true) { doDelete()?.let(::finishWith) }
+    private fun mutate(block: suspend () -> BaseResult?) {
+        if (mutationJob?.isActive == true) return
+        mutationJob = launch {
+            block()?.let(::finishWith)
+        }
+    }
 
     protected fun cancel() = finishWith(BaseResult.Cancelled)
+
+    override fun onCleared() {
+        mutationJob?.cancel()
+        mutationJob = null
+        super.onCleared()
+    }
 }
