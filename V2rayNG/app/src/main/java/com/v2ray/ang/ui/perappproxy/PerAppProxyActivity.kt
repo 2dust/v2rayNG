@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toastSuccess
@@ -65,19 +67,8 @@ private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
     ExportSelection(R.string.menu_item_export_proxy_app)
 }
 
-@StringRes
-internal fun perAppRoutingDescriptionRes(
-    perAppProxyEnabled: Boolean,
-    bypassApps: Boolean,
-    checked: Boolean,
-): Int = when {
-    !perAppProxyEnabled -> R.string.acc_per_app_routing_disabled
-    checked == bypassApps -> R.string.acc_app_routed_directly
-    else -> R.string.acc_app_routed_through
-}
-
 @Composable
-internal fun PerAppSwitch(
+private fun PerAppSwitch(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -86,9 +77,7 @@ internal fun PerAppSwitch(
     val checkedDescription = stringResource(if (checked) R.string.acc_toggle_on else R.string.acc_toggle_off)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        // An observable description also emits STATE_DESCRIPTION with Compose 1.11,
-        // for TalkBack versions that do not announce its native CHECKED event.
-        // Remove when implicit switch state changes deliver feedback on those versions.
+        // An observable state description provides native feedback without moving focus.
         modifier = modifier
             .semantics { stateDescription = checkedDescription }
             .toggleable(
@@ -106,7 +95,7 @@ internal fun PerAppSwitch(
         Switch(
             checked = checked,
             onCheckedChange = null,
-            modifier = Modifier.scale(0.65f),
+            modifier = Modifier.scale(0.65f).minimumInteractiveComponentSize(),
             colors = SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                 checkedTrackColor = MaterialTheme.colorScheme.secondary,
@@ -124,6 +113,11 @@ class PerAppProxyActivity : BaseComponentActivity() {
         viewModel.loadApps(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshRoutingMode()
+    }
+
     @Composable
     override fun ScreenContent() {
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
@@ -131,6 +125,8 @@ class PerAppProxyActivity : BaseComponentActivity() {
         val blacklist by viewModel.blacklist.collectAsStateWithLifecycle()
         val perAppProxyEnabled by viewModel.perAppProxyEnabled.collectAsStateWithLifecycle()
         val bypassApps by viewModel.bypassApps.collectAsStateWithLifecycle()
+        val installedApps by viewModel.appsAll.collectAsStateWithLifecycle()
+        val routingMode by viewModel.routingMode.collectAsStateWithLifecycle()
 
         PerAppProxyScreen(
             apps = apps,
@@ -138,6 +134,8 @@ class PerAppProxyActivity : BaseComponentActivity() {
             blacklist = blacklist,
             perAppProxyEnabled = perAppProxyEnabled,
             bypassApps = bypassApps,
+            installedApps = installedApps.orEmpty(),
+            routingMode = routingMode,
             onBackClick = { finish() },
             onPerAppProxyChanged = { viewModel.setPerAppProxyEnabled(it) },
             onBypassAppsChanged = { viewModel.setBypassAppsEnabled(it) },
@@ -160,12 +158,14 @@ class PerAppProxyActivity : BaseComponentActivity() {
 }
 
 @Composable
-fun PerAppProxyScreen(
+internal fun PerAppProxyScreen(
     apps: List<AppInfo>,
     isLoading: Boolean,
     blacklist: Set<String>,
     perAppProxyEnabled: Boolean,
     bypassApps: Boolean,
+    installedApps: List<AppInfo>,
+    routingMode: PerAppRoutingMode,
     onBackClick: () -> Unit,
     onPerAppProxyChanged: (Boolean) -> Unit,
     onBypassAppsChanged: (Boolean) -> Unit,
@@ -183,6 +183,9 @@ fun PerAppProxyScreen(
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     val onInfoClick = { showInfoDialog = true }
     val listState = rememberLazyListState()
+    val routing = remember(routingMode, perAppProxyEnabled, bypassApps, blacklist, installedApps) {
+        PerAppRouting(routingMode, perAppProxyEnabled, bypassApps, blacklist, installedApps, BuildConfig.APPLICATION_ID)
+    }
 
     LaunchedEffect(Unit) {
         onSearch(searchQuery)
@@ -293,9 +296,7 @@ fun PerAppProxyScreen(
             ) {
                 items(items = apps, key = { it.packageName }) { app ->
                     val checked = blacklist.contains(app.packageName)
-                    val routingDescription = stringResource(
-                        perAppRoutingDescriptionRes(perAppProxyEnabled, bypassApps, checked)
-                    )
+                    val routingDescription = routing.descriptionRes(app)?.let { stringResource(it) }
                     AppListItem(
                         appName = app.appName,
                         packageName = app.packageName,

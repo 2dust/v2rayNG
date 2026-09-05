@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,7 +52,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -180,15 +180,12 @@ fun AppListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .semantics { stateDescription = accessibilityState }
             .toggleable(
                 value = checked,
                 role = Role.Checkbox,
                 onValueChange = onCheckedChange,
             )
-            .semantics(mergeDescendants = true) {
-                contentDescription = appName
-                stateDescription = accessibilityState
-            }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -216,7 +213,6 @@ fun AppListItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = appName,
-                modifier = Modifier.semantics { hideFromAccessibility() },
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -234,6 +230,8 @@ fun AppListItem(
         Checkbox(
             checked = checked,
             onCheckedChange = null,
+            // Keep the previous footprint while the row owns the toggle action.
+            modifier = Modifier.minimumInteractiveComponentSize(),
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.secondary)
         )
     }
