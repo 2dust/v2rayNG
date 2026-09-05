@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">VPN Settings</string>
     <string name="title_pref_per_app_proxy">Per-app proxy</string>
     <string name="summary_pref_per_app_proxy">General: checked apps use the proxy, and unchecked apps connect directly;\nBypass mode: checked apps connect directly, and unchecked apps use the proxy.\nThe option to automatically select apps that should use the proxy is in the menu.</string>
-    <string name="title_pref_is_booted">Auto connect at startup</string>
-    <string name="summary_pref_is_booted">Automatically connects to the selected server at startup, which may be unsuccessful</string>
+    <string name="title_pref_is_booted">Connect after device boot</string>
+    <string name="summary_pref_is_booted">Automatically connect to the selected server after the device starts. Android may restrict background starts.</string>
+    <string name="title_system_vpn_settings">System VPN settings</string>
+    <string name="summary_system_vpn_settings">Open Android VPN settings to configure Always-on VPN, if supported by this device.</string>
+    <string name="toast_system_vpn_settings_unavailable">System VPN settings are unavailable.</string>
 
 
     <string name="subscription_updater_job_tips">The task will run in the background, and progress information will be displayed in the notification.</string>

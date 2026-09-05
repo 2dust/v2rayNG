@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">تنظیمات VPN</string>
     <string name="title_pref_per_app_proxy">پروکسی به تفکیک برنامه</string>
     <string name="summary_pref_per_app_proxy">حالت عادی: برنامه‌های انتخاب‌شده از پروکسی استفاده می‌کنند و برنامه‌های انتخاب‌نشده مستقیماً متصل می‌شوند؛\nحالت دور زدن: برنامه‌های انتخاب‌شده مستقیماً متصل می‌شوند و برنامه‌های انتخاب‌نشده از پروکسی استفاده می‌کنند.\nگزینهٔ انتخاب خودکار برنامه‌هایی که باید از پروکسی استفاده کنند در منو قرار دارد.</string>
-    <string name="title_pref_is_booted">اتصال خودکار هنگام راه اندازی</string>
-    <string name="summary_pref_is_booted">هنگام راه اندازی به طور خودکار به سرور انتخابی متصل می شود که ممکن است ناموفق باشد.</string>
+    <string name="title_pref_is_booted">اتصال پس از راه‌اندازی دستگاه</string>
+    <string name="summary_pref_is_booted">پس از راه‌اندازی دستگاه، به‌طور خودکار به سرور انتخاب‌شده متصل شود. ممکن است Android اجرای پس‌زمینه را محدود کند.</string>
+    <string name="title_system_vpn_settings">تنظیمات VPN سیستم</string>
+    <string name="summary_system_vpn_settings">تنظیمات VPN در Android را برای پیکربندی VPN همیشه‌روشن باز کنید، اگر دستگاه از آن پشتیبانی می‌کند.</string>
+    <string name="toast_system_vpn_settings_unavailable">تنظیمات VPN سیستم در دسترس نیست.</string>
 
 
     <string name="subscription_updater_job_tips">این کار در پس‌زمینه اجرا می‌شود و پیشرفت آن در اعلان نمایش داده خواهد شد.</string>
