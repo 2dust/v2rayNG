@@ -194,7 +194,6 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
-        LocalAppSnackbar provides snackbarController,
         LocalAccessibilityActionFeedback provides actionFeedback
     ) {
         MaterialTheme(
@@ -202,7 +201,7 @@ fun AppTheme(
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 content()
-                AppSnackbarHost(hostState = snackbarController.hostState)
+                AppSnackbarHost(controller = snackbarController)
                 AppSnackbarBridge(controller = snackbarController)
                 AccessibilityActionFeedbackHost(actionFeedback)
             }
