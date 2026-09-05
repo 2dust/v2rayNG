@@ -1,54 +1,82 @@
 package com.v2ray.ang.ui.checkupdate
 
-import android.app.Application
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.CheckUpdateResult
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.UpdateCheckerManager
+import com.v2ray.ang.repository.CheckUpdateRepository
+import com.v2ray.ang.ui.AppRoute
+import com.v2ray.ang.ui.base.BaseResult
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.LogUtil
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 
-class CheckUpdateViewModel(application: Application) : BaseViewModel(application) {
+class CheckUpdateViewModel(
+    private val repo: CheckUpdateRepository
+) : BaseViewModel<CheckUpdateUiState, CheckUpdateAction>(CheckUpdateUiState()) {
 
-    private val _checkPreRelease = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
-    )
-    val checkPreRelease: StateFlow<Boolean> = _checkPreRelease.asStateFlow()
+    private var checkJob: Job? = null
+    private var preReleaseJob: Job? = null
 
-    private val _updateResult = MutableStateFlow<CheckUpdateResult?>(null)
-    val updateResult: StateFlow<CheckUpdateResult?> = _updateResult.asStateFlow()
+    init {
+        val preRelease = repo.isCheckPreRelease()
+        setState { copy(checkPreRelease = preRelease, versionText = repo.appVersionText()) }
 
-    private val _showUpdateDialog = MutableStateFlow(false)
-    val showUpdateDialog: StateFlow<Boolean> = _showUpdateDialog.asStateFlow()
+        launch(onError = { /* the version line keeps the short form; launch already logged it */ }) {
+            val text = repo.fullVersionText()
+            setState { copy(versionText = text) }
+        }
 
-    fun toggleCheckPreRelease(enabled: Boolean) {
-        _checkPreRelease.value = enabled
-        MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, enabled)
+        check(preRelease)
     }
 
-    fun checkForUpdates() {
-        launchLoading {
-            toast(R.string.update_checking_for_update)
-            try {
-                val result = UpdateCheckerManager.checkForUpdate(_checkPreRelease.value)
-                if (result.hasUpdate) {
-                    _updateResult.value = result
-                    _showUpdateDialog.value = true
-                } else {
-                    toastSuccess(R.string.update_already_latest_version)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to check for updates", e)
-                toastError(R.string.toast_failure)
-            }
+    override fun onAction(action: CheckUpdateAction) {
+        when (action) {
+            CheckUpdateAction.Back -> finishWith(BaseResult.Cancelled)
+            is CheckUpdateAction.TogglePreRelease -> togglePreRelease(action.enabled)
+            CheckUpdateAction.CheckNow -> check(state.checkPreRelease)
+            is CheckUpdateAction.DownloadConfirmed -> download(action.url)
         }
     }
 
-    fun dismissUpdateDialog() {
-        _showUpdateDialog.value = false
+    override fun onCleared() {
+        checkJob?.cancel()
+        preReleaseJob?.cancel()
+        super.onCleared()
+    }
+
+    private fun togglePreRelease(enabled: Boolean) {
+        setState { copy(checkPreRelease = enabled) }
+        val previous = preReleaseJob
+        preReleaseJob = launch(onError = { toastError() }) {
+            previous?.join()
+            val persisted = withContext(NonCancellable) { repo.setCheckPreRelease(enabled) }
+            setState { copy(checkPreRelease = persisted) }
+        }
+    }
+
+    private fun download(url: String) {
+        if (url.isEmpty()) toastError() else navigate(AppRoute.OpenUrl(url))
+    }
+
+    private fun check(includePreRelease: Boolean) {
+        if (checkJob?.isActive == true) return
+        checkJob = launch(loading = true) {
+            toast(R.string.update_checking_for_update)
+            val result = repo.checkForUpdate(includePreRelease)
+            val url = result.downloadUrl
+            val error = result.error
+            when {
+                result.hasUpdate && !url.isNullOrEmpty() -> platform(
+                    CheckUpdateEvent.UpdateAvailable(
+                        UpdateInfo(
+                            version = result.latestVersion.orEmpty(),
+                            releaseNotes = result.releaseNotes.orEmpty(),
+                            downloadUrl = url
+                        )
+                    )
+                )
+                !error.isNullOrEmpty() -> toastError(error)
+                else -> toastSuccess(R.string.update_already_latest_version)
+            }
+        }
     }
 }
