@@ -528,6 +528,7 @@
     <string name="acc_move_to_bottom">移至列表底部</string>
     <string name="acc_moved">已移动</string>
     <string name="acc_selected_server">已选择</string>
+    <string name="acc_select_server">选择</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_last_updated">上次更新于%1$s</string>
     <string name="acc_subscription_update_on">更新已开启</string>

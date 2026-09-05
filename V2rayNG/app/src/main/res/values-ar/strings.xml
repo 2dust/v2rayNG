@@ -528,6 +528,7 @@
     <string name="acc_move_to_bottom">نقل إلى أسفل القائمة</string>
     <string name="acc_moved">تم النقل</string>
     <string name="acc_selected_server">محدّد</string>
+    <string name="acc_select_server">اختيار</string>
     <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
     <string name="acc_last_updated">تم آخر تحديث في %1$s</string>
     <string name="acc_subscription_update_on">التحديث مفعّل</string>

@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.subscription
 
 import android.app.Application
+import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -15,13 +16,16 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.ui.base.ViewModelEvent
 import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.QRCodeDecoder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,10 +37,16 @@ internal fun subscriptionAutoUpdateChange(
     ?.takeIf { it.url.isNotEmpty() && it.autoUpdate != enabled }
     ?.copy(autoUpdate = enabled)
 
-internal data class SubscriptionAutoUpdateChanged(val enabled: Boolean) : ViewModelEvent
-
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
     private val pendingAutoUpdates = mutableSetOf<String>()
+    // Ephemeral acknowledgements: completion must not wait for a screen to resume or replay
+    // an old result after an edit. Durable subscription state is exposed by subsFlow.
+    private val _autoUpdateChanges = MutableSharedFlow<Boolean>()
+    internal val autoUpdateChanges = _autoUpdateChanges.asSharedFlow()
+
+    private var qrCodeJob: Job? = null
+    private val _qrCode = MutableStateFlow<Bitmap?>(null)
+    internal val qrCode = _qrCode.asStateFlow()
     private val subscriptions: MutableList<SubscriptionCache> =
         MmkvManager.decodeSubscriptions().toMutableList()
 
@@ -91,17 +101,33 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
                     subscriptions[index] = SubscriptionCache(subId, updated)
                     _subsFlow.value = subscriptions.toList()
                 }
-                _viewModelEvent.send(SubscriptionAutoUpdateChanged(enabled))
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Subscription periodic update change failed: $subId", e)
                 toastError(R.string.toast_failure)
+                return@launch
             } finally {
                 pendingAutoUpdates.remove(subId)
             }
+            _autoUpdateChanges.emit(enabled)
         }
         return true
+    }
+
+    internal fun shareQRCode(url: String) {
+        dismissQRCode()
+        qrCodeJob = viewModelScope.launch {
+            val bitmap = withContext(Dispatchers.Default) { QRCodeDecoder.createQRCode(url) }
+            if (bitmap == null) toastError(R.string.toast_failure)
+            _qrCode.value = bitmap
+        }
+    }
+
+    internal fun dismissQRCode() {
+        qrCodeJob?.cancel()
+        qrCodeJob = null
+        _qrCode.value = null
     }
 
     fun move(fromPosition: Int, toPosition: Int): Boolean {

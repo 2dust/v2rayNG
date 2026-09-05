@@ -1,30 +1,19 @@
 package com.v2ray.ang.ui.subscription
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.os.Bundle
-import android.text.format.DateUtils
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,23 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.hideFromAccessibility
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -71,7 +48,6 @@ import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -89,10 +65,6 @@ private data class SubscriptionDeleteTarget(
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     @Composable
     override fun ScreenContent() {
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -106,7 +78,7 @@ class SubSettingActivity : BaseComponentActivity() {
                 startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
             },
             onRemoveSub = { subId -> removeSub(subId) },
-            onShareQRCode = { url -> QRCodeDecoder.createQRCode(url) },
+            onShareQRCode = viewModel::shareQRCode,
             onShareClipboard = { url ->
                 Utils.setClipboard(this, url)
                 toast(getString(R.string.toast_success))
@@ -133,7 +105,7 @@ fun SubSettingScreen(
     onSubUpdate: () -> Unit,
     onEditSub: (String) -> Unit,
     onRemoveSub: (String) -> Unit,
-    onShareQRCode: (String) -> Bitmap?,
+    onShareQRCode: (String) -> Unit,
     onShareClipboard: (String) -> Unit
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
@@ -141,8 +113,8 @@ fun SubSettingScreen(
     var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
-    var shareTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
-    var showQRCodeBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var shareUrl by remember { mutableStateOf<String?>(null) }
+    val qrCodeBitmap by viewModel.qrCode.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
@@ -150,13 +122,11 @@ fun SubSettingScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(viewModel, lifecycleOwner, context, actionFeedback) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.viewModelEvent.collect { event ->
-                if (event is SubscriptionAutoUpdateChanged) {
-                    actionFeedback(context.getString(
-                        if (event.enabled) R.string.acc_subscription_auto_update_enabled
-                        else R.string.acc_subscription_auto_update_disabled
-                    ))
-                }
+            viewModel.autoUpdateChanges.collect { enabled ->
+                actionFeedback(context.getString(
+                    if (enabled) R.string.acc_subscription_auto_update_enabled
+                    else R.string.acc_subscription_auto_update_disabled
+                ))
             }
         }
     }
@@ -197,29 +167,6 @@ fun SubSettingScreen(
                 val subscriptionName = subscriptionAccessibilityName(
                     subCache.subscription.remarks, subCache.subscription.url, stringResource(R.string.acc_unnamed_subscription)
                 )
-                val lastUpdated = Utils.formatTimestamp(subCache.subscription.lastUpdated)
-                val lastUpdatedAccessibility = if (lastUpdated.isNotEmpty()) {
-                    stringResource(
-                        R.string.acc_last_updated,
-                        DateUtils.formatDateTime(
-                            context,
-                            subCache.subscription.lastUpdated,
-                            DateUtils.FORMAT_SHOW_DATE or
-                                DateUtils.FORMAT_SHOW_TIME or
-                                DateUtils.FORMAT_SHOW_YEAR
-                        )
-                    )
-                } else {
-                    ""
-                }
-                val subscriptionUpdateState = stringResource(
-                    if (subCache.subscription.enabled) R.string.acc_subscription_update_on
-                    else R.string.acc_subscription_update_off,
-                )
-                val updateActionLabel = stringResource(
-                    if (subCache.subscription.enabled) R.string.acc_disable_subscription_update
-                    else R.string.acc_enable_subscription_update
-                )
                 val requestDelete = {
                     if (confirmRemove) {
                         removeTarget = SubscriptionDeleteTarget(
@@ -252,7 +199,7 @@ fun SubSettingScreen(
                         add(CustomAccessibilityAction(
                             label = stringResource(SubscriptionShareAction.QRCode.labelRes),
                             action = {
-                                showQRCodeBitmap = onShareQRCode(subCache.subscription.url)
+                                onShareQRCode(subCache.subscription.url)
                                 true
                             },
                         ))
@@ -276,113 +223,17 @@ fun SubSettingScreen(
                         scope = this,
                         isDragging = isDragging
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .semantics(mergeDescendants = true) {
-                                    contentDescription = subscriptionName
-                                    stateDescription = subscriptionUpdateState
-                                    customActions = accessibilityActions
-                                    onClick(label = updateActionLabel, action = null)
-                                }
-                                .toggleable(
-                                    value = subCache.subscription.enabled,
-                                    role = Role.Switch,
-                                    onValueChange = { checked ->
-                                        viewModel.update(subCache.guid, subCache.subscription.copy(enabled = checked))
-                                    },
-                                )
-                                .padding(horizontal = 14.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = subCache.subscription.remarks,
-                                    modifier = Modifier.clearAndSetSemantics {},
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                if (subCache.subscription.url.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = subCache.subscription.url,
-                                        modifier = Modifier.semantics { hideFromAccessibility() },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                if (lastUpdated.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = lastUpdated,
-                                        modifier = Modifier.clearAndSetSemantics {
-                                            contentDescription = lastUpdatedAccessibility
-                                        },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-
-                            Column(
-                                horizontalAlignment = Alignment.End,
-                                modifier = Modifier.padding(start = 8.dp)
-                            ) {
-                                Row {
-                                    if (subCache.subscription.url.isNotEmpty()) {
-                                        IconButton(
-                                            onClick = { shareTarget = Pair(subCache.guid, subCache.subscription.url) },
-                                            modifier = Modifier.clearAndSetSemantics {},
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.ic_share_24dp),
-                                                contentDescription = stringResource(
-                                                    R.string.acc_share_named,
-                                                    subscriptionName
-                                                )
-                                            )
-                                        }
-                                    }
-                                    IconButton(
-                                        onClick = { onEditSub(subCache.guid) },
-                                        modifier = Modifier.clearAndSetSemantics {},
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_edit_24dp),
-                                            contentDescription = stringResource(
-                                                R.string.acc_edit_named,
-                                                subscriptionName
-                                            )
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = requestDelete,
-                                        modifier = Modifier.clearAndSetSemantics {},
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_delete_24dp),
-                                            contentDescription = stringResource(
-                                                R.string.acc_delete_named,
-                                                subscriptionName
-                                            )
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Switch(
-                                    checked = subCache.subscription.enabled,
-                                    onCheckedChange = null,
-                                    modifier = Modifier.scale(0.7f),
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                        checkedTrackColor = MaterialTheme.colorScheme.secondary
-                                    )
-                                )
-                            }
-                        }
+                        SubscriptionRow(
+                            subscription = subCache.subscription,
+                            subscriptionName = subscriptionName,
+                            actions = accessibilityActions,
+                            onUpdate = { checked ->
+                                viewModel.update(subCache.guid, subCache.subscription.copy(enabled = checked))
+                            },
+                            onShare = { shareUrl = subCache.subscription.url },
+                            onEdit = { onEditSub(subCache.guid) },
+                            onDelete = requestDelete,
+                        )
                     }
                     ItemDivider()
                 }
@@ -390,27 +241,27 @@ fun SubSettingScreen(
         }
     }
 
-    if (shareTarget != null) {
-        val (_, url) = shareTarget!!
+    val url = shareUrl
+    if (url != null) {
         SelectListDialog(
             options = SubscriptionShareAction.entries,
             optionText = { stringResource(it.labelRes) },
             onSelected = { action ->
-                shareTarget = null
+                shareUrl = null
                 when (action) {
-                    SubscriptionShareAction.QRCode -> showQRCodeBitmap = onShareQRCode(url)
+                    SubscriptionShareAction.QRCode -> onShareQRCode(url)
                     SubscriptionShareAction.Clipboard -> onShareClipboard(url)
                 }
             },
-            onDismiss = { shareTarget = null }
+            onDismiss = { shareUrl = null }
         )
     }
 
     // QR Code Dialog
-    if (showQRCodeBitmap != null) {
+    if (qrCodeBitmap != null) {
         QRCodeDialog(
-            bitmap = showQRCodeBitmap,
-            onDismiss = { showQRCodeBitmap = null }
+            bitmap = qrCodeBitmap,
+            onDismiss = viewModel::dismissQRCode
         )
     }
 
