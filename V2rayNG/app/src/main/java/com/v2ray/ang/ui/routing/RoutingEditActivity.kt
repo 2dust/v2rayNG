@@ -136,6 +136,7 @@ fun RoutingEditScreen(
     }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val selectedNetwork = network.ifBlank { "tcp,udp" }
+    val deleteRuleName = initial?.remarks.orEmpty().ifBlank { remarks }
 
     val processPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -189,7 +190,10 @@ fun RoutingEditScreen(
                         IconButton(onClick = { showDeleteConfirm = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = stringResource(R.string.acc_delete)
+                                contentDescription = stringResource(
+                                    R.string.acc_delete_routing_rule_named,
+                                    deleteRuleName
+                                )
                             )
                         }
                     }
@@ -308,7 +312,10 @@ fun RoutingEditScreen(
 
         if (showDeleteConfirm) {
             DeleteConfirmDialog(
-                message = stringResource(R.string.confirm_delete_routing_rule),
+                message = stringResource(
+                    R.string.confirm_delete_routing_rule_named,
+                    deleteRuleName
+                ),
                 onConfirm = onDelete,
                 onDismiss = { showDeleteConfirm = false }
             )

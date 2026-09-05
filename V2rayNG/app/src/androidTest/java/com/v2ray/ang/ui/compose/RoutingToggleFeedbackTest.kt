@@ -1,0 +1,75 @@
+package com.v2ray.ang.ui.compose
+
+import android.view.accessibility.AccessibilityNodeInfo
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.test.core.app.ActivityScenario
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.ui.routing.RoutingRulesetItem
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class RoutingToggleFeedbackTest {
+    @Test
+    fun rowOwnsToggleAndSecondaryActions() {
+        val probe = ToggleFeedbackProbe()
+        val rule = mutableStateOf(RulesetItem(id = "feedback-rule", remarks = "Feedback test rule",
+            outboundTag = AppConfig.TAG_DIRECT, enabled = false, locked = true))
+        var changes = 0
+        var edits = 0
+        var deletes = 0
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    AppTheme {
+                        Column(Modifier.padding(top = 64.dp)) {
+                            RoutingRulesetItem(rule.value,
+                                onEdit = { edits++ },
+                                onDelete = { deletes++ },
+                                onEnabledChange = { rule.value = rule.value.copy(enabled = it); changes++ })
+                        }
+                    }
+                }
+            }
+            val row = probe.row("Feedback test rule")
+            probe.assertSingleToggle(row)
+            assertEquals(1, probe.nodes(row).count { it.isClickable })
+            probe.focus(row)
+            val label = probe.label(row)
+            val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+            assertEquals(context.getString(R.string.acc_enable_routing_rule),
+                row.actionList.single { it.id == AccessibilityNodeInfo.ACTION_CLICK }.label)
+            probe.toggle(row, true)
+            assertEquals(context.getString(R.string.acc_disable_routing_rule),
+                row.actionList.single { it.id == AccessibilityNodeInfo.ACTION_CLICK }.label)
+            probe.toggle(row, false)
+            assertEquals(label, probe.label(row))
+            probe.verifyInputModes(row)
+            assertEquals(10, changes)
+            var expectedActions = emptyList<String>()
+            scenario.onActivity { activity ->
+                expectedActions = listOf(
+                    activity.getString(R.string.acc_edit_routing_rule_named, "Feedback test rule"),
+                    activity.getString(R.string.acc_delete_routing_rule_named, "Feedback test rule"),
+                )
+            }
+            val actions = row.actionList.filter { it.label != null && it.id != AccessibilityNodeInfo.ACTION_CLICK }
+            assertEquals(expectedActions, actions.map { it.label.toString() })
+            actions.forEach { assertTrue(row.performAction(it.id)) }
+            assertEquals(1, edits)
+            assertEquals(1, deletes)
+            assertEquals(10, changes)
+        }
+    }
+}
