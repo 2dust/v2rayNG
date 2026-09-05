@@ -167,10 +167,7 @@
             android:name=".ui.backup.BackupActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.AboutActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.TranslatorsActivity"
+            android:name=".ui.about.AboutActivity"
             android:exported="false" />
 
         <service
