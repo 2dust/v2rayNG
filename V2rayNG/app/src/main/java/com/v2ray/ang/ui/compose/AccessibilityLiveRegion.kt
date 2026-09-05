@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
@@ -30,10 +31,12 @@ internal fun AccessibilityLiveRegionText(
     eventId: Long?,
     text: String,
     mode: LiveRegionMode,
+    onPublished: ((Long) -> Unit)? = null,
 ) {
     var armed by remember { mutableStateOf(false) }
     var announcedText by remember { mutableStateOf("") }
     var announcedMode by remember { mutableStateOf(mode) }
+    val publicationCallback by rememberUpdatedState(onPublished)
 
     LaunchedEffect(eventId, text, mode) {
         if (eventId == null || text.isEmpty()) {
@@ -52,6 +55,12 @@ internal fun AccessibilityLiveRegionText(
         withFrameNanos { }
         withFrameNanos { }
         announcedText = text
+        if (publicationCallback != null) {
+            // Let the nonempty semantics reach a frame before the owner starts its hold time.
+            withFrameNanos { }
+            withFrameNanos { }
+            publicationCallback?.invoke(eventId)
+        }
     }
 
     val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
