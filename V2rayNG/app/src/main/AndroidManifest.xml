@@ -93,7 +93,7 @@
             android:name=".ui.apppicker.AppPickerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ScannerActivity"
+            android:name=".ui.scanner.ScannerActivity"
             android:exported="false" />
         <activity
             android:name=".ui.logcat.LogcatActivity"

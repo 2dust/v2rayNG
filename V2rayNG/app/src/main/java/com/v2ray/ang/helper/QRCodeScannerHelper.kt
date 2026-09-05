@@ -1,29 +1,25 @@
 package com.v2ray.ang.helper
 
-import android.app.Activity
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import com.v2ray.ang.ui.ScannerActivity
+import com.v2ray.ang.ui.base.BaseResult
+import com.v2ray.ang.ui.base.BaseResultContract
+import com.v2ray.ang.ui.scanner.ScannerActivity
 
 /**
  * Helper for scanning QR codes.
  *
- * This class encapsulates the logic for launching the QR code scanner activity
- * and handling the scan result.
+ * The scanner answers with [BaseResult.Selected]; parsing it by hand with a legacy "SCAN_RESULT"
+ * extra silently dropped every scan, so the shared [BaseResultContract] is used instead.
  */
 class QRCodeScannerHelper(private val activity: ComponentActivity) {
     private var scanCallback: ((String?) -> Unit)? = null
 
     private val scanLauncher: ActivityResultLauncher<Intent> =
-        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val scanResult = result.data?.getStringExtra("SCAN_RESULT")
-                scanCallback?.invoke(scanResult)
-            } else {
-                scanCallback?.invoke(null)
-            }
+        activity.registerForActivityResult(BaseResultContract()) { result ->
+            val text = (result as? BaseResult.Selected)?.values?.firstOrNull()
+            scanCallback?.invoke(text)
             scanCallback = null
         }
 

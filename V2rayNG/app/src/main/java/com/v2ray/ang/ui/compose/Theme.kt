@@ -116,7 +116,8 @@ data class AppSemanticColors(
     val toastSuccess: Color,
     val toastError: Color,
     val toastInfo: Color,
-    val toastContent: Color
+    val toastContent: Color,
+    val onCameraPreview: Color
 )
 
 private val LightSemanticColors = AppSemanticColors(
@@ -128,7 +129,8 @@ private val LightSemanticColors = AppSemanticColors(
     toastSuccess = Color(0xB3388E3C), // Green (70%)
     toastError = Color(0xB3D50000),   // Red (70%)
     toastInfo = Color(0xB33F51B5),    // Indigo Blue (70%)
-    toastContent = Color.White      // White
+    toastContent = Color.White,      // White
+    onCameraPreview = Color.White
 )
 
 private val DarkSemanticColors = AppSemanticColors(
@@ -140,7 +142,8 @@ private val DarkSemanticColors = AppSemanticColors(
     toastSuccess = Color(0xB3388E3C),
     toastError = Color(0xB3D50000),
     toastInfo = Color(0xB33F51B5),
-    toastContent = Color.White
+    toastContent = Color.White,
+    onCameraPreview = Color.White
 )
 
 // Additional global color constants (used elsewhere in the app)
