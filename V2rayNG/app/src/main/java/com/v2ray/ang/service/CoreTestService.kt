@@ -99,7 +99,9 @@ class CoreTestService : Service() {
         }
 
         when (message.key) {
-            AppConfig.MSG_MEASURE_CONFIG_START -> handleMeasureStart(message, startId)
+            AppConfig.MSG_MEASURE_CONFIG_START -> handleMeasureStart(
+                message, startId, intent.getStringExtra(MessageHelper.EXTRA_REQUEST_ID)
+            )
             AppConfig.MSG_MEASURE_CONFIG_CANCEL -> handleMeasureCancel()
             else -> {
                 NotificationHelper.stopForeground(this); stopSelf(startId)
@@ -108,7 +110,7 @@ class CoreTestService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun handleMeasureStart(message: TestServiceMessage, startId: Int) {
+    private fun handleMeasureStart(message: TestServiceMessage, startId: Int, requestId: String?) {
         LogUtil.i(AppConfig.TAG, "CoreTestService starting worker   subscription ${message.subscriptionId}")
 
         val guidsList = when {
@@ -123,17 +125,18 @@ class CoreTestService : Service() {
                 context = this,
                 guids = guidsList,
                 onlyTcp = message.onlyTcp,
-                onEvent = { event -> handleWorkerEvent(event, message) { activeWorkers.remove(worker) } }
+                onEvent = { event -> handleWorkerEvent(event, message, requestId) { activeWorkers.remove(worker) } }
             )
             activeWorkers.add(worker)
             worker.start()
         } else {
+            MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_CANCEL, "", requestId)
             NotificationHelper.stopForeground(this)
             stopSelf(startId)
         }
     }
 
-    private fun handleWorkerEvent(event: RealPingEvent, message: TestServiceMessage, onWorkerDone: () -> Unit) {
+    private fun handleWorkerEvent(event: RealPingEvent, message: TestServiceMessage, requestId: String?, onWorkerDone: () -> Unit) {
         when (event) {
             is RealPingEvent.Progress -> {
                 NotificationHelper.updateNotification(
@@ -142,7 +145,7 @@ class CoreTestService : Service() {
                     title = getString(R.string.app_name),
                     content = getString(R.string.connection_running_task_left, event.text)
                 )
-                MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, event.text)
+                MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_NOTIFY, event.text, requestId)
             }
 
             is RealPingEvent.Result -> {
@@ -161,7 +164,7 @@ class CoreTestService : Service() {
                     }
                 }
 
-                MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, event.status)
+                MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, event.status, requestId)
                 onWorkerDone()
                 if (activeWorkers.isEmpty()) {
                     NotificationHelper.stopForeground(this)
@@ -172,7 +175,7 @@ class CoreTestService : Service() {
     }
 
     private fun handleMeasureCancel() {
-        MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_FINISH, "0")
+        MessageHelper.sendMsg2UI(this, AppConfig.MSG_MEASURE_CONFIG_CANCEL, "")
         LogUtil.i(AppConfig.TAG, "CoreTestService received cancel message, cancelling ${activeWorkers.size} active workers")
         val snapshot = ArrayList(activeWorkers)
         snapshot.forEach { it.cancel() }
