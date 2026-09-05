@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.dto.SubEditData
 import com.v2ray.ang.dto.SubUpdateOptions
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.SubscriptionUpdateResult
@@ -34,13 +35,17 @@ open class SubRepository(private val app: Application) : BaseRepository() {
         MmkvManager.decodeSubscription(subId)
     }
 
-    open suspend fun profileOptions(): List<String> = withIO {
-        SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN
-            )
+    open suspend fun loadEdit(subId: String): SubEditData = withIO {
+        SubEditData(
+            item = if (subId.isEmpty()) null else MmkvManager.decodeSubscription(subId),
+            confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false),
+            profileOptions = SettingsManager.getProfileRemarks(
+                excludeConfigTypes = setOf(
+                    EConfigType.CUSTOM,
+                    EConfigType.POLICYGROUP,
+                    EConfigType.PROXYCHAIN
+                )
+            ),
         )
     }
 

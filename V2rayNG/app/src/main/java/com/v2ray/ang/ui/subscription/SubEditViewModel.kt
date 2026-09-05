@@ -1,7 +1,5 @@
 package com.v2ray.ang.ui.subscription
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -11,78 +9,64 @@ import com.v2ray.ang.repository.SubRepository
 import com.v2ray.ang.ui.AppRoute
 import com.v2ray.ang.ui.base.BaseEditViewModel
 import com.v2ray.ang.ui.base.BaseResult
+import com.v2ray.ang.ui.base.EditFormSaver
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Job
 
 class SubEditViewModel(
-    private val handle: SavedStateHandle,
-    private val repo: SubRepository
+    handle: SavedStateHandle,
+    private val repo: SubRepository,
 ) : BaseEditViewModel<SubEditUiState, SubEditAction>(
     SubEditUiState(subId = handle.get<String>(AppRoute.EXTRA_SUB_GUID).orEmpty())
 ) {
 
+    private val saver = EditFormSaver(handle, KEY_SAVED)
+
+    private var initial: SubscriptionItem? = null
+    private var loadFailed = false
     private var loadJob: Job? = null
-    private var formDirty = false
-    private var confirmRemove = false
 
     init {
-        handle.setSavedStateProvider(KEY_SAVED) {
-            bundleOf(KEY_FORM to JsonUtil.toJson(state.form))
-        }
-        handle.get<Bundle>(KEY_SAVED)
+        saver.restore()
             ?.getString(KEY_FORM)
             ?.let { JsonUtil.fromJsonSafe(it, SubEditForm::class.java) }
             ?.let { restored ->
-                formDirty = true
+                saver.markDirty()
                 setState { copy(form = restored) }
             }
-        load()
+        saver.register { bundle -> bundle.putString(KEY_FORM, JsonUtil.toJson(state.form)) }
+        loadJob = load()
     }
 
-    val isEditMode: Boolean
-        get() = state.isEdit
-
-    private fun load() {
-        loadJob?.cancel()
-        loadJob = launch {
-            val item = if (state.isEdit) repo.loadSubscription(state.subId) else null
-            confirmRemove = repo.confirmRemove()
-
-            val form = if (formDirty) {
-                state.form
-            } else {
-                item.toSubEditForm()
-            }
-
-            setState {
-                copy(
-                    form = form,
-                    confirmRemove = confirmRemove,
-                )
-            }
-
-            val profiles = repo.profileOptions()
-            setState { copy(profileOptions = profiles) }
+    private fun load(): Job = launch(onError = { loadFailed = true; toastError() }) {
+        val data = repo.loadEdit(state.subId)
+        initial = data.item
+        if (state.isEdit && data.item == null) {
+            loadFailed = true
+            toastError()
         }
-    }
-
-    override fun onCleared() {
-        loadJob?.cancel()
-        loadJob = null
-        super.onCleared()
+        setState {
+            copy(
+                form = if (saver.dirty) form else data.item.toSubEditForm(),
+                confirmRemove = data.confirmRemove,
+                profileOptions = data.profileOptions,
+            )
+        }
     }
 
     override fun onAction(action: SubEditAction) {
         when (action) {
             is SubEditAction.TextChanged -> {
-                formDirty = true
+                saver.markDirty()
                 setState { copy(form = action.field.set(form, action.value)) }
             }
+
             is SubEditAction.FlagChanged -> {
-                formDirty = true
+                saver.markDirty()
                 setState { copy(form = action.flag.set(form, action.value)) }
             }
+
             SubEditAction.Save -> save()
             SubEditAction.Back -> cancel()
             SubEditAction.DeleteConfirmed -> delete()
@@ -90,6 +74,8 @@ class SubEditViewModel(
     }
 
     override suspend fun doSave(): BaseResult? {
+        if (!awaitLoad()) return null
+
         val form = state.form
         if (form.remarks.isBlank()) {
             toastError(R.string.sub_setting_remarks)
@@ -112,15 +98,22 @@ class SubEditViewModel(
             return null
         }
 
-        val item = (repo.loadSubscription(state.subId) ?: SubscriptionItem()).applySubEditForm(form)
+        val item = (initial ?: SubscriptionItem()).applySubEditForm(form)
         repo.save(state.subId, item)
         return BaseResult.Saved(id = state.subId, refreshList = true)
     }
 
     override suspend fun doDelete(): BaseResult? {
         if (!state.isEdit) return null
+        if (!awaitLoad()) return null
         repo.remove(state.subId)
         return BaseResult.Deleted(id = state.subId, refreshList = true)
+    }
+
+    private suspend fun awaitLoad(): Boolean {
+        loadJob?.join()
+        if (loadFailed) toastError(R.string.toast_failure)
+        return !loadFailed
     }
 
     private companion object {
