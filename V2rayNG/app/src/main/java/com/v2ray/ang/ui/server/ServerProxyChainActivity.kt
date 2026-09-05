@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.extension.toast
@@ -101,10 +100,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         members: List<String>
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(
-                R.string.server_lab_remarks,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_lab_remarks)
             return false
         }
 
@@ -113,18 +109,12 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             .filter { it.isNotEmpty() }
 
         if (chainMembers.size != members.size) {
-            toast(
-                R.string.server_proxy_chain_members_unselected,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_proxy_chain_members_unselected)
             return false
         }
 
         if (chainMembers.size < 2) {
-            toast(
-                R.string.server_proxy_chain_members_insufficient,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.server_proxy_chain_members_insufficient)
             return false
         }
 
@@ -138,8 +128,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 getString(
                     R.string.server_proxy_chain_members_invalid,
                     invalidMembers.joinToString(", ")
-                ),
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
+                )
             )
             return false
         }
@@ -185,10 +174,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
-            toast(
-                R.string.toast_action_not_allowed,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.toast_action_not_allowed)
             return false
         }
 

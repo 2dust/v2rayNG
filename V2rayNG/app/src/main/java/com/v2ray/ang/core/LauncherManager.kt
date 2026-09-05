@@ -111,10 +111,7 @@ object LauncherManager {
         }
 
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PROXY_SHARING)) {
-            context.toast(
-                R.string.toast_warning_pref_proxysharing_short,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
             context.toast(R.string.toast_services_start)
         }

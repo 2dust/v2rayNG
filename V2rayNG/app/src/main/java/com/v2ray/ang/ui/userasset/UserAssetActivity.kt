@@ -49,7 +49,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -148,10 +147,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
                 val assetList = MmkvManager.decodeAssetUrls()
                 if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-                    toast(
-                        R.string.msg_remark_is_duplicate,
-                        liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                    )
+                    toast(R.string.msg_remark_is_duplicate)
                 } else {
                     MmkvManager.encodeAsset(assetId, assetItem)
                     copyFile(uri)
@@ -199,10 +195,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
     private fun importAsset(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
-                toast(
-                    R.string.toast_invalid_url,
-                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                )
+                toast(R.string.toast_invalid_url)
                 return false
             }
             startActivity(
@@ -218,10 +211,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
     private fun downloadGeoFiles() {
         isLoadingState.value = true
-        toast(
-            R.string.msg_downloading_content,
-            liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-        )
+        toast(R.string.msg_downloading_content)
 
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
@@ -238,7 +228,6 @@ class UserAssetActivity : HelperBaseComponentActivity() {
                         result.successCount,
                         result.successCount,
                     ),
-                    liveRegionMode = AccessibilityLiveRegionMode.POLITE,
                 )
             } else {
                 toastError(R.string.toast_failure)

@@ -477,10 +477,7 @@ class MainViewModel(
                     }
                     when {
                         result.successCount + result.failureCount + result.skipCount == 0 ->
-                            toast(
-                                R.string.title_update_subscription_no_subscription,
-                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-                            )
+                            toast(R.string.title_update_subscription_no_subscription)
 
                         result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
                             toast(
@@ -489,7 +486,6 @@ class MainViewModel(
                                     result.configCount,
                                     result.configCount,
                                 ),
-                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
                             )
 
                         else ->
@@ -501,7 +497,6 @@ class MainViewModel(
                                     result.failureCount,
                                     result.skipCount,
                                 ),
-                                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
                             )
                     }
                     if (result.configCount > 0) {
@@ -724,10 +719,7 @@ class MainViewModel(
 
     fun removeServerAndRefresh(guid: String) {
         if (guid == uiState.value.selectedGuid) {
-            toast(
-                R.string.toast_action_not_allowed,
-                liveRegionMode = AccessibilityLiveRegionMode.POLITE,
-            )
+            toast(R.string.toast_action_not_allowed)
             return
         }
         viewModelScope.launch(ioDispatcher) {

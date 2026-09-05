@@ -112,44 +112,16 @@ private fun Context.dispatchMessage(
     type: ToastType,
     liveRegionMode: AccessibilityLiveRegionMode,
     accessibilityMessage: CharSequence? = null,
-    long: Boolean = false,
 ) {
     val event = AppSnackbarMessage(
         message = message,
         type = type,
-        long = long,
         liveRegionMode = liveRegionMode,
         accessibilityMessage = accessibilityMessage,
     )
-    deliverTransientMessage(
-        event = event,
-        foregroundDelivery = {
-            AppSnackbarManager.show(it).also { delivered ->
-                if (delivered) NotificationHelper.cancelTransientMessage(this)
-            }
-        },
-        backgroundDelivery = {
-            val notificationMessage = it.accessibilityMessage ?: it.message
-            NotificationHelper.notifyTransientMessage(this, notificationMessage)
-        }
-    )
-}
-
-internal enum class TransientMessageDelivery {
-    FOREGROUND_SNACKBAR,
-    BACKGROUND_NOTIFICATION,
-    UNAVAILABLE,
-}
-
-internal fun deliverTransientMessage(
-    event: AppSnackbarMessage,
-    foregroundDelivery: (AppSnackbarMessage) -> Boolean,
-    backgroundDelivery: (AppSnackbarMessage) -> Boolean,
-): TransientMessageDelivery {
-    if (foregroundDelivery(event)) return TransientMessageDelivery.FOREGROUND_SNACKBAR
-    return if (backgroundDelivery(event)) {
-        TransientMessageDelivery.BACKGROUND_NOTIFICATION
+    if (AppSnackbarManager.show(event)) {
+        NotificationHelper.cancelTransientMessage(this)
     } else {
-        TransientMessageDelivery.UNAVAILABLE
+        NotificationHelper.notifyTransientMessage(this, accessibilityMessage ?: message)
     }
 }
