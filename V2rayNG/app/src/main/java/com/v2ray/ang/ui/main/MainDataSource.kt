@@ -24,6 +24,7 @@ interface MainDataSource : Closeable {
 
     fun getString(resId: Int): String
     fun getString(resId: Int, vararg formatArgs: Any): String
+    fun getQuantityString(resId: Int, quantity: Int, vararg formatArgs: Any): String
 
     fun getSubscriptions(): List<SubscriptionCache>
     fun getSubscriptionItem(id: String): SubscriptionItem?

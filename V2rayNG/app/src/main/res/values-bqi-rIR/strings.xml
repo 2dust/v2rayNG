@@ -389,13 +389,19 @@
 
     <string name="connection_test_pending">منپیزن واجۊری کوݩ</string>
     <string name="connection_test_testing">هونی آزمایش ابۊ…</string>
+    <string name="connection_test_complete">آزمایش ٱنجوم وابی</string>
     <string name="connection_test_testing_count">%d کانفیگ هونی آزمایش ابۊ…</string>
-    <string name="connection_test_available">مووفق بی: منپیز %1$s طۊل کشی</string>
-    <string name="server_test_delay_value">%1$d میلی‌ثانیه</string>
+    <string name="connection_test_available">مووفق بی: منپیز %1$s تۊل کشی</string>
+    <string name="server_test_delay_value">%1$d میلی‌سانیه</string>
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود خطا: #%d</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌سانیه</item>
+        <item quantity="other">%1$d میلی‌سانیه</item>
+    </plurals>
     <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
+    <string name="connection_connected_accessibility">منپیز هڌ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
 

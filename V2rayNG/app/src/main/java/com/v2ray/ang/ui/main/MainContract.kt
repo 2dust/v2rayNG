@@ -9,9 +9,30 @@ sealed interface MainStatus {
     data object Disconnected : MainStatus
     data object Connected : MainStatus
     data object Testing : MainStatus
+    data object TestCompleted : MainStatus
     data class TestProgress(val progress: String) : MainStatus
     data class ConnectionTest(val result: ConnectionTestResult) : MainStatus
 }
+
+data class MainTestAnnouncement(
+    val id: Long,
+    val status: MainStatus,
+)
+
+internal fun MainStatus.isTestAnnouncement(): Boolean =
+    this == MainStatus.Testing ||
+        this == MainStatus.TestCompleted ||
+        this is MainStatus.ConnectionTest
+
+internal fun accessibilityConnectionStatus(isRunning: Boolean): MainStatus =
+    if (isRunning) MainStatus.Connected else MainStatus.Disconnected
+
+internal fun MainStatus.canExposeTestResult(
+    isRunning: Boolean,
+    announcement: MainTestAnnouncement?,
+    completedAnnouncementId: Long?,
+): Boolean = isRunning && this is MainStatus.ConnectionTest &&
+    (announcement == null || (announcement.status == this && announcement.id == completedAnnouncementId))
 
 /**
  * Main UI state
@@ -27,6 +48,27 @@ data class MainUiState(
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
     val shareQRCodeBitmap: android.graphics.Bitmap? = null
+)
+
+internal fun MainUiState.withTestingStarted(): MainUiState = copy(
+    isTesting = true,
+    status = MainStatus.Testing,
+)
+
+internal fun MainUiState.withCurrentTestResult(
+    result: ConnectionTestResult,
+): MainUiState = copy(
+    isTesting = false,
+    status = MainStatus.ConnectionTest(result),
+)
+
+internal fun MainUiState.withTestingFinished(completedBulkTest: Boolean): MainUiState = copy(
+    isTesting = false,
+    status = if (completedBulkTest) {
+        MainStatus.TestCompleted
+    } else {
+        accessibilityConnectionStatus(isRunning)
+    },
 )
 
 /**
