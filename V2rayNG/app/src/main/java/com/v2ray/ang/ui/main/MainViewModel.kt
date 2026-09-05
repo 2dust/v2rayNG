@@ -42,12 +42,12 @@ import java.util.regex.PatternSyntaxException
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource
+    private val dataSource: MainDataSource,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : BaseViewModel(application) {
 
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-    private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private val preloadDispatcher: CoroutineDispatcher = ioDispatcher.limitedParallelism(1)
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
@@ -274,14 +274,26 @@ class MainViewModel(
         groupId: String,
         forceRefresh: Boolean = false
     ): List<ServersCache> {
-        val loadMutex = groupLoadMutexes.computeIfAbsent(groupId) { Mutex() }
-        return loadMutex.withLock {
+        // Keep cache lookup, refresh and publication together: an older in-flight load must
+        // not repopulate an aggregate/shared-profile cache after it was invalidated.
+        return cacheMutex.withLock {
             if (!forceRefresh) {
-                cacheMutex.withLock { groupDataCache[groupId]?.let { return@withLock it } }
+                groupDataCache[groupId]?.let { return@withLock it }
             }
             val servers = buildServersCache(dataSource.getServerGuidList(groupId))
             currentCoroutineContext().ensureActive()
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
+            if (forceRefresh) {
+                if (groupId.isEmpty()) {
+                    groupDataCache.clear()
+                } else {
+                    // The All tab contains every group. Other groups can share profile GUIDs.
+                    val affectedIds = (groupDataCache[groupId].orEmpty() + servers).mapTo(HashSet()) { it.guid }
+                    groupDataCache.entries.removeAll { (id, cached) ->
+                        id != groupId && (id.isEmpty() || cached.any { it.guid in affectedIds })
+                    }
+                }
+            }
+            groupDataCache[groupId] = servers
             servers
         }
     }
@@ -713,14 +725,20 @@ class MainViewModel(
         mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
+        serverOrderPersistenceJobs[groupId] = viewModelScope.launch {
             previousPersistenceJob?.join()
-            if (dataSource.encodeServerList(guids, groupId)) {
-                cacheMutex.withLock { groupDataCache[groupId] = servers }
-            } else {
-                cacheMutex.withLock { groupDataCache.remove(groupId) }
-                setupGroupTab(forceRefresh = true).join()
+            if (!withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }) {
                 toastError(R.string.toast_failure)
+            }
+            // Only the final queued write reconciles the UI, on both success and failure.
+            // Read persisted membership/order instead of replaying a captured drag snapshot.
+            val thisJob = currentCoroutineContext()[Job]
+            if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                val persisted = withContext(ioDispatcher) { loadGroup(groupId, forceRefresh = true) }
+                if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                    updateGroupUi(groupId, persisted)
+                    serverOrderPersistenceJobs.remove(groupId)
+                }
             }
         }
     }

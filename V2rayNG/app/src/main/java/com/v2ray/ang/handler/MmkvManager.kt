@@ -338,14 +338,23 @@ object MmkvManager {
 
     //region Server
 
-    /**
-     * Reads the legacy server list from KEY_ANG_CONFIGS for migration.
-     * This method is for migration purposes only.
-     *
-     * @return The JSON string of legacy server list, or null if not exists.
-     */
-    fun readLegacyServerList(): String? {
-        return mainStorage.decodeString(KEY_ANG_CONFIGS)
+    /** Missing records may be skipped; existing unreadable indexes or payloads abort migration. */
+    internal fun readProfilesForMigration(legacy: Boolean = false): Map<String, ProfileItem> {
+        return withProfileIndexLock {
+            val ids = if (legacy) {
+                decodeStringListForWrite(KEY_ANG_CONFIGS, "legacy profile index")
+            } else {
+                (decodeSubsListForWrite() + DEFAULT_SUBSCRIPTION_ID).distinct()
+                    .flatMap { decodeServerListForWrite(it) }
+            }
+            val profiles = linkedMapOf<String, ProfileItem>()
+            for (guid in ids.distinct()) {
+                val json = readStoredString(profileFullStorage, guid, "migration profile $guid") ?: continue
+                profiles[guid] = JsonUtil.fromJsonSafe(json, ProfileItem::class.java)
+                    ?: throw ProfileStorageException("Failed to decode migration profile $guid")
+            }
+            profiles
+        }
     }
 
 
@@ -370,22 +379,43 @@ object MmkvManager {
     }
 
     /**
-     * Encodes the server list for a given subscription.
-     * Saves to the subscription's serverList (including default subscription for ungrouped servers).
+     * Adds legacy server IDs without dropping profiles imported since a failed migration attempt.
+     * Reordering must use [reorderServerList] instead.
      *
      * @param serverList The list of server GUIDs.
      * @param subscriptionId The subscription ID.
      */
-    fun encodeServerList(serverList: MutableList<String>, subscriptionId: String): Boolean {
+    internal fun migrateServerList(serverList: List<String>, subscriptionId: String): Boolean {
         return try {
             withProfileIndexLock {
+                val merged = (decodeServerListForWrite(subscriptionId) + serverList).distinct()
                 runStorageMutationTransaction {
-                    writeProfileIndex(serverListKey(subscriptionId), serverList)
+                    writeProfileIndex(serverListKey(subscriptionId), merged)
                 }
             }
             true
         } catch (e: Exception) {
-            LogUtil.e(TAG, "Failed to persist profile order for group $subscriptionId", e)
+            LogUtil.e(TAG, "Failed to migrate profile index for group $subscriptionId", e)
+            false
+        }
+    }
+
+    fun reorderServerList(serverList: List<String>, subscriptionId: String): Boolean =
+        reorderIndex(serverListKey(subscriptionId), serverList)
+
+    /** A stale UI snapshot may change order, but must never change current membership. */
+    private fun reorderIndex(key: String, requestedOrder: List<String>): Boolean {
+        return try {
+            withProfileIndexLock {
+                val current = decodeStringListForWrite(key, "index $key").toMutableSet()
+                val reordered = requestedOrder.filter { current.remove(it) } + current
+                runStorageMutationTransaction {
+                    writeString(mainStorage, key, JsonUtil.toJson(reordered), "index $key")
+                }
+            }
+            true
+        } catch (e: Exception) {
+            LogUtil.e(TAG, "Failed to reorder index $key", e)
             false
         }
     }
@@ -512,17 +542,8 @@ object MmkvManager {
         if (profiles.isEmpty()) return
 
         withProfileIndexLock {
-            subscriptionUpdate?.let { update ->
-                val subscriptionIds = decodeSubsListForWrite()
-                val currentSubscription = decodeSubscription(subscriptionId)
-                if (!SubscriptionUpdateGuard.canCommit(
-                        isIndexed = subscriptionId in subscriptionIds,
-                        current = currentSubscription,
-                        expected = update.expected,
-                    )
-                ) {
-                    throw SubscriptionUpdateAbortedException()
-                }
+            val updatedSubscription = subscriptionUpdate?.let { update ->
+                mergeSubscriptionUpdate(subscriptionId, update.expected, update.replacement, update.replacement.lastUpdated)
             }
             val replacedServers = if (append) {
                 emptyList()
@@ -559,7 +580,7 @@ object MmkvManager {
             val removablePayloads = runStorageMutationTransaction {
                 rawConfigs.forEach { (guid, raw) -> writeRawProfilePayload(guid, raw) }
                 profiles.forEach { (guid, profile) -> writeProfilePayload(guid, profile) }
-                subscriptionUpdate?.let { writeSubscriptionPayload(subscriptionId, it.replacement) }
+                updatedSubscription?.let { writeSubscriptionPayload(subscriptionId, it) }
                 replacementSelection?.let { writeSelectedProfile(it) }
 
                 val removable = if (replacedServers.isEmpty()) {
@@ -779,17 +800,23 @@ object MmkvManager {
     }
 
     /**
-     * Initializes the subscription list.
+     * Migrates the pre-index subscription format at startup, never during normal reads.
+     * An explicitly empty index is authoritative even if payload cleanup previously failed.
      */
-    private fun initSubsList() {
-        val subsList = decodeSubsList()
-        if (subsList.isNotEmpty()) {
-            return
+    internal fun migrateSubscriptionIndex(): Boolean {
+        return try {
+            withProfileIndexLock {
+                if (!mainStorage.containsKey(KEY_SUB_IDS)) {
+                    val ids = subStorage.allKeys()?.toList()
+                        ?: throw ProfileStorageException("Failed to read legacy subscriptions")
+                    runStorageMutationTransaction { writeSubscriptionIndex(ids) }
+                }
+            }
+            true
+        } catch (e: Exception) {
+            LogUtil.e(TAG, "Failed to migrate subscription index", e)
+            false
         }
-        subStorage.allKeys()?.forEach { key ->
-            subsList.add(key)
-        }
-        encodeSubsList(subsList)
     }
 
     /**
@@ -798,8 +825,6 @@ object MmkvManager {
      * @return The list of subscriptions.
      */
     fun decodeSubscriptions(): List<SubscriptionCache> {
-        initSubsList()
-
         val subscriptions = mutableListOf<SubscriptionCache>()
         decodeSubsList().forEach { key ->
             val json = subStorage.decodeString(key)
@@ -884,28 +909,20 @@ object MmkvManager {
     }
 
     /**
-     * Replaces an existing subscription only if it has not changed since the caller read it.
+     * Replaces unchanged subscription settings, preserving the stored refresh timestamp.
+     * A refresh supplies [updatedAt] and additionally requires unchanged refresh metadata.
      */
     fun updateSubscription(
         guid: String,
         expected: SubscriptionItem,
         replacement: SubscriptionItem,
+        updatedAt: Long? = null,
     ): Boolean {
         return try {
             withProfileIndexLock {
-                val subscriptionIds = decodeSubsListForWrite()
-                val current = decodeSubscription(guid)
-                if (!SubscriptionUpdateGuard.canCommit(
-                        isIndexed = guid in subscriptionIds,
-                        current = current,
-                        expected = expected,
-                    )
-                ) {
-                    throw SubscriptionUpdateAbortedException()
-                }
-
+                val updated = mergeSubscriptionUpdate(guid, expected, replacement, updatedAt)
                 runStorageMutationTransaction {
-                    writeSubscriptionPayload(guid, replacement)
+                    writeSubscriptionPayload(guid, updated)
                 }
             }
             true
@@ -916,6 +933,24 @@ object MmkvManager {
             LogUtil.e(TAG, "Failed to update subscription $guid", e)
             false
         }
+    }
+
+    // Caller holds the profile index lock across validation and persistence.
+    private fun mergeSubscriptionUpdate(
+        guid: String,
+        expected: SubscriptionItem,
+        replacement: SubscriptionItem,
+        updatedAt: Long?,
+    ): SubscriptionItem {
+        val current = decodeSubscription(guid) ?: throw SubscriptionUpdateAbortedException()
+        if (!SubscriptionUpdateGuard.canCommit(guid in decodeSubsListForWrite(), current, expected) ||
+            (updatedAt != null && current.lastUpdated != expected.lastUpdated)
+        ) {
+            throw SubscriptionUpdateAbortedException()
+        }
+        // Wall-clock time may move backwards. Reject stale refreshes by their expected state,
+        // not by ordering timestamps; a settings edit never owns this metadata.
+        return replacement.copy(lastUpdated = updatedAt ?: current.lastUpdated)
     }
 
     /**
@@ -930,23 +965,11 @@ object MmkvManager {
     }
 
     /**
-     * Encodes the subscription list.
+     * Reorders existing subscriptions without publishing or removing IDs.
      *
      * @param subsList The list of subscription IDs.
      */
-    fun encodeSubsList(subsList: MutableList<String>): Boolean {
-        return try {
-            withProfileIndexLock {
-                runStorageMutationTransaction {
-                    writeSubscriptionIndex(subsList)
-                }
-            }
-            true
-        } catch (e: Exception) {
-            LogUtil.e(TAG, "Failed to persist subscription order", e)
-            false
-        }
-    }
+    fun reorderSubscriptions(subsList: List<String>): Boolean = reorderIndex(KEY_SUB_IDS, subsList)
 
     /**
      * Decodes the subscription list.

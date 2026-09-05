@@ -596,7 +596,7 @@ object AngConfigManager {
             .sortedBy { it.second }
             .map { it.first }
             .toMutableList()
-        MmkvManager.encodeServerList(sorted, subId)
+        MmkvManager.reorderServerList(sorted, subId)
     }
 
     /**
