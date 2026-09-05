@@ -539,6 +539,7 @@
     <string name="acc_move_to_bottom">Move to bottom</string>
     <string name="acc_moved">Moved</string>
     <string name="acc_selected_server">Selected</string>
+    <string name="acc_select_server">Select</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>

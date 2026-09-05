@@ -539,6 +539,7 @@
     <string name="acc_move_to_bottom">移至清單底端</string>
     <string name="acc_moved">已移動</string>
     <string name="acc_selected_server">已選取</string>
+    <string name="acc_select_server">選取</string>
     <string name="acc_share_subscription">分享訂閱連結</string>
     <string name="acc_share_log">分享日誌</string>
     <string name="acc_remove">移除代理鏈成員</string>
