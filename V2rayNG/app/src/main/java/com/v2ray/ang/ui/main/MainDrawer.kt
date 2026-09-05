@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -21,6 +20,7 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -30,57 +30,58 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.AppRoute
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
-enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
-    Subscriptions(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting),
-    PerAppProxy(R.drawable.ic_per_apps_24dp, R.string.per_app_proxy_settings),
-    Routing(R.drawable.ic_routing_24dp, R.string.routing_settings_title),
-    UserAssets(R.drawable.ic_file_24dp, R.string.title_user_asset_setting),
-    Settings(R.drawable.ic_settings_24dp, R.string.title_settings),
-    Promotion(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion),
-    Logcat(R.drawable.ic_logcat_24dp, R.string.title_logcat),
-    CheckUpdate(R.drawable.ic_check_update_24dp, R.string.update_check_for_update),
-    BackupRestore(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore),
-    About(R.drawable.ic_about_24dp, R.string.title_about)
-}
+private val DrawerWidthFraction = 0.75f
+private val DrawerHeaderHeight = 180.dp
+private val LogoSize = 120.dp
 
-private val primaryDrawerItems = listOf(
-    MainDestination.Subscriptions,
-    MainDestination.PerAppProxy,
-    MainDestination.Routing,
-    MainDestination.UserAssets,
-    MainDestination.Settings
+@Immutable
+private data class DrawerItem(
+    @DrawableRes val iconRes: Int,
+    @StringRes val labelRes: Int,
+    val action: MainAction
 )
 
-private val drawerItems = primaryDrawerItems + listOf(
-    MainDestination.Promotion,
-    MainDestination.Logcat,
-    MainDestination.CheckUpdate,
-    MainDestination.BackupRestore,
-    MainDestination.About
+private val primaryMenu = listOf(
+    DrawerItem(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting, MainAction.Navigate(AppRoute.SubSetting)),
+    DrawerItem(R.drawable.ic_per_apps_24dp, R.string.per_app_proxy_settings, MainAction.Navigate(AppRoute.PerAppProxy)),
+    DrawerItem(R.drawable.ic_routing_24dp, R.string.routing_settings_title, MainAction.Navigate(AppRoute.RoutingSetting)),
+    DrawerItem(R.drawable.ic_file_24dp, R.string.title_user_asset_setting, MainAction.Navigate(AppRoute.UserAsset)),
+    DrawerItem(R.drawable.ic_settings_24dp, R.string.title_settings, MainAction.Navigate(AppRoute.Settings))
+)
+
+private val secondaryMenu = listOf(
+    DrawerItem(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion, MainAction.OpenPromotion),
+    DrawerItem(R.drawable.ic_logcat_24dp, R.string.title_logcat, MainAction.Navigate(AppRoute.Logcat)),
+    DrawerItem(R.drawable.ic_check_update_24dp, R.string.update_check_for_update, MainAction.Navigate(AppRoute.CheckUpdate)),
+    DrawerItem(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore, MainAction.Navigate(AppRoute.Backup)),
+    DrawerItem(R.drawable.ic_about_24dp, R.string.title_about, MainAction.Navigate(AppRoute.About))
 )
 
 @Composable
-fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
-    val drawerScrollState = rememberScrollState()
+fun MainDrawerContent(
+    onAction: (MainAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberScrollState()
 
     ModalDrawerSheet(
-        drawerState = drawerState,
-        modifier = Modifier.fillMaxWidth(0.75f),
+        modifier = modifier.fillMaxWidth(DrawerWidthFraction),
         drawerContainerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(drawerScrollState)
-                .verticalScrollbar(drawerScrollState)
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
         ) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(DrawerHeaderHeight)
             ) {
                 Column(
                     modifier = Modifier
@@ -93,7 +94,7 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     Image(
                         painter = painterResource(R.mipmap.ic_launcher_foreground),
                         contentDescription = null,
-                        modifier = Modifier.size(120.dp),
+                        modifier = Modifier.size(LogoSize),
                         colorFilter = if (isDarkTheme) {
                             ColorFilter.tint(Color.White, BlendMode.SrcIn)
                         } else {
@@ -107,12 +108,24 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     )
                 }
             }
-            drawerItems.forEachIndexed { index, item ->
-                if (index == primaryDrawerItems.size) AppDivider()
+
+            primaryMenu.forEach { item ->
                 NavigationDrawerItem(
                     label = { Text(stringResource(item.labelRes)) },
                     selected = false,
-                    onClick = { onNavigate(item) },
+                    onClick = { onAction(item.action) },
+                    icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+            }
+
+            AppDivider()
+
+            secondaryMenu.forEach { item ->
+                NavigationDrawerItem(
+                    label = { Text(stringResource(item.labelRes)) },
+                    selected = false,
+                    onClick = { onAction(item.action) },
                     icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )

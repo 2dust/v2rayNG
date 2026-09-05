@@ -1,6 +1,9 @@
 package com.v2ray.ang.dto
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class GroupMapItem(
-    var id: String,
-    var remarks: String,
+    val id: String,
+    val remarks: String,
 )

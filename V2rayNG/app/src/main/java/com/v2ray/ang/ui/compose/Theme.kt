@@ -109,6 +109,7 @@ private val DarkColor = darkColorScheme(
 data class AppSemanticColors(
     val pingBad: Color,
     val fabInactive: Color,
+    val fabContent: Color,
     val divider: Color,
     val toastBackground: Color,
     val toastSuccess: Color,
@@ -120,6 +121,7 @@ data class AppSemanticColors(
 private val LightSemanticColors = AppSemanticColors(
     pingBad = Color(0xFFFF0099),   // Pink Red
     fabInactive = Color(0xFF9C9C9C), // Gray
+    fabContent = Color.White,       // White
     divider = Color(0xFFE0E0E0),    // Light Gray
     toastBackground = Color(0xB3353A3E), // Dark Gray (70%)
     toastSuccess = Color(0xB3388E3C), // Green (70%)
@@ -128,10 +130,16 @@ private val LightSemanticColors = AppSemanticColors(
     toastContent = Color.White      // White
 )
 
-private val DarkSemanticColors = LightSemanticColors.copy(
-    fabInactive = Color(0xFF646464),   // Dark Gray
-    divider = Color(0xFF424242),       // Dark Gray
-    toastBackground = Color(0xB34A4F54) // Darker Gray (70%)
+private val DarkSemanticColors = AppSemanticColors(
+    pingBad = Color(0xFFFF0099),
+    fabInactive = Color(0xFF646464),
+    fabContent = Color.White,
+    divider = Color(0xFF424242),
+    toastBackground = Color(0xB34A4F54),
+    toastSuccess = Color(0xB3388E3C),
+    toastError = Color(0xB3D50000),
+    toastInfo = Color(0xB33F51B5),
+    toastContent = Color.White
 )
 
 // Additional global color constants (used elsewhere in the app)
