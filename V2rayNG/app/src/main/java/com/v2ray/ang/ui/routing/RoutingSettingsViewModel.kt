@@ -6,9 +6,11 @@ import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class RoutingSettingsViewModel(application: Application) : BaseViewModel(application) {
@@ -38,6 +40,19 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         if (position in rulesets.indices) {
             rulesets[position] = item
             SettingsManager.saveRoutingRuleset(position, item)
+            _rulesetsFlow.value = rulesets.toList()
+        }
+    }
+
+    suspend fun remove(ruleId: String) {
+        withContext(Dispatchers.IO) {
+            val savedRules = MmkvManager.decodeRoutingRulesets() ?: return@withContext
+            val position = savedRules.indexOfFirst { it.id == ruleId }
+            if (position < 0) return@withContext
+            savedRules.removeAt(position)
+            MmkvManager.encodeRoutingRulesets(savedRules)
+        }
+        if (rulesets.removeAll { it.id == ruleId }) {
             _rulesetsFlow.value = rulesets.toList()
         }
     }
