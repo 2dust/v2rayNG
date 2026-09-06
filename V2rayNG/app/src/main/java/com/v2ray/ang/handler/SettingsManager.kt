@@ -111,15 +111,16 @@ object SettingsManager {
      * @param rulesetList The list of rulesets.
      */
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
-        val rulesetNew: MutableList<RulesetItem> = mutableListOf()
-        MmkvManager.decodeRoutingRulesets()?.forEach { key ->
-            if (key.locked == true) {
-                rulesetNew.add(key)
-            }
-        }
+        val rulesetNew = mergeRoutingRulesets(MmkvManager.decodeRoutingRulesets().orEmpty(), rulesetList)
+        check(MmkvManager.encodeRoutingRulesets(rulesetNew)) { "Failed to import routing rules" }
+    }
 
-        rulesetNew.addAll(rulesetList)
-        MmkvManager.encodeRoutingRulesets(rulesetNew)
+    internal fun mergeRoutingRulesets(current: List<RulesetItem>, imported: List<RulesetItem>): MutableList<RulesetItem> {
+        val locked = current.filter { it.locked == true }
+        // IDs may have been repaired since export. Skip copies of retained locked rules by
+        // their complete contents, not their ID or title; keep genuinely different rules.
+        val retained = locked.mapTo(mutableSetOf()) { it.copy(id = "") }
+        return (locked + imported.filterNot { it.copy(id = "") in retained }).toMutableList()
     }
 
     /**
@@ -133,7 +134,7 @@ object SettingsManager {
         val rulesetList = MmkvManager.decodeRoutingRulesets()
         if (rulesetList.isNullOrEmpty()) return null
 
-        return rulesetList[index]
+        return rulesetList.getOrNull(index)
     }
 
     /**
@@ -165,7 +166,7 @@ object SettingsManager {
         if (index < 0) return
 
         val rulesetList = MmkvManager.decodeRoutingRulesets()
-        if (rulesetList.isNullOrEmpty()) return
+        if (rulesetList.isNullOrEmpty() || index !in rulesetList.indices) return
 
         rulesetList.removeAt(index)
         MmkvManager.encodeRoutingRulesets(rulesetList)

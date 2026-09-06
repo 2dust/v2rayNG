@@ -132,7 +132,20 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.reload()
+        lifecycleScope.launch { reloadRules() }
+    }
+
+    private suspend fun reloadRules(): Boolean {
+        return try {
+            viewModel.reload()
+            true
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to load routing rules", e)
+            toastError(R.string.toast_failure)
+            false
+        }
     }
 
     private fun getDomainStrategy(): String {
@@ -144,10 +157,11 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, type)
-                launch(Dispatchers.Main) {
-                    viewModel.reload()
-                    toastSuccess(R.string.toast_success)
+                withContext(Dispatchers.Main) {
+                    if (reloadRules()) toastSuccess(R.string.toast_success)
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
             }
@@ -165,8 +179,7 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             val result = SettingsManager.resetRoutingRulesets(clipboard)
             withContext(Dispatchers.Main) {
                 if (result) {
-                    viewModel.reload()
-                    toastSuccess(R.string.toast_success)
+                    if (reloadRules()) toastSuccess(R.string.toast_success)
                 } else {
                     toastError(R.string.toast_failure)
                 }
@@ -181,8 +194,7 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
                     val result = SettingsManager.resetRoutingRulesets(scanResult)
                     withContext(Dispatchers.Main) {
                         if (result) {
-                            viewModel.reload()
-                            toastSuccess(R.string.toast_success)
+                            if (reloadRules()) toastSuccess(R.string.toast_success)
                         } else {
                             toastError(R.string.toast_failure)
                         }
@@ -280,7 +292,8 @@ fun RoutingSettingScreen(
                 .verticalScrollbar(lazyListState),
             contentPadding = NavigationBarsBottomPadding()
         ) {
-            item(key = "domain_strategy") {
+            // Rule IDs are strings supplied by imports; keep header keys in a separate namespace.
+            item(key = 0) {
                 SettingsListItem(
                     title = stringResource(R.string.routing_settings_domain_strategy),
                     entries = domainStrategies,

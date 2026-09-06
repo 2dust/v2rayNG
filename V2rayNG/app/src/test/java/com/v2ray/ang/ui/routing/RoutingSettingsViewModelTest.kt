@@ -5,9 +5,13 @@ import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -18,6 +22,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class RoutingSettingsViewModelTest {
     private lateinit var storage: MMKV
@@ -106,5 +112,91 @@ class RoutingSettingsViewModelTest {
         }
         assertEquals(listOf(rule), viewModel.rulesetsFlow.value)
         assertEquals(listOf(rule), MmkvManager.decodeRoutingRulesets())
+    }
+
+    @Test
+    fun legacyDuplicateIdsArePersistedBeforeDeletingOnlyTheChosenRow() = runBlocking {
+        saved = """[{"id":"same","remarks":"Same","locked":true},{"id":"same","remarks":"Same","locked":true},{"id":null}]"""
+        viewModel.reload()
+        val loaded = viewModel.getAll()
+        assertEquals(3, loaded.map { it.id }.toSet().size)
+        assertTrue(loaded.all { it.id.isNotBlank() })
+        assertEquals(loaded, MmkvManager.decodeRoutingRulesets())
+        viewModel.remove(loaded[1].id)
+        assertEquals(listOf(loaded[0], loaded[2]), MmkvManager.decodeRoutingRulesets())
+        assertEquals(listOf(loaded[0], loaded[2]), viewModel.getAll())
+    }
+
+    @Test
+    fun failedRepairDoesNotPublishTemporaryIdsOrOverwriteStoredRules() = runBlocking {
+        val original = """[{"id":"same"},{"id":"same"}]"""
+        saved = original
+        whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
+        assertTrue(runCatching { viewModel.reload() }.exceptionOrNull() is IllegalStateException)
+        assertEquals(original, saved)
+        assertEquals(emptyList<RulesetItem>(), viewModel.getAll())
+        assertEquals(2, MmkvManager.decodeRoutingRulesets()?.size)
+    }
+
+    @Test
+    fun refusedDeletionDoesNotRemoveTheVisibleRule() = runBlocking {
+        val rule = RulesetItem(id = "keep")
+        saved = JsonUtil.toJson(listOf(rule))
+        viewModel.reload()
+        whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
+        assertTrue(runCatching { viewModel.remove("keep") }.exceptionOrNull() is IllegalStateException)
+        assertEquals(listOf(rule), viewModel.getAll())
+        assertEquals(listOf(rule), MmkvManager.decodeRoutingRulesets())
+    }
+
+    @Test
+    fun importingAnOldExportRepeatedlyKeepsLockedCopiesAndDistinctRulesStable() = runBlocking {
+        val exported = """[{"id":"same","remarks":"Locked","locked":true},{"id":"same","remarks":"Locked","locked":true},{"remarks":"Other"}]"""
+        saved = exported
+        viewModel.reload()
+        val lockedIds = viewModel.getAll().take(2).map { it.id }
+        repeat(3) {
+            assertTrue(SettingsManager.resetRoutingRulesets(exported))
+            viewModel.reload()
+            val loaded = viewModel.getAll()
+            assertEquals(3, loaded.size)
+            assertEquals(lockedIds, loaded.take(2).map { it.id })
+            assertEquals(3, loaded.map { it.id }.toSet().size)
+        }
+    }
+
+    @Test
+    fun staleReloadCannotUndoANewerReorderOrToggle() = runBlocking {
+        saved = JsonUtil.toJson(listOf(RulesetItem(id = "one"), RulesetItem(id = "two")))
+        viewModel.reload()
+        for (toggle in listOf(false, true)) {
+            val readStarted = CountDownLatch(1)
+            whenever(storage.decodeString(AppConfig.PREF_ROUTING_RULESET)).thenAnswer {
+                val snapshot = saved
+                readStarted.countDown()
+                snapshot
+            }
+            val pending = launch(start = CoroutineStart.UNDISPATCHED) { viewModel.reload() }
+            assertTrue(readStarted.await(5, TimeUnit.SECONDS))
+            if (toggle) viewModel.update(0, viewModel.getAll()[0].copy(enabled = false))
+            else viewModel.move(0, 1)
+            val expected = viewModel.getAll()
+            pending.join()
+            assertEquals(expected, viewModel.rulesetsFlow.value)
+            assertEquals(expected, MmkvManager.decodeRoutingRulesets())
+        }
+    }
+
+    @Test
+    fun addAndOutOfRangeOperationsRetainTheirIndexBasedContract() {
+        assertEquals(null, SettingsManager.getRoutingRuleset(-1))
+        SettingsManager.saveRoutingRuleset(-1, RulesetItem(remarks = "New"))
+        val added = SettingsManager.getRoutingRuleset(0)!!
+        assertTrue(added.id.isNotBlank())
+        assertEquals("New", added.remarks)
+        assertEquals(null, SettingsManager.getRoutingRuleset(3))
+        SettingsManager.removeRoutingRuleset(-1)
+        SettingsManager.removeRoutingRuleset(3)
+        assertEquals(listOf(added), MmkvManager.decodeRoutingRulesets())
     }
 }
