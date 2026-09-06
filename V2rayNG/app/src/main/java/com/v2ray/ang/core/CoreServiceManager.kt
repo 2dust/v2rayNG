@@ -100,7 +100,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
         }
@@ -172,7 +172,7 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS)
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -185,12 +185,13 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         val service = getService() ?: return false
+        val wasRunning = isRunning()
 
         networkMonitor?.unregister()
         networkMonitor = null
         currentVpnInterface = null
 
-        if (isRunning()) {
+        if (wasRunning) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     coreController.stopLoop()
@@ -207,7 +208,10 @@ object CoreServiceManager {
             browserDialer = null
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        // Failed-start cleanup must not replace the failure feedback with a successful stop.
+        if (wasRunning) {
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_STOP_SUCCESS)
+        }
         NotificationManager.cancelNotification()
 
         try {
@@ -264,7 +268,7 @@ object CoreServiceManager {
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_FAILURE, message)
             false
         } finally {
             isReloading = false

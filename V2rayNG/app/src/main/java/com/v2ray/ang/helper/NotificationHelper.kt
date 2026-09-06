@@ -1,14 +1,23 @@
 package com.v2ray.ang.helper
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.NotificationChannelType
+import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.util.LogUtil
 
 /**
  * Unified notification helper for different notification channels.
@@ -22,6 +31,58 @@ object NotificationHelper {
     // Cached instances for performance
     private var cachedNotificationManager: NotificationManager? = null
     private val builderCache = mutableMapOf<Int, NotificationCompat.Builder>()
+
+    /** Background feedback replaces the previous message; it never replaces a service notification. */
+    fun notifyTransientMessage(context: Context, content: CharSequence) {
+        if (content.isBlank()) return
+        val appContext = context.applicationContext
+        if (!NotificationManagerCompat.from(appContext).areNotificationsEnabled()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) return
+
+        val localizedContext = AppLocaleManager.localizedContext(appContext)
+        val manager = getNotificationManager(appContext)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val name = localizedContext.getString(R.string.notification_channel_other)
+                val channel = manager.getNotificationChannel(TRANSIENT_MESSAGE_CHANNEL_ID)
+                    ?: NotificationChannel(TRANSIENT_MESSAGE_CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW)
+                // Rename an existing channel without changing the user's behavior settings.
+                channel.name = name
+                manager.createNotificationChannel(channel)
+            }
+            val contentIntent = PendingIntent.getActivity(
+                appContext,
+                TRANSIENT_MESSAGE_NOTIFICATION_ID,
+                Intent(appContext, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                },
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            val notification = NotificationCompat.Builder(appContext, TRANSIENT_MESSAGE_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle(localizedContext.getString(R.string.app_name))
+                .setContentText(content)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(content))
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setTimeoutAfter(TRANSIENT_MESSAGE_TIMEOUT_MS)
+                .build()
+            manager.notify(TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
+        } catch (e: SecurityException) {
+            LogUtil.w(message = "NotificationHelper: failed to post transient message", throwable = e)
+        }
+    }
+
+    /** New foreground feedback supersedes any message left in the notification drawer. */
+    fun cancelTransientMessage(context: Context) {
+        getNotificationManager(context.applicationContext).cancel(TRANSIENT_MESSAGE_NOTIFICATION_ID)
+    }
 
     /**
      * Notify with a regular notification (non-foreground).
@@ -165,3 +226,7 @@ object NotificationHelper {
             .apply { action?.let(::addAction) }
     }
 }
+
+private const val TRANSIENT_MESSAGE_CHANNEL_ID = "transient_message_channel"
+private const val TRANSIENT_MESSAGE_NOTIFICATION_ID = 14
+private const val TRANSIENT_MESSAGE_TIMEOUT_MS = 10_000L
