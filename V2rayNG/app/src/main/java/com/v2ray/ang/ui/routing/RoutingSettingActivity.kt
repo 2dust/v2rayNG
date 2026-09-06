@@ -101,8 +101,8 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             domainStrategyState = domainStrategyState,
             onBackClick = { finish() },
             onAddRule = { startActivity(Intent(this, RoutingEditActivity::class.java)) },
-            onEditRule = { rulesetId ->
-                startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("ruleset_id", rulesetId))
+            onEditRule = { position ->
+                startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
             },
             onDomainStrategySelected = { value ->
                 MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
@@ -194,7 +194,7 @@ fun RoutingSettingScreen(
     domainStrategyState: MutableStateFlow<String>,
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
-    onEditRule: (String) -> Unit,
+    onEditRule: (Int) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
     onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
@@ -291,7 +291,7 @@ fun RoutingSettingScreen(
                     ) {
                         RoutingRulesetItem(
                             ruleset = ruleset,
-                            onEdit = { onEditRule(ruleset.id) },
+                            onEdit = { onEditRule(index) },
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
                                 viewModel.update(index, updated)
