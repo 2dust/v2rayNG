@@ -551,8 +551,8 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
-    <string name="title_remote_control">التحكم عن بُعد</string>
+    <string name="title_remote_control">وصول تطبيقات الأتمتة</string>
     <string name="summary_remote_control">السماح للتطبيقات الأخرى بالتحكم في v2rayNG</string>
-    <string name="remote_control_access_required">اسمح لهذا التطبيق في الإعدادات ← التحكم عن بُعد، ثم افتح هذا الإجراء مجددًا.</string>
+    <string name="remote_control_access_required">اسمح لهذا التطبيق في الإعدادات ← وصول تطبيقات الأتمتة، ثم افتح هذا الإجراء مجددًا.</string>
     <string name="tasker_current_profile">الملف الشخصي الحالي</string>
 </resources>

@@ -551,8 +551,8 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
-    <string name="title_remote_control">দূরবর্তী নিয়ন্ত্রণ</string>
+    <string name="title_remote_control">স্বয়ংক্রিয়করণ অ্যাপের অ্যাক্সেস</string>
     <string name="summary_remote_control">অন্য অ্যাপকে v2rayNG নিয়ন্ত্রণ করার অনুমতি দিন</string>
-    <string name="remote_control_access_required">সেটিংস → দূরবর্তী নিয়ন্ত্রণ থেকে এই অ্যাপকে অনুমতি দিন, তারপর এই কাজটি আবার খুলুন।</string>
+    <string name="remote_control_access_required">সেটিংস → স্বয়ংক্রিয়করণ অ্যাপের অ্যাক্সেস থেকে এই অ্যাপকে অনুমতি দিন, তারপর এই কাজটি আবার খুলুন।</string>
     <string name="tasker_current_profile">বর্তমান প্রোফাইল</string>
 </resources>

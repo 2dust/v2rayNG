@@ -1,6 +1,6 @@
-# Remote control
+# Automation app access
 
-Open **Settings → Remote control** (under Advanced) and select the apps allowed to
+Open **Settings → Automation app access** (under Advanced) and select the apps allowed to
 start or stop v2rayNG. Leave the picker to save the selection. The list is empty on a fresh installation and after upgrading
 from versions without access control. It is independent of per-app proxy routing.
 Removing an app revokes its access. Grant it again after reinstalling it or changing

@@ -551,8 +551,8 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
-    <string name="title_remote_control">کنترل زِ راه دور</string>
+    <string name="title_remote_control">دسترسی برنامه‌هانی خودکارسازی</string>
     <string name="summary_remote_control">اجازه بِ برنامه‌هانی دیگه سی کنترل v2rayNG</string>
-    <string name="remote_control_access_required">دِ تنظیمات ← کنترل زِ راه دور بِ ای برنامه اجازه بدین، بعد ای کار نِ دوباره وا کنین.</string>
+    <string name="remote_control_access_required">دِ تنظیمات ← دسترسی برنامه‌هانی خودکارسازی بِ ای برنامه اجازه بدین، بعد ای کار نِ دوباره وا کنین.</string>
     <string name="tasker_current_profile">پروفایل فعلی</string>
 </resources>
