@@ -65,7 +65,8 @@ class TaskerActivity : BaseComponentActivity() {
                 throw error
             } catch (error: Exception) {
                 LogUtil.e(AppConfig.TAG, "TaskerActivity: configuration failed (${error.javaClass.simpleName})")
-                denyAccess()
+                toastError(R.string.toast_failure)
+                finish()
             }
         }
     }
@@ -75,10 +76,12 @@ class TaskerActivity : BaseComponentActivity() {
         val items by viewModel.items.collectAsStateWithLifecycle()
         val start by viewModel.start.collectAsStateWithLifecycle()
         val guid by viewModel.selectedGuid.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         TaskerScreen(
             items = items,
             start = start,
             selectedGuid = guid,
+            isLoading = isLoading,
             onStartChanged = viewModel::setStart,
             onSelect = viewModel::select,
             onBackClick = { finish() },
@@ -93,13 +96,15 @@ class TaskerActivity : BaseComponentActivity() {
     }
 
     private fun confirmFinish() {
-        if (viewModel.selectedGuid.value == null) return
         lifecycleScope.launch {
             try {
-                val configuration = viewModel.configuration(callingPackage)
-                if (configuration == null) {
-                    denyAccess()
-                    return@launch
+                val configuration = when (val result = viewModel.configuration(callingPackage)) {
+                    TaskerConfiguration.NoSelection -> return@launch
+                    TaskerConfiguration.AccessDenied -> {
+                        denyAccess()
+                        return@launch
+                    }
+                    is TaskerConfiguration.Ready -> result
                 }
                 val extraBundle = Bundle().apply {
                     putBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, configuration.start)
@@ -120,7 +125,7 @@ class TaskerActivity : BaseComponentActivity() {
                 throw error
             } catch (error: Exception) {
                 LogUtil.e(AppConfig.TAG, "TaskerActivity: authorization failed (${error.javaClass.simpleName})")
-                denyAccess()
+                toastError(R.string.toast_failure)
             }
         }
     }
@@ -131,20 +136,23 @@ fun TaskerScreen(
     items: List<TaskerItem>,
     start: Boolean,
     selectedGuid: String?,
+    isLoading: Boolean,
     onStartChanged: (Boolean) -> Unit,
     onSelect: (String) -> Unit,
     onBackClick: () -> Unit,
     onSave: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val enabled = !isLoading && items.isNotEmpty()
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = "",
+                isLoading = isLoading,
                 onBackClick = onBackClick,
                 actions = {
-                    IconButton(onClick = onSave) {
+                    IconButton(onClick = onSave, enabled = enabled && selectedGuid != null) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
@@ -159,6 +167,7 @@ fun TaskerScreen(
             SettingsSwitchItem(
                 title = stringResource(R.string.tasker_start_service),
                 checked = start,
+                enabled = enabled,
                 onCheckedChange = onStartChanged
             )
             LazyColumn(
@@ -172,12 +181,13 @@ fun TaskerScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .selectable(selected = selectedGuid == item.guid, role = Role.RadioButton) { onSelect(item.guid) }
+                            .selectable(selected = selectedGuid == item.guid, enabled = enabled, role = Role.RadioButton) { onSelect(item.guid) }
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = selectedGuid == item.guid,
+                            enabled = enabled,
                             onClick = null
                         )
                         Spacer(modifier = Modifier.width(8.dp))

@@ -14,34 +14,53 @@ import kotlinx.coroutines.withContext
 
 data class TaskerItem(val label: String, val guid: String)
 
-internal data class TaskerConfiguration(val item: TaskerItem, val start: Boolean, val token: String)
+internal sealed interface TaskerConfiguration {
+    data class Ready(val item: TaskerItem, val start: Boolean, val token: String) : TaskerConfiguration
+    data object NoSelection : TaskerConfiguration
+    data object AccessDenied : TaskerConfiguration
+}
 
-class TaskerViewModel(application: Application, private val savedState: SavedStateHandle) : BaseViewModel(application) {
+class TaskerViewModel internal constructor(
+    application: Application,
+    private val savedState: SavedStateHandle,
+    private val remoteControl: RemoteControlManager,
+    private val profiles: MmkvManager
+) : BaseViewModel(application) {
+    constructor(application: Application, savedState: SavedStateHandle) :
+        this(application, savedState, RemoteControlManager, MmkvManager)
+
     private val _items = MutableStateFlow<List<TaskerItem>>(emptyList())
     val items = _items.asStateFlow()
     val start = savedState.getStateFlow("start", false)
     val selectedGuid = savedState.getStateFlow<String?>("guid", null)
 
     suspend fun load(callingPackage: String?, initialStart: Boolean?, initialGuid: String?): Boolean {
-        val allowed = withContext(Dispatchers.IO) {
-            RemoteControlManager.configurationToken(getApplication(), callingPackage) != null
-        }
-        if (!allowed) return false
-        val defaultLabel = getString(R.string.tasker_current_profile)
-        _items.value = withContext(Dispatchers.IO) {
-            buildList {
-                add(TaskerItem(defaultLabel, AppConfig.TASKER_DEFAULT_GUID))
-                MmkvManager.decodeAllServerList().forEach { guid ->
-                    MmkvManager.decodeServerConfig(guid)?.let { add(TaskerItem(it.remarks, guid)) }
-                }
-            }
-        }
         if (savedState.get<Boolean>("initialized") != true) {
             savedState["start"] = initialStart ?: false
             savedState["guid"] = initialGuid
             savedState["initialized"] = true
         }
-        return true
+        _isLoading.value = true
+        try {
+            val allowed = withContext(Dispatchers.IO) {
+                remoteControl.configurationToken(getApplication(), callingPackage) != null
+            }
+            if (!allowed) return false
+            val defaultLabel = getString(R.string.tasker_current_profile)
+            val loadedItems = withContext(Dispatchers.IO) {
+                buildList {
+                    add(TaskerItem(defaultLabel, AppConfig.TASKER_DEFAULT_GUID))
+                    profiles.decodeAllServerList().forEach { guid ->
+                        profiles.decodeServerConfig(guid)?.let { add(TaskerItem(it.remarks, guid)) }
+                    }
+                }
+            }
+            savedState["guid"] = selectedGuid.value?.takeIf { guid -> loadedItems.any { it.guid == guid } }
+            _items.value = loadedItems
+            return true
+        } finally {
+            _isLoading.value = false
+        }
     }
 
     fun setStart(value: Boolean) { savedState["start"] = value }
@@ -50,11 +69,12 @@ class TaskerViewModel(application: Application, private val savedState: SavedSta
         if (_items.value.any { it.guid == guid }) savedState["guid"] = guid
     }
 
-    internal suspend fun configuration(callingPackage: String?): TaskerConfiguration? {
-        val item = _items.value.firstOrNull { it.guid == selectedGuid.value } ?: return null
+    internal suspend fun configuration(callingPackage: String?): TaskerConfiguration {
+        if (isLoading.value) return TaskerConfiguration.NoSelection
+        val item = _items.value.firstOrNull { it.guid == selectedGuid.value } ?: return TaskerConfiguration.NoSelection
         val token = withContext(Dispatchers.IO) {
-            RemoteControlManager.configurationToken(getApplication(), callingPackage)
-        } ?: return null
-        return TaskerConfiguration(item, start.value, token)
+            remoteControl.configurationToken(getApplication(), callingPackage)
+        } ?: return TaskerConfiguration.AccessDenied
+        return TaskerConfiguration.Ready(item, start.value, token)
     }
 }

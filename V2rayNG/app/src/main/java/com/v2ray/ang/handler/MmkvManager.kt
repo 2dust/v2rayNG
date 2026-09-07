@@ -12,6 +12,7 @@ import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVHandler
 import com.tencent.mmkv.MMKVLogLevel
 import com.tencent.mmkv.MMKVRecoverStrategic
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
@@ -77,11 +78,15 @@ object MmkvManager {
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
     /** Remote grants are device-local credentials, excluded from system and configuration backups. */
-    internal fun <T> withRemoteControlStorage(context: Context, block: (MMKV) -> T): T {
-        val storage = MMKV.mmkvWithID(
+    private val remoteControlStorage by lazy {
+        MMKV.mmkvWithID(
             "REMOTE_CONTROL", MMKV.MULTI_PROCESS_MODE, null,
-            context.noBackupFilesDir.resolve("remote-control").absolutePath
+            AngApplication.application.noBackupFilesDir.resolve("remote-control").absolutePath
         )
+    }
+
+    internal fun <T> withRemoteControlStorage(block: (MMKV) -> T): T {
+        val storage = remoteControlStorage
         return synchronized(storage) {
             storage.lock()
             try {

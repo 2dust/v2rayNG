@@ -15,16 +15,16 @@ object RemoteControlManager {
     private val gson = Gson()
     private val random = SecureRandom()
 
-    fun selectedPackages(context: Context): Set<String> = readGrants(context)
+    fun selectedPackages(context: Context): Set<String> = readGrants()
         .filter { it.identity == installedIdentity(context, it.packageName) }
         .mapTo(mutableSetOf()) { it.packageName }
 
     fun setSelectedPackages(context: Context, selected: Collection<String>) {
-        val identities = selected.distinct().associateWith { packageName ->
+        val identities = selected.distinct().mapNotNull { packageName ->
             require(packageName != AppConfig.UNIDENTIFIED_PACKAGE && packageName != context.packageName)
-            checkNotNull(installedIdentity(context, packageName)) { "Remote control app is no longer installed" }
-        }
-        MmkvManager.withRemoteControlStorage(context) { storage ->
+            installedIdentity(context, packageName)?.let { packageName to it }
+        }.toMap()
+        MmkvManager.withRemoteControlStorage { storage ->
             val previous = decodeGrants(storage.decodeString(KEY_GRANTS))
             val updated = RemoteControlPolicy.select(previous, identities) {
                 hex(ByteArray(32).also(random::nextBytes))
@@ -38,13 +38,13 @@ object RemoteControlManager {
     fun configurationToken(context: Context, callingPackage: String?): String? {
         if (callingPackage.isNullOrEmpty()) return null
         val identity = installedIdentity(context, callingPackage) ?: return null
-        return readGrants(context).firstOrNull {
+        return readGrants().firstOrNull {
             it.packageName == callingPackage && it.identity == identity
         }?.token
     }
 
     fun isAuthorized(context: Context, senderUid: Int, claimedPackage: String?, token: String?): Boolean {
-        val grants = readGrants(context)
+        val grants = readGrants()
         val senderPackages = if (senderUid >= 0) {
             context.packageManager.getPackagesForUid(senderUid).orEmpty().toSet()
         } else null
@@ -55,8 +55,8 @@ object RemoteControlManager {
         return RemoteControlPolicy.isAuthorized(grants, installed, senderPackages, claimedPackage, token)
     }
 
-    private fun readGrants(context: Context): List<RemoteControlGrant> =
-        MmkvManager.withRemoteControlStorage(context) { decodeGrants(it.decodeString(KEY_GRANTS)) }
+    private fun readGrants(): List<RemoteControlGrant> =
+        MmkvManager.withRemoteControlStorage { decodeGrants(it.decodeString(KEY_GRANTS)) }
 
     private fun decodeGrants(json: String?): List<RemoteControlGrant> {
         if (json.isNullOrEmpty()) return emptyList()
