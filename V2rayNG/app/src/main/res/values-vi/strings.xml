@@ -551,4 +551,8 @@
     <string name="connection_test_empty_message">không có thông tin chi tiết</string>
     <string name="value_unknown">không xác định</string>
 
+    <string name="title_remote_control">Điều khiển từ xa</string>
+    <string name="summary_remote_control">Cho phép ứng dụng khác điều khiển v2rayNG</string>
+    <string name="remote_control_access_required">Cho phép ứng dụng này trong Cài đặt → Điều khiển từ xa, rồi mở lại tác vụ này.</string>
+    <string name="tasker_current_profile">Cấu hình hiện tại</string>
 </resources>

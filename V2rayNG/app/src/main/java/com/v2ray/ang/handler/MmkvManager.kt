@@ -76,6 +76,22 @@ object MmkvManager {
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
 
+    /** Remote grants are device-local credentials, excluded from system and configuration backups. */
+    internal fun <T> withRemoteControlStorage(context: Context, block: (MMKV) -> T): T {
+        val storage = MMKV.mmkvWithID(
+            "REMOTE_CONTROL", MMKV.MULTI_PROCESS_MODE, null,
+            context.noBackupFilesDir.resolve("remote-control").absolutePath
+        )
+        return synchronized(storage) {
+            storage.lock()
+            try {
+                block(storage)
+            } finally {
+                storage.unlock()
+            }
+        }
+    }
+
     private inline fun <T> withProfileIndexLock(block: () -> T): T {
         return synchronized(mainStorage) {
             mainStorage.lock()

@@ -551,4 +551,8 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="title_remote_control">Удалённое управление</string>
+    <string name="summary_remote_control">Разрешить другим приложениям управлять v2rayNG</string>
+    <string name="remote_control_access_required">Разрешите этому приложению доступ в разделе «Настройки → Удалённое управление», затем снова откройте это действие.</string>
+    <string name="tasker_current_profile">Текущий профиль</string>
 </resources>
