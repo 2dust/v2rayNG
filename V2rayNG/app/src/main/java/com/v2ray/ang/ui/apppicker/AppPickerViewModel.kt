@@ -127,8 +127,9 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     suspend fun saveRemoteControlSelection(): Boolean {
         // Leaving before loading completes must never replace existing grants with an empty list.
         if (!remoteControl || !remoteSelectionLoaded) return true
+        val selected = _selectedPackages.value
+        if (selected == selectedSnapshot) return true
         return try {
-            val selected = _selectedPackages.value.toSet()
             withContext(Dispatchers.IO) {
                 RemoteControlManager.setSelectedPackages(getApplication(), selected)
             }
