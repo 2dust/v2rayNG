@@ -143,4 +143,30 @@ class LauncherWidgetStateRepositoryTest {
         assertEquals(LauncherWidgetLayout.WIDE, LauncherWidgetLayout.forWidth(280f))
         assertEquals(LauncherWidgetLayout.EXTRA_WIDE, LauncherWidgetLayout.forWidth(380f))
     }
+
+    @Test
+    fun fiveColumnPixelGridShowsActionsAtThreeAndFourCells() {
+        // Pixel Launcher reports available dp, not grid spans. These are rounded down
+        // from the 426dp Pixel's five-column grid: 196, 438, 680, 922 and 1164 pixels at 3x.
+        val widths = listOf(65f, 146f, 226f, 307f, 388f)
+        val layouts = listOf(
+            LauncherWidgetLayout.COMPACT,
+            LauncherWidgetLayout.MEDIUM,
+            LauncherWidgetLayout.WIDE,
+            LauncherWidgetLayout.EXTRA_WIDE,
+            LauncherWidgetLayout.EXTRA_WIDE,
+        )
+        widths.zip(layouts).forEach { (width, expected) ->
+            assertEquals(expected, LauncherWidgetLayout.forWidth(width))
+            assertTrue(expected.size.width.value <= width)
+        }
+    }
+
+    @Test
+    fun layoutChangesAtEachDeclaredResponsiveWidth() {
+        LauncherWidgetLayout.entries.zipWithNext().forEach { (previous, next) ->
+            assertEquals(previous, LauncherWidgetLayout.forWidth(next.minimumWidthDp - 1f))
+            assertEquals(next, LauncherWidgetLayout.forWidth(next.minimumWidthDp))
+        }
+    }
 }

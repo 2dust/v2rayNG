@@ -126,8 +126,8 @@ private fun LauncherWidgetContent(
     uiState: LauncherWidgetUiState,
     openAppAction: Action,
 ) {
-    val textMetrics = launcherWidgetTextMetrics(rememberFontScale())
     val layout = LauncherWidgetLayout.forWidth(LocalSize.current.width.value)
+    val textMetrics = launcherWidgetTextMetrics(rememberFontScale(), layout)
     when (layout) {
         LauncherWidgetLayout.COMPACT -> CompactWidget(uiState)
         LauncherWidgetLayout.MEDIUM,
@@ -308,7 +308,6 @@ private fun RowScope.ServerText(
         .fillMaxHeight()
         .padding(
             start = textMetrics.startPaddingDp.dp,
-            end = textMetrics.endPaddingDp.dp,
             top = textMetrics.verticalPaddingDp.dp,
             bottom = textMetrics.verticalPaddingDp.dp,
         )

@@ -82,6 +82,21 @@ class LauncherWidgetPresentationTest {
     }
 
     @Test
+    fun smallerLayoutsLeaveMoreRoomForConnectionText() {
+        val medium = launcherWidgetTextMetrics(1f, LauncherWidgetLayout.MEDIUM)
+        val wide = launcherWidgetTextMetrics(1f, LauncherWidgetLayout.WIDE)
+        val extraWide = launcherWidgetTextMetrics(1f, LauncherWidgetLayout.EXTRA_WIDE)
+        assertEquals(11f, medium.statusFontSizeSp)
+        assertEquals(10f, wide.statusFontSizeSp)
+        assertEquals(12f, extraWide.statusFontSizeSp)
+        assertEquals(4f, wide.startPaddingDp)
+        assertEquals(
+            launcherWidgetTextMetrics(2f),
+            launcherWidgetTextMetrics(2f, LauncherWidgetLayout.WIDE),
+        )
+    }
+
+    @Test
     fun largeFontLayoutReducesTextAndPaddingAtThreshold() {
         val normal = launcherWidgetTextMetrics(1f)
         val large = launcherWidgetTextMetrics(2f)

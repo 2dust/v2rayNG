@@ -5,11 +5,12 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
+// Breakpoints are available dp, not cell spans; allow the actions on a five-column phone grid.
 internal enum class LauncherWidgetLayout(val minimumWidthDp: Float) {
-    COMPACT(68f),
+    COMPACT(48f),
     MEDIUM(110f),
-    WIDE(240f),
-    EXTRA_WIDE(320f);
+    WIDE(200f),
+    EXTRA_WIDE(288f);
 
     val size get() = DpSize(minimumWidthDp.dp, 68.dp)
 
@@ -25,13 +26,18 @@ internal data class LauncherWidgetTextMetrics(
     val profileFontSizeSp: Float,
     val statusFontSizeSp: Float,
     val startPaddingDp: Float,
-    val endPaddingDp: Float,
     val verticalPaddingDp: Float,
 )
 
-internal fun launcherWidgetTextMetrics(fontScale: Float): LauncherWidgetTextMetrics =
-    if (fontScale >= 1.8f) LauncherWidgetTextMetrics(12f, 8f, 4f, 2f, 0f)
-    else LauncherWidgetTextMetrics(14f, 12f, 8f, 4f, 5f)
+internal fun launcherWidgetTextMetrics(
+    fontScale: Float,
+    layout: LauncherWidgetLayout = LauncherWidgetLayout.EXTRA_WIDE,
+): LauncherWidgetTextMetrics = when {
+    fontScale >= 1.8f -> LauncherWidgetTextMetrics(12f, 8f, 4f, 0f)
+    layout == LauncherWidgetLayout.WIDE -> LauncherWidgetTextMetrics(14f, 10f, 4f, 5f)
+    layout == LauncherWidgetLayout.MEDIUM -> LauncherWidgetTextMetrics(14f, 11f, 4f, 5f)
+    else -> LauncherWidgetTextMetrics(14f, 12f, 8f, 5f)
+}
 
 internal data class LauncherWidgetUiState(
     val profileName: String,
