@@ -130,7 +130,7 @@
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
-    <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
+    <string name="server_lab_browser_dialer">Использовать Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать.</string>
     <string name="toast_allow_insecure_deprecated">Этот узел использует незашифрованное соединение. Ваши данные могут быть перехвачены и просмотрены государственными структурами через промежуточное сетевое оборудование.\nВ целях безопасности такие узлы больше не поддерживаются ядром Xray версии 26.2.6+.\nДля исправления: включите TLS (или другое шифрование) на своём сервере или используйте отпечаток сертификата (pinnedCA256).\nЕсли вы используете платный сервис, обратитесь в поддержку для обновления. Если провайдер отказывается, рекомендуется сменить его на более безопасный.\nПодробнее: https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">Получить отпечаток сертификата</string>
@@ -204,13 +204,13 @@
 
     <string name="title_pref_sniffing_enabled">Анализировать трафик (sniffing)</string>
     <string name="summary_pref_sniffing_enabled">Определять домены назначения в трафике (по умолчанию включено)</string>
-    <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
+    <string name="title_pref_route_only_enabled">Домен только для маршрутизации (routeOnly)</string>
     <string name="summary_pref_route_only_enabled">Использовать доменное имя только для маршрутизации и сохранять целевой адрес в виде IP</string>
 
-    <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
+    <string name="title_pref_local_dns_enabled">Использовать локальный сервер DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
 
-    <string name="title_pref_fake_dns_enabled">Использовать виртуальную DNS (FakeDNS)</string>
+    <string name="title_pref_fake_dns_enabled">Использовать виртуальный сервер DNS (FakeDNS)</string>
     <string name="summary_pref_fake_dns_enabled">FakeDNS возвращает виртуальные IP-адреса при определении доменов (быстрее, но может не работать с некоторыми приложениями)</string>
 
     <string name="title_pref_ipv6_enabled">Использовать IPv6</string>
@@ -219,7 +219,7 @@
     <string name="title_pref_prefer_ipv6">Предпочитать IPv6</string>
     <string name="summary_pref_prefer_ipv6">Предпочитать IPv6-адреса при определении доменных имён</string>
 
-    <string name="title_pref_remote_dns">Удалённая DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
+    <string name="title_pref_remote_dns">Удалённый сервер DNS (UDP/TCP/HTTPS/QUIC) (необязательно)</string>
     <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (только IPv4/IPv6)</string>
@@ -260,8 +260,8 @@
     <string name="title_pref_socks_password">Пароль локального прокси (необязательно)</string>
     <string name="summary_pref_socks_password">Пароль</string>
 
-    <string name="title_pref_local_dns_port">Порт локальной DNS</string>
-    <string name="summary_pref_local_dns_port">Порт локальной DNS</string>
+    <string name="title_pref_local_dns_port">Порт локального сервера DNS</string>
+    <string name="summary_pref_local_dns_port">Порт локального сервера DNS</string>
 
     <string name="title_pref_confirm_remove">Подтверждать удаление профиля</string>
     <string name="summary_pref_confirm_remove">Обязательное подтверждение удаления профиля</string>
@@ -364,7 +364,7 @@
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Доменная стратегия</string>
     <string name="routing_settings_title">Маршрутизация</string>
-    <string name="routing_settings_tips">Правило применяется, только если одновременно выполняются все заданные условия сопоставления (логическими оператор «И»). Правила проверяются сверху вниз; применяется первое совпавшее правило.</string>
+    <string name="routing_settings_tips">Правило применяется, только если одновременно выполняются все заданные условия сопоставления (логический оператор «И»). Правила проверяются сверху вниз; применяется первое совпавшее правило.</string>
     <string name="routing_settings_comma_tip">Разделяйте несколько значений запятыми (,).</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
@@ -378,7 +378,7 @@
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
-    <string name="routing_settings_process">process (имя пакета — поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации» и Android 10+)</string>
+    <string name="routing_settings_process">process (имя пакета — поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации (routeOnly)» и Android 10+)</string>
     <string name="routing_settings_process_select">Выбор названия пакета</string>
     <string name="routing_settings_port" translatable="false">port</string>
     <string name="routing_settings_protocol" translatable="false">protocol</string>
