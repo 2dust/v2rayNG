@@ -202,6 +202,7 @@ fun AppTheme(
             Box(modifier = Modifier.fillMaxSize()) {
                 content()
                 AppSnackbarHost(controller = snackbarController)
+                AppSnackbarBridge(controller = snackbarController)
                 AccessibilityActionFeedbackHost(actionFeedback)
             }
         }

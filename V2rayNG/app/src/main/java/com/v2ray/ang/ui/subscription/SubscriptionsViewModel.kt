@@ -38,9 +38,6 @@ internal fun subscriptionAutoUpdateChange(
     ?.copy(autoUpdate = enabled)
 
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
-    private var qrCodeJob: Job? = null
-    private val _qrCode = MutableStateFlow<Bitmap?>(null)
-    internal val qrCode = _qrCode.asStateFlow()
     private val pendingAutoUpdates = mutableSetOf<String>()
     // Ephemeral acknowledgements: completion must not wait for a screen to resume or replay
     // an old result after an edit. Durable subscription state is exposed by subsFlow.
@@ -81,21 +78,6 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
             MmkvManager.encodeSubscription(subId, item)
         }
         _subsFlow.value = subscriptions.toList()
-    }
-
-    internal fun shareQRCode(url: String) {
-        dismissQRCode()
-        qrCodeJob = viewModelScope.launch {
-            val bitmap = withContext(Dispatchers.Default) { QRCodeDecoder.createQRCode(url) }
-            if (bitmap == null) toastError(R.string.toast_failure)
-            _qrCode.value = bitmap
-        }
-    }
-
-    internal fun dismissQRCode() {
-        qrCodeJob?.cancel()
-        qrCodeJob = null
-        _qrCode.value = null
     }
 
     internal fun setAutoUpdate(subId: String, enabled: Boolean): Boolean {
