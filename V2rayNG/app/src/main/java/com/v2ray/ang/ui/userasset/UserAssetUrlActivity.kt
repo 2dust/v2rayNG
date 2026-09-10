@@ -81,6 +81,20 @@ class UserAssetUrlActivity : BaseComponentActivity() {
     }
 
     private fun saveServer(remarks: String, url: String): Boolean {
+        val assetList = MmkvManager.decodeAssetUrls()
+        if (assetList.any { it.assetUrl.remarks == remarks && it.guid != editAssetId }) {
+            toast(R.string.msg_remark_is_duplicate)
+            return false
+        }
+        if (TextUtils.isEmpty(remarks)) {
+            toast(R.string.sub_setting_remarks)
+            return false
+        }
+        if (TextUtils.isEmpty(url)) {
+            toast(R.string.title_url)
+            return false
+        }
+
         var assetItem = MmkvManager.decodeAsset(editAssetId)
         var assetId = editAssetId
         if (assetItem != null) {
@@ -99,20 +113,6 @@ class UserAssetUrlActivity : BaseComponentActivity() {
 
         assetItem.remarks = remarks
         assetItem.url = url
-
-        val assetList = MmkvManager.decodeAssetUrls()
-        if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-            toast(R.string.msg_remark_is_duplicate)
-            return false
-        }
-        if (TextUtils.isEmpty(assetItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
-            return false
-        }
-        if (TextUtils.isEmpty(assetItem.url)) {
-            toast(R.string.title_url)
-            return false
-        }
 
         MmkvManager.encodeAsset(assetId, assetItem)
         toastSuccess(R.string.toast_success)
