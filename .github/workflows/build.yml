@@ -64,7 +64,13 @@ jobs:
     - name: Fetch AndroidLibXrayLite tag
       run: |
         pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0)
+        # The aar is downloaded from the release for this tag, so the submodule
+        # has to sit exactly on it. `--abbrev=0` fell back to the nearest older
+        # tag, shipping a core that did not match the submodule source.
+        if ! CURRENT_TAG=$(git describe --tags --exact-match 2>/dev/null); then
+          echo "::error::AndroidLibXrayLite is at $(git rev-parse --short HEAD), which is not a tagged release, so there is no aar that matches it. Tag and release it first."
+          exit 1
+        fi
         echo "Current tag in this repo: $CURRENT_TAG"
         echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
         popd
