@@ -45,13 +45,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 enum class ToastType {
-    NORMAL, SUCCESS, ERROR, INFO
+    NORMAL, SUCCESS, ERROR
 }
 
 data class AppSnackbarMessage(
     val message: CharSequence,
     val type: ToastType = ToastType.NORMAL,
-    val long: Boolean = false,
     val liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     val accessibilityMessage: CharSequence? = null,
 )
@@ -80,7 +79,7 @@ class AppSnackbarController(
     private var currentId = 0
     private var currentShowTime = 0L
 
-    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
+    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL) {
         val id = ++currentId
         scope.launch {
             if (currentShowTime != 0L) {
@@ -96,8 +95,7 @@ class AppSnackbarController(
                 hostState.showSnackbar(
                     AppSnackbarVisuals(
                         message = message.toString(),
-                        type = type,
-                        duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short
+                        type = type
                     )
                 )
                 if (id == currentId) {
@@ -113,7 +111,7 @@ class AppSnackbarController(
 private data class AppSnackbarVisuals(
     override val message: String,
     val type: ToastType,
-    override val duration: SnackbarDuration,
+    override val duration: SnackbarDuration = SnackbarDuration.Short,
     override val actionLabel: String? = null,
     override val withDismissAction: Boolean = false
 ) : SnackbarVisuals
@@ -138,8 +136,7 @@ fun AppSnackbarBridge(
                 AppSnackbarManager.messages.collect { event ->
                     controller.show(
                         message = event.message,
-                        type = event.type,
-                        long = event.long
+                        type = event.type
                     )
                     liveRegionMessages.offer(event)
                 }
@@ -261,7 +258,6 @@ fun AppSnackbarHost(
                 ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
                 ToastType.SUCCESS -> toastSuccessBg
                 ToastType.ERROR -> toastErrorBg
-                ToastType.INFO -> toastInfoBg
             }
 
             Box(
