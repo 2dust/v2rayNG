@@ -1,6 +1,8 @@
 package com.v2ray.ang.ui.subscription
 
 import android.app.Application
+import android.graphics.Bitmap
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
@@ -14,14 +16,20 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.QRCodeDecoder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
+    private var qrCodeJob: Job? = null
+    private val _qrCode = MutableStateFlow<Bitmap?>(null)
+    internal val qrCode = _qrCode.asStateFlow()
     private val subscriptions: MutableList<SubscriptionCache> =
         MmkvManager.decodeSubscriptions().toMutableList()
 
@@ -53,6 +61,21 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
             MmkvManager.encodeSubscription(subId, item)
         }
         _subsFlow.value = subscriptions.toList()
+    }
+
+    internal fun shareQRCode(url: String) {
+        dismissQRCode()
+        qrCodeJob = viewModelScope.launch {
+            val bitmap = withContext(Dispatchers.Default) { QRCodeDecoder.createQRCode(url) }
+            if (bitmap == null) toastError(R.string.toast_failure)
+            _qrCode.value = bitmap
+        }
+    }
+
+    internal fun dismissQRCode() {
+        qrCodeJob?.cancel()
+        qrCodeJob = null
+        _qrCode.value = null
     }
 
     fun move(fromPosition: Int, toPosition: Int) {
