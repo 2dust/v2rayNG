@@ -97,6 +97,13 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     }
 
     /**
+     * Get a localized quantity string from a plurals resource.
+     */
+    fun getQuantityString(resId: Int, quantity: Int, vararg formatArgs: Any): String {
+        return localizedContext.resources.getQuantityString(resId, quantity, *formatArgs)
+    }
+
+    /**
      * Send finish activity event.
      */
     fun finishActivity() {
