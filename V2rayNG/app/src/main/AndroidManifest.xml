@@ -153,6 +153,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.userasset.UserAssetUrlActivity"
+            android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
 
         <activity
