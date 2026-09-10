@@ -343,7 +343,10 @@ fun ProxyChainScreen(
     }
     memberToDeleteKey?.let { memberKey ->
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_proxy_chain_member_named, members.getOrNull(index).orEmpty()),
+            message = stringResource(
+                R.string.confirm_delete_proxy_chain_member_named,
+                members.getOrNull(memberKeys.indexOf(memberKey)).orEmpty()
+            ),
             onConfirm = {
                 val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
                 members = remainingMembers
