@@ -105,7 +105,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
 
       - name: Setup Go
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -135,13 +135,31 @@ jobs:
           go install "golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}"
           export PATH="$PATH:$(go env GOPATH)/bin"
 
-          # Geo data. gen_assets.sh downloads the .dat databases that get
-          # embedded in the aar's assets. They are data, not code, but they are
-          # still fetched rather than generated, so they are listed separately in
-          # the build manifest.
-          mkdir -p assets data
-          bash gen_assets.sh download
-          cp -v data/*.dat assets/
+          # Geo data. These .dat databases end up in the aar's assets and so in
+          # the APK. gen_assets.sh fetches them from `releases/latest`, which
+          # floats and would make two builds of the same commit differ, so read
+          # the pinned dated releases from geo-assets.lock instead and verify
+          # every download against the checksum recorded there.
+          mkdir -p assets
+          # shellcheck source=/dev/null
+          . "${GITHUB_WORKSPACE}/geo-assets.lock"
+
+          fetch_dat() {
+            url="$1"; dest="$2"; want="$3"
+            curl -fsSL --retry 3 -o "$dest" "$url"
+            got=$(sha256sum "$dest" | cut -d' ' -f1)
+            if [ "$got" != "$want" ]; then
+              echo "::error::checksum mismatch for ${dest}: expected ${want}, got ${got}"
+              exit 1
+            fi
+            echo "verified ${dest} ${got}"
+          }
+
+          RULES_BASE="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${RULES_DAT_TAG}"
+          GEOIP_BASE="https://github.com/Loyalsoldier/geoip/releases/download/${GEOIP_REPO_TAG}"
+          fetch_dat "${RULES_BASE}/geoip.dat" assets/geoip.dat "${GEOIP_DAT_SHA256}"
+          fetch_dat "${RULES_BASE}/geosite.dat" assets/geosite.dat "${GEOSITE_DAT_SHA256}"
+          fetch_dat "${GEOIP_BASE}/geoip-only-cn-private.dat" assets/geoip-only-cn-private.dat "${GEOIP_ONLY_CN_PRIVATE_DAT_SHA256}"
 
           gomobile init
 
@@ -175,7 +193,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
 
       # ---------------------------------------------------------------------
       # hev-socks5-tunnel - already built from source upstream.
@@ -282,8 +300,8 @@ jobs:
             echo "java: $(java -version 2>&1 | head -1)"
             echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
             echo
-            echo '## downloaded data (not built from source, data only)'
-            echo 'geoip.dat, geosite.dat, geoip-only-cn-private.dat via AndroidLibXrayLite/gen_assets.sh'
+            echo '## pinned geo data (downloaded, not built from source)'
+            grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' geo-assets.lock || true
             echo
             echo '## native artifact checksums'
             find V2rayNG/app/libs -type f | sort | xargs sha256sum

@@ -37,17 +37,32 @@ source. `fdroid-source-build.yml` compiles it.
 
 ## What is downloaded
 
-Three geo databases are fetched by `AndroidLibXrayLite/gen_assets.sh` and
-embedded in the aar's `assets/`:
+Three geo databases are embedded in the aar's `assets/`, and from there in the
+APK:
 
 - `geoip.dat`, `geosite.dat` — from [`Loyalsoldier/v2ray-rules-dat`](https://github.com/Loyalsoldier/v2ray-rules-dat) releases
-- `geoip-only-cn-private.dat` — from [`Loyalsoldier/geoip`](https://github.com/Loyalsoldier/geoip)
+- `geoip-only-cn-private.dat` — from [`Loyalsoldier/geoip`](https://github.com/Loyalsoldier/geoip) releases
 
-These are routing **data**, not executable code, and the app can also fetch them
-at runtime (`SettingsManager.initAssets` only copies them out of the APK when
-they are present). They are listed explicitly in every build manifest. If a
-distributor objects to shipping them, omitting the `cp -v data/*.dat assets/`
-line yields an APK that downloads them on first use instead.
+These are routing **data**, not executable code, which is why they are acceptable
+in a from-source build at all. They are still downloaded rather than generated,
+so they get their own section in every build manifest.
+
+`AndroidLibXrayLite/gen_assets.sh` fetches them from `releases/latest`, which
+floats — two builds of the same commit on different days would embed different
+data and could never be verified against each other. The workflow therefore does
+**not** call that script. It reads [`geo-assets.lock`](../geo-assets.lock)
+instead, which pins an exact dated release of each project together with the
+SHA-256 of each file, and fails the build if a download does not match.
+
+Updating the pin is a deliberate act: bump the tags and checksums in
+`geo-assets.lock` as its own commit, and expect every APK checksum to change with
+it. The lock file is part of the `libv2ray.aar` cache key, so a changed pin
+forces a rebuild rather than silently reusing an aar built with the old data.
+
+If a distributor objects to shipping the databases at all, dropping the three
+`fetch_dat` lines yields an APK that downloads them on first use instead —
+`SettingsManager.initAssets` only copies them out of the APK when present. That
+changes first-run behaviour, so it is not the default here.
 
 ## Pinned toolchain
 
@@ -96,9 +111,19 @@ git submodule update --init --recursive
 
 # 1. libv2ray.aar
 cd AndroidLibXrayLite
-mkdir -p assets data
-bash gen_assets.sh download
-cp -v data/*.dat assets/
+mkdir -p assets
+
+# Pinned geo data. Do NOT run gen_assets.sh here: it fetches releases/latest,
+# which will not match what the published APK was built with.
+. ../geo-assets.lock
+RULES="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${RULES_DAT_TAG}"
+GEOIP="https://github.com/Loyalsoldier/geoip/releases/download/${GEOIP_REPO_TAG}"
+curl -fsSL -o assets/geoip.dat "${RULES}/geoip.dat"
+curl -fsSL -o assets/geosite.dat "${RULES}/geosite.dat"
+curl -fsSL -o assets/geoip-only-cn-private.dat "${GEOIP}/geoip-only-cn-private.dat"
+printf '%s  assets/geoip.dat\n%s  assets/geosite.dat\n%s  assets/geoip-only-cn-private.dat\n' \
+  "$GEOIP_DAT_SHA256" "$GEOSITE_DAT_SHA256" "$GEOIP_ONLY_CN_PRIVATE_DAT_SHA256" | sha256sum -c -
+
 go install "golang.org/x/mobile/cmd/gomobile@$(go list -m -f "{{.Version}}" golang.org/x/mobile)"
 export PATH="$PATH:$(go env GOPATH)/bin"
 gomobile init
@@ -156,10 +181,12 @@ These are unresolved and should be treated as work items, not as settled:
   twice cold and diffed; see [Verifying determinism](#verifying-determinism) for
   how. Likely suspects if the outputs differ: zip entry timestamps written by
   AGP, `gomobile`'s aar packaging, and the HTML report produced by
-  `licenseFdroidReleaseReport`. The geo databases are a further complication —
-  `gen_assets.sh` always fetches *latest*, so two runs on different days will
-  embed different `.dat` files and cannot match. Pinning them to a dated release
-  is likely a prerequisite for reproducibility.
+  `licenseFdroidReleaseReport`. The floating geo databases were a fourth and are
+  now pinned in `geo-assets.lock`.
+- **Geo data goes stale.** Pinning trades reproducibility for freshness: the
+  routing databases stay at whatever dated release the lock file names until
+  someone bumps it. Review it when cutting a release, and note that users can
+  update the databases in-app regardless of what shipped in the APK.
 - **In-app updater.** `UpdateCheckerManager` fetches APK download URLs from
   GitHub releases. IzzyOnDroid tolerates this (with an anti-feature flag);
   F-Droid normally requires it gated off for their build. Not addressed here.
