@@ -292,7 +292,7 @@
         <receiver
             android:name=".receiver.LauncherWidgetUpdateReceiver"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":daemon">
             <intent-filter>
                 <action android:name="${applicationId}.action.activity" />
             </intent-filter>
@@ -304,7 +304,7 @@
             android:enabled="true"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon"
+            android:process=":daemon"
             android:theme="@android:style/Theme.NoDisplay" />
         <activity
             android:name=".ui.widget.LauncherWidgetInvisibleActionActivity"
@@ -312,19 +312,19 @@
             android:exported="false"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:process=":RunSoLibV2RayDaemon"
+            android:process=":daemon"
             android:taskAffinity="androidx.glance.appwidget.ListAdapterCallbackTrampoline"
             android:theme="@style/Widget.Glance.AppWidget.CallbackTrampoline" />
         <receiver
             android:name=".ui.widget.LauncherWidgetActionReceiver"
             android:enabled="true"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon" />
+            android:process=":daemon" />
         <receiver
             android:name=".ui.widget.LauncherWidgetPackageReplacedReceiver"
             android:enabled="true"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon">
+            android:process=":daemon">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
@@ -333,11 +333,11 @@
             android:name=".ui.widget.LauncherWidgetRemoteViewsService"
             android:exported="true"
             android:permission="android.permission.BIND_REMOTEVIEWS"
-            android:process=":RunSoLibV2RayDaemon" />
+            android:process=":daemon" />
         <service
             android:name=".ui.widget.LauncherWidgetWorkerService"
             android:exported="false"
-            android:process=":RunSoLibV2RayDaemon" />
+            android:process=":daemon" />
         <receiver
             android:name=".receiver.BootReceiver"
             android:exported="true"
