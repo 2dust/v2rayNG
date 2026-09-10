@@ -14,10 +14,10 @@ an `fdroiddata` recipe.
 > Status: the from-source build works and reproduces byte for byte. Three
 > GitHub-hosted runs, across two VMs of the same image and a later one after
 > GitHub rolled the image, produced identical checksums for all 13 native
-> artifacts and all 5 fdroid release APKs — see [Evidence](#evidence). The whole
-> toolchain is pinned; the runner image is the one input that is not, and it
-> has been exercised for the APK stage only — see
-> [Open questions](#open-questions).
+> artifacts and all 5 fdroid release APKs — see [Evidence](#evidence). Those
+> runs compiled the aar's Java bindings with the runner image's default JDK,
+> which was not pinned then; it now is. The runner image itself is still not
+> pinned — see [Open questions](#open-questions).
 
 ## What is built from source
 
@@ -89,7 +89,8 @@ get different bytes — the Go version in particular is embedded in the compiled
 | Android NDK | 29.0.14206865 | workflow `NDK_VERSION` **and** `android.ndkVersion` |
 | Android cmdline-tools | 14742923 | workflow `CMDLINE_TOOLS_VERSION` |
 | Android platform / build-tools | android-37.0 / 37.0.0 | workflow `SDK_PACKAGES` |
-| JDK | Temurin 21.0.12.1+1 (Adoptium semver `21.0.12+101.0.LTS`) | workflow `JAVA_VERSION` |
+| JDK for Gradle | Temurin 21.0.12.1+1 (Adoptium semver `21.0.12+101.0.LTS`) | workflow `JAVA_VERSION` |
+| JDK for `gomobile` | Temurin 17.0.20.1+1 (Adoptium semver `17.0.20+101`) | workflow `GOMOBILE_JAVA_VERSION` |
 | AGP / Kotlin / dependencies | see `V2rayNG/gradle/libs.versions.toml` | Gradle |
 | `gomobile -androidapi` | 24 | workflow `GOMOBILE_ANDROID_API`, must equal `minSdk` |
 
@@ -134,6 +135,7 @@ curl -fsSL -o assets/geoip-only-cn-private.dat "${GEOIP}/geoip-only-cn-private.d
 printf '%s  assets/geoip.dat\n%s  assets/geosite.dat\n%s  assets/geoip-only-cn-private.dat\n' \
   "$GEOIP_DAT_SHA256" "$GEOSITE_DAT_SHA256" "$GEOIP_ONLY_CN_PRIVATE_DAT_SHA256" | sha256sum -c -
 
+# gomobile's javac must be Temurin 17.0.20.1+1 (put it first on PATH here)
 go install "golang.org/x/mobile/cmd/gomobile@$(go list -m -f "{{.Version}}" golang.org/x/mobile)"
 export PATH="$PATH:$(go env GOPATH)/bin"
 gomobile init
@@ -155,7 +157,7 @@ mkdir -p V2rayNG/app/libs
 cp -r libs/. V2rayNG/app/libs/
 cp AndroidLibXrayLite/libv2ray.aar V2rayNG/app/libs/
 
-# 4. APKs
+# 4. APKs, with Temurin 21.0.12.1+1 as the active JDK
 cd V2rayNG
 echo "sdk.dir=${ANDROID_HOME}" > local.properties
 ./gradlew licenseFdroidReleaseReport
@@ -179,7 +181,13 @@ which would make a comparison meaningless. Run the workflow manually with
 run also declines to write its results back to the cache, so it does not disturb
 the existing entry.
 
-The JDK is pinned to an exact Temurin build for the same reason. Only the
+There are two JDKs. `gomobile bind` compiles the aar's generated Java bindings
+into `classes.jar` with `javac`, so the JDK on the path at that point is part of
+the aar. Until this was noticed the workflow set Java up only later, for Gradle,
+leaving `gomobile` on the runner image's default JDK. It is now pinned to that
+same default, Temurin 17, and is part of the `libv2ray.aar` cache key.
+
+The JDKs are pinned to exact Temurin builds for the same reason as Go. Only the
 full Adoptium semver form in `JAVA_VERSION` achieves that: `setup-java` checks
 the runner's preinstalled JDKs first, so `21` or `21.0.12` quietly take whatever
 the image carries, and the four-part `21.0.12.1` resolves to the preinstalled
