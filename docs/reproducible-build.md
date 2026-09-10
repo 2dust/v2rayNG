@@ -11,12 +11,12 @@ source. An independently repeatable build is the answer to that, and it is also
 a hard prerequisite for both the IzzyOnDroid reproducible-builds programme and
 an `fdroiddata` recipe.
 
-> Status: the from-source build works. It is automated in
-> `.github/workflows/fdroid-source-build.yml` and first passed end to end on
-> 2026-09-10, producing unsigned fdroid release APKs in about 12 minutes on a
-> standard GitHub-hosted runner. Whether two independent runs produce
-> byte-identical APKs is **not** verified yet — see
-> [Verifying determinism](#verifying-determinism).
+> Status: the from-source build works and has reproduced byte for byte across
+> independent runners. Two runs of commit `02a6cc79` on separate GitHub-hosted
+> VMs an hour apart produced identical checksums for all 13 native artifacts and
+> all 5 fdroid release APKs — see [Evidence](#evidence). What that comparison
+> could not exercise is a different JDK patch release or runner image; see
+> [Open questions](#open-questions).
 
 ## What is built from source
 
@@ -29,6 +29,15 @@ an `fdroiddata` recipe.
 
 Nothing under `V2rayNG/app/libs/` is committed to this repository; it is
 ignored in `.gitignore` and produced entirely by the steps above.
+
+The build manifest also lists a `hev-socks5-tunnel-bin` per ABI, byte-identical
+to `libhevsockstun.so`. hev-socks5-tunnel's own `Android.mk` defines that
+executable alongside its shared library, so the first `ndk-build` pass in
+`compile-hevtun.sh` builds it, and the second pass builds the same program again
+under the `lib*.so` name the APK installer needs. It is not packaged into the
+APK: AGP's native-library merge only takes files ending in `.so`, plus the
+literal names `gdbserver` and `gdb.setup` (`MergeNativeLibsTask` in the Android
+Gradle Plugin source).
 
 The difference from `.github/workflows/build.yml` ("Build APK") is one step:
 that workflow downloads `libv2ray.aar` from the `AndroidLibXrayLite` release
@@ -79,7 +88,7 @@ get different bytes — the Go version in particular is embedded in the compiled
 | Android NDK | 29.0.14206865 | workflow `NDK_VERSION` **and** `android.ndkVersion` |
 | Android cmdline-tools | 14742923 | workflow `CMDLINE_TOOLS_VERSION` |
 | Android platform / build-tools | android-37.0 / 37.0.0 | workflow `SDK_PACKAGES` |
-| JDK | Temurin 21 | workflow `JAVA_VERSION` |
+| JDK | Temurin 21 — **major only, the patch release floats** | workflow `JAVA_VERSION`; see [Open questions](#open-questions) |
 | AGP / Kotlin / dependencies | see `V2rayNG/gradle/libs.versions.toml` | Gradle |
 | `gomobile -androidapi` | 24 | workflow `GOMOBILE_ANDROID_API`, must equal `minSdk` |
 
@@ -179,18 +188,45 @@ rebuilder starts with no such cache. The module cache is deliberately kept, sinc
 Compare its manifest against an earlier cold run's, on the same commit. The
 native artifact checksums and the APK checksums should match line for line. If
 they do not, the manifest's toolchain section is the first place to look for
-what differed; the known suspects are listed below.
+what differed.
+
+Compare the checksums *in the manifest*, not the digests GitHub shows next to
+each artifact. Those are digests of the zip container `upload-artifact` builds
+around the files, which records per-file metadata and differs on every upload
+even when the contents are identical.
+
+Note that a push to the default branch cannot see caches created on feature
+branches, so the first run after merging to `master` is cold without
+`bypass_cache` — which is how the comparison below came about.
+
+### Evidence
+
+| | Run [34460850995](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34460850995) | Run [34466248610](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34466248610) |
+| --- | --- | --- |
+| Commit | `02a6cc79` | `02a6cc79` |
+| Branch | `fdroid-source-build` | `master` |
+| `libv2ray.aar` | compiled in this run (195 s) | compiled in this run (192 s), no Go build cache |
+| hev libraries | restored from a cache built ~6 h earlier on another VM | compiled in this run (86 s) |
+| JDK / runner image | 21.0.12.1 / ubuntu24 20260831.293.1 | same |
+| Result | — | **all 18 checksums identical to the other run** |
+
+This rules out the suspects this document originally listed: AGP zip entry
+timestamps, `gomobile`'s aar packaging, and the `licenseFdroidReleaseReport` HTML
+all came out identical.
 
 ## Open questions
 
 These are unresolved and should be treated as work items, not as settled:
 
-- **Byte-for-byte determinism is unverified.** The build has not yet been run
-  twice cold and diffed; see [Verifying determinism](#verifying-determinism) for
-  how. Likely suspects if the outputs differ: zip entry timestamps written by
-  AGP, `gomobile`'s aar packaging, and the HTML report produced by
-  `licenseFdroidReleaseReport`. The floating geo databases were a fourth and are
-  now pinned in `geo-assets.lock`.
+- **The JDK and runner image still float.** The workflow asks for
+  `java-version: '21'`, which resolves to whatever 21.x patch release is current,
+  and `runs-on: ubuntu-latest` moves too. Both runs in the
+  [evidence](#evidence) got the same ones, so the comparison says nothing about
+  them. Whether a different JDK patch changes the output is unknown — AGP brings
+  its own D8, but the Kotlin and Java compilers run on the installed JDK. A
+  rebuilder working weeks later is likely to get a newer patch, so this is the
+  largest remaining risk. The manifest records both, which at least makes a
+  mismatch caused by them easy to diagnose.
 - **Geo data goes stale.** Pinning trades reproducibility for freshness: the
   routing databases stay at whatever dated release the lock file names until
   someone bumps it. Review it when cutting a release, and note that users can
