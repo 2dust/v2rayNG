@@ -9,6 +9,12 @@ android {
     namespace = "com.v2ray.ang"
     compileSdk = 37
 
+    // Pinned rather than left to the Android Gradle Plugin default: the NDK
+    // strips the prebuilt jniLibs, so its version is part of the output bytes
+    // and a reproducible rebuild has to use the same one. See
+    // docs/reproducible-build.md.
+    ndkVersion = "29.0.14206865"
+
     defaultConfig {
         applicationId = "com.v2ray.ang"
         minSdk = 24

@@ -1,0 +1,322 @@
+name: Build F-Droid flavor from source
+
+# Builds the fdroid flavor with every native artifact compiled from source in
+# this job. Unlike "Build APK" (build.yml), nothing prebuilt is downloaded:
+# libv2ray.aar is produced here from the AndroidLibXrayLite submodule instead of
+# being fetched from that project's GitHub release assets.
+#
+# This is the build an external rebuilder (IzzyOnDroid reproducible-builds, or an
+# fdroiddata recipe) has to be able to repeat byte-for-byte, so every toolchain
+# version is pinned in `env` below and recorded in the build manifest artifact.
+# See docs/reproducible-build.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to upload the APKs to (leave empty to only keep artifacts)'
+        required: false
+        type: string
+  push:
+    branches:
+      - master
+      # Bring-up branch, so the workflow can be exercised before it reaches
+      # master. Remove once merged.
+      - fdroid-source-build
+
+permissions:
+  contents: write
+
+env:
+  # Pinned toolchain. Each of these changes the output bytes, so a rebuilder has
+  # to use exactly these versions. Keep in sync with docs/reproducible-build.md.
+  CMDLINE_TOOLS_VERSION: '14742923'
+  SDK_PACKAGES: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
+  NDK_VERSION: '29.0.14206865'
+  GO_VERSION: '1.27.1'
+  JAVA_VERSION: '21'
+  # Must match minSdk in V2rayNG/app/build.gradle.kts.
+  GOMOBILE_ANDROID_API: '24'
+  # Signing is optional: without a keystore the job still proves the build works
+  # and produces unsigned release APKs.
+  HAS_KEYSTORE: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+          fetch-depth: '0'
+
+      - name: Record source revisions
+        id: revs
+        run: |
+          set -euo pipefail
+          XRAY_REV=$(git -C AndroidLibXrayLite rev-parse HEAD)
+          XRAY_TAG=$(git -C AndroidLibXrayLite describe --tags --exact-match "$XRAY_REV" 2>/dev/null || echo 'untagged')
+          HEV_REV=$(git -C hev-socks5-tunnel rev-parse HEAD)
+          HEV_TAG=$(git -C hev-socks5-tunnel describe --tags --exact-match "$HEV_REV" 2>/dev/null || echo 'untagged')
+          {
+            echo "xray_rev=$XRAY_REV"
+            echo "xray_tag=$XRAY_TAG"
+            echo "hev_rev=$HEV_REV"
+            echo "hev_tag=$HEV_TAG"
+          } >> "$GITHUB_OUTPUT"
+          echo "AndroidLibXrayLite $XRAY_REV ($XRAY_TAG)"
+          echo "hev-socks5-tunnel  $HEV_REV ($HEV_TAG)"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          log-accepted-android-sdk-licenses: false
+          cmdline-tools-version: ${{ env.CMDLINE_TOOLS_VERSION }}
+          packages: ${{ env.SDK_PACKAGES }}
+
+      - name: Install NDK
+        run: |
+          set -euo pipefail
+          echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --channel=0 \
+            --install "ndk;${NDK_VERSION}"
+          # NDK_HOME is what compile-hevtun.sh reads; ANDROID_NDK_HOME is what
+          # gomobile reads.
+          echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
+      # ---------------------------------------------------------------------
+      # libv2ray.aar - built from the AndroidLibXrayLite submodule with
+      # gomobile. This is the step that build.yml replaces with a download of
+      # 2dust's prebuilt release asset, and the only reason that build is not
+      # buildable from source.
+      # ---------------------------------------------------------------------
+
+      - name: Restore cached libv2ray.aar
+        id: cache-libv2ray-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ github.workspace }}/aar
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}
+
+      - name: Setup Go
+        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: AndroidLibXrayLite/go.sum
+
+      - name: Build libv2ray.aar from source
+        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        env:
+          # Refuse to silently download a different Go toolchain than the pinned
+          # one: the Go version is baked into the compiled .so files, so an
+          # automatic upgrade would change the output bytes without any signal.
+          GOTOOLCHAIN: local
+        run: |
+          set -euo pipefail
+          cd AndroidLibXrayLite
+
+          REQUIRED_GO=$(awk '/^go /{print $2; exit}' go.mod)
+          echo "go.mod requires go ${REQUIRED_GO}; using $(go version)"
+
+          # gomobile is pinned to the golang.org/x/mobile revision this module
+          # already depends on, so the generated binding code matches go.sum.
+          GOMOBILE_VERSION=$(go list -m -f '{{.Version}}' golang.org/x/mobile)
+          echo "gomobile version: ${GOMOBILE_VERSION}"
+          go install "golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}"
+          export PATH="$PATH:$(go env GOPATH)/bin"
+
+          # Geo data. gen_assets.sh downloads the .dat databases that get
+          # embedded in the aar's assets. They are data, not code, but they are
+          # still fetched rather than generated, so they are listed separately in
+          # the build manifest.
+          mkdir -p assets data
+          bash gen_assets.sh download
+          cp -v data/*.dat assets/
+
+          gomobile init
+
+          # gomobile bind runs gobind out of this module, so the module graph has
+          # to cover golang.org/x/mobile/cmd/gobind; `go mod tidy` is what makes
+          # that true. It is safe for reproducibility because tidy resolves
+          # minimum versions and does not upgrade anything, but any change it
+          # makes means the committed go.mod/go.sum were incomplete, so surface
+          # that instead of letting it pass silently.
+          go mod tidy
+          if ! git diff --quiet -- go.mod go.sum; then
+            echo '::warning::go mod tidy modified go.mod/go.sum'
+            git diff --stat -- go.mod go.sum
+          fi
+          go mod download
+
+          gomobile bind -v \
+            -target=android/arm,android/arm64,android/386,android/amd64 \
+            -androidapi "${GOMOBILE_ANDROID_API}" \
+            -trimpath \
+            -ldflags='-s -w -buildid= -checklinkname=0' \
+            -o libv2ray.aar \
+            ./
+
+          mkdir -p "${GITHUB_WORKSPACE}/aar"
+          mv libv2ray.aar "${GITHUB_WORKSPACE}/aar/"
+          ls -l "${GITHUB_WORKSPACE}/aar"
+
+      - name: Save libv2ray.aar
+        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ github.workspace }}/aar
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}
+
+      # ---------------------------------------------------------------------
+      # hev-socks5-tunnel - already built from source upstream.
+      # ---------------------------------------------------------------------
+
+      - name: Restore cached libhevtun
+        id: cache-libhevtun-restore
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ github.workspace }}/libs
+          key: libhevtun-${{ runner.os }}-${{ steps.revs.outputs.hev_rev }}-ndk${{ env.NDK_VERSION }}-${{ hashFiles('compile-hevtun.sh') }}
+
+      - name: Build libhevtun from source
+        if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
+        run: bash compile-hevtun.sh
+
+      - name: Save libhevtun
+        if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ github.workspace }}/libs
+          key: libhevtun-${{ runner.os }}-${{ steps.revs.outputs.hev_rev }}-ndk${{ env.NDK_VERSION }}-${{ hashFiles('compile-hevtun.sh') }}
+
+      # ---------------------------------------------------------------------
+      # Stage native artifacts and assemble the APKs.
+      # ---------------------------------------------------------------------
+
+      - name: Stage native artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p V2rayNG/app/libs
+          cp -r libs/. V2rayNG/app/libs/
+          cp aar/libv2ray.aar V2rayNG/app/libs/
+          echo "Contents of V2rayNG/app/libs:"
+          find V2rayNG/app/libs -type f | sort
+
+      - name: Setup Java
+        uses: actions/setup-java@v6.0.0
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Decode keystore
+        if: env.HAS_KEYSTORE == 'true'
+        uses: timheuer/base64-to-file@v2.0.0
+        id: android_keystore
+        with:
+          fileName: 'android_keystore.jks'
+          encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
+
+      - name: Build fdroid release APKs
+        run: |
+          set -euo pipefail
+          cd "${GITHUB_WORKSPACE}/V2rayNG"
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+          chmod 755 gradlew
+          ./gradlew licenseFdroidReleaseReport
+          if [ "${HAS_KEYSTORE}" = 'true' ]; then
+            ./gradlew assembleFdroidRelease \
+              "-Pandroid.injected.signing.store.file=${KEYSTORE_PATH}" \
+              "-Pandroid.injected.signing.store.password=${KEYSTORE_PASSWORD}" \
+              "-Pandroid.injected.signing.key.alias=${KEY_ALIAS}" \
+              "-Pandroid.injected.signing.key.password=${KEY_PASSWORD}"
+          else
+            echo 'No APP_KEYSTORE_BASE64 secret set: producing unsigned release APKs.'
+            ./gradlew assembleFdroidRelease
+          fi
+        env:
+          KEYSTORE_PATH: ${{ steps.android_keystore.outputs.filePath }}
+          KEYSTORE_PASSWORD: ${{ secrets.APP_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.APP_KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.APP_KEY_PASSWORD }}
+
+      # Required by AGENTS.md for a Gradle/build change: the Play Store debug
+      # variant must assemble. Runs after the release build so a failure here is
+      # unambiguously about the shared Gradle change.
+      - name: Validate playstore debug variant
+        run: |
+          set -euo pipefail
+          cd "${GITHUB_WORKSPACE}/V2rayNG"
+          ./gradlew :app:assemblePlaystoreDebug :app:testPlaystoreDebugUnitTest
+
+      - name: Write build manifest
+        run: |
+          set -euo pipefail
+          OUT="${GITHUB_WORKSPACE}/build-manifest.txt"
+          {
+            echo '# v2rayNG fdroid flavor - from-source build manifest'
+            echo "generated_at_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "workflow_run: ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}"
+            echo
+            echo '## sources'
+            echo "v2rayNG: ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
+            echo "AndroidLibXrayLite: ${XRAY_REV} (${XRAY_TAG})"
+            echo "hev-socks5-tunnel: ${HEV_REV} (${HEV_TAG})"
+            echo
+            echo '## toolchain'
+            echo "go: ${GO_VERSION}"
+            echo "ndk: ${NDK_VERSION}"
+            echo "cmdline-tools: ${CMDLINE_TOOLS_VERSION}"
+            echo "sdk packages: ${SDK_PACKAGES}"
+            echo "gomobile androidapi: ${GOMOBILE_ANDROID_API}"
+            echo "java: $(java -version 2>&1 | head -1)"
+            echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
+            echo
+            echo '## downloaded data (not built from source, data only)'
+            echo 'geoip.dat, geosite.dat, geoip-only-cn-private.dat via AndroidLibXrayLite/gen_assets.sh'
+            echo
+            echo '## native artifact checksums'
+            find V2rayNG/app/libs -type f | sort | xargs sha256sum
+            echo
+            echo '## apk checksums'
+            find V2rayNG/app/build/outputs/apk -name '*.apk' | sort | xargs sha256sum
+          } > "$OUT"
+          cat "$OUT"
+        env:
+          XRAY_REV: ${{ steps.revs.outputs.xray_rev }}
+          XRAY_TAG: ${{ steps.revs.outputs.xray_tag }}
+          HEV_REV: ${{ steps.revs.outputs.hev_rev }}
+          HEV_TAG: ${{ steps.revs.outputs.hev_tag }}
+
+      - name: Upload fdroid APKs
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: fdroid-apks
+          path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
+
+      - name: Upload build manifest
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-manifest
+          path: ${{ github.workspace }}/build-manifest.txt
+
+      - name: Upload libv2ray.aar
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: libv2ray-aar
+          path: ${{ github.workspace }}/aar/libv2ray.aar
+
+      - name: Upload APKs to release
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.release_tag != '' }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
+          tag: ${{ inputs.release_tag }}
+          file_glob: true
+          prerelease: true
