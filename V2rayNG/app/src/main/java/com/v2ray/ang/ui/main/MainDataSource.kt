@@ -24,6 +24,7 @@ interface MainDataSource : Closeable {
 
     fun getString(resId: Int): String
     fun getString(resId: Int, vararg formatArgs: Any): String
+    fun getQuantityString(resId: Int, quantity: Int, vararg formatArgs: Any): String
 
     fun getSubscriptions(): List<SubscriptionCache>
     fun getSubscriptionItem(id: String): SubscriptionItem?
@@ -57,9 +58,9 @@ interface MainDataSource : Closeable {
     fun share2Clipboard(guid: String): Boolean
 
     fun sendMsg2Service(msgId: Int, content: String)
-    fun sendMsg2TestService(msg: TestServiceMessage)
+    fun sendMsg2TestService(msg: TestServiceMessage, requestId: String? = null)
     fun cancelAllPing()
-    fun testCurrentServerRealPing()
+    fun testCurrentServerRealPing(requestId: String)
 
     fun syncSubscriptions()
     fun initAssets()
