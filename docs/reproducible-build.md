@@ -11,13 +11,13 @@ source. An independently repeatable build is the answer to that, and it is also
 a hard prerequisite for both the IzzyOnDroid reproducible-builds programme and
 an `fdroiddata` recipe.
 
-> Status: the from-source build works and reproduces byte for byte. Three
-> GitHub-hosted runs, across two VMs of the same image and a later one after
+> Status: the from-source build works and reproduces byte for byte. Four
+> GitHub-hosted runs, across two VMs of one runner image and later ones after
 > GitHub rolled the image, produced identical checksums for all 13 native
-> artifacts and all 5 fdroid release APKs — see [Evidence](#evidence). Those
-> runs compiled the aar's Java bindings with the runner image's default JDK,
-> which was not pinned then; it now is. The runner image itself is still not
-> pinned — see [Open questions](#open-questions).
+> artifacts and all 5 fdroid release APKs — see [Evidence](#evidence). The
+> fourth was the first with the JDK that compiles the aar's Java bindings
+> pinned, and its aar matched the earlier ones. The runner image itself is
+> still not pinned — see [Open questions](#open-questions).
 
 ## What is built from source
 
@@ -220,7 +220,7 @@ branches, so the first run after merging to `master` is cold without
 
 ### Evidence
 
-Three runs, all producing the same checksums for all 13 native artifacts and
+Four runs, all producing the same checksums for all 13 native artifacts and
 all 5 fdroid release APKs:
 
 | Run | Commit | Branch | `libv2ray.aar` | hev libraries | JDK | Runner image |
@@ -228,6 +228,7 @@ all 5 fdroid release APKs:
 | [34460850995](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34460850995) | `02a6cc79` | `fdroid-source-build` | compiled (195 s) | cache from a VM ~6 h earlier | 21.0.12.1, runner's preinstalled copy | ubuntu24 20260831.293.1 |
 | [34466248610](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34466248610) | `02a6cc79` | `master` | compiled (192 s), no Go build cache | compiled (86 s) | same | same |
 | [34475374598](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34475374598) | `8a0a0e66` | `fdroid-source-build` | cache from the first run | cache | 21.0.12.1, **downloaded from Adoptium** via the exact pin | **ubuntu24 20260907.300.1** |
+| [34494546647](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34494546647) | `995b8a3e` | `fdroid-source-build` | recompiled: `javac` fresh with the **pinned Temurin 17**, Go packages from `setup-go`'s build cache | cache | 21.0.12.1 via the pin | ubuntu24 20260907.300.1 |
 
 The first two runs rule out the suspects this document originally listed: AGP
 zip entry timestamps, `gomobile`'s aar packaging, and the
@@ -240,6 +241,13 @@ between the second and third runs, so the third additionally shows the Gradle
 and APK stage surviving an image update. It restored its native artifacts from
 cache, though, so the Go and NDK compile stages were not re-run on the new
 image.
+
+The fourth run is the first to build the aar with the gomobile JDK pinned. The
+new cache key forced the aar to be rebuilt, and it came out identical to the one
+the first two runs built with the runner's preinstalled JDK 17, so the pin
+changed nothing but where that JDK comes from. Its Go packages were replayed from
+`setup-go`'s build cache, so it still does not show the Go compile reproducing on
+a different image.
 
 ## Open questions
 
