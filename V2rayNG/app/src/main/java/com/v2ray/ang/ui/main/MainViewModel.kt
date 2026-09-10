@@ -70,7 +70,6 @@ class MainViewModel(
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
     private val groupUiFlows = ConcurrentHashMap<String, MutableStateFlow<ServerGroupUiState>>()
     private val groupServerFlows = ConcurrentHashMap<String, StateFlow<List<ServersCache>>>()
-    private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
     private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
     private var setupGroupJob: Job? = null
@@ -316,8 +315,12 @@ class MainViewModel(
     }
 
     private fun updateGroupUi(groupId: String, servers: List<ServersCache>) {
+        mutableServerGroupState(groupId).value = buildGroupUiState(groupId, servers)
+    }
+
+    private fun buildGroupUiState(groupId: String, servers: List<ServersCache>): ServerGroupUiState {
         val filteredServers = applyKeywordFilter(servers)
-        mutableServerGroupState(groupId).value = ServerGroupUiState(
+        return ServerGroupUiState(
             servers = filteredServers,
             rows = buildServerRows(groupId, filteredServers)
         )
@@ -387,7 +390,6 @@ class MainViewModel(
                 val validIds = groups.mapTo(HashSet()) { it.id }
                 groupUiFlows.keys.removeAll { it !in validIds }
                 groupServerFlows.keys.removeAll { it !in validIds }
-                groupLoadMutexes.keys.removeAll { it !in validIds }
 
                 _uiState.update {
                     it.copy(
@@ -734,9 +736,11 @@ class MainViewModel(
             // Read persisted membership/order instead of replaying a captured drag snapshot.
             val thisJob = currentCoroutineContext()[Job]
             if (serverOrderPersistenceJobs[groupId] === thisJob) {
-                val persisted = withContext(ioDispatcher) { loadGroup(groupId, forceRefresh = true) }
+                val persisted = withContext(ioDispatcher) {
+                    buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
+                }
                 if (serverOrderPersistenceJobs[groupId] === thisJob) {
-                    updateGroupUi(groupId, persisted)
+                    mutableServerGroupState(groupId).value = persisted
                     serverOrderPersistenceJobs.remove(groupId)
                 }
             }
