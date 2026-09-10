@@ -162,11 +162,19 @@ read the checksums without downloading anything.
 
 ## Verifying determinism
 
-The caches are keyed on the submodule revisions, so an ordinary second run reuses
-the previously built `libv2ray.aar` instead of rebuilding it — which would make a
-comparison meaningless. Run the workflow manually with **`bypass_cache` checked**
-to force a cold rebuild of every native artifact; that run also declines to write
-its results back to the cache, so it does not disturb the existing entry.
+The caches are keyed on the submodule revisions and the geo pin, so an ordinary
+second run reuses the previously built `libv2ray.aar` instead of rebuilding it —
+which would make a comparison meaningless. Run the workflow manually with
+**`bypass_cache` checked** to force a cold rebuild of every native artifact; that
+run also declines to write its results back to the cache, so it does not disturb
+the existing entry.
+
+`bypass_cache` additionally runs `go clean -cache`. `actions/setup-go` restores
+Go's build cache, which is content addressed and replays a previous compile's
+output rather than redoing the work — normally a pure speedup, but in a
+reproducibility check it would hide compiler-level nondeterminism, and an outside
+rebuilder starts with no such cache. The module cache is deliberately kept, since
+`go.sum` already fixes its contents.
 
 Compare its manifest against an earlier cold run's, on the same commit. The
 native artifact checksums and the APK checksums should match line for line. If

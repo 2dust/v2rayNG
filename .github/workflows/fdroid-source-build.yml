@@ -121,12 +121,24 @@ jobs:
           # one: the Go version is baked into the compiled .so files, so an
           # automatic upgrade would change the output bytes without any signal.
           GOTOOLCHAIN: local
+          BYPASS_CACHE: ${{ inputs.bypass_cache }}
         run: |
           set -euo pipefail
           cd AndroidLibXrayLite
 
           REQUIRED_GO=$(awk '/^go /{print $2; exit}' go.mod)
           echo "go.mod requires go ${REQUIRED_GO}; using $(go version)"
+
+          # actions/setup-go restores Go's build cache, which is content
+          # addressed: it replays the outputs of a previous compile instead of
+          # redoing it. That is fine normally, but it would hide compiler-level
+          # nondeterminism from a reproducibility check, and an outside rebuilder
+          # has no such cache. Drop it so a bypass_cache run is genuinely cold.
+          # The module cache is left alone: go.sum already pins its contents.
+          if [ "${BYPASS_CACHE}" = 'true' ]; then
+            echo 'bypass_cache: clearing the Go build cache for a cold compile'
+            go clean -cache
+          fi
 
           # gomobile is pinned to the golang.org/x/mobile revision this module
           # already depends on, so the generated binding code matches go.sum.
@@ -307,7 +319,11 @@ jobs:
             find V2rayNG/app/libs -type f | sort | xargs sha256sum
             echo
             echo '## apk checksums'
-            find V2rayNG/app/build/outputs/apk -name '*.apk' | sort | xargs sha256sum
+            # Only the fdroid release output. The playstore debug APKs built by
+            # the validation step are signed with the auto-generated debug
+            # keystore, which differs per machine, so including them here would
+            # show a rebuilder mismatches that mean nothing.
+            find V2rayNG/app/build/outputs/apk/fdroid/release -name '*.apk' | sort | xargs sha256sum
           } > "$OUT"
           cat "$OUT"
 
