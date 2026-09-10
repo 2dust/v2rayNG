@@ -19,8 +19,9 @@
     <string name="toast_permission_denied_notification">امکان دریافت مجوز ارسال اعلان وجود ندارد</string>
     <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
     <string name="toast_services_start">شروع خدمات</string>
-    <string name="toast_services_stop">توقف سرویس</string>
+    <string name="toast_services_stop">سرویس متوقف شد</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
+    <string name="toast_services_restart_success">سرویس با موفقیت دوباره راه‌اندازی شد</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
     <!--ServerActivity-->

@@ -53,7 +53,10 @@ class MainRepository(
             val event = when (safeIntent.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
                 AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
-                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
+                AppConfig.MSG_STATE_RESTART -> MainServiceEvent.StateRestarting
+                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess(
+                    restarted = safeIntent.serializable<Boolean>("content") == true,
+                )
                 AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
