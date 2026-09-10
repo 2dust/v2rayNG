@@ -11,10 +11,12 @@ source. An independently repeatable build is the answer to that, and it is also
 a hard prerequisite for both the IzzyOnDroid reproducible-builds programme and
 an `fdroiddata` recipe.
 
-> Status: the build is *defined* here and automated in
-> `.github/workflows/fdroid-source-build.yml`. Whether two independent runs
-> produce byte-identical APKs has **not** been verified yet — see
-> [Open questions](#open-questions).
+> Status: the from-source build works. It is automated in
+> `.github/workflows/fdroid-source-build.yml` and first passed end to end on
+> 2026-09-10, producing unsigned fdroid release APKs in about 12 minutes on a
+> standard GitHub-hosted runner. Whether two independent runs produce
+> byte-identical APKs is **not** verified yet — see
+> [Verifying determinism](#verifying-determinism).
 
 ## What is built from source
 
@@ -128,18 +130,36 @@ echo "sdk.dir=${ANDROID_HOME}" > local.properties
 Output lands in `V2rayNG/app/build/outputs/apk/fdroid/release/` as one APK per
 ABI plus a universal one.
 
-Every CI run uploads a `build-manifest` artifact recording the submodule
-revisions, the toolchain versions, the runner image, and SHA-256 sums of all
-native artifacts and APKs. Attach it when asking a rebuilder to compare.
+Every CI run records the submodule revisions, the toolchain versions, the runner
+image, and SHA-256 sums of all native artifacts and APKs. It is published both as
+a `build-manifest` artifact and on the run's summary page, so a rebuilder can
+read the checksums without downloading anything.
+
+## Verifying determinism
+
+The caches are keyed on the submodule revisions, so an ordinary second run reuses
+the previously built `libv2ray.aar` instead of rebuilding it — which would make a
+comparison meaningless. Run the workflow manually with **`bypass_cache` checked**
+to force a cold rebuild of every native artifact; that run also declines to write
+its results back to the cache, so it does not disturb the existing entry.
+
+Compare its manifest against an earlier cold run's, on the same commit. The
+native artifact checksums and the APK checksums should match line for line. If
+they do not, the manifest's toolchain section is the first place to look for
+what differed; the known suspects are listed below.
 
 ## Open questions
 
 These are unresolved and should be treated as work items, not as settled:
 
-- **Byte-for-byte determinism is unverified.** Nobody has yet run the build
-  twice and diffed the APKs. Likely suspects if they differ: zip entry
-  timestamps written by AGP, `gomobile`'s aar packaging, and the HTML report
-  produced by `licenseFdroidReleaseReport`.
+- **Byte-for-byte determinism is unverified.** The build has not yet been run
+  twice cold and diffed; see [Verifying determinism](#verifying-determinism) for
+  how. Likely suspects if the outputs differ: zip entry timestamps written by
+  AGP, `gomobile`'s aar packaging, and the HTML report produced by
+  `licenseFdroidReleaseReport`. The geo databases are a further complication —
+  `gen_assets.sh` always fetches *latest*, so two runs on different days will
+  embed different `.dat` files and cannot match. Pinning them to a dated release
+  is likely a prerequisite for reproducibility.
 - **In-app updater.** `UpdateCheckerManager` fetches APK download URLs from
   GitHub releases. IzzyOnDroid tolerates this (with an anti-feature flag);
   F-Droid normally requires it gated off for their build. Not addressed here.

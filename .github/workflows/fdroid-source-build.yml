@@ -17,6 +17,11 @@ on:
         description: 'Existing release tag to upload the APKs to (leave empty to only keep artifacts)'
         required: false
         type: string
+      bypass_cache:
+        description: 'Rebuild every native artifact from scratch, ignoring the caches. Use this to check reproducibility: run it and compare the build manifest against an earlier cold run.'
+        required: false
+        default: false
+        type: boolean
   push:
     branches:
       - master
@@ -96,6 +101,7 @@ jobs:
 
       - name: Restore cached libv2ray.aar
         id: cache-libv2ray-restore
+        if: ${{ !inputs.bypass_cache }}
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/aar
@@ -165,7 +171,7 @@ jobs:
           ls -l "${GITHUB_WORKSPACE}/aar"
 
       - name: Save libv2ray.aar
-        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        if: ${{ !inputs.bypass_cache && steps.cache-libv2ray-restore.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/aar
@@ -177,6 +183,7 @@ jobs:
 
       - name: Restore cached libhevtun
         id: cache-libhevtun-restore
+        if: ${{ !inputs.bypass_cache }}
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/libs
@@ -187,7 +194,7 @@ jobs:
         run: bash compile-hevtun.sh
 
       - name: Save libhevtun
-        if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
+        if: ${{ !inputs.bypass_cache && steps.cache-libhevtun-restore.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/libs
@@ -285,6 +292,15 @@ jobs:
             find V2rayNG/app/build/outputs/apk -name '*.apk' | sort | xargs sha256sum
           } > "$OUT"
           cat "$OUT"
+
+          # Also publish it on the run page, so a rebuilder comparing checksums
+          # does not have to download and unzip an artifact to read them.
+          {
+            echo '### Build manifest'
+            echo '```'
+            cat "$OUT"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
         env:
           XRAY_REV: ${{ steps.revs.outputs.xray_rev }}
           XRAY_TAG: ${{ steps.revs.outputs.xray_tag }}
