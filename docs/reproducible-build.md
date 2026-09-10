@@ -11,11 +11,12 @@ source. An independently repeatable build is the answer to that, and it is also
 a hard prerequisite for both the IzzyOnDroid reproducible-builds programme and
 an `fdroiddata` recipe.
 
-> Status: the from-source build works and has reproduced byte for byte across
-> independent runners. Two runs of commit `02a6cc79` on separate GitHub-hosted
-> VMs an hour apart produced identical checksums for all 13 native artifacts and
-> all 5 fdroid release APKs — see [Evidence](#evidence). What that comparison
-> could not exercise is a different JDK patch release or runner image; see
+> Status: the from-source build works and reproduces byte for byte. Three
+> GitHub-hosted runs, across two VMs of the same image and a later one after
+> GitHub rolled the image, produced identical checksums for all 13 native
+> artifacts and all 5 fdroid release APKs — see [Evidence](#evidence). The whole
+> toolchain is pinned; the runner image is the one input that is not, and it
+> has been exercised for the APK stage only — see
 > [Open questions](#open-questions).
 
 ## What is built from source
@@ -211,18 +212,26 @@ branches, so the first run after merging to `master` is cold without
 
 ### Evidence
 
-| | Run [34460850995](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34460850995) | Run [34466248610](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34466248610) |
-| --- | --- | --- |
-| Commit | `02a6cc79` | `02a6cc79` |
-| Branch | `fdroid-source-build` | `master` |
-| `libv2ray.aar` | compiled in this run (195 s) | compiled in this run (192 s), no Go build cache |
-| hev libraries | restored from a cache built ~6 h earlier on another VM | compiled in this run (86 s) |
-| JDK / runner image | 21.0.12.1 / ubuntu24 20260831.293.1 | same |
-| Result | — | **all 18 checksums identical to the other run** |
+Three runs, all producing the same checksums for all 13 native artifacts and
+all 5 fdroid release APKs:
 
-This rules out the suspects this document originally listed: AGP zip entry
-timestamps, `gomobile`'s aar packaging, and the `licenseFdroidReleaseReport` HTML
-all came out identical.
+| Run | Commit | Branch | `libv2ray.aar` | hev libraries | JDK | Runner image |
+| --- | --- | --- | --- | --- | --- | --- |
+| [34460850995](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34460850995) | `02a6cc79` | `fdroid-source-build` | compiled (195 s) | cache from a VM ~6 h earlier | 21.0.12.1, runner's preinstalled copy | ubuntu24 20260831.293.1 |
+| [34466248610](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34466248610) | `02a6cc79` | `master` | compiled (192 s), no Go build cache | compiled (86 s) | same | same |
+| [34475374598](https://github.com/AcideFluorhydrique/v2rayNG/actions/runs/34475374598) | `8a0a0e66` | `fdroid-source-build` | cache from the first run | cache | 21.0.12.1, **downloaded from Adoptium** via the exact pin | **ubuntu24 20260907.300.1** |
+
+The first two runs rule out the suspects this document originally listed: AGP
+zip entry timestamps, `gomobile`'s aar packaging, and the
+`licenseFdroidReleaseReport` HTML all came out identical.
+
+The third run changes no app source (its commit only touches the workflow and
+this document), so its APKs had to match if pinning the JDK changed nothing but
+where the JDK comes from — and they did. GitHub also rolled the runner image
+between the second and third runs, so the third additionally shows the Gradle
+and APK stage surviving an image update. It restored its native artifacts from
+cache, though, so the Go and NDK compile stages were not re-run on the new
+image.
 
 ## Open questions
 
@@ -232,8 +241,10 @@ These are unresolved and should be treated as work items, not as settled:
   image builds and, eventually, Ubuntu releases. Every tool that shapes the
   output (Go, NDK, SDK, JDK, Gradle through its wrapper) is pinned and installed
   by the workflow rather than taken from the image, so the image should not
-  matter; the [evidence](#evidence) runs shared an image, though, so this is
-  unproven. The manifest records it.
+  matter. That is now shown for the APK stage, which reproduced across an image
+  update (see [Evidence](#evidence)); the Go and NDK compile stages have not yet
+  been run on two different images. A `bypass_cache` run on a newer image would
+  close that. The manifest records the image either way.
 - **Geo data goes stale.** Pinning trades reproducibility for freshness: the
   routing databases stay at whatever dated release the lock file names until
   someone bumps it. Review it when cutting a release, and note that users can
