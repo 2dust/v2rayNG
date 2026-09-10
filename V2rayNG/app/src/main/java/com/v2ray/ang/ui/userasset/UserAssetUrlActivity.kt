@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -81,6 +85,20 @@ class UserAssetUrlActivity : BaseComponentActivity() {
     }
 
     private fun saveServer(remarks: String, url: String): Boolean {
+        val assetList = MmkvManager.decodeAssetUrls()
+        if (assetList.any { it.assetUrl.remarks == remarks && it.guid != editAssetId }) {
+            toast(R.string.msg_remark_is_duplicate)
+            return false
+        }
+        if (TextUtils.isEmpty(remarks)) {
+            toast(R.string.sub_setting_remarks)
+            return false
+        }
+        if (TextUtils.isEmpty(url)) {
+            toast(R.string.title_url)
+            return false
+        }
+
         var assetItem = MmkvManager.decodeAsset(editAssetId)
         var assetId = editAssetId
         if (assetItem != null) {
@@ -99,20 +117,6 @@ class UserAssetUrlActivity : BaseComponentActivity() {
 
         assetItem.remarks = remarks
         assetItem.url = url
-
-        val assetList = MmkvManager.decodeAssetUrls()
-        if (assetList.any { it.assetUrl.remarks == assetItem.remarks && it.guid != assetId }) {
-            toast(R.string.msg_remark_is_duplicate)
-            return false
-        }
-        if (TextUtils.isEmpty(assetItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
-            return false
-        }
-        if (TextUtils.isEmpty(assetItem.url)) {
-            toast(R.string.title_url)
-            return false
-        }
 
         MmkvManager.encodeAsset(assetId, assetItem)
         toastSuccess(R.string.toast_success)
@@ -138,9 +142,9 @@ fun UserAssetUrlScreen(
     onSave: (String, String) -> Boolean,
     onDelete: () -> Unit
 ) {
-    var remarks by remember { mutableStateOf(initialRemarks) }
-    var url by remember { mutableStateOf(initialUrl) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var remarks by rememberSaveable(editAssetId, initialRemarks) { mutableStateOf(initialRemarks) }
+    var url by rememberSaveable(editAssetId, initialUrl) { mutableStateOf(initialUrl) }
+    var showDeleteConfirm by rememberSaveable(editAssetId) { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -171,6 +175,9 @@ fun UserAssetUrlScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(vertical = 8.dp)
         ) {
             FormTextField(
