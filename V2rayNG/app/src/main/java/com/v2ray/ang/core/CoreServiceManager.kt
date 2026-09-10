@@ -21,6 +21,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.serviceStartedMessage
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
@@ -279,13 +280,8 @@ object CoreServiceManager {
 
     private fun reportStartSuccess(service: Service, serverName: String) {
         val localizedContext = AppLocaleManager.localizedContext(service)
-        val startedServerName = serverName.trim()
-        val message = if (startedServerName.isEmpty()) {
-            localizedContext.getString(R.string.toast_services_success)
-        } else {
-            localizedContext.getString(R.string.acc_service_started_connected_to, startedServerName)
-        }
-        reportServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS, startedServerName, message)
+        val message = localizedContext.serviceStartedMessage(serverName)
+        reportServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS, serverName, message)
     }
 
     internal fun reportStartFailure(service: Service, detail: String) {

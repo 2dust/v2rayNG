@@ -87,18 +87,25 @@ class LiveRegionMessageStateTest {
     }
 
     @Test
-    fun pendingServiceResultsTakePriorityWithoutReorderingEachPriority() {
+    fun assertiveResultsCannotOvertakeEarlierPoliteStateChanges() {
         val state = LiveRegionMessageState { 0L }
         state.offer(AppSnackbarMessage("Downloading"))
-        state.offer(AppSnackbarMessage("Copied"))
+        state.offer(AppSnackbarMessage("Starting service"))
         state.offer(AppSnackbarMessage("Connected", liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE))
         state.offer(AppSnackbarMessage("Stopped", liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE))
         assertEquals("Downloading", state.current?.text)
 
-        for (expected in listOf("Connected", "Stopped", "Copied")) {
+        for ((text, mode) in listOf(
+            "Starting service" to AccessibilityLiveRegionMode.POLITE,
+            "Connected" to AccessibilityLiveRegionMode.ASSERTIVE,
+            "Stopped" to AccessibilityLiveRegionMode.ASSERTIVE,
+        )) {
             state.advance(state.current!!.id)
-            assertEquals(expected, state.current?.text)
+            assertEquals(text, state.current?.text)
+            assertEquals(mode, state.current?.mode)
         }
+        state.advance(state.current!!.id)
+        assertNull(state.current)
     }
 
     @Test

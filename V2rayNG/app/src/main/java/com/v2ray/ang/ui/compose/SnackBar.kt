@@ -189,13 +189,11 @@ internal class LiveRegionMessageState(
         if (current == null) current = message else pending.addLast(message)
     }
 
-    // Hold each update for its semantics lifetime rather than cancelling publication when another
-    // message arrives. Urgent pending results go first; the accessibility service still owns speech.
+    // Hold each update for its semantics lifetime and preserve event order (e.g. starting, started).
+    // The live-region mode controls speech urgency, not the order in which we publish state changes.
     fun advance(id: Long) {
         if (current?.id != id) return
-        current = pending.firstOrNull { it.mode == AccessibilityLiveRegionMode.ASSERTIVE }
-            ?: pending.firstOrNull()
-        current?.let(pending::remove)
+        current = pending.removeFirstOrNull()
     }
 
     fun clear() {
@@ -237,7 +235,7 @@ fun AppSnackbarHost(
     controller: AppSnackbarController,
     modifier: Modifier = Modifier
 ) {
-    val liveRegionMessages = LocalAppSnackbar.current.liveRegionMessages
+    val liveRegionMessages = controller.liveRegionMessages
     val liveRegionMessage = liveRegionMessages.current
     LaunchedEffect(liveRegionMessage?.id) {
         val id = liveRegionMessage?.id ?: return@LaunchedEffect

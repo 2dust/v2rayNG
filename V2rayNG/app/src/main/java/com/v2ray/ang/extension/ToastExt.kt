@@ -1,6 +1,7 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
+import com.v2ray.ang.R
 import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.ui.compose.AppSnackbarMessage
 import com.v2ray.ang.ui.compose.AppSnackbarManager
@@ -88,23 +89,14 @@ fun Context.toastError(
     dispatchMessage(message, ToastType.ERROR, liveRegionMode)
 }
 
-/**
- * Shows an info toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastInfo(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.INFO, AccessibilityLiveRegionMode.POLITE)
-}
-
-/**
- * Shows an info toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO, AccessibilityLiveRegionMode.POLITE)
+/** Shared text for the service's background notification and foreground live region. */
+internal fun Context.serviceStartedMessage(serverName: String): String {
+    val name = serverName.trim()
+    return if (name.isEmpty()) {
+        getString(R.string.toast_services_success)
+    } else {
+        getString(R.string.acc_service_started_connected_to, name)
+    }
 }
 
 private fun Context.dispatchMessage(
