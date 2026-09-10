@@ -88,7 +88,7 @@ get different bytes — the Go version in particular is embedded in the compiled
 | Android NDK | 29.0.14206865 | workflow `NDK_VERSION` **and** `android.ndkVersion` |
 | Android cmdline-tools | 14742923 | workflow `CMDLINE_TOOLS_VERSION` |
 | Android platform / build-tools | android-37.0 / 37.0.0 | workflow `SDK_PACKAGES` |
-| JDK | Temurin 21 — **major only, the patch release floats** | workflow `JAVA_VERSION`; see [Open questions](#open-questions) |
+| JDK | Temurin 21.0.12.1+1 (Adoptium semver `21.0.12+101.0.LTS`) | workflow `JAVA_VERSION` |
 | AGP / Kotlin / dependencies | see `V2rayNG/gradle/libs.versions.toml` | Gradle |
 | `gomobile -androidapi` | 24 | workflow `GOMOBILE_ANDROID_API`, must equal `minSdk` |
 
@@ -178,6 +178,16 @@ which would make a comparison meaningless. Run the workflow manually with
 run also declines to write its results back to the cache, so it does not disturb
 the existing entry.
 
+The JDK is pinned to an exact Temurin build for the same reason. Only the
+full Adoptium semver form in `JAVA_VERSION` achieves that: `setup-java` checks
+the runner's preinstalled JDKs first, so `21` or `21.0.12` quietly take whatever
+the image carries, and the four-part `21.0.12.1` resolves to the preinstalled
+copy only by an accident of its folder name, then fails to match anything on
+Adoptium once the image moves on. The full form never matches a preinstalled
+JDK, so `setup-java` always downloads that exact build and verifies its SHA-256.
+Updating it is manual: copy the `semver` field for the new release from the
+Adoptium API URL given in the workflow.
+
 `bypass_cache` additionally runs `go clean -cache`. `actions/setup-go` restores
 Go's build cache, which is content addressed and replays a previous compile's
 output rather than redoing the work — normally a pure speedup, but in a
@@ -218,15 +228,12 @@ all came out identical.
 
 These are unresolved and should be treated as work items, not as settled:
 
-- **The JDK and runner image still float.** The workflow asks for
-  `java-version: '21'`, which resolves to whatever 21.x patch release is current,
-  and `runs-on: ubuntu-latest` moves too. Both runs in the
-  [evidence](#evidence) got the same ones, so the comparison says nothing about
-  them. Whether a different JDK patch changes the output is unknown — AGP brings
-  its own D8, but the Kotlin and Java compilers run on the installed JDK. A
-  rebuilder working weeks later is likely to get a newer patch, so this is the
-  largest remaining risk. The manifest records both, which at least makes a
-  mismatch caused by them easy to diagnose.
+- **The runner image still floats.** `runs-on: ubuntu-latest` moves between
+  image builds and, eventually, Ubuntu releases. Every tool that shapes the
+  output (Go, NDK, SDK, JDK, Gradle through its wrapper) is pinned and installed
+  by the workflow rather than taken from the image, so the image should not
+  matter; the [evidence](#evidence) runs shared an image, though, so this is
+  unproven. The manifest records it.
 - **Geo data goes stale.** Pinning trades reproducibility for freshness: the
   routing databases stay at whatever dated release the lock file names until
   someone bumps it. Review it when cutting a release, and note that users can

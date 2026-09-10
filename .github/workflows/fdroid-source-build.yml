@@ -39,7 +39,14 @@ env:
   SDK_PACKAGES: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
   NDK_VERSION: '29.0.14206865'
   GO_VERSION: '1.27.1'
-  JAVA_VERSION: '21'
+  # Exact Temurin build: this is 21.0.12.1+1, written as the Adoptium
+  # `version_data.semver` that setup-java matches against. Only the full form
+  # pins anything. '21' and '21.0.12' take whatever JDK the runner image has
+  # preinstalled. '21.0.12.1' happens to match the preinstalled folder today but
+  # matches nothing on Adoptium, so it fails once the image moves on. And
+  # '21.0.12+101' matches nothing at all. To update, copy the `semver` field from
+  # https://api.adoptium.net/v3/info/release_versions?release_type=ga&version=%5B21,22)
+  JAVA_VERSION: '21.0.12+101.0.LTS'
   # Must match minSdk in V2rayNG/app/build.gradle.kts.
   GOMOBILE_ANDROID_API: '24'
   # Signing is optional: without a keystore the job still proves the build works
@@ -309,6 +316,7 @@ jobs:
             echo "cmdline-tools: ${CMDLINE_TOOLS_VERSION}"
             echo "sdk packages: ${SDK_PACKAGES}"
             echo "gomobile androidapi: ${GOMOBILE_ANDROID_API}"
+            echo "java requested: ${JAVA_VERSION}"
             echo "java: $(java -version 2>&1 | head -1)"
             echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
             echo
