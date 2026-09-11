@@ -50,6 +50,7 @@ class MainRepository(
     private val serviceReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val safeIntent = intent ?: return
+            val requestId = safeIntent.getStringExtra(MessageHelper.EXTRA_REQUEST_ID).orEmpty()
             val event = when (safeIntent.getIntExtra("key", 0)) {
                 AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
                 AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
@@ -59,16 +60,18 @@ class MainRepository(
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
                 AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
                     .serializable<ConnectionTestResult>("content")
-                    ?.let { MainServiceEvent.MeasureDelayResult(it) }
+                    ?.let { MainServiceEvent.MeasureDelayResult(it, requestId) }
+                AppConfig.MSG_MEASURE_DELAY_CANCEL -> MainServiceEvent.MeasureDelayCancelled(requestId)
 
-                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> MainServiceEvent.MeasureConfigSuccess(requestId)
                 AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
-                    safeIntent.getStringExtra("content").orEmpty()
+                    safeIntent.getStringExtra("content").orEmpty(), requestId
                 )
 
                 AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
-                    safeIntent.getStringExtra("content")
+                    requestId
                 )
+                AppConfig.MSG_MEASURE_CONFIG_CANCEL -> MainServiceEvent.MeasureConfigCancelled(requestId)
 
                 else -> null
             }
@@ -205,8 +208,8 @@ class MainRepository(
     override fun sendMsg2Service(msgId: Int, content: String) =
         MessageHelper.sendMsg2Service(app, msgId, content)
 
-    override fun sendMsg2TestService(msg: TestServiceMessage) =
-        MessageHelper.sendMsg2TestService(app, msg)
+    override fun sendMsg2TestService(msg: TestServiceMessage, requestId: String?) =
+        MessageHelper.sendMsg2TestService(app, msg, requestId)
 
     override fun cancelAllPing() {
         sendMsg2TestService(
@@ -214,8 +217,10 @@ class MainRepository(
         )
     }
 
-    override fun testCurrentServerRealPing() {
-        sendMsg2Service(AppConfig.MSG_MEASURE_DELAY, "")
+    override fun testCurrentServerRealPing(requestId: String) {
+        MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_MEASURE_DELAY, requestId) { handled ->
+            if (!handled) _mainServiceEvent.tryEmit(MainServiceEvent.MeasureDelayCancelled(requestId))
+        }
     }
 
     override fun syncSubscriptions() {
