@@ -17,10 +17,15 @@
     <string name="notification_action_stop_v2ray">توقف</string>
     <string name="toast_permission_denied">امکان دریافت مجوز وجود ندارد</string>
     <string name="toast_permission_denied_notification">امکان دریافت مجوز ارسال اعلان وجود ندارد</string>
+    <string name="notification_channel_service">سرویس v2rayNG</string>
+    <string name="notification_channel_subscription_updates">به‌روزرسانی اشتراک‌ها</string>
+    <string name="notification_channel_connection_checks">بررسی اتصال</string>
+    <string name="notification_channel_other">سایر اعلان‌ها</string>
     <string name="notification_action_more">برای اطلاعات بیشتر کلیک کنید</string>
     <string name="toast_services_start">شروع خدمات</string>
-    <string name="toast_services_stop">توقف سرویس</string>
+    <string name="toast_services_stop">سرویس متوقف شد</string>
     <string name="toast_services_success">سرویس با موفقیت شروع شد</string>
+    <string name="acc_service_started_connected_to">سرویس با موفقیت شروع شد. اکنون به %1$s متصل هستید.</string>
     <string name="toast_services_failure">شروع سرویس با شکست مواجه شد</string>
 
     <!--ServerActivity-->
