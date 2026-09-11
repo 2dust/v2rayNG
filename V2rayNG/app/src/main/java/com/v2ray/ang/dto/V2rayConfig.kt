@@ -343,6 +343,7 @@ data class V2rayConfig(
         val disableCache: Boolean? = null,
         val queryStrategy: String? = null,
         val enableParallelQuery: Boolean? = null,
+        val disableFallbackIfMatch: Boolean? = null,
         val tag: String? = null
     ) {
         data class ServersBean(
