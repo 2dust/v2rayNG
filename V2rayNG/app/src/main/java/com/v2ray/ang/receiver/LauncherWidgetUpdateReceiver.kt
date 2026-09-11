@@ -22,8 +22,6 @@ class LauncherWidgetUpdateReceiver : BroadcastReceiver() {
             AppConfig.MSG_STATE_START_SUCCESS,
             AppConfig.MSG_STATE_START_FAILURE,
             AppConfig.MSG_STATE_STOP_SUCCESS,
-            AppConfig.MSG_MEASURE_DELAY,
-            AppConfig.MSG_MEASURE_DELAY_RESULT,
             AppConfig.MSG_SELECTED_PROFILE_CHANGED -> Unit
             else -> return
         }

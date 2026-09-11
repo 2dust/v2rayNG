@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.widget
 
-import com.v2ray.ang.core.CoreConnectionState
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.handler.MmkvManager
 import kotlinx.coroutines.Dispatchers
@@ -15,24 +14,22 @@ internal data class WidgetProfile(val guid: String, val name: String)
 
 internal data class LauncherWidgetState(
     val profile: WidgetProfile?,
-    val connection: CoreConnectionState,
-) {
-    val isRunning: Boolean get() = connection.isRunning
-}
+    val isRunning: Boolean,
+)
 
 /** Loads profile storage outside composition; connection state belongs to the live daemon. */
 internal class LauncherWidgetStateRepository(
     private val readProfile: () -> WidgetProfile?,
-    private val connection: StateFlow<CoreConnectionState>,
+    private val running: StateFlow<Boolean>,
 ) {
     private val profile = MutableStateFlow<WidgetProfile?>(null)
     private val refreshMutex = Mutex()
-    val states = combine(profile, connection, ::LauncherWidgetState)
+    val states = combine(profile, running, ::LauncherWidgetState)
 
     suspend fun refresh(): LauncherWidgetState = withContext(Dispatchers.IO) {
         refreshMutex.withLock {
             profile.value = readProfile()
-            LauncherWidgetState(profile.value, connection.value)
+            LauncherWidgetState(profile.value, running.value)
         }
     }
 
@@ -45,7 +42,7 @@ internal class LauncherWidgetStateRepository(
                         MmkvManager.decodeServerConfig(guid)?.let { WidgetProfile(guid, it.remarks) }
                     }
                 },
-                connection = CoreServiceManager.connectionState,
+                running = CoreServiceManager.runningState,
             )
         }
     }

@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui.widget
 
-import com.v2ray.ang.core.ConnectionTestSession
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -16,8 +16,8 @@ class LauncherWidgetStateRepositoryTest {
     @Test
     fun importingFirstProfileReplacesEmptyStateAfterStorageRefresh() = runBlocking {
         var selected: WidgetProfile? = null
-        val session = ConnectionTestSession()
-        val repository = LauncherWidgetStateRepository({ selected }, session.state)
+        val running = MutableStateFlow(false)
+        val repository = LauncherWidgetStateRepository({ selected }, running)
         assertNull(repository.refresh().profile)
 
         selected = WidgetProfile("imported", "Imported profile")
@@ -30,7 +30,7 @@ class LauncherWidgetStateRepositoryTest {
     @Test
     fun replacementsRenamesAndDeletionAreObservedWithoutServiceEvents() = runBlocking {
         var selected: WidgetProfile? = WidgetProfile("old", "Old name")
-        val repository = LauncherWidgetStateRepository({ selected }, ConnectionTestSession().state)
+        val repository = LauncherWidgetStateRepository({ selected }, MutableStateFlow(false))
         repository.refresh()
         selected = WidgetProfile("new", "Replacement")
         assertEquals(selected, repository.refresh().profile)
@@ -42,20 +42,20 @@ class LauncherWidgetStateRepositoryTest {
 
     @Test
     fun refreshCannotRestoreRunningStateAfterStop() = runBlocking {
-        val session = ConnectionTestSession()
-        val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, session.state)
-        session.started("a")
+        val running = MutableStateFlow(false)
+        val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, running)
+        running.value = true
         assertTrue(repository.refresh().isRunning)
-        session.stopped()
+        running.value = false
         repeat(3) { assertFalse(repository.refresh().isRunning) }
     }
 
     @Test
     fun profileSwitchShowsSelectedNameWhileStopControlsRunningService() = runBlocking {
-        val session = ConnectionTestSession()
+        val running = MutableStateFlow(false)
         var selected = WidgetProfile("a", "A")
-        val repository = LauncherWidgetStateRepository({ selected }, session.state)
-        session.started("a")
+        val repository = LauncherWidgetStateRepository({ selected }, running)
+        running.value = true
         assertEquals(selected, repository.refresh().profile)
 
         selected = WidgetProfile("b", "B")
@@ -63,19 +63,19 @@ class LauncherWidgetStateRepositoryTest {
         assertTrue(state.isRunning) // Stop still controls the running A service.
         assertEquals(selected, state.profile)
 
-        session.started("b")
+        running.value = true
         assertTrue(repository.states.first().isRunning)
     }
 
     @Test
     fun recreatedWidgetReadsLiveServiceStateButNewDaemonStartsStopped() = runBlocking {
-        val session = ConnectionTestSession()
-        session.started("a")
-        val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, session.state)
+        val running = MutableStateFlow(false)
+        running.value = true
+        val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, running)
         assertTrue(repository.refresh().isRunning)
 
         val newDaemon = LauncherWidgetStateRepository(
-            { WidgetProfile("a", "A") }, ConnectionTestSession().state
+            { WidgetProfile("a", "A") }, MutableStateFlow(false)
         )
         assertFalse(newDaemon.refresh().isRunning)
     }
@@ -84,7 +84,7 @@ class LauncherWidgetStateRepositoryTest {
     fun observingPresentationDoesNotRepeatedlyReadStorage() = runBlocking {
         var reads = 0
         val repository = LauncherWidgetStateRepository(
-            { reads++; WidgetProfile("a", "A") }, ConnectionTestSession().state
+            { reads++; WidgetProfile("a", "A") }, MutableStateFlow(false)
         )
         repository.refresh()
         repeat(4) { repository.states.first() }
@@ -96,7 +96,7 @@ class LauncherWidgetStateRepositoryTest {
         var fail = false
         val repository = LauncherWidgetStateRepository(
             { if (fail) throw IOException("storage unavailable") else WidgetProfile("a", "A") },
-            ConnectionTestSession().state,
+            MutableStateFlow(false),
         )
         repository.refresh()
         fail = true
