@@ -78,8 +78,8 @@ class MainViewModel(
     private var selectedGroupLoadJob: Job? = null
     private var reloadJob: Job? = null
 
-    @Volatile
-    private var testingGroupId: String? = null
+    private val testRequests = MainTestRequests()
+    private var bulkTestJob: Job? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -113,23 +113,35 @@ class MainViewModel(
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
-                _uiState.update { it.copy(status = MainStatus.ConnectionTest(event.result)) }
+                if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return
+                _uiState.update { it.copy(isTesting = testRequests.isTesting, status = MainStatus.ConnectionTest(event.result)) }
             }
 
-            MainServiceEvent.MeasureConfigSuccess -> {
+            is MainServiceEvent.MeasureConfigSuccess -> {
+                val request = testRequests.bulk?.takeIf { it.id == event.requestId } ?: return
                 viewModelScope.launch(ioDispatcher) {
-                    val gid = testingGroupId ?: uiState.value.selectedGroupId
+                    val gid = request.groupId
                     cacheMutex.withLock { groupDataCache.remove(gid) }
                     updateGroupUi(gid, loadGroup(gid, forceRefresh = true))
                 }
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
-                _uiState.update { it.copy(status = MainStatus.TestProgress(event.progress)) }
+                if (event.requestId == testRequests.bulk?.id) {
+                    _uiState.update { it.copy(status = MainStatus.TestProgress(event.progress)) }
+                }
             }
 
             is MainServiceEvent.MeasureConfigFinish -> {
-                onTestsFinished()
+                onTestsFinished(event.requestId)
+            }
+
+            is MainServiceEvent.MeasureDelayCancelled -> {
+                if (testRequests.completeCurrent(event.requestId)) resetTestStatus()
+            }
+
+            is MainServiceEvent.MeasureConfigCancelled -> {
+                if (testRequests.completeBulk(event.requestId) != null) resetTestStatus()
             }
         }
     }
@@ -724,22 +736,29 @@ class MainViewModel(
 
     // ---------- Testing ----------
     fun cancelAllPing() {
+        bulkTestJob?.cancel()
+        bulkTestJob = null
+        testRequests.cancelBulk()
+        testRequests.invalidateCurrent()
+        resetTestStatus()
         dataSource.cancelAllPing()
-        testingGroupId = null
+    }
+
+    private fun resetTestStatus() {
         _uiState.update {
             it.copy(
-                isTesting = false,
-                status = if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
+                isTesting = testRequests.isTesting,
+                status = if (testRequests.isTesting) MainStatus.Testing
+                else if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
             )
         }
     }
 
     fun testAllRealPing(onlyTcp: Boolean = false) {
-        dataSource.cancelAllPing()
+        cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
         if (servers.isEmpty()) {
-            _uiState.update { it.copy(isTesting = false) }
             return
         }
         val serverGuids = servers.map { it.guid }
@@ -755,42 +774,42 @@ class MainViewModel(
                 }
             )
         }
-        testingGroupId = groupId
+        val request = testRequests.beginBulk(groupId)
+        val message = TestServiceMessage(
+            key = AppConfig.MSG_MEASURE_CONFIG_START,
+            subscriptionId = groupId,
+            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            onlyTcp = onlyTcp
+        )
         _uiState.update {
             it.copy(
                 isTesting = true,
                 status = MainStatus.Testing
             )
         }
-        viewModelScope.launch(ioDispatcher) {
-            dataSource.clearAllTestDelayResults(serverGuids)
-            cacheMutex.withLock { groupDataCache.remove(groupId) }
-            dataSource.sendMsg2TestService(
-                TestServiceMessage(
-                    key = AppConfig.MSG_MEASURE_CONFIG_START,
-                    subscriptionId = groupId,
-                    serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
-                    onlyTcp = onlyTcp
-                )
-            )
+        bulkTestJob = viewModelScope.launch {
+            withContext(ioDispatcher) {
+                cacheMutex.withLock {
+                    dataSource.clearAllTestDelayResults(serverGuids)
+                    groupDataCache.remove(groupId)
+                }
+            }
+            dataSource.sendMsg2TestService(message, request.id)
         }
     }
 
     fun testCurrentServerRealPing() {
-        _uiState.update { it.copy(status = MainStatus.Testing) }
-        dataSource.testCurrentServerRealPing()
+        if (!uiState.value.isRunning) return
+        val requestId = testRequests.beginCurrent()
+        _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
+        dataSource.testCurrentServerRealPing(requestId)
     }
 
-    private fun onTestsFinished() {
+    private fun onTestsFinished(requestId: String) {
+        if (testRequests.completeBulk(requestId) == null) return
+        resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
             cacheMutex.withLock { groupDataCache.clear() }
-            testingGroupId = null
-            _uiState.update {
-                it.copy(
-                    isTesting = false,
-                    status = if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
-                )
-            }
             reloadAllGroups(_uiState.value.groups.map { it.id })
         }
     }
@@ -818,10 +837,12 @@ class MainViewModel(
 
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
+        if (!running || clearTestingText) testRequests.invalidateCurrent()
         _uiState.update { state ->
             state.copy(
                 isRunning = running,
-                status = if (!clearTestingText && state.isTesting) state.status
+                isTesting = testRequests.isTesting,
+                status = if (!clearTestingText && state.isRunning == running) state.status
                 else if (running) MainStatus.Connected else MainStatus.Disconnected
             )
         }
