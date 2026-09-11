@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.widget
 
 import com.v2ray.ang.core.ConnectionTestSession
-import com.v2ray.ang.dto.ConnectionTestResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -46,44 +45,39 @@ class LauncherWidgetStateRepositoryTest {
         val session = ConnectionTestSession()
         val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, session.state)
         session.started("a")
-        assertTrue(repository.refresh().isConnected)
+        assertTrue(repository.refresh().isRunning)
         session.stopped()
         repeat(3) { assertFalse(repository.refresh().isRunning) }
     }
 
     @Test
-    fun profileSwitchHidesPreviousResultAndDisablesTestingUntilCoreSwitches() = runBlocking {
+    fun profileSwitchShowsSelectedNameWhileStopControlsRunningService() = runBlocking {
         val session = ConnectionTestSession()
         var selected = WidgetProfile("a", "A")
         val repository = LauncherWidgetStateRepository({ selected }, session.state)
         session.started("a")
-        session.complete(session.beginTest()!!, ConnectionTestResult(42, country = "DE"))
-        assertEquals(42L, repository.refresh().result?.delayMillis)
+        assertEquals(selected, repository.refresh().profile)
 
         selected = WidgetProfile("b", "B")
         val state = repository.refresh()
         assertTrue(state.isRunning) // Stop still controls the running A service.
-        assertFalse(state.isConnected)
-        assertFalse(state.canTest)
-        assertNull(state.result)
+        assertEquals(selected, state.profile)
 
         session.started("b")
-        assertTrue(repository.states.first().canTest)
+        assertTrue(repository.states.first().isRunning)
     }
 
     @Test
-    fun recreatedWidgetRetainsCompletedResultButNewDaemonDoesNot() = runBlocking {
+    fun recreatedWidgetReadsLiveServiceStateButNewDaemonStartsStopped() = runBlocking {
         val session = ConnectionTestSession()
         session.started("a")
-        session.complete(session.beginTest()!!, ConnectionTestResult(42, country = "DE"))
         val repository = LauncherWidgetStateRepository({ WidgetProfile("a", "A") }, session.state)
-        assertEquals(42L, repository.refresh().result?.delayMillis)
+        assertTrue(repository.refresh().isRunning)
 
         val newDaemon = LauncherWidgetStateRepository(
             { WidgetProfile("a", "A") }, ConnectionTestSession().state
         )
-        assertNull(newDaemon.refresh().result)
-        assertFalse(newDaemon.refresh().isTesting)
+        assertFalse(newDaemon.refresh().isRunning)
     }
 
     @Test
@@ -139,22 +133,22 @@ class LauncherWidgetStateRepositoryTest {
             assertTrue(it.size.height.value >= 68f)
         }
         assertEquals(LauncherWidgetLayout.COMPACT, LauncherWidgetLayout.forWidth(85f))
-        assertEquals(LauncherWidgetLayout.MEDIUM, LauncherWidgetLayout.forWidth(180f))
-        assertEquals(LauncherWidgetLayout.WIDE, LauncherWidgetLayout.forWidth(280f))
-        assertEquals(LauncherWidgetLayout.EXTRA_WIDE, LauncherWidgetLayout.forWidth(380f))
+        listOf(180f, 280f, 380f, 600f).forEach { width ->
+            assertEquals(LauncherWidgetLayout.HORIZONTAL, LauncherWidgetLayout.forWidth(width))
+        }
     }
 
     @Test
-    fun fiveColumnPixelGridShowsActionsAtThreeAndFourCells() {
+    fun fiveColumnPixelGridUsesSameRowAtEveryWidthAboveOneCell() {
         // Pixel Launcher reports available dp, not grid spans. These are rounded down
         // from the 426dp Pixel's five-column grid: 196, 438, 680, 922 and 1164 pixels at 3x.
         val widths = listOf(65f, 146f, 226f, 307f, 388f)
         val layouts = listOf(
             LauncherWidgetLayout.COMPACT,
-            LauncherWidgetLayout.MEDIUM,
-            LauncherWidgetLayout.WIDE,
-            LauncherWidgetLayout.EXTRA_WIDE,
-            LauncherWidgetLayout.EXTRA_WIDE,
+            LauncherWidgetLayout.HORIZONTAL,
+            LauncherWidgetLayout.HORIZONTAL,
+            LauncherWidgetLayout.HORIZONTAL,
+            LauncherWidgetLayout.HORIZONTAL,
         )
         widths.zip(layouts).forEach { (width, expected) ->
             assertEquals(expected, LauncherWidgetLayout.forWidth(width))

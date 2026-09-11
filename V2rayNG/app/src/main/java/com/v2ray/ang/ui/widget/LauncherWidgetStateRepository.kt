@@ -18,10 +18,6 @@ internal data class LauncherWidgetState(
     val connection: CoreConnectionState,
 ) {
     val isRunning: Boolean get() = connection.isRunning
-    val isConnected: Boolean get() = isRunning && profile?.guid == connection.profileGuid
-    val isTesting: Boolean get() = isConnected && connection.isTesting
-    val result get() = connection.result.takeIf { isConnected }
-    val canTest: Boolean get() = isConnected && !isTesting
 }
 
 /** Loads profile storage outside composition; connection state belongs to the live daemon. */
