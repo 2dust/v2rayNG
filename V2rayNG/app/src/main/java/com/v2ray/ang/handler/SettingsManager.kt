@@ -43,6 +43,49 @@ object SettingsManager {
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
+        ensureDefaultServer()
+    }
+
+    /**
+     * SkyVPN: import the bundled default server (brief section 2) on first launch, so
+     * the app opens with a ready-to-use server and the user never has to add one by hand.
+     * No-ops once any server exists, and no-ops while AppConfig.DEFAULT_SERVER_VLESS_URI
+     * is still the placeholder (see its doc comment) so a build never silently ships with
+     * a non-functional default.
+     */
+    private fun ensureDefaultServer() {
+        val migrationKey = "skyvpn_default_server_seeded"
+        if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
+            return
+        }
+        if (decodeAllServerList().isNotEmpty()) {
+            MmkvManager.encodeSettings(migrationKey, true)
+            return
+        }
+        val vlessUri = AppConfig.DEFAULT_SERVER_VLESS_URI
+        if (vlessUri.isBlank() || vlessUri == "PASTE_FRESH_VLESS_LINK_HERE") {
+            LogUtil.e(
+                AppConfig.TAG,
+                "SkyVPN default server not seeded: AppConfig.DEFAULT_SERVER_VLESS_URI is still a placeholder"
+            )
+            return
+        }
+
+        val (count, _) = AngConfigManager.importBatchConfig(
+            vlessUri,
+            DEFAULT_SUBSCRIPTION_ID,
+            append = true
+        )
+        if (count > 0) {
+            val guid = MmkvManager.decodeServerList(DEFAULT_SUBSCRIPTION_ID).firstOrNull()
+                ?: decodeAllServerList().firstOrNull()
+            if (guid != null) {
+                MmkvManager.setSelectServer(guid)
+            }
+            MmkvManager.encodeSettings(migrationKey, true)
+        } else {
+            LogUtil.e(AppConfig.TAG, "SkyVPN default server import failed: check DEFAULT_SERVER_VLESS_URI")
+        }
     }
 
     /**

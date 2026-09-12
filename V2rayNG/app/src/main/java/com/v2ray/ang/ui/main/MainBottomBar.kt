@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+
+// SkyVPN "squircle" connect button: a large rounded square, not a circle.
+private val ConnectButtonShape = RoundedCornerShape(26.dp)
+private val ConnectButtonSize = 72.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.colorFabActive
@@ -72,8 +77,10 @@ fun MainBottomBar(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(end = 24.dp)
-                .offset(y = (-28).dp)
+                .offset(y = (-36).dp)
+                .size(ConnectButtonSize)
                 .navigationBarsPadding(),
+            shape = ConnectButtonShape,
             containerColor = if (isRunning) colorFabActive
             else if (isDarkTheme) colorFabInactiveDark
             else colorFabInactiveLight
@@ -84,8 +91,8 @@ fun MainBottomBar(
                 contentDescription = stringResource(
                     if (isRunning) R.string.acc_stop else R.string.acc_start
                 ),
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
+                tint = if (isRunning) Color(0xFF10120A) else Color.White,
+                modifier = Modifier.size(28.dp)
             )
         }
     }

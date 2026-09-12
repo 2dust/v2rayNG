@@ -23,15 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
-import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
@@ -56,7 +52,8 @@ private val primaryDrawerItems = listOf(
 )
 
 private val drawerItems = primaryDrawerItems + listOf(
-    MainDestination.Promotion,
+    // SkyVPN: Promotion opens an unrelated third-party ad link baked into upstream
+    // v2rayNG (AppConfig.APP_PROMOTION_URL) - hidden from the menu, not relevant here.
     MainDestination.Logcat,
     MainDestination.CheckUpdate,
     MainDestination.BackupRestore,
@@ -89,16 +86,10 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    val isDarkTheme = LocalDarkTheme.current
                     Image(
                         painter = painterResource(R.mipmap.ic_launcher_foreground),
                         contentDescription = null,
-                        modifier = Modifier.size(120.dp),
-                        colorFilter = if (isDarkTheme) {
-                            ColorFilter.tint(Color.White, BlendMode.SrcIn)
-                        } else {
-                            null
-                        }
+                        modifier = Modifier.size(120.dp)
                     )
                     Text(
                         text = stringResource(R.string.app_name),

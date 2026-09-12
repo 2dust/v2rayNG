@@ -19,6 +19,19 @@ object AppConfig {
     // Default subscription ID for ungrouped servers
     const val DEFAULT_SUBSCRIPTION_ID = "__default_subscription__"
 
+    /**
+     * SkyVPN default server (brief section 2), imported automatically on first launch
+     * so the user sees a ready-to-use server without manual setup.
+     *
+     * IMPORTANT: this is a PLACEHOLDER. The brief explicitly warns the UUID / public key /
+     * shortId must be re-exported from the 3x-ui panel right before building, because they
+     * may have changed since the client was last recreated. Replace this string with the
+     * fresh `vless://...` link (Clients -> QR code -> "Vless / TCP / REALITY" -> copy) before
+     * shipping a build — while it's a placeholder, ensureDefaultServer() below skips it.
+     */
+    const val DEFAULT_SERVER_VLESS_URI = "PASTE_FRESH_VLESS_LINK_HERE"
+    const val DEFAULT_SERVER_REMARKS = "SkyVPN"
+
     /** Preferences mapped to MMKV storage. */
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
     const val PREF_ROUTE_ONLY_ENABLED = "pref_route_only_enabled"
