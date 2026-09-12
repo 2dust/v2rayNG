@@ -29,15 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-
-// SkyVPN "squircle" connect button: a large rounded square, not a circle.
-private val ConnectButtonShape = RoundedCornerShape(26.dp)
-private val ConnectButtonSize = 72.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
+
+// SkyVPN "squircle" connect button: a large rounded square, not a circle.
+private val ConnectButtonShape = RoundedCornerShape(26.dp)
+private val ConnectButtonSize = 72.dp
 
 @Composable
 fun MainBottomBar(
