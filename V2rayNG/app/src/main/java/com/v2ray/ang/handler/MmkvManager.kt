@@ -12,6 +12,8 @@ import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVHandler
 import com.tencent.mmkv.MMKVLogLevel
 import com.tencent.mmkv.MMKVRecoverStrategic
+import com.v2ray.ang.AngApplication
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
@@ -27,6 +29,7 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.helper.MessageHelper
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -75,6 +78,10 @@ object MmkvManager {
     private val subStorage by lazy { MMKV.mmkvWithID(ID_SUB, MMKV.MULTI_PROCESS_MODE) }
     private val assetStorage by lazy { MMKV.mmkvWithID(ID_ASSET, MMKV.MULTI_PROCESS_MODE) }
     private val settingsStorage by lazy { MMKV.mmkvWithID(ID_SETTING, MMKV.MULTI_PROCESS_MODE) }
+
+    private fun notifySelectedProfileChanged() {
+        MessageHelper.sendMsg2UI(AngApplication.application, AppConfig.MSG_SELECTED_PROFILE_CHANGED, "")
+    }
 
     private inline fun <T> withProfileIndexLock(block: () -> T): T {
         return synchronized(mainStorage) {
@@ -181,9 +188,10 @@ object MmkvManager {
      * @param guid The server GUID.
      */
     fun setSelectServer(guid: String) {
-        withProfileIndexLock {
+        val saved = withProfileIndexLock {
             mainStorage.encode(KEY_SELECTED_SERVER, guid)
         }
+        if (saved) notifySelectedProfileChanged()
     }
 
     /**
@@ -293,6 +301,7 @@ object MmkvManager {
             }
         }
 
+        if (key == getSelectServer()) notifySelectedProfileChanged()
         return key
     }
 
@@ -379,6 +388,7 @@ object MmkvManager {
             )
             removeProfilePayloads(removablePayloads)
         }
+        if (getSelectServer() in profiles) notifySelectedProfileChanged()
     }
 
     /**
@@ -406,6 +416,7 @@ object MmkvManager {
         }
         profileFullStorage.remove(guid)
         serverAffStorage.remove(guid)
+        notifySelectedProfileChanged()
     }
 
     /**
@@ -428,6 +439,7 @@ object MmkvManager {
 
         serverList.clear()
         encodeServerList(serverList, subId)
+        notifySelectedProfileChanged()
     }
 
     /**
@@ -453,6 +465,7 @@ object MmkvManager {
             serverAffStorage.remove(guid)
             serverRawStorage.remove(guid)
         }
+        notifySelectedProfileChanged()
     }
 
     /**
@@ -515,6 +528,7 @@ object MmkvManager {
         decodeSubscriptions().forEach { sub ->
             encodeServerList(mutableListOf(), sub.guid)
         }
+        notifySelectedProfileChanged()
         return count
     }
 
