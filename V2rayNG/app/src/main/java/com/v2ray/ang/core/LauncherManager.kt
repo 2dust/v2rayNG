@@ -30,7 +30,7 @@ object LauncherManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
             return false
         }
         return true
@@ -47,7 +47,7 @@ object LauncherManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
         }
     }
 

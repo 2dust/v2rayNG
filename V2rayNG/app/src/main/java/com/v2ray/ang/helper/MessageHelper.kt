@@ -6,10 +6,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.TestServiceMessage
+import com.v2ray.ang.dto.UserMessage
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.service.CoreTestService
 import com.v2ray.ang.service.SubscriptionUpdateService
 import com.v2ray.ang.util.LogUtil
@@ -38,6 +42,40 @@ object MessageHelper {
         what: Int,
         content: Serializable,
         onResult: (handled: Boolean) -> Unit,
+    ) = sendMsgForResult(ctx, AppConfig.BROADCAST_ACTION_SERVICE, what, content, onResult)
+
+    /** State receivers still receive the event, but only a resumed message host acknowledges it. */
+    internal fun sendServiceEvent(ctx: Context, what: Int, content: String = "") {
+        val message = requireNotNull(serviceMessage(ctx, what))
+        sendMsgForResult(ctx, AppConfig.BROADCAST_ACTION_ACTIVITY, what, content) { handled ->
+            if (!handled) {
+                NotificationHelper.notifyTransientMessage(ctx, message)
+            }
+        }
+    }
+
+    internal fun serviceMessage(context: Context, what: Int): UserMessage? {
+        val resource = serviceMessageResource(what) ?: return null
+        return UserMessage(
+            AppLocaleManager.localizedContext(context).getString(resource),
+            isError = what == AppConfig.MSG_STATE_START_FAILURE,
+        )
+    }
+
+    @StringRes
+    internal fun serviceMessageResource(what: Int): Int? = when (what) {
+        AppConfig.MSG_STATE_START_SUCCESS -> R.string.toast_services_success
+        AppConfig.MSG_STATE_START_FAILURE -> R.string.toast_services_failure
+        AppConfig.MSG_STATE_STOP_SUCCESS -> R.string.toast_services_stop
+        else -> null
+    }
+
+    private fun sendMsgForResult(
+        ctx: Context,
+        action: String,
+        what: Int,
+        content: Serializable,
+        onResult: (handled: Boolean) -> Unit,
     ) {
         val resultReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -46,7 +84,7 @@ object MessageHelper {
         }
         try {
             ctx.sendOrderedBroadcast(
-                messageIntent(AppConfig.BROADCAST_ACTION_SERVICE, what, content),
+                messageIntent(action, what, content),
                 null,
                 resultReceiver,
                 null,
@@ -55,7 +93,7 @@ object MessageHelper {
                 null,
             )
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to send ordered message to service", e)
+            LogUtil.e(AppConfig.TAG, "Failed to send ordered message with action: $action", e)
             onResult(false)
         }
     }

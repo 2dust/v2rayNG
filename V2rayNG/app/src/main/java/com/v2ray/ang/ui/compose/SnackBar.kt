@@ -1,220 +1,165 @@
 package com.v2ray.ang.ui.compose
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import android.app.Activity
+import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.annotation.MainThread
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarVisuals
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import com.v2ray.ang.extension.delay
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
+import com.v2ray.ang.dto.UserMessage
+import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.helper.NotificationHelper
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 
-enum class ToastType {
-    NORMAL, SUCCESS, ERROR, INFO
-}
-
-data class AppSnackbarMessage(
-    val message: CharSequence,
-    val type: ToastType = ToastType.NORMAL,
-    val long: Boolean = false,
-)
-
+/** Main-thread registration makes host selection and message handoff one operation. */
+@MainThread
 object AppSnackbarManager {
-    private val _messages = MutableSharedFlow<AppSnackbarMessage>(
-        replay = 0,
-        extraBufferCapacity = 32,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val messages = _messages.asSharedFlow()
+    private val hosts = mutableListOf<(UserMessage) -> Unit>()
 
-    fun hasActiveHost(): Boolean = _messages.subscriptionCount.value > 0
+    internal fun register(host: (UserMessage) -> Unit) {
+        hosts.add(host)
+    }
 
-    fun show(
-        message: CharSequence,
-        type: ToastType = ToastType.NORMAL,
-        long: Boolean = false,
-    ): Boolean {
-        if (!hasActiveHost()) return false
-        return _messages.tryEmit(
-            AppSnackbarMessage(
-                message = message,
-                type = type,
-                long = long
-            )
-        )
+    internal fun unregister(host: (UserMessage) -> Unit) {
+        hosts.remove(host)
+    }
+
+    fun show(message: UserMessage): Boolean {
+        val host = hosts.lastOrNull() ?: return false
+        host(message)
+        return true
     }
 }
 
-class AppSnackbarController(
-    val hostState: SnackbarHostState,
-    private val scope: CoroutineScope,
-) {
-    private var currentId = 0
-    private var currentShowTime = 0L
-
-    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
-        val id = ++currentId
-        scope.launch {
-            if (currentShowTime != 0L) {
-                val elapsed = System.currentTimeMillis() - currentShowTime
-                if (elapsed < SnackbarThrottleMs) {
-                    delay((SnackbarThrottleMs - elapsed))
-                }
-            }
-
-            hostState.currentSnackbarData?.dismiss()
-
-            launch {
-                hostState.showSnackbar(
-                    AppSnackbarVisuals(
-                        message = message.toString(),
-                        type = type,
-                        duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short
-                    )
-                )
-                if (id == currentId) {
-                    currentShowTime = 0L
-                }
-            }
-
-            currentShowTime = System.currentTimeMillis()
-        }
-    }
-}
-
-private data class AppSnackbarVisuals(
-    override val message: String,
-    val type: ToastType,
-    override val duration: SnackbarDuration,
-    override val actionLabel: String? = null,
-    override val withDismissAction: Boolean = false
-) : SnackbarVisuals
-
-val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
-    error("AppSnackbarController not provided. Wrap your content in AppTheme.")
-}
-
 @Composable
-fun rememberAppSnackbarController(): AppSnackbarController {
-    val hostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    return remember(hostState, scope) { AppSnackbarController(hostState, scope) }
-}
-
-@Composable
-fun AppSnackbarBridge(
-    controller: AppSnackbarController
-) {
+private fun AppSnackbarBridge(viewModel: AppSnackbarViewModel) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    val closeLabel = stringResource(R.string.action_close)
 
-    LaunchedEffect(controller, lifecycleOwner) {
+    LaunchedEffect(viewModel, lifecycleOwner, context, closeLabel) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            AppSnackbarManager.messages.collect { event ->
-                controller.show(
-                    message = event.message,
-                    type = event.type,
-                    long = event.long
-                )
+            val showMessage: (UserMessage) -> Unit = { message ->
+                viewModel.show(message, closeLabel)
+            }
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    if (!isOrderedBroadcast || resultCode == Activity.RESULT_OK) return
+                    if (!lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
+                    val what = intent.getIntExtra("key", 0)
+                    val message = MessageHelper.serviceMessage(context, what) ?: return
+                    showMessage(message)
+                    NotificationHelper.cancelTransientMessage(context)
+                    resultCode = Activity.RESULT_OK
+                }
+            }
+            ContextCompat.registerReceiver(
+                context, receiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
+                ContextCompat.RECEIVER_NOT_EXPORTED,
+            )
+            AppSnackbarManager.register(showMessage)
+            try {
+                awaitCancellation()
+            } finally {
+                AppSnackbarManager.unregister(showMessage)
+                context.unregisterReceiver(receiver)
             }
         }
     }
 }
 
-private val ToastCornerRadius = 24.dp
-private val ToastHorizontalPad = 16.dp
-private val ToastVerticalPad = 12.dp
-private const val ToastMaxLines = 8
-private const val ToastMaxWidthFraction = 0.75f
-private val ToastBottomOffset = 100.dp
-private const val SnackbarThrottleMs = 2000L
+/** Activity ownership retains an undismissed error and its queue across configuration changes. */
+class AppSnackbarViewModel(application: Application) : AndroidViewModel(application) {
+    val hostState = SnackbarHostState()
+
+    fun show(message: UserMessage, closeLabel: String) {
+        viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            var completed = false
+            try {
+                // Material queues messages and applies the accessibility timeout. A new
+                // message never dismisses an error that the user is still reading.
+                hostState.showSnackbar(
+                    message = message.text,
+                    actionLabel = closeLabel.takeIf { message.requiresDismissal },
+                    duration = if (message.requiresDismissal) SnackbarDuration.Indefinite else SnackbarDuration.Short,
+                )
+                completed = true
+            } finally {
+                // Finishing the screen must not discard an error awaiting user dismissal.
+                if (!completed && message.requiresDismissal) {
+                    NotificationHelper.notifyTransientMessage(getApplication(), message)
+                }
+            }
+        }
+    }
+}
 
 @Composable
-fun AppSnackbarHost(
-    hostState: SnackbarHostState,
-    modifier: Modifier = Modifier
-) {
-    BoxWithConstraints(modifier = modifier) {
-        val maxSnackbarWidth = maxWidth * ToastMaxWidthFraction
-        val density = LocalDensity.current
-        val navigationBarHeight = with(density) {
-            WindowInsets.navigationBars.getBottom(this).toDp()
-        }
-
+fun AppSnackbarHost() {
+    val viewModel: AppSnackbarViewModel = viewModel()
+    AppSnackbarBridge(viewModel)
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding(),
+    ) {
+        val maxTextHeight = maxHeight / 2
         SnackbarHost(
-            hostState = hostState,
-            modifier = Modifier.fillMaxSize()
+            hostState = viewModel.hostState,
+            modifier = Modifier.align(Alignment.BottomCenter).widthIn(max = 600.dp),
         ) { data ->
-            val type = (data.visuals as? AppSnackbarVisuals)?.type ?: ToastType.NORMAL
-
-            val isDark = LocalDarkTheme.current
-            val bgColor = when (type) {
-                ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
-                ToastType.SUCCESS -> toastSuccessBg
-                ToastType.ERROR -> toastErrorBg
-                ToastType.INFO -> toastInfoBg
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = ToastBottomOffset + navigationBarHeight),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .widthIn(max = maxSnackbarWidth),
-                    shape = RoundedCornerShape(ToastCornerRadius),
-                    color = bgColor,
-                    shadowElevation = 0.dp,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(
-                            horizontal = ToastHorizontalPad,
-                            vertical = ToastVerticalPad
-                        ),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = data.visuals.message,
-                            color = toastTextColor,
-                            fontSize = 14.sp,
-                            maxLines = ToastMaxLines,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.wrapContentWidth()
-                        )
+            Snackbar(
+                modifier = Modifier.padding(12.dp),
+                actionOnNewLine = data.visuals.actionLabel != null,
+                action = data.visuals.actionLabel?.let { label ->
+                    {
+                        TextButton(
+                            onClick = { data.performAction() },
+                            colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.actionColor),
+                        ) { Text(label) }
                     }
-                }
+                },
+            ) {
+                Text(
+                    text = data.visuals.message,
+                    modifier = Modifier.heightIn(max = maxTextHeight).verticalScroll(rememberScrollState()),
+                )
             }
         }
     }
