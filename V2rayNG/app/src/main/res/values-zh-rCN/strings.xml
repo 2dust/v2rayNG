@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">v2rayNG 服务</string>
+    <string name="notification_channel_subscription_updates">订阅更新</string>
+    <string name="notification_channel_connection_checks">连接检查</string>
     <string name="notification_action_stop_v2ray">停止</string>
     <string name="toast_permission_denied">无法取得权限</string>
     <string name="toast_permission_denied_notification">无法取得通知权限</string>
