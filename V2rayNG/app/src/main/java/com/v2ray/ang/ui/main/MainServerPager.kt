@@ -37,9 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,12 +52,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -72,10 +79,10 @@ fun GroupPagerPage(
     lazyListStates: MutableMap<String, LazyListState>,
     lazyGridStates: MutableMap<String, LazyGridState>,
     onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
+    onAction: (MainAction) -> Unit,
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String) -> Unit,
+    onRemoveServer: (String, String) -> Unit,
     contentPadding: PaddingValues
 ) {
     val groupStateFlow = remember(groupId) {
@@ -83,19 +90,25 @@ fun GroupPagerPage(
     }
     val groupState by groupStateFlow.collectAsStateWithLifecycle()
     val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+    val actionFeedback = rememberAccessibilityActionFeedback()
     val actions = remember(
         onSelectServer,
-        onEditServer,
+        actionFeedback,
+        onAction,
         onShareServer,
         onMoreServer,
         onRemoveServer,
+        groupId,
+        mainViewModel,
     ) {
         ServerRowActions(
             select = onSelectServer,
-            edit = onEditServer,
+            onAction = onAction,
             share = onShareServer,
             more = onMoreServer,
             remove = onRemoveServer,
+            move = { guid, command -> mainViewModel.moveServer(groupId, guid, command) },
+            feedback = actionFeedback,
         )
     }
     ServerListPage(
@@ -118,11 +131,17 @@ fun GroupPagerPage(
 
 private class ServerRowActions(
     val select: (String) -> Unit,
-    val edit: (String, ProfileItem) -> Unit,
+    val onAction: (MainAction) -> Unit,
     val share: (String, ProfileItem) -> Unit,
     val more: (String, ProfileItem) -> Unit,
-    val remove: (String) -> Unit,
-)
+    val remove: (String, String) -> Unit,
+    val move: (String, ReorderCommand) -> Boolean,
+    val feedback: (String) -> Unit,
+) {
+    fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
+        action.perform(row.guid, row.profile, onAction, remove)
+    }
+}
 
 @Composable
 private fun ServerListPage(
@@ -159,12 +178,13 @@ private fun ServerListPage(
                 .verticalScrollbar(gridState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { index, row ->
                 val content: @Composable () -> Unit = {
                     ServerItemColumn(
                         row = row,
                         isSelected = row.guid == selectedGuid,
-                        doubleColumnDisplay = true,
+                        reorderIndex = index.takeIf { canReorder },
+                        itemCount = rows.size,
                         actions = actions
                     )
                 }
@@ -202,7 +222,7 @@ private fun ServerListPage(
                 .verticalScrollbar(listState),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { index, row ->
                 if (canReorder && reorderableState != null) {
                     ReorderableItem(
                         reorderableState,
@@ -212,18 +232,24 @@ private fun ServerListPage(
                             scope = this,
                             isDragging = isDragging
                         ) {
-                            ServerItemRow(
+                            ServerListItem(
                                 row = row,
                                 isSelected = row.guid == selectedGuid,
+                                doubleColumnDisplay = false,
+                                reorderIndex = index,
+                                itemCount = rows.size,
                                 actions = actions
                             )
                         }
                         ItemDivider()
                     }
                 } else {
-                    ServerItemRow(
+                    ServerListItem(
                         row = row,
                         isSelected = row.guid == selectedGuid,
+                        doubleColumnDisplay = false,
+                        reorderIndex = null,
+                        itemCount = rows.size,
                         actions = actions
                     )
                     ItemDivider()
@@ -266,31 +292,20 @@ private fun LocateTargetEffect(
 }
 
 @Composable
-private fun ServerItemRow(
-    row: ServerRowUiModel,
-    isSelected: Boolean,
-    actions: ServerRowActions
-) {
-    ServerListItem(
-        row = row,
-        isSelected = isSelected,
-        doubleColumnDisplay = false,
-        actions = actions
-    )
-}
-
-@Composable
 private fun ServerItemColumn(
     row: ServerRowUiModel,
     isSelected: Boolean,
-    doubleColumnDisplay: Boolean,
+    reorderIndex: Int?,
+    itemCount: Int,
     actions: ServerRowActions
 ) {
     Column {
         ServerListItem(
             row = row,
             isSelected = isSelected,
-            doubleColumnDisplay = doubleColumnDisplay,
+            doubleColumnDisplay = true,
+            reorderIndex = reorderIndex,
+            itemCount = itemCount,
             actions = actions
         )
         ItemDivider()
@@ -302,6 +317,8 @@ private fun ServerListItem(
     row: ServerRowUiModel,
     isSelected: Boolean,
     doubleColumnDisplay: Boolean,
+    reorderIndex: Int?,
+    itemCount: Int,
     actions: ServerRowActions
 ) {
     val testResult = if (row.testDelayMillis == 0L) {
@@ -309,21 +326,47 @@ private fun ServerListItem(
     } else {
         stringResource(R.string.server_test_delay_value, row.testDelayMillis)
     }
-    val selectedStateDescription = if (isSelected) {
-        stringResource(R.string.acc_selected_server)
+    val testResultAccessibility = when {
+        row.testDelayMillis < 0L -> stringResource(R.string.acc_server_test_failed)
+        row.testDelayMillis == 0L -> ""
+        else -> pluralStringResource(
+            R.plurals.server_test_delay_accessibility_value,
+            row.testDelayMillis.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+            row.testDelayMillis,
+        )
+    }
+    val description = row.accessibilityDescription(
+        testResult = testResultAccessibility,
+        prefix = if (isSelected) stringResource(R.string.acc_selected_server) else null,
+    )
+    val itemActions = serverAccessibilityActions(row.profile.configType.isComplexType()).map { action ->
+        val label = when (action) {
+            ServerMenuAction.Edit -> stringResource(R.string.acc_edit_config_named, row.remarks)
+            ServerMenuAction.Delete -> stringResource(R.string.acc_delete_config_named, row.remarks)
+            else -> stringResource(action.labelRes)
+        }
+        CustomAccessibilityAction(label) {
+            actions.perform(action, row)
+            true
+        }
+    }
+    val accessibilityActions = itemActions + if (reorderIndex != null) {
+        reorderAccessibilityActions(reorderIndex, itemCount, actions.feedback) { command ->
+            actions.move(row.guid, command)
+        }
     } else {
-        null
+        emptyList()
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .semantics {
-                if (selectedStateDescription != null) {
-                    stateDescription = selectedStateDescription
-                }
+            .clickable(onClickLabel = stringResource(R.string.acc_select_server)) { actions.select(row.guid) }
+            // Keep native activation, but move the child buttons into the row's action menu.
+            .clearAndSetSemantics {
+                contentDescription = description
+                customActions = accessibilityActions
             }
-            .clickable { actions.select(row.guid) }
     ) {
         Box(
             Modifier
@@ -363,21 +406,21 @@ private fun ServerListItem(
                     IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_share_24dp),
-                            stringResource(R.string.title_configuration_share),
+                            stringResource(R.string.acc_share_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                    IconButton(onClick = { actions.perform(ServerMenuAction.Edit, row) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_edit_24dp),
-                            stringResource(R.string.acc_edit),
+                            stringResource(R.string.acc_edit_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
-                    IconButton(onClick = { actions.remove(row.guid) }, Modifier.size(36.dp)) {
+                    IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
-                            stringResource(R.string.acc_delete),
+                            stringResource(R.string.acc_delete_config_named, row.remarks),
                             Modifier.size(24.dp)
                         )
                     }
