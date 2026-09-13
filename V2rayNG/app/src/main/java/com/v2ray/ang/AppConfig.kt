@@ -106,6 +106,10 @@ object AppConfig {
     const val TASKER_EXTRA_STRING_BLURB = "com.twofortyfouram.locale.intent.extra.BLURB"
     const val TASKER_EXTRA_BUNDLE_SWITCH = "tasker_extra_bundle_switch"
     const val TASKER_EXTRA_BUNDLE_GUID = "tasker_extra_bundle_guid"
+    const val TASKER_ACTION_FIRE_SETTING = "com.twofortyfouram.locale.intent.action.FIRE_SETTING"
+    const val TASKER_ACTION_EDIT_SETTING = "com.twofortyfouram.locale.intent.action.EDIT_SETTING"
+    const val TASKER_EXTRA_BUNDLE_PACKAGE = "tasker_extra_bundle_package"
+    const val TASKER_EXTRA_BUNDLE_TOKEN = "tasker_extra_bundle_token"
     const val TASKER_DEFAULT_GUID = "Default"
 
     /** Tags for different proxy modes. */

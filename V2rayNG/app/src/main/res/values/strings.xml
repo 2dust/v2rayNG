@@ -557,4 +557,8 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="title_remote_control">Automation app access</string>
+    <string name="summary_remote_control">Allow other apps to control v2rayNG</string>
+    <string name="remote_control_access_required">Allow this app in Settings → Automation app access, then reopen this action.</string>
+    <string name="tasker_current_profile">Current profile</string>
 </resources>

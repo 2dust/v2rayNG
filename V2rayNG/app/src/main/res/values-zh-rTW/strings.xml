@@ -555,4 +555,8 @@
     <string name="connection_test_empty_message">沒有詳細資訊</string>
     <string name="value_unknown">未知</string>
 
+    <string name="title_remote_control">自動化應用程式存取權限</string>
+    <string name="summary_remote_control">允許其他應用程式控制 v2rayNG</string>
+    <string name="remote_control_access_required">請在「設定 → 自動化應用程式存取權限」中允許此應用程式，然後重新開啟此操作。</string>
+    <string name="tasker_current_profile">目前設定檔</string>
 </resources>

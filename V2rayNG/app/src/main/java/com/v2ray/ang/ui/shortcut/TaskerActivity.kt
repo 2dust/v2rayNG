@@ -2,8 +2,8 @@ package com.v2ray.ang.ui.shortcut
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
-import androidx.compose.foundation.clickable
+import androidx.activity.viewModels
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,117 +22,137 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.handler.MmkvManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
-
-data class TaskerItem(
-    val label: String,
-    val guid: String,
-)
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 class TaskerActivity : BaseComponentActivity() {
 
-    private val items = mutableListOf<TaskerItem>()
-
-    private val switchState = mutableStateOf(false)
-    private val selectedPosition = mutableStateOf(-1)
+    private val viewModel: TaskerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        items.add(TaskerItem(label = "Default", guid = AppConfig.TASKER_DEFAULT_GUID))
-
-        MmkvManager.decodeAllServerList().forEach { key ->
-            MmkvManager.decodeServerConfig(key)?.let { config ->
-                items.add(TaskerItem(label = config.remarks, guid = key))
+        if (intent.action != AppConfig.TASKER_ACTION_EDIT_SETTING || callingPackage == null) {
+            denyAccess()
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                val bundle = intent.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE)
+                if (!viewModel.load(
+                        callingPackage, bundle?.getBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH),
+                        bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID)
+                    )) denyAccess()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                LogUtil.e(AppConfig.TAG, "TaskerActivity: configuration failed (${error.javaClass.simpleName})")
+                toastError(R.string.toast_failure)
+                finish()
             }
         }
-
-        init()
     }
 
     @Composable
     override fun ScreenContent() {
+        val items by viewModel.items.collectAsStateWithLifecycle()
+        val start by viewModel.start.collectAsStateWithLifecycle()
+        val guid by viewModel.selectedGuid.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         TaskerScreen(
             items = items,
-            switchState = switchState,
-            selectedPosition = selectedPosition,
+            start = start,
+            selectedGuid = guid,
+            isLoading = isLoading,
+            onStartChanged = viewModel::setStart,
+            onSelect = viewModel::select,
             onBackClick = { finish() },
             onSave = { confirmFinish() }
         )
     }
 
-    private fun init() {
-        try {
-            val bundle = intent?.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE)
-            val switch = bundle?.getBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, false)
-            val guid = bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, "")
-
-            if (switch == null || TextUtils.isEmpty(guid)) {
-                return
-            } else {
-                switchState.value = switch
-                selectedPosition.value = items.indexOfFirst { it.guid == guid.toString() }
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to initialize Tasker settings", e)
-        }
+    private fun denyAccess() {
+        setResult(RESULT_CANCELED)
+        toastError(R.string.remote_control_access_required)
+        finish()
     }
 
     private fun confirmFinish() {
-        val position = selectedPosition.value
-        if (position < 0) {
-            return
+        lifecycleScope.launch {
+            try {
+                val configuration = when (val result = viewModel.configuration(callingPackage)) {
+                    TaskerConfiguration.NoSelection -> return@launch
+                    TaskerConfiguration.AccessDenied -> {
+                        denyAccess()
+                        return@launch
+                    }
+                    is TaskerConfiguration.Ready -> result
+                }
+                val extraBundle = Bundle().apply {
+                    putBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, configuration.start)
+                    putString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, configuration.item.guid)
+                    putString(AppConfig.TASKER_EXTRA_BUNDLE_PACKAGE, callingPackage)
+                    putString(AppConfig.TASKER_EXTRA_BUNDLE_TOKEN, configuration.token)
+                }
+                val result = Intent().apply {
+                    putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)
+                    putExtra(AppConfig.TASKER_EXTRA_STRING_BLURB, getString(
+                        if (configuration.start) R.string.tasker_blurb_start else R.string.tasker_blurb_stop,
+                        configuration.item.label
+                    ))
+                }
+                setResult(RESULT_OK, result)
+                finish()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                LogUtil.e(AppConfig.TAG, "TaskerActivity: authorization failed (${error.javaClass.simpleName})")
+                toastError(R.string.toast_failure)
+            }
         }
-
-        val extraBundle = Bundle()
-        extraBundle.putBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, switchState.value)
-        extraBundle.putString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, items[position].guid)
-        val intent = Intent()
-
-        val blurb = getString(
-            if (switchState.value) R.string.tasker_blurb_start else R.string.tasker_blurb_stop,
-            items[position].label
-        )
-
-        intent.putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)
-        intent.putExtra(AppConfig.TASKER_EXTRA_STRING_BLURB, blurb)
-        setResult(RESULT_OK, intent)
-        finish()
     }
 }
 
 @Composable
 fun TaskerScreen(
     items: List<TaskerItem>,
-    switchState: MutableState<Boolean>,
-    selectedPosition: MutableState<Int>,
+    start: Boolean,
+    selectedGuid: String?,
+    isLoading: Boolean,
+    onStartChanged: (Boolean) -> Unit,
+    onSelect: (String) -> Unit,
     onBackClick: () -> Unit,
     onSave: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val enabled = !isLoading && items.isNotEmpty()
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = "",
+                isLoading = isLoading,
                 onBackClick = onBackClick,
                 actions = {
-                    IconButton(onClick = onSave) {
+                    IconButton(onClick = onSave, enabled = enabled && selectedGuid != null) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
@@ -146,8 +166,9 @@ fun TaskerScreen(
         ) {
             SettingsSwitchItem(
                 title = stringResource(R.string.tasker_start_service),
-                checked = switchState.value,
-                onCheckedChange = { switchState.value = it }
+                checked = start,
+                enabled = enabled,
+                onCheckedChange = onStartChanged
             )
             LazyColumn(
                 state = listState,
@@ -156,17 +177,18 @@ fun TaskerScreen(
                     .verticalScrollbar(listState),
                 contentPadding = NavigationBarsBottomPadding()
             ) {
-                itemsIndexed(items, key = { _, item -> item.guid }) { index, item ->
+                items(items, key = { it.guid }) { item ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { selectedPosition.value = index }
+                            .selectable(selected = selectedGuid == item.guid, enabled = enabled, role = Role.RadioButton) { onSelect(item.guid) }
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = selectedPosition.value == index,
-                            onClick = { selectedPosition.value = index }
+                            selected = selectedGuid == item.guid,
+                            enabled = enabled,
+                            onClick = null
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = item.label, style = MaterialTheme.typography.bodyLarge)
