@@ -9,7 +9,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -18,7 +17,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.UserMessage
 import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.ui.feedback.UserMessageActivity
 import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.util.LogUtil
 import java.util.UUID
@@ -59,18 +57,8 @@ object NotificationHelper {
                 manager.createNotificationChannel(channel)
             }
             val notificationTag = if (message.requiresDismissal) UUID.randomUUID().toString() else null
-            val target = if (notificationTag != null) {
-                Intent(appContext, UserMessageActivity::class.java).apply {
-                    // This notification-only viewer must not replace the app's task or editor drafts.
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    // Extras do not distinguish PendingIntents. Each retained error needs its own identity.
-                    data = Uri.fromParts("v2rayng-message", notificationTag, null)
-                    putExtra(UserMessageActivity.EXTRA_MESSAGE, content)
-                }
-            } else {
-                Intent(appContext, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                }
+            val target = Intent(appContext, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
             val contentIntent = PendingIntent.getActivity(
                 appContext,

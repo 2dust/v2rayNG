@@ -136,11 +136,6 @@
             android:name=".ui.ScannerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.feedback.UserMessageActivity"
-            android:taskAffinity=""
-            android:excludeFromRecents="true"
-            android:exported="false" />
-        <activity
             android:name=".ui.logcat.LogcatActivity"
             android:exported="false" />
         <activity
