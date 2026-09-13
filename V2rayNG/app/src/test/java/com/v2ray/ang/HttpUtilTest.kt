@@ -1,7 +1,9 @@
 package com.v2ray.ang
 
+import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.util.HttpUtil
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HttpUtilTest {
@@ -37,5 +39,32 @@ class HttpUtilTest {
         assertEquals(nonAsciiAuth, HttpUtil.toIdnUrl(nonAsciiAuth))
     }
 
+    @Test
+    fun requestHeadersOverrideDefaultsCaseInsensitively() {
+        val headers = HttpUtil.buildRequestHeaders(
+            UrlContentRequest(
+                url = "https://user:password@example.com/path",
+                requestHeaders = """{"authorization":"Bearer token","user-agent":"custom-agent","X-Test":"value"}""",
+            ),
+            includeDefaultUserAgent = true,
+        )
 
+        assertEquals("Bearer token", headers.valueFor("Authorization"))
+        assertEquals("custom-agent", headers.valueFor("User-Agent"))
+        assertEquals("value", headers.valueFor("X-Test"))
+        assertEquals(3, headers.size)
+    }
+
+    @Test
+    fun requestHeadersSupplyDefaultUserAgent() {
+        val headers = HttpUtil.buildRequestHeaders(
+            UrlContentRequest(url = "https://example.com/path", requestHeaders = ""),
+            includeDefaultUserAgent = true,
+        )
+
+        assertTrue(headers.valueFor("User-Agent").startsWith("v2rayNG/"))
+    }
+
+    private fun Map<String, String>.valueFor(name: String): String =
+        entries.single { it.key.equals(name, ignoreCase = true) }.value
 }

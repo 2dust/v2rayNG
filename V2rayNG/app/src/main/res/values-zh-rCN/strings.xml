@@ -249,7 +249,7 @@
 
     <string name="title_pref_socks_port">本地代理端口</string>
     <string name="title_pref_enable_local_proxy">启用本地代理</string>
-    <string name="summary_pref_enable_local_proxy">不开启时没有 socks 代理，无法通过代理更新订阅等</string>
+    <string name="summary_pref_enable_local_proxy">关闭时，订阅更新等操作将使用当前连接的 VPN 隧道</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">使用 UDP 时，SOCKS5 认证并不完全安全。</string>
     <string name="summary_pref_socks_port">本地代理端口</string>
