@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,15 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,16 +64,21 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
+import com.v2ray.ang.ui.compose.reorderAccessibilityActions
+import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -103,6 +119,18 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             onAddRule = { startActivity(Intent(this, RoutingEditActivity::class.java)) },
             onEditRule = { position ->
                 startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
+            },
+            onRemoveRule = { ruleId ->
+                lifecycleScope.launch {
+                    try {
+                        viewModel.remove(ruleId)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (e: Exception) {
+                        LogUtil.e(AppConfig.TAG, "Failed to delete routing rule $ruleId", e)
+                        toastError(R.string.toast_failure)
+                    }
+                }
             },
             onDomainStrategySelected = { value ->
                 MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
@@ -195,6 +223,7 @@ fun RoutingSettingScreen(
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
     onEditRule: (Int) -> Unit,
+    onRemoveRule: (String) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
     onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
@@ -205,9 +234,11 @@ fun RoutingSettingScreen(
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
+    var deleteRuleId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
+    val actionFeedback = rememberAccessibilityActionFeedback()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
         val fromIndex = rulesets.indexOfFirst { it.id == from.key }
@@ -291,11 +322,19 @@ fun RoutingSettingScreen(
                     ) {
                         RoutingRulesetItem(
                             ruleset = ruleset,
-                            onEdit = { onEditRule(index) },
+                            onEdit = {
+                                val position = viewModel.getAll().indexOfFirst { it.id == ruleset.id }
+                                if (position >= 0) onEditRule(position)
+                            },
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
-                                viewModel.update(index, updated)
-                            }
+                                viewModel.update(ruleset.id, updated)
+                            },
+                            onDelete = { deleteRuleId = ruleset.id },
+                            reorderIndex = index,
+                            itemCount = rulesets.size,
+                            onMove = { command -> viewModel.move(ruleset.id, command) },
+                            onFeedback = actionFeedback,
                         )
                     }
                     ItemDivider()
@@ -304,6 +343,16 @@ fun RoutingSettingScreen(
         }
     }
 
+    rulesets.firstOrNull { it.id == deleteRuleId }?.let { rule ->
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_routing_rule_named, rule.remarks.orEmpty()),
+            onConfirm = {
+                deleteRuleId = null
+                onRemoveRule(rule.id)
+            },
+            onDismiss = { deleteRuleId = null }
+        )
+    }
 
     if (showPresetDialog) {
         SelectListDialog(
@@ -323,11 +372,64 @@ fun RoutingSettingScreen(
 private fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
-    onEnabledChange: (Boolean) -> Unit
+    onEnabledChange: (Boolean) -> Unit,
+    onDelete: () -> Unit,
+    reorderIndex: Int,
+    itemCount: Int,
+    onMove: (ReorderCommand) -> Boolean,
+    onFeedback: (String) -> Unit,
 ) {
+    val enabled = ruleset.enabled
+    val toggleLabel = stringResource(
+        if (enabled) R.string.acc_disable_routing_rule else R.string.acc_enable_routing_rule
+    )
+    val ruleName = ruleset.remarks.orEmpty()
+    val outboundTag = ruleset.outboundTag.ifBlank { AppConfig.TAG_PROXY }
+    val routeDescription = when (outboundTag) {
+        AppConfig.TAG_BLOCKED ->
+            stringResource(R.string.acc_routing_rule_blocked)
+
+        AppConfig.TAG_DIRECT ->
+            stringResource(R.string.acc_routing_rule_routed_directly)
+
+        else -> stringResource(R.string.acc_routing_rule_routed_through, outboundTag)
+    }
+    val ruleState = stringResource(
+        if (enabled) R.string.acc_routing_rule_enabled else R.string.acc_routing_rule_disabled
+    )
+    val ruleSummary = stringResource(
+        R.string.acc_routing_rule_summary,
+        ruleName,
+        routeDescription
+    )
+    val accessibilitySummary = if (ruleset.locked == true) {
+        stringResource(R.string.acc_routing_rule_locked_summary, ruleSummary)
+    } else {
+        ruleSummary
+    }
+    val itemActions = listOf(
+        CustomAccessibilityAction(
+            label = stringResource(R.string.acc_edit_routing_rule_named, ruleName),
+            action = { onEdit(); true },
+        ),
+        CustomAccessibilityAction(
+            label = stringResource(R.string.acc_delete_routing_rule_named, ruleName),
+            action = { onDelete(); true },
+        ),
+    )
+    val accessibilityActions = itemActions +
+        reorderAccessibilityActions(reorderIndex, itemCount, onFeedback, onMove)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                contentDescription = accessibilitySummary
+                stateDescription = ruleState
+                customActions = accessibilityActions
+                onClick(label = toggleLabel, action = null)
+            }
+            .toggleable(value = enabled, role = Role.Switch, onValueChange = onEnabledChange)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -335,6 +437,7 @@ private fun RoutingRulesetItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = ruleset.remarks ?: "",
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -343,7 +446,7 @@ private fun RoutingRulesetItem(
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         painter = painterResource(R.drawable.ic_lock_24dp),
-                        contentDescription = stringResource(R.string.acc_locked),
+                        contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -354,6 +457,7 @@ private fun RoutingRulesetItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = domainIpInfo,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -364,6 +468,7 @@ private fun RoutingRulesetItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = ruleset.outboundTag,
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.labelMedium,
                     color = colorConfigType
                 )
@@ -374,16 +479,30 @@ private fun RoutingRulesetItem(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(start = 8.dp)
         ) {
-            IconButton(onClick = onEdit) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_edit_24dp),
-                    contentDescription = stringResource(R.string.acc_edit)
-                )
+            Row {
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.clearAndSetSemantics {},
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_edit_24dp),
+                        contentDescription = null
+                    )
+                }
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.clearAndSetSemantics {},
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete_24dp),
+                        contentDescription = null
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Switch(
-                checked = ruleset.enabled ?: false,
-                onCheckedChange = onEnabledChange,
+                checked = enabled,
+                onCheckedChange = null,
                 modifier = Modifier.scale(0.7f),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
