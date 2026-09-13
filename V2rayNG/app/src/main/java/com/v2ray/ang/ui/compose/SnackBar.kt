@@ -142,7 +142,11 @@ fun AppSnackbarHost() {
         val maxTextHeight = maxHeight / 2
         SnackbarHost(
             hostState = viewModel.hostState,
-            modifier = Modifier.align(Alignment.BottomCenter).widthIn(max = 600.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                // Keep both sides clear of MainBottomBar's 56 dp button and 24 dp edge inset.
+                .padding(horizontal = 80.dp)
+                .widthIn(max = 600.dp),
         ) { data ->
             Snackbar(
                 modifier = Modifier.padding(12.dp),
