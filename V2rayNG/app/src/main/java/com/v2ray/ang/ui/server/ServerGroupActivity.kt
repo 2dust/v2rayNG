@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -232,7 +231,7 @@ fun ServerGroupScreen(
     var subValue by rememberSaveable { mutableStateOf(subDisplay.getOrNull(initialSubIndex).orEmpty()) }
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val selectedType = typeEntries.indexOf(typeValue).coerceAtLeast(0).toString()
     val supportsObservatory = BalancerStrategyType.from(selectedType).supportsObservatory
@@ -305,7 +304,7 @@ fun ServerGroupScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_policy_group),
+            message = stringResource(R.string.confirm_delete_policy_group_named, initialRemarks),
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )
