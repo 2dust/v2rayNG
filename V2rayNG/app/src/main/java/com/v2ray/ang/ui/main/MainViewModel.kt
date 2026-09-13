@@ -129,16 +129,8 @@ class MainViewModel(
         when (event) {
             MainServiceEvent.StateRunning -> updateRunningState(true, clearTestingText = false)
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
-            MainServiceEvent.StateStartSuccess -> {
-                toastSuccess(R.string.toast_services_success)
-                updateRunningState(true)
-            }
-
-            MainServiceEvent.StateStartFailure -> {
-                toastError(R.string.toast_services_failure)
-                updateRunningState(false)
-            }
-
+            MainServiceEvent.StateStartSuccess -> updateRunningState(true)
+            MainServiceEvent.StateStartFailure -> updateRunningState(false)
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
                 if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return

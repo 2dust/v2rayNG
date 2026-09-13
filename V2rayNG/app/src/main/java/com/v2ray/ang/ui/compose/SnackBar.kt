@@ -1,5 +1,10 @@
 package com.v2ray.ang.ui.compose
 
+import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -24,14 +29,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.extension.delay
+import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.helper.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -135,15 +145,44 @@ fun AppSnackbarBridge(
     controller: AppSnackbarController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
-    LaunchedEffect(controller, lifecycleOwner) {
+    LaunchedEffect(controller, lifecycleOwner, context) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            AppSnackbarManager.messages.collect { event ->
-                controller.show(
-                    message = event.message,
-                    type = event.type,
-                    long = event.long
-                )
+            // A repository subscriber can outlive a visible screen. Acknowledge feedback here,
+            // where it is actually handed to a resumed host, not when service state is queued.
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    if (!isOrderedBroadcast || resultCode == Activity.RESULT_OK) return
+                    if (!lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
+                    val what = intent.getIntExtra("key", 0)
+                    val messageRes = MessageHelper.serviceMessageResource(what) ?: return
+                    val type = when (what) {
+                        AppConfig.MSG_STATE_START_FAILURE -> ToastType.ERROR
+                        AppConfig.MSG_STATE_START_SUCCESS -> ToastType.SUCCESS
+                        else -> ToastType.NORMAL
+                    }
+                    controller.show(context.getString(messageRes), type)
+                    NotificationHelper.cancelTransientMessage(context)
+                    resultCode = Activity.RESULT_OK
+                }
+            }
+            ContextCompat.registerReceiver(
+                context,
+                receiver,
+                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
+                ContextCompat.RECEIVER_NOT_EXPORTED,
+            )
+            try {
+                AppSnackbarManager.messages.collect { event ->
+                    controller.show(
+                        message = event.message,
+                        type = event.type,
+                        long = event.long
+                    )
+                }
+            } finally {
+                context.unregisterReceiver(receiver)
             }
         }
     }

@@ -1,9 +1,7 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
+import com.v2ray.ang.helper.NotificationHelper
 import com.v2ray.ang.ui.compose.AppSnackbarManager
 import com.v2ray.ang.ui.compose.ToastType
 
@@ -14,9 +12,7 @@ import com.v2ray.ang.ui.compose.ToastType
  */
 fun Context.toast(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.NORMAL) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.NORMAL)
 }
 
 /**
@@ -25,9 +21,7 @@ fun Context.toast(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toast(message: CharSequence) {
-    dispatchMessage(message, ToastType.NORMAL) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(message, ToastType.NORMAL)
 }
 
 /**
@@ -37,9 +31,7 @@ fun Context.toast(message: CharSequence) {
  */
 fun Context.toastSuccess(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.SUCCESS) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.SUCCESS)
 }
 
 /**
@@ -48,9 +40,7 @@ fun Context.toastSuccess(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastSuccess(message: CharSequence) {
-    dispatchMessage(message, ToastType.SUCCESS) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(message, ToastType.SUCCESS)
 }
 
 /**
@@ -60,9 +50,7 @@ fun Context.toastSuccess(message: CharSequence) {
  */
 fun Context.toastError(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.ERROR) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.ERROR)
 }
 
 /**
@@ -71,9 +59,7 @@ fun Context.toastError(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastError(message: CharSequence) {
-    dispatchMessage(message, ToastType.ERROR) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(message, ToastType.ERROR)
 }
 
 /**
@@ -83,9 +69,7 @@ fun Context.toastError(message: CharSequence) {
  */
 fun Context.toastInfo(message: Int) {
     val text = getString(message)
-    dispatchMessage(text, ToastType.INFO) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(text, ToastType.INFO)
 }
 
 /**
@@ -94,31 +78,16 @@ fun Context.toastInfo(message: Int) {
  * @param message The text of the message to show.
  */
 fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+    dispatchMessage(message, ToastType.INFO)
 }
 
-private inline fun runOnMain(crossinline block: () -> Unit) {
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-        block()
-    } else {
-        Handler(Looper.getMainLooper()).post { block() }
-    }
-}
-
-private inline fun dispatchMessage(
+private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
-    long: Boolean = false,
-    crossinline fallback: () -> Unit
 ) {
-    val handledBySnackbar = AppSnackbarManager.show(
-        message = message,
-        type = type,
-        long = long
-    )
-    if (!handledBySnackbar) {
-        runOnMain { fallback() }
+    if (AppSnackbarManager.show(message, type)) {
+        NotificationHelper.cancelTransientMessage(this)
+    } else {
+        NotificationHelper.notifyTransientMessage(this, message)
     }
 }
