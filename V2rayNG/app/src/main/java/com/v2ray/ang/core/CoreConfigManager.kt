@@ -829,6 +829,7 @@ object CoreConfigManager {
             servers = servers,
             hosts = hosts,
             tag = AppConfig.TAG_DNS,
+            disableFallbackIfMatch = true,
             enableParallelQuery = if ((domesticDns.size + remoteDns.size) > 2) true else null
         )
 
@@ -889,6 +890,7 @@ object CoreConfigManager {
             servers = servers,
             hosts = hosts,
             tag = AppConfig.TAG_DNS,
+            disableFallbackIfMatch = true,
             enableParallelQuery = if ((domesticDns.size + remoteDns.size) > 2) true else null
         )
 
