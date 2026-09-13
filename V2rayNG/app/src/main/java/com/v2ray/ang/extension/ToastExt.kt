@@ -22,7 +22,6 @@ fun Context.toastError(@StringRes message: Int) = toastError(AppLocaleManager.lo
 fun Context.toastError(message: CharSequence) = showMessage(UserMessage(message.toString(), isError = true))
 
 private fun Context.showMessage(message: UserMessage) {
-    if (message.text.isBlank()) return
     val appContext = applicationContext
     val deliver = Runnable {
         (appContext as AngApplication).snackbarManager.show(message)

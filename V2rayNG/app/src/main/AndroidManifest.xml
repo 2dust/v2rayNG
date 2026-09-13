@@ -137,7 +137,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.feedback.UserMessageActivity"
-            android:parentActivityName=".ui.main.MainActivity"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:exported="false" />
         <activity
             android:name=".ui.logcat.LogcatActivity"

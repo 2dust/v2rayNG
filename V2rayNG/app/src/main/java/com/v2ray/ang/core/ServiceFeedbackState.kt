@@ -9,7 +9,8 @@ internal class ServiceFeedbackState {
     private val state = AtomicReference(State.NONE)
 
     fun started() {
-        state.set(State.STARTED)
+        // A successful reload can re-arm feedback after a failure, but must retain an in-flight stop.
+        state.compareAndSet(State.NONE, State.STARTED)
     }
 
     fun startFailed() {

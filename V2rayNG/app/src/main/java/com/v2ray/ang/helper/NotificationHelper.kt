@@ -13,7 +13,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UserMessage
@@ -62,6 +61,8 @@ object NotificationHelper {
             val notificationTag = if (message.requiresDismissal) UUID.randomUUID().toString() else null
             val target = if (notificationTag != null) {
                 Intent(appContext, UserMessageActivity::class.java).apply {
+                    // This notification-only viewer must not replace the app's task or editor drafts.
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     // Extras do not distinguish PendingIntents. Each retained error needs its own identity.
                     data = Uri.fromParts("v2rayng-message", notificationTag, null)
                     putExtra(UserMessageActivity.EXTRA_MESSAGE, content)
@@ -71,12 +72,12 @@ object NotificationHelper {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 }
             }
-            val contentIntent = TaskStackBuilder.create(appContext)
-                .addNextIntentWithParentStack(target)
-                .getPendingIntent(
-                    TRANSIENT_MESSAGE_NOTIFICATION_ID,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-                )
+            val contentIntent = PendingIntent.getActivity(
+                appContext,
+                TRANSIENT_MESSAGE_NOTIFICATION_ID,
+                target,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
             val notification = NotificationCompat.Builder(appContext, TRANSIENT_MESSAGE_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(localizedContext.getString(R.string.app_name))
@@ -89,12 +90,7 @@ object NotificationHelper {
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setTimeoutAfter(if (message.requiresDismissal) 0L else TRANSIENT_MESSAGE_TIMEOUT_MS)
                 .build()
-            if (message.requiresDismissal) {
-                // Routine feedback must not replace an error before the user dismisses it.
-                manager.notify(notificationTag, TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
-            } else {
-                manager.notify(TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
-            }
+            manager.notify(notificationTag, TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
         } catch (e: SecurityException) {
             LogUtil.w(message = "NotificationHelper: failed to post transient message", throwable = e)
         }

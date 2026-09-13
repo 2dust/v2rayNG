@@ -105,7 +105,7 @@ class AppSnackbarManager(
         val job = scope.launch(start = CoroutineStart.LAZY) {
             hostState.showSnackbar(
                 message = message.text,
-                actionLabel = closeLabel().takeIf { message.requiresDismissal },
+                actionLabel = if (message.requiresDismissal) closeLabel() else null,
                 duration = if (message.requiresDismissal) SnackbarDuration.Indefinite else SnackbarDuration.Short,
             )
         }

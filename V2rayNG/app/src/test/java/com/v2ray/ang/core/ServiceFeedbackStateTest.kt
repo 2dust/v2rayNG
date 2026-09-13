@@ -38,4 +38,26 @@ class ServiceFeedbackStateTest {
         state.requestStop()
         assertTrue(state.stopped())
     }
+
+    @Test
+    fun successfulReloadPreservesAStopRequestedBeforeItFinished() {
+        val state = ServiceFeedbackState()
+        state.started()
+        assertFalse(state.stopped()) // Internal shutdown before starting the replacement core.
+        state.requestStop()
+        state.started()
+        assertTrue(state.stopped())
+        assertFalse(state.stopped())
+    }
+
+    @Test
+    fun successfulReloadAfterFailureRearmsLaterStopFeedback() {
+        val state = ServiceFeedbackState()
+        state.started()
+        state.startFailed()
+        assertFalse(state.stopped())
+        state.started()
+        state.requestStop()
+        assertTrue(state.stopped())
+    }
 }

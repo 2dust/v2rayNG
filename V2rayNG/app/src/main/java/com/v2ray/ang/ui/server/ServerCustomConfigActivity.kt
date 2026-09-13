@@ -58,6 +58,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
@@ -123,7 +124,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             )
             val detail = e.cause?.message?.takeIf { it.isNotBlank() }
                 ?: e.message?.takeIf { it.isNotBlank() }
-            toast(
+            toastError(
                 if (detail.isNullOrBlank()) {
                     getString(R.string.toast_malformed_json)
                 } else {
