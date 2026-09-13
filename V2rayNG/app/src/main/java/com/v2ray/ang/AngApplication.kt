@@ -10,8 +10,11 @@ import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.ThemeManager
+import com.v2ray.ang.ui.compose.AppSnackbarManager
 
 class AngApplication : Application() {
+    lateinit var snackbarManager: AppSnackbarManager
+        private set
     companion object {
         lateinit var application: AngApplication
     }
@@ -47,5 +50,6 @@ class AngApplication : Application() {
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()
+        snackbarManager = AppSnackbarManager.create(this)
     }
 }

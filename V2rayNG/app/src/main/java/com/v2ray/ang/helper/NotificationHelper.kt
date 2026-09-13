@@ -9,14 +9,17 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UserMessage
 import com.v2ray.ang.enums.NotificationChannelType
 import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.ui.feedback.UserMessageActivity
 import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.util.LogUtil
 import java.util.UUID
@@ -56,14 +59,24 @@ object NotificationHelper {
                 channel.name = name
                 manager.createNotificationChannel(channel)
             }
-            val contentIntent = PendingIntent.getActivity(
-                appContext,
-                TRANSIENT_MESSAGE_NOTIFICATION_ID,
+            val notificationTag = if (message.requiresDismissal) UUID.randomUUID().toString() else null
+            val target = if (notificationTag != null) {
+                Intent(appContext, UserMessageActivity::class.java).apply {
+                    // Extras do not distinguish PendingIntents. Each retained error needs its own identity.
+                    data = Uri.fromParts("v2rayng-message", notificationTag, null)
+                    putExtra(UserMessageActivity.EXTRA_MESSAGE, content)
+                }
+            } else {
                 Intent(appContext, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-            )
+                }
+            }
+            val contentIntent = TaskStackBuilder.create(appContext)
+                .addNextIntentWithParentStack(target)
+                .getPendingIntent(
+                    TRANSIENT_MESSAGE_NOTIFICATION_ID,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
             val notification = NotificationCompat.Builder(appContext, TRANSIENT_MESSAGE_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle(localizedContext.getString(R.string.app_name))
@@ -78,7 +91,7 @@ object NotificationHelper {
                 .build()
             if (message.requiresDismissal) {
                 // Routine feedback must not replace an error before the user dismisses it.
-                manager.notify(UUID.randomUUID().toString(), TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
+                manager.notify(notificationTag, TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
             } else {
                 manager.notify(TRANSIENT_MESSAGE_NOTIFICATION_ID, notification)
             }

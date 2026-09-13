@@ -44,7 +44,7 @@ object MessageHelper {
         onResult: (handled: Boolean) -> Unit,
     ) = sendMsgForResult(ctx, AppConfig.BROADCAST_ACTION_SERVICE, what, content, onResult)
 
-    /** State receivers still receive the event, but only a resumed message host acknowledges it. */
+    /** State receivers still receive the event; a foreground process acknowledges ownership of feedback. */
     internal fun sendServiceEvent(ctx: Context, what: Int, content: String = "") {
         val message = requireNotNull(serviceMessage(ctx, what))
         sendMsgForResult(ctx, AppConfig.BROADCAST_ACTION_ACTIVITY, what, content) { handled ->
