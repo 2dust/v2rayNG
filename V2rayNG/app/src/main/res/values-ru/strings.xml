@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Остановить</string>
-    <string name="toast_permission_denied">Разрешение не получено</string>
-    <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
     <string name="notification_action_more">Ещё…</string>
     <string name="toast_services_start">Запуск служб</string>
     <string name="toast_services_stop">Служба остановлена</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50 мс)</string>
     <string name="toast_success">Успешно</string>
     <string name="toast_failure">Ошибка</string>
-    <string name="toast_none_data">Ничего нет</string>
-    <string name="toast_incorrect_protocol">Неправильный протокол</string>
     <string name="toast_decoding_failed">Невозможно декодировать</string>
     <string name="title_file_chooser">Выберите профиль</string>
     <string name="toast_require_file_manager">Установите файловый менеджер</string>
     <string name="server_customize_config">Изменить профиль</string>
     <string name="toast_config_file_invalid">Неправильный профиль</string>
     <string name="server_lab_content">Данные</string>
-    <string name="toast_none_data_clipboard">В буфере обмена нет данных</string>
     <string name="toast_invalid_url">Неправильный URL</string>
     <string name="toast_insecure_url_protocol">Не используйте небезопасный HTTP-протокол в адресе подписки</string>
     <string name="server_lab_need_inbound">Убедитесь, что входящий порт соответствует настройкам</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">Обратная связь</string>
     <string name="summary_pref_feedback">Предложить улучшение или сообщить об ошибке на GitHub</string>
     <string name="summary_pref_tg_group">Присоединиться к группе в Telegram</string>
-    <string name="toast_tg_app_not_found">Приложение Telegram не найдено</string>
     <string name="title_privacy_policy">Политика конфиденциальности</string>
     <string name="title_qr_code">QR-код</string>
     <string name="title_about">О приложении</string>
@@ -366,7 +360,6 @@
     </plurals>
     <string name="title_update_subscription_result">Обновлено профилей: %1$d (успешно: %2$d, ошибки: %3$d, пропущено: %4$d)</string>
     <string name="title_update_subscription_no_subscription">Нет подписок</string>
-    <string name="toast_server_not_found_in_group">Выбранный профиль не найден в текущей группе</string>
     <string name="title_locate_selected_config">Найти выбранный профиль</string>
 
     <string name="tasker_start_service">Запуск службы</string>

@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>
-    <string name="toast_permission_denied">無法取得此權限</string>
-    <string name="toast_permission_denied_notification">無法取得此通知權限</string>
     <string name="notification_action_more">瞭解更多</string>
     <string name="toast_services_start">啟動服務</string>
     <string name="toast_services_stop">服務已停止</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI（可選，預設 50 毫秒）</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失敗</string>
-    <string name="toast_none_data">無資料</string>
-    <string name="toast_incorrect_protocol">通訊協定不正確</string>
     <string name="toast_decoding_failed">解碼失敗</string>
     <string name="title_file_chooser">選取一個設定檔</string>
     <string name="toast_require_file_manager">請安裝檔案總管。</string>
     <string name="server_customize_config">自訂設定</string>
     <string name="toast_config_file_invalid">無效設定</string>
     <string name="server_lab_content">內容</string>
-    <string name="toast_none_data_clipboard">剪貼簿內無資料</string>
     <string name="toast_invalid_url">URL 無效</string>
     <string name="toast_insecure_url_protocol">請不要使用不安全的 HTTP 協定訂閱位址</string>
     <string name="server_lab_need_inbound">請確保入站連接埠與設定一致</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">意見回饋</string>
     <string name="summary_pref_feedback">前往 GitHub 提出改進建議或回報錯誤</string>
     <string name="summary_pref_tg_group">加入 Telegram 群組</string>
-    <string name="toast_tg_app_not_found">找不到 Telegram 應用程式</string>
     <string name="title_privacy_policy">隱私權政策</string>
     <string name="title_qr_code">QR Code</string>
     <string name="title_about">關於</string>
@@ -360,7 +354,6 @@
     </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 個設定（%2$d 個成功，%3$d 個失敗，%4$d 個跳過）</string>
     <string name="title_update_subscription_no_subscription">無訂閱</string>
-    <string name="toast_server_not_found_in_group">目前群組中找不到所選伺服器</string>
     <string name="title_locate_selected_config">尋找所選設定檔</string>
 
     <string name="tasker_start_service">啟動服務</string>

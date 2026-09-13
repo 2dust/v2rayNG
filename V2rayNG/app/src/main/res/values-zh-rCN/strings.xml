@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">停止</string>
-    <string name="toast_permission_denied">无法取得权限</string>
-    <string name="toast_permission_denied_notification">无法取得通知权限</string>
     <string name="notification_action_more">点击了解更多</string>
     <string name="toast_services_start">启动服务</string>
     <string name="toast_services_stop">服务已停止</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI（可选，默认 50 毫秒）</string>
     <string name="toast_success">成功</string>
     <string name="toast_failure">失败</string>
-    <string name="toast_none_data">没有数据</string>
-    <string name="toast_incorrect_protocol">不正确的协议</string>
     <string name="toast_decoding_failed">解码失败</string>
     <string name="title_file_chooser">选择一个配置</string>
     <string name="toast_require_file_manager">请安装一个文件管理器</string>
     <string name="server_customize_config">自定义配置</string>
     <string name="toast_config_file_invalid">无效的配置</string>
     <string name="server_lab_content">内容</string>
-    <string name="toast_none_data_clipboard">剪贴板中没有数据</string>
     <string name="toast_invalid_url">无效的网址</string>
     <string name="toast_insecure_url_protocol">请不要使用不安全的 HTTP 协议订阅地址</string>
     <string name="server_lab_need_inbound">确保入站端口与设置一致</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">反馈</string>
     <string name="summary_pref_feedback">前往 GitHub 提出改进建议或报告问题</string>
     <string name="summary_pref_tg_group">加入 Telegram 群组</string>
-    <string name="toast_tg_app_not_found">未找到 Telegram 应用</string>
     <string name="title_privacy_policy">隐私权政策</string>
     <string name="title_qr_code">二维码</string>
     <string name="title_about">关于</string>
@@ -360,7 +354,6 @@
     </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
-    <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
     <string name="title_locate_selected_config">定位所选配置</string>
 
     <string name="tasker_start_service">启动服务</string>

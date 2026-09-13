@@ -35,6 +35,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.CertificateFingerprintManager
@@ -324,7 +325,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                                     CertificateFingerprintManager.fetchForManualFill(temp)
                                 }
                                 if (sha256.isNullOrBlank()) {
-                                    context.toast(R.string.toast_fetch_cert_sha256_failed)
+                                    context.toastError(R.string.toast_fetch_cert_sha256_failed)
                                 } else {
                                     state.pinnedCA256 = sha256
                                     context.toastSuccess(R.string.toast_fetch_cert_sha256_success)

@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
-    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
-    <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
     <string name="notification_action_more">Nhấn để biết thêm…</string>
     <string name="toast_services_start">Đang khởi động v2rayNG…</string>
     <string name="toast_services_stop">Đã dừng v2rayNG!</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (không bắt buộc, mặc định 50 ms)</string>
     <string name="toast_success">Thành công!</string>
     <string name="toast_failure">Đã xảy ra lỗi, vui lòng thử lại!</string>
-    <string name="toast_none_data">Không có gì ở đây!</string>
-    <string name="toast_incorrect_protocol">Giao thức không hợp lệ.</string>
     <string name="toast_decoding_failed">Không thể giải mã!</string>
     <string name="title_file_chooser">Vui lòng chọn tệp cấu hình!</string>
     <string name="toast_require_file_manager">Vui lòng cài đặt trình quản lý tệp để tiếp tục!</string>
     <string name="server_customize_config">Cấu hình tùy chỉnh</string>
     <string name="toast_config_file_invalid">Cấu hình không hợp lệ!</string>
     <string name="server_lab_content">Nội dung</string>
-    <string name="toast_none_data_clipboard">Không có dữ liệu trong bảng tạm!</string>
     <string name="toast_invalid_url">URL không hợp lệ hoặc trống!</string>
     <string name="toast_insecure_url_protocol">Vui lòng không dùng địa chỉ đăng ký với giao thức HTTP không an toàn</string>
     <string name="server_lab_need_inbound">Đảm bảo cổng inbound khớp với cài đặt</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">Phản hồi lỗi</string>
     <string name="summary_pref_feedback">Phản hồi cải tiến hoặc lỗi lên GitHub</string>
     <string name="summary_pref_tg_group">Tham gia nhóm Telegram</string>
-    <string name="toast_tg_app_not_found">Không tìm thấy ứng dụng Telegram!</string>
     <string name="title_privacy_policy">Chính sách bảo mật</string>
     <string name="title_qr_code">Mã QR</string>
     <string name="title_about">Giới thiệu</string>
@@ -360,7 +354,6 @@
     </plurals>
     <string name="title_update_subscription_result">Đã cập nhật %1$d cấu hình (%2$d thành công, %3$d thất bại, %4$d bỏ qua)</string>
     <string name="title_update_subscription_no_subscription">Không có đăng ký</string>
-    <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
     <string name="title_locate_selected_config">Tìm cấu hình đã chọn</string>
 
     <string name="tasker_start_service">Khởi động v2rayNG</string>

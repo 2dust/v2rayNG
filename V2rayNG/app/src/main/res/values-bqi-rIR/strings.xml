@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
-    <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
-    <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
     <string name="notification_action_more">سی دووسمندیا قلوه کیلیک کوݩ</string>
     <string name="toast_services_start">ره وستن سرویس</string>
     <string name="toast_services_stop">واڌاشتن سرویس وا مووفقیت ٱنجوم وابی</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرض 50 میلی‌ثانیه)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_failure">شکست خرد</string>
-    <string name="toast_none_data">هیچ داڌه ای وۊجۊڌ نڌاره</string>
-    <string name="toast_incorrect_protocol">پوروتوکول نادوروست</string>
     <string name="toast_decoding_failed">رزم گوشایی ٱنجوم نوابی</string>
     <string name="title_file_chooser">پسند فایل کانفیگ</string>
     <string name="toast_require_file_manager">ی برنومه دؽوۉداری فایل بپۊرنین.</string>
     <string name="server_customize_config">کانفیگ سفارشی</string>
     <string name="toast_config_file_invalid">کانفیگ نا موئتبر هڌ</string>
     <string name="server_lab_content">محتوا</string>
-    <string name="toast_none_data_clipboard">هیچ داڌه ای من کلیپ بورد وۊجۊڌ نڌاره</string>
     <string name="toast_invalid_url">نشۊوی اینترنتی نا موئتبر هڌ</string>
     <string name="toast_insecure_url_protocol">نشۊوی اشتراک پوروتوکول نا ٱمن HTTP ن و کار مبرین</string>
     <string name="server_lab_need_inbound">موطمئن بۊین ک پورت وۊرۊڌی وا سامووا ی جۊر هڌ</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">فشناڌن منشڌ</string>
     <string name="summary_pref_feedback">فشناڌن منشڌ یا گوزارش موشکلا من GitHub</string>
     <string name="summary_pref_tg_group">ٱووڌن من بونکۊ تلگرام</string>
-    <string name="toast_tg_app_not_found">برنومه تلگرامن نجوست</string>
     <string name="title_privacy_policy">حریم سیخومی</string>
     <string name="title_qr_code">کود QR</string>
     <string name="title_about">زبار</string>
@@ -362,7 +356,6 @@
     </plurals>
     <string name="title_update_subscription_result">%1$d کانفیگ ورۊ وابی (مووفق: %2$d، شکست خرده: %3$d، رڌ وابیڌه: %4$d)</string>
     <string name="title_update_subscription_no_subscription">بؽ اشتراک</string>
-    <string name="toast_server_not_found_in_group">سرور پسند وابیڌه من بونکۊ سکویی نجۊرست</string>
     <string name="title_locate_selected_config">کانفیگ پسند وابیڌه ن بجۊرین</string>
 
     <string name="tasker_start_service">ره وندن سرویس</string>

@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">إيقاف</string>
-    <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
-    <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
     <string name="notification_action_more">انقر للمزيد</string>
     <string name="toast_services_start">بدء الخدمات</string>
     <string name="toast_services_stop">تم إيقاف الخدمة</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي 50 مللي ثانية)</string>
     <string name="toast_success">نجاح</string>
     <string name="toast_failure">فشل</string>
-    <string name="toast_none_data">لا يوجد شيء</string>
-    <string name="toast_incorrect_protocol">بروتوكول غير صحيح</string>
     <string name="toast_decoding_failed">فشل فك التشفير</string>
     <string name="title_file_chooser">حدد ملف التكوين</string>
     <string name="toast_require_file_manager">يرجى تثبيت مدير الملفات.</string>
     <string name="server_customize_config">تخصيص التكوين</string>
     <string name="toast_config_file_invalid">تكوين غير صالح</string>
     <string name="server_lab_content">المحتوى</string>
-    <string name="toast_none_data_clipboard">لا توجد بيانات في الحافظة</string>
     <string name="toast_invalid_url">رابط URL غير صالح</string>
     <string name="toast_insecure_url_protocol">يرجى عدم استخدام عنوان اشتراك ببروتوكول HTTP غير الآمن</string>
     <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">ملاحظات</string>
     <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
     <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
-    <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
     <string name="title_privacy_policy">سياسة الخصوصية</string>
     <string name="title_qr_code">رمز QR</string>
     <string name="title_about">حول التطبيق</string>
@@ -370,7 +364,6 @@
     </plurals>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
-    <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
     <string name="title_locate_selected_config">العثور على التكوين المحدد</string>
 
     <string name="tasker_start_service">بدء الخدمة</string>

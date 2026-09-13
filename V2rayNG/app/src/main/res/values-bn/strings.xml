@@ -15,8 +15,6 @@
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
-    <string name="toast_permission_denied">অনুমতি পাওয়া যাচ্ছে না</string>
-    <string name="toast_permission_denied_notification">বিজ্ঞপ্তির অনুমতি পাওয়া যায়নি</string>
     <string name="notification_action_more">আরও দেখতে ক্লিক করুন</string>
     <string name="toast_services_start">সার্ভিস শুরু করুন</string>
     <string name="toast_services_stop">সার্ভিস বন্ধ হয়েছে</string>
@@ -105,15 +103,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (ঐচ্ছিক, ডিফল্ট 50 মিলিসেকেন্ড)</string>
     <string name="toast_success">সফল</string>
     <string name="toast_failure">ব্যর্থ</string>
-    <string name="toast_none_data">কোনও তথ্য নেই</string>
-    <string name="toast_incorrect_protocol">ভুল প্রোটোকল</string>
     <string name="toast_decoding_failed">ডিকোডিং ব্যর্থ</string>
     <string name="title_file_chooser">একটি কনফিগারেশন ফাইল নির্বাচন করুন</string>
     <string name="toast_require_file_manager">অনুগ্রহ করে একটি ফাইল ম্যানেজার ইনস্টল করুন।</string>
     <string name="server_customize_config">কাস্টমাইজ কনফিগারেশন</string>
     <string name="toast_config_file_invalid">অবৈধ কনফিগারেশন</string>
     <string name="server_lab_content">কনটেন্ট</string>
-    <string name="toast_none_data_clipboard">ক্লিপবোর্ডে কোনও তথ্য নেই</string>
     <string name="toast_invalid_url">অবৈধ URL</string>
     <string name="toast_insecure_url_protocol">অনিরাপদ HTTP প্রোটোকলের সাবস্ক্রিপশন ঠিকানা ব্যবহার করবেন না</string>
     <string name="server_lab_need_inbound">ইনবাউন্ড পোর্ট নিশ্চিত করুন সেটিংসের সাথে সামঞ্জস্যপূর্ণ</string>
@@ -281,7 +276,6 @@
     <string name="title_pref_feedback">মতামত</string>
     <string name="summary_pref_feedback">মতামত উন্নয়ন বা বাগগুলি GitHub-এ পাঠান</string>
     <string name="summary_pref_tg_group">টেলিগ্রাম গ্রুপে যোগদান করুন</string>
-    <string name="toast_tg_app_not_found">টেলিগ্রাম অ্যাপ পাওয়া যায়নি</string>
     <string name="title_privacy_policy">গোপনীয়তা নীতি</string>
     <string name="title_qr_code">QR কোড</string>
     <string name="title_about">সম্পর্কিত</string>
@@ -362,7 +356,6 @@
     </plurals>
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
-    <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>
     <string name="title_locate_selected_config">নির্বাচিত কনফিগটি খুঁজুন</string>
 
     <string name="tasker_start_service">সার্ভিস শুরু করুন</string>
