@@ -9,6 +9,11 @@ android {
     namespace = "com.v2ray.ang"
     compileSdk = 37
 
+    // Pinned so release APKs can be rebuilt byte for byte: the NDK strips the
+    // jniLibs, so its version is part of the output. build.yml used to insert
+    // this line with sed, which only took effect inside CI.
+    ndkVersion = "29.0.14206865"
+
     defaultConfig {
         applicationId = "com.v2ray.ang"
         minSdk = 24

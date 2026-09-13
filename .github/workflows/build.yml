@@ -37,9 +37,6 @@ jobs:
           --channel=0 \
           --install "ndk;29.0.14206865"
         echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> $GITHUB_ENV
-        sed -i '10i\
-        \
-            ndkVersion = "29.0.14206865"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
 
     - name: Restore cached libhevtun
       id: cache-libhevtun-restore
@@ -67,7 +64,13 @@ jobs:
     - name: Fetch AndroidLibXrayLite tag
       run: |
         pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0)
+        # The aar is downloaded from the release for this tag, so the submodule
+        # has to sit exactly on it. `--abbrev=0` fell back to the nearest older
+        # tag, shipping a core that did not match the submodule source.
+        if ! CURRENT_TAG=$(git describe --tags --exact-match 2>/dev/null); then
+          echo "::error::AndroidLibXrayLite is at $(git rev-parse --short HEAD), which is not a tagged release, so there is no aar that matches it. Tag and release it first."
+          exit 1
+        fi
         echo "Current tag in this repo: $CURRENT_TAG"
         echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
         popd
@@ -84,7 +87,15 @@ jobs:
       uses: actions/setup-java@v6.0.0
       with:
         distribution: 'temurin'
-        java-version: '21'
+        # An exact build rather than '21', which takes whatever JDK 21 the
+        # runner image has preinstalled and so changes the output as the image
+        # is updated. This is Temurin 21.0.12.1+1, spelled as the Adoptium
+        # semver setup-java matches against. '21.0.12.1' only matches the
+        # preinstalled copy by accident of its folder name and breaks once the
+        # image moves on; '21.0.12+101' matches nothing. Next value: the
+        # `semver` field at
+        # https://api.adoptium.net/v3/info/release_versions?release_type=ga&version=%5B21,22)
+        java-version: '21.0.12+101.0.LTS'
 
     - name: Decode Keystore
       uses: timheuer/base64-to-file@v2.0.0
