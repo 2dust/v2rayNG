@@ -345,7 +345,8 @@ internal fun UserAssetScreen(
 
     deleteTarget?.let { asset ->
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_asset_file, asset.name),
+            message = stringResource(R.string.confirm_delete_asset_file),
+            itemName = asset.name,
             onConfirm = {
                 deleteTarget = null
                 onRemoveAsset(asset.guid, asset.name)

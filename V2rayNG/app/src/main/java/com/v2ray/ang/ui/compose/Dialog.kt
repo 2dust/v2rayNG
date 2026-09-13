@@ -100,9 +100,10 @@ fun DeleteConfirmDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    itemName: String? = null,
 ) {
     ConfirmDialog(
-        message = message,
+        message = if (itemName.isNullOrBlank()) message else "$message\n\n$itemName",
         messageTextAlign = TextAlign.Center,
         confirmText = stringResource(R.string.action_delete),
         confirmIcon = {

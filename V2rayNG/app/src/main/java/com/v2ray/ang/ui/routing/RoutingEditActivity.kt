@@ -308,7 +308,8 @@ fun RoutingEditScreen(
 
         if (showDeleteConfirm) {
             DeleteConfirmDialog(
-                message = stringResource(R.string.confirm_delete_routing_rule_named, initial?.remarks.orEmpty()),
+                message = stringResource(R.string.confirm_delete_routing_rule),
+                itemName = initial?.remarks.orEmpty(),
                 onConfirm = onDelete,
                 onDismiss = { showDeleteConfirm = false }
             )
