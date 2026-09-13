@@ -100,10 +100,8 @@ class ServerGroupActivity : BaseComponentActivity() {
             initialFallbackTag = initialFallbackTag,
             fallbackSuggestions = fallbackSuggestions,
             onBackClick = { finish() },
-            onSave = { remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag ->
-                saveServer(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
-            },
-            onDelete = { deleteServer() }
+            onSave = ::saveServer,
+            onDelete = ::deleteServer,
         )
     }
 
@@ -114,10 +112,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         subIdx: Int,
         testOutbounds: Boolean,
         fallbackTag: String,
-    ): Boolean {
+    ) {
         if (remarks.isBlank()) {
             toast(R.string.server_lab_remarks)
-            return false
+            return
         }
 
         val config =
@@ -155,7 +153,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         val savedGuid = MmkvManager.encodeServerConfig(
             editGuid,
             config
-        )
+        ) ?: run {
+            toast(R.string.toast_failure)
+            return
+        }
 
         toastSuccess(R.string.toast_success)
 
@@ -165,27 +166,26 @@ class ServerGroupActivity : BaseComponentActivity() {
                 restartService = isRunning
             )
         }
-
-        return true
     }
 
-    private fun deleteServer(): Boolean {
+    private fun deleteServer() {
         if (editGuid.isEmpty()) {
-            return false
+            return
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed)
-            return false
+            return
         }
 
-        MmkvManager.removeServer(editGuid)
+        if (!MmkvManager.removeServer(editGuid)) {
+            toast(R.string.toast_failure)
+            return
+        }
 
         ProfileEditorResult.run {
             finishDeleted(editGuid)
         }
-
-        return true
     }
 
     private fun populateSubscriptionSpinner() {
@@ -221,7 +221,7 @@ fun ServerGroupScreen(
     initialFallbackTag: String,
     fallbackSuggestions: List<String>,
     onBackClick: () -> Unit,
-    onSave: (String, String, Int, Int, Boolean, String) -> Boolean,
+    onSave: (String, String, Int, Int, Boolean, String) -> Unit,
     onDelete: () -> Unit
 ) {
     val typeEntries = stringArrayResource(R.array.policy_group_type).toList()

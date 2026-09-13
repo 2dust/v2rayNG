@@ -1,36 +1,31 @@
 package com.v2ray.ang.handler
 
 import android.util.Log
-import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.util.JsonUtil
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Test
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class SubscriptionIndexTest {
-    private val mainValues = mutableMapOf<String, String>()
-    private val subValues = mutableMapOf<String, String>()
+    private lateinit var stores: MmkvTestStore
+    private val mainValues get() = stores.main.values
+    private val subValues get() = stores.subscriptions.values
 
     @Before
     fun prepareStorage() {
-        for ((storage, values) in listOf(main to mainValues, subs to subValues)) {
-            reset(storage)
-            whenever(storage.decodeString(any())).thenAnswer { values[it.getArgument<String>(0)] }
-            whenever(storage.encode(any<String>(), any<String>())).thenAnswer {
-                values[it.getArgument(0)] = it.getArgument(1)
-                true
-            }
-            whenever(storage.allKeys()).thenAnswer { values.keys.toTypedArray() }
-        }
+        stores = MmkvTestStore()
+    }
+
+    @After
+    fun restoreStorage() {
+        stores.close()
     }
 
     @Test
@@ -40,7 +35,7 @@ class SubscriptionIndexTest {
 
         assertEquals(listOf("second", "first", "third"), MmkvManager.decodeSubsList())
         assertEquals(stored, mainValues["SUB_IDS"])
-        verify(main, never()).encode(any<String>(), any<String>())
+        verify(stores.main.mmkv, never()).encode(any<String>(), any<String>())
     }
 
     @Test
@@ -66,15 +61,15 @@ class SubscriptionIndexTest {
     }
 
     @Test
-    fun decodedIndexRemainsMutableAndCanBeSavedInANewOrder() {
+    fun decodedIndexRemainsMutableAndReordersOnlyExistingMembership() {
         mainValues["SUB_IDS"] = """["a","b","a"]"""
         val ids = MmkvManager.decodeSubsList()
         ids.remove("a")
         ids.add(0, "c")
-        MmkvManager.encodeSubsList(ids)
+        assertTrue(MmkvManager.reorderSubscriptions(ids))
 
-        assertEquals("""["c","b"]""", mainValues["SUB_IDS"])
-        assertEquals(listOf("c", "b"), MmkvManager.decodeSubsList())
+        assertEquals("""["b","a"]""", mainValues["SUB_IDS"])
+        assertEquals(listOf("b", "a"), MmkvManager.decodeSubsList())
     }
 
     @Test
@@ -94,21 +89,4 @@ class SubscriptionIndexTest {
         }
     }
 
-    companion object {
-        private val main: MMKV = mock()
-        private val subs: MMKV = mock()
-        private val settings: MMKV = mock()
-
-        @BeforeClass
-        @JvmStatic
-        fun initializeHandles() {
-            mockStatic(MMKV::class.java).use {
-                it.`when`<MMKV> { MMKV.mmkvWithID("MAIN", MMKV.MULTI_PROCESS_MODE) }.thenReturn(main)
-                it.`when`<MMKV> { MMKV.mmkvWithID("SUB", MMKV.MULTI_PROCESS_MODE) }.thenReturn(subs)
-                it.`when`<MMKV> { MMKV.mmkvWithID("SETTING", MMKV.MULTI_PROCESS_MODE) }.thenReturn(settings)
-                MmkvManager.decodeSubscriptions()
-                MmkvManager.decodeSettingsString("test-initialize")
-            }
-        }
-    }
 }
