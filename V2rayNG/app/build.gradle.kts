@@ -11,7 +11,9 @@ android {
     namespace = "com.v2ray.ang"
     compileSdk = 37
 
-    providers.gradleProperty("NDK_VERSION").orNull?.let { ndkVersion = it }
+    // Match CI by default: the NDK strips jniLibs, so its version affects APK bytes.
+    // Keep the override for builds that intentionally select a different NDK.
+    ndkVersion = providers.gradleProperty("NDK_VERSION").getOrElse("29.0.14206865")
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
