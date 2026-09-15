@@ -23,7 +23,6 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -81,7 +80,7 @@ class MainRepository(
             app,
             serviceReceiver,
             IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
-            Utils.receiverFlags()
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
         MessageHelper.sendMsg2Service(app, AppConfig.MSG_REGISTER_CLIENT, "")
     }
