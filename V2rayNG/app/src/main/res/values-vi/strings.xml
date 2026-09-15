@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">Nhập cấu hình?</string>
+    <string name="external_import_message">Một ứng dụng khác muốn nhập cấu hình. Chỉ tiếp tục nếu bạn tin cậy nguồn này. Các hồ sơ hiện có sẽ được giữ lại. Để cập nhật tự động, hãy cho phép ứng dụng tự động hóa trong Cài đặt → %1$s.</string>
+    <string name="external_import_confirm">Nhập</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Kết nối ngay</string>
     <string name="app_tile_name">Kết nối ngay</string>

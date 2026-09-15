@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">匯入設定？</string>
+    <string name="external_import_message">其他應用程式要求匯入設定。請僅在信任其來源時繼續。現有設定將保留。如需自動更新，請在設定 → %1$s 中允許該自動化應用程式。</string>
+    <string name="external_import_confirm">匯入</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">開關</string>
     <string name="app_tile_name">開關</string>

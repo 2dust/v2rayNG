@@ -1,7 +1,8 @@
 # Automation app access
 
 Open **Settings → Automation app access** (under Advanced) and select the apps allowed to
-start or stop v2rayNG. Leave the picker to save the selection. The list is empty on a fresh installation and after upgrading
+start or stop v2rayNG and import or replace configurations without confirmation.
+Leave the picker to save the selection. The list is empty on a fresh installation and after upgrading
 from versions without access control. It is independent of per-app proxy routing.
 Removing an app revokes its access. Grant it again after reinstalling it or changing
 its signing certificate. Grants are device-local and excluded from backups.
@@ -45,6 +46,28 @@ and the selected operating mode still apply.
 Launcher widgets use the app's immutable PendingIntent and do not need an allowlist
 entry. Their receiver is private to prevent direct broadcasts bypassing this setting.
 
-Platform references: [broadcast sender identity](https://developer.android.com/reference/android/content/BroadcastReceiver#getSentFromUid()),
+## External configuration imports
+
+Shared text and `v2rayng://install-config` / `v2rayng://install-sub` links use the same
+Automation app access grants. Allowed, authenticated automation apps retain the existing
+replacement behavior for unattended updates. Removing the grant also removes this access.
+
+On API 34+, launch the import activity with
+`ActivityOptions.makeBasic().setShareIdentityEnabled(true).toBundle()`. Android's
+`Activity.getLaunchedFromUid()` identifies the sender. When Android does not expose
+the launcher identity (including versions before API 34), include the saved Locale configuration bundle
+as `com.twofortyfouram.locale.intent.extra.BUNDLE`, retaining its package and capability
+fields. Never put the capability in a URL. A known platform identity takes precedence
+over supplied credentials; referrers and claimed package names alone are not trusted.
+`getCallingPackage()` is not used here: result forwarding can make it identify a
+different app from the sender of the configuration.
+
+Other callers require explicit confirmation before any configuration import or
+subscription download. These one-off imports append profiles instead of replacing the
+default group. Cancelling leaves the configuration untouched. No automatic access grant
+is created by confirming an import.
+
+Platform references: [activity launch identity](https://developer.android.com/reference/android/app/Activity#getLaunchedFromUid()),
+[broadcast sender identity](https://developer.android.com/reference/android/content/BroadcastReceiver#getSentFromUid()),
 [sharing identity](https://developer.android.com/reference/android/app/BroadcastOptions#setShareIdentityEnabled(boolean)),
 [activity caller identity](https://developer.android.com/reference/android/app/Activity#getCallingPackage()).

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">কনফিগারেশন আমদানি করবেন?</string>
+    <string name="external_import_message">অন্য একটি অ্যাপ কনফিগারেশন আমদানি করতে চায়। উৎসটি বিশ্বাসযোগ্য হলেই এগিয়ে যান। বিদ্যমান প্রোফাইলগুলো রাখা হবে। স্বয়ংক্রিয় আপডেটের জন্য সেটিংস → %1$s থেকে অটোমেশন অ্যাপটিকে অনুমতি দিন।</string>
+    <string name="external_import_confirm">আমদানি করুন</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>

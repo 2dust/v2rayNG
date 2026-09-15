@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">استيراد الإعدادات؟</string>
+    <string name="external_import_message">يريد تطبيق آخر استيراد إعدادات. تابع فقط إذا كنت تثق بالمصدر. سيتم الاحتفاظ بملفات التعريف الحالية. للتحديث التلقائي، اسمح لتطبيق الأتمتة من الإعدادات ← %1$s.</string>
+    <string name="external_import_confirm">استيراد</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>

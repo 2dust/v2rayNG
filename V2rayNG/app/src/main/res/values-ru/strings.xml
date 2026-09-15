@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">Импортировать конфигурацию?</string>
+    <string name="external_import_message">Другое приложение запрашивает импорт конфигурации. Продолжайте, только если доверяете источнику. Существующие профили будут сохранены. Для автоматических обновлений разрешите доступ приложению автоматизации в разделе «Настройки → %1$s».</string>
+    <string name="external_import_confirm">Импортировать</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>

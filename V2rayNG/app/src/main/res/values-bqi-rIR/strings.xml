@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">پیکربندی وارد بووه؟</string>
+    <string name="external_import_message">یه برنامه دیگه می‌خواد پیکربندی وارد کنه. فقط اگه وه سرچشمه‌س اعتماد دارین ادامه بدین. پروفایلای هَنده نگه داشته می‌بوون. سی به‌روزرسانی خودکار، وه برنامه خودکارسازی مِن تنظیمات ← %1$s اجازه بدین.</string>
+    <string name="external_import_confirm">وارد کردن</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
