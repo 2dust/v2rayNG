@@ -34,8 +34,11 @@ internal fun ServersCache.withCustomMetadata(raw: String?): ServersCache {
         null
     }
     // Re-read raw JSON so profiles saved by older versions also get accurate metadata.
+    val refreshedProfile = profile.copy(server = metadata?.server, serverPort = metadata?.serverPort).apply {
+        description = AngConfigManager.generateDescription(this)
+    }
     return copy(
-        profile = profile.copy(server = metadata?.server, serverPort = metadata?.serverPort, description = null),
+        profile = refreshedProfile,
         customServerCount = metadata?.serverCount ?: 0,
     )
 }

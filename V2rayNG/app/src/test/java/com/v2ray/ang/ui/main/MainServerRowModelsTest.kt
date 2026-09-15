@@ -42,6 +42,16 @@ class MainServerRowModelsTest {
     }
 
     @Test
+    fun refreshedDescriptionKeepsTheCurrentPortSearchable() {
+        val refreshed = stored.withCustomMetadata(single)
+        assertEquals("example.*** : 443", refreshed.profile.description)
+        assertEquals("example.*** : 8443", refreshed.withCustomMetadata(single.replace("443", "8443")).profile.description)
+        assertEquals("", refreshed.withCustomMetadata(multiple).profile.description)
+        assertEquals("", refreshed.withCustomMetadata(null).profile.description)
+        assertEquals("stale metadata", stored.profile.description)
+    }
+
+    @Test
     fun multipleServersUseTheCurrentLocalizedLabelAndClearTheOldEndpoint() {
         val refreshed = stored.withCustomMetadata(multiple)
         assertEquals(2, refreshed.customServerCount)

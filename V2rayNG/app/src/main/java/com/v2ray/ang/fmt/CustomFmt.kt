@@ -5,7 +5,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSyntaxException
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.util.JsonUtil
 import java.net.IDN
 import java.net.URI
@@ -48,12 +47,7 @@ object CustomFmt : FmtBase() {
             ?.flatMap { element ->
                 val outbound = element.takeIf { it.isJsonObject }?.asJsonObject
                 val protocol = outbound?.get("protocol").stringValue()
-                val type = EConfigType.entries.firstOrNull { it.name.equals(protocol, ignoreCase = true) }
-                if (type == null || type.isComplexType()) {
-                    emptyList()
-                } else {
-                    readServers(outbound?.get("settings")?.takeIf { it.isJsonObject }?.asJsonObject, protocol)
-                }
+                readServers(outbound?.get("settings")?.takeIf { it.isJsonObject }?.asJsonObject, protocol)
             }.orEmpty()
         val single = servers.singleOrNull()
         val address = single?.first?.takeIf(::isValidAddress)
@@ -66,7 +60,13 @@ object CustomFmt : FmtBase() {
     }
 
     private fun readServers(settings: JsonObject?, protocol: String?): List<Pair<String?, String?>> {
-        if (protocol.equals("wireguard", ignoreCase = true)) {
+        val key = when (protocol?.lowercase()) {
+            "vmess", "vless" -> "vnext"
+            "trojan", "shadowsocks", "socks", "http", "hysteria", "hysteria2" -> "servers"
+            "wireguard" -> "peers"
+            else -> return emptyList()
+        }
+        if (key == "peers") {
             return settings?.get("peers")?.takeIf { it.isJsonArray }?.asJsonArray?.map { peer ->
                 val endpoint = peer.takeIf { it.isJsonObject }?.asJsonObject?.get("endpoint").stringValue()
                 val address = endpoint?.substringBeforeLast(':', "")?.removeSurrounding("[", "]")
@@ -77,7 +77,6 @@ object CustomFmt : FmtBase() {
         if (settings?.get("address")?.isJsonNull == false) {
             return listOf(readServer(settings))
         }
-        val key = if (protocol.equals("vmess", true) || protocol.equals("vless", true)) "vnext" else "servers"
         return settings?.get(key)?.takeIf { it.isJsonArray }?.asJsonArray?.map {
             readServer(it.takeIf { element -> element.isJsonObject }?.asJsonObject)
         }?.takeIf { it.isNotEmpty() } ?: listOf(null to null)
