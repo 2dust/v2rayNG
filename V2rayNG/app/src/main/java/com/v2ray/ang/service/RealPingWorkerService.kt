@@ -1,15 +1,19 @@
 package com.v2ray.ang.service
 
 import android.content.Context
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.RealPingEvent
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +40,26 @@ internal object RealPingExecutionLimiter {
             block()
         }
     }
+}
+
+/** Resolves TCP-only probes independently of the native real-delay pre-check. */
+internal fun resolveTcpingEndpoint(config: ProfileItem, customConfig: String?): Pair<String, Int>? {
+    val (server, serverPort) = if (config.configType == EConfigType.CUSTOM) {
+        // Saved profile metadata may be stale; only the raw config determines its target.
+        val metadata = customConfig?.let(CustomFmt::parseMetadata) ?: return null
+        if (metadata.serverCount != 1) return null
+        metadata.server to metadata.serverPort
+    } else {
+        if (config.configType.isComplexType()
+            || config.configType == EConfigType.HYSTERIA2
+            || config.configType == EConfigType.WIREGUARD
+            || config.alpn?.split(',')?.all { it.trim().startsWith("h3") } == true
+        ) return null
+        config.server to config.serverPort
+    }
+    if (!server.isNotNullEmpty()) return null
+    val port = serverPort?.toIntOrNull() ?: return null
+    return server.orEmpty() to port
 }
 
 /**
@@ -136,20 +160,14 @@ class RealPingWorkerService(
         val retFailure = -1L
 
         val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
-        if (!config.configType.isComplexType()
-            && config.configType != EConfigType.HYSTERIA2
-            && config.configType != EConfigType.WIREGUARD
-            && config.alpn?.split(',')?.all { it.trim().startsWith("h3") } != true
-            && config.server.isNotNullEmpty()
-            && config.serverPort?.toIntOrNull() != null
-        ) {
-            val url = config.server.orEmpty()
-            val port = config.serverPort.orEmpty().toInt()
-            val tcpTime = SpeedtestManager.socketConnectTime(url, port, 1000)
-
-            return tcpTime
+        val endpoint = try {
+            val raw = if (config.configType == EConfigType.CUSTOM) MmkvManager.decodeServerRaw(guid) else null
+            resolveTcpingEndpoint(config, raw)
+        } catch (error: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to resolve TCPing endpoint for $guid", error)
+            return retFailure
         }
-
-        return retFailure
+        return endpoint?.let { (server, port) -> SpeedtestManager.socketConnectTime(server, port, 1000) }
+            ?: retFailure
     }
 }
