@@ -54,6 +54,10 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : HelperBaseComponentActivity() {
 
+    companion object {
+        const val EXTRA_IMPORT_CONFIG = "import_config"
+    }
+
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
@@ -93,8 +97,22 @@ class MainActivity : HelperBaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.onAction(MainAction.Initialize)
+        if (savedInstanceState == null) importFromIntent(intent)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        importFromIntent(intent)
+    }
+
+    private fun importFromIntent(intent: Intent) {
+        val configText = intent.getStringExtra(EXTRA_IMPORT_CONFIG) ?: return
+        // The ViewModel owns the import across recreation; consume each delivery once.
+        intent.removeExtra(EXTRA_IMPORT_CONFIG)
+        mainViewModel.onAction(MainAction.ImportBatchConfig(configText, "", false))
     }
 
     @Composable

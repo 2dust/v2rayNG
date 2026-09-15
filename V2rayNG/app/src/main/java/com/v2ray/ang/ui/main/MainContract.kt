@@ -64,7 +64,11 @@ sealed interface MainAction {
     data class ShareFullContent(val guid: String) : MainAction
     data object DismissQRCodeDialog : MainAction
 
-    data class ImportBatchConfig(val configText: String) : MainAction
+    data class ImportBatchConfig(
+        val configText: String,
+        val subscriptionId: String? = null,
+        val append: Boolean = true
+    ) : MainAction
 
     data object LocateHandled : MainAction
 }
