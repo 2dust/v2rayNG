@@ -29,6 +29,7 @@ import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object AngConfigManager {
+    private val subscriptionImportLock = Any()
 
     private data class ParsedProfile(
         val profile: ProfileItem,
@@ -215,11 +216,14 @@ object AngConfigManager {
                 .orEmpty()
             if (urls.isEmpty()) return imported
 
-            val existingUrls = MmkvManager.decodeSubscriptions()
-                .mapTo(HashSet()) { it.subscription.url }
-            urls.forEach { url ->
-                if (url !in existingUrls) {
-                    imported += importUrlAsSubscription(url)
+            // Keep the snapshot and creation atomic across imports; downloads run after this lock.
+            synchronized(subscriptionImportLock) {
+                val existingUrls = MmkvManager.decodeSubscriptions()
+                    .mapTo(HashSet()) { it.subscription.url }
+                urls.forEach { url ->
+                    if (url !in existingUrls) {
+                        imported += importUrlAsSubscription(url)
+                    }
                 }
             }
         } catch (e: Exception) {

@@ -35,6 +35,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     @Suppress("PropertyName")
     protected val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private var loadingOperations = 0
 
     @Suppress("PropertyName")
     protected val _viewModelEvent = Channel<ViewModelEvent>()
@@ -117,11 +118,12 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      */
     protected fun launchLoading(block: suspend CoroutineScope.() -> Unit) {
         viewModelScope.launch {
+            loadingOperations++
             _isLoading.value = true
             try {
                 block()
             } finally {
-                _isLoading.value = false
+                _isLoading.value = --loadingOperations > 0
             }
         }
     }

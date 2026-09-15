@@ -9,6 +9,7 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.util.JsonUtil
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
@@ -22,10 +23,15 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeoutException
 
 class SubscriptionIndexTest {
-    private val mainValues = mutableMapOf<String, String>()
-    private val subValues = mutableMapOf<String, String>()
+    private val mainValues = ConcurrentHashMap<String, String>()
+    private val subValues = ConcurrentHashMap<String, String>()
 
     @Before
     fun prepareStorage() {
@@ -166,6 +172,66 @@ class SubscriptionIndexTest {
             assertEquals(fetched.single().subscription, MmkvManager.decodeSubscription(fetched.single().guid))
             verify(importer, never()).updateConfigViaSubAll()
         }
+
+    @Test
+    fun overlappingBatchesSerializeCreationButNotDownloads() {
+        val urls = listOf("https://example.invalid/a", "https://example.invalid/b", "https://example.invalid/c")
+        val creating = CountDownLatch(1)
+        val allowCreation = CountDownLatch(1)
+        val downloading = CountDownLatch(1)
+        val allowDownload = CountDownLatch(1)
+        val secondStarted = CountDownLatch(1)
+        whenever(subs.encode(any<String>(), any<String>())).thenAnswer {
+            val value = it.getArgument<String>(1)
+            subValues[it.getArgument(0)] = value
+            if (JsonUtil.fromJson(value, SubscriptionItem::class.java)?.url == urls[0]) {
+                creating.countDown()
+                check(allowCreation.await(5, SECONDS))
+            }
+            true
+        }
+        val executor = Executors.newFixedThreadPool(2)
+        try {
+            val first = executor.submit<List<String>> {
+                var fetchedUrls = emptyList<String>()
+                withImporter { importer, fetched ->
+                    doAnswer {
+                        downloading.countDown()
+                        check(allowDownload.await(5, SECONDS))
+                        fetched += it.getArgument<SubscriptionCache>(0)
+                        SubscriptionUpdateResult(successCount = 1)
+                    }.whenever(importer).updateConfigViaSub(any())
+                    assertEquals(0 to 2, importer.importBatchConfig(urls.take(2).joinToString("\n"), "", true))
+                    fetchedUrls = fetched.map { it.subscription.url }
+                }
+                fetchedUrls
+            }
+            assertTrue(creating.await(5, SECONDS))
+            val second = executor.submit<List<String>> {
+                var fetchedUrls = emptyList<String>()
+                withImporter { importer, fetched ->
+                    secondStarted.countDown()
+                    assertEquals(0 to 1, importer.importBatchConfig(urls.drop(1).joinToString("\n"), "", true))
+                    fetchedUrls = fetched.map { it.subscription.url }
+                }
+                fetchedUrls
+            }
+            assertTrue(secondStarted.await(5, SECONDS))
+            assertThrows(TimeoutException::class.java) { second.get(1, SECONDS) }
+            allowCreation.countDown()
+            assertTrue(downloading.await(5, SECONDS))
+            // The second import completes while the first import's network request is still blocked.
+            assertEquals(listOf(urls[2]), second.get(5, SECONDS))
+            allowDownload.countDown()
+            assertEquals(urls.take(2), first.get(5, SECONDS))
+            assertEquals(urls, MmkvManager.decodeSubscriptions().map { it.subscription.url })
+        } finally {
+            allowCreation.countDown()
+            allowDownload.countDown()
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, SECONDS))
+        }
+    }
 
     private fun seedSubscriptions(count: Int) {
         repeat(count) {

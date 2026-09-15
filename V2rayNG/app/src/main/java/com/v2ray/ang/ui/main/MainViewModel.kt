@@ -68,12 +68,12 @@ private fun applyTestDelayResultsToRows(
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource
+    private val dataSource: MainDataSource,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
 ) : BaseViewModel(application) {
 
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-    private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
+    private val preloadDispatcher: CoroutineDispatcher = ioDispatcher.limitedParallelism(1)
 
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
