@@ -555,4 +555,5 @@
     <string name="connection_test_empty_message">沒有詳細資訊</string>
     <string name="value_unknown">未知</string>
 
+    <string name="server_multiple_servers">多個伺服器</string>
 </resources>

@@ -1,10 +1,14 @@
 package com.v2ray.ang.ui.main
 
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.util.LogUtil
 
 internal data class ServerRowUiModel(
     val guid: String,
@@ -21,17 +25,36 @@ internal data class ServerGroupUiState(
     val rows: List<ServerRowUiModel> = emptyList(),
 )
 
+internal fun ServersCache.withCustomMetadata(raw: String?): ServersCache {
+    if (profile.configType != EConfigType.CUSTOM) return this
+    val metadata = try {
+        raw?.let(CustomFmt::parseMetadata)
+    } catch (error: Exception) {
+        LogUtil.e(AppConfig.TAG, "Failed to read custom server metadata for $guid", error)
+        null
+    }
+    // Re-read raw JSON so profiles saved by older versions also get accurate metadata.
+    return copy(
+        profile = profile.copy(server = metadata?.server, serverPort = metadata?.serverPort, description = null),
+        customServerCount = metadata?.serverCount ?: 0,
+    )
+}
+
 internal fun buildServerRowUiModel(
     server: ServersCache,
     subscriptionRemarks: String,
+    multipleServersText: String,
 ): ServerRowUiModel {
     val profile = server.profile
     return ServerRowUiModel(
         guid = server.guid,
         profile = profile,
         remarks = profile.remarks,
-        statistics = profile.description.nullIfBlank()
-            ?: AngConfigManager.generateDescription(profile),
+        statistics = if (profile.configType == EConfigType.CUSTOM && server.customServerCount > 1) {
+            multipleServersText
+        } else {
+            profile.description.nullIfBlank() ?: AngConfigManager.generateDescription(profile)
+        },
         typeDescription = serverProtocolDescription(profile),
         testDelayMillis = server.testDelayMillis,
         subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),

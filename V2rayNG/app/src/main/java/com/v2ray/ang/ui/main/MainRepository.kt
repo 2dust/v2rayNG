@@ -155,6 +155,8 @@ class MainRepository(
     override fun decodeServerConfig(guid: String): ProfileItem? =
         MmkvManager.decodeServerConfig(guid)
 
+    override fun decodeServerRaw(guid: String): String? = MmkvManager.decodeServerRaw(guid)
+
     override fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? =
         MmkvManager.decodeServerAffiliationInfo(guid)
 

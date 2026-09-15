@@ -565,4 +565,5 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="server_multiple_servers">خوادم متعددة</string>
 </resources>

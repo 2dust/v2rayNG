@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
@@ -343,11 +344,17 @@ class MainViewModel(
             currentCoroutineContext().ensureActive()
             val profile = dataSource.decodeServerConfig(guid) ?: return@mapNotNull null
             val affiliation = dataSource.decodeAffiliationInfo(guid)
-            ServersCache(
+            val server = ServersCache(
                 guid = guid,
                 profile = profile.copy(),
                 testDelayMillis = affiliation?.testDelayMillis ?: 0L
             )
+            if (profile.configType == EConfigType.CUSTOM) {
+                val raw = dataSource.decodeServerRaw(guid)
+                withContext(defaultDispatcher) { server.withCustomMetadata(raw) }
+            } else {
+                server
+            }
         }
 
     private suspend fun loadGroup(
@@ -403,10 +410,12 @@ class MainViewModel(
         } else {
             emptyMap()
         }
+        val multipleServersText = dataSource.getString(R.string.server_multiple_servers)
         return servers.map { server ->
             buildServerRowUiModel(
                 server = server,
-                subscriptionRemarks = subscriptionRemarks[server.profile.subscriptionId].orEmpty()
+                subscriptionRemarks = subscriptionRemarks[server.profile.subscriptionId].orEmpty(),
+                multipleServersText = multipleServersText,
             )
         }
     }

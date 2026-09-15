@@ -557,4 +557,5 @@
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
 
+    <string name="server_multiple_servers">چندین سرور</string>
 </resources>
