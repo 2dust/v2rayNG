@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import com.v2ray.ang.dto.BatchImportResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -46,8 +47,8 @@ interface MainDataSource : Closeable {
     suspend fun importBatchConfig(
         server: String?,
         subscriptionId: String,
-        updateUI: Boolean
-    ): Pair<Int, Int>
+        append: Boolean
+    ): BatchImportResult
 
     fun updateConfigViaSubAll(): SubscriptionUpdateResult
     fun updateConfigViaSub(subscriptionCache: SubscriptionCache): SubscriptionUpdateResult

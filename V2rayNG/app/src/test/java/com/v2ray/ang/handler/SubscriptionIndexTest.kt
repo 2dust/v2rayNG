@@ -4,6 +4,7 @@ import android.util.Log
 import android.util.Base64
 import android.webkit.URLUtil
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.dto.BatchImportResult
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
@@ -15,8 +16,11 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.withSettings
+import org.mockito.MockMakers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -43,6 +47,7 @@ class SubscriptionIndexTest {
                 true
             }
             whenever(storage.allKeys()).thenAnswer { values.keys.toTypedArray() }
+            doAnswer { values.remove(it.getArgument<String>(0)); storage }.whenever(storage).remove(any())
         }
     }
 
@@ -112,9 +117,11 @@ class SubscriptionIndexTest {
         seedSubscriptions(10)
         val before = subValues.toMap()
 
-        assertEquals(0 to 1, importer.importBatchConfig("https://example.invalid/new#New", "", true))
+        val result = importer.importBatchConfig("https://example.invalid/new#New", "", true)
 
         val created = MmkvManager.decodeSubscriptions().single { it.subscription.remarks == "New" }
+        assertEquals(BatchImportResult(subscriptionIds = listOf(created.guid),
+            subscriptionUpdates = SubscriptionUpdateResult(successCount = 1)), result)
         assertEquals(listOf(created), fetched)
         assertTrue(created.guid.isNotBlank())
         before.forEach { (id, value) -> assertEquals(value, subValues[id]) }
@@ -129,7 +136,9 @@ class SubscriptionIndexTest {
             "https://example.invalid/b", "https://example.invalid/a#First%20sub"
         )
 
-        assertEquals(0 to 2, importer.importBatchConfig(urls.joinToString("\n"), "", true))
+        val result = importer.importBatchConfig(urls.joinToString("\n"), "", true)
+        assertEquals(fetched.map { it.guid }, result.subscriptionIds)
+        assertEquals(SubscriptionUpdateResult(successCount = 2), result.subscriptionUpdates)
 
         assertEquals(listOf(urls[1], urls[2]), fetched.map { it.subscription.url })
         assertEquals(listOf("First sub", "import sub"), fetched.map { it.subscription.remarks })
@@ -143,7 +152,8 @@ class SubscriptionIndexTest {
         val text = "https://example.invalid/old0\nhttps://example.invalid/new"
         val encoded = java.util.Base64.getEncoder().encodeToString(text.toByteArray())
 
-        assertEquals(0 to 1, importer.importBatchConfig(encoded, "", true))
+        val result = importer.importBatchConfig(encoded, "", true)
+        assertEquals(fetched.map { it.guid }, result.subscriptionIds)
         assertEquals(listOf("https://example.invalid/new"), fetched.map { it.subscription.url })
         verify(importer, never()).updateConfigViaSubAll()
     }
@@ -154,7 +164,7 @@ class SubscriptionIndexTest {
         val before = subValues.toMap()
 
         listOf(null, "", "invalid", "https://example.invalid/old0").forEach {
-            assertEquals(0 to 0, importer.importBatchConfig(it, "", true))
+            assertEquals(BatchImportResult(), importer.importBatchConfig(it, "", true))
         }
 
         assertTrue(fetched.isEmpty())
@@ -167,11 +177,85 @@ class SubscriptionIndexTest {
         withImporter(SubscriptionUpdateResult(failureCount = 1)) { importer, fetched ->
             seedSubscriptions(2)
 
-            assertEquals(0 to 1, importer.importBatchConfig("https://example.invalid/new", "", true))
+            val result = importer.importBatchConfig("https://example.invalid/new", "", true)
+            assertEquals(fetched.map { it.guid }, result.subscriptionIds)
+            assertEquals(SubscriptionUpdateResult(failureCount = 1), result.subscriptionUpdates)
             assertEquals(listOf("https://example.invalid/new"), fetched.map { it.subscription.url })
             assertEquals(fetched.single().subscription, MmkvManager.decodeSubscription(fetched.single().guid))
             verify(importer, never()).updateConfigViaSubAll()
         }
+
+    @Test
+    fun failedPayloadWriteDoesNotFetchOrPublishSubscription() = withImporter { importer, fetched ->
+        seedSubscriptions(1)
+        val before = subValues.toMap()
+        whenever(subs.encode(any<String>(), any<String>())).thenReturn(false)
+
+        val result = importer.importBatchConfig("https://example.invalid/new", "", true)
+
+        assertEquals(BatchImportResult(subscriptionUpdates = SubscriptionUpdateResult(failureCount = 1)), result)
+        assertTrue(fetched.isEmpty())
+        assertEquals(before, subValues)
+        assertEquals(listOf("old-0"), MmkvManager.decodeSubsList())
+    }
+
+    @Test
+    fun failedIndexWriteRemovesPayloadAndDoesNotFetchSubscription() = withImporter { importer, fetched ->
+        seedSubscriptions(1)
+        val before = subValues.toMap()
+        whenever(main.encode(eq("SUB_IDS"), any<String>())).thenReturn(false)
+
+        val result = importer.importBatchConfig("https://example.invalid/new", "", true)
+
+        assertEquals(1, result.subscriptionUpdates.failureCount)
+        assertTrue(result.subscriptionIds.isEmpty())
+        assertTrue(fetched.isEmpty())
+        assertEquals(before, subValues)
+        assertEquals(listOf("old-0"), MmkvManager.decodeSubsList())
+    }
+
+    @Test
+    fun indexWriteExceptionAlsoRemovesUnpublishedPayload() = withImporter { importer, fetched ->
+        seedSubscriptions(1)
+        val before = subValues.toMap()
+        whenever(main.encode(eq("SUB_IDS"), any<String>())).thenThrow(IllegalStateException("Storage unavailable"))
+
+        val result = importer.importBatchConfig("https://example.invalid/new", "", true)
+
+        assertEquals(1, result.subscriptionUpdates.failureCount)
+        assertTrue(fetched.isEmpty())
+        assertEquals(before, subValues)
+        assertEquals(listOf("old-0"), MmkvManager.decodeSubsList())
+    }
+
+    @Test
+    fun batchContinuesAfterFailedSaveAndCombinesDownloadOutcomes() = withImporter { importer, fetched ->
+        whenever(subs.encode(any<String>(), any<String>())).thenAnswer {
+            val value = it.getArgument<String>(1)
+            if (JsonUtil.fromJson(value, SubscriptionItem::class.java)?.url?.endsWith("unsaved") == true) {
+                false
+            } else {
+                subValues[it.getArgument(0)] = value
+                true
+            }
+        }
+        doAnswer {
+            val cache = it.getArgument<SubscriptionCache>(0)
+            fetched += cache
+            if (cache.subscription.url.endsWith("failed-download")) SubscriptionUpdateResult(failureCount = 1)
+            else SubscriptionUpdateResult(configCount = 3, successCount = 1)
+        }.whenever(importer).updateConfigViaSub(any())
+
+        val result = importer.importBatchConfig(
+            listOf("unsaved", "failed-download", "success").joinToString("\n") { "https://example.invalid/$it" }, "", true
+        )
+
+        assertEquals(fetched.map { it.guid }, result.subscriptionIds)
+        assertEquals(2, result.subscriptionIds.size)
+        assertEquals(SubscriptionUpdateResult(configCount = 3, successCount = 1, failureCount = 2), result.subscriptionUpdates)
+        assertEquals(result.subscriptionIds, MmkvManager.decodeSubsList())
+        assertEquals(result.subscriptionIds.toSet(), subValues.keys)
+    }
 
     @Test
     fun overlappingBatchesSerializeCreationButNotDownloads() {
@@ -201,7 +285,7 @@ class SubscriptionIndexTest {
                         fetched += it.getArgument<SubscriptionCache>(0)
                         SubscriptionUpdateResult(successCount = 1)
                     }.whenever(importer).updateConfigViaSub(any())
-                    assertEquals(0 to 2, importer.importBatchConfig(urls.take(2).joinToString("\n"), "", true))
+                    assertEquals(2, importer.importBatchConfig(urls.take(2).joinToString("\n"), "", true).subscriptionIds.size)
                     fetchedUrls = fetched.map { it.subscription.url }
                 }
                 fetchedUrls
@@ -211,7 +295,7 @@ class SubscriptionIndexTest {
                 var fetchedUrls = emptyList<String>()
                 withImporter { importer, fetched ->
                     secondStarted.countDown()
-                    assertEquals(0 to 1, importer.importBatchConfig(urls.drop(1).joinToString("\n"), "", true))
+                    assertEquals(1, importer.importBatchConfig(urls.drop(1).joinToString("\n"), "", true).subscriptionIds.size)
                     fetchedUrls = fetched.map { it.subscription.url }
                 }
                 fetchedUrls
@@ -267,7 +351,8 @@ class SubscriptionIndexTest {
     }
 
     companion object {
-        private val main: MMKV = mock()
+        // Subclass mocking intercepts MMKV's native lock/unlock methods on the JVM.
+        private val main: MMKV = org.mockito.Mockito.mock(MMKV::class.java, withSettings().mockMaker(MockMakers.SUBCLASS))
         private val subs: MMKV = mock()
         private val settings: MMKV = mock()
 

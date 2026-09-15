@@ -4,9 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.BatchImportResult
+import com.v2ray.ang.dto.SubscriptionUpdateResult
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.enums.EConfigType
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +30,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.clearInvocations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
@@ -39,7 +45,7 @@ import org.mockito.kotlin.whenever
 class MainImportTest {
     @Test
     fun externalImportUsesDefaultGroupAndRefreshesAfterCompletion() = withViewModel { model, source ->
-        val result = CompletableDeferred<Pair<Int, Int>>()
+        val result = CompletableDeferred<BatchImportResult>()
         source.importResult = { result.await() }
         assertEquals("selected", model.uiState.value.selectedGroupId)
         assertFalse(model.isLoading.value)
@@ -52,7 +58,7 @@ class MainImportTest {
             SubscriptionCache("selected", SubscriptionItem("Selected")),
             SubscriptionCache("new", SubscriptionItem("New"))
         ))
-        result.complete(0 to 1)
+        result.complete(subscriptionImport("new"))
         advanceUntilIdle()
 
         assertEquals(listOf(ImportCall("external", "", false)), source.imports)
@@ -63,7 +69,7 @@ class MainImportTest {
 
     @Test
     fun regularImportKeepsSelectedGroupAndAppendMode() = withViewModel { model, source ->
-        source.importResult = { 1 to 0 }
+        source.importResult = { BatchImportResult(profileCount = 1) }
         whenever(source.getString(R.string.title_import_config_count, 1)).thenReturn("Imported 1")
 
         model.onAction(MainAction.ImportBatchConfig("profile"))
@@ -76,7 +82,7 @@ class MainImportTest {
 
     @Test
     fun emptyAndInvalidImportsFinishLoadingWithFailureFeedback() = withViewModel { model, source ->
-        source.importResult = { 0 to 0 }
+        source.importResult = { BatchImportResult() }
         for (text in listOf("", "invalid")) {
             model.onAction(MainAction.ImportBatchConfig(text, "", false))
             advanceUntilIdle()
@@ -88,8 +94,8 @@ class MainImportTest {
 
     @Test
     fun overlappingImportsStayLoadingUntilBothComplete() = withViewModel { model, source ->
-        val first = CompletableDeferred<Pair<Int, Int>>()
-        val second = CompletableDeferred<Pair<Int, Int>>()
+        val first = CompletableDeferred<BatchImportResult>()
+        val second = CompletableDeferred<BatchImportResult>()
         source.importResult = { if (it.text == "first") first.await() else second.await() }
         model.onAction(MainAction.ImportBatchConfig("first"))
         model.onAction(MainAction.ImportBatchConfig("second"))
@@ -97,12 +103,112 @@ class MainImportTest {
         assertEquals(2, source.imports.size)
         assertTrue(model.isLoading.value)
 
-        first.complete(0 to 1)
+        first.complete(subscriptionImport("first"))
         advanceUntilIdle()
         assertTrue(model.isLoading.value)
-        second.complete(0 to 1)
+        second.complete(subscriptionImport("second"))
         advanceUntilIdle()
         assertFalse(model.isLoading.value)
+    }
+
+    @Test
+    fun initialDownloadFailureKeepsTheGroupAndReportsFailureCounts() = withViewModel { model, source ->
+        source.importResult = { BatchImportResult(
+            subscriptionIds = listOf("new"), subscriptionUpdates = SubscriptionUpdateResult(failureCount = 1)
+        ) }
+        whenever(source.getSubscriptions()).thenReturn(listOf(
+            SubscriptionCache("selected", SubscriptionItem("Selected")), SubscriptionCache("new", SubscriptionItem("New"))
+        ))
+        whenever(source.getString(R.string.title_update_subscription_result, 0, 0, 1, 0)).thenReturn("0 success, 1 failed")
+
+        model.onAction(MainAction.ImportBatchConfig("failed download"))
+        advanceUntilIdle()
+
+        verify(model).toast("0 success, 1 failed")
+        verify(model, never()).toast(R.string.import_subscription_success)
+        assertEquals(listOf("selected", "new"), model.uiState.value.groups.map { it.id })
+        assertFalse(model.isLoading.value)
+    }
+
+    @Test
+    fun mixedImportReportsPartialFailureAndTotalProfileCount() = withViewModel { model, source ->
+        source.importResult = { BatchImportResult(
+            profileCount = 2, subscriptionIds = listOf("new"),
+            subscriptionUpdates = SubscriptionUpdateResult(configCount = 3, successCount = 1, failureCount = 1, skipCount = 1)
+        ) }
+        whenever(source.getString(R.string.title_update_subscription_result, 5, 1, 1, 1)).thenReturn("5 configs, 1 failed, 1 skipped")
+
+        model.onAction(MainAction.ImportBatchConfig("mixed"))
+        advanceUntilIdle()
+
+        verify(model).toast("5 configs, 1 failed, 1 skipped")
+        verify(model, never()).toast(R.string.import_subscription_success)
+    }
+
+    @Test
+    fun failedSaveReportsFailureWithoutRefreshingGroups() = withViewModel { model, source ->
+        source.importResult = { BatchImportResult(subscriptionUpdates = SubscriptionUpdateResult(failureCount = 1)) }
+        whenever(source.getString(R.string.title_update_subscription_result, 0, 0, 1, 0)).thenReturn("1 failed")
+        clearInvocations(source.defaults)
+
+        model.onAction(MainAction.ImportBatchConfig("unsaved"))
+        advanceUntilIdle()
+
+        verify(model).toast("1 failed")
+        verify(source.defaults, never()).getSubscriptions()
+        verify(source.defaults, never()).getServerGuidList(any())
+    }
+
+    @Test
+    fun addingSubscriptionPreservesExistingCacheAndRefreshesAllGroup() = withViewModel { model, source ->
+        whenever(source.getSubscriptions()).thenReturn(listOf(
+            SubscriptionCache("", SubscriptionItem("All")), SubscriptionCache("selected", SubscriptionItem("Selected"))
+        ))
+        model.setupGroupTab()
+        advanceUntilIdle()
+        clearInvocations(source.defaults)
+        whenever(source.getSubscriptions()).thenReturn(listOf(
+            SubscriptionCache("", SubscriptionItem("All")), SubscriptionCache("selected", SubscriptionItem("Selected")),
+            SubscriptionCache("new", SubscriptionItem("New"))
+        ))
+        whenever(source.getServerGuidList("new")).thenReturn(listOf("new-profile"))
+        whenever(source.getServerGuidList("")).thenReturn(listOf("new-profile"))
+        whenever(source.decodeServerConfig("new-profile")).thenReturn(ProfileItem(configType = EConfigType.VLESS, subscriptionId = "new"))
+        source.importResult = { subscriptionImport("new") }
+
+        model.onAction(MainAction.ImportBatchConfig("new"))
+        advanceUntilIdle()
+
+        verify(source.defaults, never()).getServerGuidList("selected")
+        verify(source.defaults).getServerGuidList("new")
+        verify(source.defaults).getServerGuidList("")
+        assertEquals(listOf("new-profile"), model.serverGroupState("new").value.servers.map { it.guid })
+        assertEquals(listOf("new-profile"), model.serverGroupState("").value.servers.map { it.guid })
+        assertEquals("selected", model.uiState.value.selectedGroupId)
+    }
+
+    @Test
+    fun overlappingMixedImportsInvalidateBothTargetsAndDefaultGroup() = withViewModel { model, source ->
+        val groupIds = listOf("", "selected", AppConfig.DEFAULT_SUBSCRIPTION_ID)
+        whenever(source.getSubscriptions()).thenReturn(groupIds.map { SubscriptionCache(it, SubscriptionItem(it)) })
+        model.setupGroupTab()
+        advanceUntilIdle()
+        clearInvocations(source.defaults)
+        whenever(source.getString(R.string.title_import_config_count, 1)).thenReturn("Imported 1")
+        whenever(source.getServerGuidList("selected")).thenReturn(listOf("selected-profile"))
+        whenever(source.getServerGuidList(AppConfig.DEFAULT_SUBSCRIPTION_ID)).thenReturn(listOf("default-profile"))
+        whenever(source.getServerGuidList("")).thenReturn(listOf("selected-profile", "default-profile"))
+        whenever(source.decodeServerConfig("selected-profile")).thenReturn(ProfileItem(configType = EConfigType.VLESS, subscriptionId = "selected"))
+        whenever(source.decodeServerConfig("default-profile")).thenReturn(ProfileItem(configType = EConfigType.VLESS, subscriptionId = AppConfig.DEFAULT_SUBSCRIPTION_ID))
+        source.importResult = { BatchImportResult(profileCount = 1) }
+
+        model.onAction(MainAction.ImportBatchConfig("selected"))
+        model.onAction(MainAction.ImportBatchConfig("default", "", false))
+        advanceUntilIdle()
+
+        assertEquals(listOf("selected-profile"), model.serverGroupState("selected").value.servers.map { it.guid })
+        assertEquals(listOf("default-profile"), model.serverGroupState(AppConfig.DEFAULT_SUBSCRIPTION_ID).value.servers.map { it.guid })
+        assertEquals(listOf("selected-profile", "default-profile"), model.serverGroupState("").value.servers.map { it.guid })
     }
 
     @Test
@@ -150,14 +256,18 @@ class MainImportTest {
         }
     }
 
+    private fun subscriptionImport(id: String) = BatchImportResult(
+        subscriptionIds = listOf(id), subscriptionUpdates = SubscriptionUpdateResult(successCount = 1)
+    )
+
     private data class ImportCall(val text: String?, val subscriptionId: String, val append: Boolean)
 
     private class ImportSource(val defaults: MainDataSource = mock()) : MainDataSource by defaults {
         val imports = mutableListOf<ImportCall>()
-        var importResult: suspend (ImportCall) -> Pair<Int, Int> = { 0 to 0 }
+        var importResult: suspend (ImportCall) -> BatchImportResult = { BatchImportResult() }
 
-        override suspend fun importBatchConfig(server: String?, subscriptionId: String, updateUI: Boolean): Pair<Int, Int> {
-            val call = ImportCall(server, subscriptionId, updateUI)
+        override suspend fun importBatchConfig(server: String?, subscriptionId: String, append: Boolean): BatchImportResult {
+            val call = ImportCall(server, subscriptionId, append)
             imports += call
             return importResult(call)
         }

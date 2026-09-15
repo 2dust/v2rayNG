@@ -676,15 +676,25 @@ object MmkvManager {
      *
      * @param guid The subscription GUID.
      * @param subItem The subscription item.
+     * @return Whether both the payload and its index entry were saved.
      */
-    fun encodeSubscription(guid: String, subItem: SubscriptionItem) {
+    fun encodeSubscription(guid: String, subItem: SubscriptionItem): Boolean = withProfileIndexLock {
         val key = guid.ifBlank { Utils.getUuid() }
-        subStorage.encode(key, JsonUtil.toJson(subItem))
-
+        val previous = subStorage.decodeString(key)
         val subsList = decodeSubsList()
-        if (!subsList.contains(key)) {
-            subsList.add(key)
-            encodeSubsList(subsList)
+        var saved = false
+        try {
+            saved = subStorage.encode(key, JsonUtil.toJson(subItem)) &&
+                    (key in subsList || mainStorage.encode(KEY_SUB_IDS, JsonUtil.toJson(subsList + key)))
+            saved
+        } finally {
+            if (!saved) {
+                if (previous == null) {
+                    subStorage.remove(key)
+                } else {
+                    check(subStorage.encode(key, previous)) { "Failed to restore subscription payload" }
+                }
+            }
         }
     }
 

@@ -357,7 +357,8 @@ class MainViewModel(
         val loadMutex = groupLoadMutexes.computeIfAbsent(groupId) { Mutex() }
         return loadMutex.withLock {
             if (!forceRefresh) {
-                cacheMutex.withLock { groupDataCache[groupId]?.let { return@withLock it } }
+                val cached = cacheMutex.withLock { groupDataCache[groupId] }
+                if (cached != null) return@withLock cached
             }
             val servers = buildServersCache(dataSource.getServerGuidList(groupId))
             currentCoroutineContext().ensureActive()
@@ -505,29 +506,42 @@ class MainViewModel(
     private fun importBatchConfig(action: MainAction.ImportBatchConfig) {
         val subscriptionId = action.subscriptionId ?: uiState.value.selectedGroupId
         launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val (count, countSub) = dataSource.importBatchConfig(
+            try {
+                val result = withContext(ioDispatcher) {
+                    dataSource.importBatchConfig(
                         action.configText, subscriptionId, action.append
                     )
-                    when {
-                        count > 0 -> {
-                            toast(dataSource.getString(R.string.title_import_config_count, count))
-                            setupGroupTab(forceRefresh = true)
-                        }
-
-                        countSub > 0 -> {
-                            toast(R.string.import_subscription_success)
-                            setupGroupTab(forceRefresh = true)
-                        }
-                        else -> toastError(R.string.toast_failure)
-                    }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
-                    toastError(R.string.toast_failure)
                 }
+                val updates = result.subscriptionUpdates
+                val configCount = result.profileCount + updates.configCount
+                when {
+                    updates.failureCount + updates.skipCount > 0 -> toast(dataSource.getString(
+                        R.string.title_update_subscription_result,
+                        configCount, updates.successCount, updates.failureCount, updates.skipCount
+                    ))
+                    result.profileCount > 0 -> toast(dataSource.getString(R.string.title_import_config_count, configCount))
+                    updates.successCount > 0 -> toast(R.string.import_subscription_success)
+                    else -> toastError(R.string.toast_failure)
+                }
+                val affectedGroups = result.subscriptionIds.toMutableSet()
+                if (result.profileCount > 0) {
+                    affectedGroups += subscriptionId.ifEmpty { AppConfig.DEFAULT_SUBSCRIPTION_ID }
+                }
+                if (affectedGroups.isNotEmpty()) {
+                    affectedGroups += "" // The All group also contains the imported profiles.
+                    for (groupId in affectedGroups) {
+                        // Wait for an older load before invalidating so it cannot restore stale data.
+                        groupLoadMutexes.computeIfAbsent(groupId) { Mutex() }.withLock {
+                            cacheMutex.withLock { groupDataCache.remove(groupId) }
+                        }
+                    }
+                    setupGroupTab()
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
+                toastError(R.string.toast_failure)
             }
         }
     }
