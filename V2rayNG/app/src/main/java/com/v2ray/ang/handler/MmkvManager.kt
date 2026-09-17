@@ -571,26 +571,6 @@ object MmkvManager {
         var count = 0
         if (guid.isNotEmpty()) {
             decodeServerAffiliationInfo(guid)?.let { aff ->
-                if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
-                    removeServer(guid)
-                    count++
-                }
-            }
-        } else {
-            serverAffStorage.allKeys()?.forEach { key ->
-                decodeServerAffiliationInfo(key)?.let { aff ->
-                    if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
-                        removeServer(key)
-                        count++
-                    }
-                }
-            }
-        }
-        return count
-    }
-        var count = 0
-        if (guid.isNotEmpty()) {
-            decodeServerAffiliationInfo(guid)?.let { aff ->
                 if (aff.testDelayMillis < 0L) {
                     removeServer(guid)
                     count++
