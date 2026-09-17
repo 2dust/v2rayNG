@@ -19,6 +19,11 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
     )
     val checkPreRelease: StateFlow<Boolean> = _checkPreRelease.asStateFlow()
 
+    private val _updateViaActiveProxy = MutableStateFlow(
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_VIA_ACTIVE_PROXY, false)
+    )
+    val updateViaActiveProxy: StateFlow<Boolean> = _updateViaActiveProxy.asStateFlow()
+
     private val _updateResult = MutableStateFlow<CheckUpdateResult?>(null)
     val updateResult: StateFlow<CheckUpdateResult?> = _updateResult.asStateFlow()
 
@@ -30,11 +35,24 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
         MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, enabled)
     }
 
+    fun toggleUpdateViaActiveProxy(enabled: Boolean) {
+        _updateViaActiveProxy.value = enabled
+        MmkvManager.encodeSettings(AppConfig.PREF_CHECK_UPDATE_VIA_ACTIVE_PROXY, enabled)
+    }
+
     fun checkForUpdates() {
         launchLoading {
+            val updateViaActiveProxy = _updateViaActiveProxy.value
+            val httpPort = com.v2ray.ang.handler.SettingsManager.getHttpPort()
+            
+            if (updateViaActiveProxy && httpPort <= 0) {
+                toast(R.string.toast_requires_active_proxy)
+                return@launchLoading
+            }
+
             toast(R.string.update_checking_for_update)
             try {
-                val result = UpdateCheckerManager.checkForUpdate(_checkPreRelease.value)
+                val result = UpdateCheckerManager.checkForUpdate(_checkPreRelease.value, updateViaActiveProxy)
                 if (result.hasUpdate) {
                     _updateResult.value = result
                     _showUpdateDialog.value = true

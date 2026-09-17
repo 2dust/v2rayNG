@@ -565,6 +565,9 @@
     <string name="sub_keep_balancers_custom_tip">Конфиги с балансерами останутся кастомными профилями, чтобы сохранить маршрутизацию и распределение нагрузки</string>
     <string name="sub_auto_set_insecure_when_sha256_present">Авто-allowInsecure если есть сертификат SHA-256</string>
     <string name="sub_auto_set_insecure_when_sha256_present_tip">При обновлении подписки: если у прокси есть отпечаток (pinnedCA256), автоматически включать опцию пропуска проверки сертификата (allowInsecure).</string>
+    <string name="sub_update_via_active_proxy">Обновлять только через включённый профиль</string>
+    <string name="sub_update_via_active_proxy_tip">Подписка будет обновляться строго через локальный прокси. Если V2rayNG не запущен, обновление будет отменено.</string>
+    <string name="toast_requires_active_proxy">Требуется включённый профиль (прокси) для выполнения этой проверки/обновления!</string>
     <string name="acc_decrypt_link">Расшифровать ссылку подписки</string>
     <string name="sub_link_decoded">Ссылка расшифрована</string>
     <string name="sub_link_already_plain">Это уже обычная ссылка — расшифровывать нечего</string>

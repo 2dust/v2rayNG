@@ -59,6 +59,7 @@ fun CheckUpdateScreen(
 
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val checkPreRelease by viewModel.checkPreRelease.collectAsStateWithLifecycle()
+    val updateViaActiveProxy by viewModel.updateViaActiveProxy.collectAsStateWithLifecycle()
     val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
     val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
@@ -86,6 +87,13 @@ fun CheckUpdateScreen(
                 title = stringResource(R.string.update_check_pre_release),
                 checked = checkPreRelease,
                 onCheckedChange = { viewModel.toggleCheckPreRelease(it) }
+            )
+            SettingsSwitchItem(
+                icon = painterResource(R.drawable.ic_cloud_done_24dp),
+                title = stringResource(R.string.sub_update_via_active_proxy),
+                summary = stringResource(R.string.sub_update_via_active_proxy_tip),
+                checked = updateViaActiveProxy,
+                onCheckedChange = { viewModel.toggleUpdateViaActiveProxy(it) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_check_update_24dp),

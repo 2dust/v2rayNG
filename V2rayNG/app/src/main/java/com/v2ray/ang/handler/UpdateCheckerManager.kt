@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object UpdateCheckerManager {
-    suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
+    suspend fun checkForUpdate(includePreRelease: Boolean = false, forceActiveProxy: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
         val url = if (includePreRelease) {
             AppConfig.APP_API_URL
         } else {
@@ -23,15 +23,14 @@ object UpdateCheckerManager {
 
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
+        val httpPort = SettingsManager.getHttpPort()
 
-        var response = HttpUtil.getUrlContent(
-            UrlContentRequest(
-                url = url,
-                timeout = 5000
-            )
-        )
-        if (response.isNullOrEmpty()) {
-            val httpPort = SettingsManager.getHttpPort()
+        var response = ""
+        
+        if (forceActiveProxy) {
+            if (httpPort <= 0) {
+                return@withContext CheckUpdateResult(hasUpdate = false)
+            }
             response = HttpUtil.getUrlContent(
                 UrlContentRequest(
                     url = url,
@@ -40,8 +39,29 @@ object UpdateCheckerManager {
                     proxyUsername = proxyUsername,
                     proxyPassword = proxyPassword
                 )
-            )
-                ?: throw IllegalStateException("Failed to get response")
+            ) ?: ""
+        } else {
+            response = HttpUtil.getUrlContent(
+                UrlContentRequest(
+                    url = url,
+                    timeout = 5000
+                )
+            ) ?: ""
+            if (response.isEmpty()) {
+                response = HttpUtil.getUrlContent(
+                    UrlContentRequest(
+                        url = url,
+                        timeout = 5000,
+                        httpPort = httpPort,
+                        proxyUsername = proxyUsername,
+                        proxyPassword = proxyPassword
+                    )
+                ) ?: throw IllegalStateException("Failed to get response")
+            }
+        }
+
+        if (response.isEmpty()) {
+            throw IllegalStateException("Failed to get response")
         }
 
         val latestRelease = if (includePreRelease) {

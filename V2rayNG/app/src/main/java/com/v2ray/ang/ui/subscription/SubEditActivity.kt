@@ -154,6 +154,7 @@ fun SubEditScreen(
     var convertCustomToLinks by rememberSaveable { mutableStateOf(initial.convertCustomToLinks) }
     var keepBalancersCustom by rememberSaveable { mutableStateOf(initial.keepBalancersCustom) }
     var autoSetInsecureWhenSha256Present by rememberSaveable { mutableStateOf(initial.autoSetInsecureWhenSha256Present) }
+    var updateViaActiveProxy by rememberSaveable { mutableStateOf(initial.updateViaActiveProxy) }
     var prevProfile by rememberSaveable { mutableStateOf(initial.prevProfile ?: "") }
     var nextProfile by rememberSaveable { mutableStateOf(initial.nextProfile ?: "") }
 
@@ -206,6 +207,7 @@ fun SubEditScreen(
         subItem.convertCustomToLinks = convertCustomToLinks
         subItem.keepBalancersCustom = keepBalancersCustom
         subItem.autoSetInsecureWhenSha256Present = autoSetInsecureWhenSha256Present
+        subItem.updateViaActiveProxy = updateViaActiveProxy
         return subItem
     }
 
@@ -308,6 +310,12 @@ fun SubEditScreen(
                 summary = stringResource(R.string.sub_auto_set_insecure_when_sha256_present_tip),
                 checked = autoSetInsecureWhenSha256Present,
                 onCheckedChange = { autoSetInsecureWhenSha256Present = it }
+            )
+            SettingsSwitchItem(
+                title = stringResource(R.string.sub_update_via_active_proxy),
+                summary = stringResource(R.string.sub_update_via_active_proxy_tip),
+                checked = updateViaActiveProxy,
+                onCheckedChange = { updateViaActiveProxy = it }
             )
             FormDropdownField(
                 label = stringResource(R.string.sub_setting_pre_profile),

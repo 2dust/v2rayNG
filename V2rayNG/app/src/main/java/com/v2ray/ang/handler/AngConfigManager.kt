@@ -21,6 +21,8 @@ import com.v2ray.ang.fmt.V2rayNFmt
 import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
+import com.v2ray.ang.AngApplication
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -519,9 +521,17 @@ object AngConfigManager {
             val requestHeaders = it.subscription.requestHeaders
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
+            val httpPort = SettingsManager.getHttpPort()
+
+            if (it.subscription.updateViaActiveProxy) {
+                if (httpPort <= 0) {
+                    AngApplication.application.toast(R.string.toast_requires_active_proxy)
+                    LogUtil.w(AppConfig.TAG, "Subscription requires active proxy, but HTTP port is $httpPort")
+                    return SubscriptionUpdateResult(failureCount = 1)
+                }
+            }
 
             var configText = try {
-                val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(
                     UrlContentRequest(
                         url = url,
@@ -537,7 +547,7 @@ object AngConfigManager {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
                 ""
             }
-            if (configText.isEmpty()) {
+            if (configText.isEmpty() && !it.subscription.updateViaActiveProxy) {
                 configText = try {
                     HttpUtil.getUrlContentWithUserAgent(
                         UrlContentRequest(

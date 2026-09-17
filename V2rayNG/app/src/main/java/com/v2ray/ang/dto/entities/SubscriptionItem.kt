@@ -22,5 +22,7 @@ data class SubscriptionItem(
     var keepBalancersCustom: Boolean = false,
     /** When true, automatically sets allowInsecure to true if pinnedCA256 is present. */
     var autoSetInsecureWhenSha256Present: Boolean = false,
+    /** When true, forces the update to be routed through the active proxy profile. */
+    var updateViaActiveProxy: Boolean = false,
 )
 
