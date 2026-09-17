@@ -39,6 +39,9 @@ interface MainDataSource : Closeable {
     fun removeInvalidServerByGuid(guid: String): Int
     fun removeInvalidServersInGroup(groupId: String): Int
 
+    fun removeZeroSpeedServerByGuid(guid: String): Int
+    fun removeZeroSpeedServersInGroup(groupId: String): Int
+
     fun clearAllTestDelayResults(guids: List<String>)
     fun sortByTestResultsForSub(subId: String)
     fun sortBySpeedResultsForSub(subId: String)

@@ -320,6 +320,7 @@
     <string name="title_del_all_config">Удалить профили</string>
     <string name="title_del_duplicate_config">Удалить дубликаты профилей</string>
     <string name="title_del_invalid_config">Удалить нерабочие профили</string>
+    <string name="title_del_zerospeed_config">Удалить профили с 0 кБ/с</string>
     <string name="title_export_all">Экспортировать профили в буфер обмена</string>
     <string name="title_sub_setting">Подписки</string>
     <string name="sub_setting_remarks">Название</string>

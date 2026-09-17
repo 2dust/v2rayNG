@@ -58,6 +58,7 @@ fun MainScreen(
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
+    var showDelZeroSpeedConfirm by remember { mutableStateOf(false) }
     var showRemoveConfirm by remember { mutableStateOf<String?>(null) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
@@ -142,6 +143,9 @@ fun MainScreen(
         showDelInvalidConfirm = showDelInvalidConfirm,
         onDismissDelInvalid = { showDelInvalidConfirm = false },
         onConfirmDelInvalid = { showDelInvalidConfirm = false; onAction(MainAction.RemoveInvalidServers) },
+        showDelZeroSpeedConfirm = showDelZeroSpeedConfirm,
+        onDismissDelZeroSpeed = { showDelZeroSpeedConfirm = false },
+        onConfirmDelZeroSpeed = { showDelZeroSpeedConfirm = false; onAction(MainAction.RemoveZeroSpeedServers) },
         showRemoveConfirm = showRemoveConfirm,
         onDismissRemove = { showRemoveConfirm = null },
         onConfirmRemove = { guid -> showRemoveConfirm = null; onAction(MainAction.RemoveServer(guid)) }
@@ -199,6 +203,7 @@ fun MainScreen(
                             MainMoreMenuAction.DeleteAll -> showDelAllConfirm = true
                             MainMoreMenuAction.DeleteDuplicate -> showDelDuplicateConfirm = true
                             MainMoreMenuAction.DeleteInvalid -> showDelInvalidConfirm = true
+                            MainMoreMenuAction.DeleteZeroSpeed -> showDelZeroSpeedConfirm = true
                             MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
                             MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
                             MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)

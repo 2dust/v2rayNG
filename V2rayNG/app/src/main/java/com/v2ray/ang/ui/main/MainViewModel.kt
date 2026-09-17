@@ -199,6 +199,7 @@ class MainViewModel(
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
+            MainAction.RemoveZeroSpeedServers -> removeZeroSpeedServerAsync()
             MainAction.SortByTestResults -> sortByTestResultsAsync()
             MainAction.SortBySpeedResults -> sortBySpeedResultsAsync()
             MainAction.UpdateSubscriptions -> importConfigViaSub()
@@ -596,6 +597,38 @@ class MainViewModel(
             }
         } else {
             dataSource.removeInvalidServersInGroup("")
+        }
+    }
+
+    private fun removeZeroSpeedServerAsync() {
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val count = removeZeroSpeedServerInternal()
+                    viewModelScope.launch(ioDispatcher) {
+                        cacheMutex.withLock { groupDataCache.clear() }
+                        setupGroupTab(forceRefresh = true)
+                    }
+                    toast(dataSource.getString(R.string.title_del_config_count, count))
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Delete 0 speed failed", e)
+                    toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    private fun removeZeroSpeedServerInternal(): Int {
+        val visibleServersOnly =
+            uiState.value.selectedGroupId.isNotEmpty() || keywordFilter.isNotBlank()
+        return if (visibleServersOnly) {
+            currentServers().sumOf { server ->
+                dataSource.removeZeroSpeedServerByGuid(server.guid)
+            }
+        } else {
+            dataSource.removeZeroSpeedServersInGroup("")
         }
     }
 

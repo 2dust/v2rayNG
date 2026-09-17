@@ -16,6 +16,9 @@ fun MainDialogs(
     showDelInvalidConfirm: Boolean,
     onDismissDelInvalid: () -> Unit,
     onConfirmDelInvalid: () -> Unit,
+    showDelZeroSpeedConfirm: Boolean,
+    onDismissDelZeroSpeed: () -> Unit,
+    onConfirmDelZeroSpeed: () -> Unit,
     showRemoveConfirm: String?,
     onDismissRemove: () -> Unit,
     onConfirmRemove: (String) -> Unit,
@@ -36,9 +39,17 @@ fun MainDialogs(
     }
     if (showDelInvalidConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_invalid_profiles),
+            message = stringResource(R.string.title_del_invalid_config),
             onConfirm = onConfirmDelInvalid,
             onDismiss = onDismissDelInvalid
+        )
+    }
+
+    if (showDelZeroSpeedConfirm) {
+        DeleteConfirmDialog(
+            message = stringResource(R.string.title_del_zerospeed_config),
+            onConfirm = onConfirmDelZeroSpeed,
+            onDismiss = onDismissDelZeroSpeed
         )
     }
     if (showRemoveConfirm != null) {

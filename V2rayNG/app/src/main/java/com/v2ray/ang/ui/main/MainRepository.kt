@@ -172,6 +172,16 @@ class MainRepository(
             getServerGuidList(groupId).sumOf(::removeInvalidServerByGuid)
         }
 
+    override fun removeZeroSpeedServerByGuid(guid: String): Int =
+        MmkvManager.removeZeroSpeedServer(guid)
+
+    override fun removeZeroSpeedServersInGroup(groupId: String): Int =
+        if (groupId.isEmpty()) {
+            MmkvManager.removeZeroSpeedServer("")
+        } else {
+            getServerGuidList(groupId).sumOf(::removeZeroSpeedServerByGuid)
+        }
+
     override fun clearAllTestDelayResults(guids: List<String>) =
         MmkvManager.clearAllTestDelayResults(guids)
 

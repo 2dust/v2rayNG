@@ -545,7 +545,49 @@ object MmkvManager {
      * @param guid The server GUID.
      * @return The number of server configurations removed.
      */
+    fun removeZeroSpeedServer(guid: String): Int {
+        var count = 0
+        if (guid.isNotEmpty()) {
+            decodeServerAffiliationInfo(guid)?.let { aff ->
+                if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
+                    removeServer(guid)
+                    count++
+                }
+            }
+        } else {
+            serverAffStorage.allKeys()?.forEach { key ->
+                decodeServerAffiliationInfo(key)?.let { aff ->
+                    if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
+                        removeServer(key)
+                        count++
+                    }
+                }
+            }
+        }
+        return count
+    }
+
     fun removeInvalidServer(guid: String): Int {
+        var count = 0
+        if (guid.isNotEmpty()) {
+            decodeServerAffiliationInfo(guid)?.let { aff ->
+                if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
+                    removeServer(guid)
+                    count++
+                }
+            }
+        } else {
+            serverAffStorage.allKeys()?.forEach { key ->
+                decodeServerAffiliationInfo(key)?.let { aff ->
+                    if (aff.testSpeedBytesPerSec != null && aff.testSpeedBytesPerSec == 0L) {
+                        removeServer(key)
+                        count++
+                    }
+                }
+            }
+        }
+        return count
+    }
         var count = 0
         if (guid.isNotEmpty()) {
             decodeServerAffiliationInfo(guid)?.let { aff ->
