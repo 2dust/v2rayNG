@@ -451,6 +451,12 @@ object AngConfigManager {
                 if (!matched) return null
             }
 
+            if (subItem?.autoSetInsecureWhenSha256Present == true) {
+                if (!config.pinnedCA256.isNullOrEmpty() || !config.pinSHA256.isNullOrEmpty()) {
+                    config.insecure = true
+                }
+            }
+
             config.subscriptionId = subid
             config.description = generateDescription(config)
 

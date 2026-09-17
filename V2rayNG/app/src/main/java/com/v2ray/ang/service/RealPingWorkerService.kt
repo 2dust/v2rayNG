@@ -82,11 +82,12 @@ class RealPingWorkerService(
     private val context: Context,
     private val guids: List<String>,
     private val onlyTcp: Boolean = false,
+    private val onlyIcmp: Boolean = false,
     private val onEvent: (RealPingEvent) -> Unit = {}
 ) {
     private val job = SupervisorJob()
     private val concurrency = SettingsManager.getRealPingConcurrency()
-    private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp) concurrency * 2 else concurrency).asCoroutineDispatcher()
+    private val dispatcher = Executors.newFixedThreadPool(if (onlyTcp || onlyIcmp) concurrency * 2 else concurrency).asCoroutineDispatcher()
     private val scope = CoroutineScope(job + dispatcher + CoroutineName("RealPingBatchWorker"))
 
     private val runningCount = AtomicInteger(0)
@@ -98,7 +99,7 @@ class RealPingWorkerService(
             scope.launch {
                 runningCount.incrementAndGet()
                 try {
-                    val result = if (onlyTcp) startTcping(guid) else startRealPing(guid)
+                    val result = if (onlyTcp) startTcping(guid) else if (onlyIcmp) startIcmping(guid) else startRealPing(guid)
                     if (scope.isActive) {
                         onEvent(RealPingEvent.Result(guid, result))
                     }
@@ -162,6 +163,16 @@ class RealPingWorkerService(
             return tcpTime
         }
 
+        return retFailure
+    }
+
+    private fun startIcmping(guid: String): Long {
+        val retFailure = -1L
+        val config = MmkvManager.decodeServerConfig(guid) ?: return retFailure
+        val url = config.server ?: config.getServerAddressAndPort().substringBefore(":")
+        if (url.isNotEmpty() && url != AppConfig.LOOPBACK) {
+            return SpeedtestManager.icmpConnectTime(url, 1000)
+        }
         return retFailure
     }
 }

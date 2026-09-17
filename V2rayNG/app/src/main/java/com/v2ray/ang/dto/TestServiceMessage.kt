@@ -6,6 +6,7 @@ data class TestServiceMessage(
     val key: Int,
     val subscriptionId: String = "",
     val serverGuids: List<String> = emptyList(),
-    val onlyTcp: Boolean = false
+    val onlyTcp: Boolean = false,
+    val onlyIcmp: Boolean = false
 ) : Serializable
 

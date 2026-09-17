@@ -152,6 +152,7 @@ class CoreTestService : Service() {
                 context = this,
                 guids = guidsList,
                 onlyTcp = message.onlyTcp,
+                onlyIcmp = message.onlyIcmp,
                 onEvent = { event -> handleWorkerEvent(event, message) { activeWorkers.remove(worker) } }
             )
             activeWorkers.add(worker)

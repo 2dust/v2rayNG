@@ -39,6 +39,7 @@ sealed interface MainAction {
     data object TestCurrentServer : MainAction
     data object TestAllServers : MainAction
     data object TestRealAllServers : MainAction
+    data object TestIcmpAllServers : MainAction
     data object WhitelistSearch : MainAction
     data object CancelTesting : MainAction
     data object RemoveAllServers : MainAction

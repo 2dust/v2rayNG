@@ -210,6 +210,7 @@ fun MainScreen(
                             MainMoreMenuAction.SortBySpeedResults -> onAction(MainAction.SortBySpeedResults)
                             MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
                             MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
+                            MainMoreMenuAction.TestAllIcmpPing -> onAction(MainAction.TestIcmpAllServers)
                             MainMoreMenuAction.WhitelistSearch -> onAction(MainAction.WhitelistSearch)
                             MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
                         }

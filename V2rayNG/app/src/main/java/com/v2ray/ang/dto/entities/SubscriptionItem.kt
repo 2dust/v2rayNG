@@ -20,5 +20,7 @@ data class SubscriptionItem(
     var convertCustomToLinks: Boolean = false,
     /** When true, configs containing balancers stay as custom profiles even if convertCustomToLinks is on. */
     var keepBalancersCustom: Boolean = false,
+    /** When true, automatically sets allowInsecure to true if pinnedCA256 is present. */
+    var autoSetInsecureWhenSha256Present: Boolean = false,
 )
 

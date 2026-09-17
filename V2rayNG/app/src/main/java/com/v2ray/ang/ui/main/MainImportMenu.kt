@@ -38,6 +38,7 @@ enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
     SortBySpeedResults(R.string.title_sort_by_speed_results),
     TestAll(R.string.title_ping_all_server),
     TestAllRealPing(R.string.title_real_ping_all_server),
+    TestAllIcmpPing(R.string.title_icmp_ping_all_server),
     WhitelistSearch(R.string.title_wl_search),
     UpdateSubscriptions(R.string.title_sub_update)
 }

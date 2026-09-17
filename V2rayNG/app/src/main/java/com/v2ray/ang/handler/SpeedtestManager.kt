@@ -53,6 +53,35 @@ object SpeedtestManager {
         return -1
     }
 
+    /**
+     * Measures the time taken to ICMP ping a given URL/IP.
+     *
+     * @param url The URL or IP to ping.
+     * @param timeoutMs The timeout in milliseconds.
+     * @return The ping time in milliseconds, or -1 if the ping failed.
+     */
+    fun icmpConnectTime(url: String, timeoutMs: Int = 1500): Long {
+        return try {
+            val timeoutSec = (timeoutMs / 1000).coerceAtLeast(1)
+            val process = Runtime.getRuntime().exec("/system/bin/ping -c 1 -W $timeoutSec $url")
+            val exitValue = process.waitFor()
+            if (exitValue == 0) {
+                // Read the output to extract time
+                val reader = process.inputStream.bufferedReader()
+                for (line in reader.readLines()) {
+                    if (line.contains("time=")) {
+                        val timeStr = line.substringAfter("time=").substringBefore(" ms")
+                        return timeStr.toDoubleOrNull()?.toLong() ?: -1L
+                    }
+                }
+            }
+            -1L
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to ICMP ping $url", e)
+            -1L
+        }
+    }
+
     fun getRemoteIPInfo(): RemoteEndpointInfo? {
         val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
             .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL

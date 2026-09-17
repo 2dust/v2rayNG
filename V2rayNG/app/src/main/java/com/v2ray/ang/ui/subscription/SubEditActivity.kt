@@ -153,6 +153,7 @@ fun SubEditScreen(
     var decodeBase64ToText by rememberSaveable { mutableStateOf(initial.decodeBase64ToText) }
     var convertCustomToLinks by rememberSaveable { mutableStateOf(initial.convertCustomToLinks) }
     var keepBalancersCustom by rememberSaveable { mutableStateOf(initial.keepBalancersCustom) }
+    var autoSetInsecureWhenSha256Present by rememberSaveable { mutableStateOf(initial.autoSetInsecureWhenSha256Present) }
     var prevProfile by rememberSaveable { mutableStateOf(initial.prevProfile ?: "") }
     var nextProfile by rememberSaveable { mutableStateOf(initial.nextProfile ?: "") }
 
@@ -204,6 +205,7 @@ fun SubEditScreen(
         subItem.decodeBase64ToText = decodeBase64ToText
         subItem.convertCustomToLinks = convertCustomToLinks
         subItem.keepBalancersCustom = keepBalancersCustom
+        subItem.autoSetInsecureWhenSha256Present = autoSetInsecureWhenSha256Present
         return subItem
     }
 
@@ -300,6 +302,12 @@ fun SubEditScreen(
                 checked = keepBalancersCustom && convertCustomToLinks,
                 enabled = convertCustomToLinks,
                 onCheckedChange = { keepBalancersCustom = it }
+            )
+            SettingsSwitchItem(
+                title = stringResource(R.string.sub_auto_set_insecure_when_sha256_present),
+                summary = stringResource(R.string.sub_auto_set_insecure_when_sha256_present_tip),
+                checked = autoSetInsecureWhenSha256Present,
+                onCheckedChange = { autoSetInsecureWhenSha256Present = it }
             )
             FormDropdownField(
                 label = stringResource(R.string.sub_setting_pre_profile),

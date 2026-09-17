@@ -192,7 +192,8 @@ class MainViewModel(
         when (action) {
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
-            MainAction.TestAllServers -> testAllRealPing(true)
+            MainAction.TestAllServers -> testAllRealPing(onlyTcp = true)
+            MainAction.TestIcmpAllServers -> testAllRealPing(onlyIcmp = true)
             MainAction.TestRealAllServers -> testAllRealPing()
             MainAction.WhitelistSearch -> whitelistSearch()
             MainAction.CancelTesting -> cancelAllPing()
@@ -788,7 +789,7 @@ class MainViewModel(
         }
     }
 
-    fun testAllRealPing(onlyTcp: Boolean = false) {
+    fun testAllRealPing(onlyTcp: Boolean = false, onlyIcmp: Boolean = false) {
         dataSource.cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
@@ -824,7 +825,8 @@ class MainViewModel(
                     key = AppConfig.MSG_MEASURE_CONFIG_START,
                     subscriptionId = groupId,
                     serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
-                    onlyTcp = onlyTcp
+                    onlyTcp = onlyTcp,
+                    onlyIcmp = onlyIcmp
                 )
             )
         }

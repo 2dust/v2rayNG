@@ -325,6 +325,8 @@
     <string name="sub_convert_custom_to_links_tip">Convert custom JSON profiles into regular links on update</string>
     <string name="sub_keep_balancers_custom">Keep balancers as custom</string>
     <string name="sub_keep_balancers_custom_tip">Configs with balancers stay as custom profiles to preserve routing and load balancing</string>
+    <string name="sub_auto_set_insecure_when_sha256_present">Auto set allowInsecure if SHA-256 present</string>
+    <string name="sub_auto_set_insecure_when_sha256_present_tip">When updating, if a config contains pinnedCA256, automatically skip TLS certificate verification (allowInsecure).</string>
     <string name="acc_decrypt_link">Decode subscription link</string>
     <string name="sub_link_decoded">Link decoded</string>
     <string name="sub_link_already_plain">This is already a plain URL — nothing to decode</string>
@@ -359,6 +361,7 @@
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
+    <string name="title_icmp_ping_all_server">Test ICMP delays</string>
     <string name="title_real_ping_all_server">Test real delays</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sort by test results</string>
