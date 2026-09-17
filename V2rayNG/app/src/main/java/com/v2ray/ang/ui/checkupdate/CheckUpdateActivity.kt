@@ -89,7 +89,7 @@ fun CheckUpdateScreen(
                 onCheckedChange = { viewModel.toggleCheckPreRelease(it) }
             )
             SettingsSwitchItem(
-                icon = painterResource(R.drawable.ic_cloud_done_24dp),
+                icon = painterResource(R.drawable.ic_check_update_24dp),
                 title = stringResource(R.string.sub_update_via_active_proxy),
                 summary = stringResource(R.string.sub_update_via_active_proxy_tip),
                 checked = updateViaActiveProxy,

@@ -22,6 +22,7 @@ import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.AngApplication
+import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
