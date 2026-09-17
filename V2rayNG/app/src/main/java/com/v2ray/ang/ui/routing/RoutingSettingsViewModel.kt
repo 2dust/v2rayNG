@@ -17,16 +17,12 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     private val _rulesetsFlow = MutableStateFlow<List<RulesetItem>>(emptyList())
     val rulesetsFlow: StateFlow<List<RulesetItem>> = _rulesetsFlow.asStateFlow()
 
-    fun getAll(): List<RulesetItem> = rulesets.toList()
-
     fun reload() {
         val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        var needsSave = false
         loaded.forEachIndexed { index, item ->
             if (item.id.isEmpty()) {
                 item.id = UUID.randomUUID().toString()
                 SettingsManager.saveRoutingRuleset(index, item)
-                needsSave = true
             }
         }
         rulesets.clear()

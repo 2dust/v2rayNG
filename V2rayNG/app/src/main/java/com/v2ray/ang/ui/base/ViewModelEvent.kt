@@ -5,9 +5,3 @@ package com.v2ray.ang.ui.base
  */
 interface ViewModelEvent
 
-/**
- * Common UI events for all ViewModels.
- */
-interface BaseViewModelEvent : ViewModelEvent {
-    object FinishActivity : BaseViewModelEvent
-}

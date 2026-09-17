@@ -4,31 +4,19 @@
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
-    <string name="navigation_drawer_open">فتح درج التنقل</string>
-    <string name="navigation_drawer_close">إغلاق درج التنقل</string>
-    <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
-    <string name="action_stop_service">إيقاف الخدمة</string>
     <string name="action_ok">موافق</string>
     <string name="action_cancel">إلغاء</string>
-    <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
-    <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
     <string name="notification_action_stop_v2ray">إيقاف</string>
-    <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
-    <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
     <string name="notification_action_more">انقر للمزيد</string>
     <string name="toast_services_start">بدء الخدمات</string>
-    <string name="toast_services_stop">إيقاف الخدمات</string>
     <string name="toast_services_success">نجاح بدء الخدمات</string>
     <string name="toast_services_failure">فشل بدء الخدمات</string>
 
     <!--ServerActivity-->
     <string name="title_server">ملف التكوين</string>
-    <string name="menu_item_add_config">إضافة تكوين</string>
     <string name="menu_item_save_config">حفظ التكوين</string>
-    <string name="menu_item_edit_config">تعديل التكوين</string>
-    <string name="menu_item_del_config">حذف التكوين</string>
     <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز QR</string>
     <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
     <string name="menu_item_import_config_local">استيراد التكوين من الجهاز</string>
@@ -56,26 +44,18 @@
     <string name="server_lab_address">العنوان</string>
     <string name="server_lab_port">المنفذ</string>
     <string name="server_lab_id">المعرف</string>
-    <string name="server_lab_alterid">AlterId</string>
     <string name="server_lab_security">الأمان</string>
     <string name="server_lab_network">الشبكة</string>
-    <string name="server_lab_more_function">النقل</string>
     <string name="server_lab_head_type">نوع الرأس</string>
     <string name="server_lab_mode_type">وضع gRPC</string>
-    <string name="server_lab_request_host">host</string>
     <string name="server_lab_request_host_http">http host</string>
     <string name="server_lab_request_host_ws">ws host</string>
-    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
-    <string name="server_lab_request_host_xhttp">xhttp host</string>
-    <string name="server_lab_request_host_h2">h2 host</string>
-    <string name="server_lab_request_host_quic">QUIC security</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
     <string name="server_lab_path_xhttp">xhttp path</string>
     <string name="server_lab_path_h2">h2 path</string>
-    <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
@@ -83,10 +63,7 @@
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">تخطي التحقق من الشهادة (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
-    <string name="server_lab_address3">العنوان</string>
-    <string name="server_lab_port3">المنفذ</string>
     <string name="server_lab_id3">كلمة المرور</string>
-    <string name="server_lab_security3">الأمان</string>
     <string name="server_lab_id4">كلمة المرور (اختياري)</string>
     <string name="server_lab_security4">المستخدم (اختياري)</string>
     <string name="server_lab_encryption">التشفير</string>
@@ -104,18 +81,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي 50 مللي ثانية)</string>
     <string name="toast_success">نجاح</string>
     <string name="toast_failure">فشل</string>
-    <string name="toast_none_data">لا يوجد شيء</string>
-    <string name="toast_incorrect_protocol">بروتوكول غير صحيح</string>
     <string name="toast_decoding_failed">فشل فك التشفير</string>
     <string name="title_file_chooser">حدد ملف التكوين</string>
     <string name="toast_require_file_manager">يرجى تثبيت مدير الملفات.</string>
-    <string name="server_customize_config">تخصيص التكوين</string>
     <string name="toast_config_file_invalid">تكوين غير صالح</string>
-    <string name="server_lab_content">المحتوى</string>
-    <string name="toast_none_data_clipboard">لا توجد بيانات في الحافظة</string>
     <string name="toast_invalid_url">رابط URL غير صالح</string>
     <string name="toast_insecure_url_protocol">يرجى عدم استخدام عنوان اشتراك ببروتوكول HTTP غير الآمن</string>
-    <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
     <string name="toast_malformed_json">تنسيق التكوين غير صالح.</string>
     <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
@@ -131,7 +102,6 @@
     <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>
     <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>
     <string name="server_lab_browser_dialer">تمكين Browser Dialer</string>
-    <string name="server_lab_browser_dialer_tip">يدعم فقط اتصالات xhttp (packet-up) وws الصادرة؛ قد يتم تجاهل الإعدادات المتعلقة بـ TLS أو قد تتعارض</string>
     <string name="toast_allow_insecure_deprecated">تستخدم العقدة الحالية اتصالاً غير مشفر. قد تتمكن تجهيزات الشبكة الوسيطة الخاضعة لسيطرة حكومات استبدادية من الاطلاع مباشرةً على اتصالاتك.\nلأسباب أمنية، لا يمكن الاتصال بهذه العقد عبر نواة Xray الإصدار 26.2.6 أو أحدث.\nإذا كانت العقدة من إعدادك، ففعّل تشفيراً آمناً مثل TLS أو ثبّت بصمة الشهادة pinnedCA256.\nإذا كانت العقدة تابعة لمزوّد خدمة، فتواصل معه لإكمال الترقية التقنية. إذا رفض المزوّد التعاون، فنوصي بالانتقال إلى مزوّد يهتم أكثر بأمان المستخدمين.\nلمزيد من المعلومات، تفضل بزيارة https://github.com/2dust/v2rayN/discussions/9460</string>
     <string name="pinned_ca256_action_fetch">جلب بصمة الشهادة</string>
     <string name="toast_fetch_cert_sha256_success">تم جلب بصمة الشهادة بنجاح</string>
@@ -139,23 +109,19 @@
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">فشل نسخ الملف، يرجى استخدام مدير الملفات</string>
-    <string name="menu_item_add_asset">إضافة أصل</string>
     <string name="menu_item_add_file">إضافة ملفات</string>
     <string name="menu_item_add_url">إضافة URL</string>
     <string name="menu_item_scan_qrcode">مسح رمز QR</string>
     <string name="title_url" translatable="false">URL</string>
-    <string name="menu_item_download_file">تنزيل الملفات</string>
     <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
     <string name="msg_file_not_found">الملف غير موجود</string>
     <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
     <string name="asset_geo_files_sources">مصدر ملفات Geo (اختياري)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">جار التحميل</string>
     <string name="menu_item_search">بحث</string>
     <string name="menu_item_select_all">تحديد الكل</string>
     <string name="menu_item_invert_selection">عكس الاختيار</string>
-    <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
     <string name="switch_bypass_apps_mode">وضع التجاوز</string>
     <string name="menu_item_select_proxy_app">تحديد التطبيقات التي ستستخدم الوكيل تلقائيًا</string>
     <string name="msg_downloading_content">جارٍ تنزيل المحتوى</string>
@@ -170,7 +136,6 @@
     <string name="title_advanced">إعدادات متقدمة</string>
     <string name="title_core_settings">إعدادات النواة</string>
     <string name="title_vpn_settings">إعدادات VPN</string>
-    <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
     <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر في القائمة خيار لتحديد التطبيقات التي ستستخدم الوكيل تلقائيًا.</string>
     <string name="title_pref_is_booted">الاتصال بعد إقلاع الجهاز</string>
     <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد بعد إقلاع الجهاز. قد يقيّد Android بدء التشغيل في الخلفية.</string>
@@ -220,7 +185,6 @@
     <string name="summary_pref_prefer_ipv6">تفضيل عناوين IPv6 عند حل أسماء النطاقات</string>
 
     <string name="title_pref_remote_dns">DNS البعيد (UDP/TCP/HTTPS/QUIC، اختياري)</string>
-    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (IPv4/IPv6 فقط)</string>
     <string name="title_pref_vpn_bypass_lan">هل تتجاوز VPN شبكة LAN؟</string>
@@ -231,17 +195,13 @@
 
 
     <string name="title_pref_domestic_dns">DNS المباشر (اختياري)</string>
-    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
     <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address,…)</string>
-    <string name="summary_pref_dns_hosts">domain:address,…</string>
 
     <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
-    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
     <string name="title_pref_real_ping_concurrency">اختبارات تأخير حقيقي متزامنة</string>
 
     <string name="title_pref_ip_api_url">عنوان URL لاختبار معلومات الاتصال الحالي</string>
-    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">السماح بالاتصالات من الشبكة المحلية</string>
     <string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالبروكسي بواسطة عنوان IP الخاص بك من خلال socks/http، يتم التمكين فقط في الشبكة الموثوقة لتجنب الاتصال غير المصرح به</string>
@@ -252,16 +212,10 @@
     <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">مصادقة SOCKS5 ليست آمنة تمامًا عند استخدام UDP.</string>
-    <string name="summary_pref_socks_port">منفذ البروكسي المحلي</string>
     <string name="title_pref_dynamic_socks_port">تمكين منفذ وكيل محلي ديناميكي</string>
     <string name="summary_pref_dynamic_socks_port">إنشاء منفذ وكيل محلي عشوائي في كل مرة يُنشأ فيها inbound</string>
     <string name="title_pref_socks_username">اسم مستخدم الوكيل المحلي (اختياري)</string>
-    <string name="summary_pref_socks_username">اسم المستخدم</string>
     <string name="title_pref_socks_password">كلمة مرور الوكيل المحلي (اختيارية)</string>
-    <string name="summary_pref_socks_password">كلمة المرور</string>
-
-    <string name="title_pref_local_dns_port">منفذ DNS المحلي</string>
-    <string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>
 
     <string name="title_pref_confirm_remove">تأكيد حذف ملف التكوين</string>
     <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من قبل المستخدم</string>
@@ -278,11 +232,7 @@
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">ملاحظات</string>
-    <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
-    <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
-    <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
     <string name="title_privacy_policy">سياسة الخصوصية</string>
-    <string name="title_qr_code">رمز QR</string>
     <string name="title_about">حول التطبيق</string>
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_oss_license">تراخيص المصادر المفتوحة</string>
@@ -292,7 +242,6 @@
     <string name="title_pref_promotion">ترويج</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
-    <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
     <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
 
     <string name="title_core_loglevel">مستوى السجل</string>
@@ -316,8 +265,6 @@
     <string name="summary_root_lan_sharing">توجيه حركة مرور أجهزة نقطة اتصال Wi-Fi والأجهزة المربوطة عبر USB من خلال VPN.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
-    <string name="logcat_copy">نسخ</string>
-    <string name="logcat_clear">مسح</string>
     <string name="logcat_share">مشاركة السجل</string>
     <string name="title_service_restart">إعادة تشغيل الخدمة</string>
     <string name="title_del_all_config">حذف جميع الإعدادات</string>
@@ -344,7 +291,6 @@
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
-    <string name="title_filter_config">تصفية ملف التكوين</string>
     <string name="filter_config_all">الكل</string>
     <string name="summary_scan_qrcode">انقر على الشاشة لفتح الكاميرا والمسح</string>
     <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
@@ -369,23 +315,17 @@
     </plurals>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
-    <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
     <string name="title_locate_selected_config">العثور على التكوين المحدد</string>
 
     <string name="tasker_start_service">بدء الخدمة</string>
-    <string name="tasker_setting_confirm">تأكيد</string>
 
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
     <string name="routing_settings_title">إعدادات التوجيه</string>
     <string name="routing_settings_tips">لا تُطبَّق القاعدة إلا إذا تحققت جميع شروط المطابقة المحددة معًا (AND). تُفحص القواعد من الأعلى إلى الأسفل، وتُطبَّق أول قاعدة متطابقة.</string>
     <string name="routing_settings_comma_tip">افصل بين الإدخالات المتعددة بفواصل (,).</string>
-    <string name="routing_settings_save">حفظ</string>
-    <string name="routing_settings_delete">مسح</string>
     <string name="routing_settings_rule_title">إعدادات قاعدة التوجيه</string>
-    <string name="routing_settings_add_rule">إضافة قاعدة</string>
     <string name="routing_settings_import_predefined_rulesets">استيراد مجموعات قواعد محددة مسبقاً</string>
-    <string name="routing_settings_import_rulesets_tip">سيتم حذف مجموعات القواعد الحالية. هل تريد المتابعة؟</string>
     <string name="routing_settings_import_rulesets_from_clipboard">استيراد مجموعة قواعد من الحافظة</string>
     <string name="routing_settings_import_rulesets_from_qrcode">استيراد مجموعة قواعد من رمز الاستجابة السريعة</string>
     <string name="routing_settings_export_rulesets_to_clipboard">تصدير مجموعة القواعد إلى الحافظة</string>
@@ -401,14 +341,10 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
-    <string name="connection_test_pending">التحقق من الاتصال</string>
     <string name="connection_test_testing">يجري الاختبار…</string>
-    <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
     <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
     <string name="server_test_delay_value">%1$d ملي ثانية</string>
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
-    <string name="connection_test_fail">الإنترنت غير متاح</string>
-    <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
     <string name="connection_connected">متصل. اضغط للتحقق من الاتصال.</string>
     <string name="connection_not_connected">غير متصل</string>
     <string name="connection_running_task_left">الاختبارات قيد التشغيل: %s</string>
@@ -444,7 +380,6 @@
     <string name="title_policy_group_fallback">الاتصال الصادر الاحتياطي (outbound، اختياري)</string>
 
     <string name="server_proxy_chain_members">أعضاء سلسلة الوكيل</string>
-    <string name="server_proxy_chain_pick_members">اضغط هنا لاختيار عضو</string>
     <string name="server_proxy_chain_member_unselected">اختر عضوًا</string>
     <string name="server_proxy_chain_members_unselected">يرجى اختيار عضو لكل صف في السلسلة</string>
     <string name="server_proxy_chain_members_insufficient">عدد الأعضاء غير كافٍ</string>

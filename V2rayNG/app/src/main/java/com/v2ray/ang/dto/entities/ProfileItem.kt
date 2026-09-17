@@ -1,8 +1,6 @@
 package com.v2ray.ang.dto.entities
 
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.util.Utils
 
 data class ProfileItem(
     val configVersion: Int = 4,
@@ -78,13 +76,6 @@ data class ProfileItem(
     companion object {
         fun create(configType: EConfigType): ProfileItem =
             ProfileItem(configType = configType)
-    }
-
-    fun getServerAddressAndPort(): String {
-        if (server.isNullOrEmpty() && configType == EConfigType.CUSTOM) {
-            return "${AppConfig.LOOPBACK}:${AppConfig.PORT_SOCKS}"
-        }
-        return "${Utils.getIpv6Address(server)}:$serverPort"
     }
 
     /**

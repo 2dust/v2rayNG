@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.LocaleList
 import android.provider.Settings
 import android.util.Base64
 import android.util.Patterns
@@ -385,13 +384,6 @@ object Utils {
             address
         }
     }
-
-    /**
-     * Get the system locale.
-     *
-     * @return The system locale.
-     */
-    fun getSysLocale(): Locale = LocaleList.getDefault().get(0) ?: Locale.getDefault()
 
     /**
      * Fix illegal characters in a URL.

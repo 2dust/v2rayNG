@@ -13,9 +13,6 @@ object AppConfig {
     const val WEBDAV_BACKUP_DIR = "backups"
     const val WEBDAV_BACKUP_FILE_NAME = "backup_ng.zip"
 
-    /** Legacy configuration keys. */
-    const val ANG_CONFIG = "ang_config"
-
     // Default subscription ID for ungrouped servers
     const val DEFAULT_SUBSCRIPTION_ID = "__default_subscription__"
 
@@ -28,7 +25,6 @@ object AppConfig {
     const val PREF_LOCAL_DNS_ENABLED = "pref_local_dns_enabled"
     const val PREF_FAKE_DNS_ENABLED = "pref_fake_dns_enabled"
     const val PREF_APPEND_HTTP_PROXY = "pref_append_http_proxy"
-    const val PREF_LOCAL_DNS_PORT = "pref_local_dns_port"
     const val PREF_VPN_DNS = "pref_vpn_dns"
     const val PREF_VPN_BYPASS_LAN = "pref_vpn_bypass_lan"
     const val PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX = "pref_vpn_interface_address_config_index"
@@ -93,9 +89,6 @@ object AppConfig {
     /** Cache keys. */
     const val CACHE_SUBSCRIPTION_ID = "cache_subscription_id"
 
-    /** Protocol identifiers. */
-    const val PROTOCOL_FREEDOM = "freedom"
-
     /** Broadcast actions. */
     const val BROADCAST_ACTION_SERVICE = "$ANG_PACKAGE.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "$ANG_PACKAGE.action.activity"
@@ -112,7 +105,6 @@ object AppConfig {
     const val TAG_PROXY = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
-    const val TAG_FRAGMENT = "fragment"
     const val TAG_DNS = "dns-module"
     const val TAG_DOMESTIC_DNS = "domestic-dns"
     const val TAG_BALANCER = "balancer-main"
@@ -160,11 +152,8 @@ object AppConfig {
     const val GEOIP_ONLY_CN_PRIVATE_DAT = "geoip-only-cn-private.dat"
     const val GEOIP_ONLY_CN_PRIVATE_URL = "$GITHUB_RAW_URL/Loyalsoldier/geoip/release/$GEOIP_ONLY_CN_PRIVATE_DAT"
 
-    /** Ports and addresses for various services. */
-    const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
-    const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
     const val LOOPBACK = "127.0.0.1"
 
@@ -214,7 +203,6 @@ object AppConfig {
     const val VLESS = "vless://"
     const val TROJAN = "trojan://"
     const val WIREGUARD = "wireguard://"
-    const val TUIC = "tuic://"
     const val HYSTERIA = "hysteria://"
     const val HYSTERIA2 = "hysteria2://"
     const val HY2 = "hy2://"

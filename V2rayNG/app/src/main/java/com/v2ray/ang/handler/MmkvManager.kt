@@ -893,39 +893,6 @@ object MmkvManager {
     }
 
     /**
-     * Decodes the settings integer.
-     *
-     * @param key The settings key.
-     * @param defaultValue The default value.
-     * @return The settings value.
-     */
-    fun decodeSettingsInt(key: String, defaultValue: Int): Int {
-        return settingsStorage.decodeInt(key, defaultValue)
-    }
-
-    /**
-     * Decodes the settings long.
-     *
-     * @param key The settings key.
-     * @param defaultValue The default value.
-     * @return The settings value.
-     */
-    fun decodeSettingsLong(key: String, defaultValue: Long): Long {
-        return settingsStorage.decodeLong(key, defaultValue)
-    }
-
-    /**
-     * Decodes the settings float.
-     *
-     * @param key The settings key.
-     * @param defaultValue The default value.
-     * @return The settings value.
-     */
-    fun decodeSettingsFloat(key: String, defaultValue: Float): Float {
-        return settingsStorage.decodeFloat(key, defaultValue)
-    }
-
-    /**
      * Decodes the settings boolean.
      *
      * @param key The settings key.
@@ -956,15 +923,6 @@ object MmkvManager {
         return settingsStorage.decodeStringSet(key)
     }
 
-
-    /**
-     * Encodes the start on boot setting.
-     *
-     * @param startOnBoot Whether to start on boot.
-     */
-    fun encodeStartOnBoot(startOnBoot: Boolean) {
-        encodeSettings(PREF_IS_BOOTED, startOnBoot)
-    }
 
     /**
      * Decodes the start on boot setting.

@@ -104,15 +104,6 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     }
 
     /**
-     * Send finish activity event.
-     */
-    fun finishActivity() {
-        viewModelScope.launch {
-            _viewModelEvent.send(BaseViewModelEvent.FinishActivity)
-        }
-    }
-
-    /**
      * Helper method: execute task in coroutine and automatically manage isLoading state.
      */
     protected fun launchLoading(block: suspend CoroutineScope.() -> Unit) {

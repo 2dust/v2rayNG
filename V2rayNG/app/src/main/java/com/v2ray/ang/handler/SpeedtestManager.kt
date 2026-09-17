@@ -46,7 +46,7 @@ object SpeedtestManager {
                     if (!s.isClosed) {
                         s.close()
                     }
-                } catch (closeEx: IOException) {
+                } catch (_: IOException) {
                 }
             }
         }

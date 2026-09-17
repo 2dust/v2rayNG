@@ -36,8 +36,6 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     private val _subsFlow = MutableStateFlow(subscriptions.toList())
     val subsFlow: StateFlow<List<SubscriptionCache>> = _subsFlow.asStateFlow()
 
-    fun getAll(): List<SubscriptionCache> = subscriptions.toList()
-
     fun reload() {
         subscriptions.clear()
         subscriptions.addAll(MmkvManager.decodeSubscriptions())

@@ -31,18 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
 @Composable
-fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.secondary,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
-    )
-}
-
-@Composable
 fun CollapsiblePreferenceGroupHeader(
     title: String,
     expanded: Boolean,

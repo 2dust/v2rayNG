@@ -725,14 +725,6 @@ class MainViewModel(
         }
     }
 
-    fun reloadServerList() {
-        val groupId = uiState.value.selectedGroupId
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
-            updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
-        }
-    }
-
     fun reloadAllGroups(groupIds: List<String>) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch(preloadDispatcher) {

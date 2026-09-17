@@ -76,29 +76,6 @@ fun Context.toastError(message: CharSequence) {
     }
 }
 
-/**
- * Shows an info toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
-fun Context.toastInfo(message: Int) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.INFO) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-}
-
-/**
- * Shows an info toast message with the given text.
- *
- * @param message The text of the message to show.
- */
-fun Context.toastInfo(message: CharSequence) {
-    dispatchMessage(message, ToastType.INFO) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-}
-
 private inline fun runOnMain(crossinline block: () -> Unit) {
     if (Looper.myLooper() == Looper.getMainLooper()) {
         block()

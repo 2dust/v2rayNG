@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.server
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
@@ -14,7 +13,6 @@ class ServerHttpActivity : BaseServerActivity() {
 
     @Composable
     override fun ScreenContent() {
-        val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
                 initialConfig = initialConfig

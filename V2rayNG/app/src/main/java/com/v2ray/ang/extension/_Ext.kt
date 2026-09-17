@@ -61,15 +61,6 @@ inline fun <reified T : Serializable> Intent.serializable(key: String): T? = whe
 }
 
 /**
- * Checks if the config type is a group type (PolicyGroup or ProxyChain).
- *
- * @return True if the config type is PolicyGroup or ProxyChain, false otherwise.
- */
-fun EConfigType.isGroupType(): Boolean {
-    return this == EConfigType.POLICYGROUP || this == EConfigType.PROXYCHAIN
-}
-
-/**
  * Checks if the config type is a complex type (Custom, PolicyGroup, or ProxyChain).
  *
  * @return True if the config type is Custom, PolicyGroup, or ProxyChain, false otherwise.

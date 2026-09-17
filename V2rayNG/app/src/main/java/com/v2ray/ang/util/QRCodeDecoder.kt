@@ -66,7 +66,7 @@ object QRCodeDecoder {
 
                 try {
                     qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source)), HINTS).text
-                } catch (e: NotFoundException) {
+                } catch (_: NotFoundException) {
                     qrReader.decode(BinaryBitmap(GlobalHistogramBinarizer(source.invert())), HINTS).text
                 }
             }.getOrNull()
@@ -91,7 +91,7 @@ object QRCodeDecoder {
             options.inSampleSize = sampleSize
             options.inJustDecodeBounds = false
             BitmapFactory.decodeFile(picturePath, options)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

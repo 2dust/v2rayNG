@@ -142,7 +142,7 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
     private fun importFromClipboard() {
         val clipboard = try {
             Utils.getClipboard(this)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             toastError(R.string.toast_failure)
             return
         }
