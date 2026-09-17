@@ -20,7 +20,7 @@ import java.net.URLEncoder
 object SubscriptionContentConverter {
 
     fun convert(content: String, decodeBase64: Boolean, customToLinks: Boolean, keepBalancers: Boolean = false): String {
-        if (!decodeBase64 && !customToLinks) return content
+        // We don't early return here anymore so we can always compact JSONs.
         LogUtil.i("SubConverter", "v2 convert: b64=$decodeBase64 links=$customToLinks balancers=$keepBalancers")
 
         // Shop subscriptions often contain multiple pretty-printed JSON objects
@@ -90,9 +90,21 @@ object SubscriptionContentConverter {
             }
         }
 
-        // Whole body is a single JSON value (compact or pretty) -> convert directly.
-        if (j2l && (trimmed.startsWith("{") || trimmed.startsWith("[")) && isWholeJsonValue(trimmed)) {
-            convertJsonText(trimmed, kb)?.let { return it }
+        // Whole body is a single JSON value (compact or pretty) -> handle it.
+        if ((trimmed.startsWith("{") || trimmed.startsWith("[")) && isWholeJsonValue(trimmed)) {
+            if (j2l) {
+                convertJsonText(trimmed, kb)?.let { return it }
+            } else {
+                return try {
+                    if (trimmed.startsWith("[")) {
+                        JSONArray(trimmed).toString()
+                    } else {
+                        JSONObject(trimmed).toString()
+                    }
+                } catch (e: Exception) {
+                    trimmed
+                }
+            }
         }
 
         val res = StringBuilder()
