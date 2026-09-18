@@ -13,6 +13,7 @@ import java.net.IDN
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.Socket
 import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URI
@@ -131,6 +132,18 @@ object HttpUtil {
             LogUtil.e(AppConfig.TAG, "Failed to get URL content", e)
         }
         return null
+    }
+
+    fun isLocalProxyAvailable(port: Int, timeoutMs: Int = 500): Boolean {
+        if (port <= 0) return false
+        return try {
+            Socket().use { socket ->
+                socket.connect(InetSocketAddress("127.0.0.1", port), timeoutMs)
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     /**

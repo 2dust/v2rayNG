@@ -44,9 +44,11 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
         launchLoading {
             val updateViaActiveProxy = _updateViaActiveProxy.value
             val httpPort = com.v2ray.ang.handler.SettingsManager.getHttpPort()
-            val isRunning = com.v2ray.ang.core.CoreServiceManager.isRunning()
+            val proxyAvailable = com.v2ray.ang.util.HttpUtil.isLocalProxyAvailable(
+                com.v2ray.ang.handler.SettingsManager.getSocksPort()
+            )
             
-            if (updateViaActiveProxy && (!isRunning || httpPort <= 0)) {
+            if (updateViaActiveProxy && (!proxyAvailable || httpPort <= 0)) {
                 toast(R.string.toast_requires_active_proxy)
                 return@launchLoading
             }

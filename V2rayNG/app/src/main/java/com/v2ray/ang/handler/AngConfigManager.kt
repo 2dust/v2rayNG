@@ -354,13 +354,14 @@ object AngConfigManager {
         if (server == null) {
             return 0
         }
-        if (server.contains("inbounds")
-            && server.contains("outbounds")
-            && server.contains("routing")
-        ) {
+        val trimmed = server.trim()
+        if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
             try {
-                val serverList: Array<Any> =
-                    JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
+                val serverList: Array<Any> = if (trimmed.startsWith("[")) {
+                    JsonUtil.fromJson(trimmed, Array<Any>::class.java) ?: arrayOf()
+                } else {
+                    arrayOf(JsonUtil.fromJson(trimmed, Any::class.java) ?: return 0)
+                }
 
                 if (serverList.isNotEmpty()) {
                     val configs = serverList.reversed().map { srv ->
@@ -383,11 +384,11 @@ object AngConfigManager {
 
             try {
                 // For compatibility
-                val config = CustomFmt.parse(server)
+                val config = CustomFmt.parse(trimmed)
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
                 commitProfiles(
-                    configs = listOf(ParsedProfile(config, server)),
+                    configs = listOf(ParsedProfile(config, trimmed)),
                     subid = subid,
                     append = append,
                 )
@@ -523,10 +524,12 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
             val httpPort = SettingsManager.getHttpPort()
-            val isRunning = com.v2ray.ang.core.CoreServiceManager.isRunning()
+            val proxyAvailable = HttpUtil.isLocalProxyAvailable(
+                SettingsManager.getSocksPort()
+            )
 
             if (it.subscription.updateViaActiveProxy) {
-                if (!isRunning || httpPort <= 0) {
+                if (!proxyAvailable || httpPort <= 0) {
                     AngApplication.application.toast(R.string.toast_requires_active_proxy)
                     LogUtil.w(AppConfig.TAG, "Subscription requires active proxy, but it's not running or port is invalid")
                     return SubscriptionUpdateResult(failureCount = 1)
