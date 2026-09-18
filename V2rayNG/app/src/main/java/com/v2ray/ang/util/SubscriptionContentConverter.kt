@@ -22,20 +22,6 @@ object SubscriptionContentConverter {
     fun convert(content: String, decodeBase64: Boolean, customToLinks: Boolean, keepBalancers: Boolean = false): String {
         // We don't early return here anymore so we can always compact JSONs.
         LogUtil.i("SubConverter", "v2 convert: b64=$decodeBase64 links=$customToLinks balancers=$keepBalancers")
-
-        // Shop subscriptions often contain multiple pretty-printed JSON objects
-        // concatenated with newlines (not a JSON array). Split them so each
-        // object gets processed independently.
-        val split = splitConcatenatedJson(content)
-        if (split.size > 1) {
-            val out = StringBuilder()
-            for (chunk in split) {
-                val converted = walk(chunk, decodeBase64, customToLinks)
-                if (converted.isNotBlank()) out.append(converted).append("\n")
-            }
-            return out.toString().trim()
-        }
-
         return walk(content, decodeBase64, customToLinks, keepBalancers)
     }
 
@@ -83,6 +69,20 @@ object SubscriptionContentConverter {
         val trimmed = input.trim()
         if (trimmed.isEmpty()) return input
 
+        // If the input contains multiple top-level JSON objects concatenated,
+        // process each object independently to avoid destroying pretty-printed JSON.
+        if (trimmed.startsWith("{")) {
+            val split = splitConcatenatedJson(trimmed)
+            if (split.size > 1) {
+                val out = StringBuilder()
+                for (chunk in split) {
+                    val p = walk(chunk, b64, j2l, kb)
+                    if (p.isNotBlank()) out.append(p).append("\n")
+                }
+                return out.toString().trim()
+            }
+        }
+
         // Whole body is one base64 blob -> decode first and recurse.
         if (b64) {
             tryDecodeBase64(trimmed)?.let { decoded ->
@@ -97,7 +97,12 @@ object SubscriptionContentConverter {
             } else {
                 return try {
                     if (trimmed.startsWith("[")) {
-                        JSONArray(trimmed).toString()
+                        val arr = JSONArray(trimmed)
+                        val sb = StringBuilder()
+                        for (i in 0 until arr.length()) {
+                            sb.append(arr.getJSONObject(i).toString()).append("\n")
+                        }
+                        sb.toString().trim()
                     } else {
                         JSONObject(trimmed).toString()
                     }

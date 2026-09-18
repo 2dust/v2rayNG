@@ -44,8 +44,9 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
         launchLoading {
             val updateViaActiveProxy = _updateViaActiveProxy.value
             val httpPort = com.v2ray.ang.handler.SettingsManager.getHttpPort()
+            val isRunning = com.v2ray.ang.core.CoreServiceManager.isRunning()
             
-            if (updateViaActiveProxy && httpPort <= 0) {
+            if (updateViaActiveProxy && (!isRunning || httpPort <= 0)) {
                 toast(R.string.toast_requires_active_proxy)
                 return@launchLoading
             }
@@ -61,7 +62,7 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
                 }
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to check for updates", e)
-                toastError(R.string.toast_failure)
+                toast("Error: ${e.message}")
             }
         }
     }

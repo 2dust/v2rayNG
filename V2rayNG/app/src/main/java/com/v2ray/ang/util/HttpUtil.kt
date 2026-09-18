@@ -240,17 +240,17 @@ object HttpUtil {
             .followSslRedirects(followRedirects)
 
         if (httpPort != 0) {
-            builder.proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(LOOPBACK, httpPort)))
+            val socksPort = com.v2ray.ang.handler.SettingsManager.getSocksPort()
+            builder.proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress("127.0.0.1", socksPort)))
             if (!proxyUsername.isNullOrBlank() && !proxyPassword.isNullOrBlank()) {
-                builder.proxyAuthenticator { _, response ->
-                    if (response.request.header("Proxy-Authorization") != null) {
-                        null
-                    } else {
-                        response.request.newBuilder()
-                            .header("Proxy-Authorization", Credentials.basic(proxyUsername, proxyPassword))
-                            .build()
+                java.net.Authenticator.setDefault(object : java.net.Authenticator() {
+                    override fun getPasswordAuthentication(): java.net.PasswordAuthentication? {
+                        if (requestingSite?.hostName == "127.0.0.1" && requestingPort == socksPort) {
+                            return java.net.PasswordAuthentication(proxyUsername, proxyPassword.toCharArray())
+                        }
+                        return null
                     }
-                }
+                })
             }
         }
 

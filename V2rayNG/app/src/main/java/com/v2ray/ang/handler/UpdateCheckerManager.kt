@@ -31,27 +31,31 @@ object UpdateCheckerManager {
             if (httpPort <= 0) {
                 return@withContext CheckUpdateResult(hasUpdate = false)
             }
-            response = HttpUtil.getUrlContent(
-                UrlContentRequest(
-                    url = url,
-                    timeout = 5000,
-                    httpPort = httpPort,
-                    proxyUsername = proxyUsername,
-                    proxyPassword = proxyPassword
+            try {
+                response = HttpUtil.getUrlContentWithUserAgent(
+                    UrlContentRequest(
+                        url = url,
+                        timeout = 15000,
+                        httpPort = httpPort,
+                        proxyUsername = proxyUsername,
+                        proxyPassword = proxyPassword
+                    )
                 )
-            ) ?: ""
+            } catch (e: Exception) {
+                throw IllegalStateException(e.message ?: "Failed to get response")
+            }
         } else {
             response = HttpUtil.getUrlContent(
                 UrlContentRequest(
                     url = url,
-                    timeout = 5000
+                    timeout = 15000
                 )
             ) ?: ""
             if (response.isEmpty()) {
                 response = HttpUtil.getUrlContent(
                     UrlContentRequest(
                         url = url,
-                        timeout = 5000,
+                        timeout = 15000,
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
                         proxyPassword = proxyPassword

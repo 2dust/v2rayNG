@@ -523,11 +523,12 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
             val httpPort = SettingsManager.getHttpPort()
+            val isRunning = com.v2ray.ang.core.CoreServiceManager.isRunning()
 
             if (it.subscription.updateViaActiveProxy) {
-                if (httpPort <= 0) {
+                if (!isRunning || httpPort <= 0) {
                     AngApplication.application.toast(R.string.toast_requires_active_proxy)
-                    LogUtil.w(AppConfig.TAG, "Subscription requires active proxy, but HTTP port is $httpPort")
+                    LogUtil.w(AppConfig.TAG, "Subscription requires active proxy, but it's not running or port is invalid")
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
@@ -546,6 +547,9 @@ object AngConfigManager {
                 )
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
+                if (it.subscription.updateViaActiveProxy) {
+                    AngApplication.application.toast("Proxy Error: ${e.message}")
+                }
                 ""
             }
             if (configText.isEmpty() && !it.subscription.updateViaActiveProxy) {
