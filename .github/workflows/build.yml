@@ -64,6 +64,24 @@ jobs:
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
 
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: '1.24.x'
+
+    - name: Build sing-box Android core
+      env:
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        ANDROID_NDK_HOME: ${{ env.NDK_HOME }}
+      run: |
+        git clone --depth 1 --branch v1.15.0-alpha.6 https://github.com/SagerNet/sing-box.git sing-box
+        cd sing-box
+        go install github.com/sagernet/gomobile/cmd/gomobile@v0.1.13
+        go install github.com/sagernet/gomobile/cmd/gobind@v0.1.13
+        go run ./cmd/internal/build_libbox -target android
+        cp libbox.aar ${{ github.workspace }}/V2rayNG/app/libs/libbox.aar
+        cp libbox-legacy.aar ${{ github.workspace }}/V2rayNG/app/libs/libbox-legacy.aar
+
     - name: Fetch AndroidLibXrayLite tag
       run: |
         pushd AndroidLibXrayLite
