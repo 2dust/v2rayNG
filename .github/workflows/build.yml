@@ -64,6 +64,12 @@ jobs:
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
 
+    - name: Setup Java
+      uses: actions/setup-java@v6.0.0
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Setup Go
       uses: actions/setup-go@v6
       with:
@@ -97,12 +103,6 @@ jobs:
         tag: ${{ env.CURRENT_TAG }}
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
-
-    - name: Setup Java
-      uses: actions/setup-java@v6.0.0
-      with:
-        distribution: 'temurin'
-        java-version: '21'
 
     - name: Decode Keystore
       uses: timheuer/base64-to-file@v2.0.0
