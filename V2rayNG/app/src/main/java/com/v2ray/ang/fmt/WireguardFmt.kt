@@ -33,6 +33,7 @@ object WireguardFmt : FmtBase() {
         config.preSharedKey = queryParam["presharedkey"]?.nullIfBlank()
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.reserved = queryParam["reserved"] ?: "0,0,0"
+        config.finalMask = (queryParam["fm"] ?: queryParam["finalmask"] ?: queryParam["finalMask"])?.nullIfBlank()
 
         return config
     }
@@ -93,6 +94,7 @@ object WireguardFmt : FmtBase() {
             config.serverPort = ""
         }
         config.reserved = peerParams["reserved"] ?: "0,0,0"
+        config.finalMask = (peerParams["finalmask"] ?: peerParams["fm"] ?: interfaceParams["finalmask"] ?: interfaceParams["fm"])?.nullIfBlank()
 
         return config
     }
@@ -118,6 +120,7 @@ object WireguardFmt : FmtBase() {
         if (config.preSharedKey != null) {
             dicQuery["presharedkey"] = config.preSharedKey.removeWhiteSpace().orEmpty()
         }
+        config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
 
         return toUri(config, config.secretKey, dicQuery)
     }
