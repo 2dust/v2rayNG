@@ -19,8 +19,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 24
         targetSdk = 37
-        versionCode = 746
-        versionName = "2.3.6"
+        versionCode = 748
+        versionName = "2.3.8"
 
         val abiFilterList = providers.gradleProperty("ABI_FILTERS").orNull?.split(';')
         splits {

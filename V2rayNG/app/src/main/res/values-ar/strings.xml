@@ -100,8 +100,8 @@
     <string name="server_lab_reserved">Reserved (اختياري، مفصول بفواصل)</string>
     <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
     <string name="server_lab_local_mtu">MTU (اختياري، الافتراضي 1420)</string>
-    <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي في النواة 1350)</string>
-    <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي في النواة 50)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي 50 مللي ثانية)</string>
     <string name="toast_success">نجاح</string>
     <string name="toast_failure">فشل</string>
     <string name="toast_none_data">لا يوجد شيء</string>
@@ -172,8 +172,11 @@
     <string name="title_vpn_settings">إعدادات VPN</string>
     <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
     <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر في القائمة خيار لتحديد التطبيقات التي ستستخدم الوكيل تلقائيًا.</string>
-    <string name="title_pref_is_booted">الاتصال تلقائياً عند بدء التشغيل</string>
-    <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد عند بدء التشغيل؛ قد لا تنجح المحاولة</string>
+    <string name="title_pref_is_booted">الاتصال بعد إقلاع الجهاز</string>
+    <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد بعد إقلاع الجهاز. قد يقيّد Android بدء التشغيل في الخلفية.</string>
+    <string name="title_system_vpn_settings">إعدادات VPN للنظام</string>
+    <string name="summary_system_vpn_settings">فتح إعدادات VPN في Android لإعداد VPN الدائم، إذا كان الجهاز يدعمه.</string>
+    <string name="toast_system_vpn_settings_unavailable">إعدادات VPN للنظام غير متاحة.</string>
 
 
     <string name="subscription_updater_job_tips">ستعمل المهمة في الخلفية، وسيُعرض تقدمها في الإشعار.</string>
@@ -348,8 +351,22 @@
     <string name="title_del_config_count">حذف %d من التكوينات</string>
     <string name="title_import_config_count">استيراد %d من التكوينات</string>
     <string name="title_export_config_count">تصدير %d من التكوينات</string>
-    <string name="title_update_config_count">تحديث %d من التكوينات</string>
-    <string name="title_update_asset_count">تم تحديث %d من ملفات الأصول</string>
+    <plurals name="title_update_config_count">
+        <item quantity="zero">لم يتم تحديث أي تكوينات</item>
+        <item quantity="one">تم تحديث تكوين واحد</item>
+        <item quantity="two">تم تحديث تكوينين</item>
+        <item quantity="few">تم تحديث %1$d تكوينات</item>
+        <item quantity="many">تم تحديث %1$d تكوينًا</item>
+        <item quantity="other">تم تحديث %1$d تكوين</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="zero">لم يتم تحديث أي ملفات أصول</item>
+        <item quantity="one">تم تحديث ملف أصول واحد</item>
+        <item quantity="two">تم تحديث ملفي أصول</item>
+        <item quantity="few">تم تحديث %1$d ملفات أصول</item>
+        <item quantity="many">تم تحديث %1$d ملف أصول</item>
+        <item quantity="other">تم تحديث %1$d ملف أصول</item>
+    </plurals>
     <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
     <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
     <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
