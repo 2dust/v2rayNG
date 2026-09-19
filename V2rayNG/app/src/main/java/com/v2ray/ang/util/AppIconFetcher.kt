@@ -1,12 +1,13 @@
 package com.v2ray.ang.util
 
 import android.content.Context
-import coil.ImageLoader
-import coil.decode.DataSource
-import coil.fetch.DrawableResult
-import coil.fetch.FetchResult
-import coil.fetch.Fetcher
-import coil.request.Options
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DataSource
+import coil3.fetch.FetchResult
+import coil3.fetch.Fetcher
+import coil3.fetch.ImageFetchResult
+import coil3.request.Options
 import com.v2ray.ang.AppConfig
 
 class AppIconFetcher(
@@ -25,8 +26,8 @@ class AppIconFetcher(
             null
         } ?: return null
 
-        return DrawableResult(
-            drawable = drawable,
+        return ImageFetchResult(
+            image = drawable.asImage(),
             isSampled = false,
             dataSource = DataSource.DISK
         )
