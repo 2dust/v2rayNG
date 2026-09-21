@@ -237,9 +237,15 @@ object AngConfigManager {
      * @param servers The servers string.
      * @param subid The subscription ID.
      * @param append Whether to append the configurations.
+     * @param isSubscription Whether the profiles came from subscription content.
      * @return The number of configurations parsed.
      */
-    private fun parseBatchConfig(servers: String?, subid: String, append: Boolean): Int {
+    private fun parseBatchConfig(
+        servers: String?,
+        subid: String,
+        append: Boolean,
+        isSubscription: Boolean = false,
+    ): Int {
         try {
             if (servers == null) {
                 return 0
@@ -272,6 +278,7 @@ object AngConfigManager {
                     configs = allConfigs.map(::ParsedProfile),
                     subid = subid,
                     append = append,
+                    isSubscription = isSubscription,
                 )
             }
 
@@ -290,17 +297,20 @@ object AngConfigManager {
      * @param configs The parsed profiles to save.
      * @param subid The subscription ID.
      * @param append Whether to append to the existing server list.
+     * @param isSubscription Whether the profiles came from subscription content.
      */
     private fun commitProfiles(
         configs: List<ParsedProfile>,
         subid: String,
         append: Boolean,
+        isSubscription: Boolean,
     ) {
         val keyToProfile = linkedMapOf<String, ProfileItem>()
         val rawConfigs = mutableMapOf<String, String>()
 
         configs.forEach { parsed ->
             val key = Utils.getUuid()
+            parsed.profile.isSubscription = isSubscription
             keyToProfile[key] = parsed.profile
             parsed.rawConfig?.let { raw -> rawConfigs[key] = raw }
         }
@@ -319,9 +329,15 @@ object AngConfigManager {
      * @param server The server string.
      * @param subid The subscription ID.
      * @param append Whether to append the configurations.
+     * @param isSubscription Whether the profiles came from subscription content.
      * @return The number of configurations parsed.
      */
-    private fun parseCustomConfigServer(server: String?, subid: String, append: Boolean): Int {
+    private fun parseCustomConfigServer(
+        server: String?,
+        subid: String,
+        append: Boolean,
+        isSubscription: Boolean = false,
+    ): Int {
         if (server == null) {
             return 0
         }
@@ -343,7 +359,7 @@ object AngConfigManager {
                             rawConfig = JsonUtil.toJsonPretty(srv) ?: "",
                         )
                     }
-                    commitProfiles(configs, subid, append)
+                    commitProfiles(configs, subid, append, isSubscription)
                     return configs.size
                 }
             } catch (e: ProfileStorageException) {
@@ -361,6 +377,7 @@ object AngConfigManager {
                     configs = listOf(ParsedProfile(config, server)),
                     subid = subid,
                     append = append,
+                    isSubscription = isSubscription,
                 )
                 return 1
             } catch (e: ProfileStorageException) {
@@ -378,6 +395,7 @@ object AngConfigManager {
                     configs = listOf(ParsedProfile(config, server)),
                     subid = subid,
                     append = append,
+                    isSubscription = isSubscription,
                 )
                 return 1
             } catch (e: ProfileStorageException) {
@@ -586,12 +604,12 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        var count = parseBatchConfig(Utils.decode(server), subid, append, isSubscription = true)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(server, subid, append, isSubscription = true)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid, append)
+            count = parseCustomConfigServer(server, subid, append, isSubscription = true)
         }
         return count
     }

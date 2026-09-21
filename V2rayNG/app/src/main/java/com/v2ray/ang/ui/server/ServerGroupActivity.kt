@@ -130,6 +130,7 @@ class ServerGroupActivity : BaseComponentActivity() {
             subIds.getOrNull(subIdx)
         config.policyGroupTestOutbounds = testOutbounds
         config.policyGroupFallbackTag = fallbackTag.trim().takeIf { it.isNotEmpty() }
+        config.isSubscription = false
 
         if (
             config.subscriptionId.isEmpty() &&

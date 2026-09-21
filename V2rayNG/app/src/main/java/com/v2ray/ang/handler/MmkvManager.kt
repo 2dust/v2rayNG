@@ -298,6 +298,8 @@ object MmkvManager {
 
     /**
      * Saves a profile batch before publishing its group index and removing replaced payloads.
+     * Non-appended replacements retain locally created policy groups in the destination group;
+     * subscription-owned profiles remain replaceable.
      *
      * @param profiles Generated GUIDs and parsed profiles, in insertion order.
      * @param rawConfigs Optional raw configuration payloads keyed by profile GUID.
@@ -313,10 +315,21 @@ object MmkvManager {
         if (profiles.isEmpty()) return
 
         withProfileIndexLock {
+            val existingServers = decodeServerList(subscriptionId).toList()
+            val preservedServers = if (append) {
+                emptyList()
+            } else {
+                val existingProfiles = existingServers.associateWith(::decodeServerConfig)
+                ProfileReplacement.findManualPolicyGroups(
+                    serverIds = existingServers,
+                    profilesByGuid = existingProfiles,
+                    subscriptionId = subscriptionId,
+                )
+            }
             val replacedServers = if (append) {
                 emptyList()
             } else {
-                decodeServerList(subscriptionId).toList()
+                existingServers - preservedServers.toSet()
             }
             val previousSelection = getSelectServer()
             val selectedProfile = if (!append &&
@@ -349,7 +362,7 @@ object MmkvManager {
             val serverList = if (append) {
                 decodeServerList(subscriptionId)
             } else {
-                mutableListOf()
+                preservedServers.toMutableList()
             }
             val indexedServers = serverList.toHashSet()
             profiles.keys.forEach { guid ->

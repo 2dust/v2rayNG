@@ -2,11 +2,88 @@ package com.v2ray.ang.handler
 
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.util.JsonUtil
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ProfileReplacementTest {
+
+    @Test
+    fun `preserves a manually created policy group`() {
+        val profile = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "sub"
+            isSubscription = false
+        }
+
+        assertTrue(ProfileReplacement.isManualPolicyGroup(profile, "sub"))
+    }
+
+    @Test
+    fun `replaces a policy group created by a subscription`() {
+        val profile = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "sub"
+            isSubscription = true
+        }
+
+        assertFalse(ProfileReplacement.isManualPolicyGroup(profile, "sub"))
+    }
+
+    @Test
+    fun `uses subscription ownership for legacy policy groups`() {
+        val matching = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "sub"
+        }
+        val other = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "other"
+        }
+
+        assertTrue(ProfileReplacement.isManualPolicyGroup(matching, "sub"))
+        assertFalse(ProfileReplacement.isManualPolicyGroup(other, "sub"))
+    }
+
+    @Test
+    fun `keeps manual groups in their existing order and excludes remote groups`() {
+        val manual = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "sub"
+            isSubscription = false
+        }
+        val remote = profile(EConfigType.POLICYGROUP).apply {
+            subscriptionId = "sub"
+            isSubscription = true
+        }
+
+        assertEquals(
+            listOf("manual"),
+            ProfileReplacement.findManualPolicyGroups(
+                serverIds = listOf("remote", "manual"),
+                profilesByGuid = mapOf("remote" to remote, "manual" to manual),
+                subscriptionId = "sub",
+            ),
+        )
+    }
+
+    @Test
+    fun `does not preserve ordinary profiles`() {
+        val profile = profile(EConfigType.VMESS).apply {
+            subscriptionId = "sub"
+            isSubscription = false
+        }
+
+        assertFalse(ProfileReplacement.isManualPolicyGroup(profile, "sub"))
+    }
+
+    @Test
+    fun `reads legacy profiles without a source marker`() {
+        val profile = JsonUtil.fromJsonSafe(
+            """{"configType":"POLICYGROUP","subscriptionId":"sub"}""",
+            ProfileItem::class.java,
+        )
+
+        assertNull(profile?.isSubscription)
+    }
 
     @Test
     fun `prefers a full match over a remarks-only match`() {
@@ -127,11 +204,12 @@ class ProfileReplacementTest {
     }
 
     private fun profile(
+        type: EConfigType = EConfigType.VMESS,
         remarks: String = "",
         server: String = "",
         port: String = "",
         password: String = "",
-    ) = ProfileItem.create(EConfigType.VMESS).apply {
+    ) = ProfileItem.create(type).apply {
         this.remarks = remarks
         this.server = server
         this.serverPort = port

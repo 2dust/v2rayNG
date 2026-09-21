@@ -8,6 +8,11 @@ data class ProfileItem(
     val configVersion: Int = 4,
     val configType: EConfigType,
     var subscriptionId: String = "",
+    /**
+     * Whether this profile was created from subscription content.
+     * A null value means the profile predates this source marker.
+     */
+    var isSubscription: Boolean? = null,
     var addedTime: Long = System.currentTimeMillis(),
 
     var remarks: String = "",
@@ -94,6 +99,7 @@ data class ProfileItem(
      * Ignores metadata that does not affect connection:
      * - configVersion
      * - subscriptionId
+     * - isSubscription
      * - addedTime
      * - remarks
      * - description
@@ -106,6 +112,7 @@ data class ProfileItem(
         copy(
             configVersion = 0,
             subscriptionId = "",
+            isSubscription = null,
             addedTime = 0L,
             remarks = "",
             description = null

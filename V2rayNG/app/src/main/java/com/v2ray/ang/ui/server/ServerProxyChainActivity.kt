@@ -139,6 +139,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         config.remarks = remarks.trim()
         config.proxyChainProfiles =
             chainMembers.joinToString(",")
+        config.isSubscription = false
 
         config.description =
             chainMembers.joinToString(" -> ")

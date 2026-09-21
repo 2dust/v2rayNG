@@ -1,8 +1,32 @@
 package com.v2ray.ang.handler
 
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.EConfigType
 
 internal object ProfileReplacement {
+
+    /**
+     * Returns whether a policy group belongs to the local profile set rather than subscription
+     * content. Legacy profiles without the source marker are retained only when their stored
+     * subscription ownership matches the group being replaced.
+     */
+    fun isManualPolicyGroup(profile: ProfileItem?, subscriptionId: String): Boolean {
+        if (profile?.configType != EConfigType.POLICYGROUP) return false
+
+        return when (profile.isSubscription) {
+            true -> false
+            false -> true
+            null -> profile.subscriptionId == subscriptionId
+        }
+    }
+
+    fun findManualPolicyGroups(
+        serverIds: List<String>,
+        profilesByGuid: Map<String, ProfileItem?>,
+        subscriptionId: String,
+    ): List<String> = serverIds.filter { guid ->
+        isManualPolicyGroup(profilesByGuid[guid], subscriptionId)
+    }
 
     /**
      * Finds the profile that should become selected after publishing a replacement batch.
