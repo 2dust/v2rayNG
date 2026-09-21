@@ -115,7 +115,6 @@ class ServerGroupActivity : BaseComponentActivity() {
         fallbackTag: String,
     ): Boolean {
         if (remarks.isBlank()) {
-            toast(R.string.server_lab_remarks)
             return false
         }
 
@@ -226,6 +225,7 @@ fun ServerGroupScreen(
     val typeEntries = stringArrayResource(R.array.policy_group_type).toList()
 
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
+    var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var filter by rememberSaveable { mutableStateOf(initialFilter) }
     var typeValue by rememberSaveable { mutableStateOf(typeEntries.getOrNull(initialType).orEmpty()) }
     var subValue by rememberSaveable { mutableStateOf(subDisplay.getOrNull(initialSubIndex).orEmpty()) }
@@ -249,9 +249,15 @@ fun ServerGroupScreen(
                         }
                     }
                     IconButton(onClick = {
-                        val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
-                        val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
-                        onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+                        val remarksErr = remarks.isBlank()
+                        isRemarksError = remarksErr
+
+                        val hasError = remarksErr
+                        if (!hasError) {
+                            val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
+                            val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
+                            onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+                        }
                     }) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
@@ -268,7 +274,12 @@ fun ServerGroupScreen(
                 .padding(vertical = 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            FormTextField(stringResource(R.string.server_lab_remarks), remarks, { remarks = it })
+            FormTextField(
+                label = stringResource(R.string.server_lab_remarks),
+                value = remarks,
+                onValueChange = { remarks = it },
+                isError = isRemarksError
+            )
             FormDropdownField(
                 label = stringResource(R.string.title_policy_group_type),
                 value = typeValue,
@@ -304,8 +315,12 @@ fun ServerGroupScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_policy_group_named, initialRemarks),
-            onConfirm = onDelete,
+            message = stringResource(R.string.confirm_delete_policy_group),
+            itemName = initialRemarks,
+            onConfirm = {
+                showDeleteConfirm = false
+                onDelete()
+            },
             onDismiss = { showDeleteConfirm = false }
         )
     }
