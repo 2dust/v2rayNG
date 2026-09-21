@@ -8,24 +8,35 @@ import com.v2ray.ang.AngApplication
 import com.v2ray.ang.dto.UserMessage
 import com.v2ray.ang.handler.AppLocaleManager
 
+private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
 // Keep the existing caller API; delivery uses snackbars, never platform toasts.
-fun Context.toast(@StringRes message: Int) = toast(AppLocaleManager.localizedContext(this).getString(message))
+// The long option extends transient feedback; lengthy errors still require dismissal.
+fun Context.toast(@StringRes message: Int, long: Boolean = false) =
+    toast(AppLocaleManager.localizedContext(this).getString(message), long)
 
-fun Context.toast(message: CharSequence) = showMessage(UserMessage(message.toString()))
+fun Context.toast(message: CharSequence, long: Boolean = false) =
+    dispatchMessage(UserMessage(message.toString(), long = long))
 
-fun Context.toastSuccess(@StringRes message: Int) = toast(message)
+fun Context.toastSuccess(@StringRes message: Int, long: Boolean = false) = toast(message, long)
 
-fun Context.toastSuccess(message: CharSequence) = toast(message)
+fun Context.toastSuccess(message: CharSequence, long: Boolean = false) = toast(message, long)
 
-fun Context.toastError(@StringRes message: Int) = toastError(AppLocaleManager.localizedContext(this).getString(message))
+fun Context.toastError(@StringRes message: Int, long: Boolean = false) =
+    toastError(AppLocaleManager.localizedContext(this).getString(message), long)
 
-fun Context.toastError(message: CharSequence) = showMessage(UserMessage(message.toString(), isError = true))
+fun Context.toastError(message: CharSequence, long: Boolean = false) =
+    dispatchMessage(UserMessage(message.toString(), isError = true, long = long))
 
-private fun Context.showMessage(message: UserMessage) {
+fun Context.toastInfo(@StringRes message: Int, long: Boolean = false) = toast(message, long)
+
+fun Context.toastInfo(message: CharSequence, long: Boolean = false) = toast(message, long)
+
+private fun Context.dispatchMessage(message: UserMessage) {
     val appContext = applicationContext
     val deliver = Runnable {
         (appContext as AngApplication).snackbarManager.show(message)
     }
     if (Looper.myLooper() == Looper.getMainLooper()) deliver.run()
-    else Handler(Looper.getMainLooper()).post(deliver)
+    else mainHandler.post(deliver)
 }

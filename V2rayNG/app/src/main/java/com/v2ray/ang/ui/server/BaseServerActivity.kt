@@ -383,13 +383,13 @@ abstract class BaseServerActivity : BaseComponentActivity() {
 
     protected open fun validateProtocolConfig(config: ProfileItem): Boolean = true
 
-    protected open fun validateCommonConfig(config: ProfileItem): Boolean {
+    protected open fun validateCommonConfig(state: ServerUiState, config: ProfileItem): Boolean {
 
         if (config.password.isNullOrBlank()) {
+            state.isPasswordError = true
             if (config.configType == EConfigType.VMESS ||
                 config.configType == EConfigType.VLESS
             ) {
-                toast(R.string.server_lab_id)
                 return false
             }
 
@@ -397,7 +397,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 config.configType == EConfigType.SHADOWSOCKS ||
                 config.configType == EConfigType.HYSTERIA2
             ) {
-                toast(R.string.server_lab_id3)
                 return false
             }
         }
@@ -423,7 +422,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected fun saveServer(state: ServerUiState): Boolean {
         if (!validateBasicConfig(state)) return false
         val config = state.toProfileItem(initialConfig)
-        if (!validateCommonConfig(config)) return false
+        if (!validateCommonConfig(state, config)) return false
         if (!validateProtocolConfig(config)) return false
 
         config.description = AngConfigManager.generateDescription(config)

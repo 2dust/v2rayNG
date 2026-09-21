@@ -125,7 +125,11 @@ class AppSnackbarManager(
             hostState.showSnackbar(
                 message = message.text,
                 actionLabel = if (message.requiresDismissal) closeLabel() else null,
-                duration = if (message.requiresDismissal) SnackbarDuration.Indefinite else SnackbarDuration.Short,
+                duration = when {
+                    message.requiresDismissal -> SnackbarDuration.Indefinite
+                    message.long -> SnackbarDuration.Long
+                    else -> SnackbarDuration.Short
+                },
             )
         }
         pending[job] = message

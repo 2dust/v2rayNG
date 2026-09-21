@@ -24,6 +24,43 @@ class AppSnackbarManagerTest {
     fun close() = scope.cancel()
 
     @Test
+    fun explicitLongDurationExtendsTransientFeedbackWithoutRequiringDismissal() {
+        manager.setForeground(true)
+        for (isError in listOf(false, true)) {
+            manager.show(UserMessage("Brief message", isError = isError, long = true))
+            val snackbar = manager.hostState.currentSnackbarData!!
+            assertEquals(SnackbarDuration.Long, snackbar.visuals.duration)
+            assertNull(snackbar.visuals.actionLabel)
+            snackbar.dismiss()
+        }
+    }
+
+    @Test
+    fun lengthyErrorsRequireDismissalRegardlessOfExplicitDuration() {
+        manager.setForeground(true)
+        for (long in listOf(false, true)) {
+            manager.show(UserMessage("Error\nDetails", isError = true, long = long))
+            val snackbar = manager.hostState.currentSnackbarData!!
+            assertEquals(SnackbarDuration.Indefinite, snackbar.visuals.duration)
+            assertEquals("Close", snackbar.visuals.actionLabel)
+            snackbar.performAction()
+        }
+    }
+
+    @Test
+    fun navigationDoesNotReplayShownLongDurationFeedbackEither() {
+        manager.setForeground(true)
+        manager.register("updates")
+        manager.show(UserMessage("Update available", long = true))
+        manager.onPresented("updates", manager.hostState.currentSnackbarData!!)
+        manager.unregister("updates")
+        manager.register("main")
+
+        assertNull(manager.hostState.currentSnackbarData)
+        assertTrue(notifications.isEmpty())
+    }
+
+    @Test
     fun closingAnEditorTransfersItsErrorAndQueuedConfirmationToTheNextHost() {
         manager.setForeground(true)
         val editor = "editor"
