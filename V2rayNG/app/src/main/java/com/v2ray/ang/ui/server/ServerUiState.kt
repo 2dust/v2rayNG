@@ -8,6 +8,7 @@ import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -30,6 +31,7 @@ class ServerUiState(
     reserved: String = "0,0,0",
     localAddress: String = WIREGUARD_LOCAL_ADDRESS_V4,
     mtu: String = WIREGUARD_LOCAL_MTU,
+    remoteDNS: String = WIREGUARD_LOCAL_REMOTE_DNS,
     obfsPassword: String = "",
     portHopping: String = "",
     portHoppingInterval: String = "",
@@ -78,6 +80,7 @@ class ServerUiState(
     var reserved by mutableStateOf(reserved)
     var localAddress by mutableStateOf(localAddress)
     var mtu by mutableStateOf(mtu)
+    var remoteDNS by mutableStateOf(remoteDNS)
     var obfsPassword by mutableStateOf(obfsPassword)
     var portHopping by mutableStateOf(portHopping)
     var portHoppingInterval by mutableStateOf(portHoppingInterval)
@@ -142,6 +145,7 @@ class ServerUiState(
             reserved = if (isWireguard) reserved else null,
             localAddress = if (isWireguard) localAddress else null,
             mtu = if (isWireguard) mtu.toIntOrNull() else null,
+            remoteDNS = if (isWireguard) remoteDNS else null,
             obfsPassword = if (isHysteria2) obfsPassword else null,
             portHopping = if (isHysteria2) portHopping else null,
             portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
@@ -199,6 +203,7 @@ class ServerUiState(
                 reserved = initialConfig.reserved ?: "0,0,0",
                 localAddress = initialConfig.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4,
                 mtu = initialConfig.mtu?.toString() ?: WIREGUARD_LOCAL_MTU,
+                remoteDNS = initialConfig.remoteDNS ?: WIREGUARD_LOCAL_REMOTE_DNS,
                 obfsPassword = initialConfig.obfsPassword ?: "",
                 portHopping = initialConfig.portHopping ?: "",
                 portHoppingInterval = initialConfig.portHoppingInterval ?: "",

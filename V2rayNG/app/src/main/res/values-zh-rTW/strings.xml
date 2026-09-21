@@ -100,6 +100,7 @@
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
     <string name="server_lab_local_address">本機位址 (可選 IPv4/IPv6，逗號隔開)</string>
     <string name="server_lab_local_mtu">MTU（可選，預設 1420）</string>
+    <string name="server_lab_remote_dns">remoteDNS(選填,多個 IPv4/IPv6 位址以逗號分隔,或輸入 "local" 使用裝置本機 DNS)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU（可選，預設 1350）</string>
     <string name="server_lab_kcp_tti">mKCP TTI（可選，預設 50 毫秒）</string>
     <string name="toast_success">成功</string>
