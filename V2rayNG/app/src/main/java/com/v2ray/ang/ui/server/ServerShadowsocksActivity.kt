@@ -52,9 +52,10 @@ class ServerShadowsocksActivity : BaseServerActivity() {
         methodOptions: List<String>
     ) {
         FormTextField(
-            stringResource(R.string.server_lab_id3),
-            state.password,
-            { state.password = it }
+            label = stringResource(R.string.server_lab_id3),
+            value = state.password,
+            onValueChange = { state.password = it },
+            isError = state.isPasswordError
         )
         FormDropdownField(
             stringResource(R.string.server_lab_security),
