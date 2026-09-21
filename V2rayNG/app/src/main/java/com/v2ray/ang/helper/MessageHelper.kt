@@ -103,6 +103,9 @@ object MessageHelper {
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to send message to test service", e)
+            if (message.key == AppConfig.MSG_MEASURE_CONFIG_START) {
+                sendMsg2UI(ctx, AppConfig.MSG_MEASURE_CONFIG_CANCEL, "", requestId)
+            }
         }
     }
 
