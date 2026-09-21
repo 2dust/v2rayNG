@@ -350,7 +350,8 @@ internal fun UserAssetScreen(
 
     uiState.assets.firstOrNull { it.guid == deleteAssetId }?.let { asset ->
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_asset_file, asset.assetUrl.remarks),
+            message = stringResource(R.string.confirm_delete_asset_file),
+            itemName = asset.assetUrl.remarks,
             onConfirm = {
                 deleteAssetId = null
                 onRemoveAsset(asset.guid, asset.assetUrl.remarks)
