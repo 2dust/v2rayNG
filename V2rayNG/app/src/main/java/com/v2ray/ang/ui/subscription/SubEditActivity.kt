@@ -80,24 +80,18 @@ class SubEditActivity : BaseComponentActivity() {
 
     private fun saveSubscription(subItem: SubscriptionItem) {
         if (TextUtils.isEmpty(subItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
             return
         }
         if (subItem.url.isNotEmpty()) {
             if (!Utils.isValidUrl(subItem.url)) {
-                toast(R.string.toast_invalid_url)
                 return
             }
-            if (!Utils.isValidSubUrl(subItem.url)) {
-                toast(R.string.toast_insecure_url_protocol)
-                if (!subItem.allowInsecureUrl) {
-                    return
-                }
+            if (!Utils.isValidSubUrl(subItem.url) && !subItem.allowInsecureUrl) {
+                return
             }
         }
 
         if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-            toast(R.string.toast_invalid_update_interval)
             return
         }
 
@@ -150,13 +144,16 @@ fun SubEditScreen(
 ) {
     //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
+    var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
+    var isUrlError by rememberSaveable { mutableStateOf(false) }
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }
     var requestHeaders by rememberSaveable { mutableStateOf(initial.requestHeaders.orEmpty()) }
     var filter by rememberSaveable { mutableStateOf(initial.filter ?: "") }
     var enabled by rememberSaveable { mutableStateOf(initial.enabled) }
     var autoUpdate by rememberSaveable { mutableStateOf(initial.autoUpdate) }
     var updateInterval by rememberSaveable { mutableStateOf(initial.updateInterval.toString()) }
+    var isUpdateIntervalError by rememberSaveable { mutableStateOf(false) }
     var allowInsecureUrl by rememberSaveable { mutableStateOf(initial.allowInsecureUrl) }
     var prevProfile by rememberSaveable { mutableStateOf(initial.prevProfile ?: "") }
     var nextProfile by rememberSaveable { mutableStateOf(initial.nextProfile ?: "") }
@@ -195,7 +192,22 @@ fun SubEditScreen(
                             Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
                         }
                     }
-                    IconButton(onClick = { onSave(buildSubItem()) }) {
+                    IconButton(onClick = {
+                        val remarksErr = remarks.isBlank()
+                        val urlErr = url.isNotEmpty() && (
+                            !Utils.isValidUrl(url) || (!Utils.isValidSubUrl(url) && !allowInsecureUrl)
+                        )
+                        val intervalErr = autoUpdate && updateInterval.toLongEx() < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES
+
+                        isRemarksError = remarksErr
+                        isUrlError = urlErr
+                        isUpdateIntervalError = intervalErr
+
+                        val hasError = remarksErr || urlErr || intervalErr
+                        if (!hasError) {
+                            onSave(buildSubItem())
+                        }
+                    }) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
@@ -213,8 +225,19 @@ fun SubEditScreen(
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {
-            FormTextField(stringResource(R.string.sub_setting_remarks), remarks, { remarks = it })
-            FormTextField(stringResource(R.string.sub_setting_url), url, { url = it })
+            FormTextField(
+                label = stringResource(R.string.sub_setting_remarks),
+                value = remarks,
+                onValueChange = { remarks = it },
+                isError = isRemarksError
+            )
+            FormTextField(
+                label = stringResource(R.string.sub_setting_url),
+                value = url,
+                onValueChange = { url = it },
+                isError = isUrlError,
+                supportingText = if (isUrlError) stringResource(R.string.toast_invalid_url) else null
+            )
             FormTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
             FormTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
             FormTextField(stringResource(R.string.sub_setting_filter), filter, { filter = it })
@@ -231,8 +254,12 @@ fun SubEditScreen(
             )
 
             FormTextField(
-                stringResource(R.string.title_pref_auto_update_interval),
-                updateInterval, { updateInterval = it }, keyboardType = KeyboardType.Number
+                label = stringResource(R.string.title_pref_auto_update_interval),
+                value = updateInterval,
+                onValueChange = { updateInterval = it },
+                keyboardType = KeyboardType.Number,
+                isError = isUpdateIntervalError,
+                supportingText = if (isUpdateIntervalError) stringResource(R.string.toast_invalid_update_interval) else null
             )
 
             SettingsSwitchItem(
@@ -265,6 +292,7 @@ fun SubEditScreen(
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_subscription_group),
+            itemName = initial.remarks,
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )
