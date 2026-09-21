@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -48,14 +49,12 @@ object NotificationHelper {
         val localizedContext = AppLocaleManager.localizedContext(appContext)
         val manager = getNotificationManager(appContext)
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val name = localizedContext.getString(R.string.notification_channel_other)
-                val channel = manager.getNotificationChannel(TRANSIENT_MESSAGE_CHANNEL_ID)
-                    ?: NotificationChannel(TRANSIENT_MESSAGE_CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW)
-                // Rename an existing channel without changing the user's behavior settings.
-                channel.name = name
-                manager.createNotificationChannel(channel)
-            }
+            ensureNotificationChannel(
+                context = appContext,
+                channelId = TRANSIENT_MESSAGE_CHANNEL_ID,
+                channelNameRes = R.string.notification_channel_other,
+                importance = NotificationManager.IMPORTANCE_LOW,
+            )
             val notificationTag = if (message.requiresDismissal) UUID.randomUUID().toString() else null
             val target = Intent(appContext, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -190,20 +189,43 @@ object NotificationHelper {
         return cachedNotificationManager!!
     }
 
-    private fun ensureChannelCreated(channelType: NotificationChannelType, context: Context) {
+    private fun ensureChannelCreated(channelType: NotificationChannelType, context: Context) =
+        ensureNotificationChannel(
+            context = context,
+            channelId = channelType.channelId,
+            channelNameRes = channelType.channelNameRes,
+            importance = NotificationManager.IMPORTANCE_LOW,
+        )
+
+    /**
+     * Creates a channel or updates only its localized name.
+     *
+     * Android lets apps rename an existing channel, while its behavior remains under user control.
+     */
+    internal fun ensureNotificationChannel(
+        context: Context,
+        channelId: String,
+        @StringRes channelNameRes: Int,
+        importance: Int,
+        configureNewChannel: NotificationChannel.() -> Unit = {},
+    ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (notificationManager.getNotificationChannel(channelType.channelId) != null) return
-
-        val channel = NotificationChannel(
-            channelType.channelId,
-            channelType.channelName,
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val localizedName = AppLocaleManager.localizedContext(context).getString(channelNameRes)
+        val existingChannel = notificationManager.getNotificationChannel(channelId)
+        if (existingChannel == null) {
+            NotificationChannel(channelId, localizedName, importance)
+                .apply {
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                    configureNewChannel()
+                }
+                .also(notificationManager::createNotificationChannel)
+        } else if (existingChannel.name.toString() != localizedName) {
+            existingChannel.name = localizedName
+            notificationManager.createNotificationChannel(existingChannel)
         }
-        notificationManager.createNotificationChannel(channel)
     }
 
     private fun buildNotificationBuilder(

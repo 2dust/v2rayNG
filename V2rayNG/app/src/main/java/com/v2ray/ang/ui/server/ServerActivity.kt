@@ -520,6 +520,7 @@ fun ServerScreen(
     if (showDeleteDialog) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_profile),
+            itemName = initialConfig.remarks,
             onConfirm = { showDeleteDialog = false; onDelete() },
             onDismiss = { showDeleteDialog = false }
         )
