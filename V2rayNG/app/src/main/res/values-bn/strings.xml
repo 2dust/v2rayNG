@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">v2rayNG সার্ভিস</string>
+    <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
+    <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
     <string name="toast_permission_denied">অনুমতি পাওয়া যাচ্ছে না</string>
     <string name="toast_permission_denied_notification">বিজ্ঞপ্তির অনুমতি পাওয়া যায়নি</string>
@@ -49,9 +52,8 @@
     <string name="confirm_delete_policy_group">আপনি কি এই পলিসি গ্রুপটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_proxy_chain_member">আপনি কি এই প্রক্সি চেইন সদস্যটিকে মুছে ফেলতে চান?</string>
     <string name="confirm_delete_routing_rule">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?</string>
-    <string name="confirm_delete_routing_rule_named">আপনি কি এই রাউটিং নিয়মটি মুছে ফেলতে চান?\n%1$s</string>
     <string name="confirm_delete_subscription_group">আপনি কি এই সাবস্ক্রিপশন গ্রুপটি মুছে ফেলতে চান?</string>
-    <string name="confirm_delete_asset_file">আপনি কি \"%1$s\" অ্যাসেট ফাইলটি মুছে ফেলতে চান?</string>
+    <string name="confirm_delete_asset_file">আপনি কি এই অ্যাসেট ফাইলটি মুছে ফেলতে চান?</string>
     <string name="confirm_delete_asset_source">আপনি কি এই অ্যাসেট উৎসটি মুছে ফেলতে চান?</string>
     <string name="server_lab_remarks">মন্তব্য</string>
     <string name="server_lab_address">ঠিকানা</string>
@@ -101,6 +103,7 @@
     <string name="server_lab_reserved">Reserved (ঐচ্ছিক, কমা দিয়ে পৃথক)</string>
     <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
     <string name="server_lab_local_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1420)</string>
+    <string name="server_lab_remote_dns">remoteDNS (ঐচ্ছিক, কমা দ্বারা পৃথক করা IPv4/IPv6 ঠিকানা, অথবা ডিভাইসের DNS ব্যবহার করতে "local")</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (ঐচ্ছিক, ডিফল্ট 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (ঐচ্ছিক, ডিফল্ট 50 মিলিসেকেন্ড)</string>
     <string name="toast_success">সফল</string>
@@ -352,8 +355,14 @@
     <string name="title_del_config_count">%dটি কনফিগারেশন মুছুন</string>
     <string name="title_import_config_count">%dটি কনফিগারেশন আমদানি করুন</string>
     <string name="title_export_config_count">%dটি কনফিগারেশন রপ্তানি করুন</string>
-    <string name="title_update_config_count">%dটি কনফিগারেশন আপডেট করুন</string>
-    <string name="title_update_asset_count">%dটি অ্যাসেট ফাইল আপডেট হয়েছে</string>
+    <plurals name="title_update_config_count">
+        <item quantity="one">%1$dটি কনফিগারেশন আপডেট হয়েছে</item>
+        <item quantity="other">%1$dটি কনফিগারেশন আপডেট হয়েছে</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="one">%1$dটি অ্যাসেট ফাইল আপডেট হয়েছে</item>
+        <item quantity="other">%1$dটি অ্যাসেট ফাইল আপডেট হয়েছে</item>
+    </plurals>
     <string name="title_update_subscription_result">%1$dটি কনফিগ আপডেট হয়েছে (%2$d সফল, %3$d ব্যর্থ, %4$d এড়ানো)</string>
     <string name="title_update_subscription_no_subscription">কোনো সাবস্ক্রিপশন নেই</string>
     <string name="toast_server_not_found_in_group">বর্তমান গ্রুপে নির্বাচিত সার্ভারটি পাওয়া যায়নি</string>
@@ -542,7 +551,6 @@
     <string name="acc_move_to_bottom">তালিকার শেষে সরান</string>
     <string name="acc_moved">সরানো হয়েছে</string>
     <string name="acc_selected_server">নির্বাচিত</string>
-    <string name="acc_select_server">নির্বাচন করুন</string>
     <string name="acc_share_subscription">সাবস্ক্রিপশন লিংক শেয়ার করুন</string>
     <string name="acc_share_log">লগ শেয়ার করুন</string>
     <string name="acc_remove">প্রক্সি চেইনের সদস্য সরান</string>

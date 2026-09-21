@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +63,6 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.ReorderCommand
@@ -78,7 +76,6 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -119,18 +116,6 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             onAddRule = { startActivity(Intent(this, RoutingEditActivity::class.java)) },
             onEditRule = { position ->
                 startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
-            },
-            onRemoveRule = { ruleId ->
-                lifecycleScope.launch {
-                    try {
-                        viewModel.remove(ruleId)
-                    } catch (cancelled: CancellationException) {
-                        throw cancelled
-                    } catch (e: Exception) {
-                        LogUtil.e(AppConfig.TAG, "Failed to delete routing rule $ruleId", e)
-                        toastError(R.string.toast_failure)
-                    }
-                }
             },
             onDomainStrategySelected = { value ->
                 MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
@@ -223,7 +208,6 @@ fun RoutingSettingScreen(
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
     onEditRule: (Int) -> Unit,
-    onRemoveRule: (String) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
     onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
@@ -234,7 +218,6 @@ fun RoutingSettingScreen(
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
-    var deleteRuleId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
@@ -322,15 +305,11 @@ fun RoutingSettingScreen(
                     ) {
                         RoutingRulesetItem(
                             ruleset = ruleset,
-                            onEdit = {
-                                val position = viewModel.getAll().indexOfFirst { it.id == ruleset.id }
-                                if (position >= 0) onEditRule(position)
-                            },
+                            onEdit = { onEditRule(index) },
                             onEnabledChange = { checked ->
                                 val updated = ruleset.copy(enabled = checked)
-                                viewModel.update(ruleset.id, updated)
+                                viewModel.update(index, updated)
                             },
-                            onDelete = { deleteRuleId = ruleset.id },
                             reorderIndex = index,
                             itemCount = rulesets.size,
                             onMove = { command -> viewModel.move(ruleset.id, command) },
@@ -341,17 +320,6 @@ fun RoutingSettingScreen(
                 }
             }
         }
-    }
-
-    rulesets.firstOrNull { it.id == deleteRuleId }?.let { rule ->
-        DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_routing_rule_named, rule.remarks.orEmpty()),
-            onConfirm = {
-                deleteRuleId = null
-                onRemoveRule(rule.id)
-            },
-            onDismiss = { deleteRuleId = null }
-        )
     }
 
     if (showPresetDialog) {
@@ -373,7 +341,6 @@ private fun RoutingRulesetItem(
     ruleset: RulesetItem,
     onEdit: () -> Unit,
     onEnabledChange: (Boolean) -> Unit,
-    onDelete: () -> Unit,
     reorderIndex: Int,
     itemCount: Int,
     onMove: (ReorderCommand) -> Boolean,
@@ -411,10 +378,6 @@ private fun RoutingRulesetItem(
         CustomAccessibilityAction(
             label = stringResource(R.string.acc_edit_routing_rule_named, ruleName),
             action = { onEdit(); true },
-        ),
-        CustomAccessibilityAction(
-            label = stringResource(R.string.acc_delete_routing_rule_named, ruleName),
-            action = { onDelete(); true },
         ),
     )
     val accessibilityActions = itemActions +
@@ -479,25 +442,14 @@ private fun RoutingRulesetItem(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.padding(start = 8.dp)
         ) {
-            Row {
-                IconButton(
-                    onClick = onEdit,
-                    modifier = Modifier.clearAndSetSemantics {},
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_edit_24dp),
-                        contentDescription = null
-                    )
-                }
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.clearAndSetSemantics {},
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete_24dp),
-                        contentDescription = null
-                    )
-                }
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier.clearAndSetSemantics {},
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_edit_24dp),
+                    contentDescription = null
+                )
             }
             Spacer(modifier = Modifier.height(4.dp))
             Switch(

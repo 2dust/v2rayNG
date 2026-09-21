@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">v2rayNG 服务</string>
+    <string name="notification_channel_subscription_updates">订阅更新</string>
+    <string name="notification_channel_connection_checks">连接检查</string>
     <string name="notification_action_stop_v2ray">停止</string>
     <string name="toast_permission_denied">无法取得权限</string>
     <string name="toast_permission_denied_notification">无法取得通知权限</string>
@@ -49,9 +52,8 @@
     <string name="confirm_delete_policy_group">确定要删除此策略组吗？</string>
     <string name="confirm_delete_proxy_chain_member">确定要删除此代理链成员吗？</string>
     <string name="confirm_delete_routing_rule">确定要删除此路由规则吗？</string>
-    <string name="confirm_delete_routing_rule_named">确定要删除此路由规则吗？\n%1$s</string>
     <string name="confirm_delete_subscription_group">确定要删除此订阅组吗？</string>
-    <string name="confirm_delete_asset_file">确定要删除资源文件“%1$s”吗？</string>
+    <string name="confirm_delete_asset_file">确定要删除此资源文件吗？</string>
     <string name="confirm_delete_asset_source">确定要删除此资源来源吗？</string>
     <string name="server_lab_remarks">别名 (remarks)</string>
     <string name="server_lab_address">地址 (address)</string>
@@ -101,6 +103,7 @@
     <string name="server_lab_reserved">Reserved (可选，逗号隔开)</string>
     <string name="server_lab_local_address">本地地址 (可选 IPv4/IPv6，逗号隔开)</string>
     <string name="server_lab_local_mtu">MTU（可选，默认 1420）</string>
+    <string name="server_lab_remote_dns">remoteDNS(可选,多个 IPv4/IPv6 地址用逗号分隔,或填写 "local" 使用设备本地 DNS)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU（可选，默认 1350）</string>
     <string name="server_lab_kcp_tti">mKCP TTI（可选，默认 50 毫秒）</string>
     <string name="toast_success">成功</string>
@@ -352,8 +355,12 @@
     <string name="title_del_config_count">删除 %d 个配置</string>
     <string name="title_import_config_count">导入 %d 个配置</string>
     <string name="title_export_config_count">导出 %d 个配置</string>
-    <string name="title_update_config_count">更新 %d 个配置</string>
-    <string name="title_update_asset_count">已更新 %d 个资源文件</string>
+    <plurals name="title_update_config_count">
+        <item quantity="other">已更新 %1$d 个配置</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="other">已更新 %1$d 个资源文件</item>
+    </plurals>
     <string name="title_update_subscription_result">更新了 %1$d 个配置（%2$d 个成功，%3$d 个失败，%4$d 个跳过）</string>
     <string name="title_update_subscription_no_subscription">无订阅</string>
     <string name="toast_server_not_found_in_group">当前分组中未找到选中的服务器</string>
@@ -542,7 +549,6 @@
     <string name="acc_move_to_bottom">移至列表底部</string>
     <string name="acc_moved">已移动</string>
     <string name="acc_selected_server">已选择</string>
-    <string name="acc_select_server">选择</string>
     <string name="acc_share_subscription">分享订阅链接</string>
     <string name="acc_share_log">分享日志</string>
     <string name="acc_remove">移除代理链成员</string>
