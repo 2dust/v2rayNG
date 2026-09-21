@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">Dịch vụ v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
+    <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>

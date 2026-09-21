@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">Служба v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Обновления подписок</string>
+    <string name="notification_channel_connection_checks">Проверки соединения</string>
     <string name="notification_action_stop_v2ray">Остановить</string>
     <string name="toast_permission_denied">Разрешение не получено</string>
     <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
