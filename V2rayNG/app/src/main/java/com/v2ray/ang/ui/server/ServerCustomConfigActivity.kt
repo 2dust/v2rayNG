@@ -486,6 +486,7 @@ fun ServerCustomConfigScreen(
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_profile),
+            itemName = initialRemarks,
             onConfirm = {
                 showDeleteConfirm = false
                 onDelete()
