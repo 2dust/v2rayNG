@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.MainThread
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -27,8 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +59,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /** Process ownership lets unread messages follow navigation instead of dying with an activity. */
 @MainThread
@@ -66,21 +70,36 @@ class AppSnackbarManager(
     private val closeLabel: () -> String,
 ) {
     val hostState = SnackbarHostState()
-    private val hosts = mutableListOf<Any>()
-    private val _activeHost = MutableStateFlow<Any?>(null)
+    private val hosts = mutableListOf<String>()
+    private val _activeHost = MutableStateFlow<String?>(null)
     val activeHost = _activeHost.asStateFlow()
     private val pending = linkedMapOf<Job, UserMessage>()
+    private var presentation: Pair<String, SnackbarData>? = null
     var isForeground = false
         private set
 
-    internal fun register(host: Any) {
+    internal fun register(host: String) {
+        presentation?.let { (previousHost, snackbar) ->
+            // Do not replay already-shown transient feedback on a different screen.
+            // Unseen queued messages and errors requiring dismissal still follow navigation.
+            if (previousHost != host && snackbar.visuals.duration != SnackbarDuration.Indefinite) {
+                snackbar.dismiss()
+                presentation = null
+            }
+        }
         hosts.add(host)
         _activeHost.value = host
     }
 
-    internal fun unregister(host: Any) {
+    internal fun unregister(host: String) {
         hosts.remove(host)
         _activeHost.value = hosts.lastOrNull()
+    }
+
+    internal fun onPresented(host: String, snackbar: SnackbarData) {
+        if (_activeHost.value == host && hostState.currentSnackbarData === snackbar) {
+            presentation = host to snackbar
+        }
     }
 
     internal fun setForeground(foreground: Boolean) {
@@ -154,8 +173,10 @@ class AppSnackbarManager(
 @Composable
 fun AppSnackbarHost() {
     val manager = (LocalContext.current.applicationContext as AngApplication).snackbarManager
+    val activity = LocalActivity.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val host = remember { Any() }
+    // A recreated screen is the same destination, not navigation to a new message host.
+    val host = rememberSaveable { UUID.randomUUID().toString() }
     LaunchedEffect(manager, lifecycleOwner, host) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             manager.register(host)
@@ -167,7 +188,7 @@ fun AppSnackbarHost() {
         }
     }
     val activeHost by manager.activeHost.collectAsStateWithLifecycle()
-    if (activeHost !== host) return
+    if (activeHost != host) return
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding(),
     ) {
@@ -180,6 +201,10 @@ fun AppSnackbarHost() {
                 .padding(horizontal = 80.dp)
                 .widthIn(max = 600.dp),
         ) { data ->
+            SideEffect {
+                // A save-and-finish can still compose one last frame; leave its feedback unread.
+                if (activity?.isFinishing != true) manager.onPresented(host, data)
+            }
             Snackbar(
                 modifier = Modifier.padding(12.dp),
                 actionOnNewLine = data.visuals.actionLabel != null,

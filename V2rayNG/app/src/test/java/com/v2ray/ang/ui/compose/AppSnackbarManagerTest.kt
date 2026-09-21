@@ -26,14 +26,15 @@ class AppSnackbarManagerTest {
     @Test
     fun closingAnEditorTransfersItsErrorAndQueuedConfirmationToTheNextHost() {
         manager.setForeground(true)
-        val editor = Any()
-        val main = Any()
+        val editor = "editor"
+        val main = "main"
         manager.register(editor)
         manager.show(UserMessage("Long error\ndetails", isError = true))
         manager.show(UserMessage("Saved"))
         val error = manager.hostState.currentSnackbarData!!
         assertEquals(SnackbarDuration.Indefinite, error.visuals.duration)
         assertEquals("Close", error.visuals.actionLabel)
+        manager.onPresented(editor, error)
 
         manager.unregister(editor)
         assertNull(manager.activeHost.value)
@@ -47,6 +48,84 @@ class AppSnackbarManagerTest {
         assertEquals(SnackbarDuration.Short, manager.hostState.currentSnackbarData?.visuals?.duration)
         manager.hostState.currentSnackbarData!!.dismiss()
         assertNull(manager.hostState.currentSnackbarData)
+    }
+
+    @Test
+    fun navigationDismissesShownTransientFeedbackWithoutDroppingTheQueue() {
+        manager.setForeground(true)
+        manager.register("updates")
+        manager.show(UserMessage("Checking for update"))
+        manager.onPresented("updates", manager.hostState.currentSnackbarData!!)
+        manager.show(UserMessage("Finished"))
+
+        manager.unregister("updates")
+        manager.register("main")
+
+        assertEquals("Finished", manager.hostState.currentSnackbarData?.visuals?.message)
+        assertTrue(notifications.isEmpty())
+    }
+
+    @Test
+    fun finishingBeforePresentationKeepsTheMessageForTheNextScreen() {
+        manager.setForeground(true)
+        manager.register("editor")
+        manager.show(UserMessage("Saved"))
+        val message = manager.hostState.currentSnackbarData
+
+        manager.unregister("editor")
+        manager.register("main")
+
+        assertSame(message, manager.hostState.currentSnackbarData)
+    }
+
+    @Test
+    fun recreationRetainsShownFeedbackWithTheRestoredHostIdentity() {
+        manager.setForeground(true)
+        manager.register("updates")
+        manager.show(UserMessage("Checking for update"))
+        val message = manager.hostState.currentSnackbarData!!
+        manager.onPresented("updates", message)
+
+        manager.unregister("updates")
+        manager.register(charArrayOf('u', 'p', 'd', 'a', 't', 'e', 's').concatToString())
+
+        assertSame(message, manager.hostState.currentSnackbarData)
+    }
+
+    @Test
+    fun aNewMessageWithTheSameTextIsNotDeduplicated() {
+        manager.setForeground(true)
+        manager.register("updates")
+        manager.show(UserMessage("Success"))
+        manager.onPresented("updates", manager.hostState.currentSnackbarData!!)
+        manager.unregister("updates")
+        manager.register("main")
+        assertNull(manager.hostState.currentSnackbarData)
+
+        manager.show(UserMessage("Success"))
+        val message = manager.hostState.currentSnackbarData!!
+        manager.unregister("main")
+        manager.register("editor")
+        assertSame(message, manager.hostState.currentSnackbarData)
+    }
+
+    @Test
+    fun anOutgoingHostCannotClaimTheNextMessage() {
+        manager.setForeground(true)
+        manager.register("updates")
+        manager.show(UserMessage("First"))
+        val first = manager.hostState.currentSnackbarData!!
+        manager.onPresented("updates", first)
+        manager.register("main")
+        manager.show(UserMessage("Second"))
+        val second = manager.hostState.currentSnackbarData!!
+        manager.onPresented("updates", second)
+        manager.onPresented("main", first)
+        manager.unregister("updates")
+        manager.unregister("main")
+        manager.register("editor")
+
+        assertSame(second, manager.hostState.currentSnackbarData)
     }
 
     @Test
@@ -89,8 +168,8 @@ class AppSnackbarManagerTest {
 
     @Test
     fun onlyOneHostRendersDuringOverlappingActivityLifecycles() {
-        val first = Any()
-        val second = Any()
+        val first = "first"
+        val second = "second"
         manager.register(first)
         manager.register(second)
         assertSame(second, manager.activeHost.value)
