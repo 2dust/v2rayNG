@@ -80,7 +80,6 @@ class SubEditActivity : BaseComponentActivity() {
     private fun saveServer(subItem: SubscriptionItem): Boolean {
 
         if (TextUtils.isEmpty(subItem.remarks)) {
-            toast(R.string.sub_setting_remarks)
             return false
         }
         if (subItem.url.isNotEmpty()) {
@@ -132,6 +131,7 @@ fun SubEditScreen(
 ) {
     //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
+    var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
     var userAgent by rememberSaveable { mutableStateOf(initial.userAgent.orEmpty()) }
     var requestHeaders by rememberSaveable { mutableStateOf(initial.requestHeaders.orEmpty()) }
@@ -146,7 +146,7 @@ fun SubEditScreen(
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
-    val subscriptionName = subscriptionAccessibilityName(remarks, url, stringResource(R.string.acc_unnamed_subscription))
+    val subscriptionName = subscriptionAccessibilityName(initial.remarks, initial.url, stringResource(R.string.acc_unnamed_subscription))
 
     fun buildSubItem(): SubscriptionItem {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
@@ -178,7 +178,15 @@ fun SubEditScreen(
                             Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete_named, subscriptionName))
                         }
                     }
-                    IconButton(onClick = { buildSubItem()?.let { onSave(it) } }) {
+                    IconButton(onClick = {
+                        val remarksErr = remarks.isBlank()
+                        isRemarksError = remarksErr
+
+                        val hasError = remarksErr
+                        if (!hasError) {
+                            onSave(buildSubItem())
+                        }
+                    }) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
@@ -196,7 +204,12 @@ fun SubEditScreen(
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {
-            FormTextField(stringResource(R.string.sub_setting_remarks), remarks, { remarks = it })
+            FormTextField(
+                label = stringResource(R.string.sub_setting_remarks),
+                value = remarks,
+                onValueChange = { remarks = it },
+                isError = isRemarksError
+            )
             FormTextField(stringResource(R.string.sub_setting_url), url, { url = it })
             FormTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
             FormTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
@@ -247,7 +260,8 @@ fun SubEditScreen(
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_subscription_group_named, subscriptionName),
+            message = stringResource(R.string.confirm_delete_subscription_group),
+            itemName = subscriptionName,
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )

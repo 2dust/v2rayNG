@@ -166,6 +166,7 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
+    const val WIREGUARD_LOCAL_REMOTE_DNS = "1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
     const val LOOPBACK = "127.0.0.1"
 
     /** Shared defaults for settings shown in the UI and consumed by config generation. */
@@ -188,6 +189,7 @@ object AppConfig {
     const val MSG_STATE_RESTART = 5
     const val MSG_MEASURE_DELAY = 6
     const val MSG_MEASURE_DELAY_RESULT = 61
+    const val MSG_MEASURE_DELAY_CANCEL = 62
     const val MSG_MEASURE_CONFIG_START = 7
     const val MSG_MEASURE_CONFIG_CANCEL = 71
     const val MSG_MEASURE_CONFIG_SUCCESS = 72
@@ -200,7 +202,6 @@ object AppConfig {
     /** Notification channel IDs and names. */
     // Use a new ID because Android does not let an app raise an existing channel's importance.
     const val RAY_NG_CHANNEL_ID = "CORE_M_CH_ID_V2"
-    const val RAY_NG_CHANNEL_NAME = "Core Background Service"
 
     /** Protocols Scheme **/
     const val VMESS = "vmess://"

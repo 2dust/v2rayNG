@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">سرویس v2rayNG</string>
+    <string name="notification_channel_subscription_updates">ورۊ کردن اشتراکا</string>
+    <string name="notification_channel_connection_checks">واجۊری منپیز</string>
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
@@ -50,8 +53,8 @@
     <string name="confirm_delete_proxy_chain_member">ای عوزو زنجیره پروکسی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_routing_rule">ای قانووݩ تور جوستن پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="confirm_delete_subscription_group">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_file">فایل بونچک جوقرافیایی «%1$s» پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
-    <string name="confirm_delete_asset_source">ای بونچک فایل جوقرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_file">ای فایل بونچک جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
+    <string name="confirm_delete_asset_source">ای بونچک فایلا جغرافیایی پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟</string>
     <string name="server_lab_remarks">نیشتنا</string>
     <string name="server_lab_address">نشۊوی</string>
     <string name="server_lab_port">پورت</string>
@@ -100,6 +103,7 @@
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی محلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرض 1420)</string>
+    <string name="server_lab_remote_dns">remoteDNS (اختياری، آدرس‌های IPv4/IPv6 جدا شده با کاما، یا "local" برای استفاده از DNS دستگاه)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پؽش فرض 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پؽش فرض 50 میلی‌ثانیه)</string>
     <string name="toast_success">وا مووفقیت ٱنجوم وابی</string>
@@ -328,7 +332,6 @@
     <string name="sub_setting_remarks">نیشتنا</string>
     <string name="sub_setting_url">نشۊوی اینترنتی اختیاری</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
-    <string name="confirm_delete_subscription_group_named">ای بونکۊ اشتراک پاک ابۊ، هنی هم اخۊی پاکس کۊنی؟\n%1$s</string>
     <string name="acc_last_updated">ورۊ رسۊوی نهایی من %1$s</string>
     <string name="acc_subscription_update_on">ورۊ کردن روشن هڌ</string>
     <string name="acc_subscription_update_off">ورۊ کردن خاموش هڌ</string>
@@ -339,7 +342,6 @@
     <string name="acc_subscription_auto_update_enabled">ورۊ کردن خوتکار وا فاصله زمۊوی روشن هڌ</string>
     <string name="acc_subscription_auto_update_disabled">ورۊ کردن خوتکار وا فاصله زمۊوی خاموش هڌ</string>
     <string name="acc_unnamed_subscription">بی‌نوم.</string>
-    <string name="acc_share_named">یک رسۊوی %1$s</string>
     <string name="acc_edit_named">آلشتکاری %1$s</string>
     <string name="acc_delete_named">پاک کردن %1$s</string>
     <string name="sub_setting_request_headers">سرآیندا درخواست (قالوو JSON)</string>
@@ -550,7 +552,6 @@
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
     <string name="acc_moved">آلشت وابید</string>
     <string name="acc_selected_server">پسند وابیڌه</string>
-    <string name="acc_select_server">پسند کردن</string>
     <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>

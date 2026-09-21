@@ -57,10 +57,7 @@ private enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
     Clipboard(R.string.share_subscription_clipboard)
 }
 
-private data class SubscriptionDeleteTarget(
-    val guid: String,
-    val name: String
-)
+private data class SubscriptionDeleteTarget(val guid: String, val name: String)
 
 class SubSettingActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionsViewModel by viewModels()
@@ -265,16 +262,13 @@ fun SubSettingScreen(
         )
     }
 
-    val deleteTarget = removeTarget
-    if (deleteTarget != null) {
+    removeTarget?.let { target ->
         DeleteConfirmDialog(
-            message = stringResource(
-                R.string.confirm_delete_subscription_group_named,
-                deleteTarget.name
-            ),
+            message = stringResource(R.string.confirm_delete_subscription_group),
+            itemName = target.name,
             onConfirm = {
-                onRemoveSub(deleteTarget.guid)
                 removeTarget = null
+                onRemoveSub(target.guid)
             },
             onDismiss = { removeTarget = null }
         )
