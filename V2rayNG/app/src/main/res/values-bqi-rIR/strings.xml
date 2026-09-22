@@ -561,4 +561,5 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+    <string name="toast_policy_group_chain_invalid">زنجیرۀ گروه سیاست درست نیه. اعضا، پراکسی ورودی، پراکسی خروجی و مسیر جایگزین نه بررسی بکنید.</string>
 </resources>

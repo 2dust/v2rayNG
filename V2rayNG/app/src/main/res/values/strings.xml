@@ -561,4 +561,5 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="toast_policy_group_chain_invalid">Invalid policy group chain. Check the members, preproxy, landing proxy and fallback.</string>
 </resources>

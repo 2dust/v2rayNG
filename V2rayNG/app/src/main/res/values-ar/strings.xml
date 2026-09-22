@@ -569,4 +569,5 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="toast_policy_group_chain_invalid">سلسلة مجموعة السياسات غير صالحة. تحقق من الأعضاء والوكيل الأولي ووكيل الخروج والمسار الاحتياطي.</string>
 </resources>

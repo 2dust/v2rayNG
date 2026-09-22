@@ -207,13 +207,19 @@ object SettingsManager {
      * @return The ProfileItem.
      */
     fun getServerViaRemarks(remarks: String?): ProfileItem? {
+        return getServerViaRemarksWithGuid(remarks)?.second
+    }
+
+    /** Resolve legacy remark references without losing the stored server identity. */
+    fun getServerViaRemarksWithGuid(remarks: String?): Pair<String, ProfileItem>? {
         if (remarks.isNullOrEmpty()) {
             return null
         }
         val serverList = decodeAllServerList()
         return serverList
-            .mapNotNull { guid -> decodeServerConfig(guid) }
-            .firstOrNull { it.remarks == remarks }
+            .asSequence()
+            .mapNotNull { guid -> decodeServerConfig(guid)?.let { guid to it } }
+            .firstOrNull { it.second.remarks == remarks }
     }
 
     /**

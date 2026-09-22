@@ -559,4 +559,5 @@
     <string name="connection_test_empty_message">沒有詳細資訊</string>
     <string name="value_unknown">未知</string>
 
+    <string name="toast_policy_group_chain_invalid">策略組鏈路無效，請檢查成員、前置代理、落地代理與回退設定。</string>
 </resources>

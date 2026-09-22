@@ -5,6 +5,7 @@ import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.V2rayConfig
@@ -21,6 +22,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.PackageUidResolver
 import com.v2ray.ang.util.Utils
+import java.util.UUID
 
 object CoreConfigManager {
     private var initConfigCache: String? = null
@@ -43,6 +45,9 @@ object CoreConfigManager {
                 return buildV2rayCustomConfig(configContext)
             }
             return toConfigResult(configContext, buildUnifiedConfig(configContext))
+        } catch (e: PolicyGroupConfigException) {
+            LogUtil.e(AppConfig.TAG, "Build policy group config failed: groupId=${e.groupId}", e)
+            return ConfigResult(status = false, guid = guid, errorMessage = context.getString(R.string.toast_policy_group_chain_invalid))
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config", e)
             return ConfigResult(
@@ -73,6 +78,9 @@ object CoreConfigManager {
             postProcessForSpeedtest(v2rayConfig)
 
             return toConfigResult(configContext, v2rayConfig)
+        } catch (e: PolicyGroupConfigException) {
+            LogUtil.e(AppConfig.TAG, "Build policy group speedtest config failed: groupId=${e.groupId}", e)
+            return ConfigResult(status = false, guid = guid, errorMessage = context.getString(R.string.toast_policy_group_chain_invalid))
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
             return ConfigResult(
@@ -373,39 +381,15 @@ object CoreConfigManager {
         policyGroupBalancerTags: MutableMap<String, String>,
         balancerStrategies: MutableList<BalancerStrategy>,
     ) {
-        val memberPairs = resolvedOutbound.resolvedProfiles.mapNotNull { profile ->
-            convertProfile2Outbound(profile)?.let { ob -> ob to profile }
-        }
-        if (memberPairs.isEmpty()) {
-            LogUtil.w(AppConfig.TAG, "POLICYGROUP resolved outbound '${resolvedOutbound.tag}' has no valid member outbounds, skipping")
-            return
-        }
-
-        val memberTagPrefix = "${AppConfig.TAG_PROXY}-${resolvedOutbound.tag}-"
-        val membersToAdd = mutableListOf<V2rayConfig.OutboundBean>()
-        memberPairs.forEachIndexed { index, (outbound, profile) ->
-            val memberTag = "$memberTagPrefix${index + 1}-${profile.remarks.trim()}"
-            if (memberTag in existingTags) {
-                return@forEachIndexed
-            }
-            outbound.tag = memberTag
-            membersToAdd.add(outbound)
-            existingTags.add(memberTag)
-        }
-
-        if (membersToAdd.isEmpty()) {
-            LogUtil.w(
-                AppConfig.TAG,
-                "POLICYGROUP resolved outbound '${resolvedOutbound.tag}' produced no unique member tags, skipping"
-            )
-            return
-        }
+        val generated = buildPolicyGroupOutbounds(resolvedOutbound, existingTags)
+        val membersToAdd = generated.outbounds
 
         if (prepend) {
             v2rayConfig.outbounds.addAll(0, membersToAdd)
         } else {
             v2rayConfig.outbounds.addAll(membersToAdd)
         }
+        existingTags.addAll(membersToAdd.map { it.tag })
 
         val balancerTag = if (resolvedOutbound.tag == AppConfig.TAG_PROXY) {
             AppConfig.TAG_BALANCER
@@ -414,15 +398,15 @@ object CoreConfigManager {
         }
         val strategyType = BalancerStrategyType.from(resolvedOutbound.profile.policyGroupType)
         val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
-            resolvedOutbound.profile.policyGroupFallbackTag
+            generated.fallbackTag ?: resolvedOutbound.profile.policyGroupFallbackTag
                 ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
             // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
             // without this default, an enabled empty field creates no observatory.
-                ?: membersToAdd.first().tag
+                ?: generated.rootTags.first()
         } else null
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
-            selector = listOf(memberTagPrefix),
+            selector = listOf(generated.selector),
             balancerTag = balancerTag,
             fallbackTag = fallbackTag,
         )
@@ -433,6 +417,60 @@ object CoreConfigManager {
         }
         balancerStrategies.add(strategy)
         policyGroupBalancerTags[resolvedOutbound.tag] = balancerTag
+    }
+
+    internal data class PolicyGroupOutbounds(
+        val outbounds: List<V2rayConfig.OutboundBean>,
+        val rootTags: List<String>,
+        val selector: String,
+        val fallbackTag: String?,
+    )
+
+    /** Build atomically: a failed hop must never turn a chain into a shorter successful one. */
+    internal fun buildPolicyGroupOutbounds(
+        resolved: CoreConfigContext.ResolvedOutbound,
+        existingTags: Set<String>,
+        convert: (ProfileItem) -> V2rayConfig.OutboundBean? = CoreOutboundBuilder::convert,
+    ): PolicyGroupOutbounds {
+        val group = resolved.policyGroup ?: throw PolicyGroupConfigException("", "Missing resolved policy group")
+        fun identity(value: String) = UUID.nameUUIDFromBytes(value.toByteArray(Charsets.UTF_8)).toString()
+        val namespace = "${AppConfig.TAG_PROXY}-pg-${identity(group.guid + "\u0000" + resolved.tag)}"
+        val selector = "$namespace-member-"
+        val outbounds = mutableListOf<V2rayConfig.OutboundBean>()
+        val roots = mutableListOf<String>()
+
+        fun append(member: CoreConfigContext.PolicyGroupMember, fallback: Boolean): String {
+            if (member.chain.isEmpty()) throw PolicyGroupConfigException(group.guid, "Empty member chain")
+            val memberId = identity(member.guid)
+            val root = if (fallback) "$namespace-fallback" else "$selector$memberId"
+            val tags = member.chain.mapIndexed { index, hop ->
+                if (index == 0) root else "$namespace-${if (fallback) "fallback-hop" else "hop"}-$memberId-${identity(hop.guid)}"
+            }
+            member.chain.forEachIndexed { index, hop ->
+                val outbound = try {
+                    convert(hop.profile)?.also {
+                        it.tag = tags[index]
+                        tags.getOrNull(index + 1)?.let { dialer ->
+                            CoreOutboundBuilder.applyChainDialer(it, hop.profile, dialer)
+                        }
+                    }
+                } catch (_: Exception) {
+                    // Converter exceptions may contain user-supplied connection fields.
+                    throw PolicyGroupConfigException(group.guid, "Policy group hop conversion failed")
+                } ?: throw PolicyGroupConfigException(group.guid, "Unsupported policy group hop")
+                outbounds.add(outbound)
+            }
+            return root
+        }
+
+        group.members.forEach { roots.add(append(it, false)) }
+        if (roots.isEmpty()) throw PolicyGroupConfigException(group.guid, "Empty policy group")
+        val fallback = group.fallback?.let { append(it, true) }
+        val tags = outbounds.map { it.tag }
+        if (tags.distinct().size != tags.size || tags.any { it in existingTags }) {
+            throw PolicyGroupConfigException(group.guid, "Policy group outbound tag collision")
+        }
+        return PolicyGroupOutbounds(outbounds, roots, selector, fallback)
     }
 
     /**
