@@ -85,7 +85,10 @@ fun AppTopBar(
                         placeholder = searchPlaceholder
                     )
                 } else {
-                    Text(text = title)
+                    Text(
+                        text = title,
+                        modifier = Modifier.accessibilityTraversalIndex(-1f)
+                    )
                 }
             },
             navigationIcon = {
@@ -151,7 +154,10 @@ private fun SearchInputField(
         )
         if (query.isNotEmpty()) {
             IconButton(onClick = { onQueryChange("") }) {
-                Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), "Clear")
+                Icon(
+                    painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                    contentDescription = stringResource(R.string.acc_clear_search)
+                )
             }
         }
     }
