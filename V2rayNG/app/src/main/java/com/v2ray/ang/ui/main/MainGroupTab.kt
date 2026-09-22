@@ -1,24 +1,33 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.ui.compose.AppDivider
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
@@ -30,29 +39,41 @@ fun GroupTabBar(
     modifier: Modifier = Modifier
 ) {
     val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
-    ScrollableTabRow(
-        selectedTabIndex = selectedIndex,
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = selectedIndex)
+
+    LaunchedEffect(selectedIndex) {
+        if (listState.layoutInfo.visibleItemsInfo.none { it.index == selectedIndex }) {
+            listState.animateScrollToItem(selectedIndex)
+        }
+    }
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
-        edgePadding = 16.dp,
-        indicator = { tabPositions ->
-            TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
     ) {
-        groups.forEachIndexed { index, group ->
-            val serverFlow = remember(group.id, mainViewModel) {
-                mainViewModel.serversForGroup(group.id)
+        AppDivider(Modifier.align(Alignment.BottomCenter))
+        // Keep the collection semantics so TalkBack can reach groups beyond the viewport.
+        LazyRow(
+            state = listState,
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            itemsIndexed(
+                items = groups,
+                key = { _, group -> group.id },
+            ) { index, group ->
+                val serverFlow = remember(group.id, mainViewModel) {
+                    mainViewModel.serversForGroup(group.id)
+                }
+                GroupTabItem(
+                    group = group,
+                    selected = index == selectedIndex,
+                    serverFlow = serverFlow,
+                    onClick = { onTabClick(index) }
+                )
             }
-            GroupTabItem(
-                group = group,
-                selected = index == selectedIndex,
-                serverFlow = serverFlow,
-                onClick = { onTabClick(index) }
-            )
         }
     }
 }
@@ -70,20 +91,36 @@ private fun GroupTabItem(
     } else {
         "${group.remarks} (${servers.size})"
     }
+    val indicatorColor = MaterialTheme.colorScheme.secondary
 
-    Tab(
-        selected = selected,
-        onClick = onClick,
-        modifier = Modifier
+    Box(
+        Modifier
             .widthIn(min = 56.dp)
-            .heightIn(min = 48.dp),
-        text = {
-            Text(
-                text = text,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    )
+            .drawWithContent {
+                drawContent()
+                if (selected) {
+                    val indicatorHeight = 3.dp.toPx()
+                    drawRoundRect(
+                        color = indicatorColor,
+                        topLeft = Offset(0f, size.height - indicatorHeight),
+                        size = Size(size.width, indicatorHeight),
+                        cornerRadius = CornerRadius(indicatorHeight / 2f)
+                    )
+                }
+            }
+    ) {
+        Tab(
+            selected = selected,
+            onClick = onClick,
+            modifier = Modifier.heightIn(min = 48.dp),
+            text = {
+                Text(
+                    text = text,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        )
+    }
 }
