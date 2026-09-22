@@ -9,7 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.util.LogUtil
 
 /**
@@ -60,7 +60,7 @@ class FileChooserHelper(private val activity: ComponentActivity) {
             )
         } catch (ex: ActivityNotFoundException) {
             LogUtil.e(AppConfig.TAG, "File chooser activity not found", ex)
-            activity.toast(R.string.toast_require_file_manager)
+            activity.toastError(R.string.toast_require_file_manager)
             fileChooserCallback?.invoke(null)
             fileChooserCallback = null
         }
@@ -81,7 +81,7 @@ class FileChooserHelper(private val activity: ComponentActivity) {
             documentCreateLauncher.launch(fileName)
         } catch (ex: ActivityNotFoundException) {
             LogUtil.e(AppConfig.TAG, "Document creator activity not found", ex)
-            activity.toast(R.string.toast_require_file_manager)
+            activity.toastError(R.string.toast_require_file_manager)
             documentCreateCallback?.invoke(null)
             documentCreateCallback = null
         }

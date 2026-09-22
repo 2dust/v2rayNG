@@ -41,42 +41,42 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     val viewModelEvent = _viewModelEvent.receiveAsFlow()
 
     /**
-     * Send neutral toast event (Resource ID).
+     * Show informational feedback from a string resource.
      */
     fun toast(resId: Int) {
         localizedContext.toast(resId)
     }
 
     /**
-     * Send neutral toast event (String).
+     * Show informational feedback.
      */
     fun toast(message: String) {
         app.toast(message)
     }
 
     /**
-     * Send success toast event (Resource ID).
+     * Show success feedback from a string resource.
      */
     fun toastSuccess(resId: Int) {
         localizedContext.toastSuccess(resId)
     }
 
     /**
-     * Send success toast event (String).
+     * Show success feedback.
      */
     fun toastSuccess(message: String) {
         app.toastSuccess(message)
     }
 
     /**
-     * Send error toast event (Resource ID).
+     * Show error feedback from a string resource.
      */
     fun toastError(resId: Int) {
         localizedContext.toastError(resId)
     }
 
     /**
-     * Send error toast event (String).
+     * Show error feedback.
      */
     fun toastError(message: String) {
         app.toastError(message)

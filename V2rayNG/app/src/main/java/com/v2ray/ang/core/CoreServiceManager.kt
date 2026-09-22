@@ -53,6 +53,7 @@ object CoreServiceManager {
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
     private val connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val feedbackState = ServiceFeedbackState()
 
     @Volatile
     private var isReloading = false
@@ -102,11 +103,14 @@ object CoreServiceManager {
 
         try {
             doStartCoreLoop(service, vpnInterface)
+            feedbackState.started()
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_SUCCESS)
             return true
         } catch (e: Exception) {
+            feedbackState.startFailed()
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_FAILURE, message)
             NotificationManager.cancelNotification()
             return false
         }
@@ -126,7 +130,7 @@ object CoreServiceManager {
     }
 
     @Throws(Exception::class)
-    private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
+    private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?) {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
         val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
 
@@ -177,9 +181,6 @@ object CoreServiceManager {
             else -> {}
         }
 
-        if (!isReload) {
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-        }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
     }
@@ -192,12 +193,14 @@ object CoreServiceManager {
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
+        val wasRunning = isRunning()
+        feedbackState.requestStop()
 
         networkMonitor?.unregister()
         networkMonitor = null
         currentVpnInterface = null
 
-        if (isRunning()) {
+        if (wasRunning) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     coreController.stopLoop()
@@ -214,7 +217,6 @@ object CoreServiceManager {
             browserDialer = null
         }
 
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
         NotificationManager.cancelNotification()
 
         try {
@@ -265,14 +267,16 @@ object CoreServiceManager {
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
 
             coreController.stopLoop()
-            launchCore(service, tunFd, isReload = true)
+            launchCore(service, tunFd)
+            feedbackState.started()
 
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload finished")
             true
         } catch (e: Exception) {
+            feedbackState.startFailed()
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to reload core: $message", e)
-            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
+            MessageHelper.sendServiceEvent(service, AppConfig.MSG_STATE_START_FAILURE, message)
             false
         } finally {
             isReloading = false
@@ -394,6 +398,10 @@ object CoreServiceManager {
          */
         override fun shutdown(): Long {
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: CoreCallback shutdown")
+            // AndroidLibXrayLite invokes this after closing the instance and clearing isRunning.
+            if (feedbackState.stopped()) {
+                getService()?.let { MessageHelper.sendServiceEvent(it, AppConfig.MSG_STATE_STOP_SUCCESS) }
+            }
             return 0
         }
 
