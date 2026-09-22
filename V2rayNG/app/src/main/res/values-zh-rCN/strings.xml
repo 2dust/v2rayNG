@@ -522,6 +522,9 @@
     <string name="toast_malformed_json_detail">配置格式无效：%1$s</string>
     <string name="acc_add_asset">添加资源来源</string>
     <string name="acc_download_file">下载资源文件</string>
+    <string name="acc_asset_file_details">文件大小：%1$s。更新于%2$s</string>
+    <string name="acc_edit_asset_named">编辑%1$s</string>
+    <string name="acc_delete_asset_named">删除%1$s</string>
     <string name="acc_qr_code">二维码</string>
     <string name="acc_copy_log">复制日志</string>
     <string name="acc_clear_log">清除日志</string>

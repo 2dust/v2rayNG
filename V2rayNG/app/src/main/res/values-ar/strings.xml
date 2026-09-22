@@ -532,6 +532,9 @@
     <string name="toast_malformed_json_detail">تنسيق التكوين غير صالح: %1$s</string>
     <string name="acc_add_asset">إضافة مصدر موارد</string>
     <string name="acc_download_file">تنزيل ملفات الموارد</string>
+    <string name="acc_asset_file_details">حجم الملف %1$s. تم التحديث في %2$s</string>
+    <string name="acc_edit_asset_named">تعديل %1$s</string>
+    <string name="acc_delete_asset_named">حذف %1$s</string>
     <string name="acc_qr_code">رمز QR</string>
     <string name="acc_copy_log">نسخ السجل</string>
     <string name="acc_clear_log">مسح السجل</string>
