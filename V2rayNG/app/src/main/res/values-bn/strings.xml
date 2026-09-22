@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">কনফিগারেশন আমদানি করবেন?</string>
+    <string name="external_import_message">অন্য একটি অ্যাপ কনফিগারেশন আমদানি করতে চায়। উৎসটি বিশ্বাসযোগ্য হলেই এগিয়ে যান। বিদ্যমান প্রোফাইলগুলো রাখা হবে। স্বয়ংক্রিয় আপডেটের জন্য সেটিংস → %1$s থেকে অটোমেশন অ্যাপটিকে অনুমতি দিন।</string>
+    <string name="external_import_confirm">আমদানি করুন</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>
@@ -561,4 +564,8 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
+    <string name="title_remote_control">স্বয়ংক্রিয়করণ অ্যাপের অ্যাক্সেস</string>
+    <string name="summary_remote_control">অন্য অ্যাপকে v2rayNG নিয়ন্ত্রণ করার অনুমতি দিন</string>
+    <string name="remote_control_access_required">সেটিংস → স্বয়ংক্রিয়করণ অ্যাপের অ্যাক্সেস থেকে এই অ্যাপকে অনুমতি দিন, তারপর এই কাজটি আবার খুলুন।</string>
+    <string name="tasker_current_profile">বর্তমান প্রোফাইল</string>
 </resources>

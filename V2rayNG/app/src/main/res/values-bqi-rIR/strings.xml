@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">پیکربندی وارد بووه؟</string>
+    <string name="external_import_message">یه برنامه دیگه می‌خواد پیکربندی وارد کنه. فقط اگه وه سرچشمه‌س اعتماد دارین ادامه بدین. پروفایلای هَنده نگه داشته می‌بوون. سی به‌روزرسانی خودکار، وه برنامه خودکارسازی مِن تنظیمات ← %1$s اجازه بدین.</string>
+    <string name="external_import_confirm">وارد کردن</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
@@ -561,4 +564,8 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+    <string name="title_remote_control">دسترسی برنامه‌هانی خودکارسازی</string>
+    <string name="summary_remote_control">اجازه بِ برنامه‌هانی دیگه سی کنترل v2rayNG</string>
+    <string name="remote_control_access_required">دِ تنظیمات ← دسترسی برنامه‌هانی خودکارسازی بِ ای برنامه اجازه بدین، بعد ای کار نِ دوباره وا کنین.</string>
+    <string name="tasker_current_profile">پروفایل فعلی</string>
 </resources>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">Import configuration?</string>
+    <string name="external_import_message">Another app wants to import configuration. Only continue if you trust its source. Existing profiles will be kept. For unattended updates, allow the automation app in Settings → %1$s.</string>
+    <string name="external_import_confirm">Import</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
@@ -561,4 +564,8 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="title_remote_control">Automation app access</string>
+    <string name="summary_remote_control">Allow other apps to control v2rayNG</string>
+    <string name="remote_control_access_required">Allow this app in Settings → Automation app access, then reopen this action.</string>
+    <string name="tasker_current_profile">Current profile</string>
 </resources>

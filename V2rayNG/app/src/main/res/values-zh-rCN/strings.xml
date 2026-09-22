@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">导入配置？</string>
+    <string name="external_import_message">其他应用请求导入配置。请仅在信任其来源时继续。现有配置将保留。如需自动更新，请在设置 → %1$s 中允许该自动化应用。</string>
+    <string name="external_import_confirm">导入</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
@@ -559,4 +562,8 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+    <string name="title_remote_control">自动化应用访问权限</string>
+    <string name="summary_remote_control">允许其他应用控制 v2rayNG</string>
+    <string name="remote_control_access_required">请在“设置 → 自动化应用访问权限”中允许此应用，然后重新打开此操作。</string>
+    <string name="tasker_current_profile">当前配置</string>
 </resources>
