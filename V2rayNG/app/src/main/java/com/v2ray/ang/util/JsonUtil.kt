@@ -95,6 +95,7 @@ object JsonUtil {
 
     fun parseHeadersToMap(headersJson: String?): Map<String, String> {
         val headerMap = mutableMapOf<String, String>()
+        if (headersJson.isNullOrBlank()) return headerMap
         val jsonObject = parseString(headersJson) ?: return headerMap
         try {
             for ((key, jsonElement) in jsonObject.entrySet()) {
