@@ -110,6 +110,62 @@ class MmkvPersistenceTest {
         assertFalse(MmkvManager.updateSubscription("s", expected, expected, updatedAt = 15000))
     }
 
+    @Test fun `replacement retains policy groups and proxy chains without cleaning their payloads`() {
+        seedReplacementWithGroups()
+        val retainedPayloads = listOf("policy", "chain").associateWith { stores.profiles.values[it] }
+        val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+
+        MmkvManager.saveServerProfiles(mapOf("new" to profile), mapOf("new" to "new-raw"), "s", false)
+
+        assertEquals(listOf("new", "policy", "chain"), MmkvManager.decodeServerList("s"))
+        assertEquals("new", MmkvManager.getSelectServer())
+        retainedPayloads.forEach { (guid, payload) ->
+            assertEquals(payload, stores.profiles.values[guid])
+            assertEquals("raw-$guid", stores.raw.values[guid])
+            assertEquals("aff-$guid", stores.affiliations.values[guid])
+        }
+        assertNotNull(MmkvManager.decodeServerConfig("new"))
+        assertEquals("new-raw", stores.raw.values["new"])
+        assertFalse(stores.profiles.values.containsKey("old"))
+        assertFalse(stores.raw.values.containsKey("old"))
+        assertFalse(stores.affiliations.values.containsKey("old"))
+    }
+
+    @Test fun `failed replacement publication restores selection metadata and all grouped payloads`() {
+        seedReplacementWithGroups()
+        val expected = SubscriptionItem(lastUpdated = 100)
+        MmkvManager.encodeSubscription("s", expected)
+        val affectedStores = listOf(stores.main, stores.profiles, stores.raw, stores.affiliations, stores.subscriptions)
+        val before = affectedStores.map { it.values.toMap() }
+        var failNextIndexWrite = true
+        stores.main.failWrite = { key ->
+            (key == "SUB_SERVERS_s" && failNextIndexWrite).also { fail ->
+                if (fail) failNextIndexWrite = false
+            }
+        }
+        val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+
+        assertThrows(ProfileStorageException::class.java) {
+            MmkvManager.saveServerProfiles(mapOf("new" to profile), mapOf("new" to "new-raw"), "s", false,
+                SubscriptionUpdateCommit(expected, expected.copy(lastUpdated = 200)))
+        }
+
+        assertFalse(failNextIndexWrite)
+        assertEquals(before, affectedStores.map { it.values.toMap() })
+    }
+
+    private fun seedReplacementWithGroups() {
+        stores.main.values["SUB_IDS"] = "[\"s\"]"
+        stores.main.values["SUB_SERVERS_s"] = "[\"old\",\"policy\",\"chain\"]"
+        stores.main.values["SELECTED_SERVER"] = "old"
+        mapOf("old" to EConfigType.VLESS, "policy" to EConfigType.POLICYGROUP, "chain" to EConfigType.PROXYCHAIN)
+            .forEach { (guid, type) ->
+                stores.profiles.values[guid] = JsonUtil.toJson(ProfileItem.create(type).apply { subscriptionId = "s" })
+                stores.raw.values[guid] = "raw-$guid"
+                stores.affiliations.values[guid] = "aff-$guid"
+            }
+    }
+
     @Test fun `settings edits never replace refresh metadata from their snapshot`() {
         val expected = SubscriptionItem(lastUpdated = 100)
         MmkvManager.encodeSubscription("s", expected)

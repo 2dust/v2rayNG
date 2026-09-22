@@ -20,6 +20,7 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.extension.isGroupType
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
@@ -519,7 +520,9 @@ object MmkvManager {
             val serverList = if (append) {
                 decodeServerListForWrite(subscriptionId)
             } else {
-                mutableListOf()
+                replacedServers.filter { guid ->
+                    decodeServerConfig(guid)?.configType?.isGroupType() == true
+                }.toMutableList()
             }
             val indexedServers = serverList.toHashSet()
             profiles.keys.forEach { guid ->
@@ -539,7 +542,7 @@ object MmkvManager {
                 } else {
                     ProfileReplacement.findRemovablePayloads(
                         replacedServers = replacedServers,
-                        replacementServers = profiles.keys,
+                        replacementServers = serverList.toSet(),
                         protectedServer = replacementSelection ?: previousSelection,
                         serversReferencedByOtherGroups =
                             decodeServersReferencedByOtherGroups(subscriptionId),
