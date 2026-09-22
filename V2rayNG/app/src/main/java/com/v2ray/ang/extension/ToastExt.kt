@@ -18,19 +18,23 @@ fun Context.toast(@StringRes message: Int, long: Boolean = false) =
 fun Context.toast(message: CharSequence, long: Boolean = false) =
     dispatchMessage(UserMessage(message.toString(), long = long))
 
-fun Context.toastSuccess(@StringRes message: Int, long: Boolean = false) = toast(message, long)
+fun Context.toastSuccess(@StringRes message: Int, long: Boolean = false) =
+    toastSuccess(AppLocaleManager.localizedContext(this).getString(message), long)
 
-fun Context.toastSuccess(message: CharSequence, long: Boolean = false) = toast(message, long)
+fun Context.toastSuccess(message: CharSequence, long: Boolean = false) =
+    dispatchMessage(UserMessage(message.toString(), type = UserMessage.Type.SUCCESS, long = long))
 
 fun Context.toastError(@StringRes message: Int, long: Boolean = false) =
     toastError(AppLocaleManager.localizedContext(this).getString(message), long)
 
 fun Context.toastError(message: CharSequence, long: Boolean = false) =
-    dispatchMessage(UserMessage(message.toString(), isError = true, long = long))
+    dispatchMessage(UserMessage(message.toString(), type = UserMessage.Type.ERROR, long = long))
 
-fun Context.toastInfo(@StringRes message: Int, long: Boolean = false) = toast(message, long)
+fun Context.toastInfo(@StringRes message: Int, long: Boolean = false) =
+    toastInfo(AppLocaleManager.localizedContext(this).getString(message), long)
 
-fun Context.toastInfo(message: CharSequence, long: Boolean = false) = toast(message, long)
+fun Context.toastInfo(message: CharSequence, long: Boolean = false) =
+    dispatchMessage(UserMessage(message.toString(), type = UserMessage.Type.INFO, long = long))
 
 private fun Context.dispatchMessage(message: UserMessage) {
     val appContext = applicationContext

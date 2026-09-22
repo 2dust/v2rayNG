@@ -26,9 +26,10 @@ class AppSnackbarManagerTest {
     @Test
     fun explicitLongDurationExtendsTransientFeedbackWithoutRequiringDismissal() {
         manager.setForeground(true)
-        for (isError in listOf(false, true)) {
-            manager.show(UserMessage("Brief message", isError = isError, long = true))
+        for (type in UserMessage.Type.entries) {
+            manager.show(UserMessage("Brief message", type = type, long = true))
             val snackbar = manager.hostState.currentSnackbarData!!
+            assertEquals(type, (snackbar.visuals as AppSnackbarVisuals).feedback.type)
             assertEquals(SnackbarDuration.Long, snackbar.visuals.duration)
             assertNull(snackbar.visuals.actionLabel)
             snackbar.dismiss()
@@ -36,10 +37,31 @@ class AppSnackbarManagerTest {
     }
 
     @Test
+    fun messageTypeFollowsQueuedFeedbackAcrossNavigationAndBackgrounding() {
+        manager.setForeground(true)
+        manager.register("editor")
+        val error = UserMessage("Error\nDetails", UserMessage.Type.ERROR)
+        val success = UserMessage("Saved", UserMessage.Type.SUCCESS)
+        val info = UserMessage("Update available", UserMessage.Type.INFO)
+        manager.show(error)
+        manager.show(success)
+        manager.show(info)
+        val snackbar = manager.hostState.currentSnackbarData!!
+        manager.onPresented("editor", snackbar)
+        manager.unregister("editor")
+        manager.register("main")
+        assertEquals(error, (manager.hostState.currentSnackbarData!!.visuals as AppSnackbarVisuals).feedback)
+        snackbar.performAction()
+        assertEquals(success, (manager.hostState.currentSnackbarData!!.visuals as AppSnackbarVisuals).feedback)
+        manager.setForeground(false)
+        assertEquals(listOf(success, info), notifications)
+    }
+
+    @Test
     fun lengthyErrorsRequireDismissalRegardlessOfExplicitDuration() {
         manager.setForeground(true)
         for (long in listOf(false, true)) {
-            manager.show(UserMessage("Error\nDetails", isError = true, long = long))
+            manager.show(UserMessage("Error\nDetails", type = UserMessage.Type.ERROR, long = long))
             val snackbar = manager.hostState.currentSnackbarData!!
             assertEquals(SnackbarDuration.Indefinite, snackbar.visuals.duration)
             assertEquals("Close", snackbar.visuals.actionLabel)
@@ -66,7 +88,7 @@ class AppSnackbarManagerTest {
         val editor = "editor"
         val main = "main"
         manager.register(editor)
-        manager.show(UserMessage("Long error\ndetails", isError = true))
+        manager.show(UserMessage("Long error\ndetails", type = UserMessage.Type.ERROR))
         manager.show(UserMessage("Saved"))
         val error = manager.hostState.currentSnackbarData!!
         assertEquals(SnackbarDuration.Indefinite, error.visuals.duration)
@@ -196,7 +218,7 @@ class AppSnackbarManagerTest {
     fun backgroundMessagesGoStraightToNotificationsAndBlanksAreIgnored() {
         assertFalse(manager.isForeground)
         manager.show(UserMessage(" \n"))
-        val error = UserMessage("Error", isError = true)
+        val error = UserMessage("Error", type = UserMessage.Type.ERROR)
         manager.show(error)
         assertEquals(listOf(error), notifications)
         assertNull(manager.hostState.currentSnackbarData)

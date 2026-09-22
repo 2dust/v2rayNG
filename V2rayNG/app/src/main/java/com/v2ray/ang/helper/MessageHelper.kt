@@ -46,7 +46,7 @@ object MessageHelper {
 
     /** State receivers still receive the event; a foreground process acknowledges ownership of feedback. */
     internal fun sendServiceEvent(ctx: Context, what: Int, content: String = "") {
-        val message = requireNotNull(serviceMessage(ctx, what))
+        val message = requireNotNull(serviceMessage(ctx, what, content))
         sendMsgForResult(ctx, AppConfig.BROADCAST_ACTION_ACTIVITY, what, content) { handled ->
             if (!handled) {
                 NotificationHelper.notifyTransientMessage(ctx, message)
@@ -54,11 +54,13 @@ object MessageHelper {
         }
     }
 
-    internal fun serviceMessage(context: Context, what: Int): UserMessage? {
+    internal fun serviceMessage(context: Context, what: Int, content: String? = null): UserMessage? {
         val resource = serviceMessageResource(what) ?: return null
+        val isError = what == AppConfig.MSG_STATE_START_FAILURE
         return UserMessage(
-            AppLocaleManager.localizedContext(context).getString(resource),
-            isError = what == AppConfig.MSG_STATE_START_FAILURE,
+            content?.takeIf { isError && it.isNotBlank() }
+                ?: AppLocaleManager.localizedContext(context).getString(resource),
+            type = if (isError) UserMessage.Type.ERROR else UserMessage.Type.SUCCESS,
         )
     }
 

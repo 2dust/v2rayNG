@@ -7,22 +7,24 @@ import org.junit.Test
 class UserMessageTest {
     @Test
     fun ordinaryInformationAlwaysUsesATimeout() {
-        assertFalse(UserMessage("Updated").requiresDismissal)
-        assertFalse(UserMessage("Message\n".repeat(100)).requiresDismissal)
+        for (type in listOf(UserMessage.Type.NORMAL, UserMessage.Type.SUCCESS, UserMessage.Type.INFO)) {
+            assertFalse(UserMessage("Updated", type).requiresDismissal)
+            assertFalse(UserMessage("Message\n".repeat(100), type).requiresDismissal)
+        }
     }
 
     @Test
     fun onlyLongOrMultilineErrorsRequireDismissal() {
-        assertFalse(UserMessage("", isError = true).requiresDismissal)
-        assertFalse(UserMessage("x".repeat(120), isError = true).requiresDismissal)
-        assertTrue(UserMessage("x".repeat(121), isError = true).requiresDismissal)
-        assertTrue(UserMessage("Error\nDetails", isError = true).requiresDismissal)
-        assertTrue(UserMessage("Error\rDetails", isError = true).requiresDismissal)
+        assertFalse(UserMessage("", type = UserMessage.Type.ERROR).requiresDismissal)
+        assertFalse(UserMessage("x".repeat(120), type = UserMessage.Type.ERROR).requiresDismissal)
+        assertTrue(UserMessage("x".repeat(121), type = UserMessage.Type.ERROR).requiresDismissal)
+        assertTrue(UserMessage("Error\nDetails", type = UserMessage.Type.ERROR).requiresDismissal)
+        assertTrue(UserMessage("Error\rDetails", type = UserMessage.Type.ERROR).requiresDismissal)
     }
 
     @Test
     fun supplementaryCharactersCountAsOneCharacter() {
-        assertFalse(UserMessage("\uD83D\uDEAB".repeat(120), isError = true).requiresDismissal)
-        assertTrue(UserMessage("\uD83D\uDEAB".repeat(121), isError = true).requiresDismissal)
+        assertFalse(UserMessage("\uD83D\uDEAB".repeat(120), type = UserMessage.Type.ERROR).requiresDismissal)
+        assertTrue(UserMessage("\uD83D\uDEAB".repeat(121), type = UserMessage.Type.ERROR).requiresDismissal)
     }
 }

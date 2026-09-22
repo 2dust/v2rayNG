@@ -8,23 +8,27 @@ import android.content.IntentFilter
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.MainThread
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +39,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
@@ -123,13 +129,7 @@ class AppSnackbarManager(
         // Track its jobs only so unread messages can be handed to background notifications.
         val job = scope.launch(start = CoroutineStart.LAZY) {
             hostState.showSnackbar(
-                message = message.text,
-                actionLabel = if (message.requiresDismissal) closeLabel() else null,
-                duration = when {
-                    message.requiresDismissal -> SnackbarDuration.Indefinite
-                    message.long -> SnackbarDuration.Long
-                    else -> SnackbarDuration.Short
-                },
+                AppSnackbarVisuals(message, if (message.requiresDismissal) closeLabel() else null),
             )
         }
         pending[job] = message
@@ -159,7 +159,8 @@ class AppSnackbarManager(
                     if (!isOrderedBroadcast || resultCode == Activity.RESULT_OK) return
                     if (!manager.isForeground) return
                     val what = intent.getIntExtra("key", 0)
-                    val message = MessageHelper.serviceMessage(context, what) ?: return
+                    val details = if (what == AppConfig.MSG_STATE_START_FAILURE) intent.getStringExtra("content") else null
+                    val message = MessageHelper.serviceMessage(context, what, details) ?: return
                     manager.show(message)
                     // The process now owns delivery even if the current screen closes.
                     resultCode = Activity.RESULT_OK
@@ -172,6 +173,19 @@ class AppSnackbarManager(
             return manager
         }
     }
+}
+
+internal data class AppSnackbarVisuals(
+    val feedback: UserMessage,
+    override val actionLabel: String?,
+) : SnackbarVisuals {
+    override val message = feedback.text
+    override val duration = when {
+        feedback.requiresDismissal -> SnackbarDuration.Indefinite
+        feedback.long -> SnackbarDuration.Long
+        else -> SnackbarDuration.Short
+    }
+    override val withDismissAction = false
 }
 
 @Composable
@@ -193,38 +207,54 @@ fun AppSnackbarHost() {
     }
     val activeHost by manager.activeHost.collectAsStateWithLifecycle()
     if (activeHost != host) return
+    val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).imePadding(),
+        modifier = Modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .imePadding()
+            // Keep upstream's offset above the service controls, but leave room above the IME.
+            .padding(bottom = if (imeVisible) 8.dp else 100.dp),
     ) {
         val maxTextHeight = maxHeight / 2
         SnackbarHost(
             hostState = manager.hostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                // Keep both sides clear of MainBottomBar's 56 dp button and 24 dp edge inset.
-                .padding(horizontal = 80.dp)
-                .widthIn(max = 600.dp),
+                .widthIn(max = maxWidth * 0.75f),
         ) { data ->
             SideEffect {
                 // A save-and-finish can still compose one last frame; leave its feedback unread.
                 if (activity?.isFinishing != true) manager.onPresented(host, data)
             }
-            Snackbar(
-                modifier = Modifier.padding(12.dp),
-                actionOnNewLine = data.visuals.actionLabel != null,
-                action = data.visuals.actionLabel?.let { label ->
-                    {
+            val type = (data.visuals as AppSnackbarVisuals).feedback.type
+            val background = when (type) {
+                UserMessage.Type.NORMAL -> if (LocalDarkTheme.current) toastNormalBgDark else toastNormalBgLight
+                UserMessage.Type.SUCCESS -> toastSuccessBg
+                UserMessage.Type.ERROR -> toastErrorBg
+                UserMessage.Type.INFO -> toastInfoBg
+            }
+            Surface(
+                modifier = Modifier.wrapContentWidth(),
+                shape = RoundedCornerShape(24.dp),
+                color = background,
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                    Text(
+                        text = data.visuals.message,
+                        color = toastTextColor,
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f, fill = false)
+                            .heightIn(max = maxTextHeight)
+                            .verticalScroll(rememberScrollState()),
+                    )
+                    data.visuals.actionLabel?.let { label ->
                         TextButton(
                             onClick = { data.performAction() },
-                            colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.actionColor),
+                            modifier = Modifier.align(Alignment.End),
+                            colors = ButtonDefaults.textButtonColors(contentColor = toastTextColor),
                         ) { Text(label) }
                     }
-                },
-            ) {
-                Text(
-                    text = data.visuals.message,
-                    modifier = Modifier.heightIn(max = maxTextHeight).verticalScroll(rememberScrollState()),
-                )
+                }
             }
         }
     }
