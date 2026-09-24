@@ -42,6 +42,12 @@ android {
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Every build of this app ships the Xray core. Utils.isXray() used to
+        // infer that from the application ID starting with "com.v2ray.ang",
+        // which silently turned it off for any other ID and changed the local
+        // proxy ports and inbounds.
+        buildConfigField("boolean", "XRAY_CORE", "true")
     }
 
     buildTypes {
@@ -58,7 +64,10 @@ android {
     productFlavors {
         create("fdroid") {
             dimension = "distribution"
-            applicationIdSuffix = ".fdroid"
+            // This fork's own ID, not upstream's com.v2ray.ang.fdroid: F-Droid
+            // requires forks to use a fresh ID, and sharing upstream's would
+            // make the two builds fail to install over each other.
+            applicationId = "io.github.acidefluorhydrique.v2rayng"
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
         }
         create("playstore") {
