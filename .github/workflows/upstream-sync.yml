@@ -1,0 +1,46 @@
+name: Upstream sync
+
+# Checks for a new upstream v2rayNG release and proposes merging it as a pull
+# request into master, where fdroid-source-build.yml builds and tests it. A
+# release that does not merge cleanly becomes an issue instead. Nothing is
+# merged without review. See .github/scripts/upstream-sync.sh and
+# docs/maintenance.md.
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # SYNC_TOKEN is a fine-grained personal access token for this repository
+      # (Contents, Pull requests, Issues and Workflows: read and write). The
+      # default GITHUB_TOKEN cannot do this job on its own: it may not push a
+      # branch that changes files under .github/workflows, which upstream does,
+      # and pull requests it opens do not trigger the checks. Without the token
+      # the job still runs, but only opens an issue.
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          ref: master
+          fetch-depth: '0'
+          token: ${{ secrets.SYNC_TOKEN || github.token }}
+
+      - name: Propose the newest upstream release
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
+          OPEN_PR: ${{ secrets.SYNC_TOKEN != '' }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          bash .github/scripts/upstream-sync.sh
