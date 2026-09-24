@@ -100,7 +100,22 @@ data class V2rayConfig(
             var mtu: Int? = null,
             var remoteDNS: List<String>? = null,
             var domainStrategy: String? = null,
+            /*Classic v2ray layout, used by custom configurations*/
+            var vnext: List<EndpointBean>? = null,
+            var servers: List<EndpointBean>? = null,
         ) {
+            /**
+             * Endpoint entry of the classic v2ray layout.
+             *
+             * VMess and VLESS write it to `vnext`, HTTP, SOCKS and Shadowsocks write it to
+             * `servers`. Only the endpoint address and port are modelled here, because the raw
+             * configuration text is what gets handed to the core.
+             */
+            data class EndpointBean(
+                var address: Any? = null,
+                var port: Int? = null,
+            )
+
             data class WireGuardBean(
                 var publicKey: String = "",
                 var preSharedKey: String? = null,
@@ -308,20 +323,34 @@ data class V2rayConfig(
             var xudpProxyUDP443: String? = null,
         )
 
+        /**
+         * Returns the address of the outbound endpoint, or null when it cannot be determined.
+         *
+         * Profiles created in the app use the flat `settings.address`/`settings.port` pair, while
+         * custom configurations may keep the classic v2ray layout, where the endpoint lives in
+         * `settings.vnext` (VMess/VLESS) or `settings.servers` (HTTP/SOCKS/Shadowsocks).
+         */
         fun getServerAddress(): String? {
-            return if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                settings?.peers?.firstOrNull()?.endpoint?.substringBeforeLast(":")
-            } else {
-                settings?.address as? String
+            if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
+                return settings?.peers?.firstOrNull()?.endpoint?.substringBeforeLast(":")
             }
+            (settings?.address as? String)?.let { return it }
+            return (settings?.vnext?.firstOrNull()?.address as? String)
+                ?: (settings?.servers?.firstOrNull()?.address as? String)
         }
 
+        /**
+         * Returns the port of the outbound endpoint, or null when it cannot be determined.
+         *
+         * Supports the same layouts as [getServerAddress].
+         */
         fun getServerPort(): Int? {
-            return if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
-                settings?.peers?.firstOrNull()?.endpoint?.substringAfterLast(":")?.toIntOrNull()
-            } else {
-                settings?.port
+            if (protocol.equals(EConfigType.WIREGUARD.name, true)) {
+                return settings?.peers?.firstOrNull()?.endpoint?.substringAfterLast(":")?.toIntOrNull()
             }
+            return settings?.port
+                ?: settings?.vnext?.firstOrNull()?.port
+                ?: settings?.servers?.firstOrNull()?.port
         }
 
         fun ensureSockopt(): StreamSettingsBean.SockoptBean {
