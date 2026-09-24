@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.LocalDarkTheme
@@ -55,13 +56,21 @@ private val primaryDrawerItems = listOf(
     MainDestination.Settings
 )
 
-private val drawerItems = primaryDrawerItems + listOf(
-    MainDestination.Promotion,
-    MainDestination.Logcat,
-    MainDestination.CheckUpdate,
-    MainDestination.BackupRestore,
-    MainDestination.About
-)
+/**
+ * Drawer entries in display order. [MainDestination.CheckUpdate] is omitted when
+ * [updateCheckEnabled] is false, as in the F-Droid build, where F-Droid clients
+ * deliver updates.
+ */
+internal fun mainDrawerItems(updateCheckEnabled: Boolean): List<MainDestination> =
+    primaryDrawerItems + listOfNotNull(
+        MainDestination.Promotion,
+        MainDestination.Logcat,
+        MainDestination.CheckUpdate.takeIf { updateCheckEnabled },
+        MainDestination.BackupRestore,
+        MainDestination.About
+    )
+
+private val drawerItems = mainDrawerItems(BuildConfig.UPDATE_CHECK_ENABLED)
 
 @Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {

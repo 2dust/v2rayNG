@@ -69,10 +69,14 @@ android {
             // make the two builds fail to install over each other.
             applicationId = "io.github.acidefluorhydrique.v2rayng"
             buildConfigField("String", "DISTRIBUTION", "\"F-Droid\"")
+            // F-Droid clients deliver updates; F-Droid's inclusion policy does
+            // not allow an app to fetch its own updates without opt-in.
+            buildConfigField("boolean", "UPDATE_CHECK_ENABLED", "false")
         }
         create("playstore") {
             dimension = "distribution"
             buildConfigField("String", "DISTRIBUTION", "\"Play Store\"")
+            buildConfigField("boolean", "UPDATE_CHECK_ENABLED", "true")
         }
     }
 
