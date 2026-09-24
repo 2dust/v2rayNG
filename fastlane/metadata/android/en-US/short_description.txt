@@ -1,1 +1,1 @@
-A V2Ray client for Android, support Xray core and v2fly core
+A V2Ray client for Android, forked from v2rayNG and built from source

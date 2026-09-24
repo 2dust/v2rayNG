@@ -1,7 +1,7 @@
 Categories:
   - Internet
 License: GPL-3.0-only
-AuthorName: 2dust (upstream v2rayNG), fork maintained by AcideFluorhydrique
+AuthorName: AcideFluorhydrique (fork of v2rayNG by 2dust)
 SourceCode: https://github.com/AcideFluorhydrique/v2rayNG
 IssueTracker: https://github.com/AcideFluorhydrique/v2rayNG/issues
 Changelog: https://github.com/AcideFluorhydrique/v2rayNG/releases

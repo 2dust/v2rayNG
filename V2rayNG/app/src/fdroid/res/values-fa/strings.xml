@@ -2,5 +2,5 @@
 <!-- Forkray overrides every string whose upstream text names v2rayNG. -->
 <resources>
     <string name="app_name" translatable="false">Forkray</string>
-    <string name="notification_channel_service">Forkray service</string>
+    <string name="notification_channel_service">سرویس Forkray</string>
 </resources>

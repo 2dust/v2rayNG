@@ -4,11 +4,11 @@
 # the repository's GitHub secrets. See docs/maintenance.md.
 
 repo_url: https://acidefluorhydrique.github.io/v2rayNG/repo
-repo_name: v2rayNG fork by AcideFluorhydrique
+repo_name: Forkray
 repo_description: >-
-  Builds of the F-Droid flavor of a v2rayNG fork, compiled from source on
-  GitHub Actions. Every release publishes a build manifest with the exact
-  sources, toolchain and checksums, so it can be rebuilt and compared.
+  Forkray, a fork of v2rayNG, compiled from source on GitHub Actions.
+  Every release publishes a build manifest with the exact sources,
+  toolchain and checksums, so it can be rebuilt and compared.
   Source: https://github.com/AcideFluorhydrique/v2rayNG
 
 # Only the APKs release.yml puts in repo/ are offered; there is no archive.
