@@ -1,0 +1,26 @@
+name: Pin report
+
+# Weekly check that the reproducible-build pins (Go, JDKs, NDK, geo data) have
+# not fallen behind, kept as one issue that updates and closes itself. See
+# .github/scripts/pin-report.sh and docs/maintenance.md.
+
+on:
+  schedule:
+    - cron: '41 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Report stale pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/pin-report.sh
