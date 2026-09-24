@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">v2rayNG 服務</string>
+    <string name="notification_channel_subscription_updates">訂閱更新</string>
+    <string name="notification_channel_connection_checks">連線檢查</string>
     <string name="notification_action_stop_v2ray">停止</string>
     <string name="toast_permission_denied">無法取得此權限</string>
     <string name="toast_permission_denied_notification">無法取得此通知權限</string>
@@ -50,7 +53,7 @@
     <string name="confirm_delete_proxy_chain_member">確定要刪除此代理鏈成員嗎？</string>
     <string name="confirm_delete_routing_rule">確定要刪除此路由規則嗎？</string>
     <string name="confirm_delete_subscription_group">確定要刪除此訂閱群組嗎？</string>
-    <string name="confirm_delete_asset_file">確定要刪除資源檔案「%1$s」嗎？</string>
+    <string name="confirm_delete_asset_file">確定要刪除此資源檔案嗎？</string>
     <string name="confirm_delete_asset_source">確定要刪除此資源來源嗎？</string>
     <string name="server_lab_remarks">備註</string>
     <string name="server_lab_address">位址</string>
@@ -100,6 +103,7 @@
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
     <string name="server_lab_local_address">本機位址 (可選 IPv4/IPv6，逗號隔開)</string>
     <string name="server_lab_local_mtu">MTU（可選，預設 1420）</string>
+    <string name="server_lab_remote_dns">remoteDNS(選填,多個 IPv4/IPv6 位址以逗號分隔,或輸入 "local" 使用裝置本機 DNS)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU（可選，預設 1350）</string>
     <string name="server_lab_kcp_tti">mKCP TTI（可選，預設 50 毫秒）</string>
     <string name="toast_success">成功</string>
