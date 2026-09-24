@@ -13,6 +13,18 @@ import org.junit.Test
  */
 class UtilsTest {
 
+    // Runs once per flavor. isXray() used to be derived from the application ID
+    // starting with "com.v2ray.ang"; the F-Droid build's ID no longer does, and
+    // it must still report the Xray core it ships, or the local HTTP inbound and
+    // port layout change.
+    @Test
+    fun test_isXray_doesNotDependOnApplicationId() {
+        if (BuildConfig.DISTRIBUTION == "F-Droid") {
+            assertFalse(BuildConfig.APPLICATION_ID.startsWith("com.v2ray.ang"))
+        }
+        assertTrue(Utils.isXray())
+    }
+
     @Test
     fun test_parseInt() {
         assertEquals(Utils.parseInt("1234"), 1234)

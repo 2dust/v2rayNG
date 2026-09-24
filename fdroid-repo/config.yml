@@ -1,0 +1,22 @@
+# fdroidserver configuration for this fork's own F-Droid repository, published
+# to GitHub Pages by .github/workflows/release.yml. Secrets are not stored here:
+# each {env: ...} value is read from the environment release.yml sets up from
+# the repository's GitHub secrets. See docs/maintenance.md.
+
+repo_url: https://acidefluorhydrique.github.io/v2rayNG/repo
+repo_name: Forkray
+repo_description: >-
+  Forkray, a fork of v2rayNG, compiled from source on GitHub Actions.
+  Every release publishes a build manifest with the exact sources,
+  toolchain and checksums, so it can be rebuilt and compared.
+  Source: https://github.com/AcideFluorhydrique/v2rayNG
+
+# Only the APKs release.yml puts in repo/ are offered; there is no archive.
+archive_older: 0
+
+sdk_path: {env: ANDROID_HOME}
+
+keystore: keystore.jks
+repo_keyalias: {env: FDROID_REPO_KEY_ALIAS}
+keystorepass: {env: FDROID_REPO_KEYSTORE_PASSWORD}
+keypass: {env: FDROID_REPO_KEY_PASSWORD}

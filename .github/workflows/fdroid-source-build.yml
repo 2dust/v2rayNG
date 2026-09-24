@@ -13,24 +13,29 @@ name: Build F-Droid flavor from source
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Existing release tag to upload the APKs to (leave empty to only keep artifacts)'
-        required: false
-        type: string
       bypass_cache:
         description: 'Rebuild every native artifact from scratch, ignoring the caches. Use this to check reproducibility: run it and compare the build manifest against an earlier cold run.'
+        required: false
+        default: false
+        type: boolean
+  # release.yml calls this to build what it publishes, with sign: true.
+  workflow_call:
+    inputs:
+      sign:
+        description: 'Sign the release APKs with the APP_KEYSTORE_* secrets, failing if they are missing.'
         required: false
         default: false
         type: boolean
   push:
     branches:
       - master
-      # Bring-up branch, so the workflow can be exercised before it reaches
-      # master. Remove once merged.
-      - fdroid-source-build
+  # Includes the upstream-sync PRs opened by upstream-sync.yml.
+  pull_request:
+    branches:
+      - master
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   # Pinned toolchain. Each of these changes the output bytes, so a rebuilder has
@@ -47,10 +52,17 @@ env:
   # '21.0.12+101' matches nothing at all. To update, copy the `semver` field from
   # https://api.adoptium.net/v3/info/release_versions?release_type=ga&version=%5B21,22)
   JAVA_VERSION: '21.0.12+101.0.LTS'
+  # The JDK gomobile runs javac from to compile the aar's Java bindings
+  # (classes.jar), so it is part of the aar. Before this was pinned the runner
+  # image's default JDK was used; this is that default, Temurin 17.0.20.1+1,
+  # in the Adoptium semver form. Note that 17 has no `.0.LTS` suffix.
+  GOMOBILE_JAVA_VERSION: '17.0.20+101'
   # Must match minSdk in V2rayNG/app/build.gradle.kts.
   GOMOBILE_ANDROID_API: '24'
-  # Signing is optional: without a keystore the job still proves the build works
-  # and produces unsigned release APKs.
+  # Only release.yml signs. Every other run produces unsigned APKs, so builds of
+  # unreviewed commits, such as upstream-sync PRs, never carry the release
+  # signature and the keystore is decoded only when a release is being made.
+  SIGN: ${{ inputs.sign == true }}
   HAS_KEYSTORE: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
 
 jobs:
@@ -112,7 +124,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
 
       - name: Setup Go
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -120,6 +132,13 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache-dependency-path: AndroidLibXrayLite/go.sum
+
+      - name: Setup Java for gomobile
+        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v6.0.0
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.GOMOBILE_JAVA_VERSION }}
 
       - name: Build libv2ray.aar from source
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -212,7 +231,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
 
       # ---------------------------------------------------------------------
       # hev-socks5-tunnel - already built from source upstream.
@@ -257,7 +276,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Decode keystore
-        if: env.HAS_KEYSTORE == 'true'
+        if: env.SIGN == 'true' && env.HAS_KEYSTORE == 'true'
         uses: timheuer/base64-to-file@v2.0.0
         id: android_keystore
         with:
@@ -271,14 +290,18 @@ jobs:
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           chmod 755 gradlew
           ./gradlew licenseFdroidReleaseReport
-          if [ "${HAS_KEYSTORE}" = 'true' ]; then
+          if [ "${SIGN}" = 'true' ] && [ "${HAS_KEYSTORE}" != 'true' ]; then
+            echo '::error::A signed build was requested but the APP_KEYSTORE_BASE64 secret is not set.'
+            exit 1
+          fi
+          if [ "${SIGN}" = 'true' ]; then
             ./gradlew assembleFdroidRelease \
               "-Pandroid.injected.signing.store.file=${KEYSTORE_PATH}" \
               "-Pandroid.injected.signing.store.password=${KEYSTORE_PASSWORD}" \
               "-Pandroid.injected.signing.key.alias=${KEY_ALIAS}" \
               "-Pandroid.injected.signing.key.password=${KEY_PASSWORD}"
           else
-            echo 'No APP_KEYSTORE_BASE64 secret set: producing unsigned release APKs.'
+            echo 'Unsigned build: only release.yml signs.'
             ./gradlew assembleFdroidRelease
           fi
         env:
@@ -287,14 +310,15 @@ jobs:
           KEY_ALIAS: ${{ secrets.APP_KEYSTORE_ALIAS }}
           KEY_PASSWORD: ${{ secrets.APP_KEY_PASSWORD }}
 
-      # Required by AGENTS.md for a Gradle/build change: the Play Store debug
-      # variant must assemble. Runs after the release build so a failure here is
-      # unambiguously about the shared Gradle change.
-      - name: Validate playstore debug variant
+      # The checks AGENTS.md requires for Gradle and shared Kotlin changes. The
+      # unit tests run for both flavors, because shared code now branches on
+      # per-flavor BuildConfig fields (UPDATE_CHECK_ENABLED, and the F-Droid
+      # application ID that XRAY_CORE must not depend on).
+      - name: Validate debug variants and unit tests
         run: |
           set -euo pipefail
           cd "${GITHUB_WORKSPACE}/V2rayNG"
-          ./gradlew :app:assemblePlaystoreDebug :app:testPlaystoreDebugUnitTest
+          ./gradlew :app:assemblePlaystoreDebug :app:testPlaystoreDebugUnitTest :app:testFdroidDebugUnitTest
 
       - name: Write build manifest
         run: |
@@ -316,6 +340,7 @@ jobs:
             echo "cmdline-tools: ${CMDLINE_TOOLS_VERSION}"
             echo "sdk packages: ${SDK_PACKAGES}"
             echo "gomobile androidapi: ${GOMOBILE_ANDROID_API}"
+            echo "gomobile java requested: ${GOMOBILE_JAVA_VERSION}"
             echo "java requested: ${JAVA_VERSION}"
             echo "java: $(java -version 2>&1 | head -1)"
             echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
@@ -369,12 +394,3 @@ jobs:
         with:
           name: libv2ray-aar
           path: ${{ github.workspace }}/aar/libv2ray.aar
-
-      - name: Upload APKs to release
-        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.release_tag != '' }}
-        uses: svenstaro/upload-release-action@v2
-        with:
-          file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/fdroid/release/*.apk
-          tag: ${{ inputs.release_tag }}
-          file_glob: true
-          prerelease: true

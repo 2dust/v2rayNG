@@ -1,0 +1,170 @@
+name: Release
+
+# Publishes a signed release of the F-Droid flavor for a tag v<versionName>
+# pushed on a commit that is already on master:
+#   1. builds it from source with fdroid-source-build.yml, signed
+#   2. creates a GitHub release with the APKs and the build manifest
+#   3. regenerates this fork's own F-Droid repository and publishes it to
+#      GitHub Pages at https://acidefluorhydrique.github.io/v2rayNG/repo
+# See docs/maintenance.md for the secrets and one-time settings it needs.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  APP_ID: io.github.acidefluorhydrique.v2rayng
+  # How many releases, this one included, the F-Droid repository offers. Two
+  # lets users roll back one version; each costs roughly 150 MB of Pages space.
+  REPO_KEEP_RELEASES: '2'
+  FDROIDSERVER_VERSION: '2.4.5'
+
+jobs:
+  check-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: '0'
+
+      - name: Check the tag
+        run: |
+          set -euo pipefail
+          name=$(sed -nE 's/^ *versionName = "([^"]+)".*/\1/p' V2rayNG/app/build.gradle.kts)
+          if [ "${GITHUB_REF_NAME}" != "v${name}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match versionName ${name}. Tag v${name} instead."
+            exit 1
+          fi
+          # Only what was reviewed and merged gets released.
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/master; then
+            echo "::error::${GITHUB_REF_NAME} points at ${GITHUB_SHA}, which is not on master."
+            exit 1
+          fi
+
+  build:
+    needs: check-tag
+    uses: ./.github/workflows/fdroid-source-build.yml
+    with:
+      sign: true
+    secrets: inherit
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APKs and build manifest
+        uses: actions/download-artifact@v8
+        with:
+          path: dist
+          pattern: '{fdroid-apks,build-manifest}'
+          merge-multiple: true
+
+      - name: Verify the APK signatures
+        env:
+          EXPECTED_CERT_SHA256: ${{ vars.APP_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          apksigner="$(ls -d "${ANDROID_HOME}"/build-tools/* | sort -V | tail -n 1)/apksigner"
+          for apk in dist/*.apk; do
+            cert=$("$apksigner" verify --print-certs "$apk" | sed -nE 's/^Signer #1 certificate SHA-256 digest: //p')
+            echo "$(basename "$apk"): $cert"
+            if [ -n "${EXPECTED_CERT_SHA256}" ] && [ "$cert" != "${EXPECTED_CERT_SHA256,,}" ]; then
+              echo "::error::$(basename "$apk") is signed by $cert, not the expected ${EXPECTED_CERT_SHA256}."
+              exit 1
+            fi
+          done
+          if [ -z "${EXPECTED_CERT_SHA256}" ]; then
+            echo "::warning::Set the APP_CERT_SHA256 repository variable to the digest above so a release signed with the wrong key is refused."
+          fi
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          upstream="${GITHUB_REF_NAME#v}"
+          gh release create "${GITHUB_REF_NAME}" dist/*.apk dist/build-manifest.txt \
+            --repo "${GITHUB_REPOSITORY}" \
+            --verify-tag \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Built from source from ${GITHUB_SHA}, which includes upstream v2rayNG [${upstream}](https://github.com/2dust/v2rayNG/releases/tag/${upstream}).
+
+          \`build-manifest.txt\` lists the exact sources, toolchain and SHA-256 of every APK, for rebuilding and comparing; see docs/reproducible-build.md. The same APKs are available from this fork's F-Droid repository: https://acidefluorhydrique.github.io/v2rayNG/repo"
+
+  fdroid-repo:
+    needs: github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install fdroidserver
+        run: pip install "fdroidserver==${FDROIDSERVER_VERSION}"
+
+      - name: Collect the APKs to offer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p fdroid-repo/repo
+          # Newest REPO_KEEP_RELEASES published releases, this one first. F-Droid
+          # clients choose the per-ABI APK, so the universal one is left out.
+          gh release list --repo "${GITHUB_REPOSITORY}" --exclude-drafts --exclude-pre-releases \
+            --limit 50 --json tagName \
+            --jq "[.[].tagName | select(startswith(\"v\"))][:${REPO_KEEP_RELEASES}][]" \
+            | while read -r tag; do
+                echo "Adding ${tag}"
+                gh release download "$tag" --repo "${GITHUB_REPOSITORY}" --dir fdroid-repo/repo --pattern '*-fdroid_*.apk'
+              done
+          rm -f fdroid-repo/repo/*universal*.apk
+          ls -l fdroid-repo/repo
+
+      - name: Add the listing metadata
+        run: |
+          set -euo pipefail
+          mkdir -p "fdroid-repo/metadata/${APP_ID}" fdroid-repo/repo/icons
+          cp -r fastlane/metadata/android/. "fdroid-repo/metadata/${APP_ID}/"
+          cp fastlane/metadata/android/en-US/images/icon.png fdroid-repo/repo/icons/icon.png
+
+      - name: Decode the repository signing key
+        uses: timheuer/base64-to-file@v2.0.0
+        id: repo_keystore
+        with:
+          fileName: 'keystore.jks'
+          fileDir: 'fdroid-repo'
+          encodedString: ${{ secrets.FDROID_REPO_KEYSTORE_BASE64 }}
+
+      - name: Generate the repository index
+        env:
+          FDROID_REPO_KEY_ALIAS: ${{ secrets.FDROID_REPO_KEY_ALIAS }}
+          FDROID_REPO_KEYSTORE_PASSWORD: ${{ secrets.FDROID_REPO_KEYSTORE_PASSWORD }}
+          FDROID_REPO_KEY_PASSWORD: ${{ secrets.FDROID_REPO_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cd fdroid-repo
+          chmod 600 config.yml keystore.jks
+          fdroid update --verbose
+          rm -f keystore.jks
+          ls -l repo
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: ./fdroid-repo/repo
+          destination_dir: repo
+          force_orphan: true

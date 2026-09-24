@@ -458,7 +458,7 @@ object Utils {
      *
      * @return True if the package is Xray, false otherwise.
      */
-    fun isXray(): Boolean = BuildConfig.APPLICATION_ID.startsWith("com.v2ray.ang")
+    fun isXray(): Boolean = BuildConfig.XRAY_CORE
 
     /**
      * Check if an IPv4 address is within an IPv4 CIDR range

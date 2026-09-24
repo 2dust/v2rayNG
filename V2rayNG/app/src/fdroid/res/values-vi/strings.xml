@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forkray overrides every string whose upstream text names v2rayNG. -->
+<resources>
+    <string name="app_name" translatable="false">Forkray</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào Forkray để sử dụng!</string>
+    <string name="notification_channel_service">Dịch vụ Forkray</string>
+    <string name="notification_action_stop_v2ray">Ngắt kết nối Forkray</string>
+    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho Forkray. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
+    <string name="toast_services_start">Đang khởi động Forkray…</string>
+    <string name="toast_services_stop">Đã dừng Forkray!</string>
+    <string name="toast_services_success">Đã khởi động Forkray!</string>
+    <string name="toast_services_failure">Không thể khởi động Forkray, kiểm tra lại cấu hình!</string>
+    <string name="title_server">Forkray</string>
+    <string name="tasker_start_service">Khởi động Forkray</string>
+</resources>
