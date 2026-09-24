@@ -8,20 +8,39 @@ import org.junit.Test
 class MainDrawerItemsTest {
 
     @Test
-    fun updateCheckEnabledListsEveryDestinationInDisplayOrder() {
-        assertEquals(MainDestination.entries, mainDrawerItems(updateCheckEnabled = true))
+    fun everythingEnabledListsEveryDestinationInDisplayOrder() {
+        assertEquals(
+            MainDestination.entries,
+            mainDrawerItems(updateCheckEnabled = true, promotionEnabled = true),
+        )
     }
 
     @Test
     fun updateCheckDisabledOmitsOnlyCheckUpdate() {
         assertEquals(
             MainDestination.entries - MainDestination.CheckUpdate,
-            mainDrawerItems(updateCheckEnabled = false),
+            mainDrawerItems(updateCheckEnabled = false, promotionEnabled = true),
         )
     }
 
     @Test
-    fun primaryItemsLeadInBothConfigurations() {
+    fun promotionDisabledOmitsOnlyPromotion() {
+        assertEquals(
+            MainDestination.entries - MainDestination.Promotion,
+            mainDrawerItems(updateCheckEnabled = true, promotionEnabled = false),
+        )
+    }
+
+    @Test
+    fun bothDisabledOmitsBoth() {
+        assertEquals(
+            MainDestination.entries - MainDestination.CheckUpdate - MainDestination.Promotion,
+            mainDrawerItems(updateCheckEnabled = false, promotionEnabled = false),
+        )
+    }
+
+    @Test
+    fun primaryItemsLeadInEveryConfiguration() {
         val primary = listOf(
             MainDestination.Subscriptions,
             MainDestination.PerAppProxy,
@@ -29,18 +48,24 @@ class MainDrawerItemsTest {
             MainDestination.UserAssets,
             MainDestination.Settings,
         )
-        for (enabled in listOf(true, false)) {
-            assertEquals(primary, mainDrawerItems(enabled).take(primary.size))
+        for (updateCheck in listOf(true, false)) {
+            for (promotion in listOf(true, false)) {
+                assertEquals(primary, mainDrawerItems(updateCheck, promotion).take(primary.size))
+            }
         }
     }
 
-    // Runs once per flavor: the F-Droid build must not offer an in-app update
-    // check, and the Play Store build keeps it.
+    // Runs once per flavor: the F-Droid build offers neither an in-app update
+    // check nor the promotion page, and the Play Store build keeps both.
     @Test
-    fun updateCheckIsDisabledExactlyInTheFdroidBuild() {
-        assertEquals(BuildConfig.DISTRIBUTION != "F-Droid", BuildConfig.UPDATE_CHECK_ENABLED)
-        if (BuildConfig.DISTRIBUTION == "F-Droid") {
-            assertFalse(MainDestination.CheckUpdate in mainDrawerItems(BuildConfig.UPDATE_CHECK_ENABLED))
+    fun optionalEntriesAreOffExactlyInTheFdroidBuild() {
+        val fdroid = BuildConfig.DISTRIBUTION == "F-Droid"
+        assertEquals(!fdroid, BuildConfig.UPDATE_CHECK_ENABLED)
+        assertEquals(!fdroid, BuildConfig.PROMOTION_ENABLED)
+        if (fdroid) {
+            val items = mainDrawerItems(BuildConfig.UPDATE_CHECK_ENABLED, BuildConfig.PROMOTION_ENABLED)
+            assertFalse(MainDestination.CheckUpdate in items)
+            assertFalse(MainDestination.Promotion in items)
         }
     }
 }

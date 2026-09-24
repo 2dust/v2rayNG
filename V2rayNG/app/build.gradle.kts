@@ -72,11 +72,16 @@ android {
             // F-Droid clients deliver updates; F-Droid's inclusion policy does
             // not allow an app to fetch its own updates without opt-in.
             buildConfigField("boolean", "UPDATE_CHECK_ENABLED", "false")
+            // Upstream's "Promotion" drawer entry opens a third-party page whose
+            // address is stored base64-encoded (AppConfig.APP_PROMOTION_URL).
+            // This build does not carry it.
+            buildConfigField("boolean", "PROMOTION_ENABLED", "false")
         }
         create("playstore") {
             dimension = "distribution"
             buildConfigField("String", "DISTRIBUTION", "\"Play Store\"")
             buildConfigField("boolean", "UPDATE_CHECK_ENABLED", "true")
+            buildConfigField("boolean", "PROMOTION_ENABLED", "true")
         }
     }
 

@@ -57,20 +57,26 @@ private val primaryDrawerItems = listOf(
 )
 
 /**
- * Drawer entries in display order. [MainDestination.CheckUpdate] is omitted when
- * [updateCheckEnabled] is false, as in the F-Droid build, where F-Droid clients
- * deliver updates.
+ * Drawer entries in display order. The F-Droid build turns off both optional
+ * entries: [MainDestination.CheckUpdate], because F-Droid clients deliver
+ * updates, and [MainDestination.Promotion], a third-party page.
  */
-internal fun mainDrawerItems(updateCheckEnabled: Boolean): List<MainDestination> =
+internal fun mainDrawerItems(
+    updateCheckEnabled: Boolean,
+    promotionEnabled: Boolean,
+): List<MainDestination> =
     primaryDrawerItems + listOfNotNull(
-        MainDestination.Promotion,
+        MainDestination.Promotion.takeIf { promotionEnabled },
         MainDestination.Logcat,
         MainDestination.CheckUpdate.takeIf { updateCheckEnabled },
         MainDestination.BackupRestore,
         MainDestination.About
     )
 
-private val drawerItems = mainDrawerItems(BuildConfig.UPDATE_CHECK_ENABLED)
+private val drawerItems = mainDrawerItems(
+    updateCheckEnabled = BuildConfig.UPDATE_CHECK_ENABLED,
+    promotionEnabled = BuildConfig.PROMOTION_ENABLED,
+)
 
 @Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
