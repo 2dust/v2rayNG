@@ -86,19 +86,25 @@ jobs:
             echo "::warning::Set the APP_CERT_SHA256 repository variable to the digest above so a release signed with the wrong key is refused."
           fi
 
-      - name: Create the GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          upstream="${GITHUB_REF_NAME#v}"
-          gh release create "${GITHUB_REF_NAME}" dist/*.apk dist/build-manifest.txt \
-            --repo "${GITHUB_REPOSITORY}" \
-            --verify-tag \
-            --title "${GITHUB_REF_NAME}" \
-            --notes "Built from source from ${GITHUB_SHA}, which includes upstream v2rayNG [${upstream}](https://github.com/2dust/v2rayNG/releases/tag/${upstream}).
+      - name: Name the upstream release
+        id: upstream
+        run: echo "tag=${GITHUB_REF_NAME#v}" >> "${GITHUB_OUTPUT}"
 
-          \`build-manifest.txt\` lists the exact sources, toolchain and SHA-256 of every APK, for rebuilding and comparing; see docs/reproducible-build.md. The same APKs are available from this fork's F-Droid repository: https://acidefluorhydrique.github.io/v2rayNG/repo"
+      # Creates the release, or adds to the one already there when the tag was
+      # made by publishing a release on the Releases page; notes written there
+      # are kept and these are appended.
+      - name: Create or update the GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            dist/*.apk
+            dist/build-manifest.txt
+          fail_on_unmatched_files: true
+          append_body: true
+          body: |
+            Built from source from ${{ github.sha }}, which includes upstream v2rayNG [${{ steps.upstream.outputs.tag }}](https://github.com/2dust/v2rayNG/releases/tag/${{ steps.upstream.outputs.tag }}).
+
+            `build-manifest.txt` lists the exact sources, toolchain and SHA-256 of every APK, for rebuilding and comparing; see docs/reproducible-build.md. The same APKs are available from this fork's F-Droid repository: https://acidefluorhydrique.github.io/v2rayNG/repo
 
   fdroid-repo:
     needs: github-release
