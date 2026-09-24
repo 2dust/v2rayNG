@@ -47,6 +47,11 @@ env:
   # '21.0.12+101' matches nothing at all. To update, copy the `semver` field from
   # https://api.adoptium.net/v3/info/release_versions?release_type=ga&version=%5B21,22)
   JAVA_VERSION: '21.0.12+101.0.LTS'
+  # The JDK gomobile runs javac from to compile the aar's Java bindings
+  # (classes.jar), so it is part of the aar. Before this was pinned the runner
+  # image's default JDK was used; this is that default, Temurin 17.0.20.1+1,
+  # in the Adoptium semver form. Note that 17 has no `.0.LTS` suffix.
+  GOMOBILE_JAVA_VERSION: '17.0.20+101'
   # Must match minSdk in V2rayNG/app/build.gradle.kts.
   GOMOBILE_ANDROID_API: '24'
   # Signing is optional: without a keystore the job still proves the build works
@@ -112,7 +117,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
 
       - name: Setup Go
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -120,6 +125,13 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache-dependency-path: AndroidLibXrayLite/go.sum
+
+      - name: Setup Java for gomobile
+        if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v6.0.0
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.GOMOBILE_JAVA_VERSION }}
 
       - name: Build libv2ray.aar from source
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -212,7 +224,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
 
       # ---------------------------------------------------------------------
       # hev-socks5-tunnel - already built from source upstream.
@@ -316,6 +328,7 @@ jobs:
             echo "cmdline-tools: ${CMDLINE_TOOLS_VERSION}"
             echo "sdk packages: ${SDK_PACKAGES}"
             echo "gomobile androidapi: ${GOMOBILE_ANDROID_API}"
+            echo "gomobile java requested: ${GOMOBILE_JAVA_VERSION}"
             echo "java requested: ${JAVA_VERSION}"
             echo "java: $(java -version 2>&1 | head -1)"
             echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
