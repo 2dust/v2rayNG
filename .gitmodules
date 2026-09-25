@@ -4,3 +4,6 @@
 [submodule "hev-socks5-tunnel"]
 	path = hev-socks5-tunnel
 	url = https://github.com/heiher/hev-socks5-tunnel
+[submodule "forkray-geodata"]
+	path = forkray-geodata
+	url = https://github.com/AcideFluorhydrique/forkray-geodata

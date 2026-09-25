@@ -123,7 +123,7 @@ can be batched; ones that update the core should not be.
 | Task | How often | Notes |
 | --- | --- | --- |
 | Merge conflicts | rarely, about once a year so far | Arrive as an issue with the conflicted files and the commands to resolve them. |
-| Pin bumps | when the pin report says so | Go, JDKs, NDK, `geo-assets.lock`. One commit each; the release checksums change with every bump. The comment next to each pin says where its next value comes from. |
+| Pin bumps | when the pin report says so | Go, JDKs, NDK, the `forkray-geodata` submodule. One commit each; the release checksums change with every bump. The comment next to each pin says where its next value comes from. |
 | Go minor upgrades | about twice a year | When AndroidLibXrayLite's `go.mod` moves past `GO_VERSION`, builds fail on purpose (`GOTOOLCHAIN=local`) and the pin report says so. |
 | Reproducibility baseline | after upstream upgrades AGP, Gradle or dependencies | The APK bytes change legitimately; compare two runs again as in docs/reproducible-build.md. |
 | A fork-only fix between upstream releases | as needed | Version codes come from upstream's `versionCode`, and a release tag must match `versionName`. Releasing the same upstream version twice therefore needs both raised first (for example `versionName = "2.3.9-1"`), and those lines will conflict with the next upstream sync. Prefer waiting for the next upstream release when you can. |

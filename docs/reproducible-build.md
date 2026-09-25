@@ -26,6 +26,7 @@ an `fdroiddata` recipe.
 | `libv2ray.aar` (Xray core + JNI bindings) | [`2dust/AndroidLibXrayLite`](https://github.com/2dust/AndroidLibXrayLite) | git submodule | `gomobile bind` in CI |
 | `libhev-socks5-tunnel.so` (in-process tun2socks for `VpnService`) | [`heiher/hev-socks5-tunnel`](https://github.com/heiher/hev-socks5-tunnel) | git submodule | `compile-hevtun.sh` (`ndk-build`) |
 | `libhevsockstun.so` (standalone binary for root mode) | same submodule | git submodule | `compile-hevtun.sh` (`ndk-build`) |
+| `geoip.dat`, `geosite.dat`, `geoip-only-cn-private.dat` (routing databases, inside the aar) | [`AcideFluorhydrique/forkray-geodata`](https://github.com/AcideFluorhydrique/forkray-geodata) | git submodule | its `scripts/build.sh` |
 | APK | this repository | git | Gradle / AGP |
 
 Nothing under `V2rayNG/app/libs/` is committed to this repository; it is
@@ -45,34 +46,42 @@ that workflow downloads `libv2ray.aar` from the `AndroidLibXrayLite` release
 assets instead of compiling it, which makes its output impossible to verify from
 source. `fdroid-source-build.yml` compiles it.
 
-## What is downloaded
+## Geo data
 
-Three geo databases are embedded in the aar's `assets/`, and from there in the
-APK:
+Three routing databases are embedded in the aar's `assets/`, and from there in
+the APK: `geoip.dat`, `geosite.dat` and `geoip-only-cn-private.dat`.
 
-- `geoip.dat`, `geosite.dat` — from [`Loyalsoldier/v2ray-rules-dat`](https://github.com/Loyalsoldier/v2ray-rules-dat) releases
-- `geoip-only-cn-private.dat` — from [`Loyalsoldier/geoip`](https://github.com/Loyalsoldier/geoip) releases
+Upstream downloads them prebuilt: `AndroidLibXrayLite/gen_assets.sh` fetches
+Loyalsoldier's releases from `releases/latest`, and that repository also commits
+two `.dat` files. Neither is used here. The workflow deletes the committed ones
+and builds all three from the [`forkray-geodata`](https://github.com/AcideFluorhydrique/forkray-geodata)
+submodule instead, which:
 
-These are routing **data**, not executable code, which is why they are acceptable
-in a from-source build at all. They are still downloaded rather than generated,
-so they get their own section in every build manifest.
+- stores every input as plain text (domain lists, CIDR lists), taken only from
+  freely licensed sources: v2fly/domain-list-community (MIT), gfwlist
+  (LGPL-2.1), gaoyifan/china-operator-ip (MIT), DB-IP Lite (CC BY 4.0) and the
+  address ranges operators publish. No MaxMind data, which needs an account and
+  a licence key;
+- records the exact upstream revision and checksum of each in
+  `sources.lock.json`;
+- builds the `.dat` files with generators pinned in its `tools/go.mod`, and its
+  CI checks that two builds of one commit are byte-identical;
+- fails the build if a category the routing presets refer to is missing, since
+  Xray refuses to start on a rule naming a category its database lacks.
 
-`AndroidLibXrayLite/gen_assets.sh` fetches them from `releases/latest`, which
-floats — two builds of the same commit on different days would embed different
-data and could never be verified against each other. The workflow therefore does
-**not** call that script. It reads [`geo-assets.lock`](../geo-assets.lock)
-instead, which pins an exact dated release of each project together with the
-SHA-256 of each file, and fails the build if a download does not match.
+So the data is pinned by the submodule commit like the other sources, and is
+built, not downloaded. The build manifest lists the submodule revision and the
+SHA-256 of each `.dat`, read back from the aar.
 
-Updating the pin is a deliberate act: bump the tags and checksums in
-`geo-assets.lock` as its own commit, and expect every APK checksum to change with
-it. The lock file is part of the `libv2ray.aar` cache key, so a changed pin
-forces a rebuild rather than silently reusing an aar built with the old data.
+The sources require attribution (DB-IP) and their licence notices to go with the
+data. The workflow appends them, rendered by `forkray-geodata/scripts/notice.py`,
+to the licences page the About screen shows, right after
+`licenseFdroidReleaseReport` regenerates it.
 
-If a distributor objects to shipping the databases at all, dropping the three
-`fetch_dat` lines yields an APK that downloads them on first use instead —
-`SettingsManager.initAssets` only copies them out of the APK when present. That
-changes first-run behaviour, so it is not the default here.
+Updating the data is a submodule bump in its own commit; expect every APK
+checksum to change with it. forkray-geodata proposes source updates weekly as
+pull requests in its own repository; the pin report here says when the
+submodule has fallen behind.
 
 ## Pinned toolchain
 
@@ -124,16 +133,11 @@ git submodule update --init --recursive
 cd AndroidLibXrayLite
 mkdir -p assets
 
-# Pinned geo data. Do NOT run gen_assets.sh here: it fetches releases/latest,
-# which will not match what the published APK was built with.
-. ../geo-assets.lock
-RULES="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${RULES_DAT_TAG}"
-GEOIP="https://github.com/Loyalsoldier/geoip/releases/download/${GEOIP_REPO_TAG}"
-curl -fsSL -o assets/geoip.dat "${RULES}/geoip.dat"
-curl -fsSL -o assets/geosite.dat "${RULES}/geosite.dat"
-curl -fsSL -o assets/geoip-only-cn-private.dat "${GEOIP}/geoip-only-cn-private.dat"
-printf '%s  assets/geoip.dat\n%s  assets/geosite.dat\n%s  assets/geoip-only-cn-private.dat\n' \
-  "$GEOIP_DAT_SHA256" "$GEOSITE_DAT_SHA256" "$GEOIP_ONLY_CN_PRIVATE_DAT_SHA256" | sha256sum -c -
+# Geo data, built from the forkray-geodata submodule (needs Python 3). Do NOT
+# run gen_assets.sh: it downloads prebuilt files from releases/latest.
+bash ../forkray-geodata/scripts/build.sh
+rm -f assets/*.dat
+cp ../forkray-geodata/out/*.dat assets/
 
 # gomobile's javac must be Temurin 17.0.20.1+1 (put it first on PATH here)
 go install "golang.org/x/mobile/cmd/gomobile@$(go list -m -f "{{.Version}}" golang.org/x/mobile)"
@@ -174,7 +178,7 @@ read the checksums without downloading anything.
 
 ## Verifying determinism
 
-The caches are keyed on the submodule revisions and the geo pin, so an ordinary
+The caches are keyed on the submodule revisions, so an ordinary
 second run reuses the previously built `libv2ray.aar` instead of rebuilding it —
 which would make a comparison meaningless. Run the workflow manually with
 **`bypass_cache` checked** to force a cold rebuild of every native artifact; that
@@ -262,9 +266,14 @@ These are unresolved and should be treated as work items, not as settled:
   been run on two different images. A `bypass_cache` run on a newer image would
   close that. The manifest records the image either way.
 - **Geo data goes stale.** Pinning trades reproducibility for freshness: the
-  routing databases stay at whatever dated release the lock file names until
-  someone bumps it. Review it when cutting a release, and note that users can
-  update the databases in-app regardless of what shipped in the APK.
+  routing databases stay at the `forkray-geodata` commit the submodule names
+  until someone bumps it. Review it when cutting a release, and note that users
+  can update the databases in-app regardless of what shipped in the APK.
+- **Geo data coverage.** Only freely licensed sources are used, so `geosite:cn`
+  is v2fly's list without Loyalsoldier's additions (which come partly from a
+  list whose licence is not stated), and `geosite.dat` is about a fifth of the
+  size. Whether mainland sites still route directly well enough needs testing
+  from inside mainland China.
 - **In-app updater.** `UpdateCheckerManager` fetches APK download URLs from
   GitHub releases. IzzyOnDroid tolerates this (with an anti-feature flag);
   F-Droid normally requires it gated off for their build. Not addressed here.

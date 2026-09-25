@@ -84,14 +84,17 @@ jobs:
           XRAY_TAG=$(git -C AndroidLibXrayLite describe --tags --exact-match "$XRAY_REV" 2>/dev/null || echo 'untagged')
           HEV_REV=$(git -C hev-socks5-tunnel rev-parse HEAD)
           HEV_TAG=$(git -C hev-socks5-tunnel describe --tags --exact-match "$HEV_REV" 2>/dev/null || echo 'untagged')
+          GEODATA_REV=$(git -C forkray-geodata rev-parse HEAD)
           {
             echo "xray_rev=$XRAY_REV"
             echo "xray_tag=$XRAY_TAG"
             echo "hev_rev=$HEV_REV"
             echo "hev_tag=$HEV_TAG"
+            echo "geodata_rev=$GEODATA_REV"
           } >> "$GITHUB_OUTPUT"
           echo "AndroidLibXrayLite $XRAY_REV ($XRAY_TAG)"
           echo "hev-socks5-tunnel  $HEV_REV ($HEV_TAG)"
+          echo "forkray-geodata    $GEODATA_REV"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
@@ -124,14 +127,16 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ steps.revs.outputs.geodata_rev }}
 
       - name: Setup Go
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
         uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache-dependency-path: AndroidLibXrayLite/go.sum
+          cache-dependency-path: |
+            AndroidLibXrayLite/go.sum
+            forkray-geodata/tools/go.sum
 
       - name: Setup Java for gomobile
         if: steps.cache-libv2ray-restore.outputs.cache-hit != 'true'
@@ -174,30 +179,16 @@ jobs:
           export PATH="$PATH:$(go env GOPATH)/bin"
 
           # Geo data. These .dat databases end up in the aar's assets and so in
-          # the APK. gen_assets.sh fetches them from `releases/latest`, which
-          # floats and would make two builds of the same commit differ, so read
-          # the pinned dated releases from geo-assets.lock instead and verify
-          # every download against the checksum recorded there.
+          # the APK. Upstream's gen_assets.sh downloads prebuilt ones, and the
+          # repository commits two more; neither is used. They are built here
+          # from the plain-text sources in the forkray-geodata submodule, whose
+          # build is byte-reproducible from its commit and fails if a category
+          # the routing presets need is missing.
+          bash "${GITHUB_WORKSPACE}/forkray-geodata/scripts/build.sh"
+          rm -f assets/*.dat
           mkdir -p assets
-          # shellcheck source=/dev/null
-          . "${GITHUB_WORKSPACE}/geo-assets.lock"
-
-          fetch_dat() {
-            url="$1"; dest="$2"; want="$3"
-            curl -fsSL --retry 3 -o "$dest" "$url"
-            got=$(sha256sum "$dest" | cut -d' ' -f1)
-            if [ "$got" != "$want" ]; then
-              echo "::error::checksum mismatch for ${dest}: expected ${want}, got ${got}"
-              exit 1
-            fi
-            echo "verified ${dest} ${got}"
-          }
-
-          RULES_BASE="https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${RULES_DAT_TAG}"
-          GEOIP_BASE="https://github.com/Loyalsoldier/geoip/releases/download/${GEOIP_REPO_TAG}"
-          fetch_dat "${RULES_BASE}/geoip.dat" assets/geoip.dat "${GEOIP_DAT_SHA256}"
-          fetch_dat "${RULES_BASE}/geosite.dat" assets/geosite.dat "${GEOSITE_DAT_SHA256}"
-          fetch_dat "${GEOIP_BASE}/geoip-only-cn-private.dat" assets/geoip-only-cn-private.dat "${GEOIP_ONLY_CN_PRIVATE_DAT_SHA256}"
+          cp "${GITHUB_WORKSPACE}"/forkray-geodata/out/*.dat assets/
+          ls -l assets
 
           gomobile init
 
@@ -231,7 +222,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: ${{ github.workspace }}/aar
-          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ hashFiles('geo-assets.lock') }}
+          key: libv2ray-${{ runner.os }}-${{ steps.revs.outputs.xray_rev }}-go${{ env.GO_VERSION }}-ndk${{ env.NDK_VERSION }}-api${{ env.GOMOBILE_ANDROID_API }}-jdk${{ env.GOMOBILE_JAVA_VERSION }}-geo${{ steps.revs.outputs.geodata_rev }}
 
       # ---------------------------------------------------------------------
       # hev-socks5-tunnel - already built from source upstream.
@@ -290,6 +281,12 @@ jobs:
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           chmod 755 gradlew
           ./gradlew licenseFdroidReleaseReport
+          # The geo data's sources require attribution (DB-IP, CC BY 4.0) and
+          # their license notices in the app; add them to the licences page the
+          # About screen shows. The report is regenerated above, so this never
+          # touches the committed copy's content from upstream.
+          python3 "${GITHUB_WORKSPACE}/forkray-geodata/scripts/notice.py" \
+            --append-to app/src/main/assets/open_source_licenses.html
           if [ "${SIGN}" = 'true' ] && [ "${HAS_KEYSTORE}" != 'true' ]; then
             echo '::error::A signed build was requested but the APP_KEYSTORE_BASE64 secret is not set.'
             exit 1
@@ -333,6 +330,7 @@ jobs:
             echo "v2rayNG: ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
             echo "AndroidLibXrayLite: ${XRAY_REV} (${XRAY_TAG})"
             echo "hev-socks5-tunnel: ${HEV_REV} (${HEV_TAG})"
+            echo "forkray-geodata: ${GEODATA_REV}"
             echo
             echo '## toolchain'
             echo "go: ${GO_VERSION}"
@@ -345,8 +343,11 @@ jobs:
             echo "java: $(java -version 2>&1 | head -1)"
             echo "runner image: ${ImageOS:-unknown} ${ImageVersion:-unknown}"
             echo
-            echo '## pinned geo data (downloaded, not built from source)'
-            grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' geo-assets.lock || true
+            echo '## geo data checksums (built from forkray-geodata, inside libv2ray.aar)'
+            # Read back from the aar so they are listed on a cache hit too.
+            for dat in geoip.dat geoip-only-cn-private.dat geosite.dat; do
+              echo "$(unzip -p aar/libv2ray.aar "assets/${dat}" | sha256sum | cut -d' ' -f1)  ${dat}"
+            done
             echo
             echo '## native artifact checksums'
             find V2rayNG/app/libs -type f | sort | xargs sha256sum
@@ -373,6 +374,7 @@ jobs:
           XRAY_TAG: ${{ steps.revs.outputs.xray_tag }}
           HEV_REV: ${{ steps.revs.outputs.hev_rev }}
           HEV_TAG: ${{ steps.revs.outputs.hev_tag }}
+          GEODATA_REV: ${{ steps.revs.outputs.geodata_rev }}
 
       - name: Upload fdroid APKs
         if: ${{ success() }}

@@ -15,6 +15,8 @@ set -o nounset
 DRY_RUN="${DRY_RUN:-false}"
 GEO_MAX_AGE_DAYS="${GEO_MAX_AGE_DAYS:-30}"
 TITLE="Reproducible-build pins to review"
+GEODATA_REPO=AcideFluorhydrique/forkray-geodata
+GEODATA_URL="https://github.com/${GEODATA_REPO}"
 WORKFLOW=.github/workflows/fdroid-source-build.yml
 
 pin() { sed -nE "s/^  $1: '([^']+)'.*/\1/p" "$WORKFLOW"; }
@@ -59,24 +61,24 @@ if [[ -n "$ndk_upstream" && "$ndk_upstream" != "$ndk_pin" ]]; then
     findings+=("**NDK**: upstream builds with ${ndk_upstream}; \`NDK_VERSION\` and \`android.ndkVersion\` are ${ndk_pin}.")
 fi
 
-# Geo data: routing databases go stale; refresh geo-assets.lock periodically.
-# shellcheck source=/dev/null
-. ./geo-assets.lock
-now=$(date -u +%s)
-for entry in "Loyalsoldier/v2ray-rules-dat:RULES_DAT_TAG:${RULES_DAT_TAG}" "Loyalsoldier/geoip:GEOIP_REPO_TAG:${GEOIP_REPO_TAG}"; do
-    IFS=: read -r repo var tag <<<"$entry"
-    stamp="${tag:0:4}-${tag:4:2}-${tag:6:2}"
-    age=$(( (now - $(date -u -d "$stamp" +%s 2>/dev/null || date -u -j -f %Y-%m-%d "$stamp" +%s)) / 86400 ))
+# Geo data: routing databases go stale. forkray-geodata refreshes its sources
+# weekly; this reports when the submodule pin has fallen behind its main
+# branch by more than GEO_MAX_AGE_DAYS.
+geo_pin=$(git rev-parse HEAD:forkray-geodata)
+geo_head=$(git ls-remote "${GEODATA_URL}" refs/heads/main | cut -f1)
+if [[ -n "$geo_head" && "$geo_head" != "$geo_pin" ]]; then
+    geo_pin_date=$(curl -fsSL "https://api.github.com/repos/${GEODATA_REPO}/commits/${geo_pin}" \
+        | json "d['commit']['committer']['date']")
+    age=$(( ($(date -u +%s) - $(date -u -d "$geo_pin_date" +%s)) / 86400 ))
     if (( age > GEO_MAX_AGE_DAYS )); then
-        latest=$(curl -fsSI "https://github.com/${repo}/releases/latest" | awk -F/ 'tolower($0) ~ /^location:/ {print $NF}' | tr -d '\r')
-        findings+=("**Geo data**: \`${var}\` is ${tag}, ${age} days old; the newest ${repo} release is ${latest}.")
+        findings+=("**Geo data**: the \`forkray-geodata\` submodule is at ${geo_pin:0:7}, ${age} days old; its main branch is at ${geo_head:0:7}. Update with \`git -C forkray-geodata fetch && git -C forkray-geodata checkout origin/main\`.")
     fi
-done
+fi
 
 if (( ${#findings[@]} == 0 )); then
     body=""
 else
-    body="These pins in \`${WORKFLOW}\`, \`V2rayNG/app/build.gradle.kts\` and \`geo-assets.lock\` have fallen behind:
+    body="These pins in \`${WORKFLOW}\`, \`V2rayNG/app/build.gradle.kts\` and the \`forkray-geodata\` submodule have fallen behind:
 
 $(printf -- '- %s\n' "${findings[@]}")
 

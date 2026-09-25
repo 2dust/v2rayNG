@@ -6,13 +6,15 @@
 <li>Built entirely from source on public CI, including the Xray core, which upstream downloads as a prebuilt library. Every release publishes the exact sources, toolchain and checksums used, so it can be rebuilt and compared byte for byte.</li>
 <li>Its own application ID, so it installs alongside v2rayNG rather than replacing it.</li>
 <li>No in-app update check (your F-Droid client handles updates) and no promotion link.</li>
+<li>Routing databases built from freely licensed sources in <a href="https://github.com/AcideFluorhydrique/forkray-geodata">forkray-geodata</a>, instead of prebuilt downloads.</li>
 </ul>
 
 <h3>Geoip and Geosite</h3>
 
 <ul>
-<li>geoip.dat and geosite.dat are in <code>Android/data/io.github.acidefluorhydrique.v2rayng/files/assets</code> (the path may differ on some devices).</li>
-<li>The download feature fetches the enhanced version from <a href="https://github.com/Loyalsoldier/v2ray-rules-dat">Loyalsoldier/v2ray-rules-dat</a>; it needs a working proxy.</li>
+<li>The bundled geoip.dat and geosite.dat come from v2fly/domain-list-community, gfwlist, china-operator-ip, DB-IP Lite and the address ranges operators publish. IP Geolocation by <a href="https://db-ip.com">DB-IP</a>.</li>
+<li>They are in <code>Android/data/io.github.acidefluorhydrique.v2rayng/files/assets</code> (the path may differ on some devices).</li>
+<li>The download feature fetches the larger lists from <a href="https://github.com/Loyalsoldier/v2ray-rules-dat">Loyalsoldier/v2ray-rules-dat</a> instead; it needs a working proxy.</li>
 </ul>
 
 <p>Source code and issues: <a href="https://github.com/AcideFluorhydrique/v2rayNG">github.com/AcideFluorhydrique/v2rayNG</a>. Documentation for the shared features: the <a href="https://github.com/2dust/v2rayNG/wiki">v2rayNG wiki</a>.</p>
