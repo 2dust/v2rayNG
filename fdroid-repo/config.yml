@@ -14,7 +14,7 @@ repo_description: >-
 # Only the APKs release.yml puts in repo/ are offered; there is no archive.
 archive_older: 0
 
-sdk_path: {env: ANDROID_HOME}
+sdk_path: $ANDROID_HOME
 
 keystore: keystore.jks
 repo_keyalias: {env: FDROID_REPO_KEY_ALIAS}
