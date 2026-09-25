@@ -84,10 +84,11 @@ jobs:
             fi
             echo "$out"
             echo "::endgroup::"
-            # "Signer #1 ..." normally, "Signer (minSdkVersion=...) ..." for
+            # "Signer #1 ..." from older apksigner, "V2 Signer: ..." per scheme
+            # from build-tools 37, "Signer (minSdkVersion=...) ..." for
             # SDK-targeted signers; the source stamp is not the app's signer.
             cert=$(printf '%s\n' "$out" \
-              | sed -nE '/^Source Stamp/d; s/^Signer.* certificate SHA-256 digest: ([0-9a-fA-F]+)$/\1/p' \
+              | sed -nE '/^Source Stamp/d; s/^(V[0-9.]+ )?Signer.* certificate SHA-256 digest: ([0-9a-fA-F]+)$/\2/p' \
               | tr 'A-F' 'a-f' | sort -u)
             echo "$(basename "$apk"): ${cert}"
             if [ -z "$cert" ] || [ "$(printf '%s\n' "$cert" | wc -l)" -ne 1 ]; then
