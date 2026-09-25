@@ -74,9 +74,26 @@ jobs:
         run: |
           set -euo pipefail
           apksigner="$(ls -d "${ANDROID_HOME}"/build-tools/* | sort -V | tail -n 1)/apksigner"
+          echo "Using ${apksigner}"
           for apk in dist/*.apk; do
-            cert=$("$apksigner" verify --print-certs "$apk" | sed -nE 's/^Signer #1 certificate SHA-256 digest: //p')
-            echo "$(basename "$apk"): $cert"
+            echo "::group::$(basename "$apk")"
+            if ! out=$("$apksigner" verify --print-certs "$apk" 2>&1); then
+              echo "$out"
+              echo "::error::$(basename "$apk") does not verify."
+              exit 1
+            fi
+            echo "$out"
+            echo "::endgroup::"
+            # "Signer #1 ..." normally, "Signer (minSdkVersion=...) ..." for
+            # SDK-targeted signers; the source stamp is not the app's signer.
+            cert=$(printf '%s\n' "$out" \
+              | sed -nE '/^Source Stamp/d; s/^Signer.* certificate SHA-256 digest: ([0-9a-fA-F]+)$/\1/p' \
+              | tr 'A-F' 'a-f' | sort -u)
+            echo "$(basename "$apk"): ${cert}"
+            if [ -z "$cert" ] || [ "$(printf '%s\n' "$cert" | wc -l)" -ne 1 ]; then
+              echo "::error::Expected exactly one signing certificate in $(basename "$apk"); see apksigner's output above."
+              exit 1
+            fi
             if [ -n "${EXPECTED_CERT_SHA256}" ] && [ "$cert" != "${EXPECTED_CERT_SHA256,,}" ]; then
               echo "::error::$(basename "$apk") is signed by $cert, not the expected ${EXPECTED_CERT_SHA256}."
               exit 1
