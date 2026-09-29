@@ -90,12 +90,7 @@ class UserAssetUrlActivity : BaseComponentActivity() {
             toast(R.string.msg_remark_is_duplicate)
             return false
         }
-        if (TextUtils.isEmpty(remarks)) {
-            toast(R.string.sub_setting_remarks)
-            return false
-        }
-        if (TextUtils.isEmpty(url)) {
-            toast(R.string.title_url)
+        if (TextUtils.isEmpty(remarks) || TextUtils.isEmpty(url)) {
             return false
         }
 
@@ -143,7 +138,9 @@ fun UserAssetUrlScreen(
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable(editAssetId, initialRemarks) { mutableStateOf(initialRemarks) }
+    var isRemarksError by rememberSaveable(editAssetId) { mutableStateOf(false) }
     var url by rememberSaveable(editAssetId, initialUrl) { mutableStateOf(initialUrl) }
+    var isUrlError by rememberSaveable(editAssetId) { mutableStateOf(false) }
     var showDeleteConfirm by rememberSaveable(editAssetId) { mutableStateOf(false) }
 
     Scaffold(
@@ -161,7 +158,18 @@ fun UserAssetUrlScreen(
                             )
                         }
                     }
-                    IconButton(onClick = { onSave(remarks, url) }) {
+                    IconButton(onClick = {
+                        val remarksErr = remarks.isBlank()
+                        val urlErr = url.isBlank()
+
+                        isRemarksError = remarksErr
+                        isUrlError = urlErr
+
+                        val hasError = remarksErr || urlErr
+                        if (!hasError) {
+                            onSave(remarks, url)
+                        }
+                    }) {
                         Icon(
                             painterResource(R.drawable.ic_fab_check),
                             contentDescription = stringResource(R.string.acc_save)
@@ -183,12 +191,14 @@ fun UserAssetUrlScreen(
             FormTextField(
                 label = stringResource(R.string.sub_setting_remarks),
                 value = remarks,
-                onValueChange = { remarks = it }
+                onValueChange = { remarks = it },
+                isError = isRemarksError
             )
             FormTextField(
                 label = stringResource(R.string.title_url),
                 value = url,
-                onValueChange = { url = it }
+                onValueChange = { url = it },
+                isError = isUrlError
             )
             NavigationBarsSpacer()
         }
@@ -197,6 +207,7 @@ fun UserAssetUrlScreen(
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_asset_source),
+            itemName = initialRemarks,
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )

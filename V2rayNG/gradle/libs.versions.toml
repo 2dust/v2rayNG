@@ -1,26 +1,26 @@
 [versions]
-agp = "9.3.2"
+agp = "9.4.1"
 desugarJdkLibs = "2.1.5"
-gradleLicensePlugin = "0.9.9"
-kotlin = "2.4.10"
+gradleLicensePlugin = "0.9.91"
+kotlin = "2.4.20"
 coreKtx = "1.19.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 activity = "1.13.0"
-appcompat = "1.7.1"
+appcompat = "1.8.0"
 mmkvStatic = "1.3.16"
 gson = "2.14.0"
-okhttp = "5.4.0"
+okhttp = "5.5.0"
 kotlinxCoroutines = "1.11.0"
 core = "3.5.4"
 workRuntimeKtx = "2.11.2"
 lifecycleViewmodelKtx = "2.11.0"
 mockitoMockitoInline = "5.2.0"
-camerax = "1.6.1"
-composeBom = "2026.06.01"
+camerax = "1.6.2"
+composeBom = "2026.09.00"
 reorderable = "3.1.0"
-coil = "2.7.0"
+coil = "3.6.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
@@ -57,7 +57,7 @@ androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtx" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }

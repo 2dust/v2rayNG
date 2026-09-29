@@ -111,12 +111,12 @@ val colorFabInactiveDark = Color(0xFF646464) // Dark Gray
 val dividerColorLight = Color(0xFFE0E0E0) // Light Gray
 val dividerColorDark = Color(0xFF424242) // Dark Gray
 
-// Toast Colors 70%
-val toastNormalBgLight = Color(0xB3353A3E) // Dark Gray
-val toastNormalBgDark = Color(0xB34A4F54) // Darker Gray
-val toastSuccessBg = Color(0xB3388E3C) // Green
-val toastErrorBg = Color(0xB3D50000) // Red
-val toastInfoBg = Color(0xB33F51B5) // Indigo Blue
+// Toast Colors 85%
+val toastNormalBgLight = Color(0xD9353A3E) // Dark Gray
+val toastNormalBgDark = Color(0xD94A4F54) // Darker Gray
+val toastSuccessBg = Color(0xD9388E3C) // Green
+val toastErrorBg = Color(0xD9D50000) // Red
+val toastInfoBg = Color(0xD93F51B5) // Indigo Blue
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
 val toastTextColor = Color.White // White
 
