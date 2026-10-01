@@ -565,4 +565,5 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="toast_policy_group_chain_invalid">Недопустимая цепочка группы политик. Проверьте узлы, входной и выходной прокси и резервный маршрут.</string>
 </resources>
