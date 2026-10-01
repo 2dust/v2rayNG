@@ -16,7 +16,8 @@ kotlinxCoroutines = "1.11.0"
 core = "3.5.4"
 workRuntimeKtx = "2.11.2"
 lifecycleViewmodelKtx = "2.11.0"
-mockitoMockitoInline = "5.2.0"
+mockitoCore = "5.24.0"
+mockitoKotlin = "6.4.0"
 camerax = "1.6.2"
 composeBom = "2026.09.00"
 reorderable = "3.1.0"
@@ -38,8 +39,8 @@ work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtx" }
-org-mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoMockitoInline" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 # CameraX
