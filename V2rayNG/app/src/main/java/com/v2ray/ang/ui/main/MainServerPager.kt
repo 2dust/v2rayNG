@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -323,7 +325,14 @@ private fun ServerListItem(
                     stateDescription = selectedStateDescription
                 }
             }
-            .clickable { actions.select(row.guid) }
+            // TV / D-pad support: keep the row an explicit single focusable
+            // node so DPAD_UP/DOWN can traverse the server list and
+            // DPAD_CENTER selects, per ui/AGENTS.md interaction rules.
+            .focusable()
+            .clickable(
+                role = Role.Button,
+                onClick = { actions.select(row.guid) }
+            )
     ) {
         Box(
             Modifier

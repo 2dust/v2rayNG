@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -50,11 +52,18 @@ fun MainBottomBar(
 ) {
     val scope = rememberCoroutineScope()
     val rotationAnim = remember { Animatable(0f) }
+    // TV / D-pad support: give the start/stop FAB initial focus so remote
+    // users can toggle the VPN with DPAD_CENTER without a mouse.
+    val fabFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(isRunning) {
         if (!isRunning) {
             rotationAnim.snapTo(0f)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        fabFocusRequester.requestFocus()
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -99,7 +108,8 @@ fun MainBottomBar(
                 .align(Alignment.TopEnd)
                 .padding(end = 24.dp)
                 .offset(y = (-28).dp)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .focusRequester(fabFocusRequester),
             containerColor = if (isRunning) colorFabActive
             else if (isDarkTheme) colorFabInactiveDark
             else colorFabInactiveLight
