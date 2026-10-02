@@ -1,8 +1,8 @@
 package com.v2ray.ang.handler
 
 import com.v2ray.ang.dto.ConnectionTestResult
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class SpeedtestManagerTest {
     @Test
