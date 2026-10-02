@@ -4,14 +4,14 @@ import android.util.Base64
 import android.util.Log
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.entities.ProfileItem
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.MockedStatic
 import org.mockito.Mockito
 import org.mockito.Mockito.mockStatic
@@ -67,7 +67,7 @@ class ShadowsocksFmtTest {
         return "$SS_SCHEME${base64Encoded}#${remarks.replace(" ", "%20")}"
     }
 
-    @Before
+    @BeforeEach
     fun setUp() {
         mockLog = mockStatic(Log::class.java, Mockito.RETURNS_DEFAULTS)
 
@@ -113,7 +113,7 @@ class ShadowsocksFmtTest {
         }
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         mockLog.close()
         mockBase64.close()
@@ -271,7 +271,7 @@ class ShadowsocksFmtTest {
         val uri = ShadowsocksFmt.toUri(config)
 
         // Verify URI does not include scheme (toUri returns without ss:// prefix)
-        assertFalse("toUri should not include scheme prefix", uri.startsWith(SS_SCHEME))
+        assertFalse(uri.startsWith(SS_SCHEME), "toUri should not include scheme prefix")
 
         assertTrue(uri.contains("@example.com:8388"))
         assertTrue(uri.contains("#Test%20Server"))
@@ -317,8 +317,8 @@ class ShadowsocksFmtTest {
 
         // Verify toUri returns without scheme, so we need to prepend it
         assertFalse(
-            "toUri should return URI without scheme",
-            regeneratedUri.startsWith(SS_SCHEME)
+            regeneratedUri.startsWith(SS_SCHEME),
+            "toUri should return URI without scheme"
         )
 
         val reparsed = ShadowsocksFmt.parse("$SS_SCHEME$regeneratedUri")
@@ -362,7 +362,7 @@ class ShadowsocksFmtTest {
 
             val result = ShadowsocksFmt.parseSip002(ssUrl)
 
-            assertNotNull("Failed for method: $method", result)
+            assertNotNull(result, "Failed for method: $method")
             assertEquals(method, result?.method)
         }
     }
