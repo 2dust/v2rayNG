@@ -3,11 +3,11 @@ package com.v2ray.ang.handler
 import android.util.Log
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.util.JsonUtil
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
@@ -18,12 +18,12 @@ class SubscriptionIndexTest {
     private val mainValues get() = stores.main.values
     private val subValues get() = stores.subscriptions.values
 
-    @Before
+    @BeforeEach
     fun prepareStorage() {
         stores = MmkvTestStore()
     }
 
-    @After
+    @AfterEach
     fun restoreStorage() {
         stores.close()
     }

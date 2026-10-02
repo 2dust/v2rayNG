@@ -16,10 +16,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,7 +29,7 @@ class MainReorderTest {
     private var persisted = listOf("a", "b", "c")
     private lateinit var viewModel: MainViewModel
 
-    @Before fun setUp() {
+    @BeforeEach fun setUp() {
         Dispatchers.setMain(dispatcher)
         whenever(source.mainServiceEvent).thenReturn(emptyFlow())
         whenever(source.getSelectedSubscriptionId()).thenReturn("s")
@@ -47,7 +47,7 @@ class MainReorderTest {
         doNothing().whenever(viewModel).toastError(any<Int>())
     }
 
-    @After fun tearDown() {
+    @AfterEach fun tearDown() {
         viewModel.viewModelScope.cancel()
         Dispatchers.resetMain()
     }

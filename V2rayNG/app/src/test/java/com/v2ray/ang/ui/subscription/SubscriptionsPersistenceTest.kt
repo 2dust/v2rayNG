@@ -12,10 +12,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -24,7 +24,7 @@ class SubscriptionsPersistenceTest {
     private lateinit var stores: MmkvTestStore
     private lateinit var viewModel: SubscriptionsViewModel
 
-    @Before fun setUp() {
+    @BeforeEach fun setUp() {
         Dispatchers.setMain(dispatcher)
         stores = MmkvTestStore()
         listOf("a", "b", "c").forEach {
@@ -34,7 +34,7 @@ class SubscriptionsPersistenceTest {
         doNothing().whenever(viewModel).toastError(any<Int>())
     }
 
-    @After fun tearDown() {
+    @AfterEach fun tearDown() {
         viewModel.viewModelScope.cancel()
         stores.close()
         Dispatchers.resetMain()

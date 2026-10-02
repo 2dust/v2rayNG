@@ -4,16 +4,16 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.util.JsonUtil
-import org.junit.After
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class MmkvPersistenceTest {
     private lateinit var stores: MmkvTestStore
 
-    @Before fun setUp() { stores = MmkvTestStore() }
-    @After fun tearDown() { stores.close() }
+    @BeforeEach fun setUp() { stores = MmkvTestStore() }
+    @AfterEach fun tearDown() { stores.close() }
 
     @Test fun `stale profile reorder preserves additions and excludes deleted IDs`() {
         stores.main.values["SUB_SERVERS_s"] = "[\"new\",\"a\",\"c\"]"
