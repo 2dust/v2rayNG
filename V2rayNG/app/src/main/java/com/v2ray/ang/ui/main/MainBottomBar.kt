@@ -30,6 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -79,8 +84,16 @@ fun MainBottomBar(
                 .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
                 // TV / D-pad: the FAB floats above-right of this bar and 2D
                 // focus search skips it, trapping D-pad users here. Route
-                // DPAD_DOWN explicitly to the start/stop FAB.
+                // DPAD_DOWN explicitly to the start/stop FAB, both via
+                // focus order and via a direct key handler as fallback.
                 .focusProperties { down = fabFocusRequester }
+                .onPreviewKeyEvent { event ->
+                    if (event.key == Key.DirectionDown && event.type == KeyEventType.KeyDown) {
+                        fabFocusRequester.requestFocus()
+                    } else {
+                        false
+                    }
+                }
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             AppDivider()
