@@ -118,7 +118,8 @@ object CoreServiceManager {
         mFilter.addAction(Intent.ACTION_SCREEN_ON)
         mFilter.addAction(Intent.ACTION_SCREEN_OFF)
         mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        // Core commands are app-internal; system screen broadcasts are still delivered.
+        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
 
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)

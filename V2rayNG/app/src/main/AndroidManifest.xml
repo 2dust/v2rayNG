@@ -278,7 +278,7 @@
 
         <receiver
             android:name=".receiver.WidgetProvider"
-            android:exported="true"
+            android:exported="false"
             android:process=":daemon">
             <meta-data
                 android:name="android.appwidget.provider"
@@ -328,8 +328,7 @@
         <receiver
             android:name=".receiver.TaskerReceiver"
             android:exported="true"
-            android:process=":daemon"
-            tools:ignore="ExportedReceiver">
+            android:process=":daemon">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
