@@ -2,9 +2,9 @@ package com.v2ray.ang.ui.perappproxy
 
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 
 class PerAppAccessibilityTest {
     private val self = AppInfo("v2rayNG", "self", false, 0, 10000)
@@ -26,7 +26,7 @@ class PerAppAccessibilityTest {
 
     private fun assertRoutes(routing: PerAppRouting, vararg expected: Pair<AppInfo, Int>) {
         expected.forEach { (app, description) ->
-            assertEquals(app.packageName, description, routing.descriptionRes(app))
+            assertEquals(description, routing.descriptionRes(app), app.packageName)
         }
     }
 
