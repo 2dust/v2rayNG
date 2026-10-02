@@ -6,13 +6,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertSame
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class AppSnackbarManagerTest {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
@@ -20,7 +20,7 @@ class AppSnackbarManagerTest {
     private var clears = 0
     private val manager = AppSnackbarManager(scope, { notifications.add(it) }, { clears++ }, { "Close" })
 
-    @After
+    @AfterEach
     fun close() = scope.cancel()
 
     @Test

@@ -3,20 +3,21 @@ agp = "9.4.1"
 desugarJdkLibs = "2.1.5"
 gradleLicensePlugin = "0.9.91"
 kotlin = "2.4.20"
-coreKtx = "1.19.0"
-junit = "4.13.2"
+coreKtx = "1.19.1"
+junit = "6.1.3"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 activity = "1.13.0"
 appcompat = "1.8.0"
-mmkvStatic = "1.3.16"
+mmkvStatic = "1.3.17"
 gson = "2.14.0"
 okhttp = "5.5.0"
 kotlinxCoroutines = "1.11.0"
 core = "3.5.4"
-workRuntimeKtx = "2.11.2"
+workRuntimeKtx = "2.12.0"
 lifecycleViewmodelKtx = "2.11.0"
-mockitoMockitoInline = "5.2.0"
+mockitoCore = "5.24.0"
+mockitoKotlin = "6.4.0"
 camerax = "1.6.2"
 composeBom = "2026.09.00"
 reorderable = "3.1.0"
@@ -25,7 +26,9 @@ coil = "3.6.3"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 gradle-license-plugin = { module = "com.jaredsburrows:gradle-license-plugin", version.ref = "gradleLicensePlugin" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 mmkv-static = { module = "com.tencent:mmkv-static", version.ref = "mmkvStatic" }
@@ -38,8 +41,8 @@ work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtx" }
-org-mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoMockitoInline" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoMockitoInline" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 # CameraX
