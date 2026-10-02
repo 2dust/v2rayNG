@@ -4,7 +4,6 @@ import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.LogUtil
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 /**
  * Minimal root command runner backed by the `su` binary.
@@ -24,32 +23,29 @@ object RootShell {
         val dir = File(context.filesDir, AppConfig.ROOT_RUNTIME_DIR).apply { mkdirs() }
         val file = File(dir, name).apply {
             writeText(script)
-            setExecutable(true, false)
+            setReadable(false, false)
+            setReadable(true, true)
+            setWritable(false, false)
+            setWritable(true, true)
         }
         val safePath = file.absolutePath.replace("'", "'\\''")
-        return exec("sh '$safePath'")
+        // Android toybox timeout owns the root shell, so killing the su client cannot leave
+        // a timed-out setup shell installing rules after rollback has already started.
+        return exec("timeout -s TERM -k 2 25 sh '$safePath'")
     }
 
     private fun exec(command: String, timeoutSeconds: Long = 30): Result {
         return try {
-            val process = ProcessBuilder("su", "-c", command)
-                .redirectErrorStream(true)
-                .start()
-            val output = process.inputStream.bufferedReader().use { it.readText() }
-            val finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
-            if (!finished) {
-                process.destroy()
-                LogUtil.e(AppConfig.TAG, "RootShell: timed out: $command")
-                return Result(-1, output)
-            }
-            val result = Result(process.exitValue(), output)
+            val outcome = RootProcessRunner.run(listOf("su", "-c", command), timeoutSeconds * 1000)
+            val result = Result(outcome.code, outcome.output)
             if (!result.success) {
-                LogUtil.w(AppConfig.TAG, "RootShell: '$command' exited ${result.code}: ${output.trim()}")
+                LogUtil.w(AppConfig.TAG, "RootShell: root command exited ${result.code}: ${result.output.trim()}")
             }
             result
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "RootShell: failed to run '$command'", e)
-            Result(-1, e.message ?: e.javaClass.simpleName)
+            if (e is InterruptedException) Thread.currentThread().interrupt()
+            LogUtil.e(AppConfig.TAG, "RootShell: root command failed", e)
+            Result(-1, e.javaClass.simpleName)
         }
     }
 }

@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">v2rayNG service</string>
+    <string name="notification_channel_subscription_updates">Subscription updates</string>
+    <string name="notification_channel_connection_checks">Connection checks</string>
     <string name="notification_action_stop_v2ray">Stop</string>
     <string name="toast_permission_denied">Permission denied</string>
     <string name="toast_permission_denied_notification">Notification permission denied</string>
@@ -50,7 +53,7 @@
     <string name="confirm_delete_proxy_chain_member">Are you sure you want to delete this chain member?</string>
     <string name="confirm_delete_routing_rule">Are you sure you want to delete this routing rule?</string>
     <string name="confirm_delete_subscription_group">Are you sure you want to delete this subscription group?</string>
-    <string name="confirm_delete_asset_file">Are you sure you want to delete the asset file \"%1$s\"?</string>
+    <string name="confirm_delete_asset_file">Are you sure you want to delete this asset file?</string>
     <string name="confirm_delete_asset_source">Are you sure you want to delete this asset source?</string>
     <string name="server_lab_remarks">remarks</string>
     <string name="server_lab_address">address</string>
@@ -100,6 +103,7 @@
     <string name="server_lab_reserved">Reserved (optional, separated by commas)</string>
     <string name="server_lab_local_address">Local address (optional IPv4/IPv6, separated by commas)</string>
     <string name="server_lab_local_mtu">MTU (optional, default 1420)</string>
+    <string name="server_lab_remote_dns">remoteDNS (optional, comma-separated IPv4/IPv6, or "local" to use device DNS)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (optional, default 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (optional, default 50 ms)</string>
     <string name="toast_success">Success</string>

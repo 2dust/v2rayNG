@@ -14,6 +14,9 @@
     <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
+    <string name="notification_channel_service">Dịch vụ v2rayNG</string>
+    <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
+    <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
@@ -50,7 +53,7 @@
     <string name="confirm_delete_proxy_chain_member">Bạn có chắc muốn xóa thành viên này khỏi chuỗi proxy không?</string>
     <string name="confirm_delete_routing_rule">Bạn có chắc muốn xóa quy tắc định tuyến này không?</string>
     <string name="confirm_delete_subscription_group">Bạn có chắc muốn xóa nhóm đăng ký này không?</string>
-    <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên \"%1$s\" không?</string>
+    <string name="confirm_delete_asset_file">Bạn có chắc muốn xóa tệp tài nguyên này không?</string>
     <string name="confirm_delete_asset_source">Bạn có chắc muốn xóa nguồn tài nguyên này không?</string>
     <string name="server_lab_remarks">Tên cấu hình</string>
     <string name="server_lab_address">Địa chỉ</string>
@@ -100,6 +103,7 @@
     <string name="server_lab_reserved">Reserved (không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6 không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_mtu">MTU (không bắt buộc, mặc định 1420)</string>
+    <string name="server_lab_remote_dns">remoteDNS (tùy chọn, các địa chỉ IPv4/IPv6 cách nhau bằng dấu phẩy, hoặc "local" để dùng DNS của thiết bị)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (không bắt buộc, mặc định 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (không bắt buộc, mặc định 50 ms)</string>
     <string name="toast_success">Thành công!</string>

@@ -13,14 +13,14 @@ android {
 
     // Match CI by default: the NDK strips jniLibs, so its version affects APK bytes.
     // Keep the override for builds that intentionally select a different NDK.
-    ndkVersion = providers.gradleProperty("NDK_VERSION").getOrElse("29.0.14206865")
+    ndkVersion = providers.gradleProperty("NDK_VERSION").getOrElse("30.0.16248370")
 
     defaultConfig {
         applicationId = "com.v2ray.ang"
         minSdk = 24
         targetSdk = 37
-        versionCode = 748
-        versionName = "2.3.8"
+        versionCode = 750
+        versionName = "2.3.10"
 
         val abiFilterList = providers.gradleProperty("ABI_FILTERS").orNull?.split(';')
         splits {
@@ -100,6 +100,17 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = true
+        }
+    }
+
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+            // Treat Jupiter discovery warnings as failures: JUnit 4 failed on an invalid @Test
+            // method, such as one that returns a value, while Jupiter only warns and skips it.
+            // The key is @API(status = EXPERIMENTAL) in JUnit 6; after a JUnit upgrade, check
+            // that a temporary `@Test fun probe() = 1` still fails the unit test task.
+            it.systemProperty("junit.platform.discovery.issue.severity.critical", "WARNING")
         }
     }
 
@@ -192,10 +203,12 @@ dependencies {
     implementation(libs.reorderable)
 
     // Testing Libraries
-    testImplementation(libs.junit)
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.org.mockito.mockito.inline)
+    testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
