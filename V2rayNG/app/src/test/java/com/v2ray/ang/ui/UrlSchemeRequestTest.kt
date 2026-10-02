@@ -1,9 +1,9 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 import java.net.URLEncoder
 
 class UrlSchemeRequestTest {
@@ -46,7 +46,7 @@ class UrlSchemeRequestTest {
             "v2rayng://install-config?url=", "v2rayng://install-config?url=%20",
             "v2rayng://install-config?url=%zz", "v2rayng://install-config?other=x",
         )) {
-            assertNull(data, UrlSchemeRequest.parse(Intent.ACTION_VIEW, null, data, null))
+            assertNull(UrlSchemeRequest.parse(Intent.ACTION_VIEW, null, data, null), data)
         }
     }
 

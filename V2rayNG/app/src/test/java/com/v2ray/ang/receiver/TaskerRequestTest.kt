@@ -1,8 +1,8 @@
 package com.v2ray.ang.receiver
 
 import com.v2ray.ang.AppConfig
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class TaskerRequestTest {
     @Test fun missingOrEmptyFieldsNeverBecomeStopCommands() {

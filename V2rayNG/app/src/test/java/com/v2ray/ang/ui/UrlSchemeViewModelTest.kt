@@ -15,10 +15,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
-import org.junit.After
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -33,7 +33,7 @@ class UrlSchemeViewModelTest {
 
     // Coroutine test APIs only override Main for these JVM tests; no production opt-in.
     @OptIn(ExperimentalCoroutinesApi::class)
-    @Before fun setUp() {
+    @BeforeEach fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         previousLogPriority = logPriority.getInt(null)
         logPriority.setInt(null, Int.MAX_VALUE)
@@ -41,7 +41,7 @@ class UrlSchemeViewModelTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    @After fun tearDown() {
+    @AfterEach fun tearDown() {
         Dispatchers.resetMain()
         logPriority.setInt(null, previousLogPriority)
     }

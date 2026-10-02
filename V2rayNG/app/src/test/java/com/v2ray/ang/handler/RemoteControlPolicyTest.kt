@@ -1,7 +1,7 @@
 package com.v2ray.ang.handler
 
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class RemoteControlPolicyTest {
     private val identity = RemoteControlIdentity(setOf("certificate"), 1)
