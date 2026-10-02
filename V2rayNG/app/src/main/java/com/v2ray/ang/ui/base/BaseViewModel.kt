@@ -45,14 +45,14 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
      * Send neutral toast event (Resource ID).
      */
     fun toast(resId: Int, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
-        localizedContext.toast(resId, liveRegionMode)
+        localizedContext.toast(resId, liveRegionMode = liveRegionMode)
     }
 
     /**
      * Send neutral toast event (String).
      */
     fun toast(message: String, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
-        app.toast(message, liveRegionMode)
+        app.toast(message, liveRegionMode = liveRegionMode)
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
         accessibilityMessage: String? = null,
     ) {
-        localizedContext.toastSuccess(resId, liveRegionMode, accessibilityMessage)
+        localizedContext.toastSuccess(resId, liveRegionMode = liveRegionMode, accessibilityMessage = accessibilityMessage)
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
         accessibilityMessage: String? = null,
     ) {
-        app.toastSuccess(message, liveRegionMode, accessibilityMessage)
+        app.toastSuccess(message, liveRegionMode = liveRegionMode, accessibilityMessage = accessibilityMessage)
     }
 
     /**
@@ -84,7 +84,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         resId: Int,
         liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     ) {
-        localizedContext.toastError(resId, liveRegionMode)
+        localizedContext.toastError(resId, liveRegionMode = liveRegionMode)
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         message: String,
         liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     ) {
-        app.toastError(message, liveRegionMode)
+        app.toastError(message, liveRegionMode = liveRegionMode)
     }
 
     /**

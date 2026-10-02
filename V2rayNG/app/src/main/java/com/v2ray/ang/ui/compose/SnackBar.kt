@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 enum class ToastType {
-    NORMAL, SUCCESS, ERROR
+    NORMAL, SUCCESS, ERROR, INFO
 }
 
 data class AppSnackbarMessage(
@@ -53,6 +53,7 @@ data class AppSnackbarMessage(
     val type: ToastType = ToastType.NORMAL,
     val liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     val accessibilityMessage: CharSequence? = null,
+    val long: Boolean = false,
 )
 
 object AppSnackbarManager {
@@ -79,7 +80,7 @@ class AppSnackbarController(
     private var currentId = 0
     private var currentShowTime = 0L
 
-    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL) {
+    fun show(message: CharSequence, type: ToastType = ToastType.NORMAL, long: Boolean = false) {
         val id = ++currentId
         scope.launch {
             if (currentShowTime != 0L) {
@@ -95,7 +96,8 @@ class AppSnackbarController(
                 hostState.showSnackbar(
                     AppSnackbarVisuals(
                         message = message.toString(),
-                        type = type
+                        type = type,
+                        duration = if (long) SnackbarDuration.Long else SnackbarDuration.Short,
                     )
                 )
                 if (id == currentId) {
@@ -136,7 +138,8 @@ fun AppSnackbarBridge(
                 AppSnackbarManager.messages.collect { event ->
                     controller.show(
                         message = event.message,
-                        type = event.type
+                        type = event.type,
+                        long = event.long,
                     )
                     liveRegionMessages.offer(event)
                 }
@@ -258,6 +261,7 @@ fun AppSnackbarHost(
                 ToastType.NORMAL -> if (isDark) toastNormalBgDark else toastNormalBgLight
                 ToastType.SUCCESS -> toastSuccessBg
                 ToastType.ERROR -> toastErrorBg
+                ToastType.INFO -> toastInfoBg
             }
 
             Box(

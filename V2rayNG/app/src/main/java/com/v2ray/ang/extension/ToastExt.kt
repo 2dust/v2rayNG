@@ -12,81 +12,78 @@ enum class AccessibilityLiveRegionMode {
     ASSERTIVE,
 }
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
+/** Shows normal feedback and mirrors it to the accessibility live region. */
 fun Context.toast(
     message: Int,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.NORMAL, liveRegionMode)
+    dispatchMessage(getString(message), ToastType.NORMAL, long, liveRegionMode)
 }
 
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
+/** Shows normal feedback and mirrors it to the accessibility live region. */
 fun Context.toast(
     message: CharSequence,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
-    dispatchMessage(message, ToastType.NORMAL, liveRegionMode)
+    dispatchMessage(message, ToastType.NORMAL, long, liveRegionMode)
 }
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
+/** Shows success feedback and mirrors it to the accessibility live region. */
 fun Context.toastSuccess(
     message: Int,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     accessibilityMessage: CharSequence? = null,
 ) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.SUCCESS, liveRegionMode, accessibilityMessage)
+    dispatchMessage(getString(message), ToastType.SUCCESS, long, liveRegionMode, accessibilityMessage)
 }
 
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
+/** Shows success feedback and mirrors it to the accessibility live region. */
 fun Context.toastSuccess(
     message: CharSequence,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
     accessibilityMessage: CharSequence? = null,
 ) {
-    dispatchMessage(message, ToastType.SUCCESS, liveRegionMode, accessibilityMessage)
+    dispatchMessage(message, ToastType.SUCCESS, long, liveRegionMode, accessibilityMessage)
 }
 
-/**
- * Shows a toast message with the given resource ID.
- *
- * @param message The resource ID of the message to show.
- */
+/** Shows error feedback and mirrors it to the accessibility live region. */
 fun Context.toastError(
     message: Int,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
-    val text = getString(message)
-    dispatchMessage(text, ToastType.ERROR, liveRegionMode)
+    dispatchMessage(getString(message), ToastType.ERROR, long, liveRegionMode)
 }
 
-/**
- * Shows a toast message with the given text.
- *
- * @param message The text of the message to show.
- */
+/** Shows error feedback and mirrors it to the accessibility live region. */
 fun Context.toastError(
     message: CharSequence,
+    long: Boolean = false,
     liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
 ) {
-    dispatchMessage(message, ToastType.ERROR, liveRegionMode)
+    dispatchMessage(message, ToastType.ERROR, long, liveRegionMode)
+}
+
+/** Shows info feedback and mirrors it to the accessibility live region. */
+fun Context.toastInfo(
+    message: Int,
+    long: Boolean = false,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
+) {
+    dispatchMessage(getString(message), ToastType.INFO, long, liveRegionMode)
+}
+
+/** Shows info feedback and mirrors it to the accessibility live region. */
+fun Context.toastInfo(
+    message: CharSequence,
+    long: Boolean = false,
+    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
+) {
+    dispatchMessage(message, ToastType.INFO, long, liveRegionMode)
 }
 
 /** Shared text for the service's background notification and foreground live region. */
@@ -102,6 +99,7 @@ internal fun Context.serviceStartedMessage(serverName: String): String {
 private fun Context.dispatchMessage(
     message: CharSequence,
     type: ToastType,
+    long: Boolean,
     liveRegionMode: AccessibilityLiveRegionMode,
     accessibilityMessage: CharSequence? = null,
 ) {
@@ -110,6 +108,7 @@ private fun Context.dispatchMessage(
         type = type,
         liveRegionMode = liveRegionMode,
         accessibilityMessage = accessibilityMessage,
+        long = long,
     )
     if (AppSnackbarManager.show(event)) {
         NotificationHelper.cancelTransientMessage(this)
