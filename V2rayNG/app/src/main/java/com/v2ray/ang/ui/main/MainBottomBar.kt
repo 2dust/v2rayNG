@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -54,6 +55,7 @@ fun MainBottomBar(
     val rotationAnim = remember { Animatable(0f) }
     // TV / D-pad support: give the start/stop FAB initial focus so remote
     // users can toggle the VPN with DPAD_CENTER without a mouse.
+    // Retry briefly: the first request can run before the node is attached.
     val fabFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(isRunning) {
@@ -63,7 +65,10 @@ fun MainBottomBar(
     }
 
     LaunchedEffect(Unit) {
-        fabFocusRequester.requestFocus()
+        repeat(20) {
+            if (fabFocusRequester.requestFocus()) return@LaunchedEffect
+            kotlinx.coroutines.delay(100)
+        }
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -72,6 +77,10 @@ fun MainBottomBar(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
+                // TV / D-pad: the FAB floats above-right of this bar and 2D
+                // focus search skips it, trapping D-pad users here. Route
+                // DPAD_DOWN explicitly to the start/stop FAB.
+                .focusProperties { down = fabFocusRequester }
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             AppDivider()
