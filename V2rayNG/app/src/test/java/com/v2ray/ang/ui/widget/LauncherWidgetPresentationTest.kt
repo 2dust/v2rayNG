@@ -3,12 +3,12 @@ package com.v2ray.ang.ui.widget
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -21,7 +21,7 @@ class LauncherWidgetPresentationTest {
         assertNotEquals(AppConfig.MSG_MEASURE_DELAY_CANCEL, AppConfig.MSG_SELECTED_PROFILE_CHANGED)
     }
 
-    @Before
+    @BeforeEach
     fun strings() {
         mapOf(
             R.string.widget_no_profile to "No profile selected",

@@ -4,12 +4,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Test
 import java.io.IOException
 
 class LauncherWidgetStateRepositoryTest {
@@ -117,7 +117,7 @@ class LauncherWidgetStateRepositoryTest {
     }
 
     @Test
-    fun updateCancellationIsPropagatedWithoutReportingFailure() = runBlocking {
+    fun updateCancellationIsPropagatedWithoutReportingFailure(): Unit = runBlocking {
         var reported = false
         try {
             runWidgetUpdate({ throw CancellationException("receiver cancelled") }, { reported = true })
