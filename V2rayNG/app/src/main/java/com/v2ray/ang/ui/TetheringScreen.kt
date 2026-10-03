@@ -85,9 +85,12 @@ internal data class TetheringUiState(
     val ipv6TetheringTypes: Int = ShizukuTetheringService.TETHERING_TYPES_UNKNOWN,
     val ipv6Enabled: Boolean = false,
     val coreRunning: Boolean = false,
+    val coreVpnMode: Boolean = false,
     val serviceConnected: Boolean = false,
     val hasRoutingSession: Boolean = false,
 ) {
+    val vpnRunning: Boolean
+        get() = coreRunning && coreVpnMode
     val routingActive: Boolean
         get() = routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_HEV ||
             routingState == ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE
@@ -122,10 +125,11 @@ internal fun TetheringUiState.withServiceConnection(connected: Boolean): Tetheri
         )
     }
 
-internal fun TetheringUiState.withCoreRunning(running: Boolean): TetheringUiState = copy(coreRunning = running)
+internal fun TetheringUiState.withCoreRunning(running: Boolean): TetheringUiState =
+    copy(coreRunning = running, coreVpnMode = false)
 
 internal fun TetheringUiState.withCoreSnapshot(snapshot: HotspotRoutingSnapshot): TetheringUiState =
-    copy(coreRunning = snapshot.running)
+    copy(coreRunning = snapshot.running, coreVpnMode = snapshot.vpnMode)
 
 internal fun TetheringUiState.withTetheringStatus(
     status: TetheringStatusSnapshot,
@@ -196,9 +200,11 @@ internal fun routingAction(
             R.string.shizuku_routing_status_stopping
         state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
             R.string.shizuku_routing_status_waiting
+        !state.routingSessionEnabled && !state.vpnRunning ->
+            R.string.shizuku_routing_status_start_v2ray
         state.routingState == ShizukuTetheringService.ROUTING_STATE_ERROR ->
             R.string.shizuku_routing_status_error
-        state.coreRunning -> R.string.shizuku_routing_status_disabled
+        state.vpnRunning -> R.string.shizuku_routing_status_disabled
         else -> R.string.shizuku_routing_status_start_v2ray
     }
     val enabled = state.serviceConnected &&
@@ -208,7 +214,7 @@ internal fun routingAction(
             ShizukuTetheringService.ROUTING_STATE_ACTIVE_NATIVE,
             ShizukuTetheringService.ROUTING_STATE_WAITING -> true
             ShizukuTetheringService.ROUTING_STATE_ERROR,
-            ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.routingSessionEnabled || state.coreRunning
+            ShizukuTetheringService.ROUTING_STATE_DISABLED -> state.routingSessionEnabled || state.vpnRunning
             else -> false
         }
     return TetheringControlState(
@@ -230,6 +236,8 @@ internal fun hotspotAction(
         state.hotspotEnabled && state.routingState == ShizukuTetheringService.ROUTING_STATE_WAITING ->
             R.string.shizuku_hotspot_status_waiting
         state.hotspotEnabled -> R.string.shizuku_hotspot_status_enabled_direct
+        state.tetheringStateKnown && !state.routingActive && !state.vpnRunning ->
+            R.string.shizuku_routing_status_start_v2ray
         state.tetheringStateKnown -> R.string.shizuku_hotspot_status_disabled
         else -> R.string.shizuku_hotspot_status_unavailable
     }
@@ -239,7 +247,7 @@ internal fun hotspotAction(
             state.operation == TetheringOperation.NONE &&
             (state.hotspotEnabled ||
                 state.tetheringStateKnown &&
-                (state.routingActive || state.coreRunning)),
+                (state.routingActive || state.vpnRunning)),
     )
 }
 

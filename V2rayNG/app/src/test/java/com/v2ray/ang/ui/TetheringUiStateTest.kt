@@ -12,6 +12,46 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class TetheringUiStateTest {
+    @Test
+    fun proxyOnlyOrRootCoreDoesNotEnableVpnOnlyStarts() {
+        val state = TetheringUiState(serviceConnected = true, activeTetheringTypes = 0)
+            .withCoreSnapshot(HotspotRoutingSnapshot(running = true, vpnMode = false))
+
+        assertTrue(state.coreRunning)
+        assertFalse(state.vpnRunning)
+        assertFalse(routingAction(state).enabled)
+        assertFalse(hotspotAction(state).enabled)
+        assertEquals(R.string.shizuku_routing_status_start_v2ray, routingAction(state).statusRes)
+        assertEquals(R.string.shizuku_routing_status_start_v2ray, hotspotAction(state).statusRes)
+    }
+
+    @Test
+    fun vpnSnapshotEnablesStartsButRunningBroadcastDoesNotAssumeVpnMode() {
+        val state = TetheringUiState(serviceConnected = true, activeTetheringTypes = 0)
+            .withCoreSnapshot(HotspotRoutingSnapshot(running = true, vpnMode = true))
+
+        assertTrue(state.vpnRunning)
+        assertTrue(routingAction(state).enabled)
+        assertTrue(hotspotAction(state).enabled)
+        assertFalse(state.withCoreRunning(false).vpnRunning)
+        assertFalse(state.withCoreRunning(true).vpnRunning)
+    }
+
+    @Test
+    fun unsupportedCoreModeStillAllowsStoppingOwnedRoutingAndHotspot() {
+        val state = TetheringUiState(
+            serviceConnected = true,
+            hasRoutingSession = true,
+            routingState = ShizukuTetheringService.ROUTING_STATE_ERROR,
+            activeTetheringTypes = tetheringTypeBit(ShizukuTetheringService.TETHERING_TYPE_WIFI),
+        ).withCoreSnapshot(HotspotRoutingSnapshot(running = true, vpnMode = false))
+
+        assertTrue(routingAction(state).enabled)
+        assertTrue(hotspotAction(state).enabled)
+        assertEquals(TetheringOperation.STOPPING_ROUTING, state.operationFor(ShizukuAction.ToggleRouting))
+        assertEquals(TetheringOperation.STOPPING_HOTSPOT, state.operationFor(ShizukuAction.ToggleHotspot))
+    }
+
 
     @Test
     fun failedShutdownRetainsStopEvenWhenMainCoreIsStopped() {

@@ -298,7 +298,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
                 startRouting(service)
             } else {
                 stopRouting(service)
-            }
+            } ?: return@launchOperation
             if (result != ShizukuTetheringService.RESULT_OK) {
                 showRoutingError(result)
                 return@launchOperation
@@ -316,7 +316,7 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         launchOperation(operation) { service ->
             var routingStartedHere = false
             if (enable && !_uiState.value.routingActive) {
-                val routingResult = startRouting(service)
+                val routingResult = startRouting(service) ?: return@launchOperation
                 if (routingResult != ShizukuTetheringService.RESULT_OK) {
                     showRoutingError(routingResult)
                     return@launchOperation
@@ -385,12 +385,17 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         }
     }
 
-    private suspend fun startRouting(service: IShizukuTetheringService): Int {
+    // Null means the local failure was already reported; do not replace it with a generic error.
+    private suspend fun startRouting(service: IShizukuTetheringService): Int? {
         val core = requestCoreSnapshot() ?: run {
             toastError(R.string.shizuku_routing_snapshot_timeout)
-            return ShizukuTetheringService.RESULT_INTERNAL_ERROR
+            return null
         }
         val snapshot = core.snapshot
+        if (!snapshot.running || !snapshot.vpnMode) {
+            toastError(R.string.shizuku_routing_status_start_v2ray)
+            return null
+        }
         val parameters = try {
             withContext(Dispatchers.Default) {
                 HotspotRoutingConfig.parametersFromSnapshot(snapshot)
@@ -400,11 +405,11 @@ internal class ShizukuViewModel(application: Application) : BaseViewModel(applic
         } catch (error: Throwable) {
             logUiFailure("configuration", "prepare tethering parameters", error)
             toastError(R.string.shizuku_routing_snapshot_timeout)
-            return ShizukuTetheringService.RESULT_ROUTING_FAILED
+            return null
         }
         val coreLease = core.lease ?: run {
             toastError(R.string.shizuku_operation_failed)
-            return ShizukuTetheringService.RESULT_ROUTING_FAILED
+            return null
         }
 
         return callService("start routing") {
