@@ -124,7 +124,7 @@
     <string name="server_lab_request_host6">Host (SNI) (istəyə bağlı)</string>
     <string name="toast_action_not_allowed">Əməliyyata icazə verilmir</string>
     <string name="server_obfs_password">Obfs şifrəsi</string>
-    <string name="server_lab_port_hop">Port dəyişmə (port-overriding)</string>
+    <string name="server_lab_port_hop">Port dəyişmə</string>
     <string name="server_lab_port_hop_interval">Port dəyişmə aralığı (saniyə)</string>
     <string name="server_lab_bandwidth_down">Yükləmə sürəti zolağı (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Ötürmə sürəti zolağı (dəstəklənən vahidlər: k/m/g/t)</string>
@@ -134,9 +134,9 @@
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Qarşı tərəfin sertifikatını ada görə doğrulayın</string>
     <string name="server_lab_pinned_ca256">Sertifikat barmaq izi (SHA-256)</string>
-    <string name="server_lab_browser_dialer">Səyahətçi Yığcısını (Browser Dialer) aktivləşdirin</string>
-    <string name="server_lab_browser_dialer_tip">Yalnız xhttp (packet-up) və ws çıxışlarını dəstəkləyir; TLS ilə bağlı parametrlər nəzərə alınmaya və ya ziddiyyət təşkil edə bilər</string>
-    <string name="toast_allow_insecure_deprecated">Cari düyün şifrələnməmiş bağlantıdan istifadə edir. Əlaqəniz avtoritar hökumətlər tərəfindən idarə olunan şəbəkə vasitəçiləri tərəfindən birbaşa izlənilə bilər.\nTəhlükəsizlik səbəbiylə, bu tür düyünlərə Xray core v26.2.6+ versiyasından etibarən qoşulmaq mümkün deyil.\nƏgər bu özünüz qurduğunuz düyündürsə, zəhmət olmasa TLS kimi təhlükəsizlik şifrələməsini aktivləşdirin və ya sertifikatı pinnedCA256 olaraq sabitləyin.\nƏgər təminatçı düyünüdürsə, zəhmət olmasa texniki yeniləmənin aparılması üçün xidmət təminatçınızla əlaqə saxlayın. Əgər təminatçı əməkdaşlıqdan imtina edərsə, istifadəçi təhlükəsizliyinə daha çox önem verən başqa bir təminatçıya keçməyiniz tövsiyə olunur.\nDaha çox məlumat üçün zəhmət olmasa https://github.com/2dust/v2rayN/discussions/9460 ünvanına baş çəkin</string>
+    <string name="server_lab_browser_dialer">Brauzer Yığcısını aktivləşdirin</string>
+    <string name="server_lab_browser_dialer_tip">Yalnız xhttp (packet-up) və ws çıxışlarını dəstəkləyir; TLS ilə bağlı tənzimləmələr nəzərə alınmaya və ya ziddiyyət təşkil edə bilər</string>
+    <string name="toast_allow_insecure_deprecated">Cari düyün şifrələnməmiş bağlantıdan istifadə edir. Əlaqəniz avtoritar hökumətlər tərəfindən idarə olunan şəbəkə vasitəçiləri tərəfindən birbaşa izlənilə bilər.\nTəhlükəsizlik səbəbiylə, bu cür düyünlərə Xray core v26.2.6+ versiyasından etibarən qoşulmaq mümkün deyil.\nƏgər bu özünüz qurduğunuz düyündürsə, zəhmət olmasa TLS kimi təhlükəsizlik şifrələməsini aktivləşdirin və ya sertifikatı pinnedCA256 olaraq sabitləyin.\nƏgər təminatçı düyünüdürsə, zəhmət olmasa texniki yeniləmənin aparılması üçün xidmət təminatçınızla əlaqə saxlayın. Əgər təminatçı əməkdaşlıqdan imtina edərsə, istifadəçi təhlükəsizliyinə daha çox üstünlük verən başqa bir təminatçıya keçməyiniz tövsiyə olunur.\nDaha çox məlumat üçün zəhmət olmasa https://github.com/2dust/v2rayN/discussions/9460 ünvanına baş çəkin</string>
     <string name="pinned_ca256_action_fetch">Sertifikat barmaq izini əldə edin</string>
     <string name="toast_fetch_cert_sha256_success">Sertifikat barmaq izi uğurla əldə edildi</string>
     <string name="toast_fetch_cert_sha256_failed">Sertifikat barmaq izini əldə etmək mümkün olmadı</string>
@@ -146,7 +146,7 @@
     <string name="menu_item_add_asset">Resurs əlavə et</string>
     <string name="menu_item_add_file">Fayllar əlavə et</string>
     <string name="menu_item_add_url">URL əlavə et</string>
-    <string name="menu_item_scan_qrcode">QR kodu skan et</string>
+    <string name="menu_item_scan_qrcode">QR kodu skanla</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Faylları endir</string>
     <string name="title_user_asset_add_url">Resurs URL-i əlavə et</string>
@@ -155,17 +155,17 @@
     <string name="asset_geo_files_sources">Geo fayl mənbəyi (istəyə bağlı)</string>
 
     <!-- PerAppProxyActivity -->
-    <string name="msg_dialog_progress">Yüklənir</string>
+    <string name="msg_dialog_progress">Yüklənilir</string>
     <string name="menu_item_search">Axtar</string>
     <string name="menu_item_select_all">Hamısını seç</string>
     <string name="menu_item_invert_selection">Seçimi tərsinə çevir</string>
     <string name="msg_enter_keywords">Açar sözləri daxil edin</string>
-    <string name="switch_bypass_apps_mode">Yayınma Rejimi (Bypass Mode)</string>
+    <string name="switch_bypass_apps_mode">Yayınma Rejimi</string>
     <string name="menu_item_select_proxy_app">Proksilənəcək tətbiqləri avtomatik seç</string>
     <string name="msg_downloading_content">Məzmun endirilir</string>
     <string name="menu_item_export_proxy_app">Mübadilə buferinə ixrac et</string>
     <string name="menu_item_import_proxy_app">Mübadilə buferindən idxal et</string>
-    <string name="per_app_proxy_settings">Tətbiqə özəl parametrlər</string>
+    <string name="per_app_proxy_settings">Tətbiqə özəl tənzimləmələr</string>
     <string name="per_app_proxy_settings_enable">Tətbiqə özəl rejimi aktivləşdirin</string>
     <string name="app_picker_unknown_app">Naməlum tətbiq (UID tanınmadı)</string>
 
@@ -178,9 +178,9 @@
     <string name="summary_pref_per_app_proxy">Ümumi: seçilmiş tətbiqlər proksidən istifadə edir, seçilməyənlər birbaşa qoşulur;\nYayınma rejimi: seçilmiş tətbiqlər birbaşa qoşulur, seçilməyənlər proksidən istifadə edir.\nProksidən istifadə edəcək tətbiqləri avtomatik seçmək seçimi menyudadır.</string>
     <string name="title_pref_is_booted">Cihaz açılanda qoşul</string>
     <string name="summary_pref_is_booted">Cihaz başladıqdan sonra seçilmiş serverə avtomatik qoşulun. Android arxa planda başlamağı məhdudlaşdıra bilər.</string>
-    <string name="title_system_vpn_settings">Sistem VPN parametrləri</string>
-    <string name="summary_system_vpn_settings">Bu cihaz tərəfindən dəstəklənərsə, "Həmişə açıq VPN" konfiqurasiyası üçün Android VPN parametrlərini açın.</string>
-    <string name="toast_system_vpn_settings_unavailable">Sistem VPN parametrləri əlçatan deyil.</string>
+    <string name="title_system_vpn_settings">Sistem VPN tənzimləmələri</string>
+    <string name="summary_system_vpn_settings">Bu cihaz tərəfindən dəstəklənərsə, "Həmişə açıq VPN" konfiqurasiyası üçün Android VPN tənzimləmələrini açın.</string>
+    <string name="toast_system_vpn_settings_unavailable">Sistem VPN tənzimləmələri əlçatan deyil.</string>
 
 
     <string name="subscription_updater_job_tips">Tapşırıq arxa planda icra olunacaq və gedişat haqqında məlumat bildirişdə göstəriləcək.</string>
@@ -191,7 +191,7 @@
     <string name="title_pref_auto_sort_after_test">Sınaqdan sonra avtomatik çeşidlə</string>
     <string name="summary_pref_auto_sort_after_test">Sınaq nəticələri dəqiq olmaya bilər;</string>
 
-    <string name="title_mux_settings">Mux Parametrləri</string>
+    <string name="title_mux_settings">Mux Tənzimləmələri</string>
     <string name="title_pref_mux_enabled">Mux-u aktivləşdirin</string>
     <string name="summary_pref_mux_enabled">Daha sürətlidir, lakin bağlantının qeyri-sabit olmasına səbəb ola bilər\nAşağıda TCP, UDP və QUIC-in necə idarə olunacağını fərdiləşdirin</string>
     <string name="title_pref_mux_concurrency">TCP bağlantıları (-1 ilə 1024 arası)</string>
