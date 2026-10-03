@@ -6,11 +6,11 @@
     <string name="app_tile_first_use">Bu funksiyanı istifadə etməzdən əvvəl tətbiqdə profil əlavə edin.</string>
     <string name="navigation_drawer_open">Naviqasiya menyusunu açın</string>
     <string name="navigation_drawer_close">Naviqasiya menyusunu bağlayın</string>
-    <string name="migration_success">Məlumatların miqrasiyası uğurla tamamlandı!</string>
+    <string name="migration_success">Məlumatların köçürülməsi uğurla tamamlandı!</string>
     <string name="action_stop_service">Xidməti saxlayın</string>
-    <string name="action_ok">OK</string>
+    <string name="action_ok">Oldu</string>
     <string name="action_cancel">Ləğv et</string>
-    <string name="migration_fail">Məlumatların miqrasiyası uğursuz oldu!</string>
+    <string name="migration_fail">Məlumatların köçürülməsi uğursuz oldu!</string>
     <string name="pull_down_to_refresh">Yeniləmək üçün aşağı çəkin!</string>
 
     <!-- Notifications -->
@@ -204,7 +204,7 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Sürət göstəricisini aktivləşdirin</string>
-    <string name="summary_pref_speed_enabled">Cari sürəti bildiriş panəlində göstərin.\nİkon proksi və ya birbaşa trafiki üstünlük təşkil etdiyini göstərir.</string>
+    <string name="summary_pref_speed_enabled">Cari sürəti bildiriş panəlində göstərin.\nİkon proksi və ya birbaşa trafikin üstünlük təşkil etdiyini göstərir.</string>
 
     <string name="title_pref_sniffing_enabled">Sniffing-i aktivləşdirin</string>
     <string name="summary_pref_sniffing_enabled">Trafikdən hədəf domenləri təyin edin (susmaya görə aktivdir).</string>
@@ -215,7 +215,7 @@
     <string name="summary_pref_local_dns_enabled">DNS nüvənin DNS modulu tərəfindən emal edilir (LAN və ölkə daxili ünvanlardan yan keçmək üçün marşrutlaşdırma lazımdırsa tövsiyə olunur)</string>
 
     <string name="title_pref_fake_dns_enabled">FakeDNS-i aktivləşdirin</string>
-    <string name="summary_pref_fake_dns_enabled">FakeDNS domen sorğuları üçün sintetik IP ünvanları qaytarır (daha sürətlidir, lakin bəzi tətbiqlərlə işləməyə bilər).</string>
+    <string name="summary_pref_fake_dns_enabled">FakeDNS domen sorğuları üçün süni IP ünvanları qaytarır (daha sürətlidir, lakin bəzi tətbiqlərlə işləməyə bilər).</string>
 
     <string name="title_pref_ipv6_enabled">IPv6-nı aktivləşdirin</string>
     <string name="summary_pref_ipv6_enabled">VPN interfeysinə IPv6 ünvanı və marşrutları əlavə edin</string>
@@ -272,12 +272,12 @@
 
 
     <string name="title_pref_append_http_proxy">VPN-ə HTTP proksisi əlavə edin</string>
-    <string name="summary_pref_append_http_proxy">Səyahətçilərə və dəstəklənən tətbiqlərə virtual şəbəkə interfeysi əvəzinə birbaşa HTTP proksisindən istifadə etməyə icazə verin (Android 10+).</string>
+    <string name="summary_pref_append_http_proxy">Brauzerlərə və dəstəklənən tətbiqlərə virtual şəbəkə interfeysi əvəzinə birbaşa HTTP proksisindən istifadə etməyə icazə verin (Android 10+).</string>
 
     <string name="title_pref_double_column_display">İki sütunlu düzülüşdən istifadə edin</string>
     <string name="summary_pref_double_column_display">Ekrana daha çox məzmun sığdırmaq üçün profil siyahısını iki sütunda göstərin.</string>
 
-    <string name="title_pref_group_all_display">"Hamsı" qrupu vərəqini (tab) göstərin</string>
+    <string name="title_pref_group_all_display">"Hamsı" qrupu vərəqini göstərin</string>
     <string name="summary_pref_group_all_display">Bütün abunəlik qruplarındakı profilləri bir vərəqdə birləşdirin.</string>
 
     <!-- AboutActivity -->
@@ -299,13 +299,13 @@
     <string name="summary_pref_auto_update_subscription">Abunəliklərinizi arxa planda müəyyən edilmiş intervallarla avtomatik yeniləyin. Cihazdan asılı olaraq bu funksiya həmişə işləməyə bilər</string>
     <string name="title_pref_auto_update_interval">Avtomatik yenilənmə intervalı (dəqiqə; minimum 15)</string>
 
-    <string name="title_core_loglevel">Jurnal Səviyyəsi (Log Level)</string>
+    <string name="title_core_loglevel">Jurnal Dəyəri</string>
     <string name="title_outbound_domain_resolve_method">Çıxış domeninin həll edilməsi</string>
     <string name="title_mode">Rejim</string>
     <string name="title_mode_help">Daha çox kömək üçün bura toxunun</string>
     <string name="title_language">Dil</string>
-    <string name="title_ui_settings">İstifadəçi interfeysi parametrləri</string>
-    <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejimi parametrləri</string>
+    <string name="title_ui_settings">İstifadəçi interfeysi tənzimləmələri</string>
+    <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejimi tənzimləmələri</string>
     <string name="title_pref_dynamic_color">Dinamik rəngləri aktivləşdirin</string>
     <string name="summary_pref_dynamic_color">Yalnız Android 12+ cihazlarda işləyir</string>
     <string name="title_pref_use_hev_tunnel">Hev TUN-dan istifadə edin</string>
@@ -314,13 +314,13 @@
     <string name="title_pref_hev_tunnel_rw_timeout">Hev TUN oxuma/yazma vaxt aşımı (saniyə; TCP/UDP susmaya görə: 300/60)</string>
     <string name="title_mode_settings">Rejim Parametrləri</string>
     <string name="title_root_mode_enabled">Root rejimini aktivləşdirin (root istifadəçiləri)</string>
-    <string name="summary_root_mode_enabled">Aşağı səviyyəli şəffaf proksiləmə üçün root icazəsindən istifadə edin. Root rejimi Android VPN xidmətindən istifadə etmək əvəzinə şəbəkə trafikini birbaşa idarə edir. Root rejimi aktiv olduqda standart rejim, tətbiqə özəl marşrutlaşdırma və VPN ilə bağlı parametrlər tətbiq olunmur.</string>
+    <string name="summary_root_mode_enabled">Aşağı səviyyəli aydın proksiləşdirmə üçün root icazəsindən istifadə edin. Root rejimi Android VPN xidmətindən istifadə etmək əvəzinə şəbəkə trafikini birbaşa idarə edir. Root rejimi aktiv olduqda standart rejim, tətbiqə özəl marşrutlaşdırma və VPN ilə bağlı tənzimləmələr tətbiq olunmur.</string>
     <string name="toast_root_required">Bu funksiya üçün root icazəsi tələb olunur</string>
     <string name="title_root_lan_sharing">VPN-i LAN / modem rejimindəki cihazlarla paylaşın (root istifadəçiləri)</string>
     <string name="summary_root_lan_sharing">Wi-Fi giriş nöqtəsi və USB modemlə bağlanan cihazların trafikini VPN vasitəsilə yönləndirin.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
-    <string name="logcat_copy">Kopyala</string>
+    <string name="logcat_copy">Köçür</string>
     <string name="logcat_clear">Təmizlə</string>
     <string name="logcat_share">Jurnalı paylaşın</string>
     <string name="title_service_restart">Xidməti yenidən başladın</string>
@@ -348,7 +348,7 @@
     <string name="title_real_ping_all_server">Real ləngimələri sınaqdan keçirin</string>
     <string name="title_user_asset_setting">Resurs faylları</string>
     <string name="title_sort_by_test_results">Sınaq nəticələrinə görə çeşidləyin</string>
-    <string name="title_filter_config">Konfiqurasiyaları süzgəcdən keçirin</string>
+    <string name="title_filter_config">Konfiqurasiyaları filtrdən keçirin</string>
     <string name="filter_config_all">Hamısı</string>
     <string name="summary_scan_qrcode">Kameranı açmaq və skan etmək üçün ekrana toxunun</string>
     <string name="title_del_duplicate_config_count">%d təkrar konfiqurasiyanı silin</string>
@@ -363,7 +363,7 @@
         <item quantity="one">%1$d resurs faylı yeniləndi</item>
         <item quantity="other">%1$d resurs faylı yeniləndi</item>
     </plurals>
-    <string name="title_update_subscription_result">%1$d konfiqurasiya yeniləndi (%2$d uğurlu, %3$d uğursuz, %4$d buraxıldı)</string>
+    <string name="title_update_subscription_result">%1$d konfiqurasiya yeniləndi (%2$d uğurlu, %3$d uğursuz, %4$d ötürüldü)</string>
     <string name="title_update_subscription_no_subscription">Abunəlik yoxdur</string>
     <string name="toast_server_not_found_in_group">Seçilmiş server cari qrupda tapılmadı</string>
     <string name="title_locate_selected_config">Seçilmiş konfiqurasiyanı tapın</string>
@@ -373,12 +373,12 @@
 
     <!-- RoutingSettingActivity -->
     <string name="routing_settings_domain_strategy">Domen strategiyası</string>
-    <string name="routing_settings_title">Marşrutlaşdırma Parametrləri</string>
+    <string name="routing_settings_title">Marşrutlaşdırma tənzimləmələri</string>
     <string name="routing_settings_tips">Qayda yalnız tənzimlənmiş hər bir uyğunlaşma şərti ödənildikdə (AND) tətbiq olunur. Qaydalar yuxarıdan aşağıya doğru yoxlanılır; uyğun gələn ilk qayda tətbiq olunur.</string>
     <string name="routing_settings_comma_tip">Çoxsaylı daxil etmələri vergüllə (,) ayırın.</string>
     <string name="routing_settings_save">Saxla</string>
     <string name="routing_settings_delete">Təmizlə</string>
-    <string name="routing_settings_rule_title">Marşrutlaşdırma Qaydası Parametrləri</string>
+    <string name="routing_settings_rule_title">Marşrutlaşdırma Qaydası Tənzimləmələri</string>
     <string name="routing_settings_add_rule">Qayda əlavə et</string>
     <string name="routing_settings_import_predefined_rulesets">Əvvəlcədən təyin edilmiş qayda dəstlərini idxal edin</string>
     <string name="routing_settings_import_rulesets_tip">Mövcud qayda dəstləri silinəcək. Davam edilsin?</string>
@@ -411,7 +411,7 @@
 
     <string name="import_subscription_success">Abunəlik uğurla idxal edildi</string>
     <string name="import_subscription_failure">Abunəliyin idxal edilməsi uğursuz oldu</string>
-    <string name="title_fragment_settings">Fraqment Parametrləri</string>
+    <string name="title_fragment_settings">Fraqment Tənzimləmələri</string>
     <string name="title_pref_fragment_packets">Fraqment Paketləri</string>
     <string name="title_pref_fragment_length">Fraqment Uzunluğu (min-maks)</string>
     <string name="title_pref_fragment_interval">Fraqment Intervalı (min-maks)</string>
@@ -423,8 +423,8 @@
     <string name="title_pref_observatory_least_load_method">leastLoad HTTP metodu</string>
     <string name="title_pref_observatory_least_load_sampling">leastLoad Seçmə (Sampling)</string>
     <string name="title_pref_observatory_least_load_timeout">leastLoad Vaxt Aşımı</string>
-    <toast_invalid_observatory_duration">Yanlış müddət. 3m və ya 30s kimi dəyərdən istifadə edin.</toast_invalid_observatory_duration>
-    <toast_invalid_observatory_sampling">Yanlış seçmə dəyəri. Müsbət ədəddən istifadə edin.</toast_invalid_observatory_sampling>
+    <string name="<toast_invalid_observatory_duration">Yanlış müddət. 3m və ya 30s kimi dəyərdən istifadə edin.</toast_invalid_observatory_duration</string>
+    <string name="<toast_invalid_observatory_sampling">Yanlış seçmə dəyəri. Müsbət ədəddən istifadə edin.</toast_invalid_observatory_sampling</string>
 
     <string name="update_check_for_update">Yenilənmələri yoxlayın</string>
     <string name="update_already_latest_version">Artıq ən son versiyadasınız</string>
@@ -443,7 +443,7 @@
     <string name="server_proxy_chain_pick_members">Üzv seçmək üçün bura toxunun</string>
     <string name="server_proxy_chain_member_unselected">Üzv seçin</string>
     <string name="server_proxy_chain_members_unselected">Zəhmət olmasa hər zəncir sətri üçün bir üzv seçin</string>
-    <server_proxy_chain_members_insufficient">Kifayət qədər üzv yoxdur</server_proxy_chain_members_insufficient>
+    <string name="<server_proxy_chain_members_insufficient">Kifayət qədər üzv yoxdur</server_proxy_chain_members_insufficient</string>
     <string name="server_proxy_chain_members_invalid">Yararsız zəncir üzvləri: %1$s</string>
 
     <!-- BackupActivity -->
@@ -479,15 +479,15 @@
     </string-array>
 
     <string-array name="browser_dialer_mode">
-        <item>Söndürün</item>
+        <item>Qapat</item>
         <item>OkHttp</item>
         <item>WebView</item>
     </string-array>
 
     <string-array name="ui_mode_night">
         <item>Sistemə uyğun</item>
-        <item>Açıq</item>
-        <item>Tünd</item>
+        <item>İşıqlı</item>
+        <item>Qaranlıq</item>
     </string-array>
 
     <string name="routing_preset_china_whitelist">Çin Ağ Siyahısı</string>
@@ -510,7 +510,7 @@
 
     <string-array name="policy_group_type">
         <item>Ən Az Ping</item>
-        <item>Ən Az Yük</item>
+        <item>Ən Az Yükləmə</item>
         <item>Təsadüfi</item>
         <item>Növbəli (Round Robin)</item>
     </string-array>
