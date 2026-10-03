@@ -17,6 +17,11 @@ internal class ServiceFeedbackState {
         state.set(State.NONE)
     }
 
+    fun restarting() {
+        // Restart reports the replacement's start or failure, not its intermediate shutdown.
+        state.compareAndSet(State.STARTED, State.NONE)
+    }
+
     fun requestStop() {
         state.compareAndSet(State.STARTED, State.STOP_REQUESTED)
     }
