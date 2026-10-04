@@ -68,7 +68,7 @@ object JsonUtil {
                 object : TypeToken<Double>() {}.type,
                 JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? ->
                     JsonPrimitive(
-                        src?.toInt()
+                        src?.let { if (it == it.toLong().toDouble()) it.toLong() else it }
                     )
                 }
             )
