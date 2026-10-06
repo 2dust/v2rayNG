@@ -126,6 +126,7 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
+        aidl = true
     }
 
     androidResources {
@@ -169,6 +170,8 @@ dependencies {
     // AndroidX Core Libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
 
     // Compose Libraries
     implementation(platform(libs.androidx.compose.bom))
