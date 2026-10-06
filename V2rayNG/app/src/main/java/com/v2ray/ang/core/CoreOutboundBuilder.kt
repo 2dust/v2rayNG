@@ -259,9 +259,7 @@ object CoreOutboundBuilder {
             ?.ifEmpty { null }
             ?: listOf(AppConfig.WIREGUARD_LOCAL_REMOTE_DNS)
 
-        val remotes = if (rawDNS.size == 1 && rawDNS[0] == "local") {
-            rawDNS
-        } else if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true) {
+        val remotes = if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true) {
             rawDNS
         } else {
             val ipv4Dns = rawDNS.filter { !it.contains(":") }
