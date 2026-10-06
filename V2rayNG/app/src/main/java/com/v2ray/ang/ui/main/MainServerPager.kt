@@ -2,6 +2,9 @@ package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,8 +39,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -314,6 +319,10 @@ private fun ServerListItem(
     } else {
         null
     }
+    // TV / D-pad: track focus to paint a visible gray highlight on the
+    // focused row, matching the highlight of menu items elsewhere.
+    val rowInteractionSource = remember { MutableInteractionSource() }
+    val isRowFocused by rowInteractionSource.collectIsFocusedAsState()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -323,7 +332,19 @@ private fun ServerListItem(
                     stateDescription = selectedStateDescription
                 }
             }
-            .clickable { actions.select(row.guid) }
+            .background(
+                if (isRowFocused) MaterialTheme.colorScheme.surfaceVariant
+                else Color.Transparent
+            )
+            // TV / D-pad support: keep the row an explicit single focusable
+            // node so DPAD_UP/DOWN can traverse the server list and
+            // DPAD_CENTER selects, per ui/AGENTS.md interaction rules.
+            .clickable(
+                interactionSource = rowInteractionSource,
+                indication = LocalIndication.current,
+                role = Role.Button,
+                onClick = { actions.select(row.guid) }
+            )
     ) {
         Box(
             Modifier
