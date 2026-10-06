@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">استيراد الإعدادات؟</string>
+    <string name="external_import_message">يريد تطبيق آخر استيراد إعدادات. تابع فقط إذا كنت تثق بالمصدر. سيتم الاحتفاظ بملفات التعريف الحالية. للتحديث التلقائي، اسمح لتطبيق الأتمتة من الإعدادات ← %1$s.</string>
+    <string name="external_import_confirm">استيراد</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
@@ -569,4 +572,8 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+    <string name="title_remote_control">وصول تطبيقات الأتمتة</string>
+    <string name="summary_remote_control">السماح للتطبيقات الأخرى بالتحكم في v2rayNG</string>
+    <string name="remote_control_access_required">اسمح لهذا التطبيق في الإعدادات ← وصول تطبيقات الأتمتة، ثم افتح هذا الإجراء مجددًا.</string>
+    <string name="tasker_current_profile">الملف الشخصي الحالي</string>
 </resources>

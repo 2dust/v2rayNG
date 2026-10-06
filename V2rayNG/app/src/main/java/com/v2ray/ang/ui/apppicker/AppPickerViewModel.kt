@@ -5,6 +5,7 @@ import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
+import com.v2ray.ang.handler.RemoteControlManager
 import com.v2ray.ang.ui.AppSelection
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.AppManagerUtil
@@ -33,10 +34,13 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     private var selectedSnapshot: Set<String> = emptySet()
     private var initialized = false
     private var isAppListLoading = false
+    private var remoteControl = false
+    private var remoteSelectionLoaded = false
 
-    fun initialize(initialSelected: Collection<String>) {
+    fun initialize(initialSelected: Collection<String>, remoteControl: Boolean = false) {
         if (initialized) return
         initialized = true
+        this.remoteControl = remoteControl
         _selectedPackages.value = initialSelected.toSet()
     }
 
@@ -61,11 +65,21 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
         isAppListLoading = true
         launchLoading {
             try {
+                if (remoteControl && !remoteSelectionLoaded) {
+                    _selectedPackages.value = withContext(Dispatchers.IO) {
+                        RemoteControlManager.selectedPackages(applicationContext)
+                    }
+                    remoteSelectionLoaded = true
+                }
                 selectedSnapshot = _selectedPackages.value
                 val apps = withContext(Dispatchers.IO) {
                     val list = AppManagerUtil.loadNetworkAppList(applicationContext)
-                    val special = createSpecialItemUnidentified(localizedUnknownApp)
-                    sortApps(list + special)
+                    val candidates = if (remoteControl) {
+                        list.filter { it.packageName != applicationContext.packageName }
+                    } else {
+                        list + createSpecialItemUnidentified(localizedUnknownApp)
+                    }
+                    sortApps(candidates)
                 }
                 allApps = apps
                 _displayedApps.value = applyFilter(currentQuery)
@@ -109,6 +123,25 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     }
 
     fun getSelectedPackages(): List<String> = _selectedPackages.value.sorted()
+
+    suspend fun saveRemoteControlSelection(): Boolean {
+        // Leaving before loading completes must never replace existing grants with an empty list.
+        if (!remoteControl || !remoteSelectionLoaded) return true
+        val selected = _selectedPackages.value
+        if (selected == selectedSnapshot) return true
+        return try {
+            withContext(Dispatchers.IO) {
+                RemoteControlManager.setSelectedPackages(getApplication(), selected)
+            }
+            true
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            LogUtil.e(AppConfig.TAG, "AppPickerViewModel: failed to save remote control selection", error)
+            toastError(R.string.toast_failure)
+            false
+        }
+    }
 
     private fun applyFilter(query: String): List<AppInfo> {
         val apps = allApps ?: return emptyList()

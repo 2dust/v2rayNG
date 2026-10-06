@@ -4,13 +4,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
 import android.util.Base64
 import android.util.Patterns
 import android.webkit.URLUtil
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
@@ -440,17 +438,6 @@ object Utils {
             LogUtil.e(AppConfig.TAG, "Failed to validate subscription URL", e)
         }
         return false
-    }
-
-    /**
-     * Get the receiver flags based on the Android version.
-     *
-     * @return The receiver flags.
-     */
-    fun receiverFlags(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        ContextCompat.RECEIVER_EXPORTED
-    } else {
-        ContextCompat.RECEIVER_NOT_EXPORTED
     }
 
     /**
