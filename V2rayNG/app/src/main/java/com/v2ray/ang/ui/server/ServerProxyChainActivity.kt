@@ -90,17 +90,17 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             initialMembers = initialMembers,
             allRemarks = allRemarks,
             onBackClick = { finish() },
-            onSave = { remarks, members -> saveServer(remarks, members) },
-            onDelete = { deleteServer() }
+            onSave = ::saveServer,
+            onDelete = ::deleteServer,
         )
     }
 
     private fun saveServer(
         remarks: String,
         members: List<String>
-    ): Boolean {
+    ) {
         if (remarks.isBlank()) {
-            return false
+            return
         }
 
         val chainMembers = members
@@ -109,12 +109,12 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 
         if (chainMembers.size != members.size) {
             toast(R.string.server_proxy_chain_members_unselected)
-            return false
+            return
         }
 
         if (chainMembers.size < 2) {
             toast(R.string.server_proxy_chain_members_insufficient)
-            return false
+            return
         }
 
         val invalidMembers = chainMembers.filter { member ->
@@ -129,7 +129,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                     invalidMembers.joinToString(", ")
                 )
             )
-            return false
+            return
         }
 
         val config =
@@ -153,7 +153,10 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         val savedGuid = MmkvManager.encodeServerConfig(
             editGuid,
             config
-        )
+        ) ?: run {
+            toast(R.string.toast_failure)
+            return
+        }
 
         toastSuccess(R.string.toast_success)
 
@@ -163,27 +166,26 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 restartService = isRunning
             )
         }
-
-        return true
     }
 
-    private fun deleteServer(): Boolean {
+    private fun deleteServer() {
         if (editGuid.isEmpty()) {
-            return false
+            return
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed)
-            return false
+            return
         }
 
-        MmkvManager.removeServer(editGuid)
+        if (!MmkvManager.removeServer(editGuid)) {
+            toast(R.string.toast_failure)
+            return
+        }
 
         ProfileEditorResult.run {
             finishDeleted(editGuid)
         }
-
-        return true
     }
 }
 
@@ -195,7 +197,7 @@ fun ProxyChainScreen(
     initialMembers: List<String>,
     allRemarks: List<String>,
     onBackClick: () -> Unit,
-    onSave: (String, List<String>) -> Boolean,
+    onSave: (String, List<String>) -> Unit,
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
