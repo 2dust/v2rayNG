@@ -146,7 +146,6 @@
         <item>Русский</item>
         <item>فارسی</item>
         <item>عربي</item>
-        <item>Azərbaycanca</item>
         <item>বাংলা</item>
         <item>لۊری بختیاری</item>
     </string-array>
@@ -161,7 +160,6 @@
         <item>ru</item>
         <item>fa</item>
         <item>ar</item>
-        <item>az</item>
         <item>bn</item>
         <item>bqi-rIR</item>
     </string-array>
