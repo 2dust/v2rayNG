@@ -413,13 +413,7 @@ object CoreConfigManager {
             "${AppConfig.TAG_BALANCER_PRE}-${resolvedOutbound.tag}"
         }
         val strategyType = BalancerStrategyType.from(resolvedOutbound.profile.policyGroupType)
-        val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
-            resolvedOutbound.profile.policyGroupFallbackTag
-                ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
-            // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
-            // without this default, an enabled empty field creates no observatory.
-                ?: membersToAdd.first().tag
-        } else null
+        val fallbackTag = resolvePolicyGroupFallbackTag(strategyType, resolvedOutbound.profile, membersToAdd.first().tag)
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
             selector = listOf(memberTagPrefix),
@@ -434,6 +428,27 @@ object CoreConfigManager {
         balancerStrategies.add(strategy)
         policyGroupBalancerTags[resolvedOutbound.tag] = balancerTag
     }
+
+    internal fun resolvePolicyGroupFallbackTag(
+        strategyType: BalancerStrategyType,
+        profile: ProfileItem,
+        firstMemberTag: String,
+    ): String? {
+        if (strategyType.requiresObservatory || strategyType.requiresBurstObservatory) {
+            // Missing or failed probes must not let a matched rule use Xray's default outbound.
+            return firstMemberTag
+        }
+        return if (strategyType.supportsObservatory && profile.policyGroupTestOutbounds != false) {
+            profile.policyGroupFallbackTag
+                ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
+            // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
+            // without this default, an enabled empty field creates no observatory.
+                ?: firstMemberTag
+        } else null
+    }
+
+    internal fun shouldUseStandardObservatory(strategyType: BalancerStrategyType, fallbackTag: String?): Boolean =
+        strategyType.requiresObservatory || (strategyType.supportsObservatory && fallbackTag != null)
 
     /**
      * Trim runtime sections that are not needed for latency testing.
@@ -1249,7 +1264,7 @@ object CoreConfigManager {
             fallbackTag = fallbackTag,
             strategy = V2rayConfig.RoutingBean.StrategyObject(type = strategyType.policyGroupType)
         )
-        val observatory = if (strategyType.requiresObservatory || fallbackTag != null) {
+        val observatory = if (shouldUseStandardObservatory(strategyType, fallbackTag)) {
             V2rayConfig.ObservatoryObject(
                 subjectSelector = selector,
                 probeUrl = probeUrl,
