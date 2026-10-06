@@ -38,6 +38,39 @@ object MessageHelper {
         what: Int,
         content: Serializable,
         onResult: (handled: Boolean) -> Unit,
+    ) = sendMsgForResult(
+        ctx = ctx,
+        action = AppConfig.BROADCAST_ACTION_SERVICE,
+        what = what,
+        content = content,
+        target = "service",
+        onResult = onResult,
+    )
+
+    /**
+     * Sends an ordered UI message and reports whether an active UI consumer accepted it.
+     */
+    internal fun sendMsg2UIForResult(
+        ctx: Context,
+        what: Int,
+        content: Serializable,
+        onResult: (handled: Boolean) -> Unit,
+    ) = sendMsgForResult(
+        ctx = ctx,
+        action = AppConfig.BROADCAST_ACTION_ACTIVITY,
+        what = what,
+        content = content,
+        target = "UI",
+        onResult = onResult,
+    )
+
+    private fun sendMsgForResult(
+        ctx: Context,
+        action: String,
+        what: Int,
+        content: Serializable,
+        target: String,
+        onResult: (handled: Boolean) -> Unit,
     ) {
         val resultReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -46,7 +79,7 @@ object MessageHelper {
         }
         try {
             ctx.sendOrderedBroadcast(
-                messageIntent(AppConfig.BROADCAST_ACTION_SERVICE, what, content),
+                messageIntent(action, what, content),
                 null,
                 resultReceiver,
                 null,
@@ -55,7 +88,7 @@ object MessageHelper {
                 null,
             )
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to send ordered message to service", e)
+            LogUtil.e(AppConfig.TAG, "Failed to send ordered message to $target", e)
             onResult(false)
         }
     }
