@@ -561,4 +561,5 @@
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
 
+    <string name="toast_policy_group_chain_invalid">زنجیرهٔ گروه سیاست نامعتبر است. اعضا، پراکسی ورودی، پراکسی خروجی و مسیر جایگزین را بررسی کنید.</string>
 </resources>
