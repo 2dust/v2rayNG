@@ -6,13 +6,14 @@ import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertThrows
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 class PolicyGroupChainTest {
     private fun node(id: String, subscription: String = "source", remark: String = id) =
@@ -181,6 +182,47 @@ class PolicyGroupChainTest {
     fun disabledHealthCheckDoesNotResolveUnusedFallback() {
         val resolved = resolve(profile = group.copy(policyGroupType = "2", policyGroupTestOutbounds = false, policyGroupFallbackTag = "missing"))
         assertNull(resolved.policyGroup!!.fallback)
+    }
+
+    @Test
+    fun leastPingAndLeastLoadKeepFallbackInsideTheirOwnGroup() {
+        val firstRoot = "complete-chain-root"
+        assertEquals(
+            firstRoot,
+            CoreConfigManager.resolvePolicyGroupFallbackTag(BalancerStrategyType.LEAST_PING, group, firstRoot),
+        )
+        assertEquals(
+            firstRoot,
+            CoreConfigManager.resolvePolicyGroupFallbackTag(BalancerStrategyType.LEAST_LOAD, group, firstRoot),
+        )
+    }
+
+    @Test
+    fun randomAndRoundRobinRespectExplicitFallbackRules() {
+        val firstRoot = "complete-chain-root"
+        assertEquals(
+            firstRoot,
+            CoreConfigManager.resolvePolicyGroupFallbackTag(
+                BalancerStrategyType.RANDOM,
+                group.copy(policyGroupFallbackTag = ""),
+                firstRoot,
+            ),
+        )
+        assertEquals(
+            AppConfig.TAG_DIRECT,
+            CoreConfigManager.resolvePolicyGroupFallbackTag(
+                BalancerStrategyType.ROUND_ROBIN,
+                group.copy(policyGroupFallbackTag = AppConfig.TAG_DIRECT),
+                firstRoot,
+            ),
+        )
+        assertNull(
+            CoreConfigManager.resolvePolicyGroupFallbackTag(
+                BalancerStrategyType.ROUND_ROBIN,
+                group.copy(policyGroupTestOutbounds = false, policyGroupFallbackTag = AppConfig.TAG_DIRECT),
+                firstRoot,
+            ),
+        )
     }
 
     @Test
