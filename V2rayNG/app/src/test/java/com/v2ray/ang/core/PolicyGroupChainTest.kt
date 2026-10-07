@@ -51,7 +51,7 @@ class PolicyGroupChainTest {
             var current: String? = root
             val visited = mutableSetOf<String>()
             while (current != null) {
-                assertTrue("Cycle in generated chain", visited.add(current))
+                assertTrue(visited.add(current), "Cycle in generated chain")
                 val outbound = requireNotNull(byTag[current])
                 path.add(outbound.settings?.address?.toString())
                 current = outbound.streamSettings?.sockopt?.dialerProxy

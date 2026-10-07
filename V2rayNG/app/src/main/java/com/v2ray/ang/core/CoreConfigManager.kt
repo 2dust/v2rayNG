@@ -488,6 +488,7 @@ object CoreConfigManager {
 
     internal fun shouldUseStandardObservatory(strategyType: BalancerStrategyType, fallbackTag: String?): Boolean =
         strategyType.requiresObservatory || (strategyType.supportsObservatory && fallbackTag != null)
+
     /**
      * Trim runtime sections that are not needed for latency testing.
      */
