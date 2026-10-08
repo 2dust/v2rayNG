@@ -278,7 +278,7 @@
     <string name="summary_pref_double_column_display">Ekrana daha çox məzmun sığdırmaq üçün profil siyahısını iki sütunda göstərin.</string>
 
     <string name="title_pref_group_all_display">"Hamısı" qrup vərəqini göstər</string>
-    <summary_pref_group_all_display">Hər abunəlik qrupundakı profilləri bir vərəqdə birləşdirin.</summary_pref_group_all_display>
+    <string name="summary_pref_group_all_display">Hər abunəlik qrupundakı profilləri bir vərəqdə birləşdirin.</string>
 
     <!-- AboutActivity -->
     <string name="title_pref_feedback">Əks-əlaqə</string>
