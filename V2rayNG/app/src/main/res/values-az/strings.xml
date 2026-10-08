@@ -20,11 +20,11 @@
     <string name="notification_action_stop_v2ray">Dayandır</string>
     <string name="toast_permission_denied">İcazə rədd edildi</string>
     <string name="toast_permission_denied_notification">Bildiriş icazəsi rədd edildi</string>
-    <string name="notification_action_more">Ətraflı üçün toxunun</string>
+    <string name="notification_action_more">Daha çoxu üçün toxunun</string>
     <string name="toast_services_start">Xidmət başladılır</string>
     <string name="toast_services_stop">Xidmət dayandırılır</string>
     <string name="toast_services_success">Xidmət uğurla başladıldı</string>
-    <string name="toast_services_failure">Xidməti başlatmaq mümkün olmadı</string>
+    <string name="toast_services_failure">Xidməti başlatmaq olmadı</string>
 
     <!--ServerActivity-->
     <string name="title_server">Konfiqurasiya</string>
@@ -82,7 +82,7 @@
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
-    <string name="server_lab_stream_fingerprint">Rəqəmsal iz (Fingerprint)</string>
+    <string name="server_lab_stream_fingerprint">Barmaq izi</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
@@ -93,7 +93,7 @@
     <string name="server_lab_id4">Şifrə (istəyə bağlı)</string>
     <string name="server_lab_security4">İstifadəçi (istəyə bağlı)</string>
     <string name="server_lab_encryption">şifrələmə</string>
-    <string name="server_lab_flow">axın (flow)</string>
+    <string name="server_lab_flow">axın</string>
     <string name="server_lab_public_key">PublicKey</string>
     <string name="server_lab_preshared_key">PreSharedKey (istəyə bağlı)</string>
     <string name="server_lab_short_id">ShortId</string>
@@ -113,40 +113,40 @@
     <string name="toast_decoding_failed">Dekodlaşdırma uğursuz oldu</string>
     <string name="title_file_chooser">Konfiqurasiya seçin</string>
     <string name="toast_require_file_manager">Zəhmət olmasa fayl menecerini quraşdırın.</string>
-    <string name="server_customize_config">Xüsusi konfiqurasiya</string>
+    <string name="server_customize_config">Fərdi konfiqurasiya</string>
     <string name="toast_config_file_invalid">Yanlış konfiqurasiya</string>
     <string name="server_lab_content">Məzmun</string>
     <string name="toast_none_data_clipboard">Mübadilə buferində məlumat yoxdur</string>
     <string name="toast_invalid_url">Yanlış URL</string>
     <string name="toast_insecure_url_protocol">Təhlükəsiz olmayan HTTP abunəlik URL-indən istifadə etməyin</string>
-    <string name="server_lab_need_inbound">Gələn (inbound) portun tənzimləmələrə uyğun olduğundan əmin olun</string>
+    <string name="server_lab_need_inbound">Gələn portun tənzimləmələrə uyğun olduğundan əmin olun</string>
     <string name="toast_malformed_json">Yanlış konfiqurasiya.</string>
     <string name="server_lab_request_host6">Host (SNI) (istəyə bağlı)</string>
-    <string name="toast_action_not_allowed">Əməliyyata icazə verilmir</string>
+    <string name="toast_action_not_allowed">Fəaliyyətə icazə verilmir</string>
     <string name="server_obfs_password">Obfs şifrəsi</string>
     <string name="server_lab_port_hop">Port dəyişməsi (portu əvəzləyir)</string>
     <string name="server_lab_port_hop_interval">Port dəyişmə tezliyi (saniyə)</string>
-    <string name="server_lab_bandwidth_down">Yükləmə (Download) zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
-    <string name="server_lab_bandwidth_up">Ötürmə (Upload) zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
+    <string name="server_lab_bandwidth_down">Yükləmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
+    <string name="server_lab_bandwidth_up">Ötürmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Rejimi</string>
     <string name="server_lab_xhttp_extra">XHTTP Əlavə xam JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask xam JSON, format: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Qarşı tərəf sertifikatını ada görə doğrulayın</string>
-    <string name="server_lab_pinned_ca256">Sertifikatın rəqəmsal izi (SHA-256)</string>
-    <string name="server_lab_browser_dialer">Səyahətçi Yığcısını (Browser Dialer) aktivləşdirin</string>
+    <string name="server_lab_pinned_ca256">Sertifikatın barmaq izi (SHA-256)</string>
+    <string name="server_lab_browser_dialer">Brauzer Yığcısını aktivləşdirin</string>
     <string name="server_lab_browser_dialer_tip">Yalnız xhttp (packet-up) və ws çıxışlarını dəstəkləyir; TLS ilə bağlı tənzimləmələr nəzərə alınmaya və ya ziddiyyət təşkil edə bilər</string>
-    <string name="toast_allow_insecure_deprecated">Cari düyün şifrələnməmiş bağlantıdan istifadə edir. Ünsiyyətiniz avtoritar hökumətlər tərəfindən idarə olunan şəbəkə vasitəçiləri tərəfindən birbaşa izlənilə bilər.\nTəhlükəsizlik səbəbiylə, bu tür düyünlərə Xray core 26.2.6+ versiyası ilə qoşulmaq mümkün deyil.\nƏgər bu özünüzün yaratdığı düyündürsə, xahiş olunur TLS kimi təhlükəsizlik şifrələməsini aktivləşdirin və ya pinnedCA256 sertifikatını bərkidib istifadə edin.\nƏgər bu xidmət təminatçısının düyünüdürsə, texniki yenilənməni tamamlamaq üçün xidmət təminatçısı ilə əlaqə saxlayın. Xidmət təminatçısı əməkdaşlıq etməkdən imtina edərsə, istifadəçi təhlükəsizliyinə daha çox önəm verən başqa bir provayderə keçməyiniz tövsiyə olunur.\nƏtraflı məlumat üçün https://github.com/2dust/v2rayN/discussions/9460 ünvanına daxil olun</string>
-    <string name="pinned_ca256_action_fetch">Sertifikatın rəqəmsal izini əldə et</string>
-    <string name="toast_fetch_cert_sha256_success">Sertifikatın rəqəmsal izi uğurla əldə edildi</string>
-    <string name="toast_fetch_cert_sha256_failed">Sertifikatın rəqəmsal izini əldə etmək mümkün olmadı</string>
+    <string name="toast_allow_insecure_deprecated">Cari düyün şifrələnməmiş bağlantı istifadə edir. Ünsiyyətiniz avtoritar hökumətlər tərəfindən idarə olunan şəbəkə vasitəçiləri tərəfindən birbaşa izlənilə bilər.\nTəhlükəsizlik səbəbiylə, bu tür düyünlərə Xray core 26.2.6+ versiyası ilə qoşulmaq mümkün deyil.\nƏgər bu özünüzün yaratdığı düyündürsə, xahiş olunur TLS kimi təhlükəsizlik şifrələməsini aktivləşdirin və ya pinnedCA256 sertifikatını bərkidib istifadə edin.\nƏgər bu xidmət təminatçısının düyünüdürsə, texniki yenilənməni tamamlamaq üçün xidmət təminatçısı ilə əlaqə saxlayın. Xidmət təminatçısı əməkdaşlıq etməkdən imtina edərsə, istifadəçi təhlükəsizliyinə daha çox önəm verən başqa bir provayderə keçməyiniz tövsiyə olunur.\nƏtraflı məlumat üçün https://github.com/2dust/v2rayN/discussions/9460 ünvanına daxil olun</string>
+    <string name="pinned_ca256_action_fetch">Sertifikatın barmaq izini əldə et</string>
+    <string name="toast_fetch_cert_sha256_success">Sertifikatın barmaq izi uğurla əldə edildi</string>
+    <string name="toast_fetch_cert_sha256_failed">Sertifikatın barmaq izini əldə etmək mümkün olmadı</string>
 
     <!-- UserAssetActivity -->
     <string name="toast_asset_copy_failed">Fayl kopyalanması uğursuz oldu, zəhmət olmasa Fayl Menecerindən istifadə edin</string>
     <string name="menu_item_add_asset">Resurs əlavə et</string>
     <string name="menu_item_add_file">Fayllar əlavə et</string>
     <string name="menu_item_add_url">URL əlavə et</string>
-    <string name="menu_item_scan_qrcode">QR kodu skan et</string>
+    <string name="menu_item_scan_qrcode">QR kodu skanla</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Faylları endir</string>
     <string name="title_user_asset_add_url">Resurs URL-i əlavə et</string>
@@ -160,7 +160,7 @@
     <string name="menu_item_select_all">Hamısını seç</string>
     <string name="menu_item_invert_selection">Seçimi tərsinə çevir</string>
     <string name="msg_enter_keywords">Açar sözləri daxil edin</string>
-    <string name="switch_bypass_apps_mode">Yayınma Rejimi (Bypass)</string>
+    <string name="switch_bypass_apps_mode">Yayınma Rejimi</string>
     <string name="menu_item_select_proxy_app">Proksi istifadə edəcək tətbiqləri avtomatik seç</string>
     <string name="msg_downloading_content">Məzmun endirilir</string>
     <string name="menu_item_export_proxy_app">Mübadilə buferinə ixrac et</string>
@@ -175,9 +175,9 @@
     <string name="title_core_settings">Nüvə Tənzimləmələri</string>
     <string name="title_vpn_settings">VPN Tənzimləmələri</string>
     <string name="title_pref_per_app_proxy">Tətbiq üzrə proksi</string>
-    <string name="summary_pref_per_app_proxy">Ümumi: seçilmiş tətbiqlər proksidən istifadə edir, seçilməyənlər birbaşa qoşulur;\nYayınma rejimi: seçilmiş tətbiqlər birbaşa qoşulur, seçilməyənlər proksidən istifadə edir.\nProksi istifadə etməli olan tətbiqlərin avtomatik seçilməsi opsiyası menyudadır.</string>
+    <string name="summary_pref_per_app_proxy">Ümumi: seçilmiş tətbiqlər proksidən istifadə edir, seçilməyənlər birbaşa qoşulur;\nYayınma rejimi: seçilmiş tətbiqlər birbaşa qoşulur, seçilməyənlər proksidən istifadə edir.\nProksi istifadə etməli olan tətbiqlərin avtomatik seçilməsi seçimi menyudadır.</string>
     <string name="title_pref_is_booted">Cihaz açılanda qoşul</string>
-    <string name="summary_pref_is_booted">Cihaz işə düşdükdən sonra avtomatik olaraq seçilmiş serverə qoşulun. Android arxa fonda başladılmanı məhdudlaşdıra bilər.</string>
+    <string name="summary_pref_is_booted">Cihaz işə düşdükdən sonra avtomatik olaraq seçilmiş serverə qoşulun. Android fonda başladılmanı məhdudlaşdıra bilər.</string>
     <string name="title_system_vpn_settings">Sistem VPN tənzimləmələri</string>
     <string name="summary_system_vpn_settings">Bu cihaz dəstəkləyirsə, Həmişə açıq VPN-i konfiqurasiya etmək üçün Android VPN tənzimləmələrini açın.</string>
     <string name="toast_system_vpn_settings_unavailable">Sistem VPN tənzimləmələri əlçatmazdır.</string>
@@ -204,7 +204,7 @@
     </string-array>
 
     <string name="title_pref_speed_enabled">Sürət göstəricisini aktivləşdir</string>
-    <string name="summary_pref_speed_enabled">Cari sürəti bildiriş panəlində göstərin.\nİkona proksi və ya birbaşa trafikin üstünlük təşkil etdiyini bildirir.</string>
+    <string name="summary_pref_speed_enabled">Cari sürəti bildiriş panelində göstərin.\nİkona proksi və ya birbaşa trafikin üstünlük təşkil etdiyini bildirir.</string>
 
     <string name="title_pref_sniffing_enabled">Dinləməni aktivləşdir</string>
     <string name="summary_pref_sniffing_enabled">Trafikdən hədəf domenləri təyin edin (standart olaraq aktivdir).</string>
@@ -227,7 +227,7 @@
     <string name="summary_pref_remote_dns" translatable="false">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (yalnız IPv4/IPv6)</string>
-    <string name="title_pref_vpn_bypass_lan">VPN rejimində məhəlli şəbəkəni (LAN) yan keç</string>
+    <string name="title_pref_vpn_bypass_lan">VPN rejimində LAN-ı yan keç</string>
 
     <string name="title_pref_vpn_interface_address">VPN İnterfeys Ünvanı</string>
 
@@ -240,20 +240,20 @@
     <string name="title_pref_dns_hosts">DNS host mənsubiyyətləri (format: domen:ünvan,…)</string>
     <string name="summary_pref_dns_hosts">domen:ünvan,…</string>
 
-    <string name="title_pref_delay_test_url">Xalis gecikmə sınağı URL-i</string>
+    <string name="title_pref_delay_test_url">Real gecikmə sınağı URL-i</string>
     <string name="summary_pref_delay_test_url" translatable="false">URL</string>
-    <string name="title_pref_real_ping_concurrency">Eyni vaxtda aparılan xalis gecikmə sınaqları</string>
+    <string name="title_pref_real_ping_concurrency">Eyni vaxtda aparılan real gecikmə sınaqları</string>
 
     <string name="title_pref_ip_api_url">Cari bağlantı məlumatı sınağı URL-i</string>
     <string name="summary_pref_ip_api_url" translatable="false">URL</string>
 
-    <string name="title_pref_proxy_sharing_enabled">Məhəlli şəbəkədən (LAN) qoşulmalara icazə ver</string>
+    <string name="title_pref_proxy_sharing_enabled">LAN qoşulmalarına icazə ver</string>
     <string name="summary_pref_proxy_sharing_enabled">Digər cihazlar yerli proksi vasitəsilə sizin IP ünvanınızla proksiyə qoşula bilər. İcazəsiz qoşulmaların qarşısını almaq üçün yalnız etibarlı şəbəkələrdə aktivləşdirin</string>
-    <string name="toast_warning_pref_proxysharing_short">Məhəlli şəbəkədən qoşulmalara icazə verilir. Etibarlı şəbəkədə olduğunuzdan əmin olun</string>
+    <string name="toast_warning_pref_proxysharing_short">LAN-dan qoşulmalara icazə verilir. Etibarlı şəbəkədə olduğunuzdan əmin olun</string>
 
     <string name="title_pref_socks_port">Yerli proksi portu</string>
     <string name="title_pref_enable_local_proxy">Yerli proksini aktivləşdir</string>
-    <string name="summary_pref_enable_local_proxy">Deaktiv olduqda, SOCKS proksi əlçatan olmur, buna görə də abunəlik yenilənmələri və bənzər əməliyyatlar proksidən istifadə edə bilmir</string>
+    <string name="summary_pref_enable_local_proxy">Qapalı olduqda, SOCKS proksi əlçatan olmur, buna görə də abunəlik yenilənmələri və bənzər əməliyyatlar proksidən istifadə edə bilmir</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
     <string name="summary_pref_socks_enable_udp">UDP istifadə edərkən SOCKS5 doğrulama üsulu tam təhlükəsiz deyil.</string>
     <string name="summary_pref_socks_port">Yerli proksi portu</string>
@@ -272,7 +272,7 @@
 
 
     <string name="title_pref_append_http_proxy">VPN-ə HTTP proksi əlavə et</string>
-    <string name="summary_pref_append_http_proxy">Səyahətçilərə və dəstəklənən tətbiqlərə virtual şəbəkə interfeysi əvəzinə birbaşa HTTP proksidən istifadə etməyə icazə verin (Android 10+).</string>
+    <string name="summary_pref_append_http_proxy">Brauzerlərə və dəstəklənən tətbiqlərə virtual şəbəkə interfeysi əvəzinə birbaşa HTTP proksidən istifadə etməyə icazə verin (Android 10+).</string>
 
     <string name="title_pref_double_column_display">İki sütunlu düzülüşdən istifadə et</string>
     <string name="summary_pref_double_column_display">Ekrana daha çox məzmun sığdırmaq üçün profil siyahısını iki sütunda göstərin.</string>
@@ -316,7 +316,7 @@
     <string name="title_root_mode_enabled">Root rejimini aktivləşdir (root istifadəçiləri)</string>
     <string name="summary_root_mode_enabled">Aşağı səviyyəli şəffaf proksiləmə üçün root icazəsindən istifadə edin. Root rejimi Android VPN xidmətindən istifadə etmək əvəzinə şəbəkə trafikini birbaşa idarə edir. Root rejimi aktiv olduqda standart rejim, tətbiq üzrə marşrutlaşdırma və VPN ilə bağlı tənzimləmələr tətbiq edilmir.</string>
     <string name="toast_root_required">Bu funksiya üçün Root icazəsi tələb olunur</string>
-    <string name="title_root_lan_sharing">VPN-i Məhəlli şəbəkə / modem rejimindəki cihazlarla paylaş (root istifadəçiləri)</string>
+    <string name="title_root_lan_sharing">VPN-i LAN / modem rejimindəki cihazlarla paylaş (root istifadəçiləri)</string>
     <string name="summary_root_lan_sharing">Wi-Fi giriş nöqtəsi (hotspot) və USB modem rejiminə qoşulmuş cihazların trafikini VPN vasitəsilə yönləndirin.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
@@ -345,10 +345,10 @@
     <string name="toast_invalid_update_interval">Yanlış yenilənmə intervalı. Minimum 15 dəqiqədir.</string>
     <string name="title_sub_update">Abunəliyi yenilə</string>
     <string name="title_ping_all_server">TCP gecikmələrini sınaqdan keçir (TCPing)</string>
-    <string name="title_real_ping_all_server">Xalis gecikmələri sınaqdan keçir</string>
+    <string name="title_real_ping_all_server">Real gecikmələri sınaqdan keçir</string>
     <string name="title_user_asset_setting">Resurs faylları</string>
     <string name="title_sort_by_test_results">Sınaq nəticələrinə görə çeşidlə</string>
-    <string name="title_filter_config">Konfiqurasiyaları süzgəcdən keçir</string>
+    <string name="title_filter_config">Konfiqurasiyaları filtrdən keçir</string>
     <string name="filter_config_all">Hamısı</string>
     <string name="summary_scan_qrcode">Kameranı açmaq və skan etmək üçün ekrana toxunun</string>
     <string name="title_del_duplicate_config_count">%d təkrar konfiqurasiya silinsin</string>
@@ -422,7 +422,7 @@
     <string name="title_pref_observatory_least_ping_interval">leastPing İntervalı</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad İntervalı</string>
     <string name="title_pref_observatory_least_load_method">leastLoad HTTP metodu</string>
-    <string name="title_pref_observatory_least_load_sampling">leastLoad Seçmələri (Sampling)</string>
+    <string name="title_pref_observatory_least_load_sampling">leastLoad Seçmələri</string>
     <string name="title_pref_observatory_least_load_timeout">leastLoad Vaxt Aşımı</string>
     <string name="toast_invalid_observatory_duration">Yanlış müddət. 3m və ya 30s kimi bir dəyərdən istifadə edin.</string>
     <string name="toast_invalid_observatory_sampling">Yanlış müddət. Müsbət ədəddən istifadə edin.</string>
@@ -436,7 +436,7 @@
 
     <string name="title_policy_group_type">Siyasət qrupu növü</string>
     <string name="title_policy_group_subscription_id">Abunəlik qrupundan</string>
-    <string name="title_policy_group_subscription_filter">Qeydlərin regex süzgəci</string>
+    <string name="title_policy_group_subscription_filter">Qeydlərin regex filtri</string>
     <string name="title_policy_group_test_outbounds">Çıxışları sınaqdan keçir</string>
     <string name="title_policy_group_fallback">Ehtiyat çıxışı (istəyə bağlı)</string>
 
@@ -480,7 +480,7 @@
     </string-array>
 
     <string-array name="browser_dialer_mode">
-        <item>Deaktiv et</item>
+        <item>Qapat</item>
         <item>OkHttp</item>
         <item>WebView</item>
     </string-array>
@@ -534,7 +534,7 @@
     <string name="acc_back">Geri</string>
     <string name="acc_search">Axtar</string>
     <string name="acc_add">Konfiqurasiya əlavə et</string>
-    <string name="acc_more">Əlavə opsiyalar</string>
+    <string name="acc_more">Əlavə seçimlər</string>
     <string name="acc_selected_server">Seçildi</string>
     <string name="acc_share_subscription">Abunəlik keçidini paylaş</string>
     <string name="acc_share_log">Jurnalı paylaş</string>
