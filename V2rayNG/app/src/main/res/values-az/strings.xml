@@ -8,7 +8,7 @@
     <string name="navigation_drawer_close">Naviqasiya menyusunu bağlayın</string>
     <string name="migration_success">Məlumatların köçürülməsi uğurla başa çatdı!</string>
     <string name="action_stop_service">Xidməti saxla</string>
-    <string name="action_ok">OK</string>
+    <string name="action_ok">Oldu</string>
     <string name="action_cancel">Ləğv et</string>
     <string name="migration_fail">Məlumatların köçürülməsi uğursuz oldu!</string>
     <string name="pull_down_to_refresh">Yeniləmək üçün aşağı çəkin!</string>
