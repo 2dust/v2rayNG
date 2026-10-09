@@ -24,6 +24,7 @@ interface MainDataSource : Closeable {
 
     fun getString(resId: Int): String
     fun getString(resId: Int, vararg formatArgs: Any): String
+    fun getStringArray(resId: Int): Array<String>
 
     fun getSubscriptions(): List<SubscriptionCache>
     fun getSubscriptionItem(id: String): SubscriptionItem?
@@ -34,10 +35,12 @@ interface MainDataSource : Closeable {
 
     fun encodeServerList(guids: List<String>, groupId: String)
 
-    fun removeServer(guid: String)
+    fun removeServer(guid: String): Boolean
     fun removeAllServer(): Int
     fun removeInvalidServerByGuid(guid: String): Int
     fun removeInvalidServersInGroup(groupId: String): Int
+
+    fun moveServer(groupId: String, fromGuid: String, toGuid: String): Boolean
 
     fun clearAllTestDelayResults(guids: List<String>)
     fun sortByTestResultsForSub(subId: String)
