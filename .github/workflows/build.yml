@@ -183,26 +183,16 @@ jobs:
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        # Tests are skipped: they fail on profiles and outbound builders that the Aether
-        # settings touch, and the release only needs an installable APK.
         if [ "$HAS_KEYSTORE" = "true" ]; then
           ./gradlew assembleRelease -PpattngVersion="${{ inputs.release_tag }}" \
-            -x test \
-            -x testPlaystoreDebugUnitTest \
-            -x testFdroidDebugUnitTest \
-            -x testPlaystoreReleaseUnitTest \
-            -x testFdroidReleaseUnitTest \
+            -x test -x testPlaystoreDebugUnitTest -x testFdroidDebugUnitTest \
             -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} \
             -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} \
             -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
         else
           ./gradlew assembleDebug -PpattngVersion="${{ inputs.release_tag }}" \
-            -x test \
-            -x testPlaystoreDebugUnitTest \
-            -x testFdroidDebugUnitTest \
-            -x testPlaystoreReleaseUnitTest \
-            -x testFdroidReleaseUnitTest
+            -x test -x testPlaystoreDebugUnitTest -x testFdroidDebugUnitTest
         fi
     
     - name: Check the native libraries in the APKs
