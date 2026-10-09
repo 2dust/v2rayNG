@@ -19,6 +19,7 @@ jobs:
     env:
       RUST_TOOLCHAIN: "1.99.0"
       GO_VERSION: "1.26"
+      HAS_KEYSTORE: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
 
     steps:
     - name: Checkout code
@@ -169,9 +170,8 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    # Only runs when the keystore secret exists; otherwise the release is built unsigned.
     - name: Decode Keystore
-      if: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
+      if: env.HAS_KEYSTORE == 'true'
       uses: timheuer/base64-to-file@v2.0.0
       id: android_keystore
       with:
@@ -185,9 +185,7 @@ jobs:
         chmod 755 gradlew
         ./gradlew :app:testPlaystoreDebugUnitTest
         ./gradlew licenseFdroidReleaseReport
-        # Signed with the release keystore when the secrets exist, otherwise a debug-signed
-        # release build that still installs on a phone but is not suitable for the Play Store.
-        if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
+        if [ "$HAS_KEYSTORE" = "true" ]; then
           ./gradlew assembleRelease -PpattngVersion="${{ inputs.release_tag }}" \
             -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} \
             -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} \
