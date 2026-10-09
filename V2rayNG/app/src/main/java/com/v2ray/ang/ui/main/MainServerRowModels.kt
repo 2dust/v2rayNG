@@ -48,8 +48,9 @@ internal fun serverProtocolDescription(
     if (profile.configType.isComplexType()) return profile.configType.name
     val parts = mutableListOf(profile.configType.name)
     if (profile.configType == EConfigType.AETHER) {
-        // The tunnel from the outside in, so a profile that runs Psiphon or Tor alone is not named after a WARP protocol it never opens.
-        parts.add(AetherCore.of(profile).path.joinToString(" / "))
+        parts.add(AetherCore.of(profile).path.joinToString(" / ") { path ->
+            aetherProtocolLabel[path] ?: path
+        })
     }
     profile.network?.let { network ->
         if (network.isNotBlank() && !network.equals("tcp", ignoreCase = true)) {
@@ -70,10 +71,6 @@ internal fun serverProtocolDescription(
     return parts.joinToString(" / ")
 }
 
-/**
- * Maps the Aether protocol values to their localized labels, so a row can show the name of the
- * protocol rather than its internal value.
- */
 internal fun aetherProtocolLabels(
     entries: Array<String>,
     values: Array<String>,
