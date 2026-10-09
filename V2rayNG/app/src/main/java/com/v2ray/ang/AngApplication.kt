@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.core.AetherCoreManager
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -44,6 +45,9 @@ class AngApplication : Application() {
 
         // Ensure critical preference defaults are present in MMKV early
         SettingsManager.initApp(this)
+
+        // Matixray: the Aether cores of this process listen on the port of the settings.
+        AetherCoreManager.listenPortSource = SettingsManager::getAetherListenPort
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()

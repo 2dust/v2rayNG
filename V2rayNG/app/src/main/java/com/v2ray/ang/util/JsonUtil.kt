@@ -7,7 +7,6 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import com.google.gson.ToNumberPolicy
 import com.google.gson.reflect.TypeToken
 import com.v2ray.ang.AppConfig
 import java.lang.reflect.Type
@@ -65,15 +64,12 @@ object JsonUtil {
         val gsonPre = GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
-            .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
             .registerTypeAdapter( // custom serializer is needed here since JSON by default parse number as Double, core will fail to start
                 object : TypeToken<Double>() {}.type,
                 JsonSerializer { src: Double?, _: Type?, _: JsonSerializationContext? ->
-                    when (src) {
-                        null -> null
-                        src.toLong().toDouble() -> JsonPrimitive(src.toLong())
-                        else -> JsonPrimitive(src)
-                    }
+                    JsonPrimitive(
+                        src?.toInt()
+                    )
                 }
             )
             .create()

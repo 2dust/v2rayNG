@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
-import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.v2ray.ang.R
@@ -146,8 +145,6 @@ object NotificationHelper {
         importance: Int,
         configureNewChannel: NotificationChannel.() -> Unit = {},
     ) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val localizedName = AppLocaleManager.localizedContext(context).getString(channelNameRes)
@@ -172,11 +169,7 @@ object NotificationHelper {
         content: String,
         action: NotificationCompat.Action? = null
     ): NotificationCompat.Builder {
-        val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channelType.channelId
-        } else {
-            ""
-        }
+        val channelId = channelType.channelId
 
         val displayTitle = title.ifEmpty { context.getString(R.string.app_name) }
         return NotificationCompat.Builder(context, channelId)

@@ -17,7 +17,7 @@ class ScStartActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         LaunchedEffect(Unit) {
             moveTaskToBack(true)
-            if (!CoreServiceManager.isRunning()) {
+            if (!CoreServiceManager.isServiceRunning()) {
                 LauncherManager.startServiceFromToggle(this@ScStartActivity)
             }
             finish()

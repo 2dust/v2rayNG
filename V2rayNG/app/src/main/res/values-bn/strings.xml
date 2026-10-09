@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>
     <string name="app_tile_first_use">এই ফিচারটি প্রথম ব্যবহার করা হচ্ছে, সার্ভার যোগ করতে অ্যাপটি ব্যবহার করুন</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG সার্ভিস</string>
+    <string name="notification_channel_service">Matixray সার্ভিস</string>
     <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
     <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">ফিঙ্গারপ্রিন্ট</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">সাইফার স্যুট (Cipher Suites)</string>
+    <string name="toast_cipher_suites_need_unsafe">cipherSuites শুধু unsafe fingerprint-এর সঙ্গে কাজ করে। unsafe বেছে নিন, অথবা cipherSuites খালি করুন।</string>
+    <string name="toast_websocket_alpn_http1_only">WebSocket ও HTTPUpgrade শুধু alpn http/1.1 হলে বা alpn না থাকলে সংযুক্ত হয়। http/1.1 বেছে নিন, অথবা alpn খালি রাখুন।</string>
     <string name="server_lab_allow_insecure">সার্টিফিকেট যাচাই এড়িয়ে যান (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">ঠিকানা</string>
@@ -131,7 +134,17 @@
     <string name="server_lab_xhttp_mode">XHTTP মোড</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra-এর কাঁচা JSON, ফরম্যাট: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
+    <string name="preset_replace_title">%1$s বদলাবেন?</string>
+    <string name="preset_replace_message">বর্তমান %1$s তালিকায় নেই এবং হারিয়ে যাবে। এর বদলে %2$s বসাবেন?</string>
+    <string name="preset_action_replace">বদলান</string>
+    <string name="preset_default">ডিফল্ট</string>
+    <string name="acc_choose_preset">একটি তৈরি %1$s বেছে নিন</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">echOutbound-এর কাঁচা JSON, ফরম্যাট: { OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">echOutbound-এর জন্য echConfigList প্রয়োজন</string>
+    <string name="toast_ech_outbound_invalid_tag">echOutbound-এ একটি খালি নয় এমন \"tag\" থাকতে হবে, যা direct বা block নয় এবং proxy দিয়ে শুরু হয় না</string>
+    <string name="toast_ech_outbound_tag_conflict">echOutbound-এর \"%1$s\" ট্যাগটি ইতিমধ্যে অন্য একটি outbound ব্যবহার করছে</string>
     <string name="server_lab_verify_peer_cert_by_name">নাম দিয়ে পিয়ার সার্টিফিকেট যাচাই করুন</string>
     <string name="server_lab_pinned_ca256">সার্টিফিকেট ফিঙ্গারপ্রিন্ট (SHA-256)</string>
     <string name="server_lab_browser_dialer">Browser Dialer চালু করুন</string>
@@ -252,6 +265,7 @@
     <string name="toast_warning_pref_proxysharing_short">LAN থেকে সংযোগ অনুমোদন করুন, নিশ্চিত করুন যে আপনি একটি বিশ্বস্ত নেটওয়ার্কে আছেন</string>
 
     <string name="title_pref_socks_port">স্থানীয় প্রক্সি পোর্ট</string>
+    <string name="title_pref_aether_listen_port">Aether-এর লিসেন পোর্ট</string>
     <string name="title_pref_enable_local_proxy">লোকাল প্রক্সি সক্ষম করুন</string>
     <string name="summary_pref_enable_local_proxy">বন্ধ থাকলে কোনো SOCKS প্রক্সি পাওয়া যাবে না, তাই সাবস্ক্রিপশন আপডেট ও অনুরূপ কাজ প্রক্সি ব্যবহার করতে পারবে না</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +348,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">রিকোয়েস্ট হেডার (JSON ফরম্যাট)</string>
     <string name="sub_setting_filter">মন্তব্যের রেগুলার এক্সপ্রেশন ফিল্টার</string>
+    <string name="sub_setting_override_address">ঠিকানা ওভাররাইড</string>
+    <string name="sub_setting_override_port">পোর্ট ওভাররাইড</string>
+    <string name="sub_setting_override_tip">সাবস্ক্রিপশনের মান রাখতে খালি রাখুন</string>
     <string name="sub_setting_enable">আপডেট সক্রিয় করুন</string>
     <string name="sub_auto_update">স্বয়ংক্রিয় আপডেট সক্রিয় করুন</string>
     <string name="sub_allow_insecure_url">অনিরাপদ HTTP ঠিকানা অনুমোদন করুন</string>
@@ -343,6 +360,7 @@
     <string name="sub_setting_entry_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের আগে সেই প্রোফাইলের প্রক্সি চেইনের প্রবেশ লিঙ্ক হিসেবে যোগ করা হবে।</string>
     <string name="sub_setting_exit_proxy_tip">নির্বাচিত প্রক্সিটি এই সাবস্ক্রিপশনের প্রতিটি প্রোফাইলের পরে সেই প্রোফাইলের প্রক্সি চেইনের প্রস্থান লিঙ্ক হিসেবে যোগ করা হবে।</string>
     <string name="toast_invalid_update_interval">আপডেটের বিরতি সঠিক নয়। সর্বনিম্ন ১৫ মিনিট।</string>
+    <string name="toast_invalid_override_port">ওভাররাইড পোর্ট অবৈধ। 1 থেকে 65535 এর মধ্যে একটি মান দিন।</string>
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
     <string name="title_real_ping_all_server">প্রকৃত বিলম্ব পরীক্ষা করুন</string>
@@ -411,12 +429,6 @@
 
     <string name="import_subscription_success">সাবস্ক্রিপশন সফলভাবে আমদানি করা হয়েছে</string>
     <string name="import_subscription_failure">সাবস্ক্রিপশন আমদানি ব্যর্থ</string>
-    <string name="title_fragment_settings">প্যাকেট বিভাজন সেটিংস (Fragment)</string>
-    <string name="title_pref_fragment_packets">ফ্র্যাগমেন্ট প্যাকেটস</string>
-    <string name="title_pref_fragment_length">ফ্র্যাগমেন্ট দৈর্ঘ্য (ন্যূনতম-সর্বাধিক)</string>
-    <string name="title_pref_fragment_interval">ফ্র্যাগমেন্ট ইন্টারভ্যাল (ন্যূনতম-সর্বাধিক)</string>
-    <string name="title_pref_fragment_enabled">ফ্র্যাগমেন্ট সক্রিয় করুন</string>
-    <string name="title_pref_fragment_maxsplit">ফ্র্যাগমেন্ট ম্যাক্স স্প্লিট</string>
     <string name="title_observatory_settings">সংযোগ পর্যবেক্ষণ সেটিংস (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing ইন্টারভ্যাল</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad ইন্টারভ্যাল</string>
@@ -425,6 +437,8 @@
     <string name="title_pref_observatory_least_load_timeout">leastLoad টাইমআউট</string>
     <string name="toast_invalid_observatory_duration">অবৈধ সময়কাল। 3m বা 30s-এর মতো মান ব্যবহার করুন।</string>
     <string name="toast_invalid_observatory_sampling">অবৈধ স্যাম্পলিং। একটি ধনাত্মক সংখ্যা ব্যবহার করুন।</string>
+    <string name="toast_invalid_aether_listen_port">Aether-এর লিসেন পোর্টের জন্য 1024 থেকে 65532 এর মধ্যে একটি পোর্ট দিন</string>
+    <string name="toast_aether_listen_port_local_proxy">Aether-এর লিসেন পোর্ট ও তার পরের তিনটি পোর্টের মধ্যে স্থানীয় প্রক্সি পোর্ট থাকতে পারবে না</string>
 
     <string name="update_check_for_update">আপডেট পরীক্ষা করুন</string>
     <string name="update_already_latest_version">ইতিমধ্যে সর্বশেষ সংস্করণ ব্যবহার করছেন</string>
@@ -444,7 +458,6 @@
     <string name="server_proxy_chain_member_unselected">চেইনের সদস্য নির্বাচন করুন</string>
     <string name="server_proxy_chain_members_unselected">চেইনের প্রতিটি সারির জন্য সদস্য নির্বাচন করুন</string>
     <string name="server_proxy_chain_members_insufficient">পর্যাপ্ত সদস্য নেই</string>
-    <string name="server_proxy_chain_members_invalid">অবৈধ চেইন সদস্য: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">ব্যাকআপ ও পুনরুদ্ধার</string>
@@ -560,5 +573,203 @@
     <string name="tasker_blurb_stop">%1$s বন্ধ করুন</string>
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
+    <string name="aether_lab_protocol">প্রোটোকল</string>
+    <string name="aether_lab_transport">ট্রান্সপোর্ট</string>
+    <string name="aether_lab_masque_sni">MASQUE সার্ভার নাম (SNI)</string>
+    <string name="aether_lab_scan_mode">স্ক্যান মোড</string>
+    <string name="aether_lab_obfuscation">অবফাসকেশন</string>
+    <string name="aether_lab_ip_version">IP সংস্করণ</string>
+    <string name="aether_lab_exit_final_mask">exit-node-এর finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
+    <string name="aether_exit_node_freedom">freedom (ডিফল্ট)</string>
+    <string name="label_numbered">%1$s (%2$d)</string>
+    <string name="aether_hint_exit_node">কোর এই প্রোফাইলের আউটবাউন্ডের মধ্য দিয়ে বাইরে সংযোগ করে, যেমন প্রক্সি চেইনের একটি হপের মধ্য দিয়ে; নিচের finalMask ও dialMode শুধু freedom-এর জন্য</string>
+    <string name="aether_exit_node_unusable">exit-node প্রোফাইল \"%1$s\" কোনো আউটবাউন্ড দেয় না; অন্য একটি, বা freedom বেছে নিন</string>
+    <string name="aether_exit_node_ech_unusable">exit-node প্রোফাইল \"%1$s\"-এর echOutbound ব্যবহার করা যায় না; সেই প্রোফাইলে এটি ঠিক করুন, বা অন্য একটি, বা freedom বেছে নিন</string>
+    <string name="toast_profile_name_not_found">\"%1$s\" নামে কোনো প্রোফাইল পাওয়া যায়নি</string>
+    <string name="toast_profile_name_duplicate">\"%1$s\" নামে দুটি প্রোফাইল পাওয়া গেছে; অনুগ্রহ করে একটির নাম পরিবর্তন করুন</string>
+    <string name="toast_profile_no_server">প্রোফাইল \"%1$s\"-এর কোনো সার্ভার ঠিকানা নেই, তাই প্রক্সি চেইন এর মধ্য দিয়ে যেতে পারে না</string>
+    <string name="toast_profile_group_not_fallback">\"%1$s\" একটি নীতি গ্রুপ, এবং নীতি গ্রুপ বিকল্প বহির্গামী সংযোগ হতে পারে না; অন্য একটি প্রোফাইল বেছে নিন</string>
+    <string name="toast_profile_group_not_hop">\"%1$s\" একটি নীতি গ্রুপ, তাই প্রক্সি চেইন এর মধ্য দিয়ে যেতে পারে না; অন্য একটি প্রোফাইল বেছে নিন</string>
+    <string name="toast_profile_chain_not_hop">\"%1$s\" একটি প্রক্সি চেইন, তাই অন্য প্রক্সি চেইন এর মধ্য দিয়ে যেতে পারে না; অন্য একটি প্রোফাইল বেছে নিন</string>
+    <string name="toast_profile_custom_not_hop">\"%1$s\" একটি কাস্টম কনফিগারেশন, তাই প্রক্সি চেইন এর মধ্য দিয়ে যেতে পারে না; অন্য একটি প্রোফাইল বেছে নিন</string>
+    <string name="toast_profile_custom_not_fallback">\"%1$s\" একটি কাস্টম কনফিগারেশন, এবং কাস্টম কনফিগারেশন বিকল্প বহির্গামী সংযোগ হতে পারে না; অন্য একটি প্রোফাইল বেছে নিন</string>
+    <string name="aether_keys_hint_fragment">WARP API-এর অনুরোধের ClientHello টুকরো টুকরো করে পাঠায়, যেসব নেটওয়ার্ক API-এর নাম ফিল্টার করে তাদের জন্য</string>
+    <string name="aether_lab_fragment">ClientHello ভাগ করুন</string>
+    <string name="aether_lab_fragment_size">খণ্ডের আকার (বাইট)</string>
+    <string name="aether_lab_fragment_delay">খণ্ডের মাঝে বিলম্ব (মিলিসেকেন্ড)</string>
+    <string name="aether_lab_wiw_outer">বাইরের হপ</string>
+    <string name="aether_lab_wiw_inner">ভিতরের হপ</string>
+    <string name="aether_hint_endpoint">স্ক্যান করতে খালি রাখুন</string>
+    <string name="aether_hint_gool_peer">WARP যে এন্ডপয়েন্ট দেয় সেটি ব্যবহার করতে খালি রাখুন</string>
+    <string name="aether_action_scan">সার্ভার খুঁজুন</string>
+    <string name="aether_action_scanning">স্ক্যান করা হচ্ছে…</string>
+    <string name="aether_scan_success">সার্ভার পাওয়া গেছে</string>
+    <string name="aether_scan_failed">কোনো সার্ভার পাওয়া যায়নি</string>
+    <string name="aether_invalid_endpoint">একটি IP ঠিকানা ও পোর্ট দিন, অথবা স্ক্যান করতে ঠিকানা খালি রাখুন</string>
+    <string name="aether_invalid_hop">ঠিকানা ও পোর্ট একসাথে লিখুন, যেমন 162.159.192.1:2408</string>
+    <string name="aether_same_hop">দুটি হপের ঠিকানা আলাদা হতে হবে</string>
+    <string name="aether_invalid_fragment">একটি সংখ্যা বা 16-32 এর মতো পরিসর লিখুন: আকার 1–4096 বাইট, বিলম্ব 0–1000 মিলিসেকেন্ড</string>
+    <string name="aether_listen_port_taken">কোর অ্যাপের স্থানীয় প্রক্সি পোর্টে, বা Aether-এর লিসেন পোর্টের চেয়ে তিন বেশি পোর্টে শুনতে পারবে না; সেটিংসে Aether-এর লিসেন পোর্ট, অথবা কমান্ডের পোর্টগুলো বদলান</string>
+    <string name="aether_secondary_port_taken">এই কনফিগারেশনের একটি ইনবাউন্ড ইতিমধ্যে %1$d-এ শুনছে, যা Aether-এর লিসেন পোর্টের চেয়ে তিন বেশি এবং যার মধ্য দিয়ে Aether কোর বাইরে সংযোগ করে; সেটিংসে Aether-এর লিসেন পোর্ট বদলান</string>
+    <string name="aether_lab_psiphon">Psiphon</string>
+    <string name="aether_lab_psiphon_mode">Psiphon সংযোগ</string>
+    <string name="aether_lab_psiphon_cdn_ips">CDN ফ্রন্টিং IP</string>
+    <string name="aether_lab_psiphon_cdn_sni">CDN ফ্রন্টিং সার্ভার নাম (SNI)</string>
+    <string name="aether_hint_psiphon_list">কমা দিয়ে আলাদা করুন; খালি রাখলে অন্তর্নির্মিত তালিকা ব্যবহৃত হবে</string>
+    <string name="aether_lab_psiphon_region">প্রস্থান দেশ</string>
+    <string name="aether_psiphon_region_any">যেকোনো দেশ</string>
+    <string name="aether_lab_psiphon_bundled_list">অ্যাপের সাথে দেওয়া সার্ভার তালিকা থেকে শুরু</string>
+    <string name="aether_hint_psiphon_bundled_list">চালু: Psiphon সঙ্গে সঙ্গে psiphon_servers.dat-এর সার্ভারগুলো চেষ্টা করে এবং সেগুলো ব্যর্থ হলেই নতুন তালিকা আনে। বন্ধ: প্রথম সংযোগের আগে নতুন তালিকা আনে, তাই তালিকাটি পৌঁছানোর মতো হতে হবে, যেমন WARP-এর পেছন থেকে</string>
+    <string name="aether_action_clear_psiphon">Psiphon ডেটা মুছুন</string>
+    <string name="aether_hint_clear_psiphon">Psiphon যে সার্ভারগুলো শিখেছে এবং যে তালিকাগুলো এনেছে তা ভুলে যায়। পরের বার আবার দেওয়া তালিকা থেকে শুরু হয়, বা উপরের সুইচ বন্ধ থাকলে নতুন ডাউনলোড থেকে</string>
+    <string name="aether_log_psiphon_cleared">Psiphon ডেটা মুছে ফেলা হয়েছে</string>
+    <string name="aether_log_psiphon_clear_failed">Psiphon ডেটা মোছা যায়নি</string>
+    <string name="aether_psiphon_clear_blocked">Psiphon ডেটা মোছার আগে Aether প্রোফাইল সংযোগ বিচ্ছিন্ন করুন; চলমান সংযোগ এটি ব্যবহার করছে</string>
+    <string name="aether_psiphon_unavailable">এই বিল্ডে Psiphon ক্লায়েন্ট নেই, তাই Psiphon সহ প্রোফাইল সংযোগ করতে পারবে না</string>
+    <string name="aether_psiphon_needs_masque">Psiphon → WARP শুধু MASQUE প্রোটোকলের সাথে কাজ করে</string>
+    <string name="aether_next_port_taken">পথে Tor বা Psiphon থাকলে কোর Aether-এর লিসেন পোর্টের পরের পোর্টগুলোও ব্যবহার করে, আর সেগুলোর কোনোটিই অ্যাপের লোকাল প্রক্সি পোর্ট হতে পারবে না; সেটিংসে Aether-এর লিসেন পোর্ট বদলান</string>
+    <string name="aether_lab_tor">Tor</string>
+    <string name="aether_lab_tor_bridges">ব্রিজ</string>
+    <string name="aether_lab_tor_bridge_lines">ব্রিজ লাইন</string>
+    <string name="aether_hint_tor_bridge_lines">প্রতি লাইনে একটি, torrc-এর মতো: obfs4 1.2.3.4:443 FINGERPRINT cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">এই বিল্ডে প্লাগেবল ট্রান্সপোর্ট নেই, তাই Tor ব্রিজ ব্যবহার করা যাবে না; Tor শুধু সেখানেই সংযোগ করবে যেখানে এটি ব্লক করা নেই</string>
+    <string name="aether_tor_needs_masque">Tor → WARP শুধু MASQUE প্রোটোকলের সাথে কাজ করে</string>
+    <string name="aether_tor_psiphon_conflict">Tor ও Psiphon একসাথে শুধু তখনই চলে যখন একটি টানেলের ভিতরে আর অন্যটি তার চারপাশে থাকে</string>
+    <string name="aether_tor_bridges_missing">অন্তত একটি ব্রিজ লাইন লিখুন, অথবা অন্য ব্রিজ সেটিং বেছে নিন</string>
+    <string name="aether_lab_ech">Encrypted Client Hello (ECH)</string>
+    <string name="aether_hint_ech">MASQUE হ্যান্ডশেকের সার্ভার নাম লুকায়; ব্যবহারযোগ্য কী ছাড়া Aether সংযোগ করে না</string>
+    <string name="aether_lab_ech_dns">ECH DNS</string>
+    <string name="aether_lab_ech_domain">ECH ডোমেইন</string>
+    <string name="aether_invalid_ech_dns">ECH DNS হতে হবে udp://IP, tcp://IP অথবা কোনো DNS-over-HTTPS সার্ভারের https:// ঠিকানা</string>
+    <string name="aether_invalid_ech_domain">ECH ডোমেইন একটি ডোমেইন নাম হতে হবে, যেমন cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">MASQUE সার্ভার নাম (SNI) একটি ডোমেইন নাম হতে হবে, যেমন www.cloudflare.com</string>
+    <string name="aether_lab_dns">টানেলের ভিতরের DNS</string>
+    <string name="aether_hint_dns">কমা দিয়ে আলাদা করুন; খালি রাখলে 1.1.1.1 ও 1.0.0.1</string>
+    <string name="aether_invalid_dns">1.1.1.1 বা 10.0.0.1:5353-এর মতো রিজলভার ঠিকানা কমা দিয়ে আলাদা করে লিখুন</string>
+    <string name="aether_lab_exit_loc">প্রস্থানের অবস্থান</string>
+    <string name="aether_hint_exit_loc">DE,SE শুধু সেগুলো অনুমোদন করে; !IR,RU সেগুলো প্রত্যাখ্যান করে; খালি রাখলে যেকোনোটি</string>
+    <string name="aether_invalid_exit_loc">কমা দিয়ে আলাদা করা দুই অক্ষরের দেশের কোড লিখুন, প্রত্যাখ্যানের জন্য শুরুতে !</string>
+    <string name="aether_lab_tor_relays">ব্রিজের উৎস</string>
+    <string name="aether_lab_other_settings">অন্যান্য সেটিংস</string>
+    <string name="aether_lab_command">Aether কমান্ড</string>
+    <string name="aether_command_custom">হাতে সম্পাদিত: এই কমান্ড যেমন লেখা তেমনই চলে, Xray-core-এর সেটিংস ছাড়া উপরের সেটিংস প্রয়োগ হয় না</string>
+    <string name="aether_action_use_settings">সেটিংস ব্যবহার করুন</string>
+    <string name="aether_invalid_command">কমান্ডে Aether কোরের আর্গুমেন্ট থাকতে হবে, --bind এর পরে শোনার পোর্টসহ</string>
+    <string name="aether_unsupported_abi">এই ডিভাইসের জন্য Aether কোর উপলব্ধ নয়</string>
+    <string name="aether_core_stopped">Aether কোর চলা বন্ধ হয়ে গেছে</string>
+    <string name="aether_core_stopped_no_ech_key">Aether কোর বন্ধ হয়ে গেছে: ECH চালু আছে, কিন্তু কোনো ব্যবহারযোগ্য ECH কী পাওয়া যায়নি। কী ছাড়া সার্ভারের নাম খোলাখুলি পাঠানো হতো।</string>
+    <string name="aether_core_connecting">Aether কোর এখনও সংযোগ করছে</string>
+    <string name="menu_item_import_config_manually_aether">ম্যানুয়ালি Aether কনফিগ যোগ করুন</string>
+    <string name="aether_action_renew_key">নতুন WARP কী নিন…</string>
+    <string name="aether_action_renewing_key">নতুন WARP কী নেওয়া হচ্ছে…</string>
+    <string name="aether_log_title">লগ</string>
+    <string name="aether_log_empty">স্ক্যানের ফলাফল ও WARP কীর অবস্থা এখানে দেখা যাবে</string>
+    <string name="aether_log_scan_started">সার্ভার খোঁজার জন্য স্ক্যান করা হচ্ছে…</string>
+    <string name="aether_log_scan_found">পাওয়া গেছে: %1$s</string>
+    <string name="aether_log_scan_found_hops">বাইরের হপ %1$s ও ভিতরের হপ %2$s পাওয়া গেছে</string>
+    <string name="aether_log_scan_cancelled">স্ক্যান বাতিল হয়েছে</string>
+    <string name="aether_log_key_renewing">নতুন WARP কী নিবন্ধন করা হচ্ছে; সব নতুন কী প্রস্তুত না হওয়া পর্যন্ত ব্যবহৃত কীগুলো নিজের জায়গায় থাকবে…</string>
+    <string name="aether_log_key_renewed">নতুন WARP কীগুলো জায়গামতো বসানো হয়েছে, পরবর্তী সংযোগ থেকে এগুলো ব্যবহার হবে</string>
+    <string name="aether_log_key_renew_failed">নতুন WARP কী নিবন্ধন ব্যর্থ হয়েছে; বর্তমান কীগুলো রাখা হয়েছে</string>
+    <string name="aether_log_key_renew_cancelled">নতুন WARP কী নেওয়া বাতিল হয়েছে</string>
+    <string name="aether_log_masque_key_ready">MASQUE কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">MASQUE কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_wireguard_key_ready">WireGuard কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">WireGuard কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_outer_key_ready">বাইরের হপের কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">বাইরের হপের কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_inner_key_ready">ভিতরের হপের কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">ভিতরের হপের কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_wireguard_inner_key_ready">WireGuard ভিতরের হপের কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">WireGuard ভিতরের হপের কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_masque_inner_key_ready">MASQUE ভিতরের হপের কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">MASQUE ভিতরের হপের কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_log_gool_key_ready">WireGuard over MASQUE কী: ডিভাইস %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">WireGuard over MASQUE কী: এখনও নিবন্ধিত নয়; প্রথম স্ক্যান বা সংযোগে নিবন্ধিত হবে</string>
+    <string name="aether_renew_blocked">এই কীগুলো নেওয়ার আগে Aether সংযোগ বিচ্ছিন্ন করুন; চলমান সংযোগ এগুলো ব্যবহার করছে</string>
+    <string name="aether_action_get_keys">নতুন WARP কী নিন</string>
+    <string name="aether_keys_lab_kind">যার জন্য নতুন কী নেওয়া হবে</string>
+    <string name="aether_keys_kind_all">সব</string>
+    <string name="aether_keys_lab_enroll_address">API ঠিকানা</string>
+    <string name="aether_keys_hint_ech">WARP API-এর অনুরোধে সার্ভার নাম লুকায়; ব্যবহারযোগ্য ECH কী ছাড়া কোনো WARP কী চাওয়া হয় না</string>
+    <string name="aether_lab_fingerprint">ফিঙ্গারপ্রিন্ট</string>
+    <string name="aether_keys_invalid_enroll_address">API ঠিকানা একটি IP ঠিকানা বা ডোমেইন নাম হতে হবে, পোর্টসহ বা পোর্ট ছাড়া, যেমন 188.114.97.6:443 বা [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">কমান্ডটিকে কী নিবন্ধন করতে হবে: --register, তারপর all, wg, masque, mim, gool-classic (WARP-in-WARP) বা gool (WireGuard over MASQUE)</string>
+    <string name="aether_keys_log_empty">কোরের আউটপুট ও WARP কী এখানে দেখা যাবে</string>
+    <string name="aether_scan_blocked">স্ক্যান করার আগে Aether সংযোগ বিচ্ছিন্ন করুন; স্ক্যান চলমান সংযোগের কী দিয়ে দ্বিতীয় একটি টানেল খুলবে</string>
+    <string name="aether_keys_missing">প্রয়োজনীয় WARP কী আপনার কাছে নেই; আগে সেটি নিন</string>
+    <string name="aether_action_save_anyway">তবুও সংরক্ষণ করুন</string>
+    <string name="aether_action_scan_anyway">তবুও স্ক্যান করুন</string>
+    <string name="aether_chain_one_profile">একটি প্রক্সি চেইনে শুধুমাত্র একটি Aether প্রোফাইল থাকতে পারে</string>
+    <string name="aether_exit_node_name_taken">এখানে রাউটিংয়ে exit-node নামের একটি প্রোফাইল ব্যবহৃত হচ্ছে, আর exit-node হলো সেই আউটবাউন্ডের নাম যার মধ্য দিয়ে Aether কোর বাইরে সংযোগ করে; প্রোফাইলটির নাম বদলান</string>
+    <string name="aether_chain_hop_missing">এই প্রক্সি চেইনে Aether প্রোফাইল যে হপের মধ্য দিয়ে বাইরে সংযোগ করে সেটি তৈরি করা যায়নি, তাই Aether কোর সেটি ছাড়াই ইন্টারনেটে পৌঁছাত</string>
+    <string name="config_main_outbound_missing">নির্বাচিত প্রোফাইলটি তৈরি করা যায়নি, তাই সব ট্রাফিক এটি ছাড়াই সরাসরি ইন্টারনেটে পৌঁছাত; এর সেটিংস পরীক্ষা করুন</string>
+    <string name="config_routing_target_unbuilt">রাউটিং নিয়ম যে প্রোফাইল \"%1$s\"-এ ট্রাফিক পাঠায় সেটি তৈরি করা যায়নি; সেটি ঠিক করুন, অথবা যে নিয়মগুলো এটি ব্যবহার করে সেগুলো বন্ধ করুন</string>
+    <string name="config_group_fallback_unbuilt">নীতি গ্রুপের বিকল্প বহির্গামী সংযোগ প্রোফাইল \"%1$s\" তৈরি করা যায়নি; সেটি ঠিক করুন, অথবা গ্রুপের জন্য অন্য একটি বিকল্প বহির্গামী সংযোগ বেছে নিন</string>
+    <string name="aether_config_single_profile">একটি কনফিগারেশন শুধুমাত্র একটি Aether প্রোফাইল ব্যবহার করতে পারে</string>
+    <string name="aether_config_two_exits">এখানে একটি Aether কোরকে দুইভাবে বাইরে সংযোগ করতে হতো: একই টানেল একা এবং প্রক্সি চেইনের একটি হপের পেছনে, দুটি ভিন্ন হপের পেছনে, বা exit-node-এর দুটি ভিন্ন সেটিং দিয়ে ব্যবহৃত হয়েছে</string>
+    <string name="aether_custom_no_outbound">কনফিগারেশনের কোনো SOCKS আউটবাউন্ড %1$s:%2$d-এ সংযোগ করে না, যেখানে Aether কমান্ড শোনে</string>
+    <string name="aether_custom_exit_node_selected">এই কনফিগারেশনের একটি ব্যালান্সার বা অবজারভেটরি সেই আউটবাউন্ডগুলো বাছে যাদের ট্যাগ %1$s দিয়ে শুরু, যার মধ্যে exit-node-ও পড়ে, যে আউটবাউন্ডের মধ্য দিয়ে Aether কোর বাইরে সংযোগ করে; সেই সিলেক্টর বদলান</string>
+    <string name="aether_custom_invalid_command">aetherCommand অবশ্যই Aether কোরের কমান্ড লাইন টেক্সট হিসেবে হতে হবে, --bind এর পরে যে ঠিকানায় এটি শোনে সেটিসহ: %1$s</string>
+    <string name="title_aether_core">Aether কোর</string>
+    <string name="summary_aether_core">CluvexStudio-এর WARP ক্লায়েন্ট, AGPL-3.0 লাইসেন্সে অন্তর্ভুক্ত। সোর্স কোড খুলতে ট্যাপ করুন।</string>
+    <string-array name="aether_scan_entries">
+        <item>টার্বো</item>
+        <item>ভারসাম্যপূর্ণ</item>
+        <item>পুঙ্খানুপুঙ্খ</item>
+        <item>যাচাইকৃত</item>
+        <item>নিশ্চিত</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>বন্ধ</item>
+        <item>WARP → Psiphon</item>
+        <item>Psiphon → WARP</item>
+        <item>শুধু Psiphon</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">স্ক্যানের জন্য CDN এজ তালিকা</string>
+    <string name="aether_hint_psiphon_cdn_sets">Psiphon-এর অন্তর্নির্মিত কোন এজ তালিকাগুলো ফ্রন্টিং স্ক্যান চেষ্টা করবে। কিছুই না বাছলে সবগুলো; আপনার নিজের IP-এর পাশে সেগুলোর পরে চেষ্টা করা হয়</string>
+    <string name="aether_psiphon_cdn_sets_all">Psiphon-এর অন্তর্নির্মিত সব তালিকা</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai (Psiphon তালিকা)</item>
+        <item>Bunny (Psiphon তালিকা)</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>বাছাই করা ফ্রন্টিং এজ</item>
+        <item>পুরনো Android ওভাররাইড</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>স্বয়ংক্রিয়</item>
+        <item>শুধু CDN ফ্রন্টিং</item>
+        <item>শুধু সরাসরি</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>বন্ধ</item>
+        <item>WARP → Tor</item>
+        <item>Tor → WARP</item>
+        <item>শুধু Tor</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>Tor ব্লক থাকলে</item>
+        <item>শুরু থেকেই</item>
+        <item>কখনো না</item>
+        <item>আমার নিজের ব্রিজ লাইন</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb ও পাবলিক রিলে</item>
+        <item>শুধু পাবলিক রিলে</item>
+        <item>শুধু bridgedb</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>স্বয়ংক্রিয়</item>
+        <item>বন্ধ</item>
+        <item>হালকা</item>
+        <item>ফায়ারওয়াল</item>
+        <item>ভারসাম্যপূর্ণ</item>
+        <item>GFW</item>
+        <item>তীব্র</item>
+    </string-array>
 
 </resources>

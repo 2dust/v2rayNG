@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +34,7 @@ import com.v2ray.ang.ui.logcat.LogcatActivity
 import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
 import com.v2ray.ang.ui.routing.RoutingSettingActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
+import com.v2ray.ang.ui.server.ServerAetherActivity
 import com.v2ray.ang.ui.server.ServerCustomConfigActivity
 import com.v2ray.ang.ui.server.ServerGroupActivity
 import com.v2ray.ang.ui.server.ServerHttpActivity
@@ -46,6 +49,8 @@ import com.v2ray.ang.ui.server.ServerWireguardActivity
 import com.v2ray.ang.ui.settings.SettingsActivity
 import com.v2ray.ang.ui.subscription.SubSettingActivity
 import com.v2ray.ang.ui.userasset.UserAssetActivity
+import com.v2ray.ang.ui.xfinder.XfinderActivity
+import com.v2ray.ang.ui.xfinder.XfinderPage
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -95,6 +100,22 @@ class MainActivity : HelperBaseComponentActivity() {
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
+
+        // "Auto connect": the fastest profile of the real tests was selected, so start (or restart) on it.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.autoConnectEvents.collect {
+                    if (mainViewModel.uiState.value.isRunning) LauncherManager.restartService(this@MainActivity)
+                    else requestServiceStart()
+                }
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // The service can have gone away while the screen was not shown, without a word if its process died.
+        mainViewModel.onAction(MainAction.RefreshServiceState)
     }
 
     @Composable
@@ -105,6 +126,7 @@ class MainActivity : HelperBaseComponentActivity() {
             onAction = { action ->
                 when (action) {
                     MainAction.ToggleService -> handleFabAction()
+                    MainAction.TogglePsiphon -> togglePsiphon()
                     MainAction.TestCurrentServer -> handleLayoutTestClick()
                     MainAction.ImportQRcode -> importQRcode()
                     MainAction.ImportClipboard -> importClipboard()
@@ -138,22 +160,20 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun navigateTo(destination: MainDestination) {
         val intent = when (destination) {
+            MainDestination.XfinderConfigs -> XfinderActivity.intent(this, XfinderPage.CONFIGS)
+            MainDestination.IpScanner -> XfinderActivity.intent(this, XfinderPage.SCANNER)
+            MainDestination.XfinderLogs -> XfinderActivity.intent(this, XfinderPage.LOGS)
             MainDestination.Subscriptions -> Intent(this, SubSettingActivity::class.java)
             MainDestination.PerAppProxy -> Intent(this, PerAppProxyActivity::class.java)
             MainDestination.Routing -> Intent(this, RoutingSettingActivity::class.java)
             MainDestination.UserAssets -> Intent(this, UserAssetActivity::class.java)
             MainDestination.Settings -> Intent(this, SettingsActivity::class.java)
+            // The language picker lives in the settings screen (title_language), see SettingsActivity.
+            MainDestination.Language -> Intent(this, SettingsActivity::class.java)
             MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
             MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
             MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
             MainDestination.About -> Intent(this, AboutActivity::class.java)
-            MainDestination.Promotion -> {
-                Utils.openUri(
-                    this,
-                    "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}"
-                )
-                return
-            }
         }
         settingsActivityLauncher.launch(intent)
     }
@@ -161,8 +181,35 @@ class MainActivity : HelperBaseComponentActivity() {
     private fun handleFabAction() {
         if (mainViewModel.uiState.value.isRunning) {
             LauncherManager.stopService(this)
+            // A service whose process died takes no stop and answers nothing; asking for its state right
+            // after lets that silence show the screen as stopped instead of leaving it connected.
+            mainViewModel.onAction(MainAction.RefreshServiceState)
         } else {
             requestServiceStart()
+        }
+    }
+
+    /**
+     * "Connect to Psiphon": Psiphon runs inside the Aether core, as a profile with Psiphon on. Disconnects when such a
+     * profile runs; otherwise selects the first one (made on the spot when there is none) and starts (or restarts) the service on it.
+     */
+    private fun togglePsiphon() {
+        if (mainViewModel.psiphonActive.value) {
+            handleFabAction()
+            return
+        }
+        lifecycleScope.launch {
+            val guid = mainViewModel.ensurePsiphonGuid()
+            if (guid == null) {
+                toastError(R.string.mx_psiphon_no_profile)
+                return@launch
+            }
+            mainViewModel.updateSelectedGuid(guid)
+            if (mainViewModel.uiState.value.isRunning) {
+                LauncherManager.restartService(this@MainActivity)
+            } else {
+                requestServiceStart()
+            }
         }
     }
 
@@ -205,6 +252,7 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.TROJAN.value -> Intent(this, ServerTrojanActivity::class.java)
             EConfigType.WIREGUARD.value -> Intent(this, ServerWireguardActivity::class.java)
             EConfigType.HYSTERIA2.value -> Intent(this, ServerHysteria2Activity::class.java)
+            EConfigType.AETHER.value -> Intent(this, ServerAetherActivity::class.java)
             else -> Intent(this, ServerHttpActivity::class.java).apply {
                 putExtra("createConfigType", createConfigType)
             }
@@ -257,6 +305,7 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.TROJAN -> ServerTrojanActivity::class.java
             EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
             EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
+            EConfigType.AETHER -> ServerAetherActivity::class.java
             else -> ServerHttpActivity::class.java
         }
         val intent = Intent(this, activityClass).apply {

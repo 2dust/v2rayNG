@@ -5,11 +5,14 @@
   },
   "policy": {
     "levels": {
-      "8": {
-        "handshake": 4,
-        "connIdle": 300,
-        "uplinkOnly": 1,
-        "downlinkOnly": 1
+      "0": {
+        "uplinkOnly": 0,
+        "downlinkOnly": 0
+      },
+      "12": {
+        "connIdle": 12,
+        "uplinkOnly": 0,
+        "downlinkOnly": 0
       }
     },
     "system": {
@@ -24,8 +27,7 @@
       "protocol": "socks",
       "settings": {
         "auth": "noauth",
-        "udp": true,
-        "userLevel": 8
+        "udp": true
       },
       "sniffing": {
         "enabled": true,
@@ -54,25 +56,11 @@
     },
     {
       "protocol": "freedom",
-      "streamSettings": {
-        "sockopt": {
-          "domainStrategy": "UseIP",
-          "happyEyeballs": {
-            "tryDelayMs": 250,
-            "interleave": 2
-          }
-        }
-      },
       "tag": "direct"
     },
     {
       "protocol": "blackhole",
-      "tag": "block",
-      "settings": {
-        "response": {
-          "type": "http"
-        }
-      }
+      "tag": "block"
     }
   ],
   "routing": {

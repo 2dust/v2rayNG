@@ -20,6 +20,7 @@ object AppConfig {
     const val DEFAULT_SUBSCRIPTION_ID = "__default_subscription__"
 
     /** Preferences mapped to MMKV storage. */
+    const val PREF_REMOVE_SNI = "pref_remove_sni"
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
     const val PREF_ROUTE_ONLY_ENABLED = "pref_route_only_enabled"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"
@@ -68,6 +69,20 @@ object AppConfig {
     const val PREF_SOCKS_USERNAME = "pref_socks_username"
     const val PREF_SOCKS_PASSWORD = "pref_socks_password"
     const val PREF_SOCKS_ENABLE_UDP = "pref_socks_enable_udp"
+
+    /** Matixray: the loopback port every Aether core listens on, whatever its profile; see SettingsManager.getAetherListenPort. */
+    const val PREF_AETHER_LISTEN_PORT = "pref_aether_listen_port"
+
+    /** Matixray: the settings of the page that gets new WARP keys, which no profile shares; see AetherKeysSettings. */
+    const val PREF_AETHER_KEYS_KIND = "pref_aether_keys_kind"
+    const val PREF_AETHER_KEYS_ENROLL_ADDRESS = "pref_aether_keys_enroll_address"
+    const val PREF_AETHER_KEYS_ECH = "pref_aether_keys_ech"
+    const val PREF_AETHER_KEYS_ECH_DNS = "pref_aether_keys_ech_dns"
+    const val PREF_AETHER_KEYS_ECH_DOMAIN = "pref_aether_keys_ech_domain"
+    const val PREF_AETHER_KEYS_FINGERPRINT = "pref_aether_keys_fingerprint"
+    const val PREF_AETHER_KEYS_FINAL_MASK = "pref_aether_keys_final_mask"
+    const val PREF_AETHER_KEYS_DIAL_MODE = "pref_aether_keys_dial_mode"
+    const val PREF_AETHER_KEYS_COMMAND = "pref_aether_keys_command"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
     const val PREF_DNS_HOSTS = "pref_dns_hosts"
@@ -81,6 +96,9 @@ object AppConfig {
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
+
+    /** The exit countries Psiphon last reported it can leave from, ISO codes comma separated; see PsiphonServerList. */
+    const val PREF_PSIPHON_REGIONS = "pref_psiphon_regions"
     const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel_v2"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"
     const val PREF_HEV_TUNNEL_RW_TIMEOUT = "pref_hev_tunnel_rw_timeout_v2"
@@ -101,6 +119,9 @@ object AppConfig {
     const val BROADCAST_ACTION_ACTIVITY = "$ANG_PACKAGE.action.activity"
     const val BROADCAST_ACTION_WIDGET_CLICK = "$ANG_PACKAGE.action.widget.click"
 
+    /** Messages for a running SubscriptionUpdateService, which a broadcast delivers without starting it. */
+    const val BROADCAST_ACTION_SUBSCRIPTION = "$ANG_PACKAGE.action.subscription"
+
     /** Tasker extras. */
     const val TASKER_EXTRA_BUNDLE = "com.twofortyfouram.locale.intent.extra.BUNDLE"
     const val TASKER_EXTRA_STRING_BLURB = "com.twofortyfouram.locale.intent.extra.BLURB"
@@ -118,6 +139,10 @@ object AppConfig {
     const val TAG_BALANCER = "balancer-main"
     const val TAG_BALANCER_PRE = "balancer"
 
+    /** Matixray: the inbound the Aether core dials out through, and the outbound its traffic leaves Xray by. */
+    const val TAG_SECONDARY_SOCKS = "secondary-socks"
+    const val TAG_EXIT_NODE = "exit-node"
+
     /** Network-related constants. */
     const val UPLINK = "uplink"
     const val DOWNLINK = "downlink"
@@ -127,13 +152,13 @@ object AppConfig {
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com"
     const val GITHUB_DOWNLOAD_URL = "$GITHUB_URL/%s/releases/latest/download"
     const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/2dust/androidpackagenamelist/master/proxy.txt"
-    const val APP_URL = "$GITHUB_URL/2dust/v2rayNG"
-    const val APP_API_URL = "https://api.github.com/repos/2dust/v2rayNG/releases"
+    const val APP_URL = "$GITHUB_URL/imatixofficel/App-Matixray"
+    const val APP_API_URL = "https://api.github.com/repos/imatixofficel/App-Matixray/releases"
     const val APP_ISSUES_URL = "$APP_URL/issues"
+    const val AETHER_URL = "$GITHUB_URL/CluvexStudio/aether"
     const val APP_WIKI_MODE = "$APP_URL/wiki/Mode"
-    const val APP_PRIVACY_POLICY = "$GITHUB_RAW_URL/2dust/v2rayNG/master/CR.md"
-    const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val TG_CHANNEL_URL = "https://t.me/github_2dust"
+    const val APP_PRIVACY_POLICY = APP_URL
+    const val TG_CHANNEL_URL = "https://t.me/imatix7"
     const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
     const val OBSERVATORY_LEAST_PING_INTERVAL = "3m"
@@ -146,9 +171,9 @@ object AppConfig {
     const val IP_API_URL = "https://api.ip.sb/geoip"
 
     /** DNS server addresses. */
-    const val DNS_PROXY = "https://cloudflare-dns.com/dns-query"
-    const val DNS_DIRECT = "223.5.5.5"
-    const val DNS_VPN = "1.1.1.1"
+    const val DNS_PROXY = "https://dns.google/dns-query"
+    const val DNS_DIRECT = "localhost"
+    const val DNS_VPN = "8.8.8.8"
     const val GEOSITE_PRIVATE = "geosite:private"
     const val GEOSITE_CN = "geosite:cn"
     const val GEOIP_PRIVATE = "geoip:private"
@@ -160,9 +185,25 @@ object AppConfig {
     const val GEOIP_ONLY_CN_PRIVATE_DAT = "geoip-only-cn-private.dat"
     const val GEOIP_ONLY_CN_PRIVATE_URL = "$GITHUB_RAW_URL/Loyalsoldier/geoip/release/$GEOIP_ONLY_CN_PRIVATE_DAT"
 
+    /** Psiphon's signed server list, as its client downloads it: shipped by every build and kept beside the geo files. */
+    const val PSIPHON_SERVERS_DAT = "psiphon_servers.dat"
+    const val PSIPHON_SERVERS_URL = "https://s3.amazonaws.com//psiphon/web/mjr4-p23r-puwl/server_list_compressed"
+
+    /** When the bundled list was published, as the build recorded it from the download: seconds since the epoch. */
+    const val PSIPHON_SERVERS_STAMP = "psiphon_servers.stamp"
+
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
+    const val PORT_AETHER_SOCKS = "10819"
+
+    /** Matixray: where the Aether core asks for the ECH key, and the domain whose key it takes, unless a profile names others. */
+    const val AETHER_ECH_DNS = "udp://1.1.1.1"
+    const val AETHER_ECH_DOMAIN = "cloudflare-ech.com"
+
+    /** Matixray: where the Aether core sends the calls to the WARP API, which register and enroll the keys, unless told otherwise. */
+    const val AETHER_ENROLL_ADDRESS = "api.cloudflareclient.com"
+
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
@@ -171,7 +212,7 @@ object AppConfig {
 
     /** Shared defaults for settings shown in the UI and consumed by config generation. */
     const val DEFAULT_SOCKS_ENABLE_UDP = true
-    const val DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD = "1"
+    const val DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD = "0"
     const val DEFAULT_VPN_BYPASS_LAN = "1"
     const val DEFAULT_HEV_TUNNEL_LOGLEVEL = "warn"
     const val DEFAULT_MUX_XUDP_CONCURRENCY = "8"
@@ -184,6 +225,9 @@ object AppConfig {
     const val MSG_STATE_START = 3
     const val MSG_STATE_START_SUCCESS = 31
     const val MSG_STATE_START_FAILURE = 32
+
+    /** The service is up but the selected profile cannot carry traffic yet; content is the localized reason. */
+    const val MSG_STATE_CONNECTING = 33
     const val MSG_STATE_STOP = 4
     const val MSG_STATE_STOP_SUCCESS = 41
     const val MSG_STATE_RESTART = 5
@@ -198,6 +242,18 @@ object AppConfig {
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
+
+    /**
+     * Ends the test phase of the subscription updates that run or wait: their tests stop and they start no more,
+     * while their downloads go on. Sent on [BROADCAST_ACTION_SUBSCRIPTION].
+     */
+    const val MSG_SUB_UPDATE_CANCEL_TEST = 82
+
+    /**
+     * Servers, subscriptions or test results changed away from the main screen, which reloads them;
+     * content is the ID of the subscription, or empty for several.
+     */
+    const val MSG_SERVERS_CHANGED = 9
 
     /** Notification channel IDs and names. */
     // Use a new ID because Android does not let an app raise an existing channel's importance.
@@ -219,6 +275,7 @@ object AppConfig {
     const val HYSTERIA2 = "hysteria2://"
     const val HY2 = "hy2://"
     const val V2RAYNFMTS = "v2rayn://"
+    const val AETHER = "aether://"
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"
@@ -271,8 +328,10 @@ object AppConfig {
 
     const val DEFAULT_PORT = 443
     const val DEFAULT_SECURITY = "auto"
-    const val DEFAULT_LEVEL = 8
     const val DEFAULT_NETWORK = "tcp"
+
+    /** Xray's default targetStrategy; a profile stores null for it and its outbound carries none. */
+    const val TARGET_STRATEGY_AS_IS = "AsIs"
     const val TLS = "tls"
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
@@ -340,9 +399,9 @@ object AppConfig {
     )
 
     val GEO_FILES_SOURCES = arrayListOf(
+        "Chocolate4U/Iran-v2ray-rules",
         "Loyalsoldier/v2ray-rules-dat",
-        "runetfreedom/russia-v2ray-rules-dat",
-        "Chocolate4U/Iran-v2ray-rules"
+        "runetfreedom/russia-v2ray-rules-dat"
     )
 
     val BUILTIN_OUTBOUND_TAGS = setOf(

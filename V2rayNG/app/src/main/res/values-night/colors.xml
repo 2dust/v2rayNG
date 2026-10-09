@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matixray palette (night): violet-black canvas, violet brand, soft lavender-white text -->
+    <color name="xf_background">#07041a</color>
+    <color name="xf_card">#0f0a2e</color>
+    <color name="xf_purple">#6b4dff</color>
+    <color name="xf_text_main">#f4f1ff</color>
+    <color name="xf_text_sub">#a79fd8</color>
+    <color name="xf_text_muted">#6f6a9e</color>
+    <color name="xf_border">#336b4dff</color>
+    <color name="xf_progress_track">#17113f</color>
+</resources>

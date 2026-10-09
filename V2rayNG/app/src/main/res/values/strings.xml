@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">Add a profile in the app before using this feature.</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG service</string>
+    <string name="notification_channel_service">Matixray service</string>
     <string name="notification_channel_subscription_updates">Subscription updates</string>
     <string name="notification_channel_connection_checks">Connection checks</string>
     <string name="notification_action_stop_v2ray">Stop</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">Cipher Suites</string>
+    <string name="toast_cipher_suites_need_unsafe">cipherSuites only apply with the unsafe fingerprint. Choose unsafe, or clear cipherSuites.</string>
+    <string name="toast_websocket_alpn_http1_only">WebSocket and HTTPUpgrade connect only with alpn http/1.1 or none. Choose http/1.1, or leave alpn empty.</string>
     <string name="server_lab_allow_insecure">allowInsecure</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">address</string>
@@ -131,7 +134,20 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="preset_replace_title">Replace the %1$s?</string>
+    <string name="preset_replace_message">The current %1$s is not on the list and will be lost. Replace it with %2$s?</string>
+    <string name="preset_action_replace">Replace</string>
+    <string name="preset_default">default</string>
+    <string name="acc_choose_preset">Choose a ready-made %1$s</string>
+    <string name="preset_setting_final_mask" translatable="false">finalMask</string>
+    <string name="preset_setting_cipher_suites" translatable="false">cipherSuites</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
+    <string name="server_lab_target_strategy" translatable="false">targetStrategy</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">echOutbound raw JSON, format: { OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">echOutbound requires echConfigList</string>
+    <string name="toast_ech_outbound_invalid_tag">echOutbound needs a \"tag\" that is not empty, not direct or block, and does not start with proxy</string>
+    <string name="toast_ech_outbound_tag_conflict">The tag \"%1$s\" of echOutbound is already used by another outbound</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer certificate by name</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
     <string name="server_lab_browser_dialer">Enable Browser Dialer</string>
@@ -252,6 +268,7 @@
     <string name="toast_warning_pref_proxysharing_short">Allow connections from the LAN. Make sure you are in a trusted network</string>
 
     <string name="title_pref_socks_port">Local proxy port</string>
+    <string name="title_pref_aether_listen_port">Aether listen port</string>
     <string name="title_pref_enable_local_proxy">Enable local proxy</string>
     <string name="summary_pref_enable_local_proxy">When disabled, no SOCKS proxy is available, so subscription updates and similar actions cannot use the proxy</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +351,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Request Headers (JSON format)</string>
     <string name="sub_setting_filter">Remarks filter (regular expression)</string>
+    <string name="sub_setting_override_address">Override address</string>
+    <string name="sub_setting_override_port">Override port</string>
+    <string name="sub_setting_override_tip">Leave empty to keep the value from the subscription</string>
     <string name="sub_setting_enable">Enable update</string>
     <string name="sub_auto_update">Enable automatic update</string>
     <string name="sub_allow_insecure_url">Allow insecure HTTP address</string>
@@ -343,6 +363,7 @@
     <string name="sub_setting_entry_proxy_tip">The selected proxy is added before every profile in this subscription as the entry link in the proxy chain for that profile.</string>
     <string name="sub_setting_exit_proxy_tip">The selected proxy is added after every profile in this subscription as the exit link in the proxy chain for that profile.</string>
     <string name="toast_invalid_update_interval">Invalid update interval. Minimum is 15 minutes.</string>
+    <string name="toast_invalid_override_port">Invalid override port. Use a value from 1 to 65535.</string>
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
     <string name="title_real_ping_all_server">Test real delays</string>
@@ -411,12 +432,6 @@
 
     <string name="import_subscription_success">Subscription imported successfully</string>
     <string name="import_subscription_failure">Import subscription failed</string>
-    <string name="title_fragment_settings">Fragment Settings</string>
-    <string name="title_pref_fragment_packets">Fragment Packets</string>
-    <string name="title_pref_fragment_length">Fragment Length (min-max)</string>
-    <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
-    <string name="title_pref_fragment_enabled">Enable Fragment</string>
-    <string name="title_pref_fragment_maxsplit">Fragment Max Split</string>
     <string name="title_observatory_settings">Observatory Settings</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing Interval</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad Interval</string>
@@ -425,6 +440,8 @@
     <string name="title_pref_observatory_least_load_timeout">leastLoad Timeout</string>
     <string name="toast_invalid_observatory_duration">Invalid duration. Use a value like 3m or 30s.</string>
     <string name="toast_invalid_observatory_sampling">Invalid sampling. Use a positive number.</string>
+    <string name="toast_invalid_aether_listen_port">Use a port from 1024 to 65532 for the Aether listen port</string>
+    <string name="toast_aether_listen_port_local_proxy">The Aether listen port and the three ports after it cannot include the local proxy port</string>
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>
@@ -444,7 +461,6 @@
     <string name="server_proxy_chain_member_unselected">Select a member</string>
     <string name="server_proxy_chain_members_unselected">Please select a member for each chain row</string>
     <string name="server_proxy_chain_members_insufficient">Insufficient members</string>
-    <string name="server_proxy_chain_members_invalid">Invalid chain members: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Backup &amp; Restore</string>
@@ -560,5 +576,207 @@
     <string name="tasker_blurb_stop">Stop %1$s</string>
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
+    <string name="aether_lab_protocol">Protocol</string>
+    <string name="aether_lab_transport">Transport</string>
+    <string name="aether_lab_masque_sni">MASQUE SNI</string>
+    <string name="aether_lab_scan_mode">Scan mode</string>
+    <string name="aether_lab_obfuscation">Obfuscation</string>
+    <string name="aether_lab_ip_version">IP version</string>
+    <string name="aether_lab_exit_final_mask">exit-node finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="aether_lab_exit_dial_mode" translatable="false">exit-node dialMode</string>
+    <string name="aether_lab_exit_node" translatable="false">exit-node</string>
+    <string name="aether_exit_node_freedom">freedom (default)</string>
+    <string name="label_numbered">%1$s (%2$d)</string>
+    <string name="aether_hint_exit_node">The core dials out through this profile\'s outbound, as through a hop of a proxy chain; finalMask and dialMode below are for freedom only</string>
+    <string name="aether_exit_node_unusable">The exit-node profile \"%1$s\" gives no outbound; choose another one, or freedom</string>
+    <string name="aether_exit_node_ech_unusable">The echOutbound of the exit-node profile \"%1$s\" cannot be used; fix it in that profile, or choose another one, or freedom</string>
+    <string name="toast_profile_name_not_found">No profile named \"%1$s\" was found</string>
+    <string name="toast_profile_name_duplicate">Two profiles named \"%1$s\" were found; please rename one</string>
+    <string name="toast_profile_no_server">Profile \"%1$s\" has no server address, so a proxy chain cannot go through it</string>
+    <string name="toast_profile_group_not_fallback">\"%1$s\" is a policy group, and a policy group cannot be a fallback outbound; choose another profile</string>
+    <string name="toast_profile_group_not_hop">\"%1$s\" is a policy group, so a proxy chain cannot go through it; choose another profile</string>
+    <string name="toast_profile_chain_not_hop">\"%1$s\" is a proxy chain, so another proxy chain cannot go through it; choose another profile</string>
+    <string name="toast_profile_custom_not_hop">\"%1$s\" is a custom configuration, so a proxy chain cannot go through it; choose another profile</string>
+    <string name="toast_profile_custom_not_fallback">\"%1$s\" is a custom configuration, and a custom configuration cannot be a fallback outbound; choose another profile</string>
+    <string name="aether_keys_hint_fragment">Sends the ClientHello of the calls to the WARP API in pieces, for networks that filter the name of the API</string>
+    <string name="aether_lab_fragment">Fragment ClientHello</string>
+    <string name="aether_lab_fragment_size">Fragment size (bytes)</string>
+    <string name="aether_lab_fragment_delay">Fragment delay (ms)</string>
+    <string name="aether_hint_fragment_size" translatable="false">8-16</string>
+    <string name="aether_hint_fragment_delay" translatable="false">2-10</string>
+    <string name="aether_lab_wiw_outer">Outer hop</string>
+    <string name="aether_lab_wiw_inner">Inner hop</string>
+    <string name="aether_hint_endpoint">Leave blank to scan</string>
+    <string name="aether_hint_gool_peer">Leave blank for the endpoint WARP assigns</string>
+    <string name="aether_action_scan">Scan for an endpoint</string>
+    <string name="aether_action_scanning">Scanning…</string>
+    <string name="aether_scan_success">Endpoint found</string>
+    <string name="aether_scan_failed">No endpoint found</string>
+    <string name="aether_invalid_endpoint">Use an IP address and a port, or leave the address empty to scan</string>
+    <string name="aether_invalid_hop">Write an address and a port, such as 162.159.192.1:2408</string>
+    <string name="aether_same_hop">The two hops must be different addresses</string>
+    <string name="aether_invalid_fragment">Use a number or a range such as 16-32: size 1–4096 bytes, delay 0–1000 ms</string>
+    <string name="aether_listen_port_taken">The core cannot listen on the local proxy port of the app, nor on the port three above the Aether listen port; change the Aether listen port in the settings, or the ports of the command</string>
+    <string name="aether_secondary_port_taken">An inbound of this configuration already listens on %1$d, the port three above the Aether listen port, which the Aether core dials out through; change the Aether listen port in the settings</string>
+    <string name="aether_lab_psiphon">Psiphon</string>
+    <string name="aether_lab_psiphon_mode">Psiphon connection</string>
+    <string name="aether_lab_psiphon_cdn_ips">CDN fronting IPs</string>
+    <string name="aether_lab_psiphon_cdn_sni">CDN fronting server names</string>
+    <string name="aether_hint_psiphon_list">Comma-separated; leave blank for the built-in list</string>
+    <string name="aether_lab_psiphon_region">Exit country</string>
+    <string name="aether_psiphon_region_any">Any country</string>
+    <string name="aether_lab_psiphon_bundled_list">Start from the bundled server list</string>
+    <string name="aether_hint_psiphon_bundled_list">On: Psiphon dials the servers in psiphon_servers.dat at once and fetches a fresh list only when they fail. Off: it fetches a fresh list before its first connection, so the list must be reachable, as it is behind WARP</string>
+    <string name="aether_action_clear_psiphon">Clear Psiphon data</string>
+    <string name="aether_hint_clear_psiphon">Forgets the servers Psiphon has learned and the lists it fetched. Its next start begins from the bundled list again, or from a fresh download when the switch above is off</string>
+    <string name="aether_log_psiphon_cleared">Psiphon data cleared</string>
+    <string name="aether_log_psiphon_clear_failed">Psiphon data could not be cleared</string>
+    <string name="aether_psiphon_clear_blocked">Disconnect the Aether profile before clearing Psiphon data; the running connection uses it</string>
+    <string name="aether_psiphon_unavailable">This build does not include the Psiphon client, so a profile with Psiphon cannot connect</string>
+    <string name="aether_psiphon_needs_masque">Psiphon → WARP works with the MASQUE protocol only</string>
+    <string name="aether_next_port_taken">With Tor or Psiphon in the path the core also uses the ports after the Aether listen port, and none of them can be the local proxy port of the app; change the Aether listen port in the settings</string>
+    <string name="aether_lab_tor">Tor</string>
+    <string name="aether_lab_tor_bridges">Bridges</string>
+    <string name="aether_lab_tor_bridge_lines">Bridge lines</string>
+    <string name="aether_hint_tor_bridge_lines">One per line, as in torrc: obfs4 1.2.3.4:443 FINGERPRINT cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">This build has no pluggable transports, so Tor bridges cannot be used; Tor connects only where it is not blocked</string>
+    <string name="aether_tor_needs_masque">Tor → WARP works with the MASQUE protocol only</string>
+    <string name="aether_tor_psiphon_conflict">Tor and Psiphon go together only with one inside the tunnel and the other around it</string>
+    <string name="aether_tor_bridges_missing">Write at least one bridge line, or choose another bridge setting</string>
+    <string name="aether_lab_ech">Encrypted Client Hello</string>
+    <string name="aether_hint_ech">Hides the server name of the MASQUE handshake; without a usable key, Aether does not connect</string>
+    <string name="aether_lab_ech_dns">ECH DNS</string>
+    <string name="aether_lab_ech_domain">ECH domain</string>
+    <string name="aether_invalid_ech_dns">The ECH DNS must be udp://IP, tcp://IP or the https:// address of a DNS-over-HTTPS server</string>
+    <string name="aether_invalid_ech_domain">The ECH domain must be a domain name, such as cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">The MASQUE SNI must be a domain name, such as www.cloudflare.com</string>
+    <string name="aether_lab_dns">DNS inside the tunnel</string>
+    <string name="aether_hint_dns">Comma-separated; leave blank for 1.1.1.1 and 1.0.0.1</string>
+    <string name="aether_invalid_dns">Write resolver addresses such as 1.1.1.1 or 10.0.0.1:5353, separated by commas</string>
+    <string name="aether_lab_exit_loc">Exit location</string>
+    <string name="aether_hint_exit_loc">DE,SE allows only those; !IR,RU refuses those; blank accepts any</string>
+    <string name="aether_invalid_exit_loc">Write two-letter country codes separated by commas, with a leading ! to refuse them</string>
+    <string name="aether_lab_tor_relays">Bridge sources</string>
+    <string name="aether_lab_other_settings">Other settings</string>
+    <string name="aether_lab_command">Aether command</string>
+    <string name="aether_command_custom">Edited by hand: this command runs as written, and the settings above are not applied, except for Xray-core settings</string>
+    <string name="aether_action_use_settings">Use the settings</string>
+    <string name="aether_invalid_command">The command has to name arguments for the Aether core, with the port it listens on after --bind</string>
+    <string name="aether_unsupported_abi">The Aether core is not available for this device</string>
+    <string name="aether_core_stopped">The Aether core stopped running</string>
+    <string name="aether_core_stopped_no_ech_key">The Aether core stopped: ECH is on, but no usable ECH key was found. Without one, the server name would have gone out in the clear.</string>
+    <string name="aether_core_connecting">The Aether core is still connecting</string>
+    <string name="menu_item_import_config_manually_aether">Add Aether config manually</string>
+    <string name="aether_action_renew_key">Get new WARP keys…</string>
+    <string name="aether_action_renewing_key">Getting new WARP keys…</string>
+    <string name="aether_log_title">Log</string>
+    <string name="aether_log_empty">Scan results and the WARP key status appear here</string>
+    <string name="aether_log_scan_started">Scanning for an endpoint…</string>
+    <string name="aether_log_scan_found">Found %1$s</string>
+    <string name="aether_log_scan_found_hops">Found outer hop %1$s and inner hop %2$s</string>
+    <string name="aether_log_scan_cancelled">Scan cancelled</string>
+    <string name="aether_log_key_renewing">Registering new WARP keys; the keys in use stay in place until all the new ones are ready…</string>
+    <string name="aether_log_key_renewed">The new WARP keys are in place and are used from the next connection</string>
+    <string name="aether_log_key_renew_failed">Registering the new WARP keys failed; the current keys were kept</string>
+    <string name="aether_log_key_renew_cancelled">Getting new WARP keys cancelled</string>
+    <string name="aether_log_masque_key_ready">MASQUE key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">MASQUE key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_wireguard_key_ready">WireGuard key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">WireGuard key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_outer_key_ready">Outer hop key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">Outer hop key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_inner_key_ready">Inner hop key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">Inner hop key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_wireguard_inner_key_ready">WireGuard inner hop key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">WireGuard inner hop key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_masque_inner_key_ready">MASQUE inner hop key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">MASQUE inner hop key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_log_gool_key_ready">WireGuard over MASQUE key: device %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">WireGuard over MASQUE key: none yet; one is registered on the first scan or connection</string>
+    <string name="aether_renew_blocked">Disconnect the Aether profile before getting these keys; the running connection uses them</string>
+    <string name="aether_action_get_keys">Get new WARP keys</string>
+    <string name="aether_keys_lab_kind">Get new keys for</string>
+    <string name="aether_keys_kind_all">All</string>
+    <string name="aether_keys_lab_enroll_address">API address</string>
+    <string name="aether_keys_hint_ech">Hides the server name of the calls to the WARP API; without a usable ECH key, no WARP key is requested</string>
+    <string name="aether_lab_fingerprint">Fingerprint</string>
+    <string name="aether_keys_invalid_enroll_address">The API address must be an IP address or a domain name, with or without a port, such as 188.114.97.6:443 or [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">The command has to register keys: --register followed by all, wg, masque, mim, gool-classic (WARP-in-WARP) or gool (WireGuard over MASQUE)</string>
+    <string name="aether_keys_log_empty">The core\'s output and the WARP keys appear here</string>
+    <string name="aether_scan_blocked">Disconnect the Aether profile before scanning; a scan would open a second tunnel on the running connection\'s key</string>
+    <string name="aether_keys_missing">You don\'t have the required WARP key; please get it first</string>
+    <string name="aether_action_save_anyway">Save anyway</string>
+    <string name="aether_action_scan_anyway">Scan anyway</string>
+    <string name="aether_chain_one_profile">A proxy chain can have only one Aether profile</string>
+    <string name="aether_exit_node_name_taken">A profile named exit-node is used by routing here, and exit-node is the name of the outbound the Aether core dials out by; rename that profile</string>
+    <string name="aether_chain_hop_missing">The hop the Aether profile of this proxy chain dials out through could not be built, and the Aether core would reach the internet without it</string>
+    <string name="config_main_outbound_missing">The selected profile could not be built, and all traffic would reach the internet directly without it; check its settings</string>
+    <string name="config_routing_target_unbuilt">The profile \"%1$s\", which a routing rule sends traffic to, could not be built; fix it, or turn off the rules that use it</string>
+    <string name="config_group_fallback_unbuilt">The profile \"%1$s\", which a policy group falls back to, could not be built; fix it, or choose another fallback outbound for the group</string>
+    <string name="aether_config_single_profile">A configuration can use only one Aether profile</string>
+    <string name="aether_config_two_exits">One Aether core would have to dial out two ways here: the same tunnel is used on its own and behind a proxy chain\'s hop, behind two different hops, or with two different exit-node settings</string>
+    <string name="aether_custom_no_outbound">No SOCKS outbound of the configuration dials %1$s:%2$d, where the Aether command listens</string>
+    <string name="aether_custom_exit_node_selected">A balancer or an observatory of this configuration picks the outbounds whose tags start with %1$s, which would include exit-node, the outbound the Aether core dials out by; change that selector</string>
+    <string name="aether_custom_invalid_command">aetherCommand has to be the command line of the Aether core, as text, with the address it listens on after --bind: %1$s</string>
+    <string name="title_aether_core">Aether core</string>
+    <string name="summary_aether_core">WARP client by CluvexStudio, bundled under the AGPL-3.0 license. Tap to open its source code.</string>
+    <string-array name="aether_scan_entries">
+        <item>Turbo</item>
+        <item>Balanced</item>
+        <item>Thorough</item>
+        <item>Verified</item>
+        <item>Ironclad</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>Off</item>
+        <item>WARP → Psiphon</item>
+        <item>Psiphon → WARP</item>
+        <item>Psiphon only</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">CDN edge lists to scan</string>
+    <string name="aether_hint_psiphon_cdn_sets">Which of the edge lists built into Psiphon the fronting scan tries. None checked means all of them; beside IPs of your own they are tried after those</string>
+    <string name="aether_psiphon_cdn_sets_all">All lists built into Psiphon</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai (Psiphon list)</item>
+        <item>Bunny (Psiphon list)</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>Curated fronting edges</item>
+        <item>Legacy Android overrides</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>Automatic</item>
+        <item>CDN fronting only</item>
+        <item>Direct only</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>Off</item>
+        <item>WARP → Tor</item>
+        <item>Tor → WARP</item>
+        <item>Tor only</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>When Tor is blocked</item>
+        <item>From the start</item>
+        <item>Never</item>
+        <item>My own bridge lines</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb and public relays</item>
+        <item>Public relays only</item>
+        <item>bridgedb only</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>Automatic</item>
+        <item>Off</item>
+        <item>Light</item>
+        <item>Firewall</item>
+        <item>Balanced</item>
+        <item>GFW</item>
+        <item>Aggressive</item>
+    </string-array>
 
 </resources>

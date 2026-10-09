@@ -76,12 +76,15 @@ object UpdateCheckerManager {
     }
 
     private fun compareVersions(version1: String, version2: String): Int {
-        val v1 = version1.split(".")
-        val v2 = version2.split(".")
+        // Compare all numeric segments so suffixed tags like "2.3.2-P1" work:
+        // "2.3.2-P1" -> [2,3,2,1], "2.3.2" -> [2,3,2], "2.3.2-P2" > "2.3.2-P1" > "2.3.2"
+        val numberRegex = Regex("\\d+")
+        val v1 = numberRegex.findAll(version1).map { it.value.toInt() }.toList()
+        val v2 = numberRegex.findAll(version2).map { it.value.toInt() }.toList()
 
         for (i in 0 until maxOf(v1.size, v2.size)) {
-            val num1 = if (i < v1.size) v1[i].toInt() else 0
-            val num2 = if (i < v2.size) v2[i].toInt() else 0
+            val num1 = v1.getOrElse(i) { 0 }
+            val num2 = v2.getOrElse(i) { 0 }
             if (num1 != num2) return num1 - num2
         }
         return 0

@@ -1,7 +1,9 @@
 package com.v2ray.ang.ui.main
 
+import com.v2ray.ang.core.AetherCore
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
@@ -38,9 +40,13 @@ internal fun buildServerRowUiModel(
     )
 }
 
-private fun serverProtocolDescription(profile: ProfileItem): String {
+internal fun serverProtocolDescription(profile: ProfileItem): String {
     if (profile.configType.isComplexType()) return profile.configType.name
     val parts = mutableListOf(profile.configType.name)
+    if (profile.configType == EConfigType.AETHER) {
+        // The tunnel from the outside in, so a profile that runs Psiphon or Tor alone is not named after a WARP protocol it never opens.
+        parts.add(AetherCore.of(profile).path.joinToString(" → "))
+    }
     profile.network?.let { network ->
         if (network.isNotBlank() && !network.equals("tcp", ignoreCase = true)) {
             parts.add(network)

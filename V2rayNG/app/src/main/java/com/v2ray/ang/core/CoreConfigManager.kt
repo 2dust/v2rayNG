@@ -5,6 +5,7 @@ import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConfigResult
 import com.v2ray.ang.dto.CoreConfigContext
 import com.v2ray.ang.dto.V2rayConfig
@@ -40,9 +41,19 @@ object CoreConfigManager {
                     errorMessage = "Failed to build config context"
                 )
             if (configContext.isCustom) {
-                return buildV2rayCustomConfig(configContext)
+                return buildV2rayCustomConfig(configContext, routeAether = true)
             }
-            return toConfigResult(configContext, buildUnifiedConfig(configContext))
+            val dependency = AetherDependency.of(configContext.resolvedOutbounds)
+            aetherFailure(context, guid, dependency)?.let { return it }
+            if (takesExitNodeName(dependency, configContext.resolvedOutbounds)) return exitNodeNameFailure(context, guid)
+            val v2rayConfig = buildUnifiedConfig(configContext)
+            // Matixray: what the Aether core sends out leaves through Xray.
+            val secondaryPort = AetherCoreManager.secondarySocksPort
+            val core = (dependency as? AetherDependency.Single)?.core?.let {
+                if (lacksChainHop(it, v2rayConfig.outbounds)) return chainHopFailure(context, guid)
+                routeAetherThroughXray(v2rayConfig, it, secondaryPort) ?: return secondaryPortFailure(context, guid, secondaryPort)
+            }
+            return toConfigResult(context, configContext, v2rayConfig, core)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config", e)
             return ConfigResult(
@@ -56,7 +67,8 @@ object CoreConfigManager {
     /**
      * Build a lightweight configuration for latency testing.
      *
-     * The core flow is reused, then non-essential sections are removed.
+     * The core flow is reused, then non-essential sections are removed. A configuration that runs
+     * on an Aether core dials it where it listens, whether the session's or a test's runs there.
      */
     fun getV2rayConfig4Speedtest(context: Context, guid: String): ConfigResult {
         try {
@@ -69,10 +81,19 @@ object CoreConfigManager {
             if (configContext.isCustom) {
                 return buildV2rayCustomConfig(configContext)
             }
+            // Only the primary outbound is measured; the routing outbounds lose their rules below.
+            val dependency = AetherDependency.of(configContext.resolvedOutbounds.take(1))
+            aetherFailure(context, guid, dependency)?.let { return it }
+            if (takesExitNodeName(dependency, configContext.resolvedOutbounds)) return exitNodeNameFailure(context, guid)
             val v2rayConfig = buildUnifiedConfig(configContext)
             postProcessForSpeedtest(v2rayConfig)
 
-            return toConfigResult(configContext, v2rayConfig)
+            // Not routed through an inbound of this configuration: a test's core of its own dials out through
+            // the exit of the process's Xray, see AetherCoreManager.exitConfiguration, and the session's core,
+            // which a test may measure through, through the session's inbound.
+            val core = (dependency as? AetherDependency.Single)?.core
+            if (core != null && lacksChainHop(core, v2rayConfig.outbounds)) return chainHopFailure(context, guid)
+            return toConfigResult(context, configContext, v2rayConfig, core)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to get V2ray config for speedtest", e)
             return ConfigResult(
@@ -85,8 +106,15 @@ object CoreConfigManager {
 
     /**
      * Build configuration for custom profiles.
+     *
+     * A custom configuration asks for an Aether core with its command line as aetherCommand; the
+     * result names that core. With [routeAether], for the session and for an export, what the core
+     * sends out leaves through Xray, see [AetherDependency.routeThroughXray].
      */
-    private fun buildV2rayCustomConfig(configContext: CoreConfigContext): ConfigResult {
+    private fun buildV2rayCustomConfig(
+        configContext: CoreConfigContext,
+        routeAether: Boolean = false,
+    ): ConfigResult {
         val context = configContext.context
         val raw = MmkvManager.decodeServerRaw(configContext.guid)
             ?: return ConfigResult(
@@ -97,6 +125,12 @@ object CoreConfigManager {
         val result = ConfigResult(true, configContext.guid, raw)
 
         val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return result
+
+        val dependency = AetherDependency.ofCustom(json)
+        aetherFailure(context, configContext.guid, dependency)?.let { return it }
+        if (dependency is AetherDependency.Single) {
+            result.aetherCore = dependency.core
+        }
 
         // Inject or remove traffic statistics configuration based on user preference
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) == true) {
@@ -122,8 +156,23 @@ object CoreConfigManager {
             }
         }
 
+        // Last, so that the entries for the Aether core go after everything else the app adds.
+        fun serialized(): ConfigResult {
+            val core = result.aetherCore
+            if (routeAether && core != null) {
+                val secondaryPort = AetherCoreManager.secondarySocksPort
+                when (val routing = AetherDependency.routeThroughXray(json, core, secondaryPort)) {
+                    is AetherDependency.Routing.Routed -> result.aetherCore = routing.core
+                    AetherDependency.Routing.PortTaken -> return secondaryPortFailure(context, configContext.guid, secondaryPort)
+                    is AetherDependency.Routing.ExitNodeSelected ->
+                        return exitNodeSelectorFailure(context, configContext.guid, routing.selector)
+                }
+            }
+            return JsonUtil.toJsonPretty(json)?.let { result.copy(content = it) } ?: result
+        }
+
         if (!needTun()) {
-            return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, configContext.guid, it) } ?: result
+            return serialized()
         }
 
         // Check whether package names need to be replaced with UIDs
@@ -158,11 +207,31 @@ object CoreConfigManager {
             val templateConfig = initV2rayConfig(configContext)
             templateConfig.inbounds.firstOrNull { it.tag == "tun" }?.let { inboundTun ->
                 inboundTun.settings?.mtu = SettingsManager.getVpnMtu()
+                // The injected inbound must be able to map the fake IPs of a fakedns config back
+                // to domains; the user's own inbounds are left as written
+                if (hasFakeDnsServer(json)) {
+                    inboundTun.sniffing?.destOverride?.let { if ("fakedns" !in it) it.add("fakedns") }
+                }
                 inboundsJson.add(JsonUtil.parseString(JsonUtil.toJson(inboundTun)))
             }
         }
 
-        return JsonUtil.toJsonPretty(json)?.let { ConfigResult(true, configContext.guid, it) } ?: result
+        return serialized()
+    }
+
+    /**
+     * Check whether the DNS servers of a custom config include fakedns, written either as the
+     * plain "fakedns" string or as a server object whose address is "fakedns".
+     */
+    private fun hasFakeDnsServer(json: JsonObject): Boolean {
+        val servers = json.get("dns")?.takeIf { it.isJsonObject }?.asJsonObject
+            ?.get("servers")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?: return false
+        return servers.any { server ->
+            val address = if (server.isJsonObject) server.asJsonObject.get("address") else server
+            address != null && address.isJsonPrimitive && address.asJsonPrimitive.isString
+                    && address.asString == "fakedns"
+        }
     }
 
     /**
@@ -203,7 +272,6 @@ object CoreConfigManager {
 
         // User routing rules (policyGroupBalancerTags rewrites TAG_PROXY→balancer when main is POLICYGROUP).
         configureRouting(configContext, v2rayConfig, policyGroupBalancerTags)
-        configureFakeDns(v2rayConfig)
         configureDns(configContext, v2rayConfig, policyGroupBalancerTags)
         configureLocalDns(configContext, v2rayConfig)
         configureRootModeDns(v2rayConfig)
@@ -306,6 +374,11 @@ object CoreConfigManager {
 
     /**
      * Build and insert a multi-hop chain entry.
+     *
+     * Matixray: an Aether hop dials through no hop by its outbound, which only reaches the core on the
+     * loopback address; the core dials out through the hop after it instead, whose outbound, as built
+     * here, becomes the core's exit-node by its tag alone, see [routeAetherThroughXray]. A second chain
+     * whose Aether hop dials out through the same hops leaves its own copy of that hop under its tag.
      */
     private fun handleProxyChainResolvedOutbound(
         resolvedOutbound: CoreConfigContext.ResolvedOutbound,
@@ -313,9 +386,9 @@ object CoreConfigManager {
         existingTags: MutableSet<String>,
         v2rayConfig: V2rayConfig,
     ) {
-        val chainOutbounds = resolvedOutbound.resolvedProfiles
-            .mapNotNull { convertProfile2Outbound(it) }
-            .toMutableList()
+        val chain = resolvedOutbound.resolvedProfiles
+            .mapNotNull { profile -> convertProfile2Outbound(profile)?.let { profile to it } }
+        val chainOutbounds = chain.map { it.second }.toMutableList()
         if (chainOutbounds.isEmpty()) {
             LogUtil.w(AppConfig.TAG, "PROXYCHAIN resolved outbound '${resolvedOutbound.tag}' has no valid profiles, skipping")
             return
@@ -332,9 +405,13 @@ object CoreConfigManager {
             return
         }
 
+        val aetherHop = chain.indexOfFirst { it.first.configType == EConfigType.AETHER }
+        val exitNodeTaken = AppConfig.TAG_EXIT_NODE in existingTags
         val chainTags = chainOutbounds.mapIndexed { index, _ ->
             if (index == 0) {
                 resolvedOutbound.tag
+            } else if (aetherHop >= 0 && index == aetherHop + 1 && !exitNodeTaken) {
+                AppConfig.TAG_EXIT_NODE
             } else {
                 "${AppConfig.TAG_PROXY}-${resolvedOutbound.tag}-$index"
             }
@@ -351,6 +428,7 @@ object CoreConfigManager {
             outbound.tag = chainTags[index]
         }
         for (i in 0 until chainOutbounds.size - 1) {
+            if (i == aetherHop) continue
             chainOutbounds[i].ensureSockopt().dialerProxy = chainOutbounds[i + 1].tag
         }
 
@@ -413,7 +491,13 @@ object CoreConfigManager {
             "${AppConfig.TAG_BALANCER_PRE}-${resolvedOutbound.tag}"
         }
         val strategyType = BalancerStrategyType.from(resolvedOutbound.profile.policyGroupType)
-        val fallbackTag = resolvePolicyGroupFallbackTag(strategyType, resolvedOutbound.profile, membersToAdd.first().tag)
+        val fallbackTag = if (strategyType.supportsObservatory && resolvedOutbound.profile.policyGroupTestOutbounds != false) {
+            resolvedOutbound.profile.policyGroupFallbackTag
+                ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
+            // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
+            // without this default, an enabled empty field creates no observatory.
+                ?: membersToAdd.first().tag
+        } else null
         val strategy = buildBalancerStrategy(
             strategyType = strategyType,
             selector = listOf(memberTagPrefix),
@@ -428,27 +512,6 @@ object CoreConfigManager {
         balancerStrategies.add(strategy)
         policyGroupBalancerTags[resolvedOutbound.tag] = balancerTag
     }
-
-    internal fun resolvePolicyGroupFallbackTag(
-        strategyType: BalancerStrategyType,
-        profile: ProfileItem,
-        firstMemberTag: String,
-    ): String? {
-        if (strategyType.requiresObservatory || strategyType.requiresBurstObservatory) {
-            // Missing or failed probes must not let a matched rule use Xray's default outbound.
-            return firstMemberTag
-        }
-        return if (strategyType.supportsObservatory && profile.policyGroupTestOutbounds != false) {
-            profile.policyGroupFallbackTag
-                ?.takeIf { it.isNotEmpty() && it != AppConfig.TAG_PROXY }
-            // Xray excludes dead random/roundRobin candidates only when fallbackTag is set;
-            // without this default, an enabled empty field creates no observatory.
-                ?: firstMemberTag
-        } else null
-    }
-
-    internal fun shouldUseStandardObservatory(strategyType: BalancerStrategyType, fallbackTag: String?): Boolean =
-        strategyType.requiresObservatory || (strategyType.supportsObservatory && fallbackTag != null)
 
     /**
      * Trim runtime sections that are not needed for latency testing.
@@ -465,14 +528,160 @@ object CoreConfigManager {
     }
 
     /**
-     * Serialize a runtime configuration into a standard result object.
+     * Serialize a runtime configuration into a standard result object. The Aether core it runs on
+     * is written into it as aetherCommand, so that the exported configuration runs again as a custom
+     * one.
+     * The ECH outbounds of its profiles are linked and appended as it is serialized; one that cannot be
+     * used fails it with a message from [context] meant for the screen.
      */
-    private fun toConfigResult(configContext: CoreConfigContext, v2rayConfig: V2rayConfig): ConfigResult {
+    private fun toConfigResult(
+        context: Context,
+        configContext: CoreConfigContext,
+        v2rayConfig: V2rayConfig,
+        core: AetherCore?,
+    ): ConfigResult {
+        v2rayConfig.aetherCommand = core?.command
+        // Matixray: the ECH outbounds of the profiles get their tags and go after every other outbound, as written
+        val content = when (val serialized = EchOutbound.serialize(v2rayConfig)) {
+            is EchOutbound.Result.Done -> serialized.content
+            is EchOutbound.Result.Invalid -> return echOutboundFailure(configContext.guid, serialized, when (serialized.error) {
+                EchOutbound.Error.INVALID_JSON ->
+                    context.getString(R.string.toast_malformed_json_detail, context.getString(R.string.server_lab_ech_outbound))
+                EchOutbound.Error.NEEDS_ECH_CONFIG_LIST -> context.getString(R.string.toast_ech_outbound_needs_ech_config_list)
+                EchOutbound.Error.INVALID_TAG -> context.getString(R.string.toast_ech_outbound_invalid_tag)
+            })
+            is EchOutbound.Result.TagConflict -> return echOutboundFailure(
+                configContext.guid,
+                serialized,
+                context.getString(R.string.toast_ech_outbound_tag_conflict, serialized.tag),
+            )
+        }
         return ConfigResult(
             status = true,
             guid = configContext.guid,
-            content = JsonUtil.toJsonPretty(v2rayConfig) ?: ""
+            content = content,
+            aetherCore = core,
         )
+    }
+
+    /**
+     * Matixray: has what the Aether [core] sends out leave through Xray: the secondary-socks inbound on
+     * [port], three above the Aether listen port, after the other inbounds, with no sniffing; the
+     * exit-node of the core, after the other outbounds, unless a hop of a chain the core dials out
+     * through is the exit-node already, see [handleProxyChainResolvedOutbound]: a freedom outbound
+     * with its profile's finalMask and dialMode; and a rule ahead of every other that sends what comes
+     * in on that inbound out by that outbound. Returns the core told to dial out through the inbound,
+     * or null, with nothing added, when an inbound of the configuration listens on [port] already. A
+     * core that names an upstream of its own, as a profile's hand-written command may, is left as it is.
+     */
+    internal fun routeAetherThroughXray(v2rayConfig: V2rayConfig, core: AetherCore, port: Int): AetherCore? {
+        if (core.hasUpstream) return core
+        if (v2rayConfig.inbounds.any { it.port == port }) return null
+        v2rayConfig.inbounds.add(
+            V2rayConfig.InboundBean(
+                tag = AppConfig.TAG_SECONDARY_SOCKS,
+                port = port,
+                protocol = "mixed",
+                listen = AppConfig.LOOPBACK,
+                settings = V2rayConfig.InboundBean.InSettingsBean(udp = true),
+            )
+        )
+        if (v2rayConfig.outbounds.none { it.tag == AppConfig.TAG_EXIT_NODE }) {
+            v2rayConfig.outbounds.add(CoreOutboundBuilder.toOutboundAetherExit(core.exit))
+        }
+        v2rayConfig.routing.rules.add(
+            0,
+            V2rayConfig.RoutingBean.RulesBean(
+                inboundTag = listOf(AppConfig.TAG_SECONDARY_SOCKS),
+                outboundTag = AppConfig.TAG_EXIT_NODE,
+            )
+        )
+        return core.through(port)
+    }
+
+    /** Matixray: a configuration with an inbound of its own on the secondary-socks [port], as a failure whose message is meant for the screen. */
+    private fun secondaryPortFailure(context: Context, guid: String, port: Int): ConfigResult {
+        LogUtil.w(AppConfig.TAG, "An inbound of the configuration listens on the Aether secondary SOCKS port $port, guid=$guid")
+        return ConfigResult(
+            status = false,
+            guid = guid,
+            errorMessage = context.getString(R.string.aether_secondary_port_taken, port),
+            localizedError = true,
+        )
+    }
+
+    /**
+     * Matixray: true when a configuration on an Aether core, [dependency], has among [outbounds] a routing
+     * target or a fallback named exit-node, an outbound tag of its own. That tag is the one the core
+     * dials out by: the core would take that profile for its exit-node, or dial into itself.
+     */
+    internal fun takesExitNodeName(dependency: AetherDependency, outbounds: List<CoreConfigContext.ResolvedOutbound>): Boolean =
+        dependency is AetherDependency.Single && outbounds.any { it.tag == AppConfig.TAG_EXIT_NODE }
+
+    /** Matixray: see [takesExitNodeName], as a failure whose message is meant for the screen. */
+    private fun exitNodeNameFailure(context: Context, guid: String): ConfigResult {
+        LogUtil.w(AppConfig.TAG, "A routing target or a fallback is named ${AppConfig.TAG_EXIT_NODE}, the tag of the Aether exit-node, guid=$guid")
+        return ConfigResult(
+            status = false,
+            guid = guid,
+            errorMessage = context.getString(R.string.aether_exit_node_name_taken),
+            localizedError = true,
+        )
+    }
+
+    /**
+     * Matixray: true when [core] dials out through a hop of its proxy chain, but [outbounds] have no
+     * exit-node: the hop could not be built, and the core would reach WARP without it.
+     */
+    internal fun lacksChainHop(core: AetherCore, outbounds: List<V2rayConfig.OutboundBean>): Boolean =
+        core.exit.hops != null && outbounds.none { it.tag == AppConfig.TAG_EXIT_NODE }
+
+    /** Matixray: see [lacksChainHop], as a failure whose message is meant for the screen. */
+    private fun chainHopFailure(context: Context, guid: String): ConfigResult {
+        LogUtil.w(AppConfig.TAG, "The chain hop the Aether core dials out through could not be built, guid=$guid")
+        return ConfigResult(
+            status = false,
+            guid = guid,
+            errorMessage = context.getString(R.string.aether_chain_hop_missing),
+            localizedError = true,
+        )
+    }
+
+    /**
+     * Matixray: a custom configuration with a balancer or an observatory that would pick the exit-node by
+     * [selector], see [AetherDependency.routeThroughXray], as a failure whose message is meant for the screen.
+     */
+    private fun exitNodeSelectorFailure(context: Context, guid: String, selector: String): ConfigResult {
+        LogUtil.w(AppConfig.TAG, "A balancer or an observatory of the custom configuration would pick the Aether exit-node, guid=$guid")
+        return ConfigResult(
+            status = false,
+            guid = guid,
+            errorMessage = context.getString(R.string.aether_custom_exit_node_selected, selector),
+            localizedError = true,
+        )
+    }
+
+    /** Matixray: a configuration whose ECH outbound cannot be used, as a failure whose message is meant for the screen. */
+    private fun echOutboundFailure(guid: String, result: EchOutbound.Result, message: String): ConfigResult {
+        LogUtil.w(AppConfig.TAG, "ECH outbound cannot be used: $result, guid=$guid")
+        return ConfigResult(status = false, guid = guid, errorMessage = message, localizedError = true)
+    }
+
+    /**
+     * A configuration the one Aether core cannot serve, as a failure whose message is a resource
+     * string meant for the screen; null when the configuration is fine.
+     */
+    private fun aetherFailure(context: Context, guid: String, dependency: AetherDependency): ConfigResult? {
+        val message = when (dependency) {
+            AetherDependency.None, is AetherDependency.Single -> return null
+            AetherDependency.Conflicting -> context.getString(R.string.aether_config_single_profile)
+            AetherDependency.TwoExits -> context.getString(R.string.aether_config_two_exits)
+            is AetherDependency.TwoAetherHops -> context.getString(R.string.aether_chain_one_profile)
+            is AetherDependency.UnusableCommand -> context.getString(R.string.aether_custom_invalid_command, dependency.written)
+            is AetherDependency.NoOutbound -> context.getString(R.string.aether_custom_no_outbound, AppConfig.LOOPBACK, dependency.port)
+        }
+        LogUtil.w(AppConfig.TAG, "Aether cannot serve this configuration: $dependency, guid=$guid")
+        return ConfigResult(status = false, guid = guid, errorMessage = message, localizedError = true)
     }
 
     /**
@@ -545,7 +754,7 @@ object CoreConfigManager {
             inbound1.settings?.auth = "noauth"
             inbound1.settings?.accounts = null
         }
-        val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
+        val fakedns = MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED, true)
         val sniffAllTlsAndHttp =
             MmkvManager.decodeSettingsBool(AppConfig.PREF_SNIFFING_ENABLED, true) != false
         inbound1.sniffing?.enabled = fakedns || sniffAllTlsAndHttp
@@ -577,17 +786,6 @@ object CoreConfigManager {
             val inboundTun = v2rayConfig.inbounds.firstOrNull { e -> e.tag == "tun" }
             inboundTun?.settings?.mtu = SettingsManager.getVpnMtu()
             inboundTun?.sniffing = inbound1.sniffing
-        }
-    }
-
-    /**
-     * Enable fake DNS when local DNS and fake DNS are both enabled.
-     */
-    private fun configureFakeDns(v2rayConfig: V2rayConfig) {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) == true
-            && MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true
-        ) {
-            v2rayConfig.fakedns = listOf(V2rayConfig.FakednsBean())
         }
     }
 
@@ -633,11 +831,11 @@ object CoreConfigManager {
      * Configure local DNS inbounds, outbounds, and routing rules.
      */
     private fun configureLocalDns(configContext: CoreConfigContext, v2rayConfig: V2rayConfig) {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED) != true) {
+        if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_LOCAL_DNS_ENABLED, true)) {
             return
         }
 
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED) == true) {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FAKE_DNS_ENABLED, true)) {
             val geositeCn = arrayListOf(AppConfig.GEOSITE_CN)
             val routingDomains = configContext.routingDomainRules
                 .asSequence()
@@ -647,6 +845,7 @@ object CoreConfigManager {
                 .distinct()
             val finalDomain = geositeCn + routingDomains
             // fakedns with all domains to make it always top priority
+            // Matixray: no "fakedns" block, so Xray-core applies its default fake IP pools
             v2rayConfig.dns?.servers?.add(
                 0,
                 V2rayConfig.DnsBean.ServersBean(
@@ -683,7 +882,7 @@ object CoreConfigManager {
                 V2rayConfig.OutboundBean(
                     protocol = "dns",
                     tag = "dns-out",
-                    settings = null,
+                    settings = V2rayConfig.OutboundBean.OutSettingsBean(userLevel = 12),
                     streamSettings = null,
                     mux = null
                 )
@@ -716,7 +915,7 @@ object CoreConfigManager {
                 V2rayConfig.OutboundBean(
                     protocol = "dns",
                     tag = "dns-out",
-                    settings = null,
+                    settings = V2rayConfig.OutboundBean.OutSettingsBean(userLevel = 12),
                     streamSettings = null,
                     mux = null
                 )
@@ -907,8 +1106,10 @@ object CoreConfigManager {
             enableParallelQuery = if ((domesticDns.size + remoteDns.size) > 2) true else null
         )
 
+        // DNS routing, inserted at the top so user rules cannot hijack DNS module queries
+        val dnsRouteRules = mutableListOf<V2rayConfig.RoutingBean.RulesBean>()
         if (domesticDnsTags.isNotEmpty()) {
-            v2rayConfig.routing.rules.add(
+            dnsRouteRules.add(
                 V2rayConfig.RoutingBean.RulesBean(
                     outboundTag = AppConfig.TAG_DIRECT,
                     inboundTag = ArrayList(domesticDnsTags),
@@ -919,7 +1120,7 @@ object CoreConfigManager {
 
         val dnsProxyBalancerTag = policyGroupBalancerTags[AppConfig.TAG_PROXY]
         if (dnsProxyBalancerTag != null) {
-            v2rayConfig.routing.rules.add(
+            dnsRouteRules.add(
                 V2rayConfig.RoutingBean.RulesBean(
                     balancerTag = dnsProxyBalancerTag,
                     inboundTag = arrayListOf(AppConfig.TAG_DNS),
@@ -927,7 +1128,7 @@ object CoreConfigManager {
                 )
             )
         } else {
-            v2rayConfig.routing.rules.add(
+            dnsRouteRules.add(
                 V2rayConfig.RoutingBean.RulesBean(
                     outboundTag = AppConfig.TAG_PROXY,
                     inboundTag = arrayListOf(AppConfig.TAG_DNS),
@@ -935,6 +1136,7 @@ object CoreConfigManager {
                 )
             )
         }
+        v2rayConfig.routing.rules.addAll(0, dnsRouteRules)
     }
 
     private fun buildDnsHostsFromRoutingRules(configContext: CoreConfigContext): MutableMap<String, Any> {
@@ -1017,6 +1219,7 @@ object CoreConfigManager {
                     domains = cnDomains,
                     expectIPs = geoipCn,
                     skipFallback = true,
+                    finalQuery = true,
                     tag = cnDomesticDnsTag
                 )
             )
@@ -1042,6 +1245,7 @@ object CoreConfigManager {
                                 address = address,
                                 domains = rule.domain,
                                 skipFallback = true,
+                                finalQuery = true,
                                 tag = tag
                             )
                         )
@@ -1264,7 +1468,7 @@ object CoreConfigManager {
             fallbackTag = fallbackTag,
             strategy = V2rayConfig.RoutingBean.StrategyObject(type = strategyType.policyGroupType)
         )
-        val observatory = if (shouldUseStandardObservatory(strategyType, fallbackTag)) {
+        val observatory = if (strategyType.requiresObservatory || fallbackTag != null) {
             V2rayConfig.ObservatoryObject(
                 subjectSelector = selector,
                 probeUrl = probeUrl,

@@ -2,7 +2,6 @@ package com.v2ray.ang.handler
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.os.Build
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -11,6 +10,8 @@ import com.v2ray.ang.AppConfig.GEOIP_PRIVATE
 import com.v2ray.ang.AppConfig.GEOSITE_PRIVATE
 import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
+import com.v2ray.ang.core.AetherCoreManager
+import com.v2ray.ang.core.PsiphonServerList
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -52,7 +53,7 @@ object SettingsManager {
     private fun initRoutingRulesets(context: Context) {
         val exist = MmkvManager.decodeRoutingRulesets()
         if (exist.isNullOrEmpty()) {
-            val rulesetList = getPresetRoutingRulesets(context)
+            val rulesetList = getPresetRoutingRulesets(context, RoutingType.WHITE_IRAN)
             MmkvManager.encodeRoutingRulesets(rulesetList)
         }
     }
@@ -291,6 +292,24 @@ object SettingsManager {
         return getSocksPort() + if (Utils.isXray()) 0 else 1
     }
 
+    /**
+     * The loopback ports the local proxy is set to listen on, which nothing else the app starts can
+     * share. Empty while the SOCKS port is picked at random on every start: no port is known before
+     * the service runs then, and asking for one here would pick one for this process only.
+     */
+    fun getLocalProxyPorts(): Set<Int> {
+        return if (IsDynamicSocksPort()) emptySet() else setOf(getSocksPort(), getHttpPort())
+    }
+
+    /**
+     * Matixray: the loopback port every Aether core listens on, whatever its profile, as every profile
+     * shares the local proxy port; the app runs one core at a time. The three ports after it go to
+     * Tor and Psiphon and to the inbound the core dials out through. A value that is no such port
+     * gives way to the default, see AetherCoreManager.listenPortOf.
+     */
+    fun getAetherListenPort(): Int =
+        AetherCoreManager.listenPortOf(MmkvManager.decodeSettingsString(AppConfig.PREF_AETHER_LISTEN_PORT))
+
     private fun IsDynamicSocksPort(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_SOCKS_PORT, false)
     }
@@ -309,9 +328,20 @@ object SettingsManager {
 
         try {
             val geo = arrayOf(AppConfig.GEOSITE_DAT, AppConfig.GEOIP_DAT, AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT)
+            // The bundled Psiphon list is the newest the build could fetch. It goes over the copy only when it
+            // was published after the copy was made, never over a file the user picked, and the copy takes the
+            // list's publication time so that the next build is compared with the list, not with the copy.
+            val publishedAt = PsiphonServerList.publishedAt(
+                runCatching { assets.open(AppConfig.PSIPHON_SERVERS_STAMP).use { it.bufferedReader().readText() } }.getOrNull()
+            )
+            // "file" is the address the Asset files screen saves for a file the user picked.
+            val keptByUser = MmkvManager.decodeAssetUrls().any { it.assetUrl.remarks == AppConfig.PSIPHON_SERVERS_DAT && it.assetUrl.url == "file" }
             assets.list("")
-                ?.filter { geo.contains(it) }
-                ?.filter { !File(extFolder, it).exists() }
+                ?.filter { geo.contains(it) || it == AppConfig.PSIPHON_SERVERS_DAT }
+                ?.filter { name ->
+                    val copy = File(extFolder, name)
+                    if (name == AppConfig.PSIPHON_SERVERS_DAT) PsiphonServerList.bundledListGoesOver(copy, publishedAt, keptByUser) else !copy.exists()
+                }
                 ?.forEach {
                     val target = File(extFolder, it)
                     assets.open(it).use { input ->
@@ -319,6 +349,7 @@ object SettingsManager {
                             input.copyTo(output)
                         }
                     }
+                    if (it == AppConfig.PSIPHON_SERVERS_DAT && publishedAt > 0) target.setLastModified(publishedAt)
                     LogUtil.i(AppConfig.TAG, "Copied from apk assets folder to ${target.absolutePath}")
                 }
         } catch (e: Exception) {
@@ -434,11 +465,6 @@ object SettingsManager {
      *  Check if process routing can be used.
      */
     fun canUseProcessRouting(): Boolean {
-        // Android 10+
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return false
-        }
-
         // Must xray tun
         if (isUsingHevTun()) {
             return false
@@ -461,6 +487,7 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
+        ensureDefaultValue(AppConfig.PREF_AETHER_LISTEN_PORT, AppConfig.PORT_AETHER_SOCKS)
         ensureDefaultValue(AppConfig.PREF_REMOTE_DNS, AppConfig.DNS_PROXY)
         ensureDefaultValue(AppConfig.PREF_DOMESTIC_DNS, AppConfig.DNS_DIRECT)
         ensureDefaultValue(AppConfig.PREF_DELAY_TEST_URL, AppConfig.DELAY_TEST_URL)

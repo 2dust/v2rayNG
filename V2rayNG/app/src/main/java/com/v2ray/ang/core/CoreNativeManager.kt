@@ -72,14 +72,56 @@ object CoreNativeManager {
      *
      * @param config The configuration JSON string
      * @param testUrl The URL to test against
-     * @return Delay in milliseconds, or -1 if test failed
+     * @param batch The batch of the measurement, which [cancelOutboundDelays] ends at once
+     * @return Delay in milliseconds, or -1 if test failed or its batch was cancelled
      */
-    fun measureOutboundDelay(config: String, testUrl: String): Long {
+    fun measureOutboundDelay(config: String, testUrl: String, batch: String): Long {
         return try {
-            Libv2ray.measureOutboundDelay(config, testUrl)
+            Libv2ray.measureOutboundDelayInBatch(batch, config, testUrl)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to measure outbound delay", e)
             -1L
+        }
+    }
+
+    /**
+     * End the measurements of a batch at once: the running ones return -1, and so do those that start later.
+     *
+     * @param batch The batch of the measurements
+     */
+    fun cancelOutboundDelays(batch: String) {
+        try {
+            Libv2ray.cancelOutboundDelays(batch)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to cancel outbound delays", e)
+        }
+    }
+
+    /**
+     * Matixray: opens the exit of this process's Xray and returns the port of its inbound: a mixed inbound
+     * on the loopback address, which stays, with its routing rule, while the instance runs. Its exit-node
+     * is the outbound tagged exit-node of [configuration], the JSON of an Xray configuration, and comes
+     * with the outbounds it dials through; of the rest only the log counts, should the exit start the
+     * instance. The Aether core of a scan, a key renewal or a latency test dials out through it, one at
+     * a time. The exit is part of the instance that the process measures delays in, since a second
+     * instance would take the dialer of the process from the measurements. Each successful call must be
+     * followed by [closeExit].
+     *
+     * @throws Exception when the exit does not open, or another core holds it
+     */
+    fun openExit(context: Context, configuration: String): Int {
+        initCoreEnv(context)
+        return Libv2ray.openExit(configuration).toInt()
+    }
+
+    /**
+     * Close the exit [openExit] opened: its exit-node goes, with the outbounds it dials through.
+     */
+    fun closeExit() {
+        try {
+            Libv2ray.closeExit()
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to close the exit", e)
         }
     }
 

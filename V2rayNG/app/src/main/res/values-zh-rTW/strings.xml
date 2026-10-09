@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
     <string name="app_widget_name">開關</string>
     <string name="app_tile_name">開關</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG 服務</string>
+    <string name="notification_channel_service">Matixray 服務</string>
     <string name="notification_channel_subscription_updates">訂閱更新</string>
     <string name="notification_channel_connection_checks">連線檢查</string>
     <string name="notification_action_stop_v2ray">停止</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">加密套件 (Cipher Suites)</string>
+    <string name="toast_cipher_suites_need_unsafe">cipherSuites 僅在指紋為 unsafe 時生效。請選擇 unsafe，或清空 cipherSuites。</string>
+    <string name="toast_websocket_alpn_http1_only">WebSocket 和 HTTPUpgrade 僅在 alpn 為 http/1.1 或為空時才能連線。請選擇 http/1.1，或留空 alpn。</string>
     <string name="server_lab_allow_insecure">跳過憑證驗證 (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">伺服器位址</string>
@@ -131,7 +134,17 @@
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
+    <string name="preset_replace_title">取代 %1$s？</string>
+    <string name="preset_replace_message">目前的 %1$s 不在清單中，取代後將遺失。要取代為 %2$s 嗎？</string>
+    <string name="preset_action_replace">取代</string>
+    <string name="preset_default">預設</string>
+    <string name="acc_choose_preset">選擇現成的 %1$s</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">echOutbound 原始 JSON，格式：{ OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">echOutbound 需要填寫 echConfigList</string>
+    <string name="toast_ech_outbound_invalid_tag">echOutbound 必須包含非空的 \"tag\"，不能是 direct 或 block，且不能以 proxy 開頭</string>
+    <string name="toast_ech_outbound_tag_conflict">echOutbound 的 tag \"%1$s\" 已被其他出站使用</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
     <string name="server_lab_pinned_ca256">憑證指紋 (SHA-256)</string>
     <string name="server_lab_browser_dialer">啟用 Browser Dialer</string>
@@ -252,6 +265,7 @@
     <string name="toast_warning_pref_proxysharing_short">已允許來自區域網路的連線。請確認目前使用的是受信任的網路。</string>
 
     <string name="title_pref_socks_port">本機代理埠</string>
+    <string name="title_pref_aether_listen_port">Aether 監聽連接埠</string>
     <string name="title_pref_enable_local_proxy">啟用本機代理</string>
     <string name="summary_pref_enable_local_proxy">停用時不會提供 SOCKS 代理，因此訂閱更新等操作無法使用代理。</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +348,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">請求標頭（JSON 格式）</string>
     <string name="sub_setting_filter">備註篩選條件（正規表示式）</string>
+    <string name="sub_setting_override_address">覆蓋位址</string>
+    <string name="sub_setting_override_port">覆蓋埠</string>
+    <string name="sub_setting_override_tip">留空則保留訂閱中的值</string>
     <string name="sub_setting_enable">啟用更新</string>
     <string name="sub_auto_update">啟用自動更新</string>
     <string name="sub_allow_insecure_url">允許不安全的 HTTP 位址</string>
@@ -343,6 +360,7 @@
     <string name="sub_setting_entry_proxy_tip">所選代理會加在此訂閱中每個設定檔之前，作為該設定檔代理鏈的入口節點。</string>
     <string name="sub_setting_exit_proxy_tip">所選代理會加在此訂閱中每個設定檔之後，作為該設定檔代理鏈的出口節點。</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
+    <string name="toast_invalid_override_port">覆蓋埠無效，請輸入 1 到 65535 之間的數字。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
     <string name="title_real_ping_all_server">測試真連接延遲</string>
@@ -409,12 +427,6 @@
 
     <string name="import_subscription_success">匯入訂閱成功</string>
     <string name="import_subscription_failure">匯入訂閱失敗</string>
-    <string name="title_fragment_settings">Fragment 設定</string>
-    <string name="title_pref_fragment_packets">要分割的封包</string>
-    <string name="title_pref_fragment_length">分段長度（最小值-最大值）</string>
-    <string name="title_pref_fragment_interval">分段間隔（最小值-最大值）</string>
-    <string name="title_pref_fragment_enabled">啟用 Fragment</string>
-    <string name="title_pref_fragment_maxsplit">Fragment 最大分段數</string>
     <string name="title_observatory_settings">連線觀測設定 (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing 探測間隔</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad 探測間隔</string>
@@ -423,6 +435,8 @@
     <string name="title_pref_observatory_least_load_timeout">leastLoad 探測逾時</string>
     <string name="toast_invalid_observatory_duration">期間無效。請使用 3m 或 30s 之類的值。</string>
     <string name="toast_invalid_observatory_sampling">取樣數量無效。請使用正數。</string>
+    <string name="toast_invalid_aether_listen_port">Aether 監聽連接埠請使用 1024 到 65532 之間的連接埠</string>
+    <string name="toast_aether_listen_port_local_proxy">Aether 監聽連接埠及其後的三個連接埠不能包含本機代理連接埠</string>
 
     <string name="update_check_for_update">檢查更新</string>
     <string name="update_already_latest_version">目前已是最新版本</string>
@@ -442,7 +456,6 @@
     <string name="server_proxy_chain_member_unselected">請選擇成員</string>
     <string name="server_proxy_chain_members_unselected">請為代理鏈中的每一列選擇成員</string>
     <string name="server_proxy_chain_members_insufficient">成員數量不足</string>
-    <string name="server_proxy_chain_members_invalid">無效的代理鏈成員：%1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">備份與還原</string>
@@ -558,5 +571,203 @@
     <string name="tasker_blurb_stop">停止 %1$s</string>
     <string name="connection_test_empty_message">沒有詳細資訊</string>
     <string name="value_unknown">未知</string>
+    <string name="aether_lab_protocol">協定</string>
+    <string name="aether_lab_transport">傳輸</string>
+    <string name="aether_lab_masque_sni">MASQUE 伺服器名稱 (SNI)</string>
+    <string name="aether_lab_scan_mode">掃描模式</string>
+    <string name="aether_lab_obfuscation">混淆</string>
+    <string name="aether_lab_ip_version">IP 版本</string>
+    <string name="aether_lab_exit_final_mask">exit-node 的 finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
+    <string name="aether_exit_node_freedom">freedom（預設）</string>
+    <string name="label_numbered">%1$s（%2$d）</string>
+    <string name="aether_hint_exit_node">核心經由此設定檔的出站向外連線，如同經由代理鏈的一跳；下方的 finalMask 和 dialMode 只用於 freedom</string>
+    <string name="aether_exit_node_unusable">exit-node 設定檔「%1$s」無法產生出站；請另選一個，或選擇 freedom</string>
+    <string name="aether_exit_node_ech_unusable">exit-node 設定檔「%1$s」的 echOutbound 無法使用；請在該設定檔中修正，或另選一個，或選擇 freedom</string>
+    <string name="toast_profile_name_not_found">找不到名為「%1$s」的設定檔</string>
+    <string name="toast_profile_name_duplicate">找到兩個名為「%1$s」的設定檔；請重新命名其中一個</string>
+    <string name="toast_profile_no_server">設定檔「%1$s」沒有伺服器位址，代理鏈無法經過它</string>
+    <string name="toast_profile_group_not_fallback">「%1$s」是策略群組，策略群組不能作為備用出站；請選擇其他設定檔</string>
+    <string name="toast_profile_group_not_hop">「%1$s」是策略群組，代理鏈無法經過它；請選擇其他設定檔</string>
+    <string name="toast_profile_chain_not_hop">「%1$s」是代理鏈，其他代理鏈無法經過它；請選擇其他設定檔</string>
+    <string name="toast_profile_custom_not_hop">「%1$s」是自訂設定，代理鏈無法經過它；請選擇其他設定檔</string>
+    <string name="toast_profile_custom_not_fallback">「%1$s」是自訂設定，自訂設定不能作為備用出站；請選擇其他設定檔</string>
+    <string name="aether_keys_hint_fragment">將 WARP API 請求的 ClientHello 分片傳送，用於會過濾 API 名稱的網路</string>
+    <string name="aether_lab_fragment">分片 ClientHello</string>
+    <string name="aether_lab_fragment_size">分片大小（位元組）</string>
+    <string name="aether_lab_fragment_delay">分片間隔（毫秒）</string>
+    <string name="aether_lab_wiw_outer">外層節點</string>
+    <string name="aether_lab_wiw_inner">內層節點</string>
+    <string name="aether_hint_endpoint">留空則自動掃描</string>
+    <string name="aether_hint_gool_peer">留空則使用 WARP 指派的端點</string>
+    <string name="aether_action_scan">掃描伺服器</string>
+    <string name="aether_action_scanning">掃描中…</string>
+    <string name="aether_scan_success">已找到伺服器</string>
+    <string name="aether_scan_failed">未找到伺服器</string>
+    <string name="aether_invalid_endpoint">請填寫 IP 位址和連接埠，或將位址留空以自動掃描</string>
+    <string name="aether_invalid_hop">請填寫位址和連接埠，例如 162.159.192.1:2408</string>
+    <string name="aether_same_hop">兩個節點的位址必須不同</string>
+    <string name="aether_invalid_fragment">請填寫數字或範圍，例如 16-32：大小 1–4096 位元組，間隔 0–1000 毫秒</string>
+    <string name="aether_listen_port_taken">核心不能監聽應用程式的本機代理埠，也不能監聽比 Aether 監聽連接埠大 3 的連接埠；請在設定中變更 Aether 監聽連接埠，或變更命令中的連接埠</string>
+    <string name="aether_secondary_port_taken">此設定的某個入站已在 %1$d 上監聽，而這是比 Aether 監聽連接埠大 3 的連接埠，Aether 核心經由它向外連線；請在設定中變更 Aether 監聽連接埠</string>
+    <string name="aether_lab_psiphon">Psiphon</string>
+    <string name="aether_lab_psiphon_mode">Psiphon 連線方式</string>
+    <string name="aether_lab_psiphon_cdn_ips">CDN 前置 IP</string>
+    <string name="aether_lab_psiphon_cdn_sni">CDN 前置伺服器名稱 (SNI)</string>
+    <string name="aether_hint_psiphon_list">以逗號分隔；留空使用內建清單</string>
+    <string name="aether_lab_psiphon_region">出口國家/地區</string>
+    <string name="aether_psiphon_region_any">任意國家/地區</string>
+    <string name="aether_lab_psiphon_bundled_list">從內建伺服器清單開始</string>
+    <string name="aether_hint_psiphon_bundled_list">開啟：Psiphon 立即嘗試 psiphon_servers.dat 中的伺服器，僅在它們失敗時才取得新清單。關閉：在首次連線前先取得新清單，因此清單必須可存取，例如透過 WARP</string>
+    <string name="aether_action_clear_psiphon">清除 Psiphon 資料</string>
+    <string name="aether_hint_clear_psiphon">忘記 Psiphon 已學到的伺服器及其取得的清單。下次啟動將重新從內建清單開始；若上方開關關閉，則從新下載開始</string>
+    <string name="aether_log_psiphon_cleared">已清除 Psiphon 資料</string>
+    <string name="aether_log_psiphon_clear_failed">無法清除 Psiphon 資料</string>
+    <string name="aether_psiphon_clear_blocked">清除 Psiphon 資料前請先中斷 Aether 設定檔；目前的連線正在使用它</string>
+    <string name="aether_psiphon_unavailable">此版本未包含 Psiphon 用戶端，使用 Psiphon 的設定檔無法連線</string>
+    <string name="aether_psiphon_needs_masque">Psiphon → WARP 僅支援 MASQUE 協定</string>
+    <string name="aether_next_port_taken">使用 Tor 或 Psiphon 時，核心還會使用 Aether 監聽連接埠之後的連接埠，它們都不能是應用程式的本機代理連接埠；請在設定中變更 Aether 監聽連接埠</string>
+    <string name="aether_lab_tor">Tor</string>
+    <string name="aether_lab_tor_bridges">橋接</string>
+    <string name="aether_lab_tor_bridge_lines">橋接行</string>
+    <string name="aether_hint_tor_bridge_lines">每行一條，格式同 torrc：obfs4 1.2.3.4:443 指紋 cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">此版本未包含可插拔傳輸，無法使用 Tor 橋接；Tor 只能在未被封鎖的網路上連線</string>
+    <string name="aether_tor_needs_masque">Tor → WARP 僅支援 MASQUE 協定</string>
+    <string name="aether_tor_psiphon_conflict">Tor 與 Psiphon 只能以一個在通道內、一個在通道外的方式搭配使用</string>
+    <string name="aether_tor_bridges_missing">請至少填寫一條橋接行，或選擇其他橋接設定</string>
+    <string name="aether_lab_ech">加密用戶端問候（ECH）</string>
+    <string name="aether_hint_ech">隱藏 MASQUE 交握中的伺服器名稱；沒有可用的金鑰時 Aether 不會連線</string>
+    <string name="aether_lab_ech_dns">ECH DNS</string>
+    <string name="aether_lab_ech_domain">ECH 網域</string>
+    <string name="aether_invalid_ech_dns">ECH DNS 必須是 udp://IP、tcp://IP 或 DNS-over-HTTPS 伺服器的 https:// 位址</string>
+    <string name="aether_invalid_ech_domain">ECH 網域必須是網域名稱，例如 cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">MASQUE 伺服器名稱 (SNI) 必須是網域名稱，例如 www.cloudflare.com</string>
+    <string name="aether_lab_dns">通道內 DNS</string>
+    <string name="aether_hint_dns">以逗號分隔；留空則使用 1.1.1.1 和 1.0.0.1</string>
+    <string name="aether_invalid_dns">請填寫解析器位址，例如 1.1.1.1 或 10.0.0.1:5353，以逗號分隔</string>
+    <string name="aether_lab_exit_loc">出口地區</string>
+    <string name="aether_hint_exit_loc">DE,SE 表示只允許這些；!IR,RU 表示拒絕這些；留空則接受任意</string>
+    <string name="aether_invalid_exit_loc">請填寫以逗號分隔的兩位國家代碼，前加 ! 表示拒絕</string>
+    <string name="aether_lab_tor_relays">橋接來源</string>
+    <string name="aether_lab_other_settings">其他設定</string>
+    <string name="aether_lab_command">Aether 命令</string>
+    <string name="aether_command_custom">已手動編輯：此命令按原樣執行，上方的設定不再生效（Xray-core 的設定除外）</string>
+    <string name="aether_action_use_settings">使用上方設定</string>
+    <string name="aether_invalid_command">命令必須包含 Aether 核心的參數，並在 --bind 後給出監聽連接埠</string>
+    <string name="aether_unsupported_abi">此裝置不支援 Aether 核心</string>
+    <string name="aether_core_stopped">Aether 核心已停止執行</string>
+    <string name="aether_core_stopped_no_ech_key">Aether 核心已停止：ECH 已開啟，但找不到可用的 ECH 金鑰。沒有金鑰，伺服器名稱就會以明文傳送。</string>
+    <string name="aether_core_connecting">Aether 核心仍在連線中</string>
+    <string name="menu_item_import_config_manually_aether">手動新增 Aether 設定</string>
+    <string name="aether_action_renew_key">取得新的 WARP 金鑰…</string>
+    <string name="aether_action_renewing_key">正在取得新的 WARP 金鑰…</string>
+    <string name="aether_log_title">記錄</string>
+    <string name="aether_log_empty">掃描結果和 WARP 金鑰狀態會顯示在這裡</string>
+    <string name="aether_log_scan_started">正在掃描伺服器…</string>
+    <string name="aether_log_scan_found">已找到 %1$s</string>
+    <string name="aether_log_scan_found_hops">已找到外層節點 %1$s 和內層節點 %2$s</string>
+    <string name="aether_log_scan_cancelled">已取消掃描</string>
+    <string name="aether_log_key_renewing">正在註冊新的 WARP 金鑰；在所有新金鑰就緒之前，使用中的金鑰保持不變…</string>
+    <string name="aether_log_key_renewed">新的 WARP 金鑰已替換就位，將在下次連線時使用</string>
+    <string name="aether_log_key_renew_failed">註冊新的 WARP 金鑰失敗，已保留目前的金鑰</string>
+    <string name="aether_log_key_renew_cancelled">已取消取得新的 WARP 金鑰</string>
+    <string name="aether_log_masque_key_ready">MASQUE 金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">MASQUE 金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_wireguard_key_ready">WireGuard 金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">WireGuard 金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_outer_key_ready">外層節點金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">外層節點金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_inner_key_ready">內層節點金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">內層節點金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_wireguard_inner_key_ready">WireGuard 內層節點金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">WireGuard 內層節點金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_masque_inner_key_ready">MASQUE 內層節點金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">MASQUE 內層節點金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_log_gool_key_ready">WireGuard over MASQUE 金鑰：裝置 %1$s，IPv4 %2$s，IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">WireGuard over MASQUE 金鑰：尚未註冊，將在首次掃描或連線時註冊</string>
+    <string name="aether_renew_blocked">請先中斷 Aether 連線，再取得這些金鑰；目前的連線正在使用它們</string>
+    <string name="aether_action_get_keys">取得新的 WARP 金鑰</string>
+    <string name="aether_keys_lab_kind">要取得新金鑰的協定</string>
+    <string name="aether_keys_kind_all">全部</string>
+    <string name="aether_keys_lab_enroll_address">API 位址</string>
+    <string name="aether_keys_hint_ech">隱藏 WARP API 請求中的伺服器名稱；沒有可用的 ECH 金鑰時不會請求 WARP 金鑰</string>
+    <string name="aether_lab_fingerprint">Fingerprint</string>
+    <string name="aether_keys_invalid_enroll_address">API 位址必須是 IP 位址或網域名稱，可帶連接埠，例如 188.114.97.6:443 或 [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">命令必須註冊金鑰：--register 後接 all、wg、masque、mim、gool-classic（WARP-in-WARP）或 gool（WireGuard over MASQUE）</string>
+    <string name="aether_keys_log_empty">核心輸出和 WARP 金鑰會顯示在這裡</string>
+    <string name="aether_scan_blocked">請先中斷 Aether 連線，再進行掃描；掃描會使用目前連線的金鑰開啟第二條隧道</string>
+    <string name="aether_keys_missing">缺少所需的 WARP 金鑰，請先取得</string>
+    <string name="aether_action_save_anyway">仍然儲存</string>
+    <string name="aether_action_scan_anyway">仍然掃描</string>
+    <string name="aether_chain_one_profile">一個代理鏈只能包含一個 Aether 設定檔</string>
+    <string name="aether_exit_node_name_taken">此處路由使用了名為 exit-node 的設定檔，而 exit-node 是 Aether 核心向外連線所經出站的名稱；請重新命名該設定檔</string>
+    <string name="aether_chain_hop_missing">無法建立此代理鏈中 Aether 設定檔向外連線所經的那一跳，Aether 核心將會不經它直接連線網際網路</string>
+    <string name="config_main_outbound_missing">無法建立所選設定檔，所有流量將會不經它直接連線網際網路；請檢查其設定</string>
+    <string name="config_routing_target_unbuilt">無法建立路由規則傳送流量所到的設定檔「%1$s」；請修正它，或停用使用它的規則</string>
+    <string name="config_group_fallback_unbuilt">無法建立策略群組的備用出站設定檔「%1$s」；請修正它，或為該策略群組選擇其他備用出站</string>
+    <string name="aether_config_single_profile">一個設定只能使用一個 Aether 設定檔</string>
+    <string name="aether_config_two_exits">這裡一個 Aether 核心將不得不以兩種方式向外連線：同一隧道既單獨使用又位於代理鏈的某一跳之後，或位於兩個不同的跳之後，或使用兩種不同的 exit-node 設定</string>
+    <string name="aether_custom_no_outbound">設定中沒有 SOCKS 出站連線到 %1$s:%2$d，而 Aether 命令在該處監聽</string>
+    <string name="aether_custom_exit_node_selected">此設定中的某個負載平衡器或觀測器會選取標籤以 %1$s 開頭的出站，其中也包括 exit-node，即 Aether 核心向外連線所經的出站；請修改該選擇器</string>
+    <string name="aether_custom_invalid_command">aetherCommand 必須是 Aether 核心的命令列文字，並在 --bind 後給出其監聽位址：%1$s</string>
+    <string name="title_aether_core">Aether 核心</string>
+    <string name="summary_aether_core">由 CluvexStudio 開發的 WARP 用戶端，以 AGPL-3.0 授權隨應用程式散佈。點按以檢視原始碼。</string>
+    <string-array name="aether_scan_entries">
+        <item>極速</item>
+        <item>均衡</item>
+        <item>全面</item>
+        <item>已驗證</item>
+        <item>可靠</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>關閉</item>
+        <item>WARP → Psiphon</item>
+        <item>Psiphon → WARP</item>
+        <item>僅 Psiphon</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">要掃描的 CDN 邊緣清單</string>
+    <string name="aether_hint_psiphon_cdn_sets">前置掃描嘗試 Psiphon 內建的哪些邊緣清單。都不勾選表示全部；與你自己的 IP 一起時，在這些 IP 之後嘗試</string>
+    <string name="aether_psiphon_cdn_sets_all">Psiphon 內建的全部清單</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai（Psiphon 清單）</item>
+        <item>Bunny（Psiphon 清單）</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>精選前置邊緣</item>
+        <item>舊版 Android 覆寫</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>自動</item>
+        <item>僅 CDN 前置</item>
+        <item>僅直連</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>關閉</item>
+        <item>WARP → Tor</item>
+        <item>Tor → WARP</item>
+        <item>僅 Tor</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>Tor 被封鎖時</item>
+        <item>一開始就使用</item>
+        <item>從不</item>
+        <item>使用我自己的橋接行</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb 與公共中繼</item>
+        <item>僅公共中繼</item>
+        <item>僅 bridgedb</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>自動</item>
+        <item>關閉</item>
+        <item>輕度</item>
+        <item>防火牆</item>
+        <item>均衡</item>
+        <item>GFW</item>
+        <item>積極</item>
+    </string-array>
 
 </resources>

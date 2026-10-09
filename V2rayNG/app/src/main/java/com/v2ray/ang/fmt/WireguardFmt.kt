@@ -35,6 +35,7 @@ object WireguardFmt : FmtBase() {
         config.remoteDNS = queryParam["dns"] ?: AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
         config.reserved = queryParam["reserved"] ?: "0,0,0"
         config.finalMask = (queryParam["fm"] ?: queryParam["finalmask"] ?: queryParam["finalMask"])?.nullIfBlank()
+        config.dialMode = queryParam["dialMode"]
 
         return config
     }
@@ -126,6 +127,7 @@ object WireguardFmt : FmtBase() {
             dicQuery["dns"] = config.remoteDNS.removeWhiteSpace().orEmpty()
         }
         config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
+        config.dialMode?.nullIfBlank()?.let { dicQuery["dialMode"] = it }
 
         return toUri(config, config.secretKey, dicQuery)
     }

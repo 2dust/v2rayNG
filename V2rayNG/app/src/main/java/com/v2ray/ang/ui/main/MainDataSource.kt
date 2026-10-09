@@ -57,6 +57,12 @@ interface MainDataSource : Closeable {
     fun share2Clipboard(guid: String): Boolean
 
     fun sendMsg2Service(msgId: Int, content: String)
+
+    /**
+     * Asks the service for its state. A running service answers through [mainServiceEvent] itself;
+     * when nothing acknowledges the question, [MainServiceEvent.StateNotRunning] is emitted instead.
+     */
+    fun queryServiceState()
     fun sendMsg2TestService(msg: TestServiceMessage, requestId: String? = null)
     fun cancelAllPing()
     fun testCurrentServerRealPing(requestId: String)

@@ -55,6 +55,7 @@ class MainRepository(
                 AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
                     safeIntent.getStringExtra("content")
                 )
+                AppConfig.MSG_STATE_CONNECTING -> MainServiceEvent.StateConnecting(safeIntent.getStringExtra("content").orEmpty())
 
                 AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
                 AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
@@ -73,6 +74,7 @@ class MainRepository(
                     requestId
                 )
                 AppConfig.MSG_MEASURE_CONFIG_CANCEL -> MainServiceEvent.MeasureConfigCancelled(requestId)
+                AppConfig.MSG_SERVERS_CHANGED -> MainServiceEvent.ServersChanged
 
                 else -> null
             }
@@ -219,9 +221,19 @@ class MainRepository(
         )
     }
 
+    override fun queryServiceState() {
+        // The daemon cannot report its own death, so what the screen shows is only as good as the last
+        // message. Only the daemon's receiver takes this broadcast: no acknowledgement means no service.
+        MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_REGISTER_CLIENT, "") { acknowledged ->
+            MainServiceEvent.forStateQuery(acknowledged)?.let { mainServiceEventChannel.trySend(it) }
+        }
+    }
+
     override fun testCurrentServerRealPing(requestId: String) {
         MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_MEASURE_DELAY, requestId) { handled ->
             if (!handled) mainServiceEventChannel.trySend(MainServiceEvent.MeasureDelayCancelled(requestId))
+            // Only the daemon takes this message as well, so a test nobody took found no service either.
+            MainServiceEvent.forStateQuery(handled)?.let { mainServiceEventChannel.trySend(it) }
         }
     }
 

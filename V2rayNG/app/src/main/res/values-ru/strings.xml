@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
-    <string name="app_widget_name">v2rayNG</string>
-    <string name="app_tile_name">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
+    <string name="app_widget_name">Matixray</string>
+    <string name="app_tile_name">Matixray</string>
     <string name="app_tile_first_use">Добавьте профиль в приложении перед использованием этой функции.</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Служба v2rayNG</string>
+    <string name="notification_channel_service">Служба Matixray</string>
     <string name="notification_channel_subscription_updates">Обновления подписок</string>
     <string name="notification_channel_connection_checks">Проверки соединения</string>
     <string name="notification_action_stop_v2ray">Остановить</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">Наборы шифров (Cipher Suites)</string>
+    <string name="toast_cipher_suites_need_unsafe">cipherSuites применяются только с отпечатком unsafe. Выберите unsafe или очистите cipherSuites.</string>
+    <string name="toast_websocket_alpn_http1_only">WebSocket и HTTPUpgrade подключаются только с alpn http/1.1 или без alpn. Выберите http/1.1 или оставьте alpn пустым.</string>
     <string name="server_lab_allow_insecure">Не проверять сертификат (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">Адрес</string>
@@ -131,7 +134,17 @@
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
+    <string name="preset_replace_title">Заменить %1$s?</string>
+    <string name="preset_replace_message">Текущее значение %1$s не из списка и будет потеряно. Заменить его на %2$s?</string>
+    <string name="preset_action_replace">Заменить</string>
+    <string name="preset_default">по умолчанию</string>
+    <string name="acc_choose_preset">Выбрать готовый %1$s</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">Необработанный JSON echOutbound, формат: { OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">Для echOutbound требуется echConfigList</string>
+    <string name="toast_ech_outbound_invalid_tag">У echOutbound должен быть непустой \"tag\", отличный от direct и block и не начинающийся с proxy</string>
+    <string name="toast_ech_outbound_tag_conflict">Тег \"%1$s\" в echOutbound уже используется другим outbound</string>
     <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Использовать Browser Dialer</string>
@@ -252,6 +265,7 @@
     <string name="toast_warning_pref_proxysharing_short">Доступ из LAN разрешён, убедитесь, что вы находитесь в доверенной сети</string>
 
     <string name="title_pref_socks_port">Порт локального прокси</string>
+    <string name="title_pref_aether_listen_port">Порт прослушивания Aether</string>
     <string name="title_pref_enable_local_proxy">Использовать локальный прокси</string>
     <string name="summary_pref_enable_local_proxy">Если отключено, SOCKS-прокси недоступен, поэтому обновления подписки и подобные действия не смогут использовать прокси</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +348,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">Заголовки запроса (формат JSON)</string>
     <string name="sub_setting_filter">Фильтр названий (регулярное выражение)</string>
+    <string name="sub_setting_override_address">Заменить адрес</string>
+    <string name="sub_setting_override_port">Заменить порт</string>
+    <string name="sub_setting_override_tip">Оставьте пустым, чтобы сохранить значение из подписки</string>
     <string name="sub_setting_enable">Использовать обновление</string>
     <string name="sub_auto_update">Использовать автообновление</string>
     <string name="sub_allow_insecure_url">Разрешать незащищённые HTTP-адреса</string>
@@ -343,6 +360,7 @@
     <string name="sub_setting_entry_proxy_tip">Выбранный прокси добавляется перед каждым профилем подписки и становится входным участником цепочки прокси для этого профиля.</string>
     <string name="sub_setting_exit_proxy_tip">Выбранный прокси добавляется после каждого профиля подписки и становится выходным участником цепочки прокси для этого профиля.</string>
     <string name="toast_invalid_update_interval">Неправильный интервал обновления. Минимум 15 минут.</string>
+    <string name="toast_invalid_override_port">Недопустимый порт замены. Укажите значение от 1 до 65535.</string>
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверить TCP-задержку</string>
     <string name="title_real_ping_all_server">Проверить реальную задержку</string>
@@ -415,12 +433,6 @@
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>
-    <string name="title_fragment_settings">Настройки фрагментирования</string>
-    <string name="title_pref_fragment_packets">Фрагментирование пакетов</string>
-    <string name="title_pref_fragment_length">Длина фрагмента (от — до)</string>
-    <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
-    <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
-    <string name="title_pref_fragment_maxsplit">Максимальное число фрагментов</string>
     <string name="title_observatory_settings">Настройки контроля соединений</string>
     <string name="title_pref_observatory_least_ping_interval">Интервал leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Интервал leastLoad</string>
@@ -429,6 +441,8 @@
     <string name="title_pref_observatory_least_load_timeout">Время ожидания leastLoad</string>
     <string name="toast_invalid_observatory_duration">Недопустимая длительность. Используйте значение вроде 3m или 30s.</string>
     <string name="toast_invalid_observatory_sampling">Недопустимый размер выборки. Используйте положительное число.</string>
+    <string name="toast_invalid_aether_listen_port">Укажите для порта прослушивания Aether порт от 1024 до 65532</string>
+    <string name="toast_aether_listen_port_local_proxy">Порт прослушивания Aether и три следующих за ним порта не могут включать порт локального прокси</string>
 
     <string name="update_check_for_update">Проверить обновление</string>
     <string name="update_already_latest_version">Установлена последняя версия</string>
@@ -448,7 +462,6 @@
     <string name="server_proxy_chain_member_unselected">Выбор участника</string>
     <string name="server_proxy_chain_members_unselected">Выберите участника для каждого звена цепочки</string>
     <string name="server_proxy_chain_members_insufficient">Недостаточно участников</string>
-    <string name="server_proxy_chain_members_invalid">Недопустимые участники цепочки: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Резервирование и восстановление</string>
@@ -564,5 +577,203 @@
     <string name="tasker_blurb_stop">Остановить %1$s</string>
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
+    <string name="aether_lab_protocol">Протокол</string>
+    <string name="aether_lab_transport">Транспорт</string>
+    <string name="aether_lab_masque_sni">Имя сервера MASQUE (SNI)</string>
+    <string name="aether_lab_scan_mode">Режим сканирования</string>
+    <string name="aether_lab_obfuscation">Обфускация</string>
+    <string name="aether_lab_ip_version">Версия IP</string>
+    <string name="aether_lab_exit_final_mask">Необработанный JSON finalMask для exit-node, формат: { FinalMaskObject }</string>
+    <string name="aether_exit_node_freedom">freedom (по умолчанию)</string>
+    <string name="label_numbered">%1$s (%2$d)</string>
+    <string name="aether_hint_exit_node">Ядро выходит наружу через исходящее соединение этого профиля, как через звено цепочки прокси; finalMask и dialMode ниже относятся только к freedom</string>
+    <string name="aether_exit_node_unusable">Профиль exit-node «%1$s» не даёт исходящего соединения; выберите другой или freedom</string>
+    <string name="aether_exit_node_ech_unusable">echOutbound профиля exit-node «%1$s» нельзя использовать; исправьте его в этом профиле, выберите другой или freedom</string>
+    <string name="toast_profile_name_not_found">Профиль с именем «%1$s» не найден</string>
+    <string name="toast_profile_name_duplicate">Найдено два профиля с именем «%1$s»; переименуйте один из них</string>
+    <string name="toast_profile_no_server">У профиля «%1$s» нет адреса сервера, поэтому цепочка прокси не может пройти через него</string>
+    <string name="toast_profile_group_not_fallback">«%1$s» — политика группы, а политика группы не может быть резервным исходящим подключением; выберите другой профиль</string>
+    <string name="toast_profile_group_not_hop">«%1$s» — политика группы, поэтому цепочка прокси не может пройти через неё; выберите другой профиль</string>
+    <string name="toast_profile_chain_not_hop">«%1$s» — цепочка прокси, поэтому другая цепочка прокси не может пройти через неё; выберите другой профиль</string>
+    <string name="toast_profile_custom_not_hop">«%1$s» — пользовательская конфигурация, поэтому цепочка прокси не может пройти через неё; выберите другой профиль</string>
+    <string name="toast_profile_custom_not_fallback">«%1$s» — пользовательская конфигурация, а пользовательская конфигурация не может быть резервным исходящим подключением; выберите другой профиль</string>
+    <string name="aether_keys_hint_fragment">Отправляет ClientHello запросов к WARP API по частям, для сетей, которые фильтруют имя API</string>
+    <string name="aether_lab_fragment">Фрагментировать ClientHello</string>
+    <string name="aether_lab_fragment_size">Размер фрагментов (байт)</string>
+    <string name="aether_lab_fragment_delay">Задержка между фрагментами (мс)</string>
+    <string name="aether_lab_wiw_outer">Внешний узел</string>
+    <string name="aether_lab_wiw_inner">Внутренний узел</string>
+    <string name="aether_hint_endpoint">Оставьте пустым для сканирования</string>
+    <string name="aether_hint_gool_peer">Оставьте пустым, чтобы использовать узел, назначенный WARP</string>
+    <string name="aether_action_scan">Найти сервер</string>
+    <string name="aether_action_scanning">Сканирование…</string>
+    <string name="aether_scan_success">Сервер найден</string>
+    <string name="aether_scan_failed">Сервер не найден</string>
+    <string name="aether_invalid_endpoint">Укажите IP-адрес и порт или оставьте адрес пустым для сканирования</string>
+    <string name="aether_invalid_hop">Укажите адрес и порт, например 162.159.192.1:2408</string>
+    <string name="aether_same_hop">Узлы должны иметь разные адреса</string>
+    <string name="aether_invalid_fragment">Укажите число или диапазон, например 16-32: размер 1–4096 байт, задержка 0–1000 мс</string>
+    <string name="aether_listen_port_taken">Ядро не может слушать порт локального прокси приложения или порт на три выше порта прослушивания Aether; измените порт прослушивания Aether в настройках или порты команды</string>
+    <string name="aether_secondary_port_taken">Один из входящих (inbound) этой конфигурации уже слушает порт %1$d — порт на три выше порта прослушивания Aether, через который ядро Aether выходит наружу; измените порт прослушивания Aether в настройках</string>
+    <string name="aether_lab_psiphon">Psiphon</string>
+    <string name="aether_lab_psiphon_mode">Подключение Psiphon</string>
+    <string name="aether_lab_psiphon_cdn_ips">IP-адреса CDN</string>
+    <string name="aether_lab_psiphon_cdn_sni">Имена серверов CDN (SNI)</string>
+    <string name="aether_hint_psiphon_list">Через запятую; пусто — встроенный список</string>
+    <string name="aether_lab_psiphon_region">Страна выхода</string>
+    <string name="aether_psiphon_region_any">Любая страна</string>
+    <string name="aether_lab_psiphon_bundled_list">Начинать со встроенного списка серверов</string>
+    <string name="aether_hint_psiphon_bundled_list">Вкл.: Psiphon сразу пробует серверы из psiphon_servers.dat и загружает свежий список, только если они не работают. Выкл.: загружает свежий список перед первым подключением, поэтому список должен быть доступен, например из-за WARP</string>
+    <string name="aether_action_clear_psiphon">Очистить данные Psiphon</string>
+    <string name="aether_hint_clear_psiphon">Забывает серверы, которые узнал Psiphon, и загруженные им списки. Следующий запуск снова начнётся со встроенного списка или со свежей загрузки, если переключатель выше выключен</string>
+    <string name="aether_log_psiphon_cleared">Данные Psiphon очищены</string>
+    <string name="aether_log_psiphon_clear_failed">Не удалось очистить данные Psiphon</string>
+    <string name="aether_psiphon_clear_blocked">Отключите профиль Aether перед очисткой данных Psiphon; текущее подключение их использует</string>
+    <string name="aether_psiphon_unavailable">В этой сборке нет клиента Psiphon, поэтому профиль с Psiphon не сможет подключиться</string>
+    <string name="aether_psiphon_needs_masque">Psiphon → WARP работает только с протоколом MASQUE</string>
+    <string name="aether_next_port_taken">С Tor или Psiphon на пути ядро использует и порты, следующие за портом прослушивания Aether, и ни один из них не может совпадать с портом локального прокси приложения; измените порт прослушивания Aether в настройках</string>
+    <string name="aether_lab_tor">Tor</string>
+    <string name="aether_lab_tor_bridges">Мосты</string>
+    <string name="aether_lab_tor_bridge_lines">Строки мостов</string>
+    <string name="aether_hint_tor_bridge_lines">По одной в строке, как в torrc: obfs4 1.2.3.4:443 ОТПЕЧАТОК cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">В этой сборке нет подключаемых транспортов, поэтому мосты Tor недоступны; Tor подключится только там, где он не заблокирован</string>
+    <string name="aether_tor_needs_masque">Режим Tor → WARP работает только с протоколом MASQUE</string>
+    <string name="aether_tor_psiphon_conflict">Tor и Psiphon сочетаются только так: один внутри туннеля, другой снаружи</string>
+    <string name="aether_tor_bridges_missing">Введите хотя бы одну строку моста или выберите другую настройку мостов</string>
+    <string name="aether_lab_ech">Encrypted Client Hello (ECH)</string>
+    <string name="aether_hint_ech">Скрывает имя сервера в рукопожатии MASQUE; без пригодного ключа Aether не подключается</string>
+    <string name="aether_lab_ech_dns">DNS для ECH</string>
+    <string name="aether_lab_ech_domain">Домен ECH</string>
+    <string name="aether_invalid_ech_dns">DNS для ECH должен быть udp://IP, tcp://IP или адресом https:// сервера DNS-over-HTTPS</string>
+    <string name="aether_invalid_ech_domain">Домен ECH должен быть доменным именем, например cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">Имя сервера MASQUE (SNI) должно быть доменным именем, например www.cloudflare.com</string>
+    <string name="aether_lab_dns">DNS внутри туннеля</string>
+    <string name="aether_hint_dns">Через запятую; оставьте пустым для 1.1.1.1 и 1.0.0.1</string>
+    <string name="aether_invalid_dns">Укажите адреса резолверов, например 1.1.1.1 или 10.0.0.1:5353, через запятую</string>
+    <string name="aether_lab_exit_loc">Страна выхода</string>
+    <string name="aether_hint_exit_loc">DE,SE разрешает только эти страны; !IR,RU запрещает их; пустое поле принимает любую</string>
+    <string name="aether_invalid_exit_loc">Укажите двухбуквенные коды стран через запятую, с ! в начале для запрета</string>
+    <string name="aether_lab_tor_relays">Источники мостов</string>
+    <string name="aether_lab_other_settings">Прочие настройки</string>
+    <string name="aether_lab_command">Команда Aether</string>
+    <string name="aether_command_custom">Изменено вручную: эта команда выполняется как написана, настройки выше не применяются, кроме настроек Xray-core</string>
+    <string name="aether_action_use_settings">Использовать настройки</string>
+    <string name="aether_invalid_command">Команда должна содержать аргументы ядра Aether, с портом прослушивания после --bind</string>
+    <string name="aether_unsupported_abi">Ядро Aether недоступно для этого устройства</string>
+    <string name="aether_core_stopped">Ядро Aether остановлено</string>
+    <string name="aether_core_stopped_no_ech_key">Ядро Aether остановлено: ECH включён, но пригодный ключ ECH не найден. Без него имя сервера ушло бы в открытом виде.</string>
+    <string name="aether_core_connecting">Ядро Aether ещё подключается</string>
+    <string name="menu_item_import_config_manually_aether">Добавить конфигурацию Aether вручную</string>
+    <string name="aether_action_renew_key">Получить новые ключи WARP…</string>
+    <string name="aether_action_renewing_key">Получение новых ключей WARP…</string>
+    <string name="aether_log_title">Журнал</string>
+    <string name="aether_log_empty">Здесь появятся результаты сканирования и состояние ключа WARP</string>
+    <string name="aether_log_scan_started">Поиск сервера…</string>
+    <string name="aether_log_scan_found">Найдено: %1$s</string>
+    <string name="aether_log_scan_found_hops">Найдены внешний узел %1$s и внутренний узел %2$s</string>
+    <string name="aether_log_scan_cancelled">Сканирование отменено</string>
+    <string name="aether_log_key_renewing">Регистрация новых ключей WARP; используемые ключи остаются на месте, пока не будут готовы все новые…</string>
+    <string name="aether_log_key_renewed">Новые ключи WARP установлены и будут использованы при следующем подключении</string>
+    <string name="aether_log_key_renew_failed">Не удалось зарегистрировать новые ключи WARP; текущие ключи сохранены</string>
+    <string name="aether_log_key_renew_cancelled">Получение новых ключей WARP отменено</string>
+    <string name="aether_log_masque_key_ready">Ключ MASQUE: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">Ключ MASQUE: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_wireguard_key_ready">Ключ WireGuard: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">Ключ WireGuard: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_outer_key_ready">Ключ внешнего узла: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">Ключ внешнего узла: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_inner_key_ready">Ключ внутреннего узла: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">Ключ внутреннего узла: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_wireguard_inner_key_ready">Ключ внутреннего узла WireGuard: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">Ключ внутреннего узла WireGuard: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_masque_inner_key_ready">Ключ внутреннего узла MASQUE: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">Ключ внутреннего узла MASQUE: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_log_gool_key_ready">Ключ WireGuard over MASQUE: устройство %1$s, IPv4 %2$s, IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">Ключ WireGuard over MASQUE: ещё не зарегистрирован; будет создан при первом сканировании или подключении</string>
+    <string name="aether_renew_blocked">Отключите профиль Aether, прежде чем получать эти ключи: текущее подключение использует их</string>
+    <string name="aether_action_get_keys">Получить новые ключи WARP</string>
+    <string name="aether_keys_lab_kind">Получить новые ключи для</string>
+    <string name="aether_keys_kind_all">Все</string>
+    <string name="aether_keys_lab_enroll_address">Адрес API</string>
+    <string name="aether_keys_hint_ech">Скрывает имя сервера в запросах к WARP API; без пригодного ключа ECH ключ WARP не запрашивается</string>
+    <string name="aether_lab_fingerprint">Отпечаток</string>
+    <string name="aether_keys_invalid_enroll_address">Адрес API должен быть IP-адресом или доменным именем, с портом или без, например 188.114.97.6:443 или [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">Команда должна регистрировать ключи: --register, а за ним all, wg, masque, mim, gool-classic (WARP-in-WARP) или gool (WireGuard over MASQUE)</string>
+    <string name="aether_keys_log_empty">Здесь появятся вывод ядра и ключи WARP</string>
+    <string name="aether_scan_blocked">Отключите профиль Aether, прежде чем сканировать: сканирование откроет второй туннель с ключом текущего подключения</string>
+    <string name="aether_keys_missing">У вас нет нужного ключа WARP; сначала получите его</string>
+    <string name="aether_action_save_anyway">Всё равно сохранить</string>
+    <string name="aether_action_scan_anyway">Всё равно сканировать</string>
+    <string name="aether_chain_one_profile">В цепочке прокси может быть только один профиль Aether</string>
+    <string name="aether_exit_node_name_taken">Здесь маршрутизация использует профиль с именем exit-node, а exit-node — это имя исходящего подключения, через которое ядро Aether выходит наружу; переименуйте этот профиль</string>
+    <string name="aether_chain_hop_missing">Не удалось построить звено, через которое профиль Aether в этой цепочке прокси выходит наружу, и ядро Aether вышло бы в интернет без него</string>
+    <string name="config_main_outbound_missing">Не удалось построить выбранный профиль, и весь трафик вышел бы в интернет напрямую без него; проверьте его настройки</string>
+    <string name="config_routing_target_unbuilt">Не удалось построить профиль «%1$s», на который правило маршрутизации отправляет трафик; исправьте его или отключите правила, которые его используют</string>
+    <string name="config_group_fallback_unbuilt">Не удалось построить профиль «%1$s», резервное исходящее подключение политики группы; исправьте его или выберите для группы другое резервное исходящее подключение</string>
+    <string name="aether_config_single_profile">Конфигурация может использовать только один профиль Aether</string>
+    <string name="aether_config_two_exits">Одному ядру Aether пришлось бы выходить наружу двумя путями: один и тот же туннель используется и сам по себе, и за звеном цепочки прокси, или за двумя разными звеньями, или с двумя разными настройками exit-node</string>
+    <string name="aether_custom_no_outbound">Ни один исходящий SOCKS конфигурации не подключается к %1$s:%2$d, где слушает команда Aether</string>
+    <string name="aether_custom_exit_node_selected">Балансировщик или обсерватория этой конфигурации выбирает исходящие подключения, чьи теги начинаются с %1$s, а значит и exit-node — исходящее подключение, через которое ядро Aether выходит наружу; измените этот селектор</string>
+    <string name="aether_custom_invalid_command">aetherCommand должен быть командной строкой ядра Aether в виде текста, с адресом прослушивания после --bind: %1$s</string>
+    <string name="title_aether_core">Ядро Aether</string>
+    <string name="summary_aether_core">Клиент WARP от CluvexStudio, включён по лицензии AGPL-3.0. Нажмите, чтобы открыть исходный код.</string>
+    <string-array name="aether_scan_entries">
+        <item>Турбо</item>
+        <item>Сбалансированный</item>
+        <item>Тщательный</item>
+        <item>Проверенный</item>
+        <item>Надёжный</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>Выключено</item>
+        <item>WARP → Psiphon</item>
+        <item>Psiphon → WARP</item>
+        <item>Только Psiphon</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">Списки узлов CDN для сканирования</string>
+    <string name="aether_hint_psiphon_cdn_sets">Какие встроенные в Psiphon списки узлов перебирает сканирование фронтинга. Ничего не отмечено, значит все; рядом с вашими IP они идут после них</string>
+    <string name="aether_psiphon_cdn_sets_all">Все встроенные в Psiphon списки</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai (список Psiphon)</item>
+        <item>Bunny (список Psiphon)</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>Отобранные узлы фронтинга</item>
+        <item>Старые переопределения Android</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>Автоматически</item>
+        <item>Только через CDN</item>
+        <item>Только напрямую</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>Выключено</item>
+        <item>WARP → Tor</item>
+        <item>Tor → WARP</item>
+        <item>Только Tor</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>Когда Tor заблокирован</item>
+        <item>С самого начала</item>
+        <item>Никогда</item>
+        <item>Мои строки мостов</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb и публичные реле</item>
+        <item>Только публичные реле</item>
+        <item>Только bridgedb</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>Автоматически</item>
+        <item>Выкл.</item>
+        <item>Лёгкая</item>
+        <item>Firewall</item>
+        <item>Сбалансированная</item>
+        <item>GFW</item>
+        <item>Агрессивная</item>
+    </string-array>
 
 </resources>

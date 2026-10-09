@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
+import com.v2ray.ang.core.TlsSettingsCheck
 import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -12,6 +13,7 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.fmt.AetherFmt
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
@@ -48,6 +50,7 @@ object AngConfigManager {
             EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
             EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
             AppConfig.HY2 to Hysteria2Fmt::parse,
+            EConfigType.AETHER.protocolScheme to AetherFmt::parse,
         )
     }
 
@@ -163,6 +166,7 @@ object AngConfigManager {
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
+                EConfigType.AETHER -> AetherFmt.toUri(config)
                 else -> {}
             }
         } catch (e: Exception) {
@@ -266,6 +270,8 @@ object AngConfigManager {
 
             val v2raynConfigs = V2rayNFmt.parse(v2raynLines, subid)
             val allConfigs = v2raynConfigs + configs
+            // Matixray: WebSocket and HTTPUpgrade connect only with alpn http/1.1 or none, which shared links often lack
+            allConfigs.forEach(TlsSettingsCheck::fixImportedAlpn)
 
             if (allConfigs.isNotEmpty()) {
                 commitProfiles(
@@ -425,6 +431,8 @@ object AngConfigManager {
                 if (!matched) return null
             }
 
+            applySubscriptionOverrides(config, subItem)
+
             config.subscriptionId = subid
             config.description = generateDescription(config)
 
@@ -433,6 +441,19 @@ object AngConfigManager {
             LogUtil.e(AppConfig.TAG, "Failed to parse config", e)
             return null
         }
+    }
+
+    /**
+     * Replaces the address and/or port of a profile imported from a subscription with the
+     * override values configured on that subscription. Blank values leave the profile unchanged.
+     *
+     * @param config The parsed profile.
+     * @param subItem The subscription the profile belongs to, or null.
+     */
+    internal fun applySubscriptionOverrides(config: ProfileItem, subItem: SubscriptionItem?) {
+        subItem ?: return
+        subItem.overrideAddress?.trim()?.takeIf { it.isNotEmpty() }?.let { config.server = it }
+        subItem.overridePort?.takeIf { it in 1..65535 }?.let { config.serverPort = it.toString() }
     }
 
     /**

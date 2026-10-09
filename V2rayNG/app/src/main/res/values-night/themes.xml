@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Night theme: override window background and status bar flags for dark mode -->
+    <!-- Night theme: window background and bar flags come from values-night resources -->
     <style name="AppThemeBaseCommon" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowBackground">@color/window_background_dark</item>
+        <item name="android:windowLightStatusBar">@bool/matixray_light_bars</item>
+        <item name="android:windowBackground">@color/xf_background</item>
+        <!-- Matixray: violet palette for AppCompat widgets (Compose reads Theme.kt) -->
+        <item name="colorPrimary">@color/xf_purple</item>
+        <item name="colorPrimaryDark">@color/xf_background</item>
+        <item name="colorAccent">@color/xf_purple_light</item>
+        <item name="android:textColorPrimary">@color/xf_text_main</item>
+        <item name="android:textColorSecondary">@color/xf_text_sub</item>
+    </style>
+
+    <style name="AppThemeBase" parent="AppThemeBaseCommon">
+        <item name="android:windowLightNavigationBar">@bool/matixray_light_bars</item>
     </style>
 
     <style name="AppThemeDayNight" parent="AppThemeBase" />

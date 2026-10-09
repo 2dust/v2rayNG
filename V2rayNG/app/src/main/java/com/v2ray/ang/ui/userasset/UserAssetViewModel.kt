@@ -68,7 +68,7 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
                 )
             }
         // Force update URL for geoip-only-cn-private.dat
-        return (builtInItems + savedAssets).map { cache ->
+        return (builtInItems + psiphonServerList(savedAssets) + savedAssets).map { cache ->
             if (cache.assetUrl.remarks == AppConfig.GEOIP_ONLY_CN_PRIVATE_DAT) {
                 cache.copy(
                     assetUrl = cache.assetUrl.copy(
@@ -80,6 +80,19 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
             }
         }
     }
+
+    /** Psiphon's server list beside the geo files: built in with the address its client downloads it from, replaceable like them. */
+    private fun psiphonServerList(savedAssets: List<AssetUrlCache>): List<AssetUrlCache> =
+        if (savedAssets.any { it.assetUrl.remarks == AppConfig.PSIPHON_SERVERS_DAT }) {
+            emptyList()
+        } else {
+            listOf(
+                AssetUrlCache(
+                    "builtin:${AppConfig.PSIPHON_SERVERS_DAT}",
+                    AssetUrlItem(AppConfig.PSIPHON_SERVERS_DAT, AppConfig.PSIPHON_SERVERS_URL, locked = true)
+                )
+            )
+        }
 
     fun downloadGeoFiles(
         extDir: File,

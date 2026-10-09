@@ -17,7 +17,7 @@ class ScSwitchActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         LaunchedEffect(Unit) {
             moveTaskToBack(true)
-            if (CoreServiceManager.isRunning()) {
+            if (CoreServiceManager.isServiceRunning()) {
                 LauncherManager.stopService(this@ScSwitchActivity)
             } else {
                 LauncherManager.startServiceFromToggle(this@ScSwitchActivity)

@@ -31,7 +31,7 @@ echo 'include $(call all-subdir-makefiles)' > jni/Android.mk
     NDK_PROJECT_PATH=. \
     APP_BUILD_SCRIPT=jni/Android.mk \
     "APP_ABI=$ABIS" \
-    APP_PLATFORM=android-24 \
+    APP_PLATFORM=android-29 \
     NDK_LIBS_OUT="$TMPDIR/libs" \
     NDK_OUT="$TMPDIR/obj" \
     "APP_CFLAGS=-O3 -DPKGNAME=com/v2ray/ang/service" \
@@ -84,7 +84,7 @@ EXECMK
     NDK_PROJECT_PATH=. \
     APP_BUILD_SCRIPT=jni/exec.mk \
     "APP_ABI=$ABIS" \
-    APP_PLATFORM=android-24 \
+    APP_PLATFORM=android-29 \
     NDK_LIBS_OUT="$TMPDIR/libs-exec" \
     NDK_OUT="$TMPDIR/obj-exec" \
     "APP_CFLAGS=-O3" \

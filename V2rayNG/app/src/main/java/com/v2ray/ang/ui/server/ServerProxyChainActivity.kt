@@ -132,6 +132,12 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             return false
         }
 
+        // An Aether member can stand anywhere in the chain, but one core runs, so there can be one.
+        if (hasSecondAetherMember(chainMembers.map { SettingsManager.getServerViaRemarks(it)?.configType })) {
+            toast(R.string.aether_chain_one_profile)
+            return false
+        }
+
         val config =
             MmkvManager.decodeServerConfig(editGuid)
                 ?: ProfileItem.create(EConfigType.PROXYCHAIN)

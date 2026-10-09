@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">خدمة v2rayNG</string>
+    <string name="notification_channel_service">خدمة Matixray</string>
     <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
     <string name="notification_channel_connection_checks">فحوص الاتصال</string>
     <string name="notification_action_stop_v2ray">إيقاف</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">البصمة</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">مجموعات التشفير (Cipher Suites)</string>
+    <string name="toast_cipher_suites_need_unsafe">لا تُطبَّق cipherSuites إلا مع بصمة unsafe. اختر unsafe أو أفرغ cipherSuites.</string>
+    <string name="toast_websocket_alpn_http1_only">لا يتصل WebSocket وHTTPUpgrade إلا مع alpn بقيمة http/1.1 أو بدونه. اختر http/1.1 أو اترك alpn فارغًا.</string>
     <string name="server_lab_allow_insecure">تخطي التحقق من الشهادة (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">العنوان</string>
@@ -131,7 +134,17 @@
     <string name="server_lab_xhttp_mode">وضع XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
     <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
+    <string name="preset_replace_title">استبدال %1$s؟</string>
+    <string name="preset_replace_message">قيمة %1$s الحالية ليست من القائمة وستُفقد. هل تريد استبدالها بـ %2$s؟</string>
+    <string name="preset_action_replace">استبدال</string>
+    <string name="preset_default">الافتراضي</string>
+    <string name="acc_choose_preset">اختيار %1$s جاهز</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">JSON خام لحقل echOutbound، بالتنسيق: { OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">يتطلب echOutbound وجود echConfigList</string>
+    <string name="toast_ech_outbound_invalid_tag">يجب أن يحتوي echOutbound على \"tag\" غير فارغ، ليس direct أو block، ولا يبدأ بـ proxy</string>
+    <string name="toast_ech_outbound_tag_conflict">الوسم \"%1$s\" في echOutbound مستخدم بالفعل من قبل outbound آخر</string>
     <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>
     <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>
     <string name="server_lab_browser_dialer">تمكين Browser Dialer</string>
@@ -252,6 +265,7 @@
     <string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد من أنك في شبكة موثوقة</string>
 
     <string name="title_pref_socks_port">منفذ البروكسي المحلي</string>
+    <string name="title_pref_aether_listen_port">منفذ الاستماع لـ Aether</string>
     <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
     <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +348,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">رؤوس الطلب (بتنسيق JSON)</string>
     <string name="sub_setting_filter">مرشح تعبير نمطي للملاحظات</string>
+    <string name="sub_setting_override_address">استبدال العنوان</string>
+    <string name="sub_setting_override_port">استبدال المنفذ</string>
+    <string name="sub_setting_override_tip">اتركه فارغًا للإبقاء على القيمة من الاشتراك</string>
     <string name="sub_setting_enable">تفعيل التحديث</string>
     <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
     <string name="sub_allow_insecure_url">السماح بعنوان HTTP غير آمن</string>
@@ -343,6 +360,7 @@
     <string name="sub_setting_entry_proxy_tip">يُضاف الوكيل المحدد قبل كل ملف تعريف في هذا الاشتراك كحلقة الدخول في سلسلة الوكلاء لذلك الملف.</string>
     <string name="sub_setting_exit_proxy_tip">يُضاف الوكيل المحدد بعد كل ملف تعريف في هذا الاشتراك كحلقة الخروج في سلسلة الوكلاء لذلك الملف.</string>
     <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
+    <string name="toast_invalid_override_port">منفذ الاستبدال غير صالح. استخدم قيمة بين 1 و 65535.</string>
     <string name="title_sub_update">تحديث الاشتراك</string>
     <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
@@ -419,12 +437,6 @@
 
     <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
     <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
-    <string name="title_fragment_settings">إعدادات تجزئة الحزم (Fragment)</string>
-    <string name="title_pref_fragment_packets">الحزم المراد تجزئتها</string>
-    <string name="title_pref_fragment_length">طول الجزء (الحد الأدنى - الحد الأقصى)</string>
-    <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
-    <string name="title_pref_fragment_enabled">تفعيل تجزئة الحزم</string>
-    <string name="title_pref_fragment_maxsplit">الحد الأقصى لعدد الأجزاء</string>
     <string name="title_observatory_settings">إعدادات مراقبة الاتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصل leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصل leastLoad</string>
@@ -433,6 +445,8 @@
     <string name="title_pref_observatory_least_load_timeout">مهلة leastLoad</string>
     <string name="toast_invalid_observatory_duration">مدة غير صالحة. استخدم قيمة مثل 3m أو 30s.</string>
     <string name="toast_invalid_observatory_sampling">عدد العينات غير صالح. استخدم رقمًا موجبًا.</string>
+    <string name="toast_invalid_aether_listen_port">استخدم منفذًا من 1024 إلى 65532 لمنفذ الاستماع لـ Aether</string>
+    <string name="toast_aether_listen_port_local_proxy">لا يمكن أن يشمل منفذ الاستماع لـ Aether والمنافذ الثلاثة التالية له منفذ البروكسي المحلي</string>
 
     <string name="update_check_for_update">التحقق من وجود تحديث</string>
     <string name="update_already_latest_version">أنت تستخدم أحدث إصدار بالفعل</string>
@@ -452,7 +466,6 @@
     <string name="server_proxy_chain_member_unselected">اختر عضوًا</string>
     <string name="server_proxy_chain_members_unselected">يرجى اختيار عضو لكل صف في السلسلة</string>
     <string name="server_proxy_chain_members_insufficient">عدد الأعضاء غير كافٍ</string>
-    <string name="server_proxy_chain_members_invalid">أعضاء سلسلة غير صالحين: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">النسخ الاحتياطي والاستعادة</string>
@@ -568,5 +581,203 @@
     <string name="tasker_blurb_stop">إيقاف %1$s</string>
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
+    <string name="aether_lab_protocol">البروتوكول</string>
+    <string name="aether_lab_transport">الناقل</string>
+    <string name="aether_lab_masque_sni">اسم خادم MASQUE (SNI)</string>
+    <string name="aether_lab_scan_mode">وضع الفحص</string>
+    <string name="aether_lab_obfuscation">التمويه</string>
+    <string name="aether_lab_ip_version">إصدار IP</string>
+    <string name="aether_lab_exit_final_mask">JSON خام لحقل finalMask في exit-node، بالتنسيق: { FinalMaskObject }</string>
+    <string name="aether_exit_node_freedom">freedom (الافتراضي)</string>
+    <string name="label_numbered">%1$s (%2$d)</string>
+    <string name="aether_hint_exit_node">تتصل النواة بالخارج عبر الصادر الخاص بهذا الملف، كما عبر قفزة في سلسلة الوكيل؛ وحقلا finalMask وdialMode أدناه لـ freedom وحده</string>
+    <string name="aether_exit_node_unusable">ملف exit-node «%1$s» لا يعطي صادرًا؛ اختر ملفًا آخر، أو freedom</string>
+    <string name="aether_exit_node_ech_unusable">لا يمكن استخدام echOutbound لملف exit-node «%1$s»؛ أصلحه في ذلك الملف، أو اختر ملفًا آخر، أو freedom</string>
+    <string name="toast_profile_name_not_found">لم يُعثر على أي ملف باسم «%1$s»</string>
+    <string name="toast_profile_name_duplicate">عُثر على ملفين باسم «%1$s»؛ يرجى إعادة تسمية أحدهما</string>
+    <string name="toast_profile_no_server">الملف «%1$s» ليس له عنوان خادم، لذا لا يمكن لسلسلة الوكيل أن تمر عبره</string>
+    <string name="toast_profile_group_not_fallback">«%1$s» مجموعة سياسات، ولا يمكن لمجموعة سياسات أن تكون اتصالًا صادرًا احتياطيًا؛ اختر ملفًا آخر</string>
+    <string name="toast_profile_group_not_hop">«%1$s» مجموعة سياسات، لذا لا يمكن لسلسلة الوكيل أن تمر عبرها؛ اختر ملفًا آخر</string>
+    <string name="toast_profile_chain_not_hop">«%1$s» سلسلة وكيل، لذا لا يمكن لسلسلة وكيل أخرى أن تمر عبرها؛ اختر ملفًا آخر</string>
+    <string name="toast_profile_custom_not_hop">«%1$s» تكوين مخصص، لذا لا يمكن لسلسلة الوكيل أن تمر عبره؛ اختر ملفًا آخر</string>
+    <string name="toast_profile_custom_not_fallback">«%1$s» تكوين مخصص، ولا يمكن لتكوين مخصص أن يكون اتصالًا صادرًا احتياطيًا؛ اختر ملفًا آخر</string>
+    <string name="aether_keys_hint_fragment">يرسل ClientHello لطلبات WARP API على أجزاء، للشبكات التي ترشّح اسم الـ API</string>
+    <string name="aether_lab_fragment">تجزئة ClientHello</string>
+    <string name="aether_lab_fragment_size">حجم الأجزاء (بايت)</string>
+    <string name="aether_lab_fragment_delay">التأخير بين الأجزاء (مللي ثانية)</string>
+    <string name="aether_lab_wiw_outer">القفزة الخارجية</string>
+    <string name="aether_lab_wiw_inner">القفزة الداخلية</string>
+    <string name="aether_hint_endpoint">اتركه فارغًا للفحص</string>
+    <string name="aether_hint_gool_peer">اتركه فارغًا لاستخدام نقطة النهاية التي يعيّنها WARP</string>
+    <string name="aether_action_scan">ابحث عن خادم</string>
+    <string name="aether_action_scanning">جارٍ الفحص…</string>
+    <string name="aether_scan_success">تم العثور على خادم</string>
+    <string name="aether_scan_failed">لم يتم العثور على خادم</string>
+    <string name="aether_invalid_endpoint">استخدم عنوان IP ومنفذًا، أو اترك العنوان فارغًا للفحص</string>
+    <string name="aether_invalid_hop">اكتب العنوان والمنفذ معًا، مثل 162.159.192.1:2408</string>
+    <string name="aether_same_hop">يجب أن تكون القفزتان بعنوانين مختلفين</string>
+    <string name="aether_invalid_fragment">اكتب رقمًا أو نطاقًا مثل 16-32: الحجم من 1 إلى 4096 بايت، والتأخير من 0 إلى 1000 مللي ثانية</string>
+    <string name="aether_listen_port_taken">لا يمكن للنواة أن تستمع على منفذ البروكسي المحلي للتطبيق، ولا على المنفذ الذي يزيد بثلاثة عن منفذ الاستماع لـ Aether؛ غيّر منفذ الاستماع لـ Aether في الإعدادات، أو منافذ الأمر</string>
+    <string name="aether_secondary_port_taken">أحد مداخل هذا الإعداد يستمع بالفعل على %1$d، وهو المنفذ الذي يزيد بثلاثة عن منفذ الاستماع لـ Aether، والذي تتصل عبره نواة Aether بالخارج؛ غيّر منفذ الاستماع لـ Aether في الإعدادات</string>
+    <string name="aether_lab_psiphon">سايفون</string>
+    <string name="aether_lab_psiphon_mode">طريقة اتصال سايفون</string>
+    <string name="aether_lab_psiphon_cdn_ips">عناوين IP لشبكة CDN</string>
+    <string name="aether_lab_psiphon_cdn_sni">أسماء خوادم CDN (SNI)</string>
+    <string name="aether_hint_psiphon_list">افصل بفواصل؛ اتركه فارغًا لاستخدام القائمة المضمنة</string>
+    <string name="aether_lab_psiphon_region">بلد الخروج</string>
+    <string name="aether_psiphon_region_any">أي بلد</string>
+    <string name="aether_lab_psiphon_bundled_list">البدء من قائمة الخوادم المرفقة مع التطبيق</string>
+    <string name="aether_hint_psiphon_bundled_list">مفعّل: يجرّب Psiphon خوادم psiphon_servers.dat فورًا ولا يجلب قائمة جديدة إلا عند فشلها. معطّل: يجلب قائمة جديدة قبل أول اتصال، لذا يجب أن تكون القائمة متاحة، كما هي من خلف WARP</string>
+    <string name="aether_action_clear_psiphon">مسح بيانات Psiphon</string>
+    <string name="aether_hint_clear_psiphon">ينسى الخوادم التي تعلّمها Psiphon والقوائم التي جلبها. تبدأ المرة القادمة من القائمة المرفقة من جديد، أو من تنزيل جديد إذا كان الخيار أعلاه معطّلًا</string>
+    <string name="aether_log_psiphon_cleared">تم مسح بيانات Psiphon</string>
+    <string name="aether_log_psiphon_clear_failed">تعذّر مسح بيانات Psiphon</string>
+    <string name="aether_psiphon_clear_blocked">افصل ملف Aether قبل مسح بيانات Psiphon؛ الاتصال الجاري يستخدمها</string>
+    <string name="aether_psiphon_unavailable">هذا الإصدار لا يتضمن عميل سايفون، لذا لا يمكن لملف تعريف يستخدم سايفون الاتصال</string>
+    <string name="aether_psiphon_needs_masque">وضع «عبر سايفون إلى WARP» يعمل مع بروتوكول MASQUE فقط</string>
+    <string name="aether_next_port_taken">مع وجود تور أو سايفون في المسار تستخدم النواة أيضًا المنافذ التالية لمنفذ الاستماع لـ Aether، ولا يمكن أن يكون أي منها منفذ الوكيل المحلي للتطبيق؛ غيّر منفذ الاستماع لـ Aether في الإعدادات</string>
+    <string name="aether_lab_tor">تور (Tor)</string>
+    <string name="aether_lab_tor_bridges">الجسور</string>
+    <string name="aether_lab_tor_bridge_lines">أسطر الجسور</string>
+    <string name="aether_hint_tor_bridge_lines">سطر لكل جسر، كما في torrc: obfs4 1.2.3.4:443 FINGERPRINT cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">هذا الإصدار لا يتضمن وسائل النقل القابلة للتوصيل، لذا لا يمكن استخدام جسور تور؛ يتصل تور فقط حيث لا يكون محجوبًا</string>
+    <string name="aether_tor_needs_masque">وضع «عبر تور إلى WARP» يعمل مع بروتوكول MASQUE فقط</string>
+    <string name="aether_tor_psiphon_conflict">لا يمكن الجمع بين تور وسايفون إلا بأن يكون أحدهما داخل النفق والآخر حوله</string>
+    <string name="aether_tor_bridges_missing">اكتب سطر جسر واحدًا على الأقل، أو اختر إعدادًا آخر للجسور</string>
+    <string name="aether_lab_ech">Encrypted Client Hello (ECH)</string>
+    <string name="aether_hint_ech">يخفي اسم الخادم في مصافحة MASQUE؛ بدون مفتاح صالح للاستخدام لا يتصل Aether</string>
+    <string name="aether_lab_ech_dns">DNS لـ ECH</string>
+    <string name="aether_lab_ech_domain">نطاق ECH</string>
+    <string name="aether_invalid_ech_dns">يجب أن يكون DNS لـ ECH بالشكل udp://IP أو tcp://IP أو عنوان https:// لخادم DNS-over-HTTPS</string>
+    <string name="aether_invalid_ech_domain">يجب أن يكون نطاق ECH اسم نطاق، مثل cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">يجب أن يكون اسم خادم MASQUE (SNI) اسم نطاق، مثل www.cloudflare.com</string>
+    <string name="aether_lab_dns">DNS داخل النفق</string>
+    <string name="aether_hint_dns">مفصولة بفواصل؛ اتركه فارغًا لاستخدام 1.1.1.1 و1.0.0.1</string>
+    <string name="aether_invalid_dns">اكتب عناوين محلّلات مثل 1.1.1.1 أو 10.0.0.1:5353 مفصولة بفواصل</string>
+    <string name="aether_lab_exit_loc">موقع الخروج</string>
+    <string name="aether_hint_exit_loc">DE,SE يسمح بهذه فقط؛ !IR,RU يرفضها؛ الفراغ يقبل أي موقع</string>
+    <string name="aether_invalid_exit_loc">اكتب رموز دول من حرفين مفصولة بفواصل، مع ! في البداية لرفضها</string>
+    <string name="aether_lab_tor_relays">مصادر الجسور</string>
+    <string name="aether_lab_other_settings">إعدادات أخرى</string>
+    <string name="aether_lab_command">أمر Aether</string>
+    <string name="aether_command_custom">مُعدَّل يدويًا: يُنفَّذ هذا الأمر كما هو مكتوب، ولا تُطبَّق الإعدادات أعلاه، باستثناء إعدادات Xray-core</string>
+    <string name="aether_action_use_settings">استخدام الإعدادات</string>
+    <string name="aether_invalid_command">يجب أن يحتوي الأمر على وسائط نواة Aether، مع منفذ الاستماع بعد --bind</string>
+    <string name="aether_unsupported_abi">نواة Aether غير متوفرة لهذا الجهاز</string>
+    <string name="aether_core_stopped">توقفت نواة Aether عن العمل</string>
+    <string name="aether_core_stopped_no_ech_key">توقفت نواة Aether: ميزة ECH مفعّلة لكن لم يُعثر على مفتاح ECH صالح للاستخدام. بدونه كان اسم الخادم سيُرسل بنص واضح.</string>
+    <string name="aether_core_connecting">لا تزال نواة Aether قيد الاتصال</string>
+    <string name="menu_item_import_config_manually_aether">إضافة إعداد Aether يدويًا</string>
+    <string name="aether_action_renew_key">الحصول على مفاتيح WARP جديدة…</string>
+    <string name="aether_action_renewing_key">جارٍ الحصول على مفاتيح WARP جديدة…</string>
+    <string name="aether_log_title">السجل</string>
+    <string name="aether_log_empty">تظهر هنا نتائج الفحص وحالة مفتاح WARP</string>
+    <string name="aether_log_scan_started">جارٍ الفحص بحثًا عن خادم…</string>
+    <string name="aether_log_scan_found">تم العثور على %1$s</string>
+    <string name="aether_log_scan_found_hops">تم العثور على القفزة الخارجية %1$s والقفزة الداخلية %2$s</string>
+    <string name="aether_log_scan_cancelled">تم إلغاء الفحص</string>
+    <string name="aether_log_key_renewing">جارٍ تسجيل مفاتيح WARP جديدة؛ تبقى المفاتيح المستخدمة في مكانها حتى تجهز كل المفاتيح الجديدة…</string>
+    <string name="aether_log_key_renewed">حلّت مفاتيح WARP الجديدة محل القديمة وستُستخدم من الاتصال التالي</string>
+    <string name="aether_log_key_renew_failed">فشل تسجيل مفاتيح WARP الجديدة؛ تم الاحتفاظ بالمفاتيح الحالية</string>
+    <string name="aether_log_key_renew_cancelled">تم إلغاء الحصول على مفاتيح WARP جديدة</string>
+    <string name="aether_log_masque_key_ready">مفتاح MASQUE: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">مفتاح MASQUE: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_wireguard_key_ready">مفتاح WireGuard: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">مفتاح WireGuard: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_outer_key_ready">مفتاح القفزة الخارجية: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">مفتاح القفزة الخارجية: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_inner_key_ready">مفتاح القفزة الداخلية: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">مفتاح القفزة الداخلية: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_wireguard_inner_key_ready">مفتاح القفزة الداخلية لـ WireGuard: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">مفتاح القفزة الداخلية لـ WireGuard: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_masque_inner_key_ready">مفتاح القفزة الداخلية لـ MASQUE: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">مفتاح القفزة الداخلية لـ MASQUE: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_log_gool_key_ready">مفتاح WireGuard over MASQUE: الجهاز %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">مفتاح WireGuard over MASQUE: غير مسجل بعد؛ سيُسجل عند أول فحص أو اتصال</string>
+    <string name="aether_renew_blocked">افصل ملف Aether قبل الحصول على هذه المفاتيح؛ الاتصال الجاري يستخدمها</string>
+    <string name="aether_action_get_keys">الحصول على مفاتيح WARP جديدة</string>
+    <string name="aether_keys_lab_kind">الحصول على مفاتيح جديدة لـ</string>
+    <string name="aether_keys_kind_all">الكل</string>
+    <string name="aether_keys_lab_enroll_address">عنوان API</string>
+    <string name="aether_keys_hint_ech">يخفي اسم الخادم في طلبات WARP API؛ بدون مفتاح ECH صالح للاستخدام لا يُطلب أي مفتاح WARP</string>
+    <string name="aether_lab_fingerprint">البصمة</string>
+    <string name="aether_keys_invalid_enroll_address">يجب أن يكون عنوان API عنوان IP أو اسم نطاق، مع منفذ أو بدونه، مثل 188.114.97.6:443 أو [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">يجب أن يسجّل الأمر مفاتيح: --register متبوعًا بـ all أو wg أو masque أو mim أو gool-classic (WARP-in-WARP) أو gool (WireGuard over MASQUE)</string>
+    <string name="aether_keys_log_empty">تظهر هنا مخرجات النواة ومفاتيح WARP</string>
+    <string name="aether_scan_blocked">افصل ملف Aether قبل الفحص؛ الفحص سيفتح نفقًا ثانيًا بمفتاح الاتصال الحالي</string>
+    <string name="aether_keys_missing">ليس لديك مفتاح WARP المطلوب؛ احصل عليه أولًا</string>
+    <string name="aether_action_save_anyway">الحفظ على أي حال</string>
+    <string name="aether_action_scan_anyway">الفحص على أي حال</string>
+    <string name="aether_chain_one_profile">لا يمكن أن تحتوي سلسلة الوكيل إلا على ملف Aether واحد</string>
+    <string name="aether_exit_node_name_taken">يُستخدم ملف باسم exit-node في التوجيه هنا، وexit-node هو اسم المنفذ الصادر الذي تتصل عبره نواة Aether بالخارج؛ غيّر اسم ذلك الملف</string>
+    <string name="aether_chain_hop_missing">تعذّر إنشاء القفزة التي يتصل عبرها ملف Aether في سلسلة الوكيل هذه بالخارج، وكانت نواة Aether ستصل إلى الإنترنت بدونها</string>
+    <string name="config_main_outbound_missing">تعذّر إنشاء الملف المحدد، وكانت كل حركة المرور ستصل إلى الإنترنت مباشرة بدونه؛ تحقق من إعداداته</string>
+    <string name="config_routing_target_unbuilt">تعذّر إنشاء الملف «%1$s» الذي ترسل إليه قاعدة توجيه حركة المرور؛ أصلحه أو عطّل القواعد التي تستخدمه</string>
+    <string name="config_group_fallback_unbuilt">تعذّر إنشاء الملف «%1$s» وهو الاتصال الصادر الاحتياطي لمجموعة سياسات؛ أصلحه أو اختر اتصالًا صادرًا احتياطيًا آخر للمجموعة</string>
+    <string name="aether_config_single_profile">لا يمكن للتكوين استخدام أكثر من ملف Aether واحد</string>
+    <string name="aether_config_two_exits">سيتعين على نواة Aether واحدة أن تتصل بالخارج بطريقتين هنا: النفق نفسه مستخدم بمفرده وخلف قفزة في سلسلة وكيل، أو خلف قفزتين مختلفتين، أو بإعدادين مختلفين لـ exit-node</string>
+    <string name="aether_custom_no_outbound">لا يتصل أي مخرج SOCKS في الإعدادات بالعنوان %1$s:%2$d، حيث يستمع أمر Aether</string>
+    <string name="aether_custom_exit_node_selected">يختار موازن أو مرصد في هذا الإعداد المنافذ الصادرة التي تبدأ وسومها بـ %1$s، وهذا يشمل exit-node، المنفذ الصادر الذي تتصل عبره نواة Aether بالخارج؛ غيّر ذلك المحدِّد</string>
+    <string name="aether_custom_invalid_command">يجب أن يكون aetherCommand سطر أوامر نواة Aether كنص، مع عنوان الاستماع بعد --bind: %1$s</string>
+    <string name="title_aether_core">نواة Aether</string>
+    <string name="summary_aether_core">عميل WARP من CluvexStudio مضمّن بموجب رخصة AGPL-3.0. انقر لفتح الشيفرة المصدرية.</string>
+    <string-array name="aether_scan_entries">
+        <item>توربو</item>
+        <item>متوازن</item>
+        <item>شامل</item>
+        <item>مُتحقَّق منه</item>
+        <item>مضمون</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>إيقاف</item>
+        <item>عبر WARP إلى سايفون</item>
+        <item>عبر سايفون إلى WARP</item>
+        <item>سايفون فقط</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">قوائم حواف CDN للفحص</string>
+    <string name="aether_hint_psiphon_cdn_sets">أي قوائم الحواف المضمّنة في Psiphon يجرّبها فحص الواجهة. لا شيء محدد يعني جميعها؛ ومع عناوين IP الخاصة بك تُجرَّب بعدها</string>
+    <string name="aether_psiphon_cdn_sets_all">جميع القوائم المضمّنة في Psiphon</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai (قائمة Psiphon)</item>
+        <item>Bunny (قائمة Psiphon)</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>حواف واجهة منتقاة</item>
+        <item>تجاوزات أندرويد القديمة</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>تلقائي</item>
+        <item>عبر CDN فقط</item>
+        <item>مباشر فقط</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>إيقاف</item>
+        <item>عبر WARP إلى تور</item>
+        <item>عبر تور إلى WARP</item>
+        <item>تور فقط</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>عندما يكون تور محجوبًا</item>
+        <item>منذ البداية</item>
+        <item>أبدًا</item>
+        <item>أسطر الجسور الخاصة بي</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb والمرحّلات العامة</item>
+        <item>المرحّلات العامة فقط</item>
+        <item>bridgedb فقط</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>تلقائي</item>
+        <item>إيقاف</item>
+        <item>خفيف</item>
+        <item>جدار الحماية</item>
+        <item>متوازن</item>
+        <item>GFW</item>
+        <item>قوي</item>
+    </string-array>
 
 </resources>

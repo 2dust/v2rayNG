@@ -105,6 +105,7 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val systemVpnSettingsAvailable by viewModel.systemVpnSettingsAvailable.collectAsStateWithLifecycle()
+    val aetherListenPort by viewModel.aetherListenPort.collectAsStateWithLifecycle()
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var coreSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -114,8 +115,8 @@ fun SettingsScreen(
     var advancedSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var modeSettingsExpanded by rememberSaveable { mutableStateOf(true) }
 
-    var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
-    var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
+    var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, true)
+    var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, true)
     var appendHttpProxy by rememberMmkvBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
     var vpnDns by rememberMmkvString(AppConfig.PREF_VPN_DNS, "")
     var vpnBypassLan by rememberMmkvString(AppConfig.PREF_VPN_BYPASS_LAN, AppConfig.DEFAULT_VPN_BYPASS_LAN)
@@ -163,13 +164,14 @@ fun SettingsScreen(
             MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE, "auto") ?: "auto"
         )
     }
-    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, "0")
-    var dynamicColor by rememberMmkvBool(AppConfig.PREF_DYNAMIC_COLOR, true)
+    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, "2")
+    var dynamicColor by rememberMmkvBool(AppConfig.PREF_DYNAMIC_COLOR, false)
 
     var ipv6Enabled by rememberMmkvBool(AppConfig.PREF_IPV6_ENABLED, false)
     var preferIpv6 by rememberMmkvBool(AppConfig.PREF_PREFER_IPV6, false)
     var sniffingEnabled by rememberMmkvBool(AppConfig.PREF_SNIFFING_ENABLED, true)
     var routeOnlyEnabled by rememberMmkvBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
+    var removeSni by rememberMmkvBool(AppConfig.PREF_REMOVE_SNI, false)
     var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
     var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
     var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
@@ -419,6 +421,12 @@ fun SettingsScreen(
                     onCheckedChange = { routeOnlyEnabled = it }
                 )
                 SettingsSwitchItem(
+                    title = stringResource(R.string.mx_remove_sni_title),
+                    summary = stringResource(R.string.mx_remove_sni_summary),
+                    checked = removeSni,
+                    onCheckedChange = { removeSni = it }
+                )
+                SettingsSwitchItem(
                     title = stringResource(R.string.title_pref_enable_local_proxy),
                     summary = stringResource(R.string.summary_pref_enable_local_proxy),
                     checked = enableLocalProxy,
@@ -472,6 +480,13 @@ fun SettingsScreen(
                     checked = socksEnableUdp,
                     enabled = effectiveLocalProxy,
                     onCheckedChange = { socksEnableUdp = it }
+                )
+                // Matixray: the port every Aether core listens on, the three after it taken as well; it is there with or without the local proxy.
+                SettingsEditItem(
+                    title = stringResource(R.string.title_pref_aether_listen_port),
+                    value = aetherListenPort,
+                    keyboardNumber = true,
+                    onValueChanged = viewModel::setAetherListenPort
                 )
                 SettingsEditItem(
                     title = stringResource(R.string.title_pref_remote_dns),

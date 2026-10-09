@@ -10,6 +10,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.util.LogUtil
@@ -77,6 +78,8 @@ class UrlSchemeActivity : BaseComponentActivity() {
             LogUtil.i(AppConfig.TAG, decodedUrl)
             lifecycleScope.launch(Dispatchers.IO) {
                 val (count, countSub) = AngConfigManager.importBatchConfig(decodedUrl, "", false)
+                // An open main screen reloads its tabs
+                if (count + countSub > 0) MessageHelper.sendMsg2UI(applicationContext, AppConfig.MSG_SERVERS_CHANGED, "")
                 withContext(Dispatchers.Main) {
                     if (count + countSub > 0) {
                         toast(R.string.import_subscription_success)

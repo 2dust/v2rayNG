@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Matixray</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
     <string name="app_tile_first_use">برای اولین استفاده از این قابلیت، لطفاً ابتدا از داخل برنامه یک سرور اضافه کنید</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">سرویس v2rayNG</string>
+    <string name="notification_channel_service">سرویس Matixray</string>
     <string name="notification_channel_subscription_updates">به‌روزرسانی اشتراک‌ها</string>
     <string name="notification_channel_connection_checks">بررسی اتصال</string>
     <string name="notification_action_stop_v2ray">توقف</string>
@@ -84,6 +84,9 @@
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">اثرانگشت</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_cipher_suites">مجموعه رمزنگاری (Cipher Suites)</string>
+    <string name="toast_cipher_suites_need_unsafe">cipherSuites فقط با fingerprint از نوع unsafe اعمال می‌شود. unsafe را انتخاب کنید یا cipherSuites را خالی کنید.</string>
+    <string name="toast_websocket_alpn_http1_only">WebSocket و HTTPUpgrade فقط با alpn برابر http/1.1 یا بدون alpn وصل می‌شوند. http/1.1 را انتخاب کنید یا alpn را خالی بگذارید.</string>
     <string name="server_lab_allow_insecure">نادیده گرفتن تأیید گواهی (allowInsecure)</string>
     <string name="server_lab_sni" translatable="false">SNI</string>
     <string name="server_lab_address3">نشانی</string>
@@ -131,7 +134,17 @@
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
     <string name="server_lab_final_mask">JSON خام finalMask، قالب: { FinalMaskObject }</string>
+    <string name="preset_replace_title">%1$s جایگزین شود؟</string>
+    <string name="preset_replace_message">%1$s فعلی در فهرست نیست و پاک می‌شود. با %2$s جایگزین شود؟</string>
+    <string name="preset_action_replace">جایگزین کن</string>
+    <string name="preset_default">پیش‌فرض</string>
+    <string name="acc_choose_preset">انتخاب یک %1$s آماده</string>
+    <string name="server_lab_dial_mode" translatable="false">dialMode</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_ech_outbound">JSON خام echOutbound، قالب: { OutboundObject }</string>
+    <string name="toast_ech_outbound_needs_ech_config_list">echOutbound به echConfigList نیاز دارد</string>
+    <string name="toast_ech_outbound_invalid_tag">echOutbound باید یک \"tag\" غیرخالی داشته باشد که direct یا block نباشد و با proxy شروع نشود</string>
+    <string name="toast_ech_outbound_tag_conflict">تگ \"%1$s\" در echOutbound قبلاً توسط outbound دیگری استفاده شده است</string>
     <string name="server_lab_verify_peer_cert_by_name">تأیید گواهی همتا بر اساس نام</string>
     <string name="server_lab_pinned_ca256">اثر انگشت گواهی (SHA-256)</string>
     <string name="server_lab_browser_dialer">فعال‌سازی Browser Dialer</string>
@@ -252,6 +265,7 @@
     <string name="toast_warning_pref_proxysharing_short">اشتراک‌گذاری در شبکه محلی فعال شد؛ مطمئن شوید در یک شبکه امن هستید.</string>
 
     <string name="title_pref_socks_port">پورت پروکسی محلی</string>
+    <string name="title_pref_aether_listen_port">پورت شنود Aether</string>
     <string name="title_pref_enable_local_proxy">فعال‌سازی پروکسی محلی</string>
     <string name="summary_pref_enable_local_proxy">اگر غیرفعال باشد، هیچ پروکسی SOCKS در دسترس نخواهد بود و کارهایی مثل آپدیت اشتراک‌ها نمی‌توانند از پروکسی استفاده کنند.</string>
     <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
@@ -334,6 +348,9 @@
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
     <string name="sub_setting_request_headers">سرآیندهای درخواست (قالب JSON)</string>
     <string name="sub_setting_filter">فیلتر عبارت منظم برای نام‌ها</string>
+    <string name="sub_setting_override_address">جایگزینی نشانی</string>
+    <string name="sub_setting_override_port">جایگزینی پورت</string>
+    <string name="sub_setting_override_tip">برای نگه داشتن مقدار اشتراک خالی بگذارید</string>
     <string name="sub_setting_enable">فعال کردن به‌روزرسانی</string>
     <string name="sub_auto_update">فعال سازی به‌روزرسانی خودکار</string>
     <string name="sub_allow_insecure_url">مجاز کردن آدرس HTTP ناامن</string>
@@ -343,6 +360,7 @@
     <string name="sub_setting_entry_proxy_tip">پروکسی انتخاب‌شده پیش از هر پروفایل این اشتراک، به‌عنوان حلقهٔ ورودی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="sub_setting_exit_proxy_tip">پروکسی انتخاب‌شده پس از هر پروفایل این اشتراک، به‌عنوان حلقهٔ خروجی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
+    <string name="toast_invalid_override_port">پورت جایگزین نامعتبر است. عددی بین 1 تا 65535 وارد کنید.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تأخیر واقعی</string>
@@ -411,12 +429,6 @@
 
     <string name="import_subscription_success">اشتراک با موفقیت وارد شد</string>
     <string name="import_subscription_failure">وارد کردن اشتراک ناموفق بود</string>
-    <string name="title_fragment_settings">تنظیمات قطعه‌بندی بسته‌ها (Fragment)</string>
-    <string name="title_pref_fragment_packets">بسته‌های مورد قطعه‌بندی (Fragment)</string>
-    <string name="title_pref_fragment_length">طول قطعه (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_interval">فاصلهٔ قطعه‌ها (حداقل-حداکثر)</string>
-    <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
-    <string name="title_pref_fragment_maxsplit">حداکثر تعداد قطعه‌ها</string>
     <string name="title_observatory_settings">تنظیمات پایش اتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصله leastLoad</string>
@@ -425,6 +437,8 @@
     <string name="title_pref_observatory_least_load_timeout">مهلت زمانی leastLoad</string>
     <string name="toast_invalid_observatory_duration">مدت زمان نامعتبر است. از مقداری مانند 3m یا 30s استفاده کنید.</string>
     <string name="toast_invalid_observatory_sampling">مقدار نمونه‌برداری نامعتبر است. از یک عدد مثبت استفاده کنید.</string>
+    <string name="toast_invalid_aether_listen_port">برای پورت شنود Aether پورتی از 1024 تا 65532 وارد کنید</string>
+    <string name="toast_aether_listen_port_local_proxy">پورت شنود Aether و سه پورت پس از آن نباید پورت پروکسی محلی را در بر بگیرند</string>
 
     <string name="update_check_for_update">بررسی به روز رسانی</string>
     <string name="update_already_latest_version">در حال حاضر آخرین نسخه نصب شده است</string>
@@ -444,7 +458,6 @@
     <string name="server_proxy_chain_member_unselected">یک عضو را انتخاب کنید</string>
     <string name="server_proxy_chain_members_unselected">لطفاً برای هر ردیف زنجیره یک عضو انتخاب کنید</string>
     <string name="server_proxy_chain_members_insufficient">تعداد اعضا کافی نیست</string>
-    <string name="server_proxy_chain_members_invalid">اعضای نامعتبر زنجیره: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">پشتیبان‌گیری و بازیابی</string>
@@ -560,5 +573,203 @@
     <string name="tasker_blurb_stop">توقف %1$s</string>
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
+    <string name="aether_lab_protocol">پروتکل</string>
+    <string name="aether_lab_transport">حامل</string>
+    <string name="aether_lab_masque_sni">نام سرور MASQUE (SNI)</string>
+    <string name="aether_lab_scan_mode">حالت اسکن</string>
+    <string name="aether_lab_obfuscation">مبهم‌سازی</string>
+    <string name="aether_lab_ip_version">نسخه IP</string>
+    <string name="aether_lab_exit_final_mask">JSON خام finalMask برای exit-node، قالب: { FinalMaskObject }</string>
+    <string name="aether_exit_node_freedom">freedom (پیش‌فرض)</string>
+    <string name="label_numbered">%1$s (%2$d)</string>
+    <string name="aether_hint_exit_node">هسته از راه خروجی این پروفایل به بیرون وصل می‌شود، مانند گامی از زنجیرهٔ پروکسی؛ finalMask و dialMode پایین فقط برای freedom است</string>
+    <string name="aether_exit_node_unusable">پروفایل exit-node «%1$s» خروجی نمی‌سازد؛ پروفایل دیگری یا freedom را انتخاب کنید</string>
+    <string name="aether_exit_node_ech_unusable">echOutbound پروفایل exit-node «%1$s» قابل استفاده نیست؛ آن را در همان پروفایل درست کنید، یا پروفایل دیگری یا freedom را انتخاب کنید</string>
+    <string name="toast_profile_name_not_found">هیچ پروفایلی با نام «%1$s» پیدا نشد</string>
+    <string name="toast_profile_name_duplicate">دو پروفایل با نام «%1$s» پیدا شد؛ لطفاً نام یکی را تغییر دهید</string>
+    <string name="toast_profile_no_server">پروفایل «%1$s» نشانی سرور ندارد، پس زنجیره پروکسی نمی‌تواند از آن بگذرد</string>
+    <string name="toast_profile_group_not_fallback">«%1$s» یک گروه خط مشی است، و گروه خط مشی نمی‌تواند خروجی پشتیبان باشد؛ پروفایل دیگری انتخاب کنید</string>
+    <string name="toast_profile_group_not_hop">«%1$s» یک گروه خط مشی است، پس زنجیره پروکسی نمی‌تواند از آن بگذرد؛ پروفایل دیگری انتخاب کنید</string>
+    <string name="toast_profile_chain_not_hop">«%1$s» یک زنجیره پروکسی است، پس زنجیره پروکسی دیگری نمی‌تواند از آن بگذرد؛ پروفایل دیگری انتخاب کنید</string>
+    <string name="toast_profile_custom_not_hop">«%1$s» یک کانفیگ سفارشی است، پس زنجیره پروکسی نمی‌تواند از آن بگذرد؛ پروفایل دیگری انتخاب کنید</string>
+    <string name="toast_profile_custom_not_fallback">«%1$s» یک کانفیگ سفارشی است، و کانفیگ سفارشی نمی‌تواند خروجی پشتیبان باشد؛ پروفایل دیگری انتخاب کنید</string>
+    <string name="aether_keys_hint_fragment">ClientHello درخواست‌های WARP API را تکه‌تکه می‌فرستد، برای شبکه‌هایی که نام API را فیلتر می‌کنند</string>
+    <string name="aether_lab_fragment">تکه‌تکه کردن ClientHello</string>
+    <string name="aether_lab_fragment_size">اندازه تکه‌ها (بایت)</string>
+    <string name="aether_lab_fragment_delay">تأخیر بین تکه‌ها (میلی‌ثانیه)</string>
+    <string name="aether_lab_wiw_outer">مسیر بیرونی</string>
+    <string name="aether_lab_wiw_inner">مسیر درونی</string>
+    <string name="aether_hint_endpoint">خالی بگذارید تا اسکن شود</string>
+    <string name="aether_hint_gool_peer">خالی بگذارید تا نشانی‌ای که WARP می‌دهد استفاده شود</string>
+    <string name="aether_action_scan">اسکن برای یافتن سرور</string>
+    <string name="aether_action_scanning">در حال اسکن…</string>
+    <string name="aether_scan_success">سرور پیدا شد</string>
+    <string name="aether_scan_failed">سروری پیدا نشد</string>
+    <string name="aether_invalid_endpoint">یک نشانی IP و پورت وارد کنید، یا نشانی را خالی بگذارید تا اسکن شود</string>
+    <string name="aether_invalid_hop">نشانی و پورت را با هم بنویسید، مثل 162.159.192.1:2408</string>
+    <string name="aether_same_hop">دو مسیر باید نشانی متفاوت داشته باشند</string>
+    <string name="aether_invalid_fragment">یک عدد یا بازه مثل 16-32 بنویسید: اندازه 1 تا 4096 بایت، تأخیر 0 تا 1000 میلی‌ثانیه</string>
+    <string name="aether_listen_port_taken">هسته نمی‌تواند روی پورت پروکسی محلی برنامه، یا روی پورتی که سه تا بالاتر از پورت شنود Aether است گوش دهد؛ پورت شنود Aether را در تنظیمات، یا پورت‌های فرمان را تغییر دهید</string>
+    <string name="aether_secondary_port_taken">یکی از inboundهای این پیکربندی همین حالا روی %1$d گوش می‌دهد، که سه تا بالاتر از پورت شنود Aether است و هستهٔ Aether از راه آن به بیرون وصل می‌شود؛ پورت شنود Aether را در تنظیمات تغییر دهید</string>
+    <string name="aether_lab_psiphon">سایفون</string>
+    <string name="aether_lab_psiphon_mode">نحوه اتصال سایفون</string>
+    <string name="aether_lab_psiphon_cdn_ips">آی‌پی‌های CDN</string>
+    <string name="aether_lab_psiphon_cdn_sni">نام سرورهای CDN (SNI)</string>
+    <string name="aether_hint_psiphon_list">با کاما جدا کنید؛ خالی بگذارید تا فهرست داخلی استفاده شود</string>
+    <string name="aether_lab_psiphon_region">کشور خروجی</string>
+    <string name="aether_psiphon_region_any">هر کشوری</string>
+    <string name="aether_lab_psiphon_bundled_list">شروع از فهرست سرورهای همراه برنامه</string>
+    <string name="aether_hint_psiphon_bundled_list">روشن: سایفون بی‌درنگ سرورهای psiphon_servers.dat را امتحان می‌کند و فهرست تازه را فقط وقتی می‌گیرد که آن‌ها کار نکنند. خاموش: پیش از نخستین اتصال فهرست تازه را می‌گیرد، پس فهرست باید در دسترس باشد، مثلاً از پشت WARP</string>
+    <string name="aether_action_clear_psiphon">پاک کردن داده‌های سایفون</string>
+    <string name="aether_hint_clear_psiphon">سرورهایی که سایفون یاد گرفته و فهرست‌هایی که گرفته فراموش می‌شوند. شروع بعدی دوباره از فهرست همراه برنامه است، یا اگر گزینهٔ بالا خاموش باشد، از یک دریافت تازه</string>
+    <string name="aether_log_psiphon_cleared">داده‌های سایفون پاک شد</string>
+    <string name="aether_log_psiphon_clear_failed">داده‌های سایفون پاک نشد</string>
+    <string name="aether_psiphon_clear_blocked">پیش از پاک کردن داده‌های سایفون، اتصال Aether را قطع کنید؛ اتصال فعلی از آن‌ها استفاده می‌کند</string>
+    <string name="aether_psiphon_unavailable">این نسخه کلاینت سایفون را ندارد؛ پروفایلی که از سایفون استفاده کند نمی‌تواند وصل شود</string>
+    <string name="aether_psiphon_needs_masque">حالت «اول سایفون، بعد WARP» فقط با پروتکل MASQUE کار می‌کند</string>
+    <string name="aether_next_port_taken">با تور یا سایفون در مسیر، هسته پورت‌های بعد از پورت شنود Aether را هم استفاده می‌کند و هیچ‌کدام نمی‌تواند پورت پروکسی محلی برنامه باشد؛ پورت شنود Aether را در تنظیمات تغییر دهید</string>
+    <string name="aether_lab_tor">تور (Tor)</string>
+    <string name="aether_lab_tor_bridges">پل‌ها</string>
+    <string name="aether_lab_tor_bridge_lines">خط‌های پل</string>
+    <string name="aether_hint_tor_bridge_lines">هر خط یک پل، مانند torrc: obfs4 1.2.3.4:443 FINGERPRINT cert=… iat-mode=0</string>
+    <string name="aether_tor_transports_unavailable">این نسخه انتقال‌های اتصال‌پذیر (pluggable transport) را ندارد، پس پل‌های تور قابل استفاده نیستند؛ تور فقط جایی وصل می‌شود که مسدود نباشد</string>
+    <string name="aether_tor_needs_masque">حالت «اول تور، بعد WARP» فقط با پروتکل MASQUE کار می‌کند</string>
+    <string name="aether_tor_psiphon_conflict">تور و سایفون فقط به این شکل با هم کار می‌کنند: یکی درون تونل و دیگری دور آن</string>
+    <string name="aether_tor_bridges_missing">دست‌کم یک خط پل بنویسید، یا تنظیم دیگری برای پل‌ها انتخاب کنید</string>
+    <string name="aether_lab_ech">Encrypted Client Hello (ECH)</string>
+    <string name="aether_hint_ech">نام سرور را در دست‌دهی MASQUE پنهان می‌کند؛ بدون کلید قابل استفاده، Aether وصل نمی‌شود</string>
+    <string name="aether_lab_ech_dns">DNS برای ECH</string>
+    <string name="aether_lab_ech_domain">دامنه‌ی ECH</string>
+    <string name="aether_invalid_ech_dns">DNS برای ECH باید udp://IP، tcp://IP یا نشانی https:// یک سرور DNS-over-HTTPS باشد</string>
+    <string name="aether_invalid_ech_domain">دامنه‌ی ECH باید نام دامنه باشد، مانند cloudflare-ech.com</string>
+    <string name="aether_invalid_masque_sni">نام سرور MASQUE (SNI) باید نام دامنه باشد، مانند www.cloudflare.com</string>
+    <string name="aether_lab_dns">DNS درون تونل</string>
+    <string name="aether_hint_dns">با کاما جدا کنید؛ خالی بگذارید تا 1.1.1.1 و 1.0.0.1 استفاده شود</string>
+    <string name="aether_invalid_dns">نشانی‌های DNS مانند 1.1.1.1 یا 10.0.0.1:5353 را با کاما جدا بنویسید</string>
+    <string name="aether_lab_exit_loc">کشور خروجی تونل</string>
+    <string name="aether_hint_exit_loc">DE,SE فقط همان‌ها را مجاز می‌کند؛ !IR,RU آن‌ها را رد می‌کند؛ خالی یعنی هر کشوری</string>
+    <string name="aether_invalid_exit_loc">کدهای دوحرفی کشور را با کاما جدا بنویسید، با ! در ابتدا برای رد کردن</string>
+    <string name="aether_lab_tor_relays">منبع پل‌ها</string>
+    <string name="aether_lab_other_settings">تنظیمات دیگر</string>
+    <string name="aether_lab_command">فرمان Aether</string>
+    <string name="aether_command_custom">دستی ویرایش شده: این فرمان همان‌طور که نوشته شده اجرا می‌شود و تنظیمات بالا اعمال نمی‌شوند، به‌جز تنظیمات Xray-core</string>
+    <string name="aether_action_use_settings">استفاده از تنظیمات</string>
+    <string name="aether_invalid_command">فرمان باید آرگومان‌های هسته Aether را داشته باشد و پورت گوش‌دادن پس از --bind بیاید</string>
+    <string name="aether_unsupported_abi">هسته Aether برای این دستگاه در دسترس نیست</string>
+    <string name="aether_core_stopped">هسته Aether متوقف شده است</string>
+    <string name="aether_core_stopped_no_ech_key">هسته Aether متوقف شد: ECH روشن است ولی هیچ کلید ECH قابل استفاده‌ای پیدا نشد. بدون آن، نام سرور به‌صورت آشکار فرستاده می‌شد.</string>
+    <string name="aether_core_connecting">هسته Aether هنوز در حال اتصال است</string>
+    <string name="menu_item_import_config_manually_aether">افزودن دستی کانفیگ Aether</string>
+    <string name="aether_action_renew_key">دریافت کلیدهای جدید WARP…</string>
+    <string name="aether_action_renewing_key">در حال دریافت کلیدهای جدید WARP…</string>
+    <string name="aether_log_title">لاگ</string>
+    <string name="aether_log_empty">نتیجه اسکن‌ها و وضعیت کلید WARP اینجا نمایش داده می‌شود</string>
+    <string name="aether_log_scan_started">در حال اسکن برای یافتن سرور…</string>
+    <string name="aether_log_scan_found">پیدا شد: %1$s</string>
+    <string name="aether_log_scan_found_hops">مسیر بیرونی %1$s و مسیر درونی %2$s پیدا شد</string>
+    <string name="aether_log_scan_cancelled">اسکن لغو شد</string>
+    <string name="aether_log_key_renewing">در حال ثبت کلیدهای جدید WARP؛ کلیدهای فعلی تا آماده شدن همه کلیدهای جدید سر جای خود می‌مانند…</string>
+    <string name="aether_log_key_renewed">کلیدهای جدید WARP جایگزین شدند و از اتصال بعدی استفاده می‌شوند</string>
+    <string name="aether_log_key_renew_failed">ثبت کلیدهای جدید WARP ناموفق بود؛ کلیدهای فعلی حفظ شد</string>
+    <string name="aether_log_key_renew_cancelled">دریافت کلیدهای جدید WARP لغو شد</string>
+    <string name="aether_log_masque_key_ready">کلید MASQUE: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_masque_key_missing">کلید MASQUE: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_wireguard_key_ready">کلید WireGuard: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_wireguard_key_missing">کلید WireGuard: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_outer_key_ready">کلید مسیر بیرونی: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_outer_key_missing">کلید مسیر بیرونی: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_inner_key_ready">کلید مسیر درونی: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_inner_key_missing">کلید مسیر درونی: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_wireguard_inner_key_ready">کلید مسیر درونی WireGuard: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_wireguard_inner_key_missing">کلید مسیر درونی WireGuard: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_masque_inner_key_ready">کلید مسیر درونی MASQUE: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_masque_inner_key_missing">کلید مسیر درونی MASQUE: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_log_gool_key_ready">کلید WireGuard over MASQUE: دستگاه %1$s، IPv4 %2$s، IPv6 %3$s</string>
+    <string name="aether_log_gool_key_missing">کلید WireGuard over MASQUE: هنوز ثبت نشده؛ در اولین اسکن یا اتصال ثبت می‌شود</string>
+    <string name="aether_renew_blocked">پیش از دریافت این کلیدها، اتصال Aether را قطع کنید؛ اتصال فعلی از آن‌ها استفاده می‌کند</string>
+    <string name="aether_action_get_keys">دریافت کلیدهای جدید WARP</string>
+    <string name="aether_keys_lab_kind">دریافت کلید جدید برای</string>
+    <string name="aether_keys_kind_all">همه</string>
+    <string name="aether_keys_lab_enroll_address">نشانی API</string>
+    <string name="aether_keys_hint_ech">نام سرور را در درخواست‌های WARP API پنهان می‌کند؛ بدون کلید ECH قابل استفاده، هیچ کلید WARP درخواست نمی‌شود</string>
+    <string name="aether_lab_fingerprint">اثرانگشت</string>
+    <string name="aether_keys_invalid_enroll_address">نشانی API باید یک نشانی IP یا نام دامنه باشد، با پورت یا بدون آن، مثل 188.114.97.6:443 یا [2606:4700::1]:8443</string>
+    <string name="aether_keys_invalid_command">فرمان باید کلید ثبت کند: --register و پس از آن all، wg، masque، mim، gool-classic (WARP-in-WARP) یا gool (WireGuard over MASQUE)</string>
+    <string name="aether_keys_log_empty">خروجی هسته و کلیدهای WARP اینجا نمایش داده می‌شود</string>
+    <string name="aether_scan_blocked">پیش از اسکن، اتصال Aether را قطع کنید؛ اسکن یک تونل دوم با کلید اتصال فعلی باز می‌کند</string>
+    <string name="aether_keys_missing">کلید WARP لازم را ندارید؛ لطفاً اول آن را دریافت کنید</string>
+    <string name="aether_action_save_anyway">با این حال ذخیره کن</string>
+    <string name="aether_action_scan_anyway">با این حال اسکن کن</string>
+    <string name="aether_chain_one_profile">یک زنجیره پروکسی فقط می‌تواند یک پروفایل Aether داشته باشد</string>
+    <string name="aether_exit_node_name_taken">در مسیریابی اینجا از پروفایلی با نام exit-node استفاده شده، و exit-node نام outbound ـی است که هستهٔ Aether از راه آن به بیرون وصل می‌شود؛ نام آن پروفایل را تغییر دهید</string>
+    <string name="aether_chain_hop_missing">گامی که پروفایل Aether این زنجیرهٔ پروکسی از راه آن به بیرون وصل می‌شود ساخته نشد، و هستهٔ Aether بدون آن به اینترنت می‌رسید</string>
+    <string name="config_main_outbound_missing">پروفایل انتخاب‌شده ساخته نشد، و همهٔ ترافیک بدون آن مستقیم به اینترنت می‌رسید؛ تنظیماتش را بررسی کنید</string>
+    <string name="config_routing_target_unbuilt">پروفایل «%1$s» که یک قانون مسیریابی ترافیک را به آن می‌فرستد ساخته نشد؛ آن را درست کنید، یا قانون‌هایی را که از آن استفاده می‌کنند خاموش کنید</string>
+    <string name="config_group_fallback_unbuilt">پروفایل «%1$s» که خروجی پشتیبان یک گروه خط مشی است ساخته نشد؛ آن را درست کنید، یا خروجی پشتیبان دیگری برای گروه انتخاب کنید</string>
+    <string name="aether_config_single_profile">یک پیکربندی فقط می‌تواند از یک پروفایل Aether استفاده کند</string>
+    <string name="aether_config_two_exits">اینجا یک هستهٔ Aether باید از دو راه به بیرون وصل شود: همان تونل هم به‌تنهایی و هم پشت یک گام زنجیرهٔ پروکسی، یا پشت دو گام متفاوت، یا با دو تنظیم متفاوت exit-node به کار رفته است</string>
+    <string name="aether_custom_no_outbound">هیچ خروجی SOCKS در پیکربندی به %1$s:%2$d وصل نمی‌شود؛ فرمان Aether همان‌جا گوش می‌دهد</string>
+    <string name="aether_custom_exit_node_selected">یک balancer یا observatory در این پیکربندی outbound هایی را برمی‌گزیند که تگشان با %1$s شروع می‌شود، و exit-node هم جزو آن‌هاست، همان outbound ـی که هستهٔ Aether از راه آن به بیرون وصل می‌شود؛ آن selector را تغییر دهید</string>
+    <string name="aether_custom_invalid_command">aetherCommand باید خط فرمان هسته Aether به صورت متن باشد و نشانی گوش‌دادن آن پس از --bind بیاید: %1$s</string>
+    <string name="title_aether_core">هسته Aether</string>
+    <string name="summary_aether_core">کلاینت WARP ساخته CluvexStudio که با مجوز AGPL-3.0 همراه برنامه است. برای دیدن کد منبع ضربه بزنید.</string>
+    <string-array name="aether_scan_entries">
+        <item>توربو</item>
+        <item>متعادل</item>
+        <item>دقیق</item>
+        <item>تأییدشده</item>
+        <item>تضمینی</item>
+    </string-array>
+    <string-array name="aether_psiphon_entries">
+        <item>خاموش</item>
+        <item>اول WARP، بعد سایفون</item>
+        <item>اول سایفون، بعد WARP</item>
+        <item>فقط سایفون</item>
+    </string-array>
+    <string name="aether_lab_psiphon_cdn_sets">فهرست‌های لبهٔ CDN برای اسکن</string>
+    <string name="aether_hint_psiphon_cdn_sets">کدام فهرست‌های لبهٔ داخلی سایفون در اسکن فرانتینگ امتحان شوند. هیچ‌کدام یعنی همه؛ در کنار IPهای خودتان، پس از آن‌ها امتحان می‌شوند</string>
+    <string name="aether_psiphon_cdn_sets_all">همهٔ فهرست‌های داخلی سایفون</string>
+    <string-array name="aether_psiphon_cdn_set_entries">
+        <item>Cloudflare</item>
+        <item>Fastly</item>
+        <item>CloudFront</item>
+        <item>Akamai (فهرست سایفون)</item>
+        <item>Bunny (فهرست سایفون)</item>
+        <item>Vercel</item>
+        <item>GitHub</item>
+        <item>لبه‌های گزینش‌شدهٔ فرانتینگ</item>
+        <item>بازنویسی‌های قدیمی اندروید</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_entries">
+        <item>خودکار</item>
+        <item>فقط از طریق CDN</item>
+        <item>فقط مستقیم</item>
+    </string-array>
+    <string-array name="aether_tor_entries">
+        <item>خاموش</item>
+        <item>اول WARP، بعد تور</item>
+        <item>اول تور، بعد WARP</item>
+        <item>فقط تور</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_entries">
+        <item>وقتی تور مسدود است</item>
+        <item>از همان ابتدا</item>
+        <item>هرگز</item>
+        <item>خط‌های پل خودم</item>
+    </string-array>
+    <string-array name="aether_tor_relays_entries">
+        <item>bridgedb و رله‌های عمومی</item>
+        <item>فقط رله‌های عمومی</item>
+        <item>فقط bridgedb</item>
+    </string-array>
+    <string-array name="aether_obfuscation_entries">
+        <item>خودکار</item>
+        <item>خاموش</item>
+        <item>سبک</item>
+        <item>فایروال</item>
+        <item>متعادل</item>
+        <item>GFW</item>
+        <item>شدید</item>
+    </string-array>
 
 </resources>

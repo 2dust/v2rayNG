@@ -23,7 +23,7 @@ class WidgetProvider : AppWidgetProvider() {
      */
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        updateWidgetBackground(context, appWidgetManager, appWidgetIds, CoreServiceManager.isRunning())
+        updateWidgetBackground(context, appWidgetManager, appWidgetIds, CoreServiceManager.isServiceRunning())
     }
 
     /**
@@ -68,7 +68,8 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (AppConfig.BROADCAST_ACTION_WIDGET_CLICK == intent.action) {
-            if (CoreServiceManager.isRunning()) {
+            // Not Xray alone: during a reload the widget shows a running service, and the tap means a stop.
+            if (CoreServiceManager.isServiceRunning()) {
                 LauncherManager.stopService(context)
             } else {
                 LauncherManager.startServiceFromToggle(context)

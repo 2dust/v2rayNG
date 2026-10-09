@@ -17,7 +17,7 @@ class ScStopActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         LaunchedEffect(Unit) {
             moveTaskToBack(true)
-            if (CoreServiceManager.isRunning()) {
+            if (CoreServiceManager.isServiceRunning()) {
                 LauncherManager.stopService(this@ScStopActivity)
             }
             finish()

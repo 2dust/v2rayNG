@@ -87,6 +87,7 @@
         <item>qq</item>
         <item>random</item>
         <item>randomized</item>
+        <item>unsafe</item>
     </string-array>
 
     <string-array name="streamsecurity_alpn" translatable="false">
@@ -221,5 +222,154 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="aether_protocol_entries" translatable="false">
+        <item>MASQUE</item>
+        <item>WireGuard</item>
+        <item>WARP-in-WARP</item>
+        <item>MASQUE-in-MASQUE</item>
+    </string-array>
+    <string-array name="aether_protocol_values" translatable="false">
+        <item>masque</item>
+        <item>wg</item>
+        <item>gool</item>
+        <item>mim</item>
+    </string-array>
+    <string-array name="aether_fingerprint_entries" translatable="false">
+        <item>Chrome</item>
+        <item>Firefox</item>
+        <item>Semi-Python</item>
+        <item>Go</item>
+    </string-array>
+    <!-- The resolvers and the domains the ECH fields offer, the default first; either field takes any other value the core does. -->
+    <string-array name="aether_ech_dns_options" translatable="false">
+        <item>udp://1.1.1.1</item>
+        <item>udp://8.8.8.8</item>
+        <item>https://1.1.1.1/dns-query@sni=www.microsoft.com</item>
+        <item>https://doq.dns4all.eu/dns-query@address=194.0.5.3</item>
+        <item>tcp://1.1.1.1</item>
+        <item>tcp://8.8.8.8</item>
+    </string-array>
+    <string-array name="aether_ech_domain_options" translatable="false">
+        <item>cloudflare-ech.com</item>
+        <item>crypto.cloudflare.com</item>
+        <item>ip.gs</item>
+        <item>api.cloudflareclient.com</item>
+        <item>consumer-masque.cloudflareclient.com</item>
+        <item>consumer-masque-proxy.cloudflareclient.com</item>
+    </string-array>
+    <string-array name="aether_fingerprint_values" translatable="false">
+        <item>chrome</item>
+        <item>firefox</item>
+        <item>semi-python</item>
+        <item>go</item>
+    </string-array>
+    <string-array name="aether_transport_entries" translatable="false">
+        <item>HTTP/3</item>
+        <item>HTTP/2</item>
+    </string-array>
+    <string-array name="aether_transport_values" translatable="false">
+        <item>h3</item>
+        <item>h2</item>
+    </string-array>
+    <string-array name="aether_scan_values" translatable="false">
+        <item>turbo</item>
+        <item>balanced</item>
+        <item>thorough</item>
+        <item>verified</item>
+        <item>ironclad</item>
+    </string-array>
+    <string-array name="aether_obfuscation_values" translatable="false">
+        <item>auto</item>
+        <item>off</item>
+        <item>light</item>
+        <item>firewall</item>
+        <item>balanced</item>
+        <item>gfw</item>
+        <item>aggressive</item>
+    </string-array>
+    <string-array name="aether_ip_entries" translatable="false">
+        <item>IPv4</item>
+        <item>IPv6</item>
+        <item>IPv4 + IPv6</item>
+    </string-array>
+    <string-array name="aether_ip_values" translatable="false">
+        <item>v4</item>
+        <item>v6</item>
+        <item>both</item>
+    </string-array>
+    <string-array name="aether_psiphon_values" translatable="false">
+        <item>off</item>
+        <item>chain</item>
+        <item>reverse</item>
+        <item>only</item>
+    </string-array>
+    <string-array name="aether_psiphon_cdn_set_values" translatable="false">
+        <item>cloudflare</item>
+        <item>fastly</item>
+        <item>cloudfront</item>
+        <item>psiphon-akamai</item>
+        <item>psiphon-bunny</item>
+        <item>vercel</item>
+        <item>github</item>
+        <item>curated-fronting</item>
+        <item>legacy-android-overrides</item>
+    </string-array>
+    <string-array name="aether_psiphon_mode_values" translatable="false">
+        <item>auto</item>
+        <item>cdn</item>
+        <item>direct</item>
+    </string-array>
+    <string-array name="aether_tor_values" translatable="false">
+        <item>off</item>
+        <item>chain</item>
+        <item>reverse</item>
+        <item>only</item>
+    </string-array>
+    <string-array name="aether_tor_bridges_values" translatable="false">
+        <item>auto</item>
+        <item>first</item>
+        <item>never</item>
+        <item>own</item>
+    </string-array>
+    <string-array name="aether_tor_relays_values" translatable="false">
+        <item>auto</item>
+        <item>only</item>
+        <item>off</item>
+    </string-array>
+    <string-array name="target_strategy_values" translatable="false">
+        <item>AsIs</item>
+        <item>UseIP</item>
+        <item>UseIPv4</item>
+        <item>UseIPv6</item>
+        <item>UseIPv4v6</item>
+        <item>UseIPv6v4</item>
+        <item>ForceIP</item>
+        <item>ForceIPv4</item>
+        <item>ForceIPv6</item>
+        <item>ForceIPv4v6</item>
+        <item>ForceIPv6v4</item>
+    </string-array>
+    <!-- The finalMasks the finalMask fields offer, by name, and at the same index the JSON a pick puts in the field:
+         quoted, so that its spaces stay, with \n for a line break. -->
+    <string-array name="final_mask_preset_names" translatable="false">
+        <item>tlshello-0-len (0-104-1-0-0-114-1-1-11)</item>
+        <item>tlshello (6-98-1-0-0-114-1-1-11)</item>
+        <item>udp-noise (rnd-24-1200-1230)</item>
+    </string-array>
+    <string-array name="final_mask_preset_values" translatable="false">
+        <item>"{\n  \"tcp\": [\n    {\"type\": \"fragment\", \"settings\": {\"packets\": \"tlshello\", \"lengths\": [\"0\", \"104\", \"1\"], \"delays\": [\"0\"], \"maxSplit\": \"0\"}},\n    {\"type\": \"fragment\", \"settings\": {\"packets\": \"1-1\", \"lengths\": [\"114\", \"1\"], \"delays\": [\"1\"], \"maxSplit\": \"11\"}}\n  ]\n}"</item>
+        <item>"{\n  \"tcp\": [\n    {\"type\": \"fragment\", \"settings\": {\"packets\": \"tlshello\", \"lengths\": [\"6\", \"98\", \"1\"], \"delays\": [\"0\"], \"maxSplit\": \"0\"}},\n    {\"type\": \"fragment\", \"settings\": {\"packets\": \"1-1\", \"lengths\": [\"114\", \"1\"], \"delays\": [\"1\"], \"maxSplit\": \"11\"}}\n  ]\n}"</item>
+        <item>"{\n  \"udp\": [\n    {\n      \"type\": \"noise\",\n      \"settings\": {\n        \"reset\": \"28\",\n        \"noise\": [\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"},\n          {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}, {\"rand\": \"1200-1230\", \"delay\": \"10\"}\n        ]\n      }\n    }\n  ]\n}"</item>
+    </string-array>
+    <!-- The lists the cipherSuites field offers, by name, and at the same index the names a pick puts in the field,
+         joined by ':' as Xray reads them. -->
+    <string-array name="cipher_suites_preset_names" translatable="false">
+        <item>semi-python-cipherSuites</item>
+        <item>real-firefox-cipherSuites</item>
+    </string-array>
+    <string-array name="cipher_suites_preset_values" translatable="false">
+        <item>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</item>
+        <item>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_RSA_WITH_AES_128_GCM_SHA256:TLS_RSA_WITH_AES_256_GCM_SHA384:TLS_RSA_WITH_AES_128_CBC_SHA:TLS_RSA_WITH_AES_256_CBC_SHA</item>
+    </string-array>
 
 </resources>

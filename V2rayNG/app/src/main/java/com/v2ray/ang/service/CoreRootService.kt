@@ -42,7 +42,9 @@ class CoreRootService : Service(), ServiceControl {
         NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
 
-        if (CoreServiceManager.isRunning()) {
+        // A reload has Xray stopped for a moment; a start on top of it would run beside the reload and
+        // take the root rules and the tunnel down to install them again, with the traffic unrouted meanwhile.
+        if (CoreServiceManager.isServiceRunning()) {
             LogUtil.i(AppConfig.TAG, "StartCore-Root: Core is already running")
             return START_STICKY
         }

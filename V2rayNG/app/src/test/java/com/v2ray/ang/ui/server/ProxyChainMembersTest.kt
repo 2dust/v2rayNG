@@ -1,7 +1,10 @@
 package com.v2ray.ang.ui.server
 
+import com.v2ray.ang.enums.EConfigType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ProxyChainMembersTest {
@@ -56,5 +59,16 @@ class ProxyChainMembersTest {
             listOf("One") to listOf("one"),
             withoutProxyChainMember(listOf("One", ""), listOf("one", "blank"), "blank"),
         )
+    }
+
+    @Test
+    fun anAetherMemberCanStandAnywhereButOnlyOnce() {
+        assertFalse(hasSecondAetherMember(listOf(EConfigType.AETHER, EConfigType.VLESS)))
+        assertFalse(hasSecondAetherMember(listOf(EConfigType.VLESS, EConfigType.AETHER)))
+        assertFalse(hasSecondAetherMember(listOf(EConfigType.VLESS, EConfigType.AETHER, EConfigType.TROJAN)))
+        assertFalse(hasSecondAetherMember(listOf(EConfigType.VLESS, EConfigType.TROJAN)))
+        assertFalse(hasSecondAetherMember(listOf(null, EConfigType.VLESS)))
+        assertTrue(hasSecondAetherMember(listOf(EConfigType.AETHER, EConfigType.AETHER)))
+        assertTrue(hasSecondAetherMember(listOf(EConfigType.AETHER, EConfigType.VLESS, EConfigType.AETHER)))
     }
 }

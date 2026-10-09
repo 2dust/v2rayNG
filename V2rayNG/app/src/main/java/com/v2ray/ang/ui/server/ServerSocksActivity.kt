@@ -29,6 +29,8 @@ class ServerSocksActivity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             SocksProtocolFields(uiState)
+            CommonDialModeField(uiState)
+            CommonTargetStrategyField(uiState)
 
         }
     }

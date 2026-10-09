@@ -43,22 +43,36 @@ class TProxyService(
     /**
      * Starts the tun2socks process with the appropriate parameters.
      */
-    override fun startTun2Socks() {
+    override fun startTun2Socks(): Boolean {
 //        LogUtil.i(AppConfig.TAG, "Starting HevSocks5Tunnel via JNI")
 
-        val configContent = buildConfig()
-        val configFile = File(context.filesDir, "hev-socks5-tunnel.yaml").apply {
-            writeText(configContent)
-        }
-//        LogUtil.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
-        LogUtil.d(AppConfig.TAG, "HevSocks5Tunnel Config content:\n$configContent")
+        return try {
+            val configContent = buildConfig()
+            val configFile = File(context.filesDir, "hev-socks5-tunnel.yaml").apply {
+                writeText(configContent)
+            }
+//            LogUtil.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
+            LogUtil.d(AppConfig.TAG, "HevSocks5Tunnel Config content:\n$configContent")
 
-        try {
 //            LogUtil.i(AppConfig.TAG, "TProxyStartService...")
+            // False when the native thread could not be created, or when one is still running.
             TProxyStartService(configFile.absolutePath, vpnInterface.fd)
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}")
+            LogUtil.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}", e)
+            false
         }
+    }
+
+    /**
+     * The flag the native side sets before the start call returns and clears when its loop ends,
+     * whether it was asked to end or gave up while setting itself up.
+     */
+    override fun isTun2SocksRunning(): Boolean = try {
+        TProxyIsRunning()
+    } catch (e: UnsatisfiedLinkError) {
+        // A native library built before this call existed cannot tell, and that must not read as a tunnel that failed.
+        LogUtil.e(AppConfig.TAG, "hev-socks5-tunnel cannot report whether it runs", e)
+        true
     }
 
     private fun buildConfig(): String {

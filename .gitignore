@@ -67,3 +67,6 @@ V2rayNG/app/google-services.json
 # Ignore OS-specific files
 Thumbs.db
 .DS_Store
+
+# Written by fetch-psiphon-servers.sh for every build beside psiphon_servers.dat (which *.dat covers).
+V2rayNG/app/src/main/assets/psiphon_servers.stamp

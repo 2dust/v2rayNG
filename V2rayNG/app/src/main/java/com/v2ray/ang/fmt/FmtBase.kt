@@ -68,6 +68,7 @@ open class FmtBase {
         config.xhttpMode = queryParam["mode"]
         config.xhttpExtra = queryParam["extra"]
         config.finalMask = queryParam["fm"]
+        config.dialMode = queryParam["dialMode"]
 
         config.security = queryParam["security"]
         if (config.security != AppConfig.TLS && config.security != AppConfig.REALITY) {
@@ -83,7 +84,9 @@ open class FmtBase {
         config.sni = queryParam["sni"]
         config.fingerPrint = queryParam["fp"]
         config.alpn = queryParam["alpn"]
+        config.cipherSuites = queryParam["cs"]
         config.echConfigList = queryParam["ech"]
+        config.echOutbound = queryParam["echOutbound"]
         config.verifyPeerCertByName = queryParam["vcn"]
         config.pinnedCA256 = queryParam["pcs"]
         config.publicKey = queryParam["pbk"]
@@ -104,7 +107,9 @@ open class FmtBase {
         dicQuery["security"] = config.security?.ifEmpty { "none" }.orEmpty()
         config.sni?.nullIfBlank()?.let { dicQuery["sni"] = it }
         config.alpn?.nullIfBlank()?.let { dicQuery["alpn"] = it }
+        config.cipherSuites?.nullIfBlank()?.let { dicQuery["cs"] = it }
         config.echConfigList?.nullIfBlank()?.let { dicQuery["ech"] = it }
+        config.echOutbound?.nullIfBlank()?.let { dicQuery["echOutbound"] = it }
         config.verifyPeerCertByName?.nullIfBlank()?.let { dicQuery["vcn"] = it }
         config.pinnedCA256?.nullIfBlank()?.let { dicQuery["pcs"] = it }
         config.fingerPrint?.nullIfBlank()?.let { dicQuery["fp"] = it }
@@ -114,6 +119,7 @@ open class FmtBase {
         config.mldsa65Verify?.nullIfBlank()?.let { dicQuery["pqv"] = it }
         config.flow?.nullIfBlank()?.let { dicQuery["flow"] = it }
         config.finalMask?.nullIfBlank()?.let { dicQuery["fm"] = it }
+        config.dialMode?.nullIfBlank()?.let { dicQuery["dialMode"] = it }
         config.kcpMtu?.let { dicQuery["mtu"] = it.toString() }
         config.kcpTti?.let { dicQuery["tti"] = it.toString() }
         // Add two keys for compatibility: "insecure" and "allowInsecure"

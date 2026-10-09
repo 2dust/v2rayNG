@@ -35,6 +35,7 @@ class ServerShadowsocksActivity : BaseServerActivity() {
             CommonBasicFields(uiState)
             ShadowsocksProtocolFields(uiState, securityOptions)
             CommonNetworkFields(uiState, options)
+            CommonTargetStrategyField(uiState)
             CommonStreamSecurityFields(
                 state = uiState,
                 options = options,

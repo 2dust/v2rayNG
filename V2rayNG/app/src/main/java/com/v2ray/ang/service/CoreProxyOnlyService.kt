@@ -33,7 +33,8 @@ class CoreProxyOnlyService : Service(), ServiceControl {
         NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
 
-        if (CoreServiceManager.isRunning()) {
+        // A reload has Xray stopped for a moment; a start on top of it would run beside the reload.
+        if (CoreServiceManager.isServiceRunning()) {
             LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Core is already running")
             return START_STICKY
         }

@@ -16,6 +16,15 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The stable release aether's own release workflow built with; pinned so a new stable
+      # release cannot change or break the release build on its own. Bump it together with
+      # the aether submodule.
+      RUST_TOOLCHAIN: "1.99.0"
+      # The Go line the Psiphon client's go.mod asks for, which also covers lyrebird's older one;
+      # aether/psiphon-build.sh and aether/pt-build.sh pin the programs themselves. Bump it when a
+      # bumped aether submodule pins a program that asks for a newer line.
+      GO_VERSION: "1.26"
 
     steps:
     - name: Checkout code
@@ -60,9 +69,92 @@ jobs:
         path: ${{ github.workspace }}/libs
         key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
 
-    - name: Copy libhevtun
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
+        targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+    - name: Restore cached libaether
+      id: cache-libaether-restore
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ github.workspace }}/libs-aether
+        key: libaether-${{ runner.os }}-${{ env.NDK_HOME }}-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('.git/modules/aether/HEAD') }}-${{ hashFiles('compile-aether.sh') }}
+
+    - name: Build libaether
+      if: steps.cache-libaether-restore.outputs.cache-hit != 'true'
+      run: |
+        bash compile-aether.sh
+
+    - name: Save libaether
+      if: steps.cache-libaether-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ github.workspace }}/libs-aether
+        key: libaether-${{ runner.os }}-${{ env.NDK_HOME }}-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('.git/modules/aether/HEAD') }}-${{ hashFiles('compile-aether.sh') }}
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+        # The client is built from a checkout of its own; there is no go.sum here to cache by.
+        cache: false
+
+    # The Aether core runs Psiphon as a program of its own, the psiphon-tunnel-core console client,
+    # which the app ships beside the core as libpsiphon-tunnel-core.so; see compile-psiphon.sh.
+    - name: Restore cached Psiphon client
+      id: cache-psiphon-restore
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ github.workspace }}/libs-psiphon
+        key: psiphon-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/psiphon-build.sh') }}-${{ hashFiles('compile-psiphon.sh') }}
+
+    - name: Build the Psiphon client
+      if: steps.cache-psiphon-restore.outputs.cache-hit != 'true'
+      run: |
+        bash compile-psiphon.sh
+
+    - name: Save the Psiphon client
+      if: steps.cache-psiphon-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ github.workspace }}/libs-psiphon
+        key: psiphon-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/psiphon-build.sh') }}-${{ hashFiles('compile-psiphon.sh') }}
+
+    # Tor's bridges run through a pluggable transport, a program of its own: lyrebird, which aether
+    # builds and the app ships beside the core as liblyrebird.so; see compile-pt.sh.
+    - name: Restore cached pluggable transport
+      id: cache-pt-restore
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ github.workspace }}/libs-pt
+        key: pt-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/pt-build.sh') }}-${{ hashFiles('compile-pt.sh') }}
+
+    - name: Build the pluggable transport
+      if: steps.cache-pt-restore.outputs.cache-hit != 'true'
+      run: |
+        bash compile-pt.sh
+
+    - name: Save the pluggable transport
+      if: steps.cache-pt-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ github.workspace }}/libs-pt
+        key: pt-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/pt-build.sh') }}-${{ hashFiles('compile-pt.sh') }}
+
+    - name: Stage the native libraries
       run: |
         cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
+        cp -r ${{ github.workspace }}/libs-aether/. ${{ github.workspace }}/V2rayNG/app/libs/
+        cp -r ${{ github.workspace }}/libs-psiphon/. ${{ github.workspace }}/V2rayNG/app/libs/
+        cp -r ${{ github.workspace }}/libs-pt/. ${{ github.workspace }}/V2rayNG/app/libs/
+
+    # Psiphon's client starts with the newest server list the build could fetch, so a fresh install has
+    # servers before it can reach the list on its own; see fetch-psiphon-servers.sh.
+    - name: Fetch the Psiphon server list
+      run: |
+        bash fetch-psiphon-servers.sh
 
     - name: Fetch AndroidLibXrayLite tag
       run: |
@@ -75,7 +167,7 @@ jobs:
     - name: Download libv2ray
       uses: robinraju/release-downloader@v1.13
       with:
-        repository: '2dust/AndroidLibXrayLite'
+        repository: 'patterniha/AndroidLibXrayLite'
         tag: ${{ env.CURRENT_TAG }}
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
@@ -98,9 +190,33 @@ jobs:
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
+        # The JVM unit tests are the only automated check of the Kotlin logic; a failure stops the
+        # build before anything is assembled or signed.
+        ./gradlew :app:testPlaystoreDebugUnitTest
         ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
+        ./gradlew assembleRelease -PpattngVersion="${{ inputs.release_tag }}" -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
     
+    - name: Check the native libraries in the APKs
+      run: |
+        # Looked into as ZIP files: every ABI the Aether core is built for has to carry the core, its
+        # Psiphon client and its pluggable transport, and each APK's native files are listed for the record.
+        status=0
+        for apk in ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*.apk; do
+          entries=$(unzip -Z1 "$apk" | grep '^lib/' || true)
+          echo "$(basename "$apk"):"
+          echo "$entries" | sed 's/^/  /'
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            echo "$entries" | grep -q "^lib/$abi/" || continue
+            for lib in libaether.so libpsiphon-tunnel-core.so liblyrebird.so; do
+              if ! echo "$entries" | grep -qx "lib/$abi/$lib"; then
+                echo "::error::$(basename "$apk") lacks lib/$abi/$lib"
+                status=1
+              fi
+            done
+          done
+        done
+        exit $status
+
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v7
       if: ${{  success() }}
@@ -151,12 +267,16 @@ jobs:
             gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
           done
 
-          gpg --armor --export "$KEY" > release-files/v2rayN-public-key.asc
+          gpg --armor --export "$KEY" > release-files/Matixray-public-key.asc
 
       - name: Upload APKs, signatures and public key to release
         uses: svenstaro/upload-release-action@v2
         with:
           file: release-files/*
           tag: ${{ inputs.release_tag }}
+          release_name: Matixray v${{ inputs.release_tag }}
+          body: "."
+          target_commit: ${{ github.sha }}
           file_glob: true
           prerelease: true
+          overwrite: true

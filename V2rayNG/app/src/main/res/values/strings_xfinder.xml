@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Splash -->
+    <string name="xf_splash_title">به نام خدا</string>
+    <string name="xf_splash_status_0">راه‌اندازی هسته...</string>
+    <string name="xf_splash_status_1">بارگذاری منابع کانفیگ...</string>
+    <string name="xf_splash_status_2">اتصال به Xfinder | Matix...</string>
+    <string name="xf_splash_status_3">آماده‌سازی اسکنر IP...</string>
+    <string name="xf_splash_status_4">راه‌اندازی رابط کاربری...</string>
+    <string name="xf_splash_status_5">آماده!</string>
+    <string name="xf_brand" translatable="false">Matixray</string>
+
+    <!-- Drawer -->
+    <string name="xf_nav_configs">کانفیگ Xfinder | Matix</string>
+    <string name="xf_nav_scanner">اسکنر IP</string>
+    <string name="xf_nav_logs">لاگ‌ها</string>
+    <string name="xf_nav_settings">تنظیمات</string>
+
+    <!-- Xfinder tab -->
+    <string name="xf_badge" translatable="false">Xfinder</string>
+    <string name="xf_subtitle">کانفیگ از Xfinder | Matix</string>
+    <string name="xf_tab_top">Top 20</string>
+    <string name="xf_tab_all">همه</string>
+    <string name="xf_refresh">بروزرسانی لیست</string>
+    <string name="xf_loading">در حال دریافت…</string>
+    <string name="xf_error_load">دریافت لیست ناموفق بود</string>
+    <string name="xf_retry">تلاش دوباره</string>
+    <string name="xf_empty">موردی یافت نشد</string>
+    <string name="xf_config_selected">کانفیگ انتخاب شد</string>
+    <string name="xf_all_added">کانفیگ‌ها به‌صورت لینک اتصال اضافه شدند</string>
+    <string name="xf_config_import_failed">افزودن کانفیگ ناموفق بود</string>
+    <string name="xf_state_selected">انتخاب‌شده</string>
+    <string name="xf_ping_ms" translatable="false">%1$d ms</string>
+
+    <!-- IP scanner tab -->
+    <string name="xf_scanner_title">اسکنر IP</string>
+    <string name="xf_scanner_source">منبع: Scanner-matix</string>
+    <string name="xf_stat_total">کل</string>
+    <string name="xf_stat_online">آنلاین</string>
+    <string name="xf_stat_pinned">پین‌شده</string>
+    <string name="xf_ip_copied">IP کپی شد</string>
+
+    <!-- Log tab -->
+    <string name="xf_logs_title">لاگ‌ها</string>
+    <string name="xf_logs_clear">پاک کردن</string>
+    <string name="xf_logs_empty">هنوز لاگی ثبت نشده است</string>
+
+    <!-- Drawer -->
+    <string name="mx_nav_language">زبان برنامه</string>
+
+    <!-- Psiphon button -->
+    <string name="mx_psiphon_connect">اتصال به Psiphon</string>
+    <string name="mx_psiphon_connected">Psiphon متصل است (برای قطع بزنید)</string>
+    <string name="mx_psiphon_no_profile">Psiphon در دسترس نیست</string>
+    <string name="mx_psiphon_state_off">قطع</string>
+    <string name="mx_psiphon_state_on">متصل</string>
+
+    <!-- About -->
+    <string name="mx_about_title">درباره Matixray</string>
+    <string name="mx_about_body">این پروژه ارتقا‌یافته است و V2Ray در آن قرار دارد.\n\nV2Ray یک پلتفرم متن‌باز برای ساخت ارتباط شبکه‌ای امن و پرسرعت است که از پروتکل‌هایی مثل VMess، VLESS، Trojan و Shadowsocks پشتیبانی می‌کند و ترافیک شما را رمزنگاری و مسیریابی می‌کند.\n\nMatixray یک کلاینت اندرویدی بر پایه V2Ray و هسته Xray است با رابط کاربری مدرن، حالت شب و روز، پیدا کردن خودکار بهترین کانفیگ، Xfinder و اتصال Psiphon.</string>
+    <string name="mx_telegram_channel" translatable="false">کانال تلگرام: t.me/imatix7</string>
+    <string name="mx_remove_sni_title">حذف SNI</string>
+    <string name="mx_remove_sni_summary">در اتصال TLS نام سرور (SNI) فرستاده نمی‌شود</string>
+    <string name="mx_auto_connect">اتصال خودکار به بهترین کانفیگ</string>
+    <string name="mx_xfinder_add_all">افزودن هر ۲۰ کانفیگ به‌صورت لینک اتصال</string>
+</resources>

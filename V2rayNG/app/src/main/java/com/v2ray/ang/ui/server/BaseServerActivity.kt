@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.R
+import com.v2ray.ang.core.EchOutbound
+import com.v2ray.ang.core.TlsSettingsCheck
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -231,11 +233,12 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     keyboardType = KeyboardType.Number
                 )
             }
-            FormTextField(
+            FinalMaskField(
                 stringResource(R.string.server_lab_final_mask),
                 state.finalMask,
                 { state.finalMask = it }
             )
+            CommonDialModeField(state)
             if (state.network == NetworkType.WS.type || state.network == NetworkType.XHTTP.type) {
                 FormDropdownField(
                     stringResource(R.string.server_lab_browser_dialer),
@@ -245,6 +248,27 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 )
             }
         }
+    }
+
+    /** dialMode goes to streamSettings.sockopt, so every protocol offers it. */
+    @Composable
+    protected fun CommonDialModeField(state: ServerUiState) {
+        FormTextField(
+            stringResource(R.string.server_lab_dial_mode),
+            state.dialMode,
+            { state.dialMode = it }
+        )
+    }
+
+    /** targetStrategy is an option of every Xray outbound, so every protocol offers it. */
+    @Composable
+    protected fun CommonTargetStrategyField(state: ServerUiState) {
+        FormDropdownField(
+            stringResource(R.string.server_lab_target_strategy),
+            state.targetStrategy,
+            stringArrayResource(R.array.target_strategy_values).toList(),
+            { state.targetStrategy = it }
+        )
     }
 
     @Composable
@@ -291,10 +315,20 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     options.alpnOptions,
                     { state.alpn = it }
                 )
+                CipherSuitesField(
+                    stringResource(R.string.server_lab_cipher_suites),
+                    state.cipherSuites,
+                    { state.cipherSuites = it }
+                )
                 FormTextField(
                     stringResource(R.string.server_lab_ech_config_list),
                     state.echConfigList,
                     { state.echConfigList = it }
+                )
+                FormTextField(
+                    stringResource(R.string.server_lab_ech_outbound),
+                    state.echOutbound,
+                    { state.echOutbound = it }
                 )
                 FormTextField(
                     stringResource(R.string.server_lab_verify_peer_cert_by_name),
@@ -367,7 +401,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
     }
 
-    protected fun validateBasicConfig(state: ServerUiState): Boolean {
+    protected open fun validateBasicConfig(state: ServerUiState): Boolean {
         val remarksErr = state.remarks.isBlank()
         val addressErr = state.address.isBlank()
         val portErr = state.configType != EConfigType.HYSTERIA2 && (state.port.toIntOrNull() ?: 0) <= 0
@@ -413,6 +447,27 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
             toast(R.string.server_lab_final_mask)
+            return false
+        }
+        // Matixray: the ECH outbound is an outbound JSON object with a tag of its own, used with echConfigList
+        val echOutboundError = when (EchOutbound.validate(config)) {
+            null -> null
+            EchOutbound.Error.INVALID_JSON -> R.string.server_lab_ech_outbound
+            EchOutbound.Error.NEEDS_ECH_CONFIG_LIST -> R.string.toast_ech_outbound_needs_ech_config_list
+            EchOutbound.Error.INVALID_TAG -> R.string.toast_ech_outbound_invalid_tag
+        }
+        if (echOutboundError != null) {
+            toast(echOutboundError)
+            return false
+        }
+        // Matixray: TLS settings the Xray-core fork would not apply, or with which it would not connect
+        val tlsError = when (TlsSettingsCheck.validate(config)) {
+            null -> null
+            TlsSettingsCheck.Error.CIPHER_SUITES_NEED_UNSAFE -> R.string.toast_cipher_suites_need_unsafe
+            TlsSettingsCheck.Error.WEBSOCKET_ALPN_NOT_HTTP1 -> R.string.toast_websocket_alpn_http1_only
+        }
+        if (tlsError != null) {
+            toast(tlsError, long = true)
             return false
         }
         return true

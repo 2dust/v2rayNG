@@ -29,6 +29,8 @@ class ServerHttpActivity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             HttpProtocolFields(uiState)
+            CommonDialModeField(uiState)
+            CommonTargetStrategyField(uiState)
 
         }
     }

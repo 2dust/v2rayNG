@@ -40,6 +40,7 @@ fun FormTextField(
     maxLines: Int = 5,
     isError: Boolean = false,
     supportingText: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -53,6 +54,7 @@ fun FormTextField(
             placeholder = placeholder?.let { { Text(it) } },
             isError = isError,
             supportingText = supportingText?.let { { Text(it) } },
+            trailingIcon = trailingIcon,
             singleLine = false,
             maxLines = maxLines,
             enabled = enabled,
@@ -83,6 +85,7 @@ fun FormDropdownField(
     enabled: Boolean = true,
     placeholder: String? = null,
     supportingText: String? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val menuScrollState = rememberScrollState()
@@ -111,6 +114,7 @@ fun FormDropdownField(
             placeholder = { if (placeholder != null) Text(placeholder) },
             supportingText = supportingText?.let { { Text(it) } },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,

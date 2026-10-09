@@ -36,6 +36,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.VersionInfoBlock
+import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.util.Utils
 
 class AboutActivity : BaseComponentActivity() {
@@ -82,6 +83,16 @@ fun AboutScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
+            Text(
+                text = stringResource(R.string.mx_about_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
+                    .liquidGlass()
+                    .padding(16.dp)
+            )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_source_code_24dp),
                 title = stringResource(R.string.title_source_code),
@@ -91,6 +102,14 @@ fun AboutScreen(
                 icon = painterResource(R.drawable.license_24px),
                 title = stringResource(R.string.title_oss_license),
                 onClick = { showOssDialog = true }
+            )
+            // The Aether binary is not a Gradle dependency, so the generated license report
+            // cannot list it; its AGPL-3.0 notice and source link live here instead.
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.license_24px),
+                title = stringResource(R.string.title_aether_core),
+                subtitle = stringResource(R.string.summary_aether_core),
+                onClick = { Utils.openUri(context, AppConfig.AETHER_URL) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_translate_24dp),
@@ -105,6 +124,7 @@ fun AboutScreen(
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_telegram_24dp),
                 title = stringResource(R.string.title_tg_channel),
+                subtitle = AppConfig.TG_CHANNEL_URL.removePrefix("https://"),
                 onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
             )
             SettingsMenuItem(

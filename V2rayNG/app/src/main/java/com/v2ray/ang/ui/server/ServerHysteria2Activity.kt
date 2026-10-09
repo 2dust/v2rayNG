@@ -30,6 +30,8 @@ class ServerHysteria2Activity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             Hysteria2ProtocolFields(uiState)
+            CommonDialModeField(uiState)
+            CommonTargetStrategyField(uiState)
 
         }
     }
@@ -94,12 +96,17 @@ class ServerHysteria2Activity : BaseServerActivity() {
             { state.echConfigList = it }
         )
         FormTextField(
+            stringResource(R.string.server_lab_ech_outbound),
+            state.echOutbound,
+            { state.echOutbound = it }
+        )
+        FormTextField(
             stringResource(R.string.server_lab_pinned_ca256),
             state.pinnedCA256,
             { state.pinnedCA256 = it }
         )
 
-        FormTextField(
+        FinalMaskField(
             stringResource(R.string.server_lab_final_mask),
             state.finalMask,
             { state.finalMask = it }

@@ -102,7 +102,11 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         launchLoading {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    AngConfigManager.updateConfigViaSubAll()
+                    AngConfigManager.updateConfigViaSubAll().also {
+                        // The main screen reloads the configs. Sent from here, the message also goes out when this
+                        // page closes before the update ends.
+                        if (it.configCount > 0) MessageHelper.sendMsg2UI(app, AppConfig.MSG_SERVERS_CHANGED, "")
+                    }
                 }
 
                 when {

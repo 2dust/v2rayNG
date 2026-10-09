@@ -25,11 +25,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.compose.LocalDarkTheme
+import com.v2ray.ang.ui.compose.AutoConnectButton
+import com.v2ray.ang.ui.compose.PsiphonButton
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -43,12 +50,25 @@ fun MainScreen(
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
+    val psiphonActive by mainViewModel.psiphonActive.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
     val displayText = mainViewModel.formatStatus(uiState.status)
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
     val shareQRCodeBitmap = uiState.shareQRCodeBitmap
+
+    // Matixray: a move of a profile the storage refused is told once, each refusal by its number, so that one set again
+    // right after the last was told is told too; the groups are shown anew, as stored.
+    val context = LocalContext.current
+    val failureText = stringResource(R.string.toast_failure)
+    val moveRefusal = uiState.moveRefusal
+    LaunchedEffect(moveRefusal) {
+        if (moveRefusal != null) {
+            context.toastError(failureText)
+            onAction(MainAction.MoveRefusalShown(moveRefusal))
+        }
+    }
 
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -150,6 +170,7 @@ fun MainScreen(
         }
     ) {
         Scaffold(
+            containerColor = Color.Transparent,
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 MainTopBar(
@@ -202,6 +223,19 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    MainConnectHero(
+                        isRunning = isRunning,
+                        statusText = displayText,
+                        onToggle = { onAction(MainAction.ToggleService) }
+                    )
+                    PsiphonButton(
+                        connected = psiphonActive,
+                        onToggle = { onAction(MainAction.TogglePsiphon) }
+                    )
+                    AutoConnectButton(
+                        testing = uiState.isTesting,
+                        onClick = { onAction(MainAction.AutoConnectBest) }
+                    )
                     if (groups.size > 1) {
                         GroupTabBar(
                             groups = groups,

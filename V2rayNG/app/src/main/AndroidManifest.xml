@@ -61,24 +61,33 @@
                 android:value="true" />
         </service>
 
+        <!-- Xfinder: launcher entry. Static app shortcuts are read from the LAUNCHER activity, so their meta-data lives here. -->
         <activity
-            android:name=".ui.main.MainActivity"
-            android:exported="true"
-            android:launchMode="singleTask">
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
 
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+        <!-- Xfinder: hosts the configs / IP scanner / log pages opened from the main drawer. -->
+        <activity
+            android:name=".ui.xfinder.XfinderActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.server.ServerVmessActivity"
             android:exported="false"
@@ -105,6 +114,14 @@
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
             android:name=".ui.server.ServerWireguardActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" />
+        <activity
+            android:name=".ui.server.ServerAetherActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" />
+        <activity
+            android:name=".ui.server.ServerAetherKeysActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
@@ -278,7 +295,7 @@
 
         <receiver
             android:name=".receiver.WidgetProvider"
-            android:exported="true"
+            android:exported="false"
             android:process=":daemon">
             <meta-data
                 android:name="android.appwidget.provider"
@@ -318,7 +335,7 @@
         <!-- =====================Tasker===================== -->
         <activity
             android:name=".ui.shortcut.TaskerActivity"
-            android:exported="true"
+            android:exported="false"
             android:icon="@mipmap/ic_launcher">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
@@ -327,9 +344,8 @@
 
         <receiver
             android:name=".receiver.TaskerReceiver"
-            android:exported="true"
-            android:process=":daemon"
-            tools:ignore="ExportedReceiver">
+            android:exported="false"
+            android:process=":daemon">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
             </intent-filter>
