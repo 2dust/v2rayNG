@@ -30,7 +30,15 @@ jobs:
 
     - name: Init nested submodules
       run: |
-        git submodule foreach --recursive git submodule update --init --recursive
+        echo "=== Initializing hev-socks5-tunnel nested submodules ==="
+        cd hev-socks5-tunnel
+        git submodule update --init --recursive
+        cd ..
+        echo "=== hev-socks5-tunnel root ==="
+        ls -la hev-socks5-tunnel/
+        echo "=== third-part contents ==="
+        ls -la hev-socks5-tunnel/third-part/ 2>/dev/null || echo "third-part folder not found"
+        echo "=== Done ==="
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v4
