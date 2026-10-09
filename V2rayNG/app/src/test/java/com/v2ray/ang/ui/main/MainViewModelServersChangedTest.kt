@@ -49,6 +49,7 @@ class MainViewModelServersChangedTest {
         override fun isGroupAllDisplayEnabled() = false
         override fun getString(resId: Int) = ""
         override fun getString(resId: Int, vararg formatArgs: Any) = ""
+        override fun getStringArray(resId: Int): Array<String> = emptyArray()
         override fun getSubscriptions() = listOf(SubscriptionCache(SUB, SubscriptionItem(remarks = "Sub")))
         override fun getSubscriptionItem(id: String): SubscriptionItem? = null
         override fun getServerGuidList(groupId: String) = serverGuids
@@ -61,10 +62,11 @@ class MainViewModelServersChangedTest {
 
         override fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? = null
         override fun encodeServerList(guids: List<String>, groupId: String) = Unit
-        override fun removeServer(guid: String) = Unit
+        override fun removeServer(guid: String) = true
         override fun removeAllServer() = 0
         override fun removeInvalidServerByGuid(guid: String) = 0
         override fun removeInvalidServersInGroup(groupId: String) = 0
+        override fun moveServer(groupId: String, fromGuid: String, toGuid: String) = true
         override fun clearAllTestDelayResults(guids: List<String>) = Unit
         override fun sortByTestResultsForSub(subId: String) = Unit
         override fun getSubsList() = listOf(SUB)
