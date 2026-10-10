@@ -57,7 +57,9 @@ import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
+import com.v2ray.ang.ui.compose.MatixIcons
 import com.v2ray.ang.ui.compose.liquidGlass
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -316,7 +318,7 @@ private fun ServerListItem(
     } else {
         null
     }
-    val rowShape = RoundedCornerShape(20.dp)
+    val rowShape = RoundedCornerShape(16.dp)
     Row(
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 5.dp)
@@ -327,7 +329,7 @@ private fun ServerListItem(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.22f) else Color.Unspecified
             )
             .then(
-                if (isSelected) Modifier.border(1.5.dp, MaterialTheme.colorScheme.secondary, rowShape) else Modifier
+                if (isSelected) Modifier.border(1.5.dp, MaterialTheme.colorScheme.primary, rowShape) else Modifier
             )
             .semantics {
                 if (selectedStateDescription != null) {
@@ -342,7 +344,30 @@ private fun ServerListItem(
                 .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                // Flag placeholder: a round badge with the first letter of the name.
+                Box(
+                    Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                ) {
+                    Text(
+                        row.remarks.trim().take(1).uppercase(),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(row.remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (isSelected) {
+                    Icon(
+                        rememberVectorPainter(MatixIcons.Check),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 4.dp).size(20.dp)
+                    )
+                }
                 if (doubleColumnDisplay) {
                     IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(36.dp)) {
                         Icon(

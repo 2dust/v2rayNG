@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.checkupdate
 
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,10 +29,14 @@ import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.Btn17
+import com.v2ray.ang.ui.compose.GithubStyleButton
+import com.v2ray.ang.ui.compose.GradientDownloadButton
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.VersionInfoBlock
+import com.v2ray.ang.ui.compose.WifiLoader
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 
@@ -87,11 +94,29 @@ fun CheckUpdateScreen(
                 checked = checkPreRelease,
                 onCheckedChange = { viewModel.toggleCheckPreRelease(it) }
             )
-            SettingsMenuItem(
-                icon = painterResource(R.drawable.ic_check_update_24dp),
-                title = stringResource(R.string.update_check_for_update),
-                onClick = { viewModel.checkForUpdates() }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (isLoading) {
+                    WifiLoader(text = stringResource(R.string.mx_loader_scanning))
+                }
+                // Main action: opens the download of a newer version if one was found, otherwise looks for one.
+                GradientDownloadButton(
+                    text = stringResource(R.string.update_now),
+                    onClick = {
+                        val url = updateResult?.downloadUrl
+                        if (url != null) Utils.openUri(context, url) else viewModel.checkForUpdates()
+                    }
+                )
+                GithubStyleButton(
+                    text = stringResource(R.string.update_check_for_update),
+                    onClick = { viewModel.checkForUpdates() }
+                )
+            }
             VersionInfoBlock(versionText = versionText)
             NavigationBarsSpacer()
         }
@@ -121,9 +146,10 @@ fun CheckUpdateScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
+                Btn17(
+                    text = stringResource(R.string.action_cancel),
+                    onClick = { viewModel.dismissUpdateDialog() }
+                )
             },
             containerColor = MaterialTheme.colorScheme.surface
         )

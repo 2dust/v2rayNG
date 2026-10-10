@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Unified Matixray dark / neon-violet palette -->
-    <color name="xf_background">#050505</color>
-    <color name="xf_card">#19191C</color>
-    <color name="xf_purple">#6500FF</color>
-    <color name="xf_purple_dark">#4B00C8</color>
-    <color name="xf_purple_light">#A56BFF</color>
-    <color name="xf_text_main">#F7F7FA</color>
-    <color name="xf_text_sub">#A2A2AC</color>
-    <color name="xf_text_muted">#777780</color>
-    <color name="xf_border">#29292E</color>
-    <color name="xf_progress_track">#242428</color>
+    <!-- Matixray palette (night): flat charcoal canvas, violet brand -->
+    <color name="xf_background">#0b1016</color>
+    <color name="xf_card">#131a22</color>
+    <color name="xf_purple">#7c5cff</color>
+    <color name="xf_text_main">#f3f5f9</color>
+    <color name="xf_text_sub">#8e98a8</color>
+    <color name="xf_text_muted">#5f6978</color>
+    <color name="xf_border">#222b36</color>
+    <color name="xf_progress_track">#1b232d</color>
 </resources>

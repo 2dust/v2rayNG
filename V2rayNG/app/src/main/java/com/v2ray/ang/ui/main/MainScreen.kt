@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -48,7 +49,11 @@ import com.v2ray.ang.ui.compose.XfOrange
 import com.v2ray.ang.ui.compose.XfOrangeLight
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.v2ray.ang.ui.compose.CirTabs
+import com.v2ray.ang.ui.compose.MainTab
 
 @Composable
 fun MainScreen(
@@ -62,6 +67,7 @@ fun MainScreen(
     val psiphonActive by mainViewModel.psiphonActive.collectAsStateWithLifecycle()
     val speed by mainViewModel.trafficSpeed.collectAsStateWithLifecycle()
     var section by rememberSaveable { mutableStateOf(MainSection.Main) }
+    var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
     val isRunning = uiState.isRunning
 
     // One timer for the connection, kept here so it does not restart when the section changes. The start time is
@@ -257,6 +263,15 @@ fun MainScreen(
                 )
             },
             floatingActionButton = {},
+            bottomBar = {
+                CirTabs(
+                    selected = tab,
+                    onSelect = { target ->
+                        // Settings opens its own screen and leaves the tab where it was.
+                        if (target == MainTab.Settings) onNavigate(MainDestination.Settings) else tab = target
+                    },
+                )
+            },
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
 
@@ -266,6 +281,9 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    if (tab == MainTab.Profile) {
+                        MainProfileTab(onCheckUpdate = { onNavigate(MainDestination.CheckUpdate) })
+                    } else if (tab == MainTab.Home) {
                     MainSectionTabs(selected = section, onSelect = { section = it })
                     if (section == MainSection.Psiphon) {
                         PsiphonSection(
@@ -290,6 +308,12 @@ fun MainScreen(
                         testing = uiState.isTesting,
                         onClick = { onAction(MainAction.AutoConnectBest) }
                     )
+                    val serverName by produceState<String?>(null, selectedGuid) {
+                        value = withContext(Dispatchers.IO) { mainViewModel.selectedServerRemarks(selectedGuid) }
+                    }
+                    ServerInfoCard(serverName = serverName, isRunning = isRunning, speed = speed)
+                    }
+                    } else {
                     if (groups.size > 1) {
                         GroupTabBar(
                             groups = groups,

@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.ui.compose.MatixSwitch
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
@@ -216,14 +217,9 @@ fun PerAppProxyScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Switch(
+                        MatixSwitch(
                             checked = perAppProxyEnabled,
-                            modifier = Modifier.scale(0.65f),
-                            onCheckedChange = onPerAppProxyChanged,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
+                            onCheckedChange = onPerAppProxyChanged
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))

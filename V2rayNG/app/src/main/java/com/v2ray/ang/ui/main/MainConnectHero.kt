@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui.main
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -49,8 +50,10 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.ui.compose.GlassCardShape
+import com.v2ray.ang.ui.compose.BallBarLoader
+import com.v2ray.ang.ui.compose.WifiLoader
 import com.v2ray.ang.ui.compose.XfGreen
-import com.v2ray.ang.ui.compose.XfPurpleLight
+import com.v2ray.ang.ui.compose.XfPurple
 import com.v2ray.ang.ui.compose.XfYellow
 import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.ui.compose.pressScale
@@ -76,7 +79,7 @@ fun MainConnectHero(
     pingMillis: Long?,
     modifier: Modifier = Modifier,
     accent: Color = MaterialTheme.colorScheme.primary,
-    accentLight: Color = XfPurpleLight,
+    accentLight: Color = MaterialTheme.colorScheme.primary,
     buttonSize: Dp = 150.dp,
     onStatusClick: (() -> Unit)? = null,
 ) {
@@ -102,7 +105,7 @@ fun MainConnectHero(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = formatElapsed(if (isRunning) elapsedSec() else 0L, scheme.onBackground, isRunning),
+            text = formatElapsed(if (isRunning) elapsedSec() else 0L, if (isRunning) accentLight else scheme.onBackground, isRunning),
             style = MaterialTheme.typography.displaySmall,
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
@@ -137,26 +140,38 @@ fun MainConnectHero(
         }
         Spacer(Modifier.height(28.dp))
 
+        val deepAccent = remember(accent) {
+            if (accent == XfPurple) Color(0xFF6A0DAD) else lerp(accent, Color.Black, 0.3f)
+        }
         Box(
             modifier = Modifier
                 .size(buttonSize)
                 .pressScale(source, 0.95f)
                 .drawBehind {
-                    // Exactly the kit's button, flat: a solid accent disc while disconnected; while connected a dark
-                    // glass disc with a thin light outline. No glow, no shadow, nothing outside the button's square.
+                    // Outer glow: a radial purple halo, stronger while connected.
                     val radius = size.minDimension / 2f
-                    if (shownRunning) {
-                        drawCircle(Color.White.copy(alpha = 0.05f), radius = radius)
-                        drawCircle(
-                            Color.White.copy(alpha = 0.22f),
-                            radius = radius - 0.75.dp.toPx(),
-                            style = Stroke(1.5.dp.toPx()),
-                        )
-                    } else {
-                        drawCircle(accent, radius = radius)
-                    }
+                    val glowRadius = radius * 1.55f
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(accent.copy(alpha = if (shownRunning) 0.6f else 0.45f), Color.Transparent),
+                            center = center,
+                            radius = glowRadius,
+                        ),
+                        radius = glowRadius,
+                    )
                 }
+                .shadow(
+                    elevation = if (shownRunning) 40.dp else 24.dp,
+                    shape = CircleShape,
+                    ambientColor = accent,
+                    spotColor = accent,
+                )
                 .clip(CircleShape)
+                .background(
+                    if (shownRunning) Brush.linearGradient(listOf(deepAccent, accent))
+                    else Brush.linearGradient(listOf(scheme.background, scheme.background))
+                )
+                .border(3.dp, accent, CircleShape)
                 .clickable(
                     interactionSource = source,
                     indication = null,
@@ -169,15 +184,34 @@ fun MainConnectHero(
                 .semantics { contentDescription = if (shownRunning) stopLabel else startLabel },
             contentAlignment = Alignment.Center,
         ) {
-            Image(
+            Icon(
                 painter = painterResource(R.drawable.ic_power_24dp),
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
+                tint = if (shownRunning) Color.White else accent,
                 modifier = Modifier.size(buttonSize * 0.32f),
             )
         }
 
-        Spacer(Modifier.height(32.dp))
+        // Under the button: "Tap to Connect" while idle, the connecting loader while the tap waits for the service,
+        // and the bar-and-ball loader while connected.
+        Spacer(Modifier.height(20.dp))
+        Box(modifier = Modifier.height(88.dp), contentAlignment = Alignment.TopCenter) {
+            when {
+                pending && !isRunning -> WifiLoader(
+                    text = stringResource(R.string.mx_loader_connecting),
+                    frontColor = accent,
+                )
+                shownRunning -> BallBarLoader(ballColor = accent)
+                else -> Text(
+                    text = stringResource(R.string.mx_tap_to_connect),
+                    color = accent,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
