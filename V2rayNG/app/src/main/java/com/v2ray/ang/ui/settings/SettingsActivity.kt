@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -172,6 +173,7 @@ fun SettingsScreen(
     var sniffingEnabled by rememberMmkvBool(AppConfig.PREF_SNIFFING_ENABLED, true)
     var routeOnlyEnabled by rememberMmkvBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
     var removeSni by rememberMmkvBool(AppConfig.PREF_REMOVE_SNI, false)
+    var adultLock by rememberMmkvBool(AppConfig.PREF_ADULT_LOCK, false)
     var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
     var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
     var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
@@ -419,6 +421,13 @@ fun SettingsScreen(
                     summary = stringResource(R.string.summary_pref_route_only_enabled),
                     checked = routeOnlyEnabled,
                     onCheckedChange = { routeOnlyEnabled = it }
+                )
+                SettingsSwitchItem(
+                    icon = painterResource(R.drawable.ic_adult_block_24dp),
+                    title = stringResource(R.string.mx_adult_lock_title),
+                    summary = stringResource(R.string.mx_adult_lock_summary),
+                    checked = adultLock,
+                    onCheckedChange = { adultLock = it }
                 )
                 SettingsSwitchItem(
                     title = stringResource(R.string.mx_remove_sni_title),

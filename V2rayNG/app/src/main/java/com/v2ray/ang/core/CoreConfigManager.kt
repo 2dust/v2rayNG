@@ -795,7 +795,7 @@ object CoreConfigManager {
     private fun collectUserRuleDomainsByTag(tag: String): ArrayList<String> {
         val domain = ArrayList<String>()
 
-        val rulesetItems = MmkvManager.decodeRoutingRulesets()
+        val rulesetItems = AdultContentLock.withLock(MmkvManager.decodeRoutingRulesets())
         rulesetItems?.forEach { key ->
             if (key.enabled && key.outboundTag == tag && !key.domain.isNullOrEmpty()) {
                 key.domain?.forEach {
@@ -1378,7 +1378,7 @@ object CoreConfigManager {
             MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY)
                 ?: "AsIs"
 
-        val rulesetItems = MmkvManager.decodeRoutingRulesets()
+        val rulesetItems = AdultContentLock.withLock(MmkvManager.decodeRoutingRulesets())
         rulesetItems?.forEach { key ->
             appendRoutingUserRule(configContext, key, v2rayConfig, policyGroupBalancerTags)
         }

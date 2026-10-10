@@ -43,36 +43,40 @@ class GlassStyle(
     val highlight: Color,
 )
 
+// Matixray: the surfaces are flat now, as in the Shadow VPN kit: a solid card color and a one-pixel border.
+// The old glass fields stay so every caller keeps compiling; only fillTop (the card) and edgeDim (the border) are used.
 val DarkGlassStyle = GlassStyle(
-    fillTop = Color(0x24FFFFFF),
-    fillBottom = Color(0x0AFFFFFF),
-    edgeLight = Color(0x66FFFFFF),
-    edgeDim = Color(0x1AA78BFF),
-    highlight = Color(0x2EFFFFFF),
+    fillTop = Color(0xFF131A22),
+    fillBottom = Color(0xFF131A22),
+    edgeLight = Color(0xFF222B36),
+    edgeDim = Color(0xFF222B36),
+    highlight = Color.Transparent,
 )
 
 val LightGlassStyle = GlassStyle(
-    fillTop = Color(0xCCFFFFFF),
-    fillBottom = Color(0x80FFFFFF),
-    edgeLight = Color(0xFFFFFFFF),
-    edgeDim = Color(0x335233E6),
-    highlight = Color(0xB3FFFFFF),
+    fillTop = Color(0xFFFFFFFF),
+    fillBottom = Color(0xFFFFFFFF),
+    edgeLight = Color(0xFFE3E8F0),
+    edgeDim = Color(0xFFE3E8F0),
+    highlight = Color.Transparent,
 )
 
 val LocalGlassStyle = staticCompositionLocalOf { DarkGlassStyle }
 
-val GlassCardShape = RoundedCornerShape(24.dp)
+val GlassCardShape = RoundedCornerShape(18.dp)
 val GlassPillShape = RoundedCornerShape(50)
 
-/** Brand gradient of buttons and selected tabs (left-to-right in the design). */
+/** Fill of buttons and selected tabs: the solid accent color. */
 val PrimaryGradient: Brush
     @Composable get() = Brush.linearGradient(
-        listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary)
+        // Flat, like the kit's buttons: a solid accent (the two stops are the same color on purpose)
+        listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary)
     )
 
 /**
- * Liquid-glass surface: translucent gradient fill, specular top-left highlight and a light-to-dim
- * edge line. [tint] colors the glass (e.g. the brand blue for a selected item).
+ * Card surface of the app: a solid fill and a thin border, flat like the Shadow VPN kit. It keeps the name of the old
+ * glass modifier so every screen picks the new look up at once. [tint] lays a color over the card (a selected item).
+ * It draws no gradient and no highlight, so a long list of cards stays cheap to scroll.
  */
 @Composable
 fun Modifier.liquidGlass(
@@ -80,22 +84,9 @@ fun Modifier.liquidGlass(
     tint: Color = Color.Unspecified,
 ): Modifier {
     val glass = LocalGlassStyle.current
-    val fill = remember(glass) { Brush.verticalGradient(listOf(glass.fillTop, glass.fillBottom)) }
-    val edge = remember(glass) {
-        Brush.linearGradient(listOf(glass.edgeLight, glass.edgeDim, glass.edgeDim, glass.edgeLight.copy(alpha = glass.edgeLight.alpha * 0.4f)))
-    }
-    val shine = remember(glass) {
-        Brush.radialGradient(
-            colors = listOf(glass.highlight, Color.Transparent),
-            center = Offset.Zero,
-            radius = 600f,
-        )
-    }
-    var result = this.clip(shape).background(fill)
+    var result = this.clip(shape).background(glass.fillTop)
     if (tint != Color.Unspecified) result = result.background(tint)
-    return result
-        .drawBehind { drawRect(brush = shine) }
-        .border(1.dp, edge, shape)
+    return result.border(1.dp, glass.edgeDim, shape)
 }
 
 /** Soft colored glow behind a shape (the violet halo of the main connect button). */
@@ -143,57 +134,25 @@ fun GlassSurface(
 }
 
 /**
- * Full-window backdrop: base color with violet glows and a faint dotted "world map" texture, so the
- * translucent glass surfaces have something to refract. Follows day/night through the color scheme.
- * The glow brushes and the dot positions are built once per size, not on every frame.
+ * Full-window backdrop: the flat canvas color with one soft violet glow at the top, like the lit-from-above look of the
+ * Shadow VPN kit. The brush is built once per size, so a frame costs two fills.
  */
 @Composable
 fun AppBackdrop(modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
     val dark = LocalDarkTheme.current
-    val glowA = if (dark) Color(0x665A33E0) else Color(0x66A78BFF)
-    val glowB = if (dark) Color(0x4D7B2FBF) else Color(0x4DBBA9FF)
-    val dot = if (dark) Color(0x22B7A2FF) else Color(0x225233E6)
+    val glow = if (dark) Color(0x337C5CFF) else Color(0x22A48DFF)
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(scheme.background)
             .drawWithCache {
-                val brushA = Brush.radialGradient(
-                    listOf(glowA, Color.Transparent),
-                    center = Offset(size.width * 0.85f, size.height * 0.05f),
-                    radius = size.width * 1.1f,
+                val brush = Brush.radialGradient(
+                    listOf(glow, Color.Transparent),
+                    center = Offset(size.width * 0.5f, 0f),
+                    radius = size.width * 1.05f,
                 )
-                val brushB = Brush.radialGradient(
-                    listOf(glowB, Color.Transparent),
-                    center = Offset(size.width * 0.05f, size.height * 0.95f),
-                    radius = size.width * 1.0f,
-                )
-                val step = 14.dp.toPx()
-                val r = 1.3.dp.toPx()
-                val rows = (size.height * 0.4f / step).toInt()
-                val cols = (size.width / step).toInt() + 1
-                // x, y, alpha of every dot kept by the sparse pseudo-random mask (continent-like speckle, fading downwards)
-                val dots = ArrayList<Float>()
-                for (y in 0 until rows) {
-                    for (x in 0 until cols) {
-                        val h = (x * 73856093) xor (y * 19349663)
-                        if ((h and 7) < 3) {
-                            dots.add(x * step)
-                            dots.add(y * step)
-                            dots.add(dot.alpha * (1f - y / rows.toFloat()))
-                        }
-                    }
-                }
-                onDrawBehind {
-                    drawRect(brushA)
-                    drawRect(brushB)
-                    var i = 0
-                    while (i < dots.size) {
-                        drawCircle(dot.copy(alpha = dots[i + 2]), r, Offset(dots[i], dots[i + 1]))
-                        i += 3
-                    }
-                }
+                onDrawBehind { drawRect(brush) }
             }
     )
 }

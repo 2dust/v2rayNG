@@ -778,5 +778,14 @@
         <item>GFW</item>
         <item>Aggressive</item>
     </string-array>
+    <!-- Proxy chain -->
+    <string name="server_proxy_chain_members_invalid">Invalid members: %1$s</string>
 
+    <!-- Fragment settings -->
+    <string name="title_fragment_settings">Fragment Settings</string>
+    <string name="title_pref_fragment_enabled">Enable Fragment</string>
+    <string name="title_pref_fragment_packets">Packets</string>
+    <string name="title_pref_fragment_length">Length</string>
+    <string name="title_pref_fragment_interval">Interval</string>
+    <string name="title_pref_fragment_maxsplit">Max Split</string>
 </resources>

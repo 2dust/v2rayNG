@@ -39,7 +39,6 @@ class MainRepository(
 
     private val closed = AtomicBoolean(false)
 
-    // Probe results are finite and must remain lossless until the ViewModel coalesces them.
     private val mainServiceEventChannel = Channel<MainServiceEvent>(Channel.UNLIMITED)
 
     override val mainServiceEvent: Flow<MainServiceEvent> = mainServiceEventChannel.receiveAsFlow()
@@ -132,6 +131,9 @@ class MainRepository(
     override fun getString(resId: Int, vararg formatArgs: Any): String =
         localizedContext.getString(resId, *formatArgs)
 
+    override fun getStringArray(resId: Int): Array<String> =
+        localizedContext.resources.getStringArray(resId)
+
     override fun getSubscriptions(): List<SubscriptionCache> {
         val result = mutableListOf<SubscriptionCache>()
         if (isGroupAllDisplayEnabled()) {
@@ -165,7 +167,14 @@ class MainRepository(
     override fun encodeServerList(guids: List<String>, groupId: String) =
         MmkvManager.encodeServerList(ArrayList(guids), groupId)
 
-    override fun removeServer(guid: String) = MmkvManager.removeServer(guid)
+    override fun removeServer(guid: String): Boolean {
+        return try {
+            MmkvManager.removeServer(guid)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     override fun removeAllServer(): Int = MmkvManager.removeAllServer()
 
@@ -178,6 +187,18 @@ class MainRepository(
         } else {
             getServerGuidList(groupId).sumOf(::removeInvalidServerByGuid)
         }
+
+    override fun moveServer(groupId: String, fromGuid: String, toGuid: String): Boolean {
+        val guids = getServerGuidList(groupId).toMutableList()
+        val fromIndex = guids.indexOf(fromGuid)
+        val toIndex = guids.indexOf(toGuid)
+        if (fromIndex == -1 || toIndex == -1) return false
+        if (fromIndex == toIndex) return true
+        val item = guids.removeAt(fromIndex)
+        guids.add(toIndex, item)
+        encodeServerList(guids, groupId)
+        return true
+    }
 
     override fun clearAllTestDelayResults(guids: List<String>) =
         MmkvManager.clearAllTestDelayResults(guids)
@@ -222,8 +243,6 @@ class MainRepository(
     }
 
     override fun queryServiceState() {
-        // The daemon cannot report its own death, so what the screen shows is only as good as the last
-        // message. Only the daemon's receiver takes this broadcast: no acknowledgement means no service.
         MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_REGISTER_CLIENT, "") { acknowledged ->
             MainServiceEvent.forStateQuery(acknowledged)?.let { mainServiceEventChannel.trySend(it) }
         }
@@ -232,7 +251,6 @@ class MainRepository(
     override fun testCurrentServerRealPing(requestId: String) {
         MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_MEASURE_DELAY, requestId) { handled ->
             if (!handled) mainServiceEventChannel.trySend(MainServiceEvent.MeasureDelayCancelled(requestId))
-            // Only the daemon takes this message as well, so a test nobody took found no service either.
             MainServiceEvent.forStateQuery(handled)?.let { mainServiceEventChannel.trySend(it) }
         }
     }

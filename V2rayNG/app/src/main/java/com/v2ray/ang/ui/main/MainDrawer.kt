@@ -5,6 +5,9 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
+import com.v2ray.ang.ui.compose.pressScale
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,13 +41,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.util.Utils
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
@@ -113,7 +112,6 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     }
                     DrawerGlassItem(item = item, onClick = { onNavigate(item) })
                 }
-                DrawerTelegramLink()
                 Spacer(Modifier.height(24.dp))
             }
         }
@@ -149,12 +147,14 @@ private fun DrawerHeader() {
 @Composable
 private fun DrawerGlassItem(item: MainDestination, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
+    val source = remember { MutableInteractionSource() }
     Row(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
+            .pressScale(source, 0.97f)
             .liquidGlass(shape)
-            .clickable(onClick = onClick)
+            .clickable(interactionSource = source, indication = null, onClick = onClick)
             .semantics(mergeDescendants = true) { role = Role.Button }
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -181,22 +181,4 @@ private fun DrawerGlassItem(item: MainDestination, onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurface
         )
     }
-}
-
-/** Footer of the drawer: the channel's full address (t.me/...), a tap opens it. */
-@Composable
-private fun DrawerTelegramLink() {
-    val context = LocalContext.current
-    Text(
-        text = stringResource(R.string.mx_telegram_channel),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.secondary,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .padding(top = 14.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(50))
-            .clickable(role = Role.Button) { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
-            .padding(vertical = 10.dp)
-    )
 }

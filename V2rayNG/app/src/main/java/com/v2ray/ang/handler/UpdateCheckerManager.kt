@@ -55,14 +55,16 @@ object UpdateCheckerManager {
             return@withContext CheckUpdateResult(hasUpdate = false)
         }
 
-        val latestVersion = latestRelease.tagName.removePrefix("v")
+        val latestVersion = latestRelease.tagName.trimStart('v', 'V')
         LogUtil.i(
             AppConfig.TAG,
             "Found new version: $latestVersion (current: ${BuildConfig.VERSION_NAME})"
         )
 
         return@withContext if (compareVersions(latestVersion, BuildConfig.VERSION_NAME) > 0) {
-            val downloadUrl = getDownloadUrl(latestRelease, Build.SUPPORTED_ABIS[0])
+            // Matixray: a release whose files carry no APK for this device still announces itself; the release page opens instead.
+            val downloadUrl = runCatching { getDownloadUrl(latestRelease, Build.SUPPORTED_ABIS[0]) }.getOrNull()
+                ?: latestRelease.htmlUrl.ifBlank { AppConfig.APP_URL + "/releases/latest" }
             CheckUpdateResult(
                 hasUpdate = true,
                 latestVersion = latestVersion,

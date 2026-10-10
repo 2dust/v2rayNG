@@ -1,6 +1,14 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,7 +44,8 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.AutoConnectButton
-import com.v2ray.ang.ui.compose.PsiphonButton
+import com.v2ray.ang.ui.compose.XfOrange
+import com.v2ray.ang.ui.compose.XfOrangeLight
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -51,6 +60,8 @@ fun MainScreen(
     val groups = uiState.groups
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val psiphonActive by mainViewModel.psiphonActive.collectAsStateWithLifecycle()
+    val speed by mainViewModel.trafficSpeed.collectAsStateWithLifecycle()
+    var section by rememberSaveable { mutableStateOf(MainSection.Main) }
     val isRunning = uiState.isRunning
     val displayText = mainViewModel.formatStatus(uiState.status)
     val selectedGuid = uiState.selectedGuid
@@ -125,6 +136,26 @@ fun MainScreen(
                     onAction(MainAction.SelectGroup(currentGroups[page].id))
                 }
             }
+    }
+
+    uiState.updateNotice?.let { notice ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { onAction(MainAction.DismissUpdateNotice) },
+            title = { Text(stringResource(R.string.mx_update_notice_title)) },
+            text = { Text(stringResource(R.string.mx_update_notice_body, notice.latestVersion.orEmpty())) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    onAction(MainAction.DismissUpdateNotice)
+                    notice.downloadUrl?.let { com.v2ray.ang.util.Utils.openUri(context, it) }
+                }) { Text(stringResource(R.string.update_now)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { onAction(MainAction.DismissUpdateNotice) }) {
+                    Text(stringResource(R.string.mx_update_later))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+        )
     }
 
     MainDialogs(
@@ -205,14 +236,6 @@ fun MainScreen(
                     }
                 )
             },
-            bottomBar = {
-                MainBottomBar(
-                    displayText = displayText,
-                    isRunning = isRunning,
-                    isDarkTheme = isDarkTheme,
-                    onAction = onAction
-                )
-            },
             floatingActionButton = {},
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
@@ -223,14 +246,23 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    MainSectionTabs(selected = section, onSelect = { section = it })
+                    if (section == MainSection.Psiphon) {
+                        PsiphonSection(
+                            connected = psiphonActive,
+                            speed = speed,
+                            pingMillis = uiState.pingMillis,
+                            onToggle = { onAction(MainAction.TogglePsiphon) },
+                            onStatusClick = { onAction(MainAction.TestCurrentServer) },
+                        )
+                    } else {
                     MainConnectHero(
                         isRunning = isRunning,
                         statusText = displayText,
-                        onToggle = { onAction(MainAction.ToggleService) }
-                    )
-                    PsiphonButton(
-                        connected = psiphonActive,
-                        onToggle = { onAction(MainAction.TogglePsiphon) }
+                        onToggle = { onAction(MainAction.ToggleService) },
+                        speed = speed,
+                        pingMillis = uiState.pingMillis,
+                        onStatusClick = { onAction(MainAction.TestCurrentServer) },
                     )
                     AutoConnectButton(
                         testing = uiState.isTesting,
@@ -283,12 +315,54 @@ fun MainScreen(
                                 start = 0.dp,
                                 top = 0.dp,
                                 end = 0.dp,
-                                bottom = 80.dp
+                                bottom = 24.dp
                             )
                         )
+                    }
                     }
                 }
             }
         }
+    }
+}
+
+/**
+ * The Psiphon section: its own page in orange, with the same big connect button and live numbers as the main section.
+ * The button connects through a Psiphon profile (made on the spot when there is none) or disconnects.
+ */
+@Composable
+private fun PsiphonSection(
+    connected: Boolean,
+    speed: TrafficSpeed,
+    pingMillis: Long?,
+    onToggle: () -> Unit,
+    onStatusClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        MainConnectHero(
+            isRunning = connected,
+            statusText = stringResource(if (connected) R.string.mx_psiphon_connected else R.string.mx_psiphon_connect),
+            onToggle = onToggle,
+            speed = speed,
+            pingMillis = pingMillis,
+            accent = XfOrange,
+            accentLight = XfOrangeLight,
+            globeHeight = 250.dp,
+            buttonSize = 160.dp,
+            onStatusClick = onStatusClick,
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.mx_psiphon_section_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+        )
+        Spacer(Modifier.height(24.dp))
     }
 }

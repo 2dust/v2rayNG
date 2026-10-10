@@ -48,7 +48,7 @@ import com.v2ray.ang.ui.compose.DotGlobe
 import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.ui.main.MainActivity
 
-/** Launcher entry: shows the Bismillah over a turning dotted globe and fills a thin progress line over about three seconds, then hands over to [MainActivity]. */
+/** Launcher entry: shows the opening words over a turning network globe and fills a thin progress line over about two seconds, then hands over to [MainActivity]. */
 class SplashActivity : BaseComponentActivity() {
 
     @Composable
@@ -64,8 +64,8 @@ class SplashActivity : BaseComponentActivity() {
     }
 }
 
-private const val SPLASH_DURATION_MS = 3200
-private const val HANDOVER_DELAY_MS = 250L
+private const val SPLASH_DURATION_MS = 2000
+private const val HANDOVER_DELAY_MS = 150L
 private val splashStatusRes = intArrayOf(
     R.string.xf_splash_status_0,
     R.string.xf_splash_status_1,
@@ -84,7 +84,7 @@ private fun SplashScreen(onFinished: () -> Unit) {
     val progress = remember { Animatable(0f) }
     val reveal = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
-        reveal.animateTo(1f, tween(durationMillis = 1100, easing = FastOutSlowInEasing))
+        reveal.animateTo(1f, tween(durationMillis = 700, easing = FastOutSlowInEasing))
     }
     LaunchedEffect(Unit) {
         progress.animateTo(1f, tween(durationMillis = SPLASH_DURATION_MS, easing = FastOutSlowInEasing))
@@ -118,7 +118,13 @@ private fun SplashScreen(onFinished: () -> Unit) {
             .navigationBarsPadding(),
     ) {
         // The globe sits behind the title, slowly turning; it fades in with the title.
-        DotGlobe(modifier = Modifier.fillMaxSize().alpha(reveal.value))
+        DotGlobe(
+            modifier = Modifier.fillMaxSize().alpha(reveal.value),
+            radiusFraction = 0.5f,
+            periodMs = 16000,
+            dotColor = scheme.secondary,
+            ringColor = scheme.primary,
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -133,7 +139,7 @@ private fun SplashScreen(onFinished: () -> Unit) {
                     .scale(0.92f + 0.08f * reveal.value),
                 style = MaterialTheme.typography.displayMedium.copy(
                     brush = titleBrush,
-                    fontSize = 44.sp,
+                    fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                 ),
                 textAlign = TextAlign.Center,

@@ -65,7 +65,7 @@ fun ScannerScreen(onBack: () -> Unit, viewModel: ScannerViewModel) {
             IconButton(
                 onClick = viewModel::refresh,
                 modifier = Modifier.semantics { contentDescription = refreshLabel },
-            ) { Text("🔄") }
+            ) { RefreshIcon() }
         },
     ) { innerPadding ->
         LazyColumn(
@@ -225,7 +225,7 @@ private fun IpRow(ip: ScannedIp, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(text = ip.sourceEmoji, fontSize = 22.sp)
+            SourceBadge(ip.source)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 MonoLtrText(
                     text = ip.ip,

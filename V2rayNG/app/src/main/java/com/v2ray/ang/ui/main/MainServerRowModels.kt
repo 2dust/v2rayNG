@@ -26,6 +26,7 @@ internal data class ServerGroupUiState(
 internal fun buildServerRowUiModel(
     server: ServersCache,
     subscriptionRemarks: String,
+    aetherProtocolLabel: Map<String, String> = emptyMap(),
 ): ServerRowUiModel {
     val profile = server.profile
     return ServerRowUiModel(
@@ -34,18 +35,22 @@ internal fun buildServerRowUiModel(
         remarks = profile.remarks,
         statistics = profile.description.nullIfBlank()
             ?: AngConfigManager.generateDescription(profile),
-        typeDescription = serverProtocolDescription(profile),
+        typeDescription = serverProtocolDescription(profile, aetherProtocolLabel),
         testDelayMillis = server.testDelayMillis,
         subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),
     )
 }
 
-internal fun serverProtocolDescription(profile: ProfileItem): String {
+internal fun serverProtocolDescription(
+    profile: ProfileItem,
+    aetherProtocolLabel: Map<String, String> = emptyMap(),
+): String {
     if (profile.configType.isComplexType()) return profile.configType.name
     val parts = mutableListOf(profile.configType.name)
     if (profile.configType == EConfigType.AETHER) {
-        // The tunnel from the outside in, so a profile that runs Psiphon or Tor alone is not named after a WARP protocol it never opens.
-        parts.add(AetherCore.of(profile).path.joinToString(" → "))
+        parts.add(AetherCore.of(profile).path.joinToString(" / ") { path ->
+            aetherProtocolLabel[path] ?: path
+        })
     }
     profile.network?.let { network ->
         if (network.isNotBlank() && !network.equals("tcp", ignoreCase = true)) {
@@ -65,3 +70,8 @@ internal fun serverProtocolDescription(profile: ProfileItem): String {
     }
     return parts.joinToString(" / ")
 }
+
+internal fun aetherProtocolLabels(
+    entries: Array<String>,
+    values: Array<String>,
+): Map<String, String> = values.zip(entries).toMap()

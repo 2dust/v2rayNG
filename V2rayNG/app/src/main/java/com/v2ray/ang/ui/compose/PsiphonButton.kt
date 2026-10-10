@@ -49,7 +49,7 @@ fun PsiphonButton(
 ) {
     val dark = LocalDarkTheme.current
     val scheme = MaterialTheme.colorScheme
-    val base = if (dark) Color(0xFF1C1830) else scheme.surfaceContainerHigh
+    val base = scheme.surfaceContainerHigh
     val accent by animateColorAsState(if (connected) XfGreen else scheme.secondary, label = "psiphonAccent")
     val outline by animateColorAsState(
         if (connected) XfGreen.copy(alpha = 0.55f) else Color.Transparent,
@@ -102,8 +102,9 @@ fun AutoConnectButton(
 ) {
     val dark = LocalDarkTheme.current
     val scheme = MaterialTheme.colorScheme
-    val container = if (dark) Color.White else scheme.primary
-    val content = if (dark) Color(0xFF0A0620) else Color.White
+    // The kit's primary button: solid accent with white text, in both themes.
+    val container = scheme.primary
+    val content = Color.White
     val source = remember { MutableInteractionSource() }
     Row(
         modifier = modifier

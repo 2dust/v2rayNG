@@ -237,7 +237,7 @@ object CoreConfigContextBuilder {
      * outbounds are normalized into three tags only: proxy / direct / block.
      */
     private fun collectRoutingDomainRulesForDns(): List<CoreConfigContext.RoutingDomainRule> {
-        val rulesetItems = MmkvManager.decodeRoutingRulesets() ?: return emptyList()
+        val rulesetItems = AdultContentLock.withLock(MmkvManager.decodeRoutingRulesets()) ?: return emptyList()
         val result = mutableListOf<CoreConfigContext.RoutingDomainRule>()
 
         rulesetItems

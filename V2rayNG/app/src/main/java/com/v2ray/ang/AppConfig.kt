@@ -21,6 +21,7 @@ object AppConfig {
 
     /** Preferences mapped to MMKV storage. */
     const val PREF_REMOVE_SNI = "pref_remove_sni"
+    const val PREF_ADULT_LOCK = "pref_adult_lock"
     const val PREF_SNIFFING_ENABLED = "pref_sniffing_enabled"
     const val PREF_ROUTE_ONLY_ENABLED = "pref_route_only_enabled"
     const val PREF_PER_APP_PROXY = "pref_per_app_proxy"

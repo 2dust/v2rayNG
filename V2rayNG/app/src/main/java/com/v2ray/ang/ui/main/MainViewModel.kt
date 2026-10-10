@@ -38,6 +38,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -105,6 +108,43 @@ class MainViewModel(
         .distinctUntilChanged()
         .flowOn(ioDispatcher)
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    /**
+     * Matixray: download and upload speed of the app while the service runs, from the system's per-app byte counters.
+     * The core's own counters are not used here: reading them resets them, and the speed notification owns that.
+     * Read off the main thread, once a second, and only while the service runs.
+     */
+    val trafficSpeed: StateFlow<TrafficSpeed> = uiState
+        .map { it.isRunning }
+        .distinctUntilChanged()
+        .flatMapLatest { running ->
+            if (!running) {
+                flowOf(TrafficSpeed())
+            } else {
+                flow {
+                    val uid = android.os.Process.myUid()
+                    var lastRx = android.net.TrafficStats.getUidRxBytes(uid)
+                    var lastTx = android.net.TrafficStats.getUidTxBytes(uid)
+                    var lastTime = android.os.SystemClock.elapsedRealtime()
+                    while (true) {
+                        kotlinx.coroutines.delay(1000L)
+                        val rx = android.net.TrafficStats.getUidRxBytes(uid)
+                        val tx = android.net.TrafficStats.getUidTxBytes(uid)
+                        val now = android.os.SystemClock.elapsedRealtime()
+                        val seconds = ((now - lastTime) / 1000.0).coerceAtLeast(0.001)
+                        // UNSUPPORTED (-1) on a device without per-app counters: show zero instead of a bogus speed
+                        val down = if (rx < 0 || lastRx < 0) 0L else ((rx - lastRx) / seconds).toLong().coerceAtLeast(0L)
+                        val up = if (tx < 0 || lastTx < 0) 0L else ((tx - lastTx) / seconds).toLong().coerceAtLeast(0L)
+                        emit(TrafficSpeed(downBytesPerSec = down, upBytesPerSec = up))
+                        lastRx = rx
+                        lastTx = tx
+                        lastTime = now
+                    }
+                }
+            }
+        }
+        .flowOn(ioDispatcher)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TrafficSpeed())
 
     /** True from the "auto connect" tap until the real tests it started have finished. */
     private var autoConnectPending = false
@@ -279,7 +319,13 @@ class MainViewModel(
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
                 if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return
-                _uiState.update { it.copy(isTesting = testRequests.isTesting, status = MainStatus.ConnectionTest(event.result)) }
+                _uiState.update {
+                    it.copy(
+                        isTesting = testRequests.isTesting,
+                        status = MainStatus.ConnectionTest(event.result),
+                        pingMillis = event.result.delayMillis.takeIf { delay -> delay >= 0L },
+                    )
+                }
             }
 
             is MainServiceEvent.MeasureConfigSuccess -> {
@@ -437,6 +483,7 @@ class MainViewModel(
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
             }
 
+            MainAction.DismissUpdateNotice -> _uiState.update { it.copy(updateNotice = null) }
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
@@ -460,8 +507,32 @@ class MainViewModel(
         }
     }
 
+    /**
+     * Matixray: asks the release page once per process whether a newer version than the running one is out, and if so
+     * announces it. A failed check (no network, rate limit) is only logged: the user can still check by hand.
+     */
+    private fun checkForUpdateOnStart() {
+        if (updateCheckedThisProcess) return
+        updateCheckedThisProcess = true
+        viewModelScope.launch(ioDispatcher) {
+            try {
+                // Let the first screen settle before the network is used.
+                kotlinx.coroutines.delay(4000L)
+                val result = com.v2ray.ang.handler.UpdateCheckerManager.checkForUpdate(
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
+                )
+                if (result.hasUpdate) _uiState.update { it.copy(updateNotice = result) }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogUtil.e(AppConfig.TAG, "Update check on start failed", error)
+            }
+        }
+    }
+
     // ---------- Initialization ----------
     fun initialize() {
+        checkForUpdateOnStart()
         viewModelScope.launch(preloadDispatcher) {
             try {
                 initialPageReady.await()
@@ -1181,7 +1252,8 @@ class MainViewModel(
             state.copy(
                 isRunning = running,
                 isTesting = testRequests.isTesting,
-                status = runningStatus(state.status, state.isRunning, running, clearTestingText)
+                status = runningStatus(state.status, state.isRunning, running, clearTestingText),
+                pingMillis = if (running) state.pingMillis else null
             )
         }
     }
@@ -1201,6 +1273,10 @@ class MainViewModel(
     internal enum class ReadingFate { SHOW, OVERTAKEN, HOLD_UNTIL_SETTLED, READ_AGAIN }
 
     companion object {
+        /** Matixray: the update check on start runs once per process, not once per screen. */
+        @Volatile
+        private var updateCheckedThisProcess = false
+
         private const val TEST_RESULT_FLUSH_INTERVAL_MS = 500L
 
         /**

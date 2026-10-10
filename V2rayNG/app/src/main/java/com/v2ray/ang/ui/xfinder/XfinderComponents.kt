@@ -1,7 +1,15 @@
 package com.v2ray.ang.ui.xfinder
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import com.v2ray.ang.R
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -81,4 +89,43 @@ fun MonoLtrText(text: String, color: Color, modifier: Modifier = Modifier, fontS
         style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr),
         maxLines = 1,
     )
+}
+
+/** The refresh icon of the Xfinder and scanner pages, drawn from a vector instead of a phone emoji. */
+@Composable
+fun RefreshIcon(modifier: Modifier = Modifier) {
+    Icon(
+        painter = painterResource(R.drawable.ic_refresh_24dp),
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Round badge for the network an IP belongs to: a colored disc with the network's first letter. It stands in for the
+ * emoji the scanner data brings, which look different on every phone.
+ */
+@Composable
+fun SourceBadge(source: String, modifier: Modifier = Modifier) {
+    val color = when (source.lowercase()) {
+        "cloudflare" -> Color(0xFFFF8A1F)
+        "fastly" -> XfRed
+        "cloudfront" -> Color(0xFF3B82F6)
+        else -> XfPurple
+    }
+    Box(
+        modifier = modifier
+            .size(34.dp)
+            .clip(CircleShape)
+            .background(color.copy(alpha = 0.22f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = source.firstOrNull()?.uppercaseChar()?.toString().orEmpty(),
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
 }

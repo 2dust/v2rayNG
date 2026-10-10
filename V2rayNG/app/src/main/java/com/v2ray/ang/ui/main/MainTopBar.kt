@@ -82,6 +82,7 @@ fun MainTopBar(
                     onDismissRequest = { showImportMenu = false },
                     scrollState = importMenuScrollState,
                     containerColor = MaterialTheme.colorScheme.surface,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(importMenuScrollState)
@@ -103,6 +104,7 @@ fun MainTopBar(
                     onDismissRequest = { showMenu = false },
                     scrollState = moreMenuScrollState,
                     containerColor = MaterialTheme.colorScheme.surface,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(moreMenuScrollState)

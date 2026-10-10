@@ -84,7 +84,7 @@ fun XfinderConfigsScreen(onBack: () -> Unit, viewModel: XfinderViewModel) {
                 IconButton(
                     onClick = viewModel::refresh,
                     modifier = Modifier.semantics { contentDescription = refreshLabel },
-                ) { Text("🔄") }
+                ) { RefreshIcon() }
             }
             Button(
                 onClick = viewModel::addAllTop20,

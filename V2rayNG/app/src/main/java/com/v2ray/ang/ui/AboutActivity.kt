@@ -1,6 +1,23 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import com.v2ray.ang.ui.compose.GlassPillShape
+import com.v2ray.ang.ui.compose.PrimaryGradient
+import com.v2ray.ang.ui.compose.pressScale
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Column
@@ -93,6 +110,7 @@ fun AboutScreen(
                     .liquidGlass()
                     .padding(16.dp)
             )
+            TelegramButton(onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) })
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_source_code_24dp),
                 title = stringResource(R.string.title_source_code),
@@ -120,12 +138,6 @@ fun AboutScreen(
                 icon = painterResource(R.drawable.ic_feedback_24dp),
                 title = stringResource(R.string.title_pref_feedback),
                 onClick = { Utils.openUri(context, AppConfig.APP_ISSUES_URL) }
-            )
-            SettingsMenuItem(
-                icon = painterResource(R.drawable.ic_telegram_24dp),
-                title = stringResource(R.string.title_tg_channel),
-                subtitle = AppConfig.TG_CHANNEL_URL.removePrefix("https://"),
-                onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_privacy_24dp),
@@ -163,6 +175,39 @@ fun AboutScreen(
             },
             containerColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier.padding(bottom = 60.dp)
+        )
+    }
+}
+
+/** The Telegram channel as a button with the Telegram icon: a gradient pill that sits under the description. */
+@Composable
+private fun TelegramButton(onClick: () -> Unit) {
+    val source = remember { MutableInteractionSource() }
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .pressScale(source)
+            .clip(GlassPillShape)
+            .background(PrimaryGradient)
+            .clickable(interactionSource = source, indication = null, role = Role.Button, onClick = onClick)
+            .heightIn(min = 52.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_telegram_24dp),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp),
+        )
+        Spacer(Modifier.width(10.dp))
+        Text(
+            text = stringResource(R.string.mx_telegram_button),
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White,
         )
     }
 }

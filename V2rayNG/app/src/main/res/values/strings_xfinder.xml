@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Splash -->
-    <string name="xf_splash_title">به نام خدا</string>
+    <string name="xf_splash_title">به نام پروردگار</string>
     <string name="xf_splash_status_0">راه‌اندازی هسته...</string>
     <string name="xf_splash_status_1">بارگذاری منابع کانفیگ...</string>
     <string name="xf_splash_status_2">اتصال به Xfinder | Matix...</string>
@@ -58,9 +58,31 @@
     <!-- About -->
     <string name="mx_about_title">درباره Matixray</string>
     <string name="mx_about_body">این پروژه ارتقا‌یافته است و V2Ray در آن قرار دارد.\n\nV2Ray یک پلتفرم متن‌باز برای ساخت ارتباط شبکه‌ای امن و پرسرعت است که از پروتکل‌هایی مثل VMess، VLESS، Trojan و Shadowsocks پشتیبانی می‌کند و ترافیک شما را رمزنگاری و مسیریابی می‌کند.\n\nMatixray یک کلاینت اندرویدی بر پایه V2Ray و هسته Xray است با رابط کاربری مدرن، حالت شب و روز، پیدا کردن خودکار بهترین کانفیگ، Xfinder و اتصال Psiphon.</string>
-    <string name="mx_telegram_channel" translatable="false">کانال تلگرام: t.me/imatix7</string>
+    <string name="mx_telegram_button">عضویت در کانال تلگرام</string>
     <string name="mx_remove_sni_title">حذف SNI</string>
     <string name="mx_remove_sni_summary">در اتصال TLS نام سرور (SNI) فرستاده نمی‌شود</string>
     <string name="mx_auto_connect">اتصال خودکار به بهترین کانفیگ</string>
     <string name="mx_xfinder_add_all">افزودن هر ۲۰ کانفیگ به‌صورت لینک اتصال</string>
+
+    <!-- Main screen: sections, live stats -->
+    <string name="mx_tab_main">اصلی</string>
+    <string name="mx_tab_psiphon">سایفون</string>
+    <string name="mx_stat_download">دانلود</string>
+    <string name="mx_stat_upload">آپلود</string>
+    <string name="mx_stat_ping">پینگ</string>
+    <string name="mx_stat_none" translatable="false">—</string>
+    <string name="mx_ping_value" translatable="false">%1$d ms</string>
+    <string name="mx_hero_tap_connect">برای اتصال بزنید</string>
+    <string name="mx_hero_connected">متصل شد</string>
+    <string name="mx_psiphon_section_hint">اتصال مستقیم و سریع با Psiphon، بدون نیاز به افزودن کانفیگ</string>
+    <string name="mx_refresh">بروزرسانی</string>
+
+    <!-- Update notice on start -->
+    <string name="mx_update_notice_title">نسخه جدید Matixray</string>
+    <string name="mx_update_notice_body">نسخه %1$s منتشر شده است. برای دریافت بهترین سرعت و رفع اشکال‌ها، برنامه را بروزرسانی کنید.</string>
+    <string name="mx_update_later">بعداً</string>
+
+    <!-- Adult content lock -->
+    <string name="mx_adult_lock_title">قفل‌سازی محتوای بزرگسال</string>
+    <string name="mx_adult_lock_summary">با روشن بودن این گزینه، سایت‌های پورن و محتوای جنسی از طریق برنامه باز نمی‌شوند</string>
 </resources>

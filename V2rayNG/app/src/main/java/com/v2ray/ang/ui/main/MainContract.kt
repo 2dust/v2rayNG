@@ -34,8 +34,15 @@ data class MainUiState(
      * Matixray: a move of a profile the storage refused, still to be told, by a number of its own, so that a refusal set
      * again right after the last one was told is told too; null when none, see [MainAction.MoveRefusalShown].
      */
-    val moveRefusal: Int? = null
+    val moveRefusal: Int? = null,
+    /** Matixray: delay in ms of the last successful connection test of the running tunnel, shown under the connect button. */
+    val pingMillis: Long? = null,
+    /** Matixray: a newer release found on start, to be announced once; null when none or after it was dismissed. */
+    val updateNotice: com.v2ray.ang.dto.CheckUpdateResult? = null
 )
+
+/** Matixray: live traffic of the app in bytes per second, shown under the connect button. */
+data class TrafficSpeed(val downBytesPerSec: Long = 0L, val upBytesPerSec: Long = 0L)
 
 /**
  * All possible user interaction intents
@@ -84,6 +91,9 @@ sealed interface MainAction {
     data class ShareClipboard(val guid: String) : MainAction
     data class ShareFullContent(val guid: String) : MainAction
     data object DismissQRCodeDialog : MainAction
+
+    /** Matixray: the notice of a newer release, see [MainUiState.updateNotice], was dismissed. */
+    data object DismissUpdateNotice : MainAction
 
     data class ImportBatchConfig(val configText: String) : MainAction
 

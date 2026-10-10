@@ -1,6 +1,12 @@
 package com.v2ray.ang.ui.main
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
@@ -27,17 +33,17 @@ private enum class ImportMenuAction(@StringRes val labelRes: Int, val action: Ma
     Aether(R.string.menu_item_import_config_manually_aether, MainAction.ImportManually(EConfigType.AETHER.value))
 }
 
-enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
-    RestartService(R.string.title_service_restart),
-    DeleteAll(R.string.title_del_all_config),
-    DeleteDuplicate(R.string.title_del_duplicate_config),
-    DeleteInvalid(R.string.title_del_invalid_config),
-    ExportAll(R.string.title_export_all),
-    LocateSelected(R.string.title_locate_selected_config),
-    SortByTestResults(R.string.title_sort_by_test_results),
-    TestAll(R.string.title_ping_all_server),
-    TestAllRealPing(R.string.title_real_ping_all_server),
-    UpdateSubscriptions(R.string.title_sub_update)
+enum class MainMoreMenuAction(@StringRes val labelRes: Int, @DrawableRes val iconRes: Int) {
+    RestartService(R.string.title_service_restart, R.drawable.ic_restore_24dp),
+    DeleteAll(R.string.title_del_all_config, R.drawable.ic_delete_24dp),
+    DeleteDuplicate(R.string.title_del_duplicate_config, R.drawable.ic_select_all_24dp),
+    DeleteInvalid(R.string.title_del_invalid_config, R.drawable.ic_flash_off_24dp),
+    ExportAll(R.string.title_export_all, R.drawable.ic_share_24dp),
+    LocateSelected(R.string.title_locate_selected_config, R.drawable.ic_search_24dp),
+    SortByTestResults(R.string.title_sort_by_test_results, R.drawable.ic_outline_filter_alt_24),
+    TestAll(R.string.title_ping_all_server, R.drawable.ic_flash_on_24dp),
+    TestAllRealPing(R.string.title_real_ping_all_server, R.drawable.ic_speed_24dp),
+    UpdateSubscriptions(R.string.title_sub_update, R.drawable.ic_subscriptions_24dp)
 }
 
 internal enum class ServerMenuAction(
@@ -66,12 +72,32 @@ fun ImportMenuContent(onAction: (MainAction) -> Unit) = AppDropdownMenuItems(
     onSelected = { onAction(it.action) }
 )
 
+/** The three-dot menu: every entry has an icon in front of its label, and the destructive ones are tinted red. */
 @Composable
-fun MoreMenuContent(onSelected: (MainMoreMenuAction) -> Unit) = AppDropdownMenuItems(
-    items = MainMoreMenuAction.entries,
-    labelRes = { it.labelRes },
-    onSelected = onSelected
-)
+fun MoreMenuContent(onSelected: (MainMoreMenuAction) -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    MainMoreMenuAction.entries.forEach { action ->
+        val destructive = action == MainMoreMenuAction.DeleteAll ||
+            action == MainMoreMenuAction.DeleteDuplicate ||
+            action == MainMoreMenuAction.DeleteInvalid
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(action.labelRes),
+                    color = if (destructive) scheme.error else scheme.onSurface,
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(action.iconRes),
+                    contentDescription = null,
+                    tint = if (destructive) scheme.error else scheme.secondary,
+                )
+            },
+            onClick = { onSelected(action) },
+        )
+    }
+}
 
 @Composable
 fun ShareMethodDialog(
