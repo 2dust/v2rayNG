@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -29,24 +30,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// ---- Matixray palette: flat charcoal canvas and cards in the style of the Shadow VPN kit, with the brand violet where that kit has blue ----
-val XfBackground = Color(0xFF0B1016)
-val XfCard = Color(0xFF131A22)
-val XfPurple = Color(0xFF7C5CFF)
-val XfPurpleDark = Color(0xFF6644F0)
-val XfPurpleLight = Color(0xFFB9A8FF)
-val XfTextMain = Color(0xFFF3F5F9)
-val XfTextSub = Color(0xFF8E98A8)
-val XfTextMuted = Color(0xFF5F6978)
-val XfBorder = Color(0xFF222B36)
-val XfGreen = Color(0xFF22C55E)
-val XfYellow = Color(0xFFFACC15)
-// Psiphon section: orange, so it reads apart from the violet main section
+// ---- Matixray palette: near-black surfaces with controlled neon-violet accents ----
+val XfBackground = Color(0xFF050505)
+val XfCard = Color(0xFF19191C)
+val XfPurple = Color(0xFF6500FF)
+val XfPurpleDark = Color(0xFF4B00C8)
+val XfPurpleLight = Color(0xFFA56BFF)
+val XfTextMain = Color(0xFFF7F7FA)
+val XfTextSub = Color(0xFFA2A2AC)
+val XfTextMuted = Color(0xFF777780)
+val XfBorder = Color(0xFF29292E)
+val XfGreen = Color(0xFF20D989)
+val XfYellow = Color(0xFFFFC857)
+// Psiphon section remains distinguishable while using the same dark visual system.
 val XfOrange = Color(0xFFFF8A1F)
 val XfOrangeDark = Color(0xFFE5700A)
 val XfOrangeLight = Color(0xFFFFC38A)
-val XfRed = Color(0xFFEF4444)
-val XfProgressTrack = Color(0xFF1B232D)
+val XfRed = Color(0xFFFF454F)
+val XfProgressTrack = Color(0xFF242428)
 
 private val LightColor = lightColorScheme(
     primary = Color(0xFF5233E6),
@@ -88,38 +89,38 @@ private val LightColor = lightColorScheme(
 private val DarkColor = darkColorScheme(
     primary = XfPurple,
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFF2B2260),
-    onPrimaryContainer = Color(0xFFE7E0FF),
-    secondary = Color(0xFFA48DFF),
-    onSecondary = Color(0xFF14083F),
-    secondaryContainer = Color(0xFF241E4A),
-    onSecondaryContainer = Color(0xFFE7E0FF),
+    primaryContainer = Color(0xFF2A1550),
+    onPrimaryContainer = Color(0xFFF0E7FF),
+    secondary = XfPurpleLight,
+    onSecondary = Color(0xFF140824),
+    secondaryContainer = Color(0xFF2B1A43),
+    onSecondaryContainer = Color(0xFFF0E7FF),
     tertiary = XfGreen,
-    onTertiary = Color(0xFF03210F),
-    tertiaryContainer = Color(0xFF0F3D22),
-    onTertiaryContainer = Color(0xFFBBF7D0),
-    error = Color(0xFFFF6B6B),
-    onError = Color(0xFF3B0000),
-    errorContainer = Color(0xFF4A0F0F),
-    onErrorContainer = Color(0xFFFECACA),
+    onTertiary = Color(0xFF032116),
+    tertiaryContainer = Color(0xFF103D2B),
+    onTertiaryContainer = Color(0xFFB9F6DA),
+    error = XfRed,
+    onError = Color(0xFF390006),
+    errorContainer = Color(0xFF4A1118),
+    onErrorContainer = Color(0xFFFFDADD),
     background = XfBackground,
     onBackground = XfTextMain,
-    surface = Color(0xFF10161D),
+    surface = Color(0xFF101012),
     onSurface = XfTextMain,
-    surfaceVariant = Color(0xFF1B232D),
+    surfaceVariant = Color(0xFF222225),
     onSurfaceVariant = XfTextSub,
     outline = XfTextMuted,
-    outlineVariant = Color(0xFF222B36),
+    outlineVariant = XfBorder,
     inverseSurface = XfTextMain,
     inverseOnSurface = XfBackground,
     inversePrimary = XfPurpleDark,
-    scrim = Color(0xFF000000),
+    scrim = Color(0xCC000000),
     surfaceTint = XfPurple,
-    surfaceContainerLowest = Color(0xFF080C11),
-    surfaceContainerLow = Color(0xFF0E141A),
+    surfaceContainerLowest = Color(0xFF050505),
+    surfaceContainerLow = Color(0xFF0B0B0D),
     surfaceContainer = XfCard,
-    surfaceContainerHigh = Color(0xFF18212A),
-    surfaceContainerHighest = Color(0xFF1F2933),
+    surfaceContainerHigh = Color(0xFF222225),
+    surfaceContainerHighest = Color(0xFF29292E),
 )
 
 /** Vazirmatn (static weights in res/font), used for every text style of the app. */
@@ -172,7 +173,7 @@ val toastTextColor = Color.White // White
 
 object ThemeManager {
     private val _themeMode = MutableStateFlow(
-        MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
+        MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "2") ?: "2"
     )
     val themeMode: StateFlow<String> = _themeMode.asStateFlow()
 
@@ -193,7 +194,7 @@ object ThemeManager {
 
     fun refresh() {
         _themeMode.value =
-            MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
+            MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "2") ?: "2"
         _dynamicColorEnabled.value =
             MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_COLOR, true)
     }
@@ -241,7 +242,14 @@ fun AppTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = typography
+            typography = typography,
+            shapes = androidx.compose.material3.Shapes(
+                extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
+                small = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                medium = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
+                large = androidx.compose.foundation.shape.RoundedCornerShape(22.dp),
+                extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(28.dp),
+            )
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 AppBackdrop()

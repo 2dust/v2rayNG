@@ -46,10 +46,10 @@ class GlassStyle(
 // Matixray: the surfaces are flat now, as in the Shadow VPN kit: a solid card color and a one-pixel border.
 // The old glass fields stay so every caller keeps compiling; only fillTop (the card) and edgeDim (the border) are used.
 val DarkGlassStyle = GlassStyle(
-    fillTop = Color(0xFF131A22),
-    fillBottom = Color(0xFF131A22),
-    edgeLight = Color(0xFF222B36),
-    edgeDim = Color(0xFF222B36),
+    fillTop = Color(0xFF19191C),
+    fillBottom = Color(0xFF19191C),
+    edgeLight = Color(0xFF29292E),
+    edgeDim = Color(0xFF29292E),
     highlight = Color.Transparent,
 )
 
@@ -63,7 +63,7 @@ val LightGlassStyle = GlassStyle(
 
 val LocalGlassStyle = staticCompositionLocalOf { DarkGlassStyle }
 
-val GlassCardShape = RoundedCornerShape(18.dp)
+val GlassCardShape = RoundedCornerShape(22.dp)
 val GlassPillShape = RoundedCornerShape(50)
 
 /** Fill of buttons and selected tabs: the solid accent color. */
@@ -141,7 +141,7 @@ fun GlassSurface(
 fun AppBackdrop(modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
     val dark = LocalDarkTheme.current
-    val glow = if (dark) Color(0x337C5CFF) else Color(0x22A48DFF)
+    val glow = if (dark) Color(0x226500FF) else Color(0x186500FF)
     Box(
         modifier = modifier
             .fillMaxSize()

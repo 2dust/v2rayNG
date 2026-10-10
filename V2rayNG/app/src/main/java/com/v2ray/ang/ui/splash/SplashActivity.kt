@@ -9,6 +9,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -39,6 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlin.math.cos
+import kotlin.math.sin
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
@@ -64,62 +69,28 @@ class SplashActivity : BaseComponentActivity() {
     }
 }
 
-private const val TYPING_MS = 950
-private const val HANDOVER_DELAY_MS = 200L
-private val splashStatusRes = intArrayOf(
-    R.string.xf_splash_status_0,
-    R.string.xf_splash_status_1,
-    R.string.xf_splash_status_2,
-    R.string.xf_splash_status_3,
-    R.string.xf_splash_status_4,
-    R.string.xf_splash_status_5,
-)
-
-/** Status line for a percentage: five stages while loading, the last one only at 100 %. */
-internal fun splashStatusIndex(percent: Int): Int =
-    if (percent >= 100) splashStatusRes.lastIndex else (percent.coerceAtLeast(0) * 5 / 100)
-
-/** A run of terminal text in one color. */
-private class TermSegment(val text: String, val color: Color)
+private const val HANDOVER_DELAY_MS = 1200L
 
 @Composable
 private fun SplashScreen(onFinished: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
-    val segments = remember(scheme) {
-        listOf(
-            TermSegment("$ ", scheme.primary), TermSegment("matixray --start\n", scheme.onSurface),
-            TermSegment("[ ok ] ", XfGreen), TermSegment("xray core\n", scheme.onSurfaceVariant),
-            TermSegment("[ ok ] ", XfGreen), TermSegment("routing rules\n", scheme.onSurfaceVariant),
-            TermSegment("[ ok ] ", XfGreen), TermSegment("secure tunnel\n", scheme.onSurfaceVariant),
-            TermSegment("$ ", scheme.primary), TermSegment("ready", scheme.onSurface),
-        )
-    }
-    val total = remember(segments) { segments.sumOf { it.text.length } }
-    val typed = remember { Animatable(0f) }
-    // The words are on screen from the first frame and the typing starts at once: nothing waits for a fade-in.
-    LaunchedEffect(Unit) {
-        typed.animateTo(total.toFloat(), tween(durationMillis = TYPING_MS, easing = LinearEasing))
-        kotlinx.coroutines.delay(HANDOVER_DELAY_MS)
-        onFinished()
-    }
-    val blink by rememberInfiniteTransition(label = "cursor").animateFloat(
+    val transition = androidx.compose.animation.core.rememberInfiniteTransition(label = "radial-loader")
+    val phase by transition.animateFloat(
         initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(700, easing = LinearEasing), RepeatMode.Restart),
-        label = "blink",
+        targetValue = (Math.PI * 2.0).toFloat(),
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(
+                durationMillis = 1800,
+                easing = androidx.compose.animation.core.LinearEasing
+            ),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Restart
+        ),
+        label = "radial-phase"
     )
 
-    val count = typed.value.toInt().coerceIn(0, total)
-    val text = buildAnnotatedString {
-        var left = count
-        for (segment in segments) {
-            if (left <= 0) break
-            val take = minOf(left, segment.text.length)
-            withStyle(SpanStyle(color = segment.color)) { append(segment.text.substring(0, take)) }
-            left -= take
-        }
-        // Block cursor: solid while typing, blinking at the end.
-        if (count < total || blink < 0.5f) withStyle(SpanStyle(color = scheme.primary)) { append("\u258C") }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(HANDOVER_DELAY_MS)
+        onFinished()
     }
 
     Box(
@@ -127,45 +98,53 @@ private fun SplashScreen(onFinished: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(horizontal = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = stringResource(R.string.xf_splash_title),
+                text = "به نام پروردگار",
                 color = scheme.onBackground,
-                style = MaterialTheme.typography.displayMedium.copy(fontSize = 38.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Medium
+                ),
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(36.dp))
-            // Code reads left to right whatever the language of the app is.
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Text(
-                    text = text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .liquidGlass(GlassCardShape)
-                        .padding(horizontal = 18.dp, vertical = 16.dp),
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
-                    textAlign = TextAlign.Start,
-                    minLines = 5,
-                )
+            Spacer(Modifier.height(28.dp))
+            Canvas(modifier = Modifier.size(150.dp)) {
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val baseRadius = size.minDimension * 0.25f
+                val pulseRange = size.minDimension * 0.18f
+                val rayCount = 8
+                for (i in 0 until rayCount) {
+                    val angle = (i.toFloat() / rayCount) * (Math.PI * 2.0).toFloat()
+                    val wave = (sin(phase + i * 0.58f) + 1f) / 2f
+                    val radius = baseRadius + pulseRange * wave
+                    val end = Offset(
+                        x = center.x + cos(angle.toDouble()).toFloat() * radius,
+                        y = center.y + sin(angle.toDouble()).toFloat() * radius
+                    )
+                    val alpha = 0.35f + wave * 0.65f
+                    drawLine(
+                        color = scheme.primary.copy(alpha = alpha),
+                        start = center,
+                        end = end,
+                        strokeWidth = 2.dp.toPx()
+                    )
+                    drawCircle(
+                        color = scheme.primary.copy(alpha = alpha),
+                        radius = 3.dp.toPx(),
+                        center = end
+                    )
+                }
+                drawCircle(color = scheme.primary, radius = 4.dp.toPx(), center = center)
             }
         }
-        Text(
-            text = stringResource(R.string.xf_brand),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 28.dp),
-            color = scheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelLarge,
-            letterSpacing = 0.2.em,
-        )
     }
 }
