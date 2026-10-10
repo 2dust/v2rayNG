@@ -3,14 +3,12 @@ package com.v2ray.ang.ui.splash
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,35 +18,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.DotGlobe
+import com.v2ray.ang.ui.compose.GlassCardShape
+import com.v2ray.ang.ui.compose.XfGreen
 import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.ui.main.MainActivity
 
-/** Launcher entry: shows the opening words over a turning network globe and fills a thin progress line over about two seconds, then hands over to [MainActivity]. */
+/** Launcher entry: shows the opening words and a few lines typed out like a terminal session, in about a second, then hands over to [MainActivity]. */
 class SplashActivity : BaseComponentActivity() {
 
     @Composable
@@ -64,8 +64,8 @@ class SplashActivity : BaseComponentActivity() {
     }
 }
 
-private const val SPLASH_DURATION_MS = 2000
-private const val HANDOVER_DELAY_MS = 150L
+private const val TYPING_MS = 950
+private const val HANDOVER_DELAY_MS = 200L
 private val splashStatusRes = intArrayOf(
     R.string.xf_splash_status_0,
     R.string.xf_splash_status_1,
@@ -79,37 +79,48 @@ private val splashStatusRes = intArrayOf(
 internal fun splashStatusIndex(percent: Int): Int =
     if (percent >= 100) splashStatusRes.lastIndex else (percent.coerceAtLeast(0) * 5 / 100)
 
+/** A run of terminal text in one color. */
+private class TermSegment(val text: String, val color: Color)
+
 @Composable
 private fun SplashScreen(onFinished: () -> Unit) {
-    val progress = remember { Animatable(0f) }
-    val reveal = remember { Animatable(0f) }
-    LaunchedEffect(Unit) {
-        reveal.animateTo(1f, tween(durationMillis = 700, easing = FastOutSlowInEasing))
+    val scheme = MaterialTheme.colorScheme
+    val segments = remember(scheme) {
+        listOf(
+            TermSegment("$ ", scheme.primary), TermSegment("matixray --start\n", scheme.onSurface),
+            TermSegment("[ ok ] ", XfGreen), TermSegment("xray core\n", scheme.onSurfaceVariant),
+            TermSegment("[ ok ] ", XfGreen), TermSegment("routing rules\n", scheme.onSurfaceVariant),
+            TermSegment("[ ok ] ", XfGreen), TermSegment("secure tunnel\n", scheme.onSurfaceVariant),
+            TermSegment("$ ", scheme.primary), TermSegment("ready", scheme.onSurface),
+        )
     }
+    val total = remember(segments) { segments.sumOf { it.text.length } }
+    val typed = remember { Animatable(0f) }
+    // The words are on screen from the first frame and the typing starts at once: nothing waits for a fade-in.
     LaunchedEffect(Unit) {
-        progress.animateTo(1f, tween(durationMillis = SPLASH_DURATION_MS, easing = FastOutSlowInEasing))
+        typed.animateTo(total.toFloat(), tween(durationMillis = TYPING_MS, easing = LinearEasing))
         kotlinx.coroutines.delay(HANDOVER_DELAY_MS)
         onFinished()
     }
-    val percent = (progress.value * 100f).toInt().coerceIn(0, 100)
-    val scheme = MaterialTheme.colorScheme
+    val blink by rememberInfiniteTransition(label = "cursor").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(700, easing = LinearEasing), RepeatMode.Restart),
+        label = "blink",
+    )
 
-    // A light sweep slides across the title while it is on screen.
-    val shimmer by rememberInfiniteTransition(label = "shimmer").animateFloat(
-        initialValue = -0.4f,
-        targetValue = 1.4f,
-        animationSpec = infiniteRepeatable(tween(2600, easing = LinearEasing), RepeatMode.Restart),
-        label = "sweep",
-    )
-    val titleBrush = Brush.linearGradient(
-        colorStops = arrayOf(
-            0f to scheme.onBackground,
-            (shimmer - 0.15f).coerceIn(0f, 1f) to scheme.onBackground,
-            shimmer.coerceIn(0f, 1f) to scheme.secondary,
-            (shimmer + 0.15f).coerceIn(0f, 1f) to scheme.onBackground,
-            1f to scheme.onBackground,
-        )
-    )
+    val count = typed.value.toInt().coerceIn(0, total)
+    val text = buildAnnotatedString {
+        var left = count
+        for (segment in segments) {
+            if (left <= 0) break
+            val take = minOf(left, segment.text.length)
+            withStyle(SpanStyle(color = segment.color)) { append(segment.text.substring(0, take)) }
+            left -= take
+        }
+        // Block cursor: solid while typing, blinking at the end.
+        if (count < total || blink < 0.5f) withStyle(SpanStyle(color = scheme.primary)) { append("\u258C") }
+    }
 
     Box(
         modifier = Modifier
@@ -117,73 +128,44 @@ private fun SplashScreen(onFinished: () -> Unit) {
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
-        // The globe sits behind the title, slowly turning; it fades in with the title.
-        DotGlobe(
-            modifier = Modifier.fillMaxSize().alpha(reveal.value),
-            radiusFraction = 0.5f,
-            periodMs = 16000,
-            dotColor = scheme.secondary,
-            ringColor = scheme.primary,
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = stringResource(R.string.xf_splash_title),
-                modifier = Modifier
-                    .alpha(reveal.value)
-                    .scale(0.92f + 0.08f * reveal.value),
-                style = MaterialTheme.typography.displayMedium.copy(
-                    brush = titleBrush,
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
+                color = scheme.onBackground,
+                style = MaterialTheme.typography.displayMedium.copy(fontSize = 38.sp, fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(56.dp))
-            ProgressLine(progress = progress.value, modifier = Modifier.alpha(reveal.value))
-            Spacer(Modifier.height(18.dp))
-            Text(
-                text = stringResource(splashStatusRes[splashStatusIndex(percent)]),
-                modifier = Modifier.alpha(reveal.value),
-                color = scheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-            )
+            Spacer(Modifier.height(36.dp))
+            // Code reads left to right whatever the language of the app is.
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Text(
+                    text = text,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .liquidGlass(GlassCardShape)
+                        .padding(horizontal = 18.dp, vertical = 16.dp),
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 14.sp,
+                    lineHeight = 22.sp,
+                    textAlign = TextAlign.Start,
+                    minLines = 5,
+                )
+            }
         }
         Text(
             text = stringResource(R.string.xf_brand),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 28.dp)
-                .alpha(reveal.value),
+                .padding(bottom = 28.dp),
             color = scheme.onSurfaceVariant,
             style = MaterialTheme.typography.labelLarge,
             letterSpacing = 0.2.em,
-        )
-    }
-}
-
-/** 240 × 8 dp liquid-glass track with a violet gradient fill that grows with [progress]. */
-@Composable
-private fun ProgressLine(progress: Float, modifier: Modifier = Modifier) {
-    val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(50)
-    Box(
-        modifier = modifier
-            .size(width = 240.dp, height = 8.dp)
-            .liquidGlass(shape),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress.coerceIn(0f, 1f))
-                .height(8.dp)
-                .clip(shape)
-                .background(Brush.horizontalGradient(listOf(scheme.secondary, scheme.primary))),
         )
     }
 }

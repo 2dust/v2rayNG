@@ -113,7 +113,7 @@ fun Modifier.pressScale(interactionSource: MutableInteractionSource, pressedScal
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
         targetValue = if (pressed) pressedScale else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessHigh),
         label = "pressScale",
     )
     return this.graphicsLayer {

@@ -63,6 +63,26 @@ fun MainScreen(
     val speed by mainViewModel.trafficSpeed.collectAsStateWithLifecycle()
     var section by rememberSaveable { mutableStateOf(MainSection.Main) }
     val isRunning = uiState.isRunning
+
+    // One timer for the connection, kept here so it does not restart when the section changes. The start time is
+    // saved across rotation; the tick is aligned to the second boundary so the digits never skip. The seconds are
+    // read through a lambda, so only the timer text is recomposed each second, not the screen.
+    var startedAt by rememberSaveable { mutableStateOf(0L) }
+    val elapsedSec = remember { mutableStateOf(0L) }
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            // 0 = not started; a start time in the future is stale (the device rebooted), so it restarts too
+            if (startedAt == 0L || startedAt > android.os.SystemClock.elapsedRealtime()) startedAt = android.os.SystemClock.elapsedRealtime()
+            while (true) {
+                val spent = android.os.SystemClock.elapsedRealtime() - startedAt
+                elapsedSec.value = spent / 1000L
+                kotlinx.coroutines.delay(1000L - spent % 1000L)
+            }
+        } else {
+            startedAt = 0L
+            elapsedSec.value = 0L
+        }
+    }
     val displayText = mainViewModel.formatStatus(uiState.status)
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
@@ -250,6 +270,7 @@ fun MainScreen(
                     if (section == MainSection.Psiphon) {
                         PsiphonSection(
                             connected = psiphonActive,
+                            elapsedSec = { elapsedSec.value },
                             speed = speed,
                             pingMillis = uiState.pingMillis,
                             onToggle = { onAction(MainAction.TogglePsiphon) },
@@ -258,6 +279,7 @@ fun MainScreen(
                     } else {
                     MainConnectHero(
                         isRunning = isRunning,
+                        elapsedSec = { elapsedSec.value },
                         statusText = displayText,
                         onToggle = { onAction(MainAction.ToggleService) },
                         speed = speed,
@@ -333,6 +355,7 @@ fun MainScreen(
 @Composable
 private fun PsiphonSection(
     connected: Boolean,
+    elapsedSec: () -> Long,
     speed: TrafficSpeed,
     pingMillis: Long?,
     onToggle: () -> Unit,
@@ -345,13 +368,13 @@ private fun PsiphonSection(
     ) {
         MainConnectHero(
             isRunning = connected,
+            elapsedSec = elapsedSec,
             statusText = stringResource(if (connected) R.string.mx_psiphon_connected else R.string.mx_psiphon_connect),
             onToggle = onToggle,
             speed = speed,
             pingMillis = pingMillis,
             accent = XfOrange,
             accentLight = XfOrangeLight,
-            globeHeight = 250.dp,
             buttonSize = 160.dp,
             onStatusClick = onStatusClick,
         )
