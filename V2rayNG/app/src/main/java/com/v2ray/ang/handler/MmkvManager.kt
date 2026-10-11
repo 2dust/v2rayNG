@@ -793,16 +793,42 @@ object MmkvManager {
         return JsonUtil.fromJsonSafe(ruleset, Array<RulesetItem>::class.java)?.toMutableList() ?: mutableListOf()
     }
 
+    private inline fun <T> withRoutingRulesetLock(block: () -> T): T = synchronized(settingsStorage, block)
+
+    /** Persist unique identities before exposing routing rules to a keyed list. */
+    fun decodeRoutingRulesetsForEditing(): MutableList<RulesetItem>? = withRoutingRulesetLock {
+        readRoutingRulesetsWithIds()
+    }
+
+    private fun readRoutingRulesetsWithIds(): MutableList<RulesetItem>? {
+        val rules = decodeRoutingRulesets() ?: return null
+        val normalized = withUniqueRoutingRuleIds(rules)
+        if (normalized != rules) {
+            check(writeRoutingRulesets(normalized)) { "Failed to persist routing rule IDs" }
+        }
+        return normalized.toMutableList()
+    }
+
+    fun removeRoutingRuleset(ruleId: String) = withRoutingRulesetLock {
+        val rules = readRoutingRulesetsWithIds() ?: return@withRoutingRulesetLock
+        val position = rules.indexOfFirst { it.id == ruleId }
+        if (position < 0) return@withRoutingRulesetLock
+        rules.removeAt(position)
+        check(writeRoutingRulesets(rules)) { "Failed to delete routing rule $ruleId" }
+    }
+
     /**
      * Encodes the routing rulesets.
      *
      * @param rulesetList The list of routing rulesets.
      */
-    fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?) {
-        if (rulesetList.isNullOrEmpty())
-            encodeSettings(PREF_ROUTING_RULESET, "")
-        else
-            encodeSettings(PREF_ROUTING_RULESET, JsonUtil.toJson(rulesetList))
+    fun encodeRoutingRulesets(rulesetList: MutableList<RulesetItem>?): Boolean = withRoutingRulesetLock {
+        writeRoutingRulesets(rulesetList)
+    }
+
+    private fun writeRoutingRulesets(rulesetList: List<RulesetItem>?): Boolean {
+        val content = if (rulesetList.isNullOrEmpty()) "" else JsonUtil.toJson(rulesetList)
+        return encodeSettings(PREF_ROUTING_RULESET, content)
     }
 
     //endregion
