@@ -20,6 +20,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
         super.onCreate()
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service created")
         CoreServiceManager.serviceControl = SoftReference(this)
+        CoreServiceManager.onServiceCreated()
     }
 
     /**
@@ -30,6 +31,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        CoreServiceManager.onStartCommandReceived()
         NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service command received")
 

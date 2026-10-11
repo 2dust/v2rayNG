@@ -36,9 +36,11 @@ class CoreRootService : Service(), ServiceControl {
         super.onCreate()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: Service created")
         CoreServiceManager.serviceControl = SoftReference(this)
+        CoreServiceManager.onServiceCreated()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        CoreServiceManager.onStartCommandReceived()
         NotificationManager.ensureForeground()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: command received")
 
