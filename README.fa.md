@@ -6,7 +6,7 @@
 
 ---
 
-**Matixray** یک کلاینت ارتقا‌یافتهٔ V2Ray برای اندروید است که بر پایهٔ v2rayNG ساخته شده و از هر دو هستهٔ **Xray** و **v2fly** پشتیبانی می‌کند. این نسخه توسط تیم **v2box** بهبود یافته است.
+**Matixray** یک کلاینت ارتقا‌یافتهٔ V2Ray برای اندروید است که بر پایهٔ v2rayNG ساخته شده و از هر دو هستهٔ **Xray** و **v2fly** پشتیبانی می‌کند. این نسخه توسط تیم **Matix** بهبود یافته است.
 
 <br>
 
@@ -16,6 +16,12 @@
 &nbsp;
 <a href="https://t.me/imatix7">
   <img src="https://img.shields.io/badge/Telegram-@imatix7-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram">
+</a>
+
+<br><br>
+
+<a href="./README.md">
+  <img src="https://img.shields.io/badge/English_Version-View-239f40?style=for-the-badge" alt="English Version">
 </a>
 
 </div>
@@ -36,7 +42,7 @@
 ---
 
 > [!IMPORTANT]
-> **Matixray** یک کلاینت ارتقا‌یافته است که بر پایهٔ **v2rayNG** ساخته شده و توسط تیم **v2box** بهبود یافته است. این برنامه از هر دو هستهٔ **Xray** و **v2fly** پشتیبانی می‌کند تا بیشترین سازگاری را داشته باشد.
+> **Matixray** یک کلاینت ارتقا‌یافته است که بر پایهٔ **v2rayNG** ساخته شده و توسط تیم **Matix** بهبود یافته است. این برنامه از هر دو هستهٔ **Xray** و **v2fly** پشتیبانی می‌کند تا بیشترین سازگاری را داشته باشد.
 
 ---
 
@@ -65,7 +71,7 @@
 - **پشتیبانی از هسته‌های Xray و v2fly**
 - **پشتیبانی از پروتکل‌های مختلف V2Ray**
 - **مبتنی بر v2rayNG** (پایدار و آشنا برای کاربران قبلی)
-- **ارتقا‌یافته توسط تیم v2box**
+- **ارتقا‌یافته توسط تیم Matix**
 - **مدیریت اتصال و مسیریابی قابل‌اعتماد**
 
 ---
@@ -168,5 +174,11 @@
 <div align="center">
 
 **ساخته شده با ❤️ برای کاربران سراسر جهان**
+
+<br><br>
+
+<a href="./README.md">
+  <img src="https://img.shields.io/badge/English_Version-View-239f40?style=for-the-badge" alt="English Version">
+</a>
 
 </div>
