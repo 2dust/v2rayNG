@@ -3,40 +3,62 @@ package com.v2ray.ang.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.text.TextUtils
+import android.os.Build
+import androidx.core.os.BundleCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.LauncherManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.RemoteControlManager
 import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class TaskerReceiver : BroadcastReceiver() {
 
-    /**
-     * This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-     * It retrieves the bundle from the intent and checks the switch and guid values.
-     * Depending on the switch value, it starts or stops the V2Ray service.
-     *
-     * @param context The Context in which the receiver is running.
-     * @param intent The Intent being received.
-     */
     override fun onReceive(context: Context, intent: Intent?) {
-        try {
-            val bundle = intent?.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE)
-            val switch = bundle?.getBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, false)
-            val guid = bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID).orEmpty()
-
-            if (switch == null || TextUtils.isEmpty(guid)) {
-                return
-            } else if (switch) {
-                if (guid == AppConfig.TASKER_DEFAULT_GUID) {
+        if (intent?.action != AppConfig.TASKER_ACTION_FIRE_SETTING) return
+        // Before API 34, and when the host does not share its identity, only the saved capability
+        // authenticates the request. Binder.getCallingUid() here would identify Android, not the host.
+        val senderUid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) sentFromUid else -1
+        val pendingResult = goAsync()
+        val requestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        requestScope.launch {
+            try {
+                val bundle = intent.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE) ?: return@launch
+                if (!RemoteControlManager.isAuthorized(
+                        context, senderUid,
+                        bundle.getString(AppConfig.TASKER_EXTRA_BUNDLE_PACKAGE),
+                        bundle.getString(AppConfig.TASKER_EXTRA_BUNDLE_TOKEN)
+                    )) return@launch
+                val request = TaskerRequest.parse(
+                    BundleCompat.getSerializable(bundle, AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, Boolean::class.javaObjectType),
+                    bundle.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID)
+                ) ?: return@launch
+                if (!request.start) {
+                    LauncherManager.stopService(context)
+                } else if (request.guid == AppConfig.TASKER_DEFAULT_GUID) {
                     LauncherManager.startServiceFromToggle(context)
-                } else {
-                    LauncherManager.startService(context, guid)
+                } else if (MmkvManager.decodeServerConfig(request.guid) != null) {
+                    // Never persist an unknown GUID, even for an authorized controller.
+                    LauncherManager.startService(context, request.guid)
                 }
-            } else {
-                LauncherManager.stopService(context)
+            } catch (error: Exception) {
+                // Malformed parcel/bundle exceptions can contain attacker-supplied credentials.
+                LogUtil.e(AppConfig.TAG, "TaskerReceiver: request failed (${error.javaClass.simpleName})")
+            } finally {
+                pendingResult.finish()
+                requestScope.cancel()
             }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Error processing Tasker broadcast", e)
         }
+    }
+}
+
+internal data class TaskerRequest(val start: Boolean, val guid: String) {
+    companion object {
+        fun parse(start: Boolean?, guid: String?): TaskerRequest? =
+            if (start == null || guid.isNullOrBlank()) null else TaskerRequest(start, guid)
     }
 }
