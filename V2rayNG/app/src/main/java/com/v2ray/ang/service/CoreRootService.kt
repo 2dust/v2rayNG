@@ -36,7 +36,7 @@ class CoreRootService : Service(), ServiceControl {
         super.onCreate()
         LogUtil.i(AppConfig.TAG, "StartCore-Root: Service created")
         CoreServiceManager.serviceControl = SoftReference(this)
-        CoreServiceManager.onServiceCreated()
+        CoreServiceManager.onServiceCreated(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

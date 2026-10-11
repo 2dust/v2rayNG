@@ -20,7 +20,7 @@ class CoreProxyOnlyService : Service(), ServiceControl {
         super.onCreate()
         LogUtil.i(AppConfig.TAG, "StartCore-Proxy: Service created")
         CoreServiceManager.serviceControl = SoftReference(this)
-        CoreServiceManager.onServiceCreated()
+        CoreServiceManager.onServiceCreated(this)
     }
 
     /**
