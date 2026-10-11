@@ -84,8 +84,7 @@ object SubscriptionUpdater {
      */
     fun updateLastUpdatedAndReschedule(context: Context = AngApplication.application, subId: String) {
         val subItem = MmkvManager.decodeSubscription(subId) ?: return
-        subItem.lastUpdated = System.currentTimeMillis()
-        MmkvManager.encodeSubscription(subId, subItem)
+        if (!MmkvManager.updateSubscription(subId, subItem, subItem, updatedAt = System.currentTimeMillis())) return
         syncOne(context, subId)
     }
 
