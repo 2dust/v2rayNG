@@ -138,6 +138,7 @@ android {
             "ru",
             "fa",
             "ar",
+            "az",
             "bn",
             "bqi-rIR"
         )
