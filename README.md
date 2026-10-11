@@ -18,6 +18,14 @@
   <img src="https://img.shields.io/badge/Telegram-@imatix7-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram">
 </a>
 
+<br><br>
+
+<a href="./README.fa.md">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Flag_of_Persia_%28alternative%29.svg/320px-Flag_of_Persia_%28alternative%29.svg.png" height="28" alt="Persian Flag">
+  &nbsp;
+  <img src="https://img.shields.io/badge/نسخهٔ_فارسی-مشاهده_شود-239f40?style=for-the-badge" alt="Persian Version">
+</a>
+
 </div>
 
 ---
@@ -168,5 +176,13 @@ This project is based on v2rayNG and is released under its respective license. F
 <div align="center">
 
 **Made with ❤️ for users around the world**
+
+<br><br>
+
+<a href="./README.fa.md">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Flag_of_Persia_%28alternative%29.svg/320px-Flag_of_Persia_%28alternative%29.svg.png" height="28" alt="Persian Flag">
+  &nbsp;
+  <img src="https://img.shields.io/badge/نسخهٔ_فارسی-مشاهده_شود-239f40?style=for-the-badge" alt="Persian Version">
+</a>
 
 </div>
