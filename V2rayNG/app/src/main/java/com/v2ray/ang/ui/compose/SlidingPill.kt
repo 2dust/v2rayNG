@@ -51,7 +51,7 @@ fun SlidingPillButton(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     container: Color = MaterialTheme.colorScheme.primary,
-    content: Color = Color.White,
+    content: Color = MaterialTheme.colorScheme.onPrimary,
     enabled: Boolean = true,
     busy: Boolean = false,
 ) {

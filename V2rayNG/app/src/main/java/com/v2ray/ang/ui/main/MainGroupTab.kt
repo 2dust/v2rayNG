@@ -74,7 +74,7 @@ private fun GroupTabItem(
     Tab(
         selected = selected,
         onClick = onClick,
-        selectedContentColor = Color.White,
+        selectedContentColor = MaterialTheme.colorScheme.onPrimary,
         unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
             .padding(horizontal = 4.dp, vertical = 8.dp)

@@ -29,12 +29,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// ---- Matixray palette: flat charcoal canvas and cards in the style of the Shadow VPN kit, with the brand violet where that kit has blue ----
+// ---- Matixray palette: flat charcoal canvas and cards in the style of the Shadow VPN kit, with the brand lilac where that kit has blue ----
 val XfBackground = Color(0xFF0B1016)
 val XfCard = Color(0xFF131A22)
-val XfPurple = Color(0xFF7C5CFF)
-val XfPurpleDark = Color(0xFF6644F0)
-val XfPurpleLight = Color(0xFFB9A8FF)
+val XfPurple = Color(0xFFB69BFF)
+val XfPurpleDark = Color(0xFF9B7BF0)
+val XfPurpleLight = Color(0xFFDACEFF)
 val XfTextMain = Color(0xFFF3F5F9)
 val XfTextSub = Color(0xFF8E98A8)
 val XfTextMuted = Color(0xFF5F6978)
@@ -49,14 +49,14 @@ val XfRed = Color(0xFFEF4444)
 val XfProgressTrack = Color(0xFF1B232D)
 
 private val LightColor = lightColorScheme(
-    primary = Color(0xFF5233E6),
+    primary = Color(0xFF8A63E6),
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFE6DEFF),
-    onPrimaryContainer = Color(0xFF1A0A66),
-    secondary = Color(0xFF6B4DFF),
+    primaryContainer = Color(0xFFEFE7FF),
+    onPrimaryContainer = Color(0xFF2A1560),
+    secondary = Color(0xFF9A78EE),
     onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFECE6FF),
-    onSecondaryContainer = Color(0xFF1D0F70),
+    secondaryContainer = Color(0xFFF1EBFF),
+    onSecondaryContainer = Color(0xFF2E1A66),
     tertiary = Color(0xFF16A34A),
     onTertiary = Color(0xFFFFFFFF),
     tertiaryContainer = Color(0xFFC9F4D7),
@@ -72,12 +72,12 @@ private val LightColor = lightColorScheme(
     surfaceVariant = Color(0xFFE9EDF3),
     onSurfaceVariant = Color(0xFF586273),
     outline = Color(0xFF8A94A6),
-    outlineVariant = Color(0x335233E6),
-    inverseSurface = Color(0xFF1A1250),
+    outlineVariant = Color(0x338A63E6),
+    inverseSurface = Color(0xFF241A4A),
     inverseOnSurface = Color(0xFFF4F1FF),
-    inversePrimary = Color(0xFFBBA9FF),
+    inversePrimary = Color(0xFFC9B6FF),
     scrim = Color(0xFF000000),
-    surfaceTint = Color(0xFF5233E6),
+    surfaceTint = Color(0xFF8A63E6),
     surfaceContainerLowest = Color(0xFFFFFFFF),
     surfaceContainerLow = Color(0xFFF8F9FC),
     surfaceContainer = Color(0xFFEFF2F7),
@@ -87,12 +87,12 @@ private val LightColor = lightColorScheme(
 
 private val DarkColor = darkColorScheme(
     primary = XfPurple,
-    onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFF2B2260),
-    onPrimaryContainer = Color(0xFFE7E0FF),
-    secondary = Color(0xFFA48DFF),
+    onPrimary = Color(0xFF22104F),
+    primaryContainer = Color(0xFF3B2E66),
+    onPrimaryContainer = Color(0xFFEADFFF),
+    secondary = Color(0xFFCDBBFF),
     onSecondary = Color(0xFF14083F),
-    secondaryContainer = Color(0xFF241E4A),
+    secondaryContainer = Color(0xFF2F2650),
     onSecondaryContainer = Color(0xFFE7E0FF),
     tertiary = XfGreen,
     onTertiary = Color(0xFF03210F),
@@ -154,8 +154,8 @@ private fun Typography.withFontFamily(family: FontFamily): Typography = copy(
 // Semantic Colors
 val colorPing = Color(0xFF009966) // Green
 val colorPingRed = Color(0xFFFF4D6D) // Red
-val colorConfigType = Color(0xFFA78BFF) // Soft violet
-val colorFabActive = Color(0xFF7C5CFF) // Brand violet
+val colorConfigType = Color(0xFFC9B6FF) // Lilac
+val colorFabActive = Color(0xFFB69BFF) // Brand lilac
 val colorFabInactiveLight = Color(0xFF9C9C9C) // Gray
 val colorFabInactiveDark = Color(0xFF646464) // Dark Gray
 val dividerColorLight = Color(0xFFE0E0E0) // Light Gray
@@ -166,7 +166,7 @@ val toastNormalBgLight = Color(0xD9353A3E) // Dark Gray
 val toastNormalBgDark = Color(0xD94A4F54) // Darker Gray
 val toastSuccessBg = Color(0xD9388E3C) // Green
 val toastErrorBg = Color(0xD9D50000) // Red
-val toastInfoBg = Color(0xD95B3FD0) // Violet
+val toastInfoBg = Color(0xD97E5BD0) // Lilac
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
 val toastTextColor = Color.White // White
 

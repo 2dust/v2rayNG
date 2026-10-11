@@ -1,94 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Splash -->
-    <string name="xf_splash_title">به نام پروردگار</string>
-    <string name="xf_splash_status_0">راه‌اندازی هسته...</string>
-    <string name="xf_splash_status_1">بارگذاری منابع کانفیگ...</string>
-    <string name="xf_splash_status_2">اتصال به Xfinder | Matix...</string>
-    <string name="xf_splash_status_3">آماده‌سازی اسکنر IP...</string>
-    <string name="xf_splash_status_4">راه‌اندازی رابط کاربری...</string>
-    <string name="xf_splash_status_5">آماده!</string>
+    <string name="xf_splash_title">In the name of God</string>
+    <string name="xf_splash_status_0">Starting core...</string>
+    <string name="xf_splash_status_1">Loading config sources...</string>
+    <string name="xf_splash_status_2">Connecting to Xfinder | Matix...</string>
+    <string name="xf_splash_status_3">Preparing the IP scanner...</string>
+    <string name="xf_splash_status_4">Starting the interface...</string>
+    <string name="xf_splash_status_5">Ready!</string>
     <string name="xf_brand" translatable="false">Matixray</string>
 
     <!-- Drawer -->
-    <string name="xf_nav_configs">کانفیگ Xfinder | Matix</string>
-    <string name="xf_nav_scanner">اسکنر IP</string>
-    <string name="xf_nav_logs">لاگ‌ها</string>
-    <string name="xf_nav_settings">تنظیمات</string>
+    <string name="xf_nav_configs">Xfinder | Matix configs</string>
+    <string name="xf_nav_scanner">IP scanner</string>
+    <string name="xf_nav_logs">Logs</string>
+    <string name="xf_nav_settings">Settings</string>
 
     <!-- Xfinder tab -->
     <string name="xf_badge" translatable="false">Xfinder</string>
-    <string name="xf_subtitle">کانفیگ از Xfinder | Matix</string>
+    <string name="xf_subtitle">Configs from Xfinder | Matix</string>
     <string name="xf_tab_top">Top 20</string>
-    <string name="xf_tab_all">همه</string>
-    <string name="xf_refresh">بروزرسانی لیست</string>
-    <string name="xf_loading">در حال دریافت…</string>
-    <string name="xf_error_load">دریافت لیست ناموفق بود</string>
-    <string name="xf_retry">تلاش دوباره</string>
-    <string name="xf_empty">موردی یافت نشد</string>
-    <string name="xf_config_selected">کانفیگ انتخاب شد</string>
-    <string name="xf_all_added">کانفیگ‌ها به‌صورت لینک اتصال اضافه شدند</string>
-    <string name="xf_config_import_failed">افزودن کانفیگ ناموفق بود</string>
-    <string name="xf_state_selected">انتخاب‌شده</string>
+    <string name="xf_tab_all">All</string>
+    <string name="xf_refresh">Refresh list</string>
+    <string name="xf_loading">Loading…</string>
+    <string name="xf_error_load">Could not load the list</string>
+    <string name="xf_retry">Try again</string>
+    <string name="xf_empty">Nothing found</string>
+    <string name="xf_config_selected">Config selected</string>
+    <string name="xf_all_added">Configs were added as connection links</string>
+    <string name="xf_config_import_failed">Could not add the config</string>
+    <string name="xf_state_selected">Selected</string>
     <string name="xf_ping_ms" translatable="false">%1$d ms</string>
 
     <!-- IP scanner tab -->
-    <string name="xf_scanner_title">اسکنر IP</string>
-    <string name="xf_scanner_source">منبع: Scanner-matix</string>
-    <string name="xf_stat_total">کل</string>
-    <string name="xf_stat_online">آنلاین</string>
-    <string name="xf_stat_pinned">پین‌شده</string>
-    <string name="xf_ip_copied">IP کپی شد</string>
+    <string name="xf_scanner_title">IP scanner</string>
+    <string name="xf_scanner_source">Source: Scanner-matix</string>
+    <string name="xf_stat_total">Total</string>
+    <string name="xf_stat_online">Online</string>
+    <string name="xf_stat_pinned">Pinned</string>
+    <string name="xf_ip_copied">IP copied</string>
 
     <!-- Log tab -->
-    <string name="xf_logs_title">لاگ‌ها</string>
-    <string name="xf_logs_clear">پاک کردن</string>
-    <string name="xf_logs_empty">هنوز لاگی ثبت نشده است</string>
+    <string name="xf_logs_title">Logs</string>
+    <string name="xf_logs_clear">Clear</string>
+    <string name="xf_logs_empty">No logs yet</string>
 
     <!-- Drawer -->
-    <string name="mx_nav_language">زبان برنامه</string>
+    <string name="mx_nav_language">App language</string>
 
     <!-- Psiphon button -->
-    <string name="mx_psiphon_connect">اتصال به Psiphon</string>
-    <string name="mx_psiphon_connected">Psiphon متصل است (برای قطع بزنید)</string>
-    <string name="mx_psiphon_no_profile">Psiphon در دسترس نیست</string>
-    <string name="mx_psiphon_state_off">قطع</string>
-    <string name="mx_psiphon_state_on">متصل</string>
+    <string name="mx_psiphon_connect">Connect to Psiphon</string>
+    <string name="mx_psiphon_connected">Psiphon is connected (tap to disconnect)</string>
+    <string name="mx_psiphon_no_profile">Psiphon is not available</string>
+    <string name="mx_psiphon_state_off">Off</string>
+    <string name="mx_psiphon_state_on">Connected</string>
 
     <!-- About -->
-    <string name="mx_about_title">درباره Matixray</string>
-    <string name="mx_about_body">این پروژه ارتقا‌یافته است و V2Ray در آن قرار دارد.\n\nV2Ray یک پلتفرم متن‌باز برای ساخت ارتباط شبکه‌ای امن و پرسرعت است که از پروتکل‌هایی مثل VMess، VLESS، Trojan و Shadowsocks پشتیبانی می‌کند و ترافیک شما را رمزنگاری و مسیریابی می‌کند.\n\nMatixray یک کلاینت اندرویدی بر پایه V2Ray و هسته Xray است با رابط کاربری مدرن، حالت شب و روز، پیدا کردن خودکار بهترین کانفیگ، Xfinder و اتصال Psiphon.</string>
-    <string name="mx_telegram_button">عضویت در کانال تلگرام</string>
-    <string name="mx_remove_sni_title">حذف SNI</string>
-    <string name="mx_remove_sni_summary">در اتصال TLS نام سرور (SNI) فرستاده نمی‌شود</string>
-    <string name="mx_auto_connect">اتصال خودکار به بهترین کانفیگ</string>
-    <string name="mx_xfinder_add_all">افزودن هر ۲۰ کانفیگ به‌صورت لینک اتصال</string>
+    <string name="mx_about_title">About Matixray</string>
+    <string name="mx_about_body">This project is an upgraded build that contains V2Ray.\n\nV2Ray is an open-source platform for building secure, fast network connections. It supports protocols such as VMess, VLESS, Trojan and Shadowsocks, and encrypts and routes your traffic.\n\nMatixray is an Android client based on V2Ray and the Xray core, with a modern interface, day and night modes, automatic best-config search, Xfinder and Psiphon.</string>
+    <string name="mx_telegram_button">Join the Telegram channel</string>
+    <string name="mx_remove_sni_title">Remove SNI</string>
+    <string name="mx_remove_sni_summary">The server name (SNI) is not sent in TLS connections</string>
+    <string name="mx_auto_connect">Auto-connect to the best config</string>
+    <string name="mx_xfinder_add_all">Add all 20 configs as connection links</string>
 
     <!-- Main screen: sections, live stats -->
     <string name="mx_tab_main" translatable="false">Matixray</string>
     <string name="mx_tab_psiphon" translatable="false">Psiphon</string>
-    <string name="mx_stat_download">دانلود</string>
-    <string name="mx_stat_upload">آپلود</string>
-    <string name="mx_stat_ping">پینگ</string>
+    <string name="mx_stat_download">Download</string>
+    <string name="mx_stat_upload">Upload</string>
+    <string name="mx_stat_ping">Ping</string>
     <string name="mx_stat_none" translatable="false">—</string>
     <string name="mx_ping_value" translatable="false">%1$d ms</string>
-    <string name="mx_hero_tap_connect">برای اتصال بزنید</string>
-    <string name="mx_hero_connected">متصل شد</string>
-    <string name="mx_psiphon_section_hint">اتصال مستقیم و سریع با Psiphon، بدون نیاز به افزودن کانفیگ</string>
-    <string name="mx_refresh">بروزرسانی</string>
+    <string name="mx_hero_tap_connect">Tap to connect</string>
+    <string name="mx_hero_connected">Connected</string>
+    <string name="mx_psiphon_section_hint">Direct, fast connection with Psiphon, no config needed</string>
+    <string name="mx_refresh">Refresh</string>
 
     <!-- Update notice on start -->
-    <string name="mx_update_notice_title">نسخه جدید Matixray</string>
-    <string name="mx_update_notice_body">نسخه %1$s منتشر شده است. برای دریافت بهترین سرعت و رفع اشکال‌ها، برنامه را بروزرسانی کنید.</string>
-    <string name="mx_update_later">بعداً</string>
+    <string name="mx_update_notice_title">New Matixray version</string>
+    <string name="mx_update_notice_body">Version %1$s is out. Update the app for the best speed and bug fixes.</string>
+    <string name="mx_update_later">Later</string>
 
     <!-- Adult content lock -->
-    <string name="mx_adult_lock_title">قفل‌سازی محتوای بزرگسال</string>
-    <string name="mx_adult_lock_summary">با روشن بودن این گزینه، سایت‌های پورن و محتوای جنسی از طریق برنامه باز نمی‌شوند</string>
+    <string name="mx_adult_lock_title">Adult content lock</string>
+    <string name="mx_adult_lock_summary">When this is on, porn and sexual-content sites will not open through the app</string>
 
     <!-- Bottom bar and selected-server card of the home screen -->
-    <string name="mx_nav_home">خانه</string>
-    <string name="mx_nav_servers">سرورها</string>
-    <string name="mx_selected_server_none">سروری انتخاب نشده</string>
-    <string name="mx_selected_server_hint">برای تغییر سرور بزنید</string>
+    <string name="mx_nav_home">Home</string>
+    <string name="mx_nav_servers">Servers</string>
+    <string name="mx_selected_server_none">No server selected</string>
+    <string name="mx_selected_server_hint">Tap to change the server</string>
+    <string name="mx_auto_switch_title">Auto-connect to the best server</string>
+    <string name="mx_auto_switch_hint">If the server drops, connect to the best server</string>
+    <string name="mx_badge_new">New</string>
 </resources>

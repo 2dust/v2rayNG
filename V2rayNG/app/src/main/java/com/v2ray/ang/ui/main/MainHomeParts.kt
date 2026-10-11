@@ -1,6 +1,11 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Switch
+import androidx.compose.ui.draw.clip
+import com.v2ray.ang.ui.compose.GlassPillShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,4 +70,38 @@ fun SelectedServerCard(name: String?, onClick: () -> Unit, modifier: Modifier = 
         container = MaterialTheme.colorScheme.surfaceContainerHigh,
         content = MaterialTheme.colorScheme.onSurface,
     )
+}
+
+/** The switch under the live numbers: when the server is cut, the app connects to the best server by itself. */
+@Composable
+fun AutoSwitchRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 5.dp)
+            .fillMaxWidth()
+            .clip(GlassPillShape)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
+            .padding(start = 22.dp, end = 14.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.mx_auto_switch_title),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(R.string.mx_auto_switch_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+            )
+        }
+        Switch(checked = checked, onCheckedChange = null)
+    }
 }

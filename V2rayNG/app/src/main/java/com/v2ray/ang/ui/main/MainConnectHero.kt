@@ -4,7 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -107,11 +115,36 @@ fun MainConnectHero(
     val startLabel = stringResource(R.string.acc_start)
     val stopLabel = stringResource(R.string.acc_stop)
     val source = remember { MutableInteractionSource() }
+    val dark = LocalDarkTheme.current
+
+    // Press feel: the button dips quickly while the finger is down and springs back with a small bounce; when the
+    // state flips it pops once, and every tap sends one ring outward.
+    val pressed by source.collectIsPressedAsState()
+    val pressFactor by animateFloatAsState(
+        targetValue = if (pressed) 0.91f else 1f,
+        animationSpec = if (pressed) tween(durationMillis = 80, easing = FastOutSlowInEasing)
+        else spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "connectPress",
+    )
+    val pop = remember { Animatable(1f) }
+    val ring = remember { Animatable(0f) }
+    var taps by remember { mutableStateOf(0) }
+    LaunchedEffect(shownRunning) {
+        pop.animateTo(1.07f, tween(90, easing = FastOutSlowInEasing))
+        pop.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+    }
+    LaunchedEffect(taps) {
+        if (taps > 0) {
+            ring.snapTo(0.001f)
+            ring.animateTo(1f, tween(450, easing = FastOutSlowInEasing))
+            ring.snapTo(0f)
+        }
+    }
 
     // The page is one box: the timer and status at the top, the button in the exact middle of the page, the live
     // numbers (and whatever the caller adds) at the bottom, and a faint internet globe behind it all.
     BoxWithConstraints(modifier = modifier.fillMaxSize().clipToBounds()) {
-        val buttonSize = (maxHeight * 0.30f).coerceIn(150.dp, 220.dp)
+        val buttonSize = (maxHeight * 0.34f).coerceIn(170.dp, 250.dp)
 
         // A picture drawn once and tinted, so it costs one bitmap draw per frame and never animates.
         Image(
@@ -167,6 +200,17 @@ fun MainConnectHero(
                         ),
                 )
             }
+            if (isRunning) {
+                // The real speed of the app's traffic, read from the system counters once a second.
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "↓ ${speed.downBytesPerSec.toSpeedString()}    ↑ ${speed.upBytesPerSec.toSpeedString()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = scheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                )
+            }
         }
 
         // The button is the two pictures of the design, off and on; a tap is taken on press so it answers at once.
@@ -177,7 +221,42 @@ fun MainConnectHero(
             modifier = Modifier
                 .align(Alignment.Center)
                 .size(buttonSize)
-                .pressScale(source, 0.96f)
+                .graphicsLayer {
+                    val sc = pressFactor * pop.value
+                    scaleX = sc
+                    scaleY = sc
+                }
+                .drawBehind {
+                    // One ring that spreads out of the button and fades on every tap.
+                    if (ring.value > 0f && ring.value < 1f) {
+                        val r0 = size.minDimension / 2f
+                        drawCircle(
+                            color = accent.copy(alpha = 0.45f * (1f - ring.value)),
+                            radius = r0 * (1f + 0.30f * ring.value),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3.dp.toPx() * (1f - ring.value) + 1.dp.toPx()),
+                        )
+                    }
+                }
+                .drawBehind {
+                    // A soft shadow under the button so it stands out from the page: wide and faint, a little lower
+                    // than the button, drawn before the clip so nothing cuts it.
+                    val r = size.minDimension / 2f
+                    val c = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f + 10.dp.toPx())
+                    val reach = r * 1.3f
+                    drawCircle(
+                        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                            colorStops = arrayOf(
+                                0.0f to Color.Black.copy(alpha = if (dark) 0.50f else 0.22f),
+                                0.72f to Color.Black.copy(alpha = if (dark) 0.28f else 0.12f),
+                                1.0f to Color.Transparent,
+                            ),
+                            center = c,
+                            radius = reach,
+                        ),
+                        radius = reach,
+                        center = c,
+                    )
+                }
                 .clip(CircleShape)
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -188,6 +267,7 @@ fun MainConnectHero(
                             source.tryEmit(if (released) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                         },
                         onTap = {
+                            taps++
                             pending = true
                             onToggle()
                         },

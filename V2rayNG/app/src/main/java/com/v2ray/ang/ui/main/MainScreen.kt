@@ -61,6 +61,8 @@ fun MainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val psiphonActive by mainViewModel.psiphonActive.collectAsStateWithLifecycle()
     val speed by mainViewModel.trafficSpeed.collectAsStateWithLifecycle()
+    val autoSwitch by mainViewModel.autoSwitch.collectAsStateWithLifecycle()
+    val updateAvailable by mainViewModel.updateAvailable.collectAsStateWithLifecycle()
     // Home has two pages side by side, Matixray and Psiphon, moved by a swipe or a tap on the titles; the bottom bar
     // switches between Home (0) and the server list (1).
     val homePager = rememberPagerState(initialPage = 0, pageCount = { 2 })
@@ -217,6 +219,7 @@ fun MainScreen(
         drawerContent = {
             MainDrawerContent(
                 drawerState = drawerState,
+                updateAvailable = updateAvailable,
                 onNavigate = { route ->
                     scope.launch { drawerState.close() }
                     onNavigate(route)
@@ -301,7 +304,10 @@ fun MainScreen(
                                     speed = speed,
                                     pingMillis = uiState.pingMillis,
                                     onStatusClick = { onAction(MainAction.TestCurrentServer) },
-                                    bottomExtra = { SelectedServerCard(name = selectedName, onClick = { bottomTab = 1 }) },
+                                    bottomExtra = {
+                                        AutoSwitchRow(checked = autoSwitch, onCheckedChange = { mainViewModel.setAutoSwitch(it) })
+                                        SelectedServerCard(name = selectedName, onClick = { bottomTab = 1 })
+                                    },
                                 )
                             }
                         }
@@ -309,6 +315,13 @@ fun MainScreen(
                         AutoConnectButton(
                             testing = uiState.isTesting,
                             onClick = { onAction(MainAction.AutoConnectBest) }
+                        )
+                        // Subscriptions also update by themselves every 15 minutes; this is the manual update.
+                        com.v2ray.ang.ui.compose.SlidingPillButton(
+                            text = stringResource(R.string.title_sub_update),
+                            onClick = { onAction(MainAction.UpdateSubscriptions) },
+                            container = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            content = MaterialTheme.colorScheme.onSurface,
                         )
                         if (groups.size > 1) {
                             GroupTabBar(

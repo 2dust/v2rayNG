@@ -81,8 +81,7 @@ fun AboutScreen(
     val context = LocalContext.current
     var showOssDialog by remember { mutableStateOf(false) }
 
-    val libVersion = CoreNativeManager.getLibVersion()
-    val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
+    val versionText = "Matixray v${BuildConfig.VERSION_NAME.trimStart('v', 'V')}"
     val appIdText = BuildConfig.APPLICATION_ID
 
     Scaffold(

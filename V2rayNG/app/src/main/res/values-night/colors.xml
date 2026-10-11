@@ -3,7 +3,7 @@
     <!-- Matixray palette (night): flat charcoal canvas, violet brand -->
     <color name="xf_background">#0b1016</color>
     <color name="xf_card">#131a22</color>
-    <color name="xf_purple">#7c5cff</color>
+    <color name="xf_purple">#b69bff</color>
     <color name="xf_text_main">#f3f5f9</color>
     <color name="xf_text_sub">#8e98a8</color>
     <color name="xf_text_muted">#5f6978</color>

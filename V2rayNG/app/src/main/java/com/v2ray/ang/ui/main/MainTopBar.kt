@@ -49,7 +49,7 @@ fun MainTopBar(
 
     AppTopBar(
         title = stringResource(R.string.app_name),
-        titleBadge = com.v2ray.ang.BuildConfig.VERSION_NAME,
+        titleBadge = "v" + com.v2ray.ang.BuildConfig.VERSION_NAME.trimStart('v', 'V'),
         onBackClick = {},
         isLoading = isLoading,
         isSearchActive = showSearch,

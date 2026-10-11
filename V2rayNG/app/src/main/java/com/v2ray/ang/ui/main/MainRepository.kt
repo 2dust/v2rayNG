@@ -256,6 +256,23 @@ class MainRepository(
     }
 
     override fun syncSubscriptions() {
+        // Once: every subscription that has a link updates itself every 15 minutes from now on (it can still be
+        // changed per subscription, and a manual update is always possible).
+        if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_SUB_AUTO15_DONE, false)) {
+            MmkvManager.decodeSubscriptions().forEach { sub ->
+                if (sub.subscription.url.isNotEmpty()) {
+                    sub.subscription.autoUpdate = true
+                    sub.subscription.updateInterval = 15
+                    MmkvManager.encodeSubscription(sub.guid, sub.subscription)
+                }
+            }
+            MmkvManager.encodeSettings(AppConfig.PREF_SUB_AUTO15_DONE, true)
+        }
+        // Once: the speed line of the notification (real download and upload) is on by default; it can be turned off in Settings.
+        if (!MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_DEFAULT_ON_DONE, false)) {
+            MmkvManager.encodeSettings(AppConfig.PREF_SPEED_ENABLED, true)
+            MmkvManager.encodeSettings(AppConfig.PREF_SPEED_DEFAULT_ON_DONE, true)
+        }
         SubscriptionUpdater.sync(app)
     }
 

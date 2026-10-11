@@ -148,6 +148,59 @@ class MainViewModel(
 
     /** True from the "auto connect" tap until the real tests it started have finished. */
     private var autoConnectPending = false
+
+    // "Connect to the best server when the server is cut": a probe of the current server every 25 s while connected;
+    // two failed probes in a row start the same real-ping search as the auto-connect button.
+    private val _autoSwitch = MutableStateFlow(MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SWITCH_ON_DROP, false))
+    val autoSwitch: StateFlow<Boolean> = _autoSwitch.asStateFlow()
+    private val _updateAvailable = MutableStateFlow(false)
+    val updateAvailable: StateFlow<Boolean> = _updateAvailable.asStateFlow()
+    private var probeFailStreak = 0
+    private var lastAutoSwitchAtMs = 0L
+
+    fun setAutoSwitch(enabled: Boolean) {
+        _autoSwitch.value = enabled
+        MmkvManager.encodeSettings(AppConfig.PREF_AUTO_SWITCH_ON_DROP, enabled)
+        probeFailStreak = 0
+    }
+
+    private var pingJob: Job? = null
+    private val silentProbeIds: MutableSet<String> = java.util.Collections.synchronizedSet(mutableSetOf())
+
+    /**
+     * Shows the ping of the connection by itself: the first test starts 0.6 s after the tunnel is up and is repeated
+     * every 2 s until a result arrives, then refreshed every 20 s while connected. The probes are silent (they change
+     * only the ping number, not the status line), and their results also feed the "connect to the best server when the
+     * server is cut" option.
+     */
+    private fun startPingLoop() {
+        pingJob?.cancel()
+        pingJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(600L)
+            var quickTries = 0
+            while (_uiState.value.isRunning) {
+                val state = _uiState.value
+                if (!state.isTesting && !autoConnectPending) testCurrentServerRealPing(silent = true)
+                val waitingForFirst = _uiState.value.pingMillis == null && quickTries++ < 6
+                kotlinx.coroutines.delay(if (waitingForFirst) 2_000L else 20_000L)
+            }
+        }
+    }
+
+    private fun onProbeResult(delayMillis: Long) {
+        if (delayMillis >= 0L) {
+            probeFailStreak = 0
+            return
+        }
+        // The first 30 s after a start or a switch are not judged: the tunnel may still be coming up.
+        if (System.currentTimeMillis() - lastAutoSwitchAtMs < 30_000L) return
+        probeFailStreak++
+        if (_autoSwitch.value && probeFailStreak >= 2 && !autoConnectPending) {
+            probeFailStreak = 0
+            lastAutoSwitchAtMs = System.currentTimeMillis()
+            startAutoConnect()
+        }
+    }
     private val _autoConnectEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     /** Emits once the fastest working profile has been selected and the service should (re)start on it. */
@@ -296,6 +349,8 @@ class MainViewModel(
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
+                probeFailStreak = 0
+                lastAutoSwitchAtMs = System.currentTimeMillis()
                 updateRunningState(true)
             }
 
@@ -319,6 +374,12 @@ class MainViewModel(
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
                 if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return
+                onProbeResult(event.result.delayMillis)
+                if (silentProbeIds.remove(event.requestId)) {
+                    // A background probe: only the ping number changes.
+                    _uiState.update { it.copy(pingMillis = event.result.delayMillis.takeIf { delay -> delay >= 0L }) }
+                    return
+                }
                 _uiState.update {
                     it.copy(
                         isTesting = testRequests.isTesting,
@@ -521,7 +582,10 @@ class MainViewModel(
                 val result = com.v2ray.ang.handler.UpdateCheckerManager.checkForUpdate(
                     MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
                 )
-                if (result.hasUpdate) _uiState.update { it.copy(updateNotice = result) }
+                if (result.hasUpdate) {
+                    _updateAvailable.value = true
+                    _uiState.update { it.copy(updateNotice = result) }
+                }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -1207,10 +1271,11 @@ class MainViewModel(
         pendingTestResults.clear()
     }
 
-    fun testCurrentServerRealPing() {
+    fun testCurrentServerRealPing(silent: Boolean = false) {
         if (!uiState.value.isRunning) return
         val requestId = testRequests.beginCurrent()
-        _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
+        if (silent) silentProbeIds.add(requestId)
+        else _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
         dataSource.testCurrentServerRealPing(requestId)
     }
 
@@ -1248,6 +1313,13 @@ class MainViewModel(
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
         if (!running || clearTestingText) testRequests.invalidateCurrent()
+        if (running) {
+            if (pingJob?.isActive != true) startPingLoop()
+        } else {
+            pingJob?.cancel()
+            pingJob = null
+            silentProbeIds.clear()
+        }
         _uiState.update { state ->
             state.copy(
                 isRunning = running,

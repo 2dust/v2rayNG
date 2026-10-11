@@ -2,7 +2,16 @@ package com.v2ray.ang.ui.main
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import com.v2ray.ang.ui.compose.SuccessBadge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -86,7 +95,7 @@ private val drawerItems = primaryDrawerItems + listOf(
 )
 
 @Composable
-fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
+fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit, updateAvailable: Boolean = false) {
     val drawerScrollState = rememberScrollState()
 
     ModalDrawerSheet(
@@ -106,14 +115,41 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     .padding(horizontal = 16.dp)
             ) {
                 DrawerHeader()
-                drawerItems.forEachIndexed { index, item ->
-                    if (index == primaryDrawerItems.size || index == xfinderDrawerItems.size) {
-                        Spacer(Modifier.height(10.dp))
-                    }
-                    DrawerGlassItem(item = item, onClick = { onNavigate(item) })
-                }
+                // Each part of the menu is one surface with its rows inside, divided by thin lines: no box per item.
+                DrawerGroup(xfinderDrawerItems, updateAvailable, onNavigate)
+                Spacer(Modifier.height(12.dp))
+                DrawerGroup(primaryDrawerItems.drop(xfinderDrawerItems.size), updateAvailable, onNavigate)
+                Spacer(Modifier.height(12.dp))
+                DrawerGroup(drawerItems.drop(primaryDrawerItems.size), updateAvailable, onNavigate)
                 Spacer(Modifier.height(24.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun DrawerGroup(items: List<MainDestination>, updateAvailable: Boolean, onNavigate: (MainDestination) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(28.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+    ) {
+        items.forEachIndexed { index, item ->
+            if (index > 0) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .height(0.5.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+            }
+            DrawerRow(
+                item = item,
+                showNew = updateAvailable && item == MainDestination.CheckUpdate,
+                onClick = { onNavigate(item) },
+            )
         }
     }
 }
@@ -143,42 +179,58 @@ private fun DrawerHeader() {
     }
 }
 
-/** One menu entry: a liquid-glass card with a blue icon tile and the label; one focusable node. */
+/** One menu row: icon and label, with the sliding arrow of the app's buttons coming in from the end edge while pressed. */
 @Composable
-private fun DrawerGlassItem(item: MainDestination, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(50)
+private fun DrawerRow(item: MainDestination, showNew: Boolean, onClick: () -> Unit) {
     val source = remember { MutableInteractionSource() }
-    Row(
+    val pressed by source.collectIsPressedAsState()
+    val progress by animateFloatAsState(
+        targetValue = if (pressed) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "drawerSlide",
+    )
+    val dir = if (LocalLayoutDirection.current == LayoutDirection.Rtl) -1f else 1f
+    Box(
         modifier = Modifier
-            .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .pressScale(source, 0.97f)
-            .liquidGlass(shape)
-            .clickable(interactionSource = source, indication = null, onClick = onClick)
-            .semantics(mergeDescendants = true) { role = Role.Button }
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .clickable(interactionSource = source, indication = null, role = Role.Button, onClick = onClick)
+            .heightIn(min = 54.dp)
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.CenterStart,
     ) {
-        Box(
-            modifier = Modifier
-                .size(38.dp)
-                .clip(CircleShape)
-                .background(PrimaryGradient),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.graphicsLayer { translationX = -dir * 10.dp.toPx() * progress },
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(item.iconRes),
                 contentDescription = null,
-                tint = androidx.compose.ui.graphics.Color.White,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(22.dp)
             )
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = stringResource(item.labelRes),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (showNew) {
+                Spacer(Modifier.width(8.dp))
+                SuccessBadge(text = stringResource(R.string.mx_badge_new))
+            }
         }
-        Spacer(Modifier.width(14.dp))
-        Text(
-            text = stringResource(item.labelRes),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+        Icon(
+            painter = painterResource(R.drawable.ic_arrow_forward_24dp),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .size(18.dp)
+                .graphicsLayer {
+                    translationX = dir * 28.dp.toPx() * (1f - progress)
+                    alpha = progress
+                },
         )
     }
 }

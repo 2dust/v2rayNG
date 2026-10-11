@@ -62,8 +62,7 @@ fun CheckUpdateScreen(
     val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
     val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
-    val libVersion = CoreNativeManager.getLibVersion()
-    val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
+    val versionText = "Matixray v${BuildConfig.VERSION_NAME.trimStart('v', 'V')}"
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),

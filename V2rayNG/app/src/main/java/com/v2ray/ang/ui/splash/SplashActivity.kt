@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui.splash
 
 import android.content.Intent
-import com.v2ray.ang.ui.compose.InfinityLoop
+import com.v2ray.ang.ui.compose.RippleLoader
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.size
@@ -52,7 +52,7 @@ import com.v2ray.ang.ui.compose.XfGreen
 import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.ui.main.MainActivity
 
-/** Launcher entry: the opening words fade in over an infinity loop, in under a second, then hands over to [MainActivity]. */
+/** Launcher entry: the opening words fade in over a ripple loader, in under a second, then hands over to [MainActivity]. */
 class SplashActivity : BaseComponentActivity() {
 
     @Composable
@@ -116,10 +116,9 @@ private fun SplashScreen(onFinished: () -> Unit) {
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(40.dp))
-            InfinityLoop(
-                modifier = Modifier.size(width = 84.dp, height = 40.dp),
+            RippleLoader(
+                modifier = Modifier.size(88.dp),
                 color = scheme.primary,
-                strokeWidth = 5.dp,
             )
         }
         Text(

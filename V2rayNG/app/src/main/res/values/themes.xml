@@ -7,7 +7,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">@bool/matixray_light_bars</item>
         <item name="android:windowBackground">@color/xf_background</item>
-        <!-- Matixray: violet palette for AppCompat widgets (Compose reads Theme.kt) -->
+        <!-- Matixray: lilac palette for AppCompat widgets (Compose reads Theme.kt) -->
         <item name="colorPrimary">@color/xf_purple</item>
         <item name="colorPrimaryDark">@color/xf_background</item>
         <item name="colorAccent">@color/xf_purple_light</item>

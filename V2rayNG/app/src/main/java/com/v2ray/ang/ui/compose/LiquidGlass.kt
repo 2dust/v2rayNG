@@ -141,7 +141,7 @@ fun GlassSurface(
 fun AppBackdrop(modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
     val dark = LocalDarkTheme.current
-    val glow = if (dark) Color(0x337C5CFF) else Color(0x22A48DFF)
+    val glow = if (dark) Color(0x33B69BFF) else Color(0x228A63E6)
     Box(
         modifier = modifier
             .fillMaxSize()

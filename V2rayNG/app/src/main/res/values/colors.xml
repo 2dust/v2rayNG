@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Matixray palette (day, violet). values-night/colors.xml overrides the surface and text colors. -->
+    <!-- Matixray palette (day, lilac). values-night/colors.xml overrides the surface and text colors. -->
     <color name="xf_background">#f3f5f9</color>
     <color name="xf_card">#ffffff</color>
-    <color name="xf_purple">#7c5cff</color>
-    <color name="xf_purple_dark">#6644f0</color>
-    <color name="xf_purple_light">#b9a8ff</color>
+    <color name="xf_purple">#8a63e6</color>
+    <color name="xf_purple_dark">#7048d0</color>
+    <color name="xf_purple_light">#daceff</color>
     <color name="xf_text_main">#0b1016</color>
     <color name="xf_text_sub">#586273</color>
     <color name="xf_text_muted">#8a94a6</color>
