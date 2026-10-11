@@ -8,6 +8,9 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -30,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -50,7 +54,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
@@ -85,8 +88,8 @@ fun MainConnectHero(
     modifier: Modifier = Modifier,
     accent: Color = MaterialTheme.colorScheme.primary,
     accentLight: Color = XfPurpleLight,
-    buttonSize: Dp = 168.dp,
     onStatusClick: (() -> Unit)? = null,
+    bottomExtra: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
 
@@ -105,64 +108,77 @@ fun MainConnectHero(
     val stopLabel = stringResource(R.string.acc_stop)
     val source = remember { MutableInteractionSource() }
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = formatElapsed(if (isRunning) elapsedSec() else 0L, scheme.onBackground, isRunning),
-            style = MaterialTheme.typography.displaySmall,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(6.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            // Status dot as in the kit: green while connected, yellow while not.
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(if (isRunning) XfGreen else XfYellow)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = statusText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                modifier = Modifier.then(
-                    // A tap on the status line of a running tunnel tests the connection again; this took the place
-                    // of the old status bar at the bottom of the screen.
-                    if (onStatusClick != null && isRunning) Modifier.clickable(role = Role.Button, onClick = onStatusClick)
-                    else Modifier
-                ),
-            )
-        }
-        Spacer(Modifier.height(28.dp))
+    // The page is one box: the timer and status at the top, the button in the exact middle of the page, the live
+    // numbers (and whatever the caller adds) at the bottom, and a faint internet globe behind it all.
+    BoxWithConstraints(modifier = modifier.fillMaxSize().clipToBounds()) {
+        val buttonSize = (maxHeight * 0.30f).coerceIn(150.dp, 220.dp)
 
-        // Hiddify-style button: a light round disc with the Matixray logo inside. Disconnected the logo is grey and
-        // dim, connected it is in full color with one very faint ring around the disc (no other light, nothing animated).
-        val dark = LocalDarkTheme.current
-        val disc = if (dark) Color(0xFFE8E6F0) else Color.White
-        val ring = scheme.outlineVariant
-        val grey = remember { ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
-        Box(
+        // A picture drawn once and tinted, so it costs one bitmap draw per frame and never animates.
+        Image(
+            painter = painterResource(R.drawable.bg_globe),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            alpha = 0.14f,
+            colorFilter = ColorFilter.tint(accent),
             modifier = Modifier
+                .align(Alignment.Center)
+                .size(maxWidth * 1.15f),
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = formatElapsed(if (isRunning) elapsedSec() else 0L, scheme.onBackground, isRunning),
+                style = MaterialTheme.typography.displaySmall,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(6.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                // Status dot: green while connected, yellow while not.
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(if (isRunning) XfGreen else XfYellow)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = scheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .then(
+                            // A tap on the status line of a running tunnel tests the connection again.
+                            if (onStatusClick != null && isRunning) Modifier.clickable(role = Role.Button, onClick = onStatusClick)
+                            else Modifier
+                        ),
+                )
+            }
+        }
+
+        // The button is the two pictures of the design, off and on; a tap is taken on press so it answers at once.
+        Image(
+            painter = painterResource(if (shownRunning) R.drawable.ic_btn_on else R.drawable.ic_btn_off),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .align(Alignment.Center)
                 .size(buttonSize)
                 .pressScale(source, 0.96f)
-                .drawBehind {
-                    val radius = size.minDimension / 2f
-                    if (shownRunning) drawCircle(accent.copy(alpha = 0.12f), radius = radius + 5.dp.toPx())
-                    drawCircle(disc, radius = radius)
-                    if (!dark) drawCircle(ring, radius = radius - 0.5.dp.toPx(), style = Stroke(1.dp.toPx()))
-                }
                 .clip(CircleShape)
-                // The tap is taken on press, not on release, so the button answers at once like Hiddify's.
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onPress = { offset ->
@@ -182,44 +198,42 @@ fun MainConnectHero(
                     role = Role.Button
                     onClick { pending = true; onToggle(); true }
                 },
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_matixray_logo),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                colorFilter = if (shownRunning) null else grey,
-                alpha = if (shownRunning) 1f else 0.6f,
-                modifier = Modifier
-                    .size(buttonSize - 14.dp)
-                    .clip(CircleShape),
-            )
-        }
+        )
 
-        Spacer(Modifier.height(32.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
         ) {
-            val idle = stringResource(R.string.mx_stat_none)
-            StatCard(
-                iconRes = R.drawable.ic_arrow_down_24dp,
-                label = stringResource(R.string.mx_stat_download),
-                value = if (isRunning) speed.downBytesPerSec.toSpeedString() else idle,
-                tint = accentLight,
-            )
-            StatCard(
-                iconRes = R.drawable.ic_arrow_up_24dp,
-                label = stringResource(R.string.mx_stat_upload),
-                value = if (isRunning) speed.upBytesPerSec.toSpeedString() else idle,
-                tint = accentLight,
-            )
-            StatCard(
-                iconRes = R.drawable.ic_speed_24dp,
-                label = stringResource(R.string.mx_stat_ping),
-                value = if (isRunning && pingMillis != null) stringResource(R.string.mx_ping_value, pingMillis) else idle,
-                tint = accentLight,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                val idle = stringResource(R.string.mx_stat_none)
+                StatCard(
+                    iconRes = R.drawable.ic_arrow_down_24dp,
+                    label = stringResource(R.string.mx_stat_download),
+                    value = if (isRunning) speed.downBytesPerSec.toSpeedString() else idle,
+                    tint = accentLight,
+                )
+                StatCard(
+                    iconRes = R.drawable.ic_arrow_up_24dp,
+                    label = stringResource(R.string.mx_stat_upload),
+                    value = if (isRunning) speed.upBytesPerSec.toSpeedString() else idle,
+                    tint = accentLight,
+                )
+                StatCard(
+                    iconRes = R.drawable.ic_speed_24dp,
+                    label = stringResource(R.string.mx_stat_ping),
+                    value = if (isRunning && pingMillis != null) stringResource(R.string.mx_ping_value, pingMillis) else idle,
+                    tint = accentLight,
+                )
+            }
+            if (bottomExtra != null) {
+                Spacer(Modifier.height(10.dp))
+                bottomExtra()
+            }
         }
     }
 }

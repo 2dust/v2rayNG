@@ -100,40 +100,12 @@ fun AutoConnectButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val dark = LocalDarkTheme.current
-    val scheme = MaterialTheme.colorScheme
-    // The kit's primary button: solid accent with white text, in both themes.
-    val container = scheme.primary
-    val content = Color.White
-    val source = remember { MutableInteractionSource() }
-    Row(
-        modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 5.dp)
-            .fillMaxWidth()
-            .pressScale(source)
-            .alpha(if (testing) 0.75f else 1f)
-            .clip(GlassPillShape)
-            .background(container)
-            .clickable(interactionSource = source, indication = null, enabled = !testing, role = Role.Button, onClick = onClick)
-            .heightIn(min = 50.dp)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        if (testing) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                color = content,
-                strokeWidth = 2.dp,
-            )
-            Spacer(Modifier.width(10.dp))
-        }
-        Text(
-            text = stringResource(R.string.mx_auto_connect),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = content,
-            textAlign = TextAlign.Center,
-        )
-    }
+    // The same sliding pill as every other bar button of the app; it shows the spinner and the arrow while it tests.
+    SlidingPillButton(
+        text = stringResource(R.string.mx_auto_connect),
+        onClick = onClick,
+        modifier = modifier,
+        enabled = !testing,
+        busy = testing,
+    )
 }

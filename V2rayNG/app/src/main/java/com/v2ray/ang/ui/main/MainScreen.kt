@@ -293,31 +293,23 @@ fun MainScreen(
                                 val selectedName = remember(selectedGuid) {
                                     selectedGuid?.let { com.v2ray.ang.handler.MmkvManager.decodeServerConfig(it)?.remarks }
                                 }
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .verticalScroll(rememberScrollState()),
-                                ) {
-                                    MainConnectHero(
-                                        isRunning = isRunning,
-                                        elapsedSec = { elapsedSec.value },
-                                        statusText = displayText,
-                                        onToggle = { onAction(MainAction.ToggleService) },
-                                        speed = speed,
-                                        pingMillis = uiState.pingMillis,
-                                        onStatusClick = { onAction(MainAction.TestCurrentServer) },
-                                    )
-                                    Spacer(Modifier.height(20.dp))
-                                    SelectedServerCard(name = selectedName, onClick = { bottomTab = 1 })
-                                    AutoConnectButton(
-                                        testing = uiState.isTesting,
-                                        onClick = { onAction(MainAction.AutoConnectBest) }
-                                    )
-                                    Spacer(Modifier.height(16.dp))
-                                }
+                                MainConnectHero(
+                                    isRunning = isRunning,
+                                    elapsedSec = { elapsedSec.value },
+                                    statusText = displayText,
+                                    onToggle = { onAction(MainAction.ToggleService) },
+                                    speed = speed,
+                                    pingMillis = uiState.pingMillis,
+                                    onStatusClick = { onAction(MainAction.TestCurrentServer) },
+                                    bottomExtra = { SelectedServerCard(name = selectedName, onClick = { bottomTab = 1 }) },
+                                )
                             }
                         }
                     } else {
+                        AutoConnectButton(
+                            testing = uiState.isTesting,
+                            onClick = { onAction(MainAction.AutoConnectBest) }
+                        )
                         if (groups.size > 1) {
                             GroupTabBar(
                                 groups = groups,
@@ -389,31 +381,24 @@ private fun PsiphonSection(
     onToggle: () -> Unit,
     onStatusClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        MainConnectHero(
-            isRunning = connected,
-            elapsedSec = elapsedSec,
-            statusText = stringResource(if (connected) R.string.mx_psiphon_connected else R.string.mx_psiphon_connect),
-            onToggle = onToggle,
-            speed = speed,
-            pingMillis = pingMillis,
-            accent = XfOrange,
-            accentLight = XfOrangeLight,
-            buttonSize = 168.dp,
-            onStatusClick = onStatusClick,
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            text = stringResource(R.string.mx_psiphon_section_hint),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-        )
-        Spacer(Modifier.height(24.dp))
-    }
+    MainConnectHero(
+        isRunning = connected,
+        elapsedSec = elapsedSec,
+        statusText = stringResource(if (connected) R.string.mx_psiphon_connected else R.string.mx_psiphon_connect),
+        onToggle = onToggle,
+        speed = speed,
+        pingMillis = pingMillis,
+        accent = XfOrange,
+        accentLight = XfOrangeLight,
+        onStatusClick = onStatusClick,
+        bottomExtra = {
+            Text(
+                text = stringResource(R.string.mx_psiphon_section_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+            )
+        },
+    )
 }

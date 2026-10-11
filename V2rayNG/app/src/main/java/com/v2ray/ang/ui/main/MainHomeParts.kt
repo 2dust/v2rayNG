@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.liquidGlass
+import com.v2ray.ang.ui.compose.SlidingPillButton
 
 /** Bottom bar of the home screen, as in Hiddify: Home (the connect pages) and Servers (the list), the selected one on a soft pill. */
 @Composable
@@ -54,40 +54,15 @@ fun MainBottomBar(selected: Int, onSelect: (Int) -> Unit) {
     }
 }
 
-/** The card under the connect button that names the selected server; a tap opens the server list. */
+/** The bar under the live numbers that names the selected server; a tap opens the server list. */
 @Composable
 fun SelectedServerCard(name: String?, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp)
-            .liquidGlass()
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.mx_selected_server_none),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(R.string.mx_selected_server_hint),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-            )
-        }
-        Icon(
-            painter = painterResource(R.drawable.ic_expand_more_24dp),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(24.dp),
-        )
-    }
+    SlidingPillButton(
+        text = name?.takeIf { it.isNotBlank() } ?: stringResource(R.string.mx_selected_server_none),
+        subtitle = stringResource(R.string.mx_selected_server_hint),
+        onClick = onClick,
+        modifier = modifier,
+        container = MaterialTheme.colorScheme.surfaceContainerHigh,
+        content = MaterialTheme.colorScheme.onSurface,
+    )
 }

@@ -92,6 +92,12 @@ fun CheckUpdateScreen(
                 title = stringResource(R.string.update_check_for_update),
                 onClick = { viewModel.checkForUpdates() }
             )
+            // The release page of Matixray: the name of the app, and a tap opens it.
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_github_24dp),
+                title = stringResource(R.string.app_name),
+                onClick = { Utils.openUri(context, com.v2ray.ang.AppConfig.APP_URL + "/releases") }
+            )
             VersionInfoBlock(versionText = versionText)
             NavigationBarsSpacer()
         }
