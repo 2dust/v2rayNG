@@ -35,19 +35,44 @@
 
 ---
 
+> [!IMPORTANT]
+> **Matixray** is an upgraded client built on top of **v2rayNG** and further enhanced by the **v2box** team. It supports both **Xray** and **v2fly** cores for maximum compatibility.
+
+---
+
+> [!TIP]
+> For best performance, always use the **latest version** and keep your subscription links updated.
+
+---
+
+> [!NOTE]
+> **Matixray** works without root access by using Android's built-in **VpnService** API.
+
+---
+
+> [!WARNING]
+> Make sure to uninstall any previous version of Matixray or v2rayNG before installing a new build to avoid conflicts.
+
+---
+
+> [!CAUTION]
+> Never share your personal subscription links or configs publicly. They contain your private server credentials.
+
+---
+
 ## ✨ Features
 
-- Support for **Xray** and **v2fly** cores
-- Support for various V2Ray protocols
-- Based on v2rayNG (stable and familiar for existing users)
-- Enhanced and upgraded by the **v2box** team
-- Reliable connection management and routing
+- **Support for Xray and v2fly cores**
+- **Support for various V2Ray protocols**
+- **Based on v2rayNG** (stable and familiar for existing users)
+- **Enhanced and upgraded by the v2box team**
+- **Reliable connection management and routing**
 
 ---
 
 ## 🧠 How It Works
 
-Matixray acts as a **local proxy client** on your Android device. Here is a simple explanation of how it works:
+**Matixray** acts as a **local proxy client** on your Android device. Here is a simple explanation of how it works:
 
 1. **Configuration Loading:**
    When you add a server (via subscription link, config text, or QR code), Matixray parses the configuration and stores it locally on your device.
@@ -62,7 +87,7 @@ Matixray acts as a **local proxy client** on your Android device. Here is a simp
    The selected core (Xray or v2fly) encrypts your traffic and tunnels it through the remote server. This hides your real IP and bypasses restrictions.
 
 5. **Routing Rules:**
-   Matixray applies routing rules (e.g., "Bypass Iran" or "Global") to decide which traffic goes through the proxy and which traffic connects directly.
+   Matixray applies routing rules (e.g., **Bypass Iran** or **Global**) to decide which traffic goes through the proxy and which traffic connects directly.
 
 6. **DNS Resolution:**
    DNS requests are handled either locally or through the proxy, depending on your settings, to prevent DNS leaks and censorship.
@@ -70,7 +95,7 @@ Matixray acts as a **local proxy client** on your Android device. Here is a simp
 7. **VPN Service:**
    Matixray uses Android's **VpnService** API to capture all device traffic without requiring root access. This is why Android asks for VPN permission when you first connect.
 
-In short: **Matixray takes your internet traffic, encrypts it, and sends it through a remote server — making your connection private, secure, and unrestricted.**
+**In short:** Matixray takes your internet traffic, **encrypts it**, and sends it through a **remote server** — making your connection **private, secure, and unrestricted**.
 
 ---
 
@@ -78,31 +103,29 @@ In short: **Matixray takes your internet traffic, encrypts it, and sends it thro
 
 1. Go to the [Releases](https://github.com/imatixofficel/App-Matixray/releases) page on GitHub.
 2. Download the latest APK file.
-3. In Android settings, enable "Install from unknown sources" for your browser or file manager.
+3. In Android settings, enable **"Install from unknown sources"** for your browser or file manager.
 4. Install the APK.
-
-> **Note:** Before installing, make sure to uninstall any previous version of Matixray or v2rayNG to avoid conflicts.
 
 ---
 
 ## 🚀 Getting Started
 
 1. **Add a server:**
-   - Tap the "+" button from the main menu.
-   - You can enter a subscription link or config, or use a QR code.
+   - Tap the **"+"** button from the main menu.
+   - You can enter a subscription link or config, or use a **QR code**.
 2. **Connect:**
    - Select your desired server.
-   - Tap the connect button (V) at the bottom of the screen.
+   - Tap the **connect button (V)** at the bottom of the screen.
 3. **Test speed and ping:**
-   - Long-press any server and choose "Test ping" or "Real speed test."
+   - Long-press any server and choose **"Test ping"** or **"Real speed test."**
 
 ---
 
 ## ⚙️ Recommended Settings
 
-- **Routing mode:** To bypass sanctions, use "Bypass Iran" or "Global" mode depending on your needs.
+- **Routing mode:** To bypass sanctions, use **"Bypass Iran"** or **"Global"** mode depending on your needs.
 - **DNS:** If you have connection issues, change DNS to `1.1.1.1` or `8.8.8.8`.
-- **Local proxy:** If you need to share your internet, enable "Allow LAN."
+- **Local proxy:** If you need to share your internet, enable **"Allow LAN."**
 
 ---
 
@@ -110,10 +133,10 @@ In short: **Matixray takes your internet traffic, encrypts it, and sends it thro
 
 | Issue | Solution |
 |-------|----------|
-| Connection fails | Recheck your config; use the Xray core |
-| Low speed | Test another server; change routing mode |
-| App crashes | Install the latest version and clear app data |
-| Persian font not showing | Vazirmatn is enabled by default; if issues persist, reinstall the app |
+| **Connection fails** | Recheck your config; use the **Xray** core |
+| **Low speed** | Test another server; change routing mode |
+| **App crashes** | Install the latest version and clear app data |
+| **Persian font not showing** | Vazirmatn is enabled by default; if issues persist, reinstall the app |
 
 ---
 
@@ -144,6 +167,6 @@ This project is based on v2rayNG and is released under its respective license. F
 
 <div align="center">
 
-**Made with ❤️ **
+**Made with ❤️ for users around the world**
 
 </div>
