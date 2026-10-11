@@ -21,8 +21,6 @@
 <br><br>
 
 <a href="./README.fa.md">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Flag_of_Persia_%28alternative%29.svg/320px-Flag_of_Persia_%28alternative%29.svg.png" height="28" alt="Persian Flag">
-  &nbsp;
   <img src="https://img.shields.io/badge/Persian_Version-View-239f40?style=for-the-badge" alt="Persian Version">
 </a>
 
@@ -180,8 +178,6 @@ This project is based on v2rayNG and is released under its respective license. F
 <br><br>
 
 <a href="./README.fa.md">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Flag_of_Persia_%28alternative%29.svg/320px-Flag_of_Persia_%28alternative%29.svg.png" height="28" alt="Persian Flag">
-  &nbsp;
   <img src="https://img.shields.io/badge/Persian_Version-View-239f40?style=for-the-badge" alt="Persian Version">
 </a>
 
