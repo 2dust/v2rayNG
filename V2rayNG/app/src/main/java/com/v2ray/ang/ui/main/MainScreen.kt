@@ -237,7 +237,7 @@ fun MainScreen(
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
                             onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                            onAction = onAction,
                             onShareServer = { guid, profile ->
                                 shareTarget = Triple(guid, profile, false)
                             },
