@@ -9,9 +9,15 @@ sealed interface MainStatus {
     data object Disconnected : MainStatus
     data object Connected : MainStatus
     data object Testing : MainStatus
+    data object TestCompleted : MainStatus
     data class TestProgress(val progress: String) : MainStatus
     data class ConnectionTest(val result: ConnectionTestResult) : MainStatus
 }
+
+data class MainTestAnnouncement(
+    val id: Long,
+    val status: MainStatus,
+)
 
 /**
  * Main UI state
