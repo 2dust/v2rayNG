@@ -26,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -49,11 +48,7 @@ import com.v2ray.ang.ui.compose.XfOrange
 import com.v2ray.ang.ui.compose.XfOrangeLight
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.v2ray.ang.ui.compose.CirTabs
-import com.v2ray.ang.ui.compose.MainTab
 
 @Composable
 fun MainScreen(
@@ -66,8 +61,11 @@ fun MainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val psiphonActive by mainViewModel.psiphonActive.collectAsStateWithLifecycle()
     val speed by mainViewModel.trafficSpeed.collectAsStateWithLifecycle()
-    var section by rememberSaveable { mutableStateOf(MainSection.Main) }
-    var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
+    // Home has two pages side by side, Matixray and Psiphon, moved by a swipe or a tap on the titles; the bottom bar
+    // switches between Home (0) and the server list (1).
+    val homePager = rememberPagerState(initialPage = 0, pageCount = { 2 })
+    var bottomTab by rememberSaveable { mutableStateOf(0) }
+    androidx.activity.compose.BackHandler(enabled = bottomTab != 0) { bottomTab = 0 }
     val isRunning = uiState.isRunning
 
     // One timer for the connection, kept here so it does not restart when the section changes. The start time is
@@ -262,109 +260,115 @@ fun MainScreen(
                     }
                 )
             },
+            bottomBar = { MainBottomBar(selected = bottomTab, onSelect = { bottomTab = it }) },
             floatingActionButton = {},
-            bottomBar = {
-                CirTabs(
-                    selected = tab,
-                    onSelect = { target ->
-                        // Settings opens its own screen and leaves the tab where it was.
-                        if (target == MainTab.Settings) onNavigate(MainDestination.Settings) else tab = target
-                    },
-                )
-            },
         ) { innerPadding ->
-            val layoutDirection = LocalLayoutDirection.current
-
             if (groups.isNotEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    if (tab == MainTab.Profile) {
-                        MainProfileTab(onCheckUpdate = { onNavigate(MainDestination.CheckUpdate) })
-                    } else if (tab == MainTab.Home) {
-                    MainSectionTabs(selected = section, onSelect = { section = it })
-                    if (section == MainSection.Psiphon) {
-                        PsiphonSection(
-                            connected = psiphonActive,
-                            elapsedSec = { elapsedSec.value },
-                            speed = speed,
-                            pingMillis = uiState.pingMillis,
-                            onToggle = { onAction(MainAction.TogglePsiphon) },
-                            onStatusClick = { onAction(MainAction.TestCurrentServer) },
+                    if (bottomTab == 0) {
+                        val section = if (homePager.currentPage == 1) MainSection.Psiphon else MainSection.Main
+                        MainSectionTabs(
+                            selected = section,
+                            onSelect = { target -> scope.launch { homePager.animateScrollToPage(target.ordinal) } },
                         )
-                    } else {
-                    MainConnectHero(
-                        isRunning = isRunning,
-                        elapsedSec = { elapsedSec.value },
-                        statusText = displayText,
-                        onToggle = { onAction(MainAction.ToggleService) },
-                        speed = speed,
-                        pingMillis = uiState.pingMillis,
-                        onStatusClick = { onAction(MainAction.TestCurrentServer) },
-                    )
-                    AutoConnectButton(
-                        testing = uiState.isTesting,
-                        onClick = { onAction(MainAction.AutoConnectBest) }
-                    )
-                    val serverName by produceState<String?>(null, selectedGuid) {
-                        value = withContext(Dispatchers.IO) { mainViewModel.selectedServerRemarks(selectedGuid) }
-                    }
-                    ServerInfoCard(serverName = serverName, isRunning = isRunning, speed = speed)
-                    }
-                    } else {
-                    if (groups.size > 1) {
-                        GroupTabBar(
-                            groups = groups,
-                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
-                            mainViewModel = mainViewModel,
-                            onTabClick = { targetIndex ->
-                                scope.launch {
-                                    pagerState.navigateToPageOptimized(
-                                        targetPage = targetIndex,
-                                        animateAdjacentPage = true
+                        HorizontalPager(
+                            state = homePager,
+                            modifier = Modifier.fillMaxSize(),
+                            beyondViewportPageCount = 1,
+                        ) { page ->
+                            if (page == MainSection.Psiphon.ordinal) {
+                                PsiphonSection(
+                                    connected = psiphonActive,
+                                    elapsedSec = { elapsedSec.value },
+                                    speed = speed,
+                                    pingMillis = uiState.pingMillis,
+                                    onToggle = { onAction(MainAction.TogglePsiphon) },
+                                    onStatusClick = { onAction(MainAction.TestCurrentServer) },
+                                )
+                            } else {
+                                val selectedName = remember(selectedGuid) {
+                                    selectedGuid?.let { com.v2ray.ang.handler.MmkvManager.decodeServerConfig(it)?.remarks }
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    MainConnectHero(
+                                        isRunning = isRunning,
+                                        elapsedSec = { elapsedSec.value },
+                                        statusText = displayText,
+                                        onToggle = { onAction(MainAction.ToggleService) },
+                                        speed = speed,
+                                        pingMillis = uiState.pingMillis,
+                                        onStatusClick = { onAction(MainAction.TestCurrentServer) },
                                     )
+                                    Spacer(Modifier.height(20.dp))
+                                    SelectedServerCard(name = selectedName, onClick = { bottomTab = 1 })
+                                    AutoConnectButton(
+                                        testing = uiState.isTesting,
+                                        onClick = { onAction(MainAction.AutoConnectBest) }
+                                    )
+                                    Spacer(Modifier.height(16.dp))
                                 }
                             }
-                        )
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        userScrollEnabled = true,
-                        beyondViewportPageCount = 1,
-                        key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
-                    ) { page ->
-                        val group = groups.getOrNull(page) ?: return@HorizontalPager
-
-                        GroupPagerPage(
-                            groupId = group.id,
-                            mainViewModel = mainViewModel,
-                            selectedGuid = selectedGuid,
-                            locateTarget = uiState.locateTarget,
-                            doubleColumnDisplay = doubleColumnDisplay,
-                            searchQuery = searchQuery,
-                            lazyListStates = lazyListStates,
-                            lazyGridStates = lazyGridStates,
-                            onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
-                            onShareServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, false)
-                            },
-                            onMoreServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, true)
-                            },
-                            onRemoveServer = removeServer,
-                            contentPadding = PaddingValues(
-                                start = 0.dp,
-                                top = 0.dp,
-                                end = 0.dp,
-                                bottom = 24.dp
+                        }
+                    } else {
+                        if (groups.size > 1) {
+                            GroupTabBar(
+                                groups = groups,
+                                selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
+                                mainViewModel = mainViewModel,
+                                onTabClick = { targetIndex ->
+                                    scope.launch {
+                                        pagerState.navigateToPageOptimized(
+                                            targetPage = targetIndex,
+                                            animateAdjacentPage = true
+                                        )
+                                    }
+                                }
                             )
-                        )
-                    }
+                        }
+
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize(),
+                            userScrollEnabled = true,
+                            beyondViewportPageCount = 1,
+                            key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
+                        ) { page ->
+                            val group = groups.getOrNull(page) ?: return@HorizontalPager
+
+                            GroupPagerPage(
+                                groupId = group.id,
+                                mainViewModel = mainViewModel,
+                                selectedGuid = selectedGuid,
+                                locateTarget = uiState.locateTarget,
+                                doubleColumnDisplay = doubleColumnDisplay,
+                                searchQuery = searchQuery,
+                                lazyListStates = lazyListStates,
+                                lazyGridStates = lazyGridStates,
+                                onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
+                                onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
+                                onShareServer = { guid, profile ->
+                                    shareTarget = Triple(guid, profile, false)
+                                },
+                                onMoreServer = { guid, profile ->
+                                    shareTarget = Triple(guid, profile, true)
+                                },
+                                onRemoveServer = removeServer,
+                                contentPadding = PaddingValues(
+                                    start = 0.dp,
+                                    top = 0.dp,
+                                    end = 0.dp,
+                                    bottom = 24.dp
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -399,7 +403,7 @@ private fun PsiphonSection(
             pingMillis = pingMillis,
             accent = XfOrange,
             accentLight = XfOrangeLight,
-            buttonSize = 160.dp,
+            buttonSize = 168.dp,
             onStatusClick = onStatusClick,
         )
         Spacer(Modifier.height(16.dp))

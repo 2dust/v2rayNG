@@ -1,8 +1,10 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,10 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -50,10 +56,9 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.ui.compose.GlassCardShape
-import com.v2ray.ang.ui.compose.BallBarLoader
-import com.v2ray.ang.ui.compose.WifiLoader
+import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.XfGreen
-import com.v2ray.ang.ui.compose.XfPurple
+import com.v2ray.ang.ui.compose.XfPurpleLight
 import com.v2ray.ang.ui.compose.XfYellow
 import com.v2ray.ang.ui.compose.liquidGlass
 import com.v2ray.ang.ui.compose.pressScale
@@ -79,8 +84,8 @@ fun MainConnectHero(
     pingMillis: Long?,
     modifier: Modifier = Modifier,
     accent: Color = MaterialTheme.colorScheme.primary,
-    accentLight: Color = MaterialTheme.colorScheme.primary,
-    buttonSize: Dp = 150.dp,
+    accentLight: Color = XfPurpleLight,
+    buttonSize: Dp = 168.dp,
     onStatusClick: (() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -105,7 +110,7 @@ fun MainConnectHero(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = formatElapsed(if (isRunning) elapsedSec() else 0L, if (isRunning) accentLight else scheme.onBackground, isRunning),
+            text = formatElapsed(if (isRunning) elapsedSec() else 0L, scheme.onBackground, isRunning),
             style = MaterialTheme.typography.displaySmall,
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
@@ -140,78 +145,58 @@ fun MainConnectHero(
         }
         Spacer(Modifier.height(28.dp))
 
-        val deepAccent = remember(accent) {
-            if (accent == XfPurple) Color(0xFF6A0DAD) else lerp(accent, Color.Black, 0.3f)
-        }
+        // Hiddify-style button: a light round disc with the Matixray logo inside. Disconnected the logo is grey and
+        // dim, connected it is in full color with one very faint ring around the disc (no other light, nothing animated).
+        val dark = LocalDarkTheme.current
+        val disc = if (dark) Color(0xFFE8E6F0) else Color.White
+        val ring = scheme.outlineVariant
+        val grey = remember { ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
         Box(
             modifier = Modifier
                 .size(buttonSize)
-                .pressScale(source, 0.95f)
+                .pressScale(source, 0.96f)
                 .drawBehind {
-                    // Outer glow: a radial purple halo, stronger while connected.
                     val radius = size.minDimension / 2f
-                    val glowRadius = radius * 1.55f
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(accent.copy(alpha = if (shownRunning) 0.6f else 0.45f), Color.Transparent),
-                            center = center,
-                            radius = glowRadius,
-                        ),
-                        radius = glowRadius,
+                    if (shownRunning) drawCircle(accent.copy(alpha = 0.12f), radius = radius + 5.dp.toPx())
+                    drawCircle(disc, radius = radius)
+                    if (!dark) drawCircle(ring, radius = radius - 0.5.dp.toPx(), style = Stroke(1.dp.toPx()))
+                }
+                .clip(CircleShape)
+                // The tap is taken on press, not on release, so the button answers at once like Hiddify's.
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = { offset ->
+                            val press = PressInteraction.Press(offset)
+                            source.tryEmit(press)
+                            val released = tryAwaitRelease()
+                            source.tryEmit(if (released) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                        },
+                        onTap = {
+                            pending = true
+                            onToggle()
+                        },
                     )
                 }
-                .shadow(
-                    elevation = if (shownRunning) 40.dp else 24.dp,
-                    shape = CircleShape,
-                    ambientColor = accent,
-                    spotColor = accent,
-                )
-                .clip(CircleShape)
-                .background(
-                    if (shownRunning) Brush.linearGradient(listOf(deepAccent, accent))
-                    else Brush.linearGradient(listOf(scheme.background, scheme.background))
-                )
-                .border(3.dp, accent, CircleShape)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    role = Role.Button,
-                    onClick = {
-                        pending = true
-                        onToggle()
-                    },
-                )
-                .semantics { contentDescription = if (shownRunning) stopLabel else startLabel },
+                .semantics(mergeDescendants = true) {
+                    contentDescription = if (shownRunning) stopLabel else startLabel
+                    role = Role.Button
+                    onClick { pending = true; onToggle(); true }
+                },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_power_24dp),
+            Image(
+                painter = painterResource(R.drawable.ic_matixray_logo),
                 contentDescription = null,
-                tint = if (shownRunning) Color.White else accent,
-                modifier = Modifier.size(buttonSize * 0.32f),
+                contentScale = ContentScale.Crop,
+                colorFilter = if (shownRunning) null else grey,
+                alpha = if (shownRunning) 1f else 0.6f,
+                modifier = Modifier
+                    .size(buttonSize - 14.dp)
+                    .clip(CircleShape),
             )
         }
 
-        // Under the button: "Tap to Connect" while idle, the connecting loader while the tap waits for the service,
-        // and the bar-and-ball loader while connected.
-        Spacer(Modifier.height(20.dp))
-        Box(modifier = Modifier.height(88.dp), contentAlignment = Alignment.TopCenter) {
-            when {
-                pending && !isRunning -> WifiLoader(
-                    text = stringResource(R.string.mx_loader_connecting),
-                    frontColor = accent,
-                )
-                shownRunning -> BallBarLoader(ballColor = accent)
-                else -> Text(
-                    text = stringResource(R.string.mx_tap_to_connect),
-                    color = accent,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(32.dp))
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),

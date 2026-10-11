@@ -10,29 +10,6 @@
     <string name="xf_splash_status_5">آماده!</string>
     <string name="xf_brand" translatable="false">Matixray</string>
 
-    <string name="mx_tap_to_connect" translatable="false">Tap to Connect</string>
-    <string name="mx_loader_scanning" translatable="false">Scanning...</string>
-    <string name="mx_loader_connecting" translatable="false">Connecting...</string>
-
-    <string name="mx_nav_home" translatable="false">Home</string>
-    <string name="mx_nav_location" translatable="false">Location</string>
-    <string name="mx_nav_settings" translatable="false">Settings</string>
-    <string name="mx_nav_profile" translatable="false">Profile</string>
-    <string name="mx_night_mode" translatable="false">Night mode</string>
-    <string name="mx_server_none" translatable="false">No server selected</string>
-    <string name="mx_protocol_title" translatable="false">Protocol</string>
-    <string name="mx_proto_auto" translatable="false">Auto</string>
-    <string name="mx_proto_wireguard" translatable="false">WireGuard</string>
-    <string name="mx_proto_openvpn" translatable="false">OpenVPN</string>
-    <string name="mx_proto_ikev2" translatable="false">IKEv2</string>
-    <string name="mx_apply" translatable="false">Apply</string>
-    <string name="mx_pro_title" translatable="false">Get Pro</string>
-    <string name="mx_pro_upgrade" translatable="false">Upgrade to Pro</string>
-    <string name="mx_pro_f1" translatable="false">Unlimited speed</string>
-    <string name="mx_pro_f2" translatable="false">All locations</string>
-    <string name="mx_pro_f3" translatable="false">No ads</string>
-    <string name="mx_pro_f4" translatable="false">Priority support</string>
-
     <!-- Drawer -->
     <string name="xf_nav_configs">کانفیگ Xfinder | Matix</string>
     <string name="xf_nav_scanner">اسکنر IP</string>
@@ -88,8 +65,8 @@
     <string name="mx_xfinder_add_all">افزودن هر ۲۰ کانفیگ به‌صورت لینک اتصال</string>
 
     <!-- Main screen: sections, live stats -->
-    <string name="mx_tab_main">اصلی</string>
-    <string name="mx_tab_psiphon">سایفون</string>
+    <string name="mx_tab_main" translatable="false">Matixray</string>
+    <string name="mx_tab_psiphon" translatable="false">Psiphon</string>
     <string name="mx_stat_download">دانلود</string>
     <string name="mx_stat_upload">آپلود</string>
     <string name="mx_stat_ping">پینگ</string>
@@ -108,4 +85,10 @@
     <!-- Adult content lock -->
     <string name="mx_adult_lock_title">قفل‌سازی محتوای بزرگسال</string>
     <string name="mx_adult_lock_summary">با روشن بودن این گزینه، سایت‌های پورن و محتوای جنسی از طریق برنامه باز نمی‌شوند</string>
+
+    <!-- Bottom bar and selected-server card of the home screen -->
+    <string name="mx_nav_home">خانه</string>
+    <string name="mx_nav_servers">سرورها</string>
+    <string name="mx_selected_server_none">سروری انتخاب نشده</string>
+    <string name="mx_selected_server_hint">برای تغییر سرور بزنید</string>
 </resources>

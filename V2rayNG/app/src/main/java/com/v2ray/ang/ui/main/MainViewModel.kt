@@ -399,10 +399,6 @@ class MainViewModel(
         }
     }
 
-    /** Name of the server with [guid], for the server card of the home tab; a blocking storage read, so call it off the main thread. */
-    fun selectedServerRemarks(guid: String?): String? =
-        guid?.let { MmkvManager.decodeServerConfig(it)?.remarks }
-
     internal fun formatStatus(status: MainStatus): String = when (status) {
         MainStatus.Disconnected -> dataSource.getString(R.string.connection_not_connected)
         MainStatus.Connected -> dataSource.getString(R.string.connection_connected)

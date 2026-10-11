@@ -48,7 +48,8 @@ fun MainTopBar(
     val maxMenuHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarHeight - navBarHeight - 20.dp
 
     AppTopBar(
-        title = stringResource(R.string.title_server),
+        title = stringResource(R.string.app_name),
+        titleBadge = com.v2ray.ang.BuildConfig.VERSION_NAME,
         onBackClick = {},
         isLoading = isLoading,
         isSearchActive = showSearch,

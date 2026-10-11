@@ -253,9 +253,14 @@ fun SettingsSwitchItem(
         } else null,
         modifier = modifier,
         trailing = {
-            MatixSwitch(
+            Switch(
                 checked = checked,
                 onCheckedChange = if (enabled) onCheckedChange else null,
+                modifier = Modifier.scale(0.8f),
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary
+                ),
                 enabled = enabled
             )
         }

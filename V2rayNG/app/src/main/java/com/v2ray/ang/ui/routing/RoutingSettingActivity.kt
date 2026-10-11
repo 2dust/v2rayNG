@@ -50,7 +50,6 @@ import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.compose.MatixSwitch
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
@@ -382,9 +381,14 @@ private fun RoutingRulesetItem(
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            MatixSwitch(
+            Switch(
                 checked = ruleset.enabled ?: false,
-                onCheckedChange = onEnabledChange
+                onCheckedChange = onEnabledChange,
+                modifier = Modifier.scale(0.7f),
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                    checkedTrackColor = MaterialTheme.colorScheme.secondary
+                )
             )
         }
     }
