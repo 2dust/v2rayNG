@@ -561,4 +561,5 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
+    <string name="toast_policy_group_chain_invalid">পলিসি গ্রুপের চেইন অবৈধ। সদস্য, প্রাথমিক প্রক্সি, বহির্গমন প্রক্সি ও ফলব্যাক সেটিংস পরীক্ষা করুন।</string>
 </resources>
