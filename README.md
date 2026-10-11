@@ -1,13 +1,14 @@
-# Matixray
-
-**In the name of Allah, the Most Gracious, the Most Merciful**
-
----
 
 **Matixray** is an upgraded V2Ray client for Android, based on v2rayNG, supporting both **Xray** and **v2fly** cores. It features a modern violet Jetpack Compose UI, day/night themes, and the Vazirmatn font.
 
-- **GitHub:** https://github.com/imatixofficel/App-Matixray
-- **Telegram:** https://t.me/imatix7
+<p align="center">
+  <a href="https://github.com/imatixofficel/App-Matixray">
+    <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  <a href="https://t.me/imatix7">
+    <img src="https://img.shields.io/badge/Telegram-@imatix7-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram">
+  </a>
+</p>
 
 ---
 
@@ -79,8 +80,18 @@
 
 ## 📞 Support
 
-- **Telegram:** [@imatix7](https://t.me/imatix7)
-- **GitHub Issues:** [Report a problem](https://github.com/imatixofficel/App-Matixray/issues)
+<p>
+  <a href="https://t.me/imatix7">
+    <img src="https://img.shields.io/badge/Telegram-@imatix7-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram">
+  </a>
+  &nbsp;
+  <a href="https://github.com/imatixofficel/App-Matixray/issues">
+    <img src="https://img.shields.io/badge/GitHub-Issues-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub Issues">
+  </a>
+</p>
+
+- 💬 **Telegram:** [@imatix7](https://t.me/imatix7)
+- 🐞 **GitHub Issues:** [Report a problem](https://github.com/imatixofficel/App-Matixray/issues)
 
 ---
 
@@ -90,4 +101,6 @@ This project is based on v2rayNG and is released under its respective license. F
 
 ---
 
-**Made with ❤️ **
+<p align="center">
+  <b>Made with ❤️</b>
+</p>
