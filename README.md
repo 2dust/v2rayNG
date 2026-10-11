@@ -6,7 +6,7 @@
 
 ---
 
-**Matixray** is an upgraded V2Ray client for Android, based on v2rayNG, supporting both **Xray** and **v2fly** cores. It features a modern violet Jetpack Compose UI, day/night themes, and the Vazirmatn font.
+**Matixray** is an upgraded V2Ray client for Android, based on v2rayNG, supporting both **Xray** and **v2fly** cores. It is an enhanced version developed by the **v2box** team.
 
 <br>
 
@@ -25,23 +25,52 @@
 ## 📑 Table of Contents
 
 1. [✨ Features](#-features)
-2. [📱 Installation](#-installation)
-3. [🚀 Getting Started](#-getting-started)
-4. [⚙️ Recommended Settings](#️-recommended-settings)
-5. [🛠 Common Troubleshooting](#-common-troubleshooting)
-6. [📞 Support](#-support)
-7. [📄 License](#-license)
+2. [🧠 How It Works](#-how-it-works)
+3. [📱 Installation](#-installation)
+4. [🚀 Getting Started](#-getting-started)
+5. [⚙️ Recommended Settings](#️-recommended-settings)
+6. [🛠 Common Troubleshooting](#-common-troubleshooting)
+7. [📞 Support](#-support)
+8. [📄 License](#-license)
 
 ---
 
 ## ✨ Features
 
 - Support for **Xray** and **v2fly** cores
-- Modern **Jetpack Compose** UI with a violet theme
-- **Day/Night themes**
-- **Vazirmatn font** for better Persian readability
 - Support for various V2Ray protocols
 - Based on v2rayNG (stable and familiar for existing users)
+- Enhanced and upgraded by the **v2box** team
+- Reliable connection management and routing
+
+---
+
+## 🧠 How It Works
+
+Matixray acts as a **local proxy client** on your Android device. Here is a simple explanation of how it works:
+
+1. **Configuration Loading:**
+   When you add a server (via subscription link, config text, or QR code), Matixray parses the configuration and stores it locally on your device.
+
+2. **Core Selection:**
+   Matixray supports two cores — **Xray** and **v2fly**. Based on the protocol used in your config, it selects the appropriate core to handle the connection.
+
+3. **Local Proxy:**
+   Once you press connect, Matixray starts a local proxy server on your device (usually on `127.0.0.1`). All your apps' traffic is routed through this local proxy.
+
+4. **Encryption & Tunneling:**
+   The selected core (Xray or v2fly) encrypts your traffic and tunnels it through the remote server. This hides your real IP and bypasses restrictions.
+
+5. **Routing Rules:**
+   Matixray applies routing rules (e.g., "Bypass Iran" or "Global") to decide which traffic goes through the proxy and which traffic connects directly.
+
+6. **DNS Resolution:**
+   DNS requests are handled either locally or through the proxy, depending on your settings, to prevent DNS leaks and censorship.
+
+7. **VPN Service:**
+   Matixray uses Android's **VpnService** API to capture all device traffic without requiring root access. This is why Android asks for VPN permission when you first connect.
+
+In short: **Matixray takes your internet traffic, encrypts it, and sends it through a remote server — making your connection private, secure, and unrestricted.**
 
 ---
 
