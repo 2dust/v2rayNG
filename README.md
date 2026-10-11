@@ -144,6 +144,6 @@ This project is based on v2rayNG and is released under its respective license. F
 
 <div align="center">
 
-**Made with ❤️ for users around the world**
+**Made with ❤️ **
 
 </div>
