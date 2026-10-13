@@ -88,7 +88,8 @@ jobs:
         ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.14206865
       run: |
         go mod download
-        go install golang.org/x/mobile/cmd/gomobile golang.org/x/mobile/cmd/gobind
+        MOBILE_VERSION=$(go list -m -f '{{.Version}}' golang.org/x/mobile)
+        go install "golang.org/x/mobile/cmd/gomobile@$MOBILE_VERSION" "golang.org/x/mobile/cmd/gobind@$MOBILE_VERSION"
         mkdir -p assets data "$GITHUB_WORKSPACE/app/libs"
         bash gen_assets.sh download
         cp data/*.dat assets/
