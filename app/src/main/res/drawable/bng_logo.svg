@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Radial Glow -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#141C38" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#0E1428" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#070A12" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Linear Gradients for Letters -->
+    <linearGradient id="bGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="50%" stop-color="#00B4D8"/>
+      <stop offset="100%" stop-color="#0077B6"/>
+    </linearGradient>
+
+    <linearGradient id="nGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00C8FF"/>
+      <stop offset="45%" stop-color="#5E60CE"/>
+      <stop offset="100%" stop-color="#9D4EDD"/>
+    </linearGradient>
+
+    <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B5179E"/>
+      <stop offset="60%" stop-color="#F72585"/>
+      <stop offset="100%" stop-color="#FF4D94"/>
+    </linearGradient>
+
+    <!-- Overall Text Gradient -->
+    <linearGradient id="fullNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="35%" stop-color="#00B4D8"/>
+      <stop offset="55%" stop-color="#7209B7"/>
+      <stop offset="80%" stop-color="#E01A8A"/>
+      <stop offset="100%" stop-color="#FF3399"/>
+    </linearGradient>
+
+    <linearGradient id="strokeNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38E8FF"/>
+      <stop offset="40%" stop-color="#4895EF"/>
+      <stop offset="70%" stop-color="#B5179E"/>
+      <stop offset="100%" stop-color="#FF66B2"/>
+    </linearGradient>
+
+    <!-- Glow Filters -->
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur1"/>
+      <feGaussianBlur stdDeviation="16" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.8"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Navy Background -->
+  <rect width="512" height="512" fill="#070A12"/>
+  <circle cx="256" cy="256" r="240" fill="url(#bgGlow)"/>
+
+  <!-- Logo Group with Italic Skew -->
+  <g transform="translate(256, 256) skewX(-11) translate(-256, -256)" filter="url(#softShadow)">
+    
+    <!-- Outer Neon Ambient Glow Paths -->
+    <g filter="url(#neonGlow)" opacity="0.85">
+      <!-- B Background Glow -->
+      <path d="M 92 196 C 80 196, 68 204, 76 220 L 86 220 C 94 220, 102 216, 114 216 L 152 216 C 182 216, 198 226, 194 246 C 190 262, 176 270, 158 274 C 182 278, 196 290, 190 312 C 184 336, 160 348, 126 348 L 72 348 C 66 348, 62 344, 64 338 L 94 204 C 95 198, 100 196, 106 196 Z"
+            fill="none" stroke="#00E5FF" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+      
+      <!-- N Background Glow -->
+      <path d="M 198 348 L 226 216 C 228 208, 234 204, 242 204 L 254 204 C 262 204, 266 210, 268 218 L 298 310 L 320 208 C 322 200, 328 196, 338 196 L 348 196 C 354 196, 358 200, 356 208 L 328 340 C 326 346, 320 350, 312 350 L 298 350 C 290 350, 286 344, 282 334 L 252 242 L 230 344 C 228 350, 222 354, 214 354 L 204 354 C 198 354, 196 350, 198 348 Z"
+            fill="none" stroke="#7928CA" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+
+      <!-- G Background Glow -->
+      <path d="M 436 212 C 438 204, 432 198, 422 198 C 400 198, 380 206, 362 224 C 340 246, 330 278, 334 308 C 338 338, 360 354, 394 354 C 428 354, 444 340, 448 316 L 448 286 C 448 280, 444 276, 438 276 L 398 276 C 392 276, 388 280, 390 286 L 392 296 C 394 302, 398 304, 404 304 L 420 304 L 418 316 C 414 326, 402 332, 390 332 C 372 332, 358 322, 356 304 C 352 284, 360 262, 374 246 C 386 232, 400 226, 416 226 C 424 226, 430 222, 436 212 Z"
+            fill="none" stroke="#FF007F" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+
+    <!-- Base 3D Extrusion Shadow Layer -->
+    <g transform="translate(0, 4)" opacity="0.6">
+      <!-- Letter B Dark Extrusion -->
+      <path d="M 88 196 C 74 196, 62 204, 72 222 C 84 222, 94 218, 110 218 L 148 218 C 178 218, 194 228, 190 248 C 186 264, 172 272, 154 276 C 178 280, 192 292, 186 314 C 180 338, 156 350, 122 350 L 68 350 C 62 350, 58 346, 60 340 L 90 204 C 92 198, 96 196, 102 196 Z"
+            fill="#05101E"/>
+      <!-- Letter N Dark Extrusion -->
+      <path d="M 194 348 L 222 216 C 224 208, 230 204, 238 204 L 250 204 C 258 204, 262 210, 264 218 L 294 310 L 316 208 C 318 200, 324 196, 334 196 L 344 196 C 350 196, 354 200, 352 208 L 324 340 C 322 346, 316 350, 308 350 L 294 350 C 286 350, 282 344, 278 334 L 248 242 L 226 344 C 224 350, 218 354, 210 354 L 200 354 C 194 354, 192 350, 194 348 Z"
+            fill="#120524"/>
+      <!-- Letter G Dark Extrusion -->
+      <path d="M 432 212 C 434 204, 428 198, 418 198 C 396 198, 376 206, 358 224 C 336 246, 326 278, 330 308 C 334 338, 356 354, 390 354 C 424 354, 440 340, 444 316 L 444 286 C 444 280, 440 276, 434 276 L 394 276 C 388 276, 384 280, 386 286 L 388 296 C 390 302, 394 304, 400 304 L 416 304 L 414 316 C 410 326, 398 332, 386 332 C 368 332, 354 322, 352 304 C 348 284, 356 262, 370 246 C 382 232, 396 226, 412 226 C 420 226, 426 222, 432 212 Z"
+            fill="#200516"/>
+    </g>
+
+    <!-- Main Solid Beveled Letters -->
+    
+    <!-- === LETTER B === -->
+    <g>
+      <!-- Outer Shape of B -->
+      <path d="M 92 196 C 80 196, 68 204, 76 220 C 88 220, 98 216, 114 216 L 152 216 C 182 216, 198 226, 194 246 C 190 262, 176 270, 158 274 C 182 278, 196 290, 190 312 C 184 336, 160 348, 126 348 L 72 348 C 66 348, 62 344, 64 338 L 94 204 C 95 198, 100 196, 106 196 Z
+               M 116 238 L 102 300 C 100 306, 104 310, 110 310 L 126 310 C 146 310, 158 302, 162 288 C 166 274, 156 264, 138 264 L 122 264 C 118 264, 114 260, 116 256 L 122 232 C 122 230, 120 228, 118 228 L 118 228 C 116 228, 114 232, 116 238 Z
+               M 126 232 L 140 232 C 154 232, 164 238, 162 248 C 160 256, 150 260, 138 260 L 124 260 Z"
+            fill="url(#bGrad)" stroke="url(#strokeNeon)" stroke-width="3.5" stroke-linejoin="round"/>
+      
+      <!-- Top Wing of B -->
+      <path d="M 76 220 C 66 206, 80 196, 92 196 C 104 196, 114 204, 116 216 C 98 216, 88 220, 76 220 Z"
+            fill="#38E8FF" opacity="0.95"/>
+      <!-- Inner Bevel Highlights for B -->
+      <path d="M 94 208 L 148 208 C 174 208, 188 216, 186 232"
+            fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+      <path d="M 72 340 L 122 340 C 150 340, 172 330, 178 310"
+            fill="none" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    </g>
+
+    <!-- === LETTER N === -->
+    <g>
+      <!-- Main N Geometry -->
+      <path d="M 198 348 L 226 216 C 228 208, 234 204, 242 204 L 254 204 C 262 204, 266 210, 268 218 L 298 310 L 320 208 C 322 200, 328 196, 338 196 L 348 196 C 354 196, 358 200, 356 208 L 328 340 C 326 346, 320 350, 312 350 L 298 350 C 290 350, 286 344, 282 334 L 252 242 L 230 344 C 228 350, 222 354, 214 354 L 204 354 C 198 354, 196 350, 198 348 Z"
+            fill="url(#nGrad)" stroke="url(#strokeNeon)" stroke-width="3.5" stroke-linejoin="round"/>
+
+      <!-- N Dynamic Right Wing Flare -->
+      <path d="M 338 196 C 348 186, 366 190, 362 206 C 358 212, 350 216, 340 216 Z"
+            fill="#D946EF" opacity="0.9"/>
+      <!-- N Diagonal Highlight Reflection -->
+      <path d="M 266 218 L 296 312"
+            fill="none" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    </g>
+
+    <!-- === LETTER G === -->
+    <g>
+      <!-- Main G Geometry -->
+      <path d="M 436 212 C 438 204, 432 198, 422 198 C 400 198, 380 206, 362 224 C 340 246, 330 278, 334 308 C 338 338, 360 354, 394 354 C 428 354, 444 340, 448 316 L 448 286 C 448 280, 444 276, 438 276 L 398 276 C 392 276, 388 280, 390 286 L 392 296 C 394 302, 398 304, 404 304 L 420 304 L 418 316 C 414 326, 402 332, 390 332 C 372 332, 358 322, 356 304 C 352 284, 360 262, 374 246 C 386 232, 400 226, 416 226 C 424 226, 430 222, 436 212 Z"
+            fill="url(#gGrad)" stroke="url(#strokeNeon)" stroke-width="3.5" stroke-linejoin="round"/>
+
+      <!-- Top Wing of G -->
+      <path d="M 422 198 C 434 188, 446 196, 442 208 C 438 214, 430 218, 420 218 Z"
+            fill="#FF4D94" opacity="0.9"/>
+      <!-- Inner Bevel Highlight on G Curve -->
+      <path d="M 416 226 C 398 226, 382 236, 370 252 C 358 270, 354 290, 358 308 C 360 322, 372 330, 388 330"
+            fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
+    </g>
+
+    <!-- Fine Gloss Line Reflection across all letters -->
+    <path d="M 100 236 L 436 236"
+          stroke="url(#fullNeon)" stroke-width="1.2" opacity="0.4" stroke-dasharray="8 12"/>
+  </g>
+</svg>

@@ -110,19 +110,16 @@ fun AboutScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Surface(
-                        shape = CircleShape,
-                        color = Color(0xFF05A870).copy(alpha = 0.15f),
-                        border = BorderStroke(1.5.dp, Color(0xFF05A870)),
-                        modifier = Modifier.size(68.dp)
+                        shape = RoundedCornerShape(18.dp),
+                        color = Color(0xFF0B101D),
+                        border = BorderStroke(2.dp, Color(0xFF00F0FF).copy(alpha = 0.6f)),
+                        modifier = Modifier.size(76.dp)
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_shield_24dp),
-                                contentDescription = null,
-                                tint = Color(0xFF05A870),
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
+                        androidx.compose.foundation.Image(
+                            painter = painterResource(R.drawable.bng_logo),
+                            contentDescription = stringResource(R.string.app_name),
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(

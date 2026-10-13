@@ -103,19 +103,16 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                 ) {
                     Column {
                         Surface(
-                            shape = androidx.compose.foundation.shape.CircleShape,
-                            color = Color(0xFF05A870).copy(alpha = 0.2f),
-                            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF05A870)),
-                            modifier = Modifier.size(52.dp)
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                            color = Color(0xFF0B101D),
+                            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF00F0FF).copy(alpha = 0.6f)),
+                            modifier = Modifier.size(56.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_shield_24dp),
-                                    contentDescription = null,
-                                    tint = Color(0xFF05A870),
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
+                            Image(
+                                painter = painterResource(R.drawable.bng_logo),
+                                contentDescription = stringResource(R.string.app_name),
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
                         androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(12.dp))
                         Text(

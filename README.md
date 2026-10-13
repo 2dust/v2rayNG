@@ -1,90 +1,139 @@
-# v2rayNG
+# behradNG
 
-A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)
+<p align="center">
+  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="100" height="100" alt="behradNG Logo" />
+</p>
 
-[![API](https://img.shields.io/badge/API-24%2B-yellow.svg?style=flat)](https://developer.android.com/about/versions/lollipop)
-[![Kotlin Version](https://img.shields.io/badge/Kotlin-2.4.0-blue.svg)](https://kotlinlang.org)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/2dust/v2rayNG)](https://github.com/2dust/v2rayNG/commits/master)
-[![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayng/badge)](https://www.codefactor.io/repository/github/2dust/v2rayng)
-[![GitHub Releases](https://img.shields.io/github/downloads/2dust/v2rayNG/latest/total?logo=github)](https://github.com/2dust/v2rayNG/releases)
-[![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/v2rayn)
+<p align="center">
+  <b>Fast & Secure V2Ray/Xray Android Client with ExpressVPN-Inspired Design</b>
+</p>
 
----
-
-## Download / 下载
-
-Download the latest release here:
-
-在这里下载最新版本：
-
-[https://github.com/2dust/v2rayNG/releases](https://github.com/2dust/v2rayNG/releases)
-
-> [!TIP]
-> v2rayNG is the mobile version. For the desktop version, please visit the v2rayN \
-> v2rayNG 是手机版，电脑版请访问 v2rayN
->
-> https://github.com/2dust/v2rayN
+<p align="center">
+  <a href="https://github.com/dashbehrad/behradNG/releases"><img src="https://img.shields.io/github/v/release/dashbehrad/behradNG?include_prereleases&label=Latest%20Release&color=05A870" alt="Latest Release"></a>
+  <a href="https://developer.android.com/about/versions/nougat"><img src="https://img.shields.io/badge/Android-7.0%2B%20(API%2024%2B)-05A870.svg" alt="Android Version"></a>
+  <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.4-7F52FF.svg" alt="Kotlin"></a>
+  <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-M3-4285F4.svg" alt="Jetpack Compose"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License"></a>
+</p>
 
 ---
 
-### Geoip and Geosite
+## 🌐 English
 
-- geoip.dat and geosite.dat files are in `Android/data/com.v2ray.ang/files/assets` (path may differ on some Android device)
-- download feature will get enhanced version in this [repo](https://github.com/Loyalsoldier/v2ray-rules-dat) (note: it needs a working proxy)
-- latest official [domain list](https://github.com/Loyalsoldier/v2ray-rules-dat) and [ip list](https://github.com/Loyalsoldier/geoip) can be imported manually
-- possible to use a third-party dat file in the same folder, like [h2y](https://guide.v2fly.org/routing/sitedata.html#%E5%A4%96%E7%BD%AE%E7%9A%84%E5%9F%9F%E5%90%8D%E6%96%87%E4%BB%B6)
+**behradNG** is a modern, high-performance V2Ray and Xray client for Android featuring an **ExpressVPN-inspired UI** and full support for adding your own custom proxy configurations.
 
-More in our [wiki](https://github.com/2dust/v2rayNG/wiki)
+### ✨ Key Features
 
-### Geoip 与 Geosite
+- **🎨 ExpressVPN-Inspired Interface**:
+  - **Giant Circular Power Button**: Iconic connect button with glowing green pulse animation when active and tactile haptic feedback.
+  - **Live Status Header**: Clear "CONNECTED" / "NOT CONNECTED" banners with real-time tunnel telemetry.
+  - **Selected Location Card**: Quick overview of the active server, protocol badge, real-time ping latency, and one-tap access to the server list.
+  - **Quick Action Bar**: Shortcuts for adding configs, speed testing, routing modes, and split tunneling.
+  - **Dual-Tab Experience**: Smooth navigation between the **Connect Dashboard** and **Configurations (Locations)**.
 
-- geoip.dat 和 geosite.dat 文件位于 `Android/data/com.v2ray.ang/files/assets`（部分设备路径可能不同）
-- 下载功能将获取该 [仓库](https://github.com/Loyalsoldier/v2ray-rules-dat) 中的增强版本（注意：此功能需要一个可用的代理）
-- 最新官方 [域名列表](https://github.com/Loyalsoldier/v2ray-rules-dat) 和 [IP 列表](https://github.com/Loyalsoldier/geoip) 可手动导入
-- 也可在同一文件夹中使用第三方 dat 文件，例如 [h2y](https://guide.v2fly.org/routing/sitedata.html#%E5%A4%96%E7%BD%AE%E7%9A%84%E5%9F%9F%E5%90%8D%E6%96%87%E4%BB%B6)
+- **⚙️ Custom Configuration Management ("Add Configs Yourself")**:
+  - **Import from Clipboard**: Automatically detects and parses configuration links.
+  - **QR Code Scanner**: Built-in camera scanner powered by CameraX and ZXing.
+  - **Local File Import**: Import `.json`, `.txt`, and backup files.
+  - **Manual Configuration**: Support for creating custom servers from scratch.
+  - **Subscription Management**: Auto-update and group support.
 
-更多内容请见我们的 [wiki](https://github.com/2dust/v2rayNG/wiki)
+- **🚀 Protocol Support**:
+  - **VLESS** (XTLS, Reality, WebSocket, gRPC, TCP, HTTP/2)
+  - **VMess**
+  - **Shadowsocks**
+  - **Trojan**
+  - **Hysteria2**
+  - **WireGuard**
+  - **SOCKS / HTTP**
+  - **Policy Groups & Proxy Chains**
+
+- **🛡️ Advanced Security & Routing**:
+  - **Split Tunneling (Per-App Proxy)**: Choose which apps bypass or route through the VPN.
+  - **Smart Routing Rules**: Bypass LAN and local IP addresses or route globally.
+  - **DNS & Fragmentation**: Custom DNS servers, Fragment options, Mux, and sniffing.
+  - **Speed & Latency Testing**: Real HTTP delay testing with instant results.
+
+### 📥 Download & Installation
+
+Download the latest prebuilt APK from the Releases section:
+
+👉 **[Download behradNG Releases](https://github.com/dashbehrad/behradNG/releases)**
+
+Every push to `master` or `main` automatically triggers **GitHub Actions** to compile and publish the latest APK to GitHub Releases.
 
 ---
 
-## Development guide / 开发指南
+## 🇮🇷 فارسی (Persian)
 
-### Note
+**behradNG** یک کلاینت مدرن، پرسرعت و امن V2Ray و Xray برای اندروید است که با طراحی جذاب **الهام‌گرفته از ExpressVPN** و امکان مدیریت کامل کانفیگ‌های اختصاصی توسعه یافته است.
 
-- Android project under the V2rayNG folder can be compiled directly in Android Studio, or using the Gradle wrapper. But the v2ray core inside the aar is (probably) outdated.
-- The aar can be compiled from the Golang project [AndroidLibV2rayLite](https://github.com/2dust/AndroidLibV2rayLite) or [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite). For a quick start, read the guides for [Go Mobile](https://github.com/golang/go/wiki/Mobile) and [Makefiles for Go Developers](https://tutorialedge.net/golang/makefiles-for-go-developers/).
-- v2rayNG can run on Android Emulators. For WSA, VPN permission needs to be granted via `appops set [package name] ACTIVATE_VPN allow`.
+### ✨ ویژگی‌های برجسته
 
-### 提示
+- **🎨 طراحی شیک به سبک ExpressVPN**:
+  - **دکمه اتصال بزرگ و دایره‌ای**: دکمه پاور معروف با انیمیشن پالس سبز رنگ در زمان اتصال و بازخورد لرزشی (Haptic).
+  - **بنر وضعیت زنده**: نمایش وضعیت واضح «CONNECTED» یا «NOT CONNECTED» به همراه جزئیات امنیت تونل.
+  - **کارت سرور انتخابی (Selected Location)**: نمایش نام کانفیگ فعال، پروتکل، پینگ زنده، دکمه تست سریع پینگ و جابجایی سریع به لیست سرورها.
+  - **دسترسی سریع**: کلیدهای میانبر برای افزودن کانفیگ، تست سرعت، مسیریابی و پروکسی برنامه‌ها.
+  - **دو تب اختصاصی**: سوییچ نرم بین داشبورد اتصال (Connect) و مدیریت کانفیگ‌ها (Configurations).
 
-- V2rayNG 文件夹下的 Android 项目可直接在 Android Studio 中编译，或使用 Gradle wrapper 编译。但 aar 内置的 v2ray core（可能）已过时。
-- aar 可由 Golang 项目 [AndroidLibV2rayLite](https://github.com/2dust/AndroidLibV2rayLite) 或 [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite) 编译而成。快速入门可参考 [Go Mobile](https://github.com/golang/go/wiki/Mobile) 指南和 [Makefiles for Go Developers](https://tutorialedge.net/golang/makefiles-for-go-developers/)。
-- v2rayNG 可在 Android 模拟器上运行。对于 WSA，需要通过 `appops set [package name] ACTIVATE_VPN allow` 授予 VPN 权限。
+- **⚙️ افزودن و مدیریت کانفیگ‌های دلخواه**:
+  - **کپی از کلیپ‌بورد (Clipboard)**: شناسایی خودکار لینک‌های پروکسی کپی‌شده.
+  - **اسکن بارکد (QR Code)**: اسکنر دوربین پرسرعت داخلی.
+  - **ورود از فایل**: پشتیبانی از فایل‌های متنی و پشتیبان.
+  - **تنظیمات دستی (Manual)**: امکان ایجاد کانفیگ‌های جدید از صفر.
+  - **پشتیبانی از سابسکریپشن (Subscription)**: دریافت و بروزرسانی خودکار لینک‌های اشتراک.
+
+- **🚀 پروتکل‌های تحت پشتیبانی**:
+  - **VLESS** (پشتیبانی از Reality، XTLS، WebSocket، gRPC، TCP)
+  - **VMess**
+  - **Shadowsocks**
+  - **Trojan**
+  - **Hysteria2**
+  - **WireGuard**
+  - **SOCKS و HTTP**
+  - **Policy Groups و Proxy Chains**
+
+- **🛡️ ابزارهای امنیتی و روتینگ**:
+  - **تونل‌بندی اختصاصی (Per-App Proxy)**: انتخاب برنامه‌هایی که باید از فیلترشکن عبور کنند یا مستقیماً وصل شوند.
+  - **قوانین مسیریابی (Routing Rules)**: عبور مستقیم ترافیک داخلی و وب‌سایت‌های محلی.
+  - **تنظیمات DNS و فرگمنت (Fragment)**: کاهش اختلالات اینترنتی با قابلیت فرگمنت و Mux.
+  - **تست پینگ واقعی (Real Ping)**: سنجش دقیق تأخیر پاسخگویی سرورها بر حسب میلی‌ثانیه.
+
+### 📥 دانلود و نصب
+
+برای دانلود آخرین نسخه، به بخش Releases در گیت‌هاب مراجعه کنید:
+
+👉 **[صفحه دانلود نسخه‌های behradNG در GitHub](https://github.com/dashbehrad/behradNG/releases)**
+
+با هر بار پوش کردن (`git push`) کدها در گیت‌هاب، **گیت‌هاب اکشنز (GitHub Actions)** به‌صورت خودکار پروژه را بیلد کرده و فایل نصبی APK را در بخش **Releases** قرار می‌دهد.
 
 ---
 
+## 🛠️ Build & Development / توسعه و بیلد
 
-## GPG Verification / GPG 签名校验
+### Prerequisites
+- Android Studio Ladybug / Meerkat or later
+- JDK 21
+- Android SDK 36+
 
-Release files are signed with GPG to verify authenticity and integrity, helping prevent mirror, ISP, or CDN hijacking.
+### Build with Gradle
+```bash
+# Debug APK
+./gradlew assembleDebug
 
-发布文件已使用 GPG 签名，可用于校验文件真实性与完整性，预防镜像站、运营商或 CDN 劫持。
-
-### Fingerprint / 公钥指纹
-
-```text
-7694 5E9F 3E9A 168F 8070 F195 805D 661C
-134D FAF6 8903 C199 463C 31E5 AE90 3AE0
+# Output location:
+# app/build/outputs/apk/debug/app-debug.apk
 ```
 
+### 🤖 GitHub Actions CI/CD Release
+این پروژه مجهز به گردش‌کار خودکار گیت‌هاب اکشنز (`.github/workflows/build.yml`) است:
+1. با هر `git push` به شاخه `master` یا `main` (یا ساخت تگ جدید مانند `v2.3.11`)، اکشن فعال می‌شود.
+2. پکیج‌های پیش‌نیاز، کتابخانه‌های بومی (Core AAR و JNI) و ابزارهای بیلد آماده‌سازی می‌شوند.
+3. فایل نصبی APK تولید شده و بلافاصله در بخش **Releases** همراه با توضیحات نسخه منتشر می‌شود.
+
 ---
 
-## Community / 社区
-
-Telegram Group / Telegram 群组：
-
-[https://t.me/v2rayN](https://t.me/v2rayN)
-
-Telegram Channel / Telegram 频道：
-
-[https://t.me/github_2dust](https://t.me/github_2dust)
+## 📄 License
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
+behradNG is a fork and customization of v2rayNG powered by Xray-core / v2ray-core.

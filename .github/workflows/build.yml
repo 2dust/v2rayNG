@@ -1,162 +1,136 @@
-name: Build APK
+name: Build and Release behradNG
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_tag:
-        required: false
-        type: string
   push:
     branches:
       - master
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Tag (e.g. v2.3.11)'
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v7
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
-        fetch-depth: '0'
+        fetch-depth: 0
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v4
-      with:
-        log-accepted-android-sdk-licenses: false
-        cmdline-tools-version: '14742923'
-        packages: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
-
-    - name: Install NDK
-      run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-          --channel=0 \
-          --install "ndk;30.0.16248370"
-        echo "NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> $GITHUB_ENV
-        sed -i '10i\
-        \
-            ndkVersion = "30.0.16248370"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
-
-    - name: Restore cached libhevtun
-      id: cache-libhevtun-restore
-      uses: actions/cache/restore@v6
-      with:
-        path: ${{ github.workspace }}/libs
-        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
-
-    - name: Build libhevtun
-      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
-      run: |
-        bash compile-hevtun.sh
-    
-    - name: Save libhevtun
-      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v6
-      with:
-        path: ${{ github.workspace }}/libs
-        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD') }}-${{ hashFiles('compile-hevtun.sh') }}
-
-    - name: Copy libhevtun
-      run: |
-        cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
-
-    - name: Fetch AndroidLibXrayLite tag
-      run: |
-        pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0)
-        echo "Current tag in this repo: $CURRENT_TAG"
-        echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
-        popd
-
-    - name: Download libv2ray
-      uses: robinraju/release-downloader@v1.13
-      with:
-        repository: '2dust/AndroidLibXrayLite'
-        tag: ${{ env.CURRENT_TAG }}
-        fileName: 'libv2ray.aar'
-        out-file-path: V2rayNG/app/libs/
-
-    - name: Setup Java
-      uses: actions/setup-java@v6.0.1
+    - name: Setup Java 21
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Decode Keystore
-      uses: timheuer/base64-to-file@v2.0.0
-      id: android_keystore
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
       with:
-        fileName: "android_keystore.jks"
-        encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
+        log-accepted-android-sdk-licenses: false
+        packages: 'platforms;android-37 build-tools;36.0.0 platform-tools'
 
-    - name: Build APK
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Determine Release Tag
+      id: tag_step
       run: |
-        cd ${{ github.workspace }}/V2rayNG
-        echo "sdk.dir=${ANDROID_HOME}" > local.properties
-        chmod 755 gradlew
-        ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
-    
-    - name: Upload arm64-v8a APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
+        if [ -n "${{ inputs.release_tag }}" ]; then
+          TAG="${{ inputs.release_tag }}"
+        elif [ "${{ github.ref_type }}" = "tag" ]; then
+          TAG="${{ github.ref_name }}"
+        else
+          TAG="v2.3.11-build.${{ github.run_number }}"
+        fi
+        echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+        echo "RELEASE_TAG=$TAG" >> $GITHUB_OUTPUT
+        echo "Release tag will be: $TAG"
+
+    - name: Download libv2ray AAR if needed
+      run: |
+        mkdir -p app/libs
+        if [ ! -f "app/libs/libv2ray.aar" ]; then
+          echo "Downloading libv2ray.aar..."
+          curl -sL https://github.com/2dust/AndroidLibXrayLite/releases/download/v26.10.10/libv2ray.aar -o app/libs/libv2ray.aar
+        fi
+
+    - name: Extract native libraries if needed
+      run: |
+        if [ ! -d "app/libs/arm64-v8a" ] || [ ! -f "app/libs/arm64-v8a/libhev-socks5-tunnel.so" ]; then
+          echo "Extracting native hev libraries..."
+          mkdir -p /tmp/apk_libs app/libs/arm64-v8a app/libs/x86_64 app/libs/armeabi-v7a app/libs/x86
+          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_arm64-v8a.apk -o /tmp/arm64.apk
+          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_x86_64.apk -o /tmp/x86_64.apk
+          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_armeabi-v7a.apk -o /tmp/armv7.apk
+          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_x86.apk -o /tmp/x86.apk
+          unzip -q /tmp/arm64.apk "lib/*" -d /tmp/apk_libs/
+          unzip -q /tmp/x86_64.apk "lib/*" -d /tmp/apk_libs/
+          unzip -q /tmp/armv7.apk "lib/*" -d /tmp/apk_libs/
+          unzip -q /tmp/x86.apk "lib/*" -d /tmp/apk_libs/
+          cp -r /tmp/apk_libs/lib/arm64-v8a/libhev* app/libs/arm64-v8a/ 2>/dev/null || true
+          cp -r /tmp/apk_libs/lib/x86_64/libhev* app/libs/x86_64/ 2>/dev/null || true
+          cp -r /tmp/apk_libs/lib/armeabi-v7a/libhev* app/libs/armeabi-v7a/ 2>/dev/null || true
+          cp -r /tmp/apk_libs/lib/x86/libhev* app/libs/x86/ 2>/dev/null || true
+        fi
+
+    - name: Build APK with Gradle
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleDebug --stacktrace
+
+    - name: Prepare Release APK Artifact
+      run: |
+        mkdir -p release-apks
+        APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+        if [ -f "$APK_FILE" ]; then
+          cp "$APK_FILE" "release-apks/behradNG-${{ env.RELEASE_TAG }}.apk"
+        else
+          echo "No APK found in app/build/outputs/apk!"
+          exit 1
+        fi
+        ls -la release-apks/
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: arm64-v8a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
+        name: behradNG-${{ env.RELEASE_TAG }}
+        path: release-apks/*.apk
 
-    - name: Upload armeabi-v7a APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
+    - name: Publish to GitHub Releases
+      uses: softprops/action-gh-release@v2
       with:
-        name: armeabi-v7a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
+        tag_name: ${{ env.RELEASE_TAG }}
+        name: "behradNG ${{ env.RELEASE_TAG }}"
+        body: |
+          # 🚀 behradNG ${{ env.RELEASE_TAG }}
 
-    - name: Upload x86 APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
-      with:
-        name: x86-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
+          Fast & Secure V2Ray / Xray client for Android with an **ExpressVPN-inspired** interface.
 
-    - name: Upload universal APK
-      uses: actions/upload-artifact@v7
-      if: ${{ success() }}
-      with:
-        name: universal-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
+          ### ✨ Key Features
+          - 🎨 **ExpressVPN-Style Design**: Giant power button with glowing connected pulse aura, dynamic status banners, and location selector card.
+          - ⚙️ **Custom Configuration Management**: Easily add and import configs (VLESS, VMess, Shadowsocks, Trojan, WireGuard, Hysteria2, SOCKS, HTTP).
+          - ⚡ **Real Ping & Speed Test**: One-tap latency test for all nodes or current server.
+          - 🛡️ **Advanced Security**: Split tunneling (Per-App Proxy), Routing rules (Bypass LAN / Global), and Custom DNS.
 
-  sign-and-release:
-    needs: build
-    runs-on: ubuntu-26.04
-    if: github.event_name == 'workflow_dispatch' && inputs.release_tag != ''
+          ### 📥 Download
+          Download the attached `behradNG-${{ env.RELEASE_TAG }}.apk` below and install it directly on your Android device (Android 7.0+).
 
-    steps:
-      - name: Download APK artifacts
-        uses: actions/download-artifact@v8
-        with:
-          path: release
-
-      - name: Sign APK files
-        run: |
-          printf '%s' "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          KEY=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
-          mkdir -p release-files
-
-          find release -type f -name '*.apk' | while read apk; do
-            cp "$apk" release-files/
-            gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
-          done
-
-          gpg --armor --export "$KEY" > release-files/v2rayN-public-key.asc
-
-      - name: Upload APKs, signatures and public key to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          file: release-files/*
-          tag: ${{ inputs.release_tag }}
-          file_glob: true
-          prerelease: true
+          ---
+          *Automated Release from commit: ${{ github.sha }}*
+        files: |
+          release-apks/*.apk
+        draft: false
+        prerelease: ${{ startsWith(env.RELEASE_TAG, 'v') && !contains(env.RELEASE_TAG, 'build') ? false : true }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
