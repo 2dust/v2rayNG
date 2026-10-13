@@ -53,10 +53,10 @@ jobs:
     - name: Restore missing Gradle wrapper
       shell: bash
       run: |
-        if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-          GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9.]*\)-bin.zip/\1/p' gradle/wrapper/gradle-wrapper.properties)
+        if [ ! -f V2rayNG/gradle/wrapper/gradle-wrapper.jar ]; then
+          GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9.]*\)-bin.zip/\1/p' V2rayNG/gradle/wrapper/gradle-wrapper.properties)
           test -n "$GRADLE_VERSION"
-          curl --fail --location --retry 3 "https://raw.githubusercontent.com/gradle/gradle/v$GRADLE_VERSION/gradle/wrapper/gradle-wrapper.jar" -o gradle/wrapper/gradle-wrapper.jar
+          curl --fail --location --retry 3 "https://raw.githubusercontent.com/gradle/gradle/v$GRADLE_VERSION/V2rayNG/gradle/wrapper/gradle-wrapper.jar" -o V2rayNG/gradle/wrapper/gradle-wrapper.jar
         fi
 
     - name: Setup Gradle
@@ -103,7 +103,17 @@ jobs:
           cp -r /tmp/apk_libs/lib/x86/libhev* app/libs/x86/ 2>/dev/null || true
         fi
 
+    - name: Prepare behradNG project
+      shell: bash
+      run: |
+        # The complete Gradle project is in V2rayNG; app contains the fork's overrides.
+        cp -a app/. V2rayNG/app/
+        if [ ! -f V2rayNG/debug.keystore ]; then
+          keytool -genkeypair -keystore V2rayNG/debug.keystore -alias androiddebugkey -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
+        fi
+
     - name: Build APK with Gradle
+      working-directory: V2rayNG
       run: |
         chmod +x gradlew
         ./gradlew assembleDebug --stacktrace
@@ -111,7 +121,7 @@ jobs:
     - name: Prepare Release APK Artifact
       run: |
         mkdir -p release-apks
-        APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+        APK_FILE=$(find V2rayNG/app/build/outputs/apk -name "*.apk" | head -n 1)
         if [ -f "$APK_FILE" ]; then
           cp "$APK_FILE" "release-apks/behradNG-${{ env.RELEASE_TAG }}.apk"
         else
