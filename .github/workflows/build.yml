@@ -56,7 +56,7 @@ jobs:
         if [ ! -f V2rayNG/gradle/wrapper/gradle-wrapper.jar ]; then
           GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9.]*\)-bin.zip/\1/p' V2rayNG/gradle/wrapper/gradle-wrapper.properties)
           test -n "$GRADLE_VERSION"
-          curl --fail --location --retry 3 "https://raw.githubusercontent.com/gradle/gradle/v$GRADLE_VERSION/V2rayNG/gradle/wrapper/gradle-wrapper.jar" -o V2rayNG/gradle/wrapper/gradle-wrapper.jar
+          curl --fail --location --retry 3 "https://raw.githubusercontent.com/gradle/gradle/v$GRADLE_VERSION/gradle/wrapper/gradle-wrapper.jar" -o V2rayNG/gradle/wrapper/gradle-wrapper.jar
         fi
 
     - name: Setup Gradle
