@@ -50,6 +50,15 @@ jobs:
         fi
         test -r "$ANDROID_HOME/platforms/android-37/android.jar"
 
+    - name: Restore missing Gradle wrapper
+      shell: bash
+      run: |
+        if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+          GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9.]*\)-bin.zip/\1/p' gradle/wrapper/gradle-wrapper.properties)
+          test -n "$GRADLE_VERSION"
+          curl --fail --location --retry 3 "https://raw.githubusercontent.com/gradle/gradle/v$GRADLE_VERSION/gradle/wrapper/gradle-wrapper.jar" -o gradle/wrapper/gradle-wrapper.jar
+        fi
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
