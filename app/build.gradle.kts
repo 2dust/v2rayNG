@@ -10,17 +10,24 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.v2ray.ang"
+        applicationId = "com.v2ray.ang.behradng"
         minSdk = 24
         targetSdk = 36
-        versionCode = 751
-        versionName = "2.3.11"
+        versionCode = 752
+        versionName = "1.0.1"
         buildConfigField("String", "DISTRIBUTION", "\"behradNG\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
+        create("release") {
+            // CI supplies the repository-owned signing key through environment variables.
+            System.getenv("BNG_SIGNING_KEYSTORE")?.let { storeFile = file(it) }
+            storePassword = System.getenv("APP_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("APP_KEYSTORE_ALIAS")
+            keyPassword = System.getenv("APP_KEY_PASSWORD")
+        }
         getByName("debug") {
             storeFile = file("${rootDir}/debug.keystore")
             storePassword = "android"
@@ -34,6 +41,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

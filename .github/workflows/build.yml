@@ -7,6 +7,8 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - '.github/workflows/release-metadata.yml'
   workflow_dispatch:
     inputs:
       release_tag:
@@ -21,12 +23,32 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
+    env:
+      APP_KEYSTORE_PASSWORD: ${{ secrets.APP_KEYSTORE_PASSWORD }}
+      APP_KEYSTORE_ALIAS: ${{ secrets.APP_KEYSTORE_ALIAS }}
+      APP_KEY_PASSWORD: ${{ secrets.APP_KEY_PASSWORD }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: 'recursive'
         fetch-depth: 0
+
+    - name: Restore persistent release signing key
+      shell: bash
+      env:
+        APP_KEYSTORE_BASE64: ${{ secrets.APP_KEYSTORE_BASE64 }}
+      run: |
+        for SECRET_NAME in APP_KEYSTORE_BASE64 APP_KEYSTORE_PASSWORD APP_KEYSTORE_ALIAS APP_KEY_PASSWORD; do
+          if [ -z "${!SECRET_NAME}" ]; then
+            echo "::error::Missing repository Actions secret: $SECRET_NAME"
+            exit 1
+          fi
+        done
+        SIGNING_FILE="$RUNNER_TEMP/behradNG-release.jks"
+        printf '%s' "$APP_KEYSTORE_BASE64" | base64 --decode > "$SIGNING_FILE"
+        echo "BNG_SIGNING_KEYSTORE=$SIGNING_FILE" >> "$GITHUB_ENV"
 
     - name: Setup Java 21
       uses: actions/setup-java@v4
@@ -70,7 +92,9 @@ jobs:
         elif [ "${{ github.ref_type }}" = "tag" ]; then
           TAG="${{ github.ref_name }}"
         else
-          TAG="v2.3.11-build.${{ github.run_number }}"
+          VERSION_NAME=$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts)
+          test -n "$VERSION_NAME"
+          TAG="v$VERSION_NAME"
         fi
         echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
         echo "RELEASE_TAG=$TAG" >> $GITHUB_OUTPUT
@@ -123,7 +147,15 @@ jobs:
       working-directory: V2rayNG
       run: |
         chmod +x gradlew
-        ./gradlew :app:testDebugUnitTest :app:compileDebugKotlin :app:assembleDebug --stacktrace
+        ./gradlew :app:testDebugUnitTest :app:compileDebugKotlin :app:assembleRelease --stacktrace
+
+    - name: Verify installable release APK
+      shell: bash
+      run: |
+        APK_FILE=$(find V2rayNG/app/build/outputs/apk -name "*.apk" | head -n 1)
+        test -n "$APK_FILE"
+        "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --min-sdk-version 24 "$APK_FILE"
+        "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK_FILE" | grep -F "package: name='com.v2ray.ang.behradng'"
 
     - name: Verify APK native libraries
       shell: bash
@@ -178,6 +210,7 @@ jobs:
         files: |
           release-apks/*.apk
         draft: false
-        prerelease: ${{ !startsWith(env.RELEASE_TAG, 'v') || contains(env.RELEASE_TAG, 'build') }}
+        prerelease: false
+        make_latest: 'true'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
