@@ -131,6 +131,6 @@ jobs:
         files: |
           release-apks/*.apk
         draft: false
-        prerelease: ${{ startsWith(env.RELEASE_TAG, 'v') && !contains(env.RELEASE_TAG, 'build') ? false : true }}
+        prerelease: ${{ !startsWith(env.RELEASE_TAG, 'v') || contains(env.RELEASE_TAG, 'build') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
