@@ -123,7 +123,7 @@ jobs:
       working-directory: V2rayNG
       run: |
         chmod +x gradlew
-        ./gradlew assembleDebug --stacktrace
+        ./gradlew :app:testDebugUnitTest :app:compileDebugKotlin :app:assembleDebug --stacktrace
 
     - name: Verify APK native libraries
       shell: bash

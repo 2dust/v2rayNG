@@ -71,6 +71,7 @@ fun AppTopBar(
     searchQuery: String = "",
     onSearchQueryChange: (String) -> Unit = {},
     onSearchClose: () -> Unit = {},
+    searchPlaceholder: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     titleContent: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
