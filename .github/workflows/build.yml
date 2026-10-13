@@ -38,7 +38,7 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         log-accepted-android-sdk-licenses: false
-        packages: 'platforms;android-37.0 build-tools;36.0.0 platform-tools'
+        packages: 'platforms;android-37.0 build-tools;36.0.0 platform-tools ndk;29.0.14206865 ndk;30.0.16248370'
 
     - name: Resolve Android 37 SDK path
       shell: bash
@@ -76,32 +76,38 @@ jobs:
         echo "RELEASE_TAG=$TAG" >> $GITHUB_OUTPUT
         echo "Release tag will be: $TAG"
 
-    - name: Download libv2ray AAR if needed
-      run: |
-        mkdir -p app/libs
-        if [ ! -f "app/libs/libv2ray.aar" ]; then
-          echo "Downloading libv2ray.aar..."
-          curl -sL https://github.com/2dust/AndroidLibXrayLite/releases/download/v26.10.10/libv2ray.aar -o app/libs/libv2ray.aar
-        fi
+    - name: Setup Go for pinned Xray source
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: AndroidLibXrayLite/go.mod
+        cache-dependency-path: AndroidLibXrayLite/go.sum
 
-    - name: Extract native libraries if needed
+    - name: Build pinned Xray AAR
+      working-directory: AndroidLibXrayLite
+      env:
+        ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.14206865
       run: |
-        if [ ! -d "app/libs/arm64-v8a" ] || [ ! -f "app/libs/arm64-v8a/libhev-socks5-tunnel.so" ]; then
-          echo "Extracting native hev libraries..."
-          mkdir -p /tmp/apk_libs app/libs/arm64-v8a app/libs/x86_64 app/libs/armeabi-v7a app/libs/x86
-          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_arm64-v8a.apk -o /tmp/arm64.apk
-          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_x86_64.apk -o /tmp/x86_64.apk
-          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_armeabi-v7a.apk -o /tmp/armv7.apk
-          curl -sL https://github.com/2dust/v2rayNG/releases/download/2.2.6/v2rayNG_2.2.6_x86.apk -o /tmp/x86.apk
-          unzip -q /tmp/arm64.apk "lib/*" -d /tmp/apk_libs/
-          unzip -q /tmp/x86_64.apk "lib/*" -d /tmp/apk_libs/
-          unzip -q /tmp/armv7.apk "lib/*" -d /tmp/apk_libs/
-          unzip -q /tmp/x86.apk "lib/*" -d /tmp/apk_libs/
-          cp -r /tmp/apk_libs/lib/arm64-v8a/libhev* app/libs/arm64-v8a/ 2>/dev/null || true
-          cp -r /tmp/apk_libs/lib/x86_64/libhev* app/libs/x86_64/ 2>/dev/null || true
-          cp -r /tmp/apk_libs/lib/armeabi-v7a/libhev* app/libs/armeabi-v7a/ 2>/dev/null || true
-          cp -r /tmp/apk_libs/lib/x86/libhev* app/libs/x86/ 2>/dev/null || true
-        fi
+        go mod download
+        go install golang.org/x/mobile/cmd/gomobile golang.org/x/mobile/cmd/gobind
+        mkdir -p assets data "$GITHUB_WORKSPACE/app/libs"
+        bash gen_assets.sh download
+        cp data/*.dat assets/
+        gomobile init
+        gomobile bind -v -target=android -androidapi 24 -trimpath -ldflags='-s -w -buildid= -checklinkname=0' -o "$GITHUB_WORKSPACE/app/libs/libv2ray.aar" ./
+        for ABI in armeabi-v7a arm64-v8a x86 x86_64; do
+          unzip -l "$GITHUB_WORKSPACE/app/libs/libv2ray.aar" "jni/$ABI/libgojni.so" | grep -F "jni/$ABI/libgojni.so"
+        done
+
+    - name: Build pinned HEV libraries
+      env:
+        NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/30.0.16248370
+      run: |
+        bash compile-hevtun.sh
+        cp -a libs/. app/libs/
+        for ABI in armeabi-v7a arm64-v8a x86 x86_64; do
+          test -s "app/libs/$ABI/libhev-socks5-tunnel.so"
+          test -s "app/libs/$ABI/libhevsockstun.so"
+        done
 
     - name: Prepare behradNG project
       shell: bash
@@ -117,6 +123,17 @@ jobs:
       run: |
         chmod +x gradlew
         ./gradlew assembleDebug --stacktrace
+
+    - name: Verify APK native libraries
+      shell: bash
+      run: |
+        APK_FILE=$(find V2rayNG/app/build/outputs/apk -name "*.apk" | head -n 1)
+        test -n "$APK_FILE"
+        for ABI in armeabi-v7a arm64-v8a x86 x86_64; do
+          for LIBRARY in libhev-socks5-tunnel.so libhevsockstun.so libgojni.so; do
+            unzip -l "$APK_FILE" "lib/$ABI/$LIBRARY" | grep -F "lib/$ABI/$LIBRARY"
+          done
+        done
 
     - name: Prepare Release APK Artifact
       run: |
