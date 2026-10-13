@@ -38,7 +38,17 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         log-accepted-android-sdk-licenses: false
-        packages: 'platforms;android-37 build-tools;36.0.0 platform-tools'
+        packages: 'platforms;android-37.0 build-tools;36.0.0 platform-tools'
+
+    - name: Resolve Android 37 SDK path
+      shell: bash
+      run: |
+        # API 37 is published as android-37.0, but compileSdk = 37 resolves android-37.
+        # Remove this alias once sdkmanager installs platforms;android-37 directly.
+        if [ ! -d "$ANDROID_HOME/platforms/android-37" ] && [ -d "$ANDROID_HOME/platforms/android-37.0" ]; then
+          ln -s "$ANDROID_HOME/platforms/android-37.0" "$ANDROID_HOME/platforms/android-37"
+        fi
+        test -r "$ANDROID_HOME/platforms/android-37/android.jar"
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
