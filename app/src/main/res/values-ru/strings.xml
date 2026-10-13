@@ -565,4 +565,5 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+    <string name="title_configs">Конфиги</string>
 </resources>

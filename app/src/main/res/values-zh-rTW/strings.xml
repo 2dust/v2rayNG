@@ -559,4 +559,5 @@
     <string name="connection_test_empty_message">沒有詳細資訊</string>
     <string name="value_unknown">未知</string>
 
+    <string name="title_configs">設定檔</string>
 </resources>

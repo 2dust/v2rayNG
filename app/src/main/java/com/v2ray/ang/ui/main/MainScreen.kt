@@ -33,7 +33,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
@@ -219,7 +218,7 @@ fun MainScreen(
                     title = if (currentTab == ExpressMainTab.Connect) {
                         stringResource(R.string.app_name)
                     } else {
-                        "Configurations"
+                        stringResource(R.string.title_configs)
                     },
                     isLoading = isLoading,
                     showSearch = showSearch && currentTab == ExpressMainTab.Locations,
@@ -287,13 +286,13 @@ fun MainScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_globe_24dp),
-                                contentDescription = "Configurations",
+                                contentDescription = stringResource(R.string.title_configs),
                                 modifier = Modifier.size(24.dp)
                             )
                         },
                         label = {
                             Text(
-                                text = "Configurations",
+                                text = stringResource(R.string.title_configs),
                                 fontWeight = if (currentTab == ExpressMainTab.Locations) FontWeight.Bold else FontWeight.Medium
                             )
                         },
@@ -308,26 +307,6 @@ fun MainScreen(
             floatingActionButton = {
                 if (currentTab == ExpressMainTab.Locations) {
                     Box(modifier = Modifier.wrapContentSize(Alignment.BottomEnd)) {
-                        ExtendedFloatingActionButton(
-                            onClick = { showLocationsAddMenu = true },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_add_24dp),
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = "Add Config",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            containerColor = Color(0xFF05A870),
-                            shape = RoundedCornerShape(18.dp)
-                        )
-
                         val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                         DropdownMenu(
                             expanded = showLocationsAddMenu,
