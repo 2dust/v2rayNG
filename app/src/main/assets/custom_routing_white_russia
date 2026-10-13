@@ -1,0 +1,43 @@
+[
+  {
+    "remarks": "Bypass bittorrent",
+    "outboundTag": "direct",
+    "protocol": [
+      "bittorrent"
+    ]
+  },
+  {
+    "remarks": "Block udp443",
+    "outboundTag": "block",
+    "port": "443",
+    "network": "udp"
+  },
+  {
+    "remarks": "Direct LAN IP",
+    "outboundTag": "direct",
+    "ip": [
+      "geoip:private"
+    ]
+  },
+  {
+    "remarks": "Direct LAN domains",
+    "outboundTag": "direct",
+    "domain": [
+      "geosite:private"
+    ]
+  },
+  {
+    "remarks": "Bypass Russia domains",
+    "outboundTag": "direct",
+    "domain": [
+      "geosite:category-ru"
+    ]
+  },
+  {
+    "remarks": "Bypass Russia IP",
+    "outboundTag": "direct",
+    "ip": [
+       "geoip:ru"
+    ]
+  }
+]

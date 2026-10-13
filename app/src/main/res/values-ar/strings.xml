@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">behradNG</string>
+    <string name="app_widget_name">التبديل</string>
+    <string name="app_tile_name">التبديل</string>
+    <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
+    <string name="navigation_drawer_open">فتح درج التنقل</string>
+    <string name="navigation_drawer_close">إغلاق درج التنقل</string>
+    <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
+    <string name="action_stop_service">إيقاف الخدمة</string>
+    <string name="action_ok">موافق</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
+    <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_service">خدمة behradNG</string>
+    <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
+    <string name="notification_channel_connection_checks">فحوص الاتصال</string>
+    <string name="notification_action_stop_v2ray">إيقاف</string>
+    <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
+    <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
+    <string name="notification_action_more">انقر للمزيد</string>
+    <string name="toast_services_start">بدء الخدمات</string>
+    <string name="toast_services_stop">إيقاف الخدمات</string>
+    <string name="toast_services_success">نجاح بدء الخدمات</string>
+    <string name="toast_services_failure">فشل بدء الخدمات</string>
+
+    <!--ServerActivity-->
+    <string name="title_server">ملف التكوين</string>
+    <string name="menu_item_add_config">إضافة تكوين</string>
+    <string name="menu_item_save_config">حفظ التكوين</string>
+    <string name="menu_item_edit_config">تعديل التكوين</string>
+    <string name="menu_item_del_config">حذف التكوين</string>
+    <string name="menu_item_import_config_qrcode">استيراد التكوين من رمز QR</string>
+    <string name="menu_item_import_config_clipboard">استيراد التكوين من الحافظة</string>
+    <string name="menu_item_import_config_local">استيراد التكوين من الجهاز</string>
+    <string name="menu_item_import_config_policy_group">إضافة [مجموعة سياسات]</string>
+    <string name="menu_item_import_config_proxy_chain">إضافة [سلسلة وكلاء]</string>
+    <string name="menu_item_import_config_manually_vmess">إضافة [VMess]</string>
+    <string name="menu_item_import_config_manually_vless">إضافة [VLESS]</string>
+    <string name="menu_item_import_config_manually_ss">إضافة [Shadowsocks]</string>
+    <string name="menu_item_import_config_manually_socks">إضافة [SOCKS]</string>
+    <string name="menu_item_import_config_manually_http">إضافة [HTTP]</string>
+    <string name="menu_item_import_config_manually_trojan">إضافة [Trojan]</string>
+    <string name="menu_item_import_config_manually_wireguard">إضافة [WireGuard]</string>
+    <string name="menu_item_import_config_manually_hysteria2">إضافة [Hysteria2]</string>
+    <string name="confirm_delete_visible_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المعروضة حاليًا؟</string>
+    <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
+    <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
+    <string name="confirm_delete_profile">هل أنت متأكد من أنك تريد حذف ملف التعريف هذا؟</string>
+    <string name="confirm_delete_policy_group">هل أنت متأكد من أنك تريد حذف مجموعة السياسات هذه؟</string>
+    <string name="confirm_delete_proxy_chain_member">هل أنت متأكد من أنك تريد حذف هذا العضو من سلسلة الوكلاء؟</string>
+    <string name="confirm_delete_routing_rule">هل أنت متأكد من أنك تريد حذف قاعدة التوجيه هذه؟</string>
+    <string name="confirm_delete_subscription_group">هل أنت متأكد من أنك تريد حذف مجموعة الاشتراك هذه؟</string>
+    <string name="confirm_delete_asset_file">هل أنت متأكد من أنك تريد حذف ملف الأصول هذا؟</string>
+    <string name="confirm_delete_asset_source">هل أنت متأكد من أنك تريد حذف مصدر الأصول هذا؟</string>
+    <string name="server_lab_remarks">ملاحظات</string>
+    <string name="server_lab_address">العنوان</string>
+    <string name="server_lab_port">المنفذ</string>
+    <string name="server_lab_id">المعرف</string>
+    <string name="server_lab_alterid">AlterId</string>
+    <string name="server_lab_security">الأمان</string>
+    <string name="server_lab_network">الشبكة</string>
+    <string name="server_lab_more_function">النقل</string>
+    <string name="server_lab_head_type">نوع الرأس</string>
+    <string name="server_lab_mode_type">وضع gRPC</string>
+    <string name="server_lab_request_host">host</string>
+    <string name="server_lab_request_host_http">http host</string>
+    <string name="server_lab_request_host_ws">ws host</string>
+    <string name="server_lab_request_host_httpupgrade">httpupgrade host</string>
+    <string name="server_lab_request_host_xhttp">xhttp host</string>
+    <string name="server_lab_request_host_h2">h2 host</string>
+    <string name="server_lab_request_host_quic">QUIC security</string>
+    <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_path">path</string>
+    <string name="server_lab_path_ws">ws path</string>
+    <string name="server_lab_path_httpupgrade">httpupgrade path</string>
+    <string name="server_lab_path_xhttp">xhttp path</string>
+    <string name="server_lab_path_h2">h2 path</string>
+    <string name="server_lab_path_quic">QUIC key</string>
+    <string name="server_lab_path_kcp">kcp seed</string>
+    <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_stream_security" translatable="false">TLS</string>
+    <string name="server_lab_stream_fingerprint">البصمة</string>
+    <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
+    <string name="server_lab_allow_insecure">تخطي التحقق من الشهادة (allowInsecure)</string>
+    <string name="server_lab_sni" translatable="false">SNI</string>
+    <string name="server_lab_address3">العنوان</string>
+    <string name="server_lab_port3">المنفذ</string>
+    <string name="server_lab_id3">كلمة المرور</string>
+    <string name="server_lab_security3">الأمان</string>
+    <string name="server_lab_id4">كلمة المرور (اختياري)</string>
+    <string name="server_lab_security4">المستخدم (اختياري)</string>
+    <string name="server_lab_encryption">التشفير</string>
+    <string name="server_lab_flow">التدفق (flow)</string>
+    <string name="server_lab_public_key">المفتاح العام</string>
+    <string name="server_lab_preshared_key">PreSharedKey (اختياري)</string>
+    <string name="server_lab_short_id">المعرّف القصير</string>
+    <string name="server_lab_spider_x" translatable="false">SpiderX</string>
+    <string name="server_lab_mldsa65_verify" translatable="false">mldsa65Verify</string>
+    <string name="server_lab_secret_key">المفتاح السري</string>
+    <string name="server_lab_reserved">Reserved (اختياري، مفصول بفواصل)</string>
+    <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
+    <string name="server_lab_local_mtu">MTU (اختياري، الافتراضي 1420)</string>
+    <string name="server_lab_remote_dns">remoteDNS (اختياري، عناوين IPv4/IPv6 مفصولة بفواصل)</string>
+    <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي 1350)</string>
+    <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي 50 مللي ثانية)</string>
+    <string name="toast_success">نجاح</string>
+    <string name="toast_failure">فشل</string>
+    <string name="toast_none_data">لا يوجد شيء</string>
+    <string name="toast_incorrect_protocol">بروتوكول غير صحيح</string>
+    <string name="toast_decoding_failed">فشل فك التشفير</string>
+    <string name="title_file_chooser">حدد ملف التكوين</string>
+    <string name="toast_require_file_manager">يرجى تثبيت مدير الملفات.</string>
+    <string name="server_customize_config">تخصيص التكوين</string>
+    <string name="toast_config_file_invalid">تكوين غير صالح</string>
+    <string name="server_lab_content">المحتوى</string>
+    <string name="toast_none_data_clipboard">لا توجد بيانات في الحافظة</string>
+    <string name="toast_invalid_url">رابط URL غير صالح</string>
+    <string name="toast_insecure_url_protocol">يرجى عدم استخدام عنوان اشتراك ببروتوكول HTTP غير الآمن</string>
+    <string name="server_lab_need_inbound">تأكد من أن منفذ الاتصالات الواردة يتوافق مع الإعدادات</string>
+    <string name="toast_malformed_json">تنسيق التكوين غير صالح.</string>
+    <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
+    <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
+    <string name="server_obfs_password">كلمة مرور Obfs</string>
+    <string name="server_lab_port_hop">التنقل بين المنافذ (يتجاوز قيمة المنفذ)</string>
+    <string name="server_lab_port_hop_interval">فاصل تبديل المنفذ (بالثواني)</string>
+    <string name="server_lab_bandwidth_down">عرض النطاق للتنزيل (الوحدات المدعومة: k/m/g/t)</string>
+    <string name="server_lab_bandwidth_up">عرض النطاق للرفع (الوحدات المدعومة: k/m/g/t)</string>
+    <string name="server_lab_xhttp_mode">وضع XHTTP</string>
+    <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
+    <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
+    <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
+    <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>
+    <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>
+    <string name="server_lab_browser_dialer">تمكين Browser Dialer</string>
+    <string name="server_lab_browser_dialer_tip">يدعم فقط اتصالات xhttp (packet-up) وws الصادرة؛ قد يتم تجاهل الإعدادات المتعلقة بـ TLS أو قد تتعارض</string>
+    <string name="toast_allow_insecure_deprecated">تستخدم العقدة الحالية اتصالاً غير مشفر. قد تتمكن تجهيزات الشبكة الوسيطة الخاضعة لسيطرة حكومات استبدادية من الاطلاع مباشرةً على اتصالاتك.\nلأسباب أمنية، لا يمكن الاتصال بهذه العقد عبر نواة Xray الإصدار 26.2.6 أو أحدث.\nإذا كانت العقدة من إعدادك، ففعّل تشفيراً آمناً مثل TLS أو ثبّت بصمة الشهادة pinnedCA256.\nإذا كانت العقدة تابعة لمزوّد خدمة، فتواصل معه لإكمال الترقية التقنية. إذا رفض المزوّد التعاون، فنوصي بالانتقال إلى مزوّد يهتم أكثر بأمان المستخدمين.\nلمزيد من المعلومات، تفضل بزيارة https://github.com/2dust/v2rayN/discussions/9460</string>
+    <string name="pinned_ca256_action_fetch">جلب بصمة الشهادة</string>
+    <string name="toast_fetch_cert_sha256_success">تم جلب بصمة الشهادة بنجاح</string>
+    <string name="toast_fetch_cert_sha256_failed">فشل جلب بصمة الشهادة</string>
+
+    <!-- UserAssetActivity -->
+    <string name="toast_asset_copy_failed">فشل نسخ الملف، يرجى استخدام مدير الملفات</string>
+    <string name="menu_item_add_asset">إضافة أصل</string>
+    <string name="menu_item_add_file">إضافة ملفات</string>
+    <string name="menu_item_add_url">إضافة URL</string>
+    <string name="menu_item_scan_qrcode">مسح رمز QR</string>
+    <string name="title_url" translatable="false">URL</string>
+    <string name="menu_item_download_file">تنزيل الملفات</string>
+    <string name="title_user_asset_add_url">إضافة عنوان URL للأصل</string>
+    <string name="msg_file_not_found">الملف غير موجود</string>
+    <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
+    <string name="asset_geo_files_sources">مصدر ملفات Geo (اختياري)</string>
+
+    <!-- PerAppProxyActivity -->
+    <string name="msg_dialog_progress">جار التحميل</string>
+    <string name="menu_item_search">بحث</string>
+    <string name="menu_item_select_all">تحديد الكل</string>
+    <string name="menu_item_invert_selection">عكس الاختيار</string>
+    <string name="msg_enter_keywords">أدخل الكلمات الرئيسية</string>
+    <string name="switch_bypass_apps_mode">وضع التجاوز</string>
+    <string name="menu_item_select_proxy_app">تحديد التطبيقات التي ستستخدم الوكيل تلقائيًا</string>
+    <string name="msg_downloading_content">جارٍ تنزيل المحتوى</string>
+    <string name="menu_item_export_proxy_app">تصدير إلى الحافظة</string>
+    <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
+    <string name="per_app_proxy_settings">إعدادات كل تطبيق</string>
+    <string name="per_app_proxy_settings_enable">تمكين الإعدادات لكل تطبيق</string>
+    <string name="app_picker_unknown_app">تطبيق غير معروف (UID غير محدد)</string>
+
+    <!-- Preferences -->
+    <string name="title_settings">الإعدادات</string>
+    <string name="title_advanced">إعدادات متقدمة</string>
+    <string name="title_core_settings">إعدادات النواة</string>
+    <string name="title_vpn_settings">إعدادات VPN</string>
+    <string name="title_pref_per_app_proxy">الوكيل لكل تطبيق</string>
+    <string name="summary_pref_per_app_proxy">عام: تستخدم التطبيقات المحددة الوكيل، وتتصل التطبيقات غير المحددة مباشرة؛\nوضع التجاوز: تتصل التطبيقات المحددة مباشرة، وتستخدم التطبيقات غير المحددة الوكيل.\nيتوفر في القائمة خيار لتحديد التطبيقات التي ستستخدم الوكيل تلقائيًا.</string>
+    <string name="title_pref_is_booted">الاتصال بعد إقلاع الجهاز</string>
+    <string name="summary_pref_is_booted">الاتصال تلقائياً بالخادم المحدد بعد إقلاع الجهاز. قد يقيّد Android بدء التشغيل في الخلفية.</string>
+    <string name="title_system_vpn_settings">إعدادات VPN للنظام</string>
+    <string name="summary_system_vpn_settings">فتح إعدادات VPN في Android لإعداد VPN الدائم، إذا كان الجهاز يدعمه.</string>
+    <string name="toast_system_vpn_settings_unavailable">إعدادات VPN للنظام غير متاحة.</string>
+
+
+    <string name="subscription_updater_job_tips">ستعمل المهمة في الخلفية، وسيُعرض تقدمها في الإشعار.</string>
+    <string name="title_pref_auto_test_after_update_subscription">اختبار تلقائي بعد تحديث الاشتراك</string>
+    <string name="summary_pref_auto_test_after_update_subscription">يستغرق الاختبار التلقائي وقتاً طويلاً. عند تمكينه، ستعمل المهمة في الخلفية؛ وإلا فستعمل في الصفحة الحالية.</string>
+    <string name="title_pref_auto_remove_invalid_after_test">حذف الإعدادات غير الصالحة تلقائياً بعد الاختبار</string>
+    <string name="summary_pref_auto_remove_invalid_after_test">قد لا تكون نتائج الاختبار دقيقة؛ لا يمكن استعادة الإعدادات المحذوفة.</string>
+    <string name="title_pref_auto_sort_after_test">الفرز تلقائياً بعد الاختبار</string>
+    <string name="summary_pref_auto_sort_after_test">قد لا تكون نتائج الاختبار دقيقة؛</string>
+
+    <string name="title_mux_settings">إعدادات Mux</string>
+    <string name="title_pref_mux_enabled">تمكين Mux</string>
+    <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية التعامل مع TCP و UDP و QUIC أدناه</string>
+    <string name="title_pref_mux_concurrency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
+    <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
+    <string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق mux</string>
+    <string-array name="mux_xudp_quic_entries">
+        <item>رفض</item>
+        <item>سماح</item>
+        <item>تخطي</item>
+    </string-array>
+
+    <string name="title_pref_speed_enabled">تمكين عرض السرعة</string>
+    <string name="summary_pref_speed_enabled">عرض سرعات الاتصال الحالية في الإشعار.\nتوضح الأيقونة ما إذا كانت حركة الوكيل أم الحركة المباشرة هي الغالبة.</string>
+
+    <string name="title_pref_sniffing_enabled">تفعيل اكتشاف نطاقات الوجهة (Sniffing)</string>
+    <string name="summary_pref_sniffing_enabled">اكتشاف نطاقات الوجهة من حركة المرور (مفعّل افتراضيًا).</string>
+    <string name="title_pref_route_only_enabled">تمكين routeOnly</string>
+    <string name="summary_pref_route_only_enabled">استخدم اسم النطاق الذي تم استخراجه للتوجيه فقط، واحتفظ بعنوان الوجهة كعنوان IP.</string>
+
+    <string name="title_pref_local_dns_enabled">تفعيل DNS المحلي</string>
+    <string name="summary_pref_local_dns_enabled">يتم معالجة DNS بواسطة وحدة DNS الأساسية (موصى به، إذا لزم تجاوز التوجيه لشبكة LAN وعنوان البر الرئيسي)</string>
+
+    <string name="title_pref_fake_dns_enabled">تفعيل DNS اصطناعي (FakeDNS)</string>
+    <string name="summary_pref_fake_dns_enabled">يعيد FakeDNS عناوين IP اصطناعية لاستعلامات النطاقات (أسرع، لكنه قد لا يعمل مع بعض التطبيقات).</string>
+
+    <string name="title_pref_ipv6_enabled">تفعيل IPv6</string>
+    <string name="summary_pref_ipv6_enabled">إضافة عنوان IPv6 والمسارات إلى واجهة VPN</string>
+
+    <string name="title_pref_prefer_ipv6">تفضيل IPv6</string>
+    <string name="summary_pref_prefer_ipv6">تفضيل عناوين IPv6 عند حل أسماء النطاقات</string>
+
+    <string name="title_pref_remote_dns">DNS البعيد (UDP/TCP/HTTPS/QUIC، اختياري)</string>
+    <string name="summary_pref_remote_dns" translatable="false">DNS</string>
+
+    <string name="title_pref_vpn_dns">VPN DNS (IPv4/IPv6 فقط)</string>
+    <string name="title_pref_vpn_bypass_lan">هل تتجاوز VPN شبكة LAN؟</string>
+
+    <string name="title_pref_vpn_interface_address">عنوان واجهة VPN</string>
+
+    <string name="title_pref_vpn_mtu">قيمة MTU لشبكة VPN (الافتراضي 1500)</string>
+
+
+    <string name="title_pref_domestic_dns">DNS المباشر (اختياري)</string>
+    <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
+
+    <string name="title_pref_dns_hosts">تعيينات مضيفي DNS (التنسيق: domain:address,…)</string>
+    <string name="summary_pref_dns_hosts">domain:address,…</string>
+
+    <string name="title_pref_delay_test_url">عنوان URL لاختبار التأخير الحقيقي</string>
+    <string name="summary_pref_delay_test_url" translatable="false">URL</string>
+    <string name="title_pref_real_ping_concurrency">اختبارات تأخير حقيقي متزامنة</string>
+
+    <string name="title_pref_ip_api_url">عنوان URL لاختبار معلومات الاتصال الحالي</string>
+    <string name="summary_pref_ip_api_url" translatable="false">URL</string>
+
+    <string name="title_pref_proxy_sharing_enabled">السماح بالاتصالات من الشبكة المحلية</string>
+    <string name="summary_pref_proxy_sharing_enabled">يمكن للأجهزة الأخرى الاتصال بالبروكسي بواسطة عنوان IP الخاص بك من خلال socks/http، يتم التمكين فقط في الشبكة الموثوقة لتجنب الاتصال غير المصرح به</string>
+    <string name="toast_warning_pref_proxysharing_short">السماح بالاتصالات من الشبكة المحلية، تأكد من أنك في شبكة موثوقة</string>
+
+    <string name="title_pref_socks_port">منفذ البروكسي المحلي</string>
+    <string name="title_pref_enable_local_proxy">تفعيل الوكيل المحلي</string>
+    <string name="summary_pref_enable_local_proxy">عند التعطيل، لن يتوفر وكيل SOCKS، ولذلك لن تتمكن تحديثات الاشتراك والإجراءات المشابهة من استخدام الوكيل</string>
+    <string name="title_pref_socks_enable_udp" translatable="false">SOCKS5 UDP</string>
+    <string name="summary_pref_socks_enable_udp">مصادقة SOCKS5 ليست آمنة تمامًا عند استخدام UDP.</string>
+    <string name="summary_pref_socks_port">منفذ البروكسي المحلي</string>
+    <string name="title_pref_dynamic_socks_port">تمكين منفذ وكيل محلي ديناميكي</string>
+    <string name="summary_pref_dynamic_socks_port">إنشاء منفذ وكيل محلي عشوائي في كل مرة يُنشأ فيها inbound</string>
+    <string name="title_pref_socks_username">اسم مستخدم الوكيل المحلي (اختياري)</string>
+    <string name="summary_pref_socks_username">اسم المستخدم</string>
+    <string name="title_pref_socks_password">كلمة مرور الوكيل المحلي (اختيارية)</string>
+    <string name="summary_pref_socks_password">كلمة المرور</string>
+
+    <string name="title_pref_local_dns_port">منفذ DNS المحلي</string>
+    <string name="summary_pref_local_dns_port">منفذ DNS المحلي</string>
+
+    <string name="title_pref_confirm_remove">تأكيد حذف ملف التكوين</string>
+    <string name="summary_pref_confirm_remove">ما إذا كان حذف ملف التكوين يتطلب تأكيدًا ثانيًا من قبل المستخدم</string>
+
+
+    <string name="title_pref_append_http_proxy">إضافة وكيل HTTP إلى شبكة VPN</string>
+    <string name="summary_pref_append_http_proxy">سيُستخدم وكيل HTTP مباشرةً من المتصفح وبعض التطبيقات المدعومة من دون المرور بواجهة NIC الافتراضية (Android 10+)</string>
+
+    <string name="title_pref_double_column_display">تمكين العرض بعمودين</string>
+    <string name="summary_pref_double_column_display">عرض قائمة التكوينات في عمودين لإظهار محتوى أكبر على الشاشة.</string>
+
+    <string name="title_pref_group_all_display">إظهار علامة تبويب «الكل»</string>
+    <string name="summary_pref_group_all_display">جمع تكوينات جميع مجموعات الاشتراك في علامة تبويب واحدة.</string>
+
+    <!-- AboutActivity -->
+    <string name="title_pref_feedback">ملاحظات</string>
+    <string name="summary_pref_feedback">ملاحظات التحسينات أو الأخطاء إلى GitHub</string>
+    <string name="summary_pref_tg_group">الانضمام إلى مجموعة Telegram</string>
+    <string name="toast_tg_app_not_found">لم يتم العثور على تطبيق Telegram</string>
+    <string name="title_privacy_policy">سياسة الخصوصية</string>
+    <string name="title_qr_code">رمز QR</string>
+    <string name="title_about">حول التطبيق</string>
+    <string name="title_source_code">الكود المصدري</string>
+    <string name="title_oss_license">تراخيص المصادر المفتوحة</string>
+    <string name="title_translators">المترجمون</string>
+    <string name="title_tg_channel">قناة Telegram</string>
+
+    <string name="title_pref_promotion">ترويج</string>
+
+    <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
+    <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
+    <string name="title_pref_auto_update_interval">فاصل التحديث التلقائي (بالدقائق، الحد الأدنى للقيمة 15)</string>
+
+    <string name="title_core_loglevel">مستوى السجل</string>
+    <string name="title_outbound_domain_resolve_method">حل أسماء نطاقات الاتصالات الصادرة (outbound)</string>
+    <string name="title_mode">الوضع</string>
+    <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
+    <string name="title_language">اللغة</string>
+    <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
+    <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
+    <string name="title_pref_dynamic_color">تفعيل الألوان الديناميكية</string>
+    <string name="summary_pref_dynamic_color">يعمل فقط على أندرويد 12+</string>
+    <string name="title_pref_use_hev_tunnel">تمكين ميزة Hev TUN</string>
+    <string name="summary_pref_use_hev_tunnel">عند التمكين، سيستخدم TUN ‏hev-socks5-tunnel؛ وإلا فسيستخدم xray-core.</string>
+    <string name="title_pref_hev_tunnel_loglevel">مستوى سجل Hev TUN</string>
+    <string name="title_pref_hev_tunnel_rw_timeout">مهلة القراءة/الكتابة لـ Hev TUN (بالثواني؛ القيم الافتراضية لـ TCP/UDP: 300/60)</string>
+    <string name="title_mode_settings">إعدادات الوضع</string>
+    <string name="title_root_mode_enabled">تمكين وضع Root (لمستخدمي Root)</string>
+    <string name="summary_root_mode_enabled">استخدام صلاحيات Root للوكيل الشفاف منخفض المستوى. يدير وضع Root حركة مرور الشبكة مباشرةً بدلاً من استخدام خدمة VPN في Android. أثناء تفعيله، لا يعمل الوضع العادي ولا توجيه التطبيقات ولا إعدادات VPN المرتبطة.</string>
+    <string name="toast_root_required">تتطلب هذه الميزة صلاحيات Root</string>
+    <string name="title_root_lan_sharing">مشاركة VPN مع أجهزة LAN / الأجهزة المربوطة (لمستخدمي Root)</string>
+    <string name="summary_root_lan_sharing">توجيه حركة مرور أجهزة نقطة اتصال Wi-Fi والأجهزة المربوطة عبر USB من خلال VPN.</string>
+
+    <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_copy">نسخ</string>
+    <string name="logcat_clear">مسح</string>
+    <string name="logcat_share">مشاركة السجل</string>
+    <string name="title_service_restart">إعادة تشغيل الخدمة</string>
+    <string name="title_del_all_config">حذف جميع الإعدادات</string>
+    <string name="title_del_duplicate_config">حذف الإعدادات المكررة</string>
+    <string name="title_del_invalid_config">حذف الإعدادات غير الصالحة</string>
+    <string name="title_export_all">تصدير التكوينات إلى الحافظة</string>
+    <string name="title_sub_setting">الاشتراكات</string>
+    <string name="sub_setting_remarks">ملاحظات</string>
+    <string name="sub_setting_url">عنوان URL اختياري</string>
+    <string name="sub_setting_user_agent" translatable="false">User Agent</string>
+    <string name="sub_setting_request_headers">رؤوس الطلب (بتنسيق JSON)</string>
+    <string name="sub_setting_filter">مرشح تعبير نمطي للملاحظات</string>
+    <string name="sub_setting_enable">تفعيل التحديث</string>
+    <string name="sub_auto_update">تفعيل التحديث التلقائي</string>
+    <string name="sub_allow_insecure_url">السماح بعنوان HTTP غير آمن</string>
+    <string name="sub_setting_pre_profile">وكيل الدخول</string>
+    <string name="sub_setting_next_profile">وكيل الخروج</string>
+    <string name="sub_setting_pre_profile_tip">يجب أن تكون ملاحظات التكوين موجودة وفريدة</string>
+    <string name="sub_setting_entry_proxy_tip">يُضاف الوكيل المحدد قبل كل ملف تعريف في هذا الاشتراك كحلقة الدخول في سلسلة الوكلاء لذلك الملف.</string>
+    <string name="sub_setting_exit_proxy_tip">يُضاف الوكيل المحدد بعد كل ملف تعريف في هذا الاشتراك كحلقة الخروج في سلسلة الوكلاء لذلك الملف.</string>
+    <string name="toast_invalid_update_interval">فاصل التحديث غير صالح. الحد الأدنى هو 15 دقيقة.</string>
+    <string name="title_sub_update">تحديث الاشتراك</string>
+    <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
+    <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
+    <string name="title_user_asset_setting">ملفات الأصول</string>
+    <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
+    <string name="title_filter_config">تصفية ملف التكوين</string>
+    <string name="filter_config_all">الكل</string>
+    <string name="summary_scan_qrcode">انقر على الشاشة لفتح الكاميرا والمسح</string>
+    <string name="title_del_duplicate_config_count">حذف %d من الإعدادات المكررة</string>
+    <string name="title_del_config_count">حذف %d من التكوينات</string>
+    <string name="title_import_config_count">استيراد %d من التكوينات</string>
+    <string name="title_export_config_count">تصدير %d من التكوينات</string>
+    <plurals name="title_update_config_count">
+        <item quantity="zero">لم يتم تحديث أي تكوينات</item>
+        <item quantity="one">تم تحديث تكوين واحد</item>
+        <item quantity="two">تم تحديث تكوينين</item>
+        <item quantity="few">تم تحديث %1$d تكوينات</item>
+        <item quantity="many">تم تحديث %1$d تكوينًا</item>
+        <item quantity="other">تم تحديث %1$d تكوين</item>
+    </plurals>
+    <plurals name="title_update_asset_count">
+        <item quantity="zero">لم يتم تحديث أي ملفات أصول</item>
+        <item quantity="one">تم تحديث ملف أصول واحد</item>
+        <item quantity="two">تم تحديث ملفي أصول</item>
+        <item quantity="few">تم تحديث %1$d ملفات أصول</item>
+        <item quantity="many">تم تحديث %1$d ملف أصول</item>
+        <item quantity="other">تم تحديث %1$d ملف أصول</item>
+    </plurals>
+    <string name="title_update_subscription_result">تم تحديث %1$d إعدادات (%2$d ناجحة، %3$d فاشلة، %4$d متخطاة)</string>
+    <string name="title_update_subscription_no_subscription">لا توجد اشتراكات</string>
+    <string name="toast_server_not_found_in_group">لم يُعثر على الخادم المحدد في المجموعة الحالية</string>
+    <string name="title_locate_selected_config">العثور على التكوين المحدد</string>
+
+    <string name="tasker_start_service">بدء الخدمة</string>
+    <string name="tasker_setting_confirm">تأكيد</string>
+
+    <!-- RoutingSettingActivity -->
+    <string name="routing_settings_domain_strategy">استراتيجية النطاق</string>
+    <string name="routing_settings_title">إعدادات التوجيه</string>
+    <string name="routing_settings_tips">لا تُطبَّق القاعدة إلا إذا تحققت جميع شروط المطابقة المحددة معًا (AND). تُفحص القواعد من الأعلى إلى الأسفل، وتُطبَّق أول قاعدة متطابقة.</string>
+    <string name="routing_settings_comma_tip">افصل بين الإدخالات المتعددة بفواصل (,).</string>
+    <string name="routing_settings_save">حفظ</string>
+    <string name="routing_settings_delete">مسح</string>
+    <string name="routing_settings_rule_title">إعدادات قاعدة التوجيه</string>
+    <string name="routing_settings_add_rule">إضافة قاعدة</string>
+    <string name="routing_settings_import_predefined_rulesets">استيراد مجموعات قواعد محددة مسبقاً</string>
+    <string name="routing_settings_import_rulesets_tip">سيتم حذف مجموعات القواعد الحالية. هل تريد المتابعة؟</string>
+    <string name="routing_settings_import_rulesets_from_clipboard">استيراد مجموعة قواعد من الحافظة</string>
+    <string name="routing_settings_import_rulesets_from_qrcode">استيراد مجموعة قواعد من رمز الاستجابة السريعة</string>
+    <string name="routing_settings_export_rulesets_to_clipboard">تصدير مجموعة القواعد إلى الحافظة</string>
+    <string name="routing_settings_locked">مقفلة؛ احتفظ بهذه القاعدة عند استيراد الإعدادات المسبقة</string>
+    <string name="routing_settings_domain" translatable="false">domain</string>
+    <string name="routing_settings_ip" translatable="false">ip</string>
+    <string name="routing_settings_process">process (اسم الحزمة — مدعوم فقط عند استخدام Xray TUN وتمكين routeOnly وعلى Android 10+)</string>
+    <string name="routing_settings_process_select">اختيار اسم الحزمة</string>
+    <string name="routing_settings_port" translatable="false">port</string>
+    <string name="routing_settings_protocol" translatable="false">protocol</string>
+    <string name="routing_settings_protocol_tip" translatable="false">[http,tls,bittorrent]</string>
+    <string name="routing_settings_network" translatable="false">network</string>
+    <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
+    <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
+
+    <string name="connection_test_pending">التحقق من الاتصال</string>
+    <string name="connection_test_testing">يجري الاختبار…</string>
+    <string name="connection_test_testing_count">جارٍ اختبار %d من التكوينات…</string>
+    <string name="connection_test_available">تم الاتصال بنجاح خلال %1$s</string>
+    <string name="server_test_delay_value">%1$d ملي ثانية</string>
+    <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
+    <string name="connection_test_fail">الإنترنت غير متاح</string>
+    <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
+    <string name="connection_connected">متصل. اضغط للتحقق من الاتصال.</string>
+    <string name="connection_not_connected">غير متصل</string>
+    <string name="connection_running_task_left">الاختبارات قيد التشغيل: %s</string>
+
+    <string name="import_subscription_success">تم استيراد الاشتراك بنجاح</string>
+    <string name="import_subscription_failure">فشل استيراد الاشتراك</string>
+    <string name="title_fragment_settings">إعدادات تجزئة الحزم (Fragment)</string>
+    <string name="title_pref_fragment_packets">الحزم المراد تجزئتها</string>
+    <string name="title_pref_fragment_length">طول الجزء (الحد الأدنى - الحد الأقصى)</string>
+    <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
+    <string name="title_pref_fragment_enabled">تفعيل تجزئة الحزم</string>
+    <string name="title_pref_fragment_maxsplit">الحد الأقصى لعدد الأجزاء</string>
+    <string name="title_observatory_settings">إعدادات مراقبة الاتصال (Observatory)</string>
+    <string name="title_pref_observatory_least_ping_interval">فاصل leastPing</string>
+    <string name="title_pref_observatory_least_load_interval">فاصل leastLoad</string>
+    <string name="title_pref_observatory_least_load_method">طريقة HTTP لـ leastLoad</string>
+    <string name="title_pref_observatory_least_load_sampling">عينات leastLoad</string>
+    <string name="title_pref_observatory_least_load_timeout">مهلة leastLoad</string>
+    <string name="toast_invalid_observatory_duration">مدة غير صالحة. استخدم قيمة مثل 3m أو 30s.</string>
+    <string name="toast_invalid_observatory_sampling">عدد العينات غير صالح. استخدم رقمًا موجبًا.</string>
+
+    <string name="update_check_for_update">التحقق من وجود تحديث</string>
+    <string name="update_already_latest_version">أنت تستخدم أحدث إصدار بالفعل</string>
+    <string name="update_new_version_found">عُثر على إصدار جديد: %s</string>
+    <string name="update_now">التحديث الآن</string>
+    <string name="update_check_pre_release">التحقق من الإصدارات التجريبية</string>
+    <string name="update_checking_for_update">جارٍ التحقق من وجود تحديث…</string>
+
+    <string name="title_policy_group_type">نوع مجموعة السياسات</string>
+    <string name="title_policy_group_subscription_id">من مجموعة الاشتراك</string>
+    <string name="title_policy_group_subscription_filter">مرشح تعبير نمطي للملاحظات</string>
+    <string name="title_policy_group_test_outbounds">اختبار الاتصالات الصادرة (outbounds)</string>
+    <string name="title_policy_group_fallback">الاتصال الصادر الاحتياطي (outbound، اختياري)</string>
+
+    <string name="server_proxy_chain_members">أعضاء سلسلة الوكيل</string>
+    <string name="server_proxy_chain_pick_members">اضغط هنا لاختيار عضو</string>
+    <string name="server_proxy_chain_member_unselected">اختر عضوًا</string>
+    <string name="server_proxy_chain_members_unselected">يرجى اختيار عضو لكل صف في السلسلة</string>
+    <string name="server_proxy_chain_members_insufficient">عدد الأعضاء غير كافٍ</string>
+    <string name="server_proxy_chain_members_invalid">أعضاء سلسلة غير صالحين: %1$s</string>
+
+    <!-- BackupActivity -->
+    <string name="title_configuration_backup_restore">النسخ الاحتياطي والاستعادة</string>
+    <string name="title_configuration_backup">نسخ التكوين احتياطيًا</string>
+    <string name="title_configuration_restore">استعادة التكوين</string>
+    <string name="title_profile_storage_cleanup">إصلاح بيانات ملفات التعريف</string>
+    <string name="summary_profile_storage_cleanup">حذف بيانات ملفات التعريف غير المستخدمة</string>
+    <string name="message_profile_storage_cleanup">هل تريد حذف بيانات ملفات التعريف التي لم تعد مستخدمة في أي مجموعة؟ سيُحتفظ بملف التعريف المحدد وأي بيانات يتعذر التأكد من أنها غير مستخدمة.</string>
+    <string name="toast_profile_storage_cleanup">تم حذف ملفات التعريف غير المستخدمة: %1$d</string>
+    <string name="toast_profile_storage_cleanup_skipped">تعذّر تحديد بيانات ملفات التعريف غير المستخدمة بأمان. لم يُحذف أي شيء.</string>
+    <string name="title_configuration_share">مشاركة التكوين</string>
+    <string name="title_webdav_config_setting">إعدادات WebDAV</string>
+    <string name="title_webdav_config_setting_unknown">يرجى إعداد WebDAV أولاً.</string>
+    <string name="title_webdav_url">عنوان URL لخادم WebDAV</string>
+    <string name="title_webdav_user">اسم المستخدم</string>
+    <string name="title_webdav_pass">كلمة المرور</string>
+    <string name="title_webdav_remote_path">الدليل البعيد (اختياري)</string>
+
+    <string name="share_method_qrcode">رمز QR</string>
+    <string name="share_method_clipboard">نسخ رابط التكوين</string>
+    <string name="share_method_full_content">نسخ التكوين الكامل</string>
+    <string name="action_edit">تعديل</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_close">إغلاق</string>
+
+    <string name="share_subscription_qrcode">رمز QR</string>
+    <string name="share_subscription_clipboard">تصدير إلى الحافظة</string>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>بروكسي فقط</item>
+    </string-array>
+
+    <string-array name="browser_dialer_mode">
+        <item>تعطيل</item>
+        <item>OkHttp</item>
+        <item>WebView</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>اتبع النظام</item>
+        <item>فاتح</item>
+        <item>داكن</item>
+    </string-array>
+
+    <string name="routing_preset_china_whitelist">القائمة البيضاء للصين</string>
+    <string name="routing_preset_china_blacklist">القائمة السوداء للصين</string>
+    <string name="routing_preset_global">عالمي</string>
+    <string name="routing_preset_iran_whitelist">القائمة البيضاء لإيران</string>
+    <string name="routing_preset_russia_whitelist">القائمة البيضاء لروسيا</string>
+
+    <string-array name="vpn_bypass_lan">
+        <item>اتباع الإعداد</item>
+        <item>تجاوز</item>
+        <item>عدم التجاوز</item>
+    </string-array>
+
+    <string-array name="outbound_domain_resolve_method">
+        <item>عدم الحل</item>
+        <item>الحل والإضافة إلى مضيفي DNS</item>
+        <item>الحل واستبدال النطاق</item>
+    </string-array>
+
+    <string-array name="policy_group_type">
+        <item>أقل زمن استجابة (leastPing)</item>
+        <item>أقل حمل (leastLoad)</item>
+        <item>عشوائي (random)</item>
+        <item>تناوب دائري (roundRobin)</item>
+    </string-array>
+
+    <string name="backup_location_local">محلي</string>
+    <string name="backup_location_webdav" translatable="false">WebDAV</string>
+
+    <string name="acc_refresh">تحديث السجل</string>
+    <string name="toast_permission_denied_for">تم رفض إذن %1$s</string>
+    <string name="acc_add_subscription">إضافة اشتراك</string>
+    <string name="toast_malformed_json_detail">تنسيق التكوين غير صالح: %1$s</string>
+    <string name="acc_add_asset">إضافة مصدر موارد</string>
+    <string name="acc_download_file">تنزيل ملفات الموارد</string>
+    <string name="acc_qr_code">رمز QR</string>
+    <string name="acc_copy_log">نسخ السجل</string>
+    <string name="acc_clear_log">مسح السجل</string>
+    <string name="acc_add_rule">إضافة قاعدة توجيه</string>
+    <string name="acc_start">بدء الخدمة</string>
+    <string name="acc_stop">إيقاف الخدمة</string>
+    <string name="acc_back">رجوع</string>
+    <string name="acc_search">بحث</string>
+    <string name="acc_add">إضافة تكوين</string>
+    <string name="acc_more">المزيد من الخيارات</string>
+    <string name="acc_selected_server">Selected</string>
+    <string name="acc_share_subscription">مشاركة رابط الاشتراك</string>
+    <string name="acc_share_log">مشاركة السجل</string>
+    <string name="acc_remove">إزالة عضو من سلسلة الوكلاء</string>
+    <string name="acc_add_member">إضافة عضو إلى سلسلة الوكلاء</string>
+    <string name="acc_start_scanner">بدء ماسح رمز QR</string>
+    <string name="acc_stop_scanner">إيقاف ماسح رمز QR</string>
+    <string name="acc_turn_torch_on">تشغيل المصباح</string>
+    <string name="acc_turn_torch_off">إطفاء المصباح</string>
+    <string name="acc_select_image">اختيار صورة لمسحها</string>
+    <string name="acc_locked">يتم الاحتفاظ بالقاعدة عند استيراد الإعدادات المسبقة</string>
+    <string name="acc_open_menu">فتح قائمة التنقل</string>
+    <string name="acc_edit">تعديل</string>
+    <string name="acc_delete">حذف</string>
+    <string name="acc_save">حفظ</string>
+    <string name="acc_update_subscriptions">تحديث الاشتراكات</string>
+    <string name="acc_per_app_proxy_information">معلومات الوكيل لكل تطبيق</string>
+    <string name="permission_camera">الكاميرا</string>
+    <string name="permission_notification">الإشعارات</string>
+    <string name="permission_local_network">الشبكة المحلية</string>
+    <string name="subscription_update_updating">جارٍ تحديث الاشتراك: %1$s</string>
+    <string name="subscription_update_progress">جارٍ اختبار %2$s: %1$s</string>
+    <string name="tasker_blurb_start">تشغيل %1$s</string>
+    <string name="tasker_blurb_stop">إيقاف %1$s</string>
+    <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
+    <string name="value_unknown">غير معروف</string>
+
+</resources>

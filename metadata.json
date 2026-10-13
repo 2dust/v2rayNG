@@ -1,0 +1,6 @@
+{
+  "name": "behradNG",
+  "description": "Fast, secure v2ray VPN client with an ExpressVPN inspired design and custom config management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
