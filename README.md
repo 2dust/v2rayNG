@@ -1,7 +1,7 @@
 # behradNG
 
 <p align="center">
-  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="100" height="100" alt="behradNG Logo" />
+  <img src="V2rayNG/bng_logo.jpg" width="100" height="100" alt="behradNG Logo" />
 </p>
 
 <p align="center">
