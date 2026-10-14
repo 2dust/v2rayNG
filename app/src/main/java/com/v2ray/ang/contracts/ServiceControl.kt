@@ -15,6 +15,9 @@ interface ServiceControl {
      */
     fun startService()
 
+    /** Returns true when this service owns an asynchronous, ordered restart. */
+    fun restartOwnedService(): Boolean = false
+
     /**
      * Stops the service.
      */

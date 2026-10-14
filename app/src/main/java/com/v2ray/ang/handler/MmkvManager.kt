@@ -20,6 +20,7 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isGroupType
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo

@@ -38,6 +38,13 @@ their respective field changes. These standalone checks use small stubs for unre
 app constants and address formatting; they are not an Android project build.
 PowerShell/Bash syntax, manifest/resource XML and pinned metadata checks passed locally.
 
+The first manually dispatched Actions build reached Kotlin compilation and reported
+four errors: root `app/` overrides replaced the new restart contract and notification
+channel, and the batch writer lacked its protocol enum import. The affected override
+and canonical files are now synchronized and both batch writers import `EConfigType`.
+A standalone compiler check of the effective override contract and notification enum
+passed with minimal Android type stubs. This does not establish a successful APK build.
+
 **Not run:** the new AetherSettingsTest, AetherLifecycleTest, AetherFmtTest, AetherProfileRollbackTest and
 AetherEditorViewModelTest JUnit classes; `:app:testDebugUnitTest`,
 `:app:compileDebugKotlin`, `:app:assembleRelease` and `:app:lintDebug` on the staged
