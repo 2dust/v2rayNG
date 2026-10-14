@@ -1,286 +1,385 @@
-package com.v2ray.ang.ui.main
+package com.v2ray.ang.ui
 
+import android.annotation.SuppressLint
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
-import androidx.activity.compose.BackHandler
+import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AngApplication
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.core.LauncherManager
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.AboutActivity
-import com.v2ray.ang.ui.backup.BackupActivity
-import com.v2ray.ang.ui.base.HelperBaseComponentActivity
-import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
-import com.v2ray.ang.ui.logcat.LogcatActivity
-import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
-import com.v2ray.ang.ui.routing.RoutingSettingActivity
-import com.v2ray.ang.ui.server.ProfileEditorResult
-import com.v2ray.ang.ui.server.ServerCustomConfigActivity
-import com.v2ray.ang.ui.server.ServerGroupActivity
-import com.v2ray.ang.ui.server.ServerHttpActivity
-import com.v2ray.ang.ui.server.ServerHysteria2Activity
-import com.v2ray.ang.ui.server.ServerProxyChainActivity
-import com.v2ray.ang.ui.server.ServerShadowsocksActivity
-import com.v2ray.ang.ui.server.ServerSocksActivity
-import com.v2ray.ang.ui.server.ServerTrojanActivity
-import com.v2ray.ang.ui.server.ServerVlessActivity
-import com.v2ray.ang.ui.server.ServerVmessActivity
-import com.v2ray.ang.ui.server.ServerWireguardActivity
-import com.v2ray.ang.ui.settings.SettingsActivity
-import com.v2ray.ang.ui.subscription.SubSettingActivity
-import com.v2ray.ang.ui.userasset.UserAssetActivity
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.v2ray.ang.handler.V2RayServiceManager
 
-class MainActivity : HelperBaseComponentActivity() {
+/* ═══════════════════════════════════════════════════════════
+   رابط کاربری «گذر» — WebView + موتور v2rayNG
+   HTML از assets/index.html لود می‌شود (بدون تغییر) و از طریق
+   پل "Android" به موتور Xray وصل می‌شود.
+   ═══════════════════════════════════════════════════════════ */
 
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Factory(application, MainRepository(application as AngApplication))
-    }
+class MainActivity : AppCompatActivity() {
 
-    private val requestVpnPermission =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) startV2Ray()
-        }
-
-    private val profileEditorLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-            val data = result.data ?: return@registerForActivityResult
-            val action = data.getStringExtra(ProfileEditorResult.EXTRA_ACTION)
-                ?: return@registerForActivityResult
-            if (action != ProfileEditorResult.ACTION_SAVED &&
-                action != ProfileEditorResult.ACTION_DELETED
-            ) return@registerForActivityResult
-            val restartService = data.getBooleanExtra(
-                ProfileEditorResult.EXTRA_RESTART_SERVICE, false
-            )
-            val selectedProfileSaved = action == ProfileEditorResult.ACTION_SAVED &&
-                    data.getStringExtra(ProfileEditorResult.EXTRA_GUID) == mainViewModel.uiState.value.selectedGuid
-            mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService || selectedProfileSaved) LauncherManager.restartService(this)
-        }
-
-    private val settingsActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            val restartService = SettingsChangeManager.consumeRestartService()
-            val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
-            mainViewModel.refreshUiSettings()
-            if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService) LauncherManager.restartService(this)
-        }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mainViewModel.onAction(MainAction.Initialize)
-
-        checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
-    }
-
-    @Composable
-    override fun ScreenContent() {
-        BackHandler { moveTaskToBack(false) }
-        MainScreen(
-            mainViewModel = mainViewModel,
-            onAction = { action ->
-                when (action) {
-                    MainAction.ToggleService -> handleFabAction()
-                    MainAction.TestCurrentServer -> handleLayoutTestClick()
-                    MainAction.ImportQRcode -> importQRcode()
-                    MainAction.ImportClipboard -> importClipboard()
-                    MainAction.ImportConfigLocal -> importConfigLocal()
-                    is MainAction.ImportManually -> importManually(action.type)
-                    MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
-                    MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
-                    is MainAction.SelectServer -> setSelectServer(action.guid)
-                    is MainAction.EditServer -> editServer(action.guid, action.profile)
-                    is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                    is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
-                    else -> mainViewModel.onAction(action)
-                }
-            },
-            onNavigate = { route -> navigateTo(route) },
+    companion object {
+        private val PROTO = Regex(
+            "^(vless|vmess|trojan|ss|hysteria2?|hy2|tuic|socks|wireguard)://",
+            RegexOption.IGNORE_CASE
         )
     }
 
-    private fun shareToClipboard(guid: String): Boolean =
-        AngConfigManager.share2Clipboard(this, guid) == 0
+    private lateinit var webView: WebView
+    private var pendingGuid: String? = null
+    private var pendingWebPermission: PermissionRequest? = null
+    private var lastCopiedLink: String? = null
 
-    private fun shareFullContentAsync(guid: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
-            withContext(Dispatchers.Main) {
-                if (result == 0) toastSuccess(R.string.toast_success)
-                else toastError(R.string.toast_failure)
-            }
-        }
+    // ── نتیجه پنجره اجازه VPN ──
+    private val vpnLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val guid = pendingGuid
+        pendingGuid = null
+        if (result.resultCode == RESULT_OK && guid != null) doStartCore(guid)
+        else pushState("disconnected")
     }
 
-    private fun navigateTo(destination: MainDestination) {
-        val intent = when (destination) {
-            MainDestination.Subscriptions -> Intent(this, SubSettingActivity::class.java)
-            MainDestination.PerAppProxy -> Intent(this, PerAppProxyActivity::class.java)
-            MainDestination.Routing -> Intent(this, RoutingSettingActivity::class.java)
-            MainDestination.UserAssets -> Intent(this, UserAssetActivity::class.java)
-            MainDestination.Settings -> Intent(this, SettingsActivity::class.java)
-            MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
-            MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
-            MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
-            MainDestination.About -> Intent(this, AboutActivity::class.java)
-            MainDestination.Promotion -> {
-                Utils.openUri(
-                    this,
-                    "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}"
-                )
-                return
-            }
-        }
-        settingsActivityLauncher.launch(intent)
+    // ── نتیجه اجازه دوربین (اسکن QR داخل WebView) ──
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val request = pendingWebPermission
+        pendingWebPermission = null
+        if (granted && request != null) request.grant(request.resources)
+        else request?.deny()
     }
 
-    private fun handleFabAction() {
-        if (mainViewModel.uiState.value.isRunning) {
-            LauncherManager.stopService(this)
-        } else {
-            requestServiceStart()
-        }
-    }
+    // ═══════════════════ Lifecycle ═══════════════════
 
-    private fun requestServiceStart() {
-        if (!SettingsManager.isVpnMode()) {
-            startV2Ray()
-            return
-        }
-        val intent = VpnService.prepare(this)
-        if (intent == null) startV2Ray() else requestVpnPermission.launch(intent)
-    }
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    private fun handleLayoutTestClick() {
-        if (mainViewModel.uiState.value.isRunning) {
-            mainViewModel.testCurrentServerRealPing()
-        }
-    }
+        webView = WebView(this)
+        webView.setBackgroundColor(0xFF0A0F0D.toInt())
+        setContentView(webView)
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
 
-    private fun startV2Ray() {
-        if (mainViewModel.uiState.value.selectedGuid.isNullOrEmpty()) {
-            toast(R.string.title_file_chooser)
-            return
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            databaseEnabled = true
+            allowFileAccess = true
+            @Suppress("DEPRECATION")
+            allowUniversalAccessFromFileURLs = true
+            mediaPlaybackRequiresUserGesture = false
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN
-        ) {
-            checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
-        }
-        LauncherManager.startService(this)
-    }
 
-    private fun importManually(createConfigType: Int) {
-        val intent = when (createConfigType) {
-            EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
-            EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)
-            EConfigType.VMESS.value -> Intent(this, ServerVmessActivity::class.java)
-            EConfigType.VLESS.value -> Intent(this, ServerVlessActivity::class.java)
-            EConfigType.SHADOWSOCKS.value -> Intent(this, ServerShadowsocksActivity::class.java)
-            EConfigType.SOCKS.value -> Intent(this, ServerSocksActivity::class.java)
-            EConfigType.HTTP.value -> Intent(this, ServerHttpActivity::class.java)
-            EConfigType.TROJAN.value -> Intent(this, ServerTrojanActivity::class.java)
-            EConfigType.WIREGUARD.value -> Intent(this, ServerWireguardActivity::class.java)
-            EConfigType.HYSTERIA2.value -> Intent(this, ServerHysteria2Activity::class.java)
-            else -> Intent(this, ServerHttpActivity::class.java).apply {
-                putExtra("createConfigType", createConfigType)
-            }
-        }.apply {
-            putExtra("subscriptionId", mainViewModel.uiState.value.selectedGroupId)
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) = injectShim()
         }
-        profileEditorLauncher.launch(intent)
-    }
 
-    private fun importQRcode() {
-        launchQRCodeScanner { scanResult ->
-            if (scanResult != null) {
-                mainViewModel.onAction(MainAction.ImportBatchConfig(scanResult))
-            }
-        }
-    }
-
-    private fun importClipboard() {
-        try {
-            val text = Utils.getClipboard(this)
-            mainViewModel.onAction(MainAction.ImportBatchConfig(text))
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to import config from clipboard", e)
-        }
-    }
-
-    private fun importConfigLocal() {
-        launchFileChooser { uri ->
-            if (uri == null) return@launchFileChooser
-            try {
-                contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
-                    mainViewModel.onAction(MainAction.ImportBatchConfig(reader.readText()))
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onPermissionRequest(request: PermissionRequest) {
+                runOnUiThread {
+                    if (request.resources.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+                        val cam = android.Manifest.permission.CAMERA
+                        if (ContextCompat.checkSelfPermission(this@MainActivity, cam)
+                            == PackageManager.PERMISSION_GRANTED
+                        ) request.grant(request.resources)
+                        else {
+                            pendingWebPermission = request
+                            cameraLauncher.launch(cam)
+                        }
+                    } else request.grant(request.resources)
                 }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to read content from URI", e)
             }
         }
+
+        webView.addJavascriptInterface(Bridge(), "Android")
+        webView.loadUrl("file:///android_asset/index.html")
+
+        handleLinkIntent(intent)
     }
 
-    private fun editServer(guid: String, profile: ProfileItem) {
-        val activityClass = when (profile.configType) {
-            EConfigType.CUSTOM -> ServerCustomConfigActivity::class.java
-            EConfigType.POLICYGROUP -> ServerGroupActivity::class.java
-            EConfigType.PROXYCHAIN -> ServerProxyChainActivity::class.java
-            EConfigType.VMESS -> ServerVmessActivity::class.java
-            EConfigType.VLESS -> ServerVlessActivity::class.java
-            EConfigType.SHADOWSOCKS -> ServerShadowsocksActivity::class.java
-            EConfigType.SOCKS -> ServerSocksActivity::class.java
-            EConfigType.HTTP -> ServerHttpActivity::class.java
-            EConfigType.TROJAN -> ServerTrojanActivity::class.java
-            EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
-            EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
-            else -> ServerHttpActivity::class.java
-        }
-        val intent = Intent(this, activityClass).apply {
-            putExtra("guid", guid)
-            putExtra("isRunning", mainViewModel.uiState.value.isRunning)
-            putExtra("createConfigType", profile.configType.value)
-            putExtra("subscriptionId", mainViewModel.uiState.value.selectedGroupId)
-        }
-        profileEditorLauncher.launch(intent)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleLinkIntent(intent)
     }
 
-    private fun setSelectServer(guid: String) {
-        val selected = mainViewModel.uiState.value.selectedGuid
-        if (guid != selected) {
-            mainViewModel.updateSelectedGuid(guid)
-            LauncherManager.restartService(this)
+    override fun onResume() {
+        super.onResume()
+        pushState(if (isVpnRunning()) "connected" else "disconnected")
+    }
+
+    private fun handleLinkIntent(intent: Intent?) {
+        val link = intent?.dataString?.trim() ?: return
+        if (PROTO.containsMatchIn(link)) {
+            lastCopiedLink = link
+            toast("کانفیگ دریافت شد — دکمه اتصال را بزن")
         }
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
-            moveTaskToBack(false)
-            return true
+    // ═══════════════════ پل JavaScript ↔ اندروید ═══════════════════
+
+    inner class Bridge {
+
+        /** اتصال: آخرین لینک کپی‌شده یا کانفیگ انتخابی موتور */
+        @JavascriptInterface
+        fun connect() = connectFlow(null)
+
+        /** اتصال با لینک مشخص */
+        @JavascriptInterface
+        fun connectLink(link: String) = connectFlow(link)
+
+        /** قطع اتصال */
+        @JavascriptInterface
+        fun disconnect() {
+            try {
+                V2RayServiceManager.stopVService()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+            }
+            pushState("disconnected")
         }
-        return super.onKeyDown(keyCode, event)
+
+        /** آیا VPN در حال اجراست؟ */
+        @JavascriptInterface
+        fun isConnected(): Boolean = isVpnRunning()
+
+        /** هر لینکی که داخل HTML کپی شود از اینجا می‌آید */
+        @JavascriptInterface
+        fun onCopied(text: String) {
+            val t = text.trim()
+            if (PROTO.containsMatchIn(t)) lastCopiedLink = t
+        }
+
+        @JavascriptInterface
+        fun toast(msg: String) = runOnUiThread {
+            Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
+        }
     }
+
+    // ═══════════════════ منطق اتصال ═══════════════════
+
+    private fun connectFlow(explicit: String?) {
+        val link = explicit?.trim()?.takeIf { PROTO.containsMatchIn(it) }
+            ?: lastCopiedLink?.takeIf { PROTO.containsMatchIn(it) }
+            ?: readClipboard()?.trim()?.takeIf { PROTO.containsMatchIn(it) }
+
+        if (link != null && importAndStart(link)) return
+
+        // fallback: کانفیگ‌های موجود در موتور
+        val guids = try {
+            MmkvManager.decodeServerList()
+        } catch (t: Throwable) {
+            mutableListOf()
+        }
+        if (guids.isEmpty()) {
+            pushState("disconnected")
+            toast("اول یک کانفیگ اضافه کن یا یک لینک کپی کن")
+            return
+        }
+        val selected = try { MmkvManager.getSelectServer() } catch (t: Throwable) { "" }
+        val guid = if (!selected.isNullOrEmpty() && guids.contains(selected)) selected else guids.first()
+        startWithPermission(guid)
+    }
+
+    /** ایمپورت لینک(ها) و اتصال به کانفیگ تازه */
+    private fun importAndStart(links: String): Boolean {
+        return try {
+            val (ok, _) = AngConfigManager.importBatchConfig(links, "", true)
+            if (ok <= 0) return false
+            val guid = try {
+                MmkvManager.decodeServerList().lastOrNull()
+            } catch (t: Throwable) {
+                null
+            }
+            if (guid.isNullOrEmpty()) return false
+            startWithPermission(guid)
+            true
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            false
+        }
+    }
+
+    private fun startWithPermission(guid: String) {
+        try {
+            MmkvManager.setSelectServer(guid)
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
+        pushState("connecting")
+        try {
+            val prepare = VpnService.prepare(this)
+            if (prepare == null) doStartCore(guid)
+            else {
+                pendingGuid = guid
+                vpnLauncher.launch(prepare)
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            pushState("error")
+        }
+    }
+
+    private fun doStartCore(guid: String) {
+        try {
+            // اگر این خط خطا داد، جایگزین: V2RayServiceManager.startV2Ray(this)
+            V2RayServiceManager.startVService(this, guid)
+            pushState("connecting")
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            pushState("error")
+        }
+    }
+
+    private fun isVpnRunning(): Boolean = try {
+        V2RayServiceManager.v2rayPoint.isRunning
+    } catch (t: Throwable) {
+        false
+    }
+
+    // اگر تابع بالا خطای کامپایل داد، آن را پاک کن و این را فعال کن:
+    // private fun isVpnRunning(): Boolean = try {
+    //     java.io.File("/proc/net/dev").readLines().any { it.trimStart().startsWith("tun") }
+    // } catch (t: Throwable) { false }
+
+    private fun readClipboard(): String? = try {
+        (getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)
+            ?.primaryClip?.getItemAt(0)?.text?.toString()
+    } catch (t: Throwable) {
+        null
+    }
+
+    // ═══════════════════ ارسال وضعیت به صفحه ═══════════════════
+
+    private fun pushState(state: String) {
+        runOnUiThread {
+            if (::webView.isInitialized)
+                webView.evaluateJavascript(
+                    "window.__setVpnState && window.__setVpnState('$state')", null
+                )
+        }
+    }
+
+    private fun injectShim() {
+        webView.evaluateJavascript(SHIM_JS, null)
+        pushState(if (isVpnRunning()) "connected" else "disconnected")
+    }
+
+    // ═══════════════════ اسکریپت پل (تزریق خودکار — HTML دست‌نخورده می‌ماند) ═══════════════════
+
+    private val SHIM_JS = """
+        (function () {
+          if (window.__gozarBridge) return;
+          window.__gozarBridge = true;
+
+          var cur = '';
+          var connectAt = 0;
+
+          var SVG = {
+            play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>',
+            stop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+            load: '<svg class="spinning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+            power: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg>'
+          };
+
+          var HINTS = {
+            disconnected: 'برای اتصال، حلقه یا دکمه پایین صفحه را لمس کن',
+            connecting: 'در حال برقراری اتصال…',
+            connected: 'اتصال برقرار است — تمام ترافیک از تونل عبور می‌کند',
+            error: 'اتصال ناموفق بود — کانفیگ فعال را بررسی کن'
+          };
+
+          function coreHtml(state) {
+            var icon = state === 'connected' ? SVG.power : (state === 'connecting' ? SVG.load : SVG.play);
+            var word = state === 'connected' ? 'وصل است' : (state === 'connecting' ? 'در حال اتصال' : (state === 'error' ? 'خطا' : 'اتصال'));
+            var sub = state === 'connected' ? 'VPN فعال است' : 'برای اتصال لمس کن';
+            return icon + '<span class="word">' + word + '</span><small>' + sub + '</small>';
+          }
+
+          window.__setVpnState = function (state) {
+            cur = state;
+            if (state === 'connecting') connectAt = Date.now();
+
+            var ring = document.getElementById('ring');
+            if (ring) {
+              ring.classList.remove('on', 'busy', 'err');
+              if (state === 'connected') ring.classList.add('on');
+              else if (state === 'connecting') ring.classList.add('busy');
+              else if (state === 'error') ring.classList.add('err');
+              var core = document.getElementById('ringCore');
+              if (core) core.innerHTML = coreHtml(state);
+            }
+
+            var fab = document.getElementById('fab');
+            if (fab) {
+              fab.classList.remove('on', 'busy');
+              if (state === 'connected') fab.classList.add('on');
+              else if (state === 'connecting') fab.classList.add('busy');
+              fab.innerHTML = state === 'connected' ? SVG.stop : (state === 'connecting' ? SVG.load : SVG.play);
+            }
+
+            var chip = document.getElementById('statusChip');
+            if (chip) {
+              chip.classList.remove('on', 'busy', 'err');
+              if (state === 'connected') chip.classList.add('on');
+              else if (state === 'connecting') chip.classList.add('busy');
+              else if (state === 'error') chip.classList.add('err');
+              var st = document.getElementById('statusTxt');
+              if (st) st.textContent = state === 'connected' ? 'متصل' : (state === 'connecting' ? 'در حال اتصال' : (state === 'error' ? 'خطا' : 'قطع'));
+            }
+
+            var hint = document.getElementById('hintTxt');
+            if (hint) hint.textContent = HINTS[state] || '';
+          };
+
+          document.addEventListener('click', function (e) {
+            var t = e.target;
+            var el = t && t.closest ? t.closest('[data-conn], #shConnect2') : null;
+            if (!el) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            try {
+              if (Android.isConnected()) { Android.disconnect(); return; }
+              if (el.id === 'shConnect2') {
+                var m = document.getElementById('shMeta');
+                Android.connectLink(m ? (m.textContent || '') : '');
+              } else {
+                Android.connect();
+              }
+            } catch (err) { }
+          }, true);
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            var orig = navigator.clipboard.writeText.bind(navigator.clipboard);
+            navigator.clipboard.writeText = function (txt) {
+              try { Android.onCopied(String(txt)); } catch (e) { }
+              return orig(txt);
+            };
+          }
+
+          function poll() {
+            var running = false;
+            try { running = Android.isConnected(); } catch (e) { }
+            if (running && cur !== 'connected') { window.__setVpnState('connected'); return; }
+            if (!running && cur === 'connected') { window.__setVpnState('disconnected'); return; }
+            if (!running && cur === 'connecting' && Date.now() - connectAt > 15000) { window.__setVpnState('error'); return; }
+            if (!running && (cur === '' || cur === 'error')) window.__setVpnState('disconnected');
+          }
+          setInterval(poll, 1500);
+          setTimeout(poll, 400);
+        })();
+    """.trimIndent()
 }
