@@ -24,11 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.FormDropdownField
 
 class ServerAetherActivity : BaseComponentActivity() {
     private val viewModel: AetherEditorViewModel by viewModels()
@@ -42,7 +44,7 @@ class ServerAetherActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         val state by viewModel.state.collectAsStateWithLifecycle()
         val settings = state.settings
-        val editable = !state.loading && !state.saving
+        val editable = state.editable
         LaunchedEffect(state.savedGuid) {
             state.savedGuid?.let { with(ProfileEditorResult) { finishSaved(it, restartService = false) } }
         }
@@ -56,21 +58,21 @@ class ServerAetherActivity : BaseComponentActivity() {
                 Text(stringResource(R.string.aether_apply_notice), modifier = Modifier.padding(horizontal = 16.dp))
                 if (state.loading) Text(stringResource(R.string.aether_loading), modifier = Modifier.padding(16.dp))
                 FormTextField(stringResource(R.string.server_lab_remarks), state.remarks, viewModel::changeRemarks, enabled = editable)
-                FormTextField(stringResource(R.string.aether_protocol), settings.protocol, { value -> viewModel.changeSettings { current -> current.copy(protocol = value) } }, enabled = editable, supportingText = stringResource(R.string.aether_protocol_values))
-                FormTextField(stringResource(R.string.aether_carrier), settings.carrier, { value -> viewModel.changeSettings { current -> current.copy(carrier = value) } }, enabled = editable, supportingText = stringResource(R.string.aether_carrier_values))
-                FormTextField(stringResource(R.string.aether_scan), settings.scanMode, { value -> viewModel.changeSettings { current -> current.copy(scanMode = value) } }, enabled = editable, supportingText = stringResource(R.string.aether_scan_values))
-                FormTextField(stringResource(R.string.aether_ip), settings.ipVersion, { value -> viewModel.changeSettings { current -> current.copy(ipVersion = value) } }, enabled = editable, supportingText = stringResource(R.string.aether_ip_values))
-                FormTextField(stringResource(R.string.aether_noise), settings.noise, { value -> viewModel.changeSettings { current -> current.copy(noise = value) } }, enabled = editable, supportingText = stringResource(R.string.aether_noise_values))
+                FormDropdownField(stringResource(R.string.aether_protocol), settings.protocol, stringArrayResource(R.array.aether_protocol_options).toList(), { value -> viewModel.changeSettings { current -> current.copy(protocol = value) } }, enabled = editable)
+                FormDropdownField(stringResource(R.string.aether_carrier), settings.carrier, stringArrayResource(R.array.aether_carrier_options).toList(), { value -> viewModel.changeSettings { current -> current.copy(carrier = value) } }, enabled = state.masqueEnabled)
+                FormDropdownField(stringResource(R.string.aether_scan), settings.scanMode, stringArrayResource(R.array.aether_scan_options).toList(), { value -> viewModel.changeSettings { current -> current.copy(scanMode = value) } }, enabled = editable)
+                FormDropdownField(stringResource(R.string.aether_ip), settings.ipVersion, stringArrayResource(R.array.aether_ip_options).toList(), { value -> viewModel.changeSettings { current -> current.copy(ipVersion = value) } }, enabled = editable)
+                FormDropdownField(stringResource(R.string.aether_noise), settings.noise, stringArrayResource(R.array.aether_noise_options).toList(), { value -> viewModel.changeSettings { current -> current.copy(noise = value) } }, enabled = editable)
                 FormTextField(stringResource(R.string.aether_endpoint), settings.endpoint, { value -> viewModel.changeSettings { current -> current.copy(endpoint = value) } }, enabled = editable)
                 FormTextField(stringResource(R.string.aether_dns), settings.dns, { value -> viewModel.changeSettings { current -> current.copy(dns = value) } }, enabled = editable)
-                Row(modifier = Modifier.fillMaxWidth().toggleable(settings.fragment, enabled = editable, role = Role.Switch,
+                Row(modifier = Modifier.fillMaxWidth().toggleable(settings.fragment, enabled = state.fragmentationEnabled, role = Role.Switch,
                     onValueChange = { value -> viewModel.changeSettings { current -> current.copy(fragment = value) } }).padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(stringResource(R.string.aether_fragment))
-                    Switch(checked = settings.fragment, onCheckedChange = null)
+                    Switch(checked = settings.fragment, onCheckedChange = null, enabled = state.fragmentationEnabled)
                 }
-                FormTextField(stringResource(R.string.aether_fragment_size), settings.fragmentSize, { value -> viewModel.changeSettings { current -> current.copy(fragmentSize = value) } }, enabled = editable)
-                FormTextField(stringResource(R.string.aether_fragment_delay), settings.fragmentDelay, { value -> viewModel.changeSettings { current -> current.copy(fragmentDelay = value) } }, enabled = editable)
+                FormTextField(stringResource(R.string.aether_fragment_size), settings.fragmentSize, { value -> viewModel.changeSettings { current -> current.copy(fragmentSize = value) } }, enabled = state.fragmentRangeEnabled)
+                FormTextField(stringResource(R.string.aether_fragment_delay), settings.fragmentDelay, { value -> viewModel.changeSettings { current -> current.copy(fragmentDelay = value) } }, enabled = state.fragmentRangeEnabled)
                 FormTextField(stringResource(R.string.aether_socks_port), settings.socksPort, { value -> viewModel.changeSettings { current -> current.copy(socksPort = value) } }, enabled = editable)
                 state.errorRes?.let { Text(stringResource(it), modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error) }
                 Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {

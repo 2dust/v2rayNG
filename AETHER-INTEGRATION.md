@@ -6,6 +6,12 @@ HTTP carrier, scan mode, IP family, noise, peer endpoint, DNS, fragmentation and
 SOCKS port. Profiles use a separate persisted protocol ID; existing IDs remain unchanged.
 Shared `aether://` links contain settings and a name, not the native WARP identity.
 
+Protocol, MASQUE transport, scan mode, IP family and noise use selection lists.
+WireGuard disables the MASQUE transport and HTTP/2 fragmentation controls while retaining
+their saved values for switching back. HTTP/3 disables fragmentation; turning fragmentation
+off disables its size and delay fields. Endpoint, DNS, numeric ranges, port and name remain
+editable text because they accept custom values.
+
 ## Native source and packaging
 
 Pinned release: [CluvexStudio/Aether v2.3.0](https://github.com/CluvexStudio/Aether/releases/tag/v2.3.0).
@@ -37,6 +43,9 @@ Stop cancelling a pending restart. Extracted editor callbacks also compiled and 
 their respective field changes. These standalone checks use small stubs for unrelated
 app constants and address formatting; they are not an Android project build.
 PowerShell/Bash syntax, manifest/resource XML and pinned metadata checks passed locally.
+Standalone checks of the editor state's protocol-dependent controls passed: loading/saving,
+WireGuard selection, switching back without losing values, HTTP/3, and fragmentation off.
+All selection arrays in both resource trees match the supported core option values.
 
 The first manually dispatched Actions build reached Kotlin compilation and reported
 four errors: root `app/` overrides replaced the new restart contract and notification
@@ -45,7 +54,8 @@ and canonical files are now synchronized and both batch writers import `EConfigT
 A standalone compiler check of the effective override contract and notification enum
 passed with minimal Android type stubs. This does not establish a successful APK build.
 
-**Not run:** the new AetherSettingsTest, AetherLifecycleTest, AetherFmtTest, AetherProfileRollbackTest and
+**Not run:** the new AetherSettingsTest, AetherLifecycleTest, AetherFmtTest, AetherProfileRollbackTest,
+AetherEditorStateTest and
 AetherEditorViewModelTest JUnit classes; `:app:testDebugUnitTest`,
 `:app:compileDebugKotlin`, `:app:assembleRelease` and `:app:lintDebug` on the staged
 fork project. The canonical project equivalents are `:app:testPlaystoreDebugUnitTest`,

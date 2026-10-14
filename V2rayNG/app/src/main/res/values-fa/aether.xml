@@ -29,5 +29,33 @@
     <string name="aether_root_unsupported">Aether از حالت VPN و فقط پروکسی پشتیبانی می‌کند. برای این پروفایل از حالت روت خارج شوید.</string>
     <string name="aether_standalone_only">Aether باید پروفایل مستقل باشد؛ مقصد مسیریابی یا عضو زنجیره نباشد.</string>
     <string name="aether_apply_notice">تنظیمات ذخیره‌شده در اتصال بعدی اعمال می‌شوند. قطع و دوباره متصل شوید.</string>
+    <string-array name="aether_protocol_options" translatable="false">
+        <item>masque</item>
+        <item>wg</item>
+    </string-array>
+    <string-array name="aether_carrier_options" translatable="false">
+        <item>h2</item>
+        <item>h3</item>
+    </string-array>
+    <string-array name="aether_scan_options" translatable="false">
+        <item>turbo</item>
+        <item>balanced</item>
+        <item>thorough</item>
+        <item>verified</item>
+        <item>ironclad</item>
+    </string-array>
+    <string-array name="aether_ip_options" translatable="false">
+        <item>v4</item>
+        <item>v6</item>
+        <item>both</item>
+    </string-array>
+    <string-array name="aether_noise_options" translatable="false">
+        <item>off</item>
+        <item>light</item>
+        <item>firewall</item>
+        <item>balanced</item>
+        <item>gfw</item>
+        <item>aggressive</item>
+    </string-array>
 </resources>
 

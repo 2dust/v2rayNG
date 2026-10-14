@@ -27,7 +27,12 @@ data class AetherEditorState(
     val saving: Boolean = false,
     val errorRes: Int? = null,
     val savedGuid: String? = null,
-)
+) {
+    val editable: Boolean get() = !loading && !saving
+    val masqueEnabled: Boolean get() = editable && settings.protocol == "masque"
+    val fragmentationEnabled: Boolean get() = masqueEnabled && settings.carrier == "h2"
+    val fragmentRangeEnabled: Boolean get() = fragmentationEnabled && settings.fragment
+}
 
 class AetherEditorViewModel @JvmOverloads constructor(
     application: Application,
