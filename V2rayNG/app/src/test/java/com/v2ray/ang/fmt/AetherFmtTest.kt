@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
+import kotlin.io.encoding.Base64
 
 class AetherFmtTest {
     @Test
@@ -39,5 +40,14 @@ class AetherFmtTest {
         assertNull(profile.aetherSettings)
         assertEquals(5, EConfigType.VLESS.value)
         assertEquals(11, EConfigType.AETHER.value)
+    }
+
+    @Test
+    fun precedingAetherLinksRetainTheLegacyPortWithoutUsingItForStartup() {
+        val precedingJson = """{"version":1,"remarks":"old Aether","settings":{"protocol":"masque","carrier":"h2","scanMode":"balanced","ipVersion":"v4","noise":"firewall","endpoint":"","dns":"1.1.1.1,1.0.0.1","fragment":true,"fragmentSize":"16-32","fragmentDelay":"2-10","socksPort":"10808"}}"""
+        val restored = AetherFmt.parse(EConfigType.AETHER.protocolScheme + Base64.UrlSafe.encode(precedingJson.toByteArray()))
+        assertEquals("10808", restored?.aetherSettings?.socksPort)
+        val arguments = restored!!.aetherSettings!!.arguments("identity.toml", 45123)
+        assertEquals("127.0.0.1:45123", arguments[arguments.indexOf("--bind") + 1])
     }
 }

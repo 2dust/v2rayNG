@@ -13,6 +13,11 @@ internal class AetherLifecycle {
         !stopping && !setupActive && !ownsCore
 
     @Synchronized
+    fun readyPort(requestedGuid: String, ownedGuid: String, childAlive: Boolean, port: Int?): Int? =
+        if (!stopping && ownedGuid.isNotBlank() && requestedGuid == ownedGuid && childAlive &&
+            port != null && port in 1024..65535) port else null
+
+    @Synchronized
     fun beginStop(): Boolean {
         restartPending = false
         if (stopping) return false

@@ -28,8 +28,16 @@ object CoreConfigContextBuilder {
      *
      * Null is returned only when the selected profile cannot be loaded.
      */
-    fun build(context: Context, guid: String): CoreConfigContext? {
-        val config = MmkvManager.decodeServerConfig(guid) ?: return null
+    fun build(context: Context, guid: String, aetherProxyPort: Int? = null): CoreConfigContext? {
+        val stored = MmkvManager.decodeServerConfig(guid) ?: return null
+        val config = if (stored.configType == EConfigType.AETHER) {
+            val port = aetherProxyPort
+                ?: error(context.getString(com.v2ray.ang.R.string.aether_start_error))
+            stored.copy(
+                server = "127.0.0.1", serverPort = port.toString(),
+                aetherSettings = (stored.aetherSettings ?: com.v2ray.ang.dto.entities.AetherSettings()).copy(socksPort = port.toString()),
+            )
+        } else stored
 
         // CUSTOM: return immediately — CoreConfigManager handles this path on its own.
         if (config.configType == EConfigType.CUSTOM) {

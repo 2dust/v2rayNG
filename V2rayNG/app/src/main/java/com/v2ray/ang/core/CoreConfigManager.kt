@@ -31,9 +31,9 @@ object CoreConfigManager {
     /**
      * Build the runtime configuration for normal startup.
      */
-    fun getV2rayConfig(context: Context, guid: String): ConfigResult {
+    fun getV2rayConfig(context: Context, guid: String, aetherProxyPort: Int? = null): ConfigResult {
         try {
-            val configContext = CoreConfigContextBuilder.build(context, guid)
+            val configContext = CoreConfigContextBuilder.build(context, guid, aetherProxyPort)
                 ?: return ConfigResult(
                     status = false,
                     guid = guid,

@@ -2,15 +2,28 @@
 
 The local source adds **aether** to the add-protocol menu and opens a dedicated settings
 editor when an Aether profile is edited. Editable settings include MASQUE/WireGuard,
-HTTP carrier, scan mode, IP family, noise, peer endpoint, DNS, fragmentation and local
-SOCKS port. Profiles use a separate persisted protocol ID; existing IDs remain unchanged.
+HTTP carrier, scan mode, IP family, noise, peer endpoint, DNS and fragmentation.
+Profiles use a separate persisted protocol ID; existing IDs remain unchanged.
 Shared `aether://` links contain settings and a name, not the native WARP identity.
 
 Protocol, MASQUE transport, scan mode, IP family and noise use selection lists.
 WireGuard disables the MASQUE transport and HTTP/2 fragmentation controls while retaining
 their saved values for switching back. HTTP/3 disables fragmentation; turning fragmentation
-off disables its size and delay fields. Endpoint, DNS, numeric ranges, port and name remain
+off disables its size and delay fields. Endpoint, DNS, numeric ranges and name remain
 editable text because they accept custom values.
+
+The Aether port field has been removed. behradNG continues to use its normal app proxy
+port and routing settings. The daemon automatically chooses a separate internal loopback
+port for Aether, excluding the app SOCKS and HTTP ports, and supplies it to Xray only for
+the owned profile GUID. Two different listeners cannot bind the same address and port.
+Existing `socksPort` profile/link fields are retained for compatibility and ignored for
+native startup; there is no separate user-configured Aether listener port.
+
+Startup now starts the routing listener before the HEV tunnel and retains the HEV owner
+before setup so failed setup can stop it. Native exit and readiness timeout errors include
+a non-secret startup phase and exit code when available; VPN permission, interface,
+HEV and routing failures have separate messages. Raw native output is never logged or
+persisted. The screenshot's generic popup does not establish which failure occurred.
 
 ## Native source and packaging
 
@@ -54,7 +67,14 @@ and canonical files are now synchronized and both batch writers import `EConfigT
 A standalone compiler check of the effective override contract and notification enum
 passed with minimal Android type stubs. This does not establish a successful APK build.
 
-**Not run:** the new AetherSettingsTest, AetherLifecycleTest, AetherFmtTest, AetherProfileRollbackTest,
+For the port/startup update, the actual service and session sources compiled against
+minimal platform and dependency stubs. Standalone checks passed for ignored legacy ports,
+runtime port bounds, GUID-owned ready ports, phase-only native diagnostics, and reading
+a literal preceding-version Aether link. Native readiness also requires the owned child's
+listener announcement plus its SOCKS handshake. These checks do not run Android or prove
+that Cloudflare registration and the tunnel work on the reported Android 16 phone.
+
+**Not run:** the new AetherSettingsTest, AetherLifecycleTest, AetherStartupTest, AetherFmtTest, AetherProfileRollbackTest,
 AetherEditorStateTest and
 AetherEditorViewModelTest JUnit classes; `:app:testDebugUnitTest`,
 `:app:compileDebugKotlin`, `:app:assembleRelease` and `:app:lintDebug` on the staged

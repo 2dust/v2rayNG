@@ -73,7 +73,6 @@ class ServerAetherActivity : BaseComponentActivity() {
                 }
                 FormTextField(stringResource(R.string.aether_fragment_size), settings.fragmentSize, { value -> viewModel.changeSettings { current -> current.copy(fragmentSize = value) } }, enabled = state.fragmentRangeEnabled)
                 FormTextField(stringResource(R.string.aether_fragment_delay), settings.fragmentDelay, { value -> viewModel.changeSettings { current -> current.copy(fragmentDelay = value) } }, enabled = state.fragmentRangeEnabled)
-                FormTextField(stringResource(R.string.aether_socks_port), settings.socksPort, { value -> viewModel.changeSettings { current -> current.copy(socksPort = value) } }, enabled = editable)
                 state.errorRes?.let { Text(stringResource(it), modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error) }
                 Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     TextButton(onClick = { finish() }) { Text(stringResource(R.string.aether_cancel)) }

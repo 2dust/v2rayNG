@@ -18,6 +18,9 @@ interface ServiceControl {
     /** Returns true when this service owns an asynchronous, ordered restart. */
     fun restartOwnedService(): Boolean = false
 
+    /** Returns the ready Aether child's internal port only for the service-owned profile GUID. */
+    fun aetherProxyPort(guid: String): Int? = null
+
     /**
      * Stops the service.
      */

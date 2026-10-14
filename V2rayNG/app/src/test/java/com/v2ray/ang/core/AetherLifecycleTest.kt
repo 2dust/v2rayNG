@@ -3,9 +3,23 @@ package com.v2ray.ang.core
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class AetherLifecycleTest {
+    @Test
+    fun runtimePortBelongsOnlyToTheReadyServiceProfile() {
+        val lifecycle = AetherLifecycle()
+        assertEquals(45123, lifecycle.readyPort("owned-guid", "owned-guid", true, 45123))
+        assertNull(lifecycle.readyPort("other-guid", "owned-guid", true, 45123))
+        assertNull(lifecycle.readyPort("owned-guid", "owned-guid", false, 45123))
+        assertNull(lifecycle.readyPort("owned-guid", "owned-guid", true, null))
+        assertNull(lifecycle.readyPort("", "", true, 45123))
+        assertNull(lifecycle.readyPort("owned-guid", "owned-guid", true, 80))
+        lifecycle.beginStop()
+        assertNull(lifecycle.readyPort("owned-guid", "owned-guid", true, 45123))
+    }
+
     @Test
     fun coldStartRejectsEquivalentSetupAndRunningStarts() {
         val lifecycle = AetherLifecycle()

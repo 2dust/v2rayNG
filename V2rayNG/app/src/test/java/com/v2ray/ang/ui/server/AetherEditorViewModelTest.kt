@@ -73,7 +73,7 @@ class AetherEditorViewModelTest {
         viewModel.save()
         assertEquals(R.string.aether_invalid_settings, viewModel.state.value.errorRes)
         viewModel.changeRemarks("new")
-        viewModel.changeSettings { it.copy(socksPort = "bad") }
+        viewModel.changeSettings { it.copy(carrier = "bad") }
         viewModel.save()
         assertEquals(R.string.aether_invalid_settings, viewModel.state.value.errorRes)
         assertEquals(0, saves)

@@ -11,7 +11,7 @@ class AetherSettingsTest {
     fun defaultsProduceAnUnattendedLoopbackOnlyCommand() {
         val settings = AetherSettings()
         assertTrue(settings.isValid())
-        val arguments = settings.arguments("/private/identity.toml")
+        val arguments = settings.arguments("/private/identity.toml", 1819)
         assertEquals("127.0.0.1:1819", arguments[arguments.indexOf("--bind") + 1])
         assertEquals("/private/identity.toml", arguments[arguments.indexOf("--config") + 1])
         assertTrue("--h2" in arguments)
@@ -23,7 +23,7 @@ class AetherSettingsTest {
     fun explicitSettingsRemainDistinctArgumentsWithoutShellInterpretation() {
         val settings = AetherSettings(protocol = "wg", carrier = "h3", endpoint = "[2606:4700::1]:2408", fragment = false)
         assertTrue(settings.isValid())
-        val arguments = settings.arguments("/private/a profile/identity.toml")
+        val arguments = settings.arguments("/private/a profile/identity.toml", 45123)
         assertTrue("--h3" in arguments && "--no-fragment" in arguments)
         assertEquals(settings.endpoint, arguments[arguments.indexOf("--peer") + 1])
         assertEquals("/private/a profile/identity.toml", arguments.last { it.endsWith("identity.toml") })
@@ -35,7 +35,6 @@ class AetherSettingsTest {
         listOf(
             base.copy(protocol = ""), base.copy(protocol = "unknown"), base.copy(carrier = "udp"),
             base.copy(scanMode = ""), base.copy(ipVersion = "unknown"), base.copy(noise = "unknown"),
-            base.copy(socksPort = ""), base.copy(socksPort = "80"), base.copy(socksPort = "65536"),
             base.copy(endpoint = "host.invalid:443"), base.copy(endpoint = "999.1.1.1:443"),
             base.copy(endpoint = "1.1.1.1:0"), base.copy(endpoint = "1.1.1.1:443/path"),
             base.copy(dns = ""), base.copy(dns = "1.1.1.1,"), base.copy(dns = "999.1.1.1"),
@@ -50,8 +49,8 @@ class AetherSettingsTest {
         listOf("turbo", "balanced", "thorough", "verified", "ironclad").forEach { assertTrue(base.copy(scanMode = it).isValid()) }
         listOf("v4", "v6", "both").forEach { assertTrue(base.copy(ipVersion = it).isValid()) }
         listOf("off", "light", "firewall", "balanced", "gfw", "aggressive").forEach { assertTrue(base.copy(noise = it).isValid()) }
-        assertTrue(base.copy(socksPort = "1024", fragmentSize = "1", fragmentDelay = "0").isValid())
-        assertTrue(base.copy(socksPort = "65535", fragmentSize = "16384", fragmentDelay = "1000").isValid())
+        assertTrue(base.copy(fragmentSize = "1", fragmentDelay = "0").isValid())
+        assertTrue(base.copy(fragmentSize = "16384", fragmentDelay = "1000").isValid())
         assertTrue(base.copy(dns = "1.1.1.1, 2606:4700:4700::1111", endpoint = "1.1.1.1:65535").isValid())
     }
 }

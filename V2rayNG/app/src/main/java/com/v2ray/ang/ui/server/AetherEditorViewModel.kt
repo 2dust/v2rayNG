@@ -109,7 +109,7 @@ class AetherEditorViewModel @JvmOverloads constructor(
                 val savedGuid = withContext(Dispatchers.IO) {
                     val profile = initial.copy(
                         remarks = snapshot.remarks.trim(), server = "127.0.0.1",
-                        serverPort = snapshot.settings.socksPort,
+                        serverPort = AppConfig.PORT_SOCKS,
                         aetherSettings = snapshot.settings,
                     )
                     saveProfile(guid, profile)

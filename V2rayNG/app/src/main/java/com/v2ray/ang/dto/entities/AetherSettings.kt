@@ -14,6 +14,7 @@ data class AetherSettings(
     val fragment: Boolean = true,
     val fragmentSize: String = "16-32",
     val fragmentDelay: String = "2-10",
+    // Retained for existing profile JSON and aether:// links; runtime port selection ignores it.
     val socksPort: String = "1819",
 ) {
     fun isValid(): Boolean =
@@ -22,16 +23,16 @@ data class AetherSettings(
             scanMode in listOf("turbo", "balanced", "thorough", "verified", "ironclad") &&
             ipVersion in listOf("v4", "v6", "both") &&
             noise in listOf("off", "light", "firewall", "balanced", "gfw", "aggressive") &&
-            (socksPort.toIntOrNull()?.let { it in 1024..65535 } == true) &&
             (endpoint.isBlank() || validEndpoint(endpoint)) &&
             dns.split(',').let { it.isNotEmpty() && it.all { ip -> validIp(ip.trim()) } } &&
             validRange(fragmentSize, 1, 16384) && validRange(fragmentDelay, 0, 1000)
 
-    fun arguments(identityPath: String): List<String> {
+    fun arguments(identityPath: String, bindPort: Int): List<String> {
         require(isValid()) { "Invalid Aether settings" }
+        require(bindPort in 1024..65535) { "Invalid runtime proxy port" }
         return buildList {
             addAll(listOf("--protocol", protocol, "--scan", scanMode, "--ip", ipVersion,
-                "--noize", noise, "--dns", dns, "--bind", "127.0.0.1:$socksPort",
+                "--noize", noise, "--dns", dns, "--bind", "127.0.0.1:$bindPort",
                 "--config", identityPath))
             add(if (carrier == "h2") "--h2" else "--h3")
             add(if (fragment) "--fragment" else "--no-fragment")

@@ -136,7 +136,7 @@ object CoreServiceManager {
             }
         }
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for guid=$guid")
-        val result = CoreConfigManager.getV2rayConfig(service, guid)
+        val result = CoreConfigManager.getV2rayConfig(service, guid, serviceControl?.get()?.aetherProxyPort(guid))
         // Generated configuration can contain credentials; never log it.
         if (!result.status) {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })

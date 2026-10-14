@@ -1,6 +1,7 @@
 package com.v2ray.ang.fmt
 
 import com.google.gson.Gson
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.AetherSettings
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -27,7 +28,7 @@ object AetherFmt {
         val shared = gson.fromJson(json, SharedProfile::class.java)
         require(shared.version == 1 && shared.settings.isValid() && shared.remarks.isNotBlank())
         ProfileItem.create(EConfigType.AETHER).copy(
-            remarks = shared.remarks, server = "127.0.0.1", serverPort = shared.settings.socksPort,
+            remarks = shared.remarks, server = "127.0.0.1", serverPort = AppConfig.PORT_SOCKS,
             aetherSettings = shared.settings,
         )
     }.getOrNull()

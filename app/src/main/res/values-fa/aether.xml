@@ -24,7 +24,7 @@
     <string name="aether_load_error">بارگذاری این پروفایل Aether ممکن نشد.</string>
     <string name="aether_save_error">ذخیره این پروفایل Aether ممکن نشد. دوباره تلاش کنید.</string>
     <string name="aether_invalid_settings">نام و مقادیر معتبر برای همه تنظیمات Aether وارد کنید.</string>
-    <string name="aether_start_error">Aether متصل نشد. پروفایل، شبکه و پورت محلی را بررسی و دوباره متصل شوید.</string>
+    <string name="aether_start_error">Aether متصل نشد. تنظیمات پروفایل و شبکه را بررسی کنید و دوباره متصل شوید.</string>
     <string name="aether_unavailable">Aether به هسته بسته‌بندی‌شده، اندروید ۸ یا بالاتر، ARM64/ARMv7/x86_64 و صفحات حافظه 4 KiB نیاز دارد.</string>
     <string name="aether_root_unsupported">Aether از حالت VPN و فقط پروکسی پشتیبانی می‌کند. برای این پروفایل از حالت روت خارج شوید.</string>
     <string name="aether_standalone_only">Aether باید پروفایل مستقل باشد؛ مقصد مسیریابی یا عضو زنجیره نباشد.</string>
@@ -57,5 +57,15 @@
         <item>gfw</item>
         <item>aggressive</item>
     </string-array>
+    <string name="aether_permission_error">اجازهٔ ایجاد اتصال VPN را به behradNG بدهید و دوباره تلاش کنید.</string>
+    <string name="aether_vpn_error">ایجاد رابط VPN ممکن نشد. مجوز VPN و تنظیمات برنامه‌های انتخاب‌شده را بررسی کنید.</string>
+    <string name="aether_tunnel_error">Aether متصل شد اما تونل VPN گوشی شروع نشد. دوباره متصل شوید و گزارش برنامه را بررسی کنید.</string>
+    <string name="aether_routing_error">هستهٔ مسیریابی behradNG برای Aether شروع نشد. بررسی کنید پورت پراکسی برنامه در حال استفاده نباشد.</string>
+    <string name="aether_native_error">Aether هنگام %1$s متوقف شد (کد خروج %2$d). شبکه را بررسی کنید و دوباره متصل شوید.</string>
+    <string name="aether_timeout_error">زمان انتظار Aether هنگام %1$s پایان یافت. شبکه، آدرس سرور و حالت جست‌وجو را بررسی کنید و دوباره تلاش کنید.</string>
+    <string name="aether_stage_core">شروع هسته</string>
+    <string name="aether_stage_registration">ثبت‌نام در Cloudflare</string>
+    <string name="aether_stage_scan">جست‌وجوی آدرس سرور</string>
+    <string name="aether_stage_transport">برقراری تونل</string>
 </resources>
 

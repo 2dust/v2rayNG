@@ -17,6 +17,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.AetherSession
 import com.v2ray.ang.core.AetherLifecycle
+import com.v2ray.ang.core.AetherStartupException
+import com.v2ray.ang.core.AetherStartupStage
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.enums.EConfigType
@@ -65,6 +67,8 @@ class AetherService : VpnService(), ServiceControl {
     private var mode = ""
     @Volatile
     private var startupSettings: com.v2ray.ang.dto.entities.AetherSettings? = null
+    @Volatile
+    private var internalProxyPort: Int? = null
     private var receiverRegistered = false
     private val commandReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -116,30 +120,36 @@ class AetherService : VpnService(), ServiceControl {
                 val profile = MmkvManager.decodeServerConfig(guid)
                     ?.takeIf { it.configType == EConfigType.AETHER } ?: error("Invalid selected profile")
                 val settings = profile.aetherSettings ?: com.v2ray.ang.dto.entities.AetherSettings()
-                check(settings.isValid() && settings.socksPort.toInt() != SettingsManager.getSocksPort())
+                failure = R.string.aether_invalid_settings
+                check(settings.isValid())
                 CoreServiceManager.serviceControl = SoftReference(this@AetherService)
                 session = AetherSession()
-                session!!.start(this@AetherService, guid, settings)
+                failure = R.string.aether_start_error
+                internalProxyPort = session!!.start(this@AetherService, guid, settings,
+                    setOf(SettingsManager.getSocksPort(), SettingsManager.getHttpPort()), serviceScope, mode)
                 startupSettings = settings
                 if (SettingsManager.isVpnMode()) {
+                    failure = R.string.aether_permission_error
                     check(prepare(this@AetherService) == null) { "VPN permission missing" }
+                    failure = R.string.aether_vpn_error
                     vpn = createInterface(profile.remarks)
-                    if (SettingsManager.isUsingHevTun()) {
-                        hev = TProxyService(this@AetherService, vpn!!,
-                            { CoreServiceManager.isRunning() }, {}).also {
-                            it.startTun2Socks()
-                            check(it.isTunnelRunning()) { "HEV tunnel failed" }
-                        }
-                    }
                 }
                 ownsCore = true
+                failure = R.string.aether_routing_error
                 check(CoreServiceManager.startCoreLoop(vpn, notifyStarted = false))
+                if (vpn != null && SettingsManager.isUsingHevTun()) {
+                    failure = R.string.aether_tunnel_error
+                    // Acquire the tunnel owner before startup so failed setup still tears it down.
+                    hev = TProxyService(this@AetherService, vpn!!, { CoreServiceManager.isRunning() }, {})
+                    hev!!.startTun2Socks()
+                    check(hev!!.isTunnelRunning()) { "HEV tunnel failed" }
+                }
                 currentCoroutineContext().ensureActive()
                 MessageHelper.sendMsg2UI(this@AetherService, AppConfig.MSG_STATE_START_SUCCESS, "")
                 watchdog = serviceScope.launch {
                     while (isActive && !lifecycle.isStopping()) {
                         delay(1_000)
-                        if (session?.isAlive() != true) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && session?.isAlive() != true) {
                             LogUtil.e(AppConfig.TAG, "Aether: mode=$mode guid=$guid child process exited", IllegalStateException("Core exited"))
                             MessageHelper.sendMsg2UI(this@AetherService, AppConfig.MSG_STATE_START_FAILURE, getString(R.string.aether_start_error))
                             stopService()
@@ -151,7 +161,17 @@ class AetherService : VpnService(), ServiceControl {
                 throw e
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Aether: mode=$mode guid=$guid startup failed", e)
-                MessageHelper.sendMsg2UI(this@AetherService, AppConfig.MSG_STATE_START_FAILURE, getString(failure))
+                val message = if (e is AetherStartupException) {
+                    val stageName = getString(when (e.stage) {
+                        AetherStartupStage.CORE -> R.string.aether_stage_core
+                        AetherStartupStage.REGISTRATION -> R.string.aether_stage_registration
+                        AetherStartupStage.SCAN -> R.string.aether_stage_scan
+                        AetherStartupStage.TRANSPORT -> R.string.aether_stage_transport
+                    })
+                    e.exitCode?.let { getString(R.string.aether_native_error, stageName, it) }
+                        ?: getString(R.string.aether_timeout_error, stageName)
+                } else getString(failure)
+                MessageHelper.sendMsg2UI(this@AetherService, AppConfig.MSG_STATE_START_FAILURE, message)
                 stopService()
             }
         }
@@ -202,6 +222,10 @@ class AetherService : VpnService(), ServiceControl {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !lifecycle.isStopping() && profileGuid == guid &&
             (settings ?: com.v2ray.ang.dto.entities.AetherSettings()) == startupSettings && session?.isAlive() == true
 
+    override fun aetherProxyPort(guid: String): Int? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            lifecycle.readyPort(guid, this.guid, session?.isAlive() == true, internalProxyPort) else null
+
     override fun restartOwnedService(): Boolean {
         if (!lifecycle.beginRestart()) return true
         cleanupJob = serviceScope.launch {
@@ -248,6 +272,7 @@ class AetherService : VpnService(), ServiceControl {
             if (release("child process") { session?.stop() }) session = null
         }
         startupSettings = null
+        internalProxyPort = null
         released
     }
 

@@ -24,7 +24,7 @@
     <string name="aether_load_error">Could not load this Aether profile.</string>
     <string name="aether_save_error">Could not save this Aether profile. Try again.</string>
     <string name="aether_invalid_settings">Enter a name and valid values for all Aether settings.</string>
-    <string name="aether_start_error">Aether could not connect. Check the profile, network, and local proxy port, then reconnect.</string>
+    <string name="aether_start_error">Aether could not connect. Check the profile and network, then reconnect.</string>
     <string name="aether_unavailable">Aether requires its packaged core, Android 8 or later, ARM64/ARMv7/x86_64, and 4 KiB memory pages.</string>
     <string name="aether_root_unsupported">Aether supports VPN and proxy-only modes. Switch out of root mode to use this profile.</string>
     <string name="aether_standalone_only">Aether must be selected as its own profile; it cannot be a routing target or chain member.</string>
@@ -57,5 +57,15 @@
         <item>gfw</item>
         <item>aggressive</item>
     </string-array>
+    <string name="aether_permission_error">Allow behradNG to create a VPN connection, then retry.</string>
+    <string name="aether_vpn_error">behradNG could not create the VPN interface. Check VPN permissions and per-app settings.</string>
+    <string name="aether_tunnel_error">Aether connected, but the phone VPN tunnel could not start. Reconnect and check the app logs.</string>
+    <string name="aether_routing_error">behradNG could not start its routing core for Aether. Check whether the app proxy port is already in use.</string>
+    <string name="aether_native_error">Aether stopped during %1$s (exit code %2$d). Check the network and reconnect.</string>
+    <string name="aether_timeout_error">Aether timed out during %1$s. Check the network, endpoint and scan mode, then retry.</string>
+    <string name="aether_stage_core">core startup</string>
+    <string name="aether_stage_registration">Cloudflare registration</string>
+    <string name="aether_stage_scan">endpoint scanning</string>
+    <string name="aether_stage_transport">tunnel handshake</string>
 </resources>
 
