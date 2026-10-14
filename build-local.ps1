@@ -151,6 +151,7 @@ try {
         Run-Native (Join-Path $env:GOPATH 'bin/gomobile.exe') @('bind', '-v', '-target=android', '-androidapi', '24', '-trimpath', '-ldflags=-s -w -buildid= -checklinkname=0', '-o', (Join-Path $libsPath 'libv2ray.aar'), './')
     } finally { Pop-Location }
 
+    & (Join-Path $repoPath 'prepare-aether.ps1') -NdkPath (Join-Path $sdkPath ($ndkPackages[1].Replace(';', '/'))) -AppPath (Join-Path $projectPath 'app')
     Write-Output 'Building HEV libraries for all four ABIs...'
     $ndkBuild = Join-Path $sdkPath ($ndkPackages[1].Replace(';', '/') + '/ndk-build.cmd')
     $hevBuildPath = Join-Path $buildPath 'hev-build'
@@ -193,6 +194,15 @@ try {
                 if ($null -eq $entry -or $entry.Length -eq 0) { throw "APK missing native library: $abi/$lib" }
             }
         }
+        $aetherLock = Get-Content (Join-Path $repoPath 'aether-core.lock.json') -Raw | ConvertFrom-Json
+        foreach ($asset in $aetherLock.assets) {
+            foreach ($lib in @('libaether-core.so', 'libaether-launcher.so')) {
+                $entry = $zip.GetEntry("lib/$($asset.abi)/$lib")
+                if ($null -eq $entry -or $entry.Length -eq 0) { throw "APK missing Aether library: $($asset.abi)/$lib" }
+            }
+        }
+        $licenseEntry = $zip.GetEntry('assets/third_party/AETHER_LICENSE.txt')
+        if ($null -eq $licenseEntry -or $licenseEntry.Length -eq 0) { throw 'APK missing Aether license.' }
     } finally { $zip.Dispose() }
     $outputPath = Join-Path $repoPath 'local-apks'
     New-Item -ItemType Directory -Path $outputPath -Force | Out-Null

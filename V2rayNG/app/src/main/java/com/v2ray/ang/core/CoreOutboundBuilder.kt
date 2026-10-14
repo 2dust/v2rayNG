@@ -24,6 +24,10 @@ object CoreOutboundBuilder {
     /** Dispatches a profile to protocol-specific outbound builder. */
     fun convert(profileItem: ProfileItem): OutboundBean? {
         val outbound = when (profileItem.configType) {
+            EConfigType.AETHER -> toOutboundSocks(profileItem.copy(
+                configType = EConfigType.SOCKS, server = "127.0.0.1", username = null, password = null,
+                serverPort = (profileItem.aetherSettings ?: com.v2ray.ang.dto.entities.AetherSettings()).socksPort,
+            ))
             EConfigType.VMESS -> toOutboundVmess(profileItem)
             EConfigType.SHADOWSOCKS -> toOutboundShadowsocks(profileItem)
             EConfigType.SOCKS -> toOutboundSocks(profileItem)

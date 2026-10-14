@@ -297,6 +297,53 @@ object MmkvManager {
         return key
     }
 
+    /** Saves one editor profile, its group index and initial selection with rollback. */
+    fun encodeServerConfigTransactional(guid: String, config: ProfileItem): String {
+        val key = guid.ifBlank { Utils.getUuid() }
+        withProfileIndexLock {
+            val subId = config.subscriptionId.ifBlank { DEFAULT_SUBSCRIPTION_ID }
+            val indexKey = serverListKey(subId)
+            val beforeProfile = profileFullStorage.decodeString(key)
+            val beforeIndex = mainStorage.decodeString(indexKey)
+            val beforeSelected = mainStorage.decodeString(KEY_SELECTED_SERVER)
+            val restorations = listOf<() -> Unit>(
+                {
+                    if (beforeProfile == null) profileFullStorage.removeValueForKey(key)
+                    else requireStorageWrite(profileFullStorage.encode(key, beforeProfile), "Restore profile failed")
+                },
+                {
+                    if (beforeIndex == null) mainStorage.removeValueForKey(indexKey)
+                    else requireStorageWrite(mainStorage.encode(indexKey, beforeIndex), "Restore index failed")
+                },
+                {
+                    if (beforeSelected == null) mainStorage.removeValueForKey(KEY_SELECTED_SERVER)
+                    else requireStorageWrite(mainStorage.encode(KEY_SELECTED_SERVER, beforeSelected), "Restore selection failed")
+                },
+            )
+            writeProfileWithRollback(restorations) {
+                requireStorageWrite(profileFullStorage.encode(key, JsonUtil.toJson(config)), "Save profile failed")
+                val index = decodeServerList(subId)
+                if (key !in index) index.add(0, key)
+                requireStorageWrite(persistServerList(index, subId), "Save index failed")
+                if (beforeSelected.isNullOrBlank()) {
+                    requireStorageWrite(mainStorage.encode(KEY_SELECTED_SERVER, key), "Save selection failed")
+                }
+            }
+        }
+        return key
+    }
+
+    internal fun <T> writeProfileWithRollback(restorations: List<() -> Unit>, write: () -> T): T {
+        try {
+            return write()
+        } catch (failure: Exception) {
+            restorations.forEach { restore ->
+                try { restore() } catch (restoreFailure: Exception) { failure.addSuppressed(restoreFailure) }
+            }
+            throw failure
+        }
+    }
+
     /**
      * Saves a profile batch before publishing its group index and removing replaced payloads.
      *
@@ -334,53 +381,77 @@ object MmkvManager {
                 selectedProfile = selectedProfile,
             )
 
-            profiles.forEach { (guid, profile) ->
-                requireStorageWrite(
-                    profileFullStorage.encode(guid, JsonUtil.toJson(profile)),
-                    "Failed to save profile payload",
-                )
-                rawConfigs[guid]?.let { raw ->
+            // Aether imports must restore every payload and index if the batch fails.
+            val restorations = if (profiles.values.any { it.configType == EConfigType.AETHER }) {
+                buildList<() -> Unit> {
+                    fun snapshot(storage: MMKV, key: String) {
+                        val value = storage.decodeString(key)
+                        add {
+                            if (value == null) storage.removeValueForKey(key)
+                            else requireStorageWrite(storage.encode(key, value), "Restore imported record failed")
+                        }
+                    }
+                    snapshot(mainStorage, serverListKey(subscriptionId))
+                    snapshot(mainStorage, KEY_SELECTED_SERVER)
+                    (profiles.keys + replacedServers).toSet().forEach { key ->
+                        snapshot(profileFullStorage, key)
+                        snapshot(serverRawStorage, key)
+                        snapshot(serverAffStorage, key)
+                    }
+                }
+            } else emptyList()
+
+            fun persistBatch() {
+                profiles.forEach { (guid, profile) ->
                     requireStorageWrite(
-                        serverRawStorage.encode(guid, raw),
-                        "Failed to save raw profile payload",
+                        profileFullStorage.encode(guid, JsonUtil.toJson(profile)),
+                        "Failed to save profile payload",
+                    )
+                    rawConfigs[guid]?.let { raw ->
+                        requireStorageWrite(
+                            serverRawStorage.encode(guid, raw),
+                            "Failed to save raw profile payload",
+                        )
+                    }
+                }
+
+                val serverList = if (append) {
+                    decodeServerList(subscriptionId)
+                } else {
+                    replacedServers.filter { guid ->
+                        decodeServerConfig(guid)?.configType?.isGroupType() == true
+                    }.toMutableList()
+                }
+                val indexedServers = serverList.toHashSet()
+                profiles.keys.forEach { guid ->
+                    if (indexedServers.add(guid)) {
+                        serverList.add(0, guid)
+                    }
+                }
+                requireStorageWrite(
+                    persistServerList(serverList, subscriptionId),
+                    "Failed to publish profile index",
+                )
+                replacementSelection?.let { guid ->
+                    requireStorageWrite(
+                        mainStorage.encode(KEY_SELECTED_SERVER, guid),
+                        "Failed to update selected profile",
                     )
                 }
-            }
+                if (replacedServers.isEmpty()) return
 
-            val serverList = if (append) {
-                decodeServerList(subscriptionId)
-            } else {
-                replacedServers.filter { guid ->
-                    decodeServerConfig(guid)?.configType?.isGroupType() == true
-                }.toMutableList()
-            }
-            val indexedServers = serverList.toHashSet()
-            profiles.keys.forEach { guid ->
-                if (indexedServers.add(guid)) {
-                    serverList.add(0, guid)
-                }
-            }
-            requireStorageWrite(
-                persistServerList(serverList, subscriptionId),
-                "Failed to publish profile index",
-            )
-            replacementSelection?.let { guid ->
-                requireStorageWrite(
-                    mainStorage.encode(KEY_SELECTED_SERVER, guid),
-                    "Failed to update selected profile",
+                val protectedServer = replacementSelection ?: previousSelection
+                val referencedByOtherGroups = decodeServersReferencedByOtherGroups(subscriptionId)
+                val removablePayloads = ProfileReplacement.findRemovablePayloads(
+                    replacedServers = replacedServers,
+                    replacementServers = serverList.toSet(),
+                    protectedServer = protectedServer,
+                    serversReferencedByOtherGroups = referencedByOtherGroups,
                 )
+                removeProfilePayloads(removablePayloads)
             }
-            if (replacedServers.isEmpty()) return@withProfileIndexLock
-
-            val protectedServer = replacementSelection ?: previousSelection
-            val referencedByOtherGroups = decodeServersReferencedByOtherGroups(subscriptionId)
-            val removablePayloads = ProfileReplacement.findRemovablePayloads(
-                replacedServers = replacedServers,
-                replacementServers = serverList.toSet(),
-                protectedServer = protectedServer,
-                serversReferencedByOtherGroups = referencedByOtherGroups,
-            )
-            removeProfilePayloads(removablePayloads)
+            if (restorations.isEmpty()) persistBatch()
+            else writeProfileWithRollback(restorations) { persistBatch() }
         }
     }
 

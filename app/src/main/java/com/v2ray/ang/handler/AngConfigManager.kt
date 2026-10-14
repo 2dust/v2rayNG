@@ -38,6 +38,7 @@ object AngConfigManager {
     // Parser mapping for different config types (lazy initialized)
     private val configFmtParsers: Map<String, (String) -> ProfileItem?> by lazy {
         mapOf(
+            EConfigType.AETHER.protocolScheme to com.v2ray.ang.fmt.AetherFmt::parse,
             EConfigType.VMESS.protocolScheme to VmessFmt::parse,
             EConfigType.SHADOWSOCKS.protocolScheme to ShadowsocksFmt::parse,
             EConfigType.SOCKS.protocolScheme to SocksFmt::parse,
@@ -132,6 +133,11 @@ object AngConfigManager {
     fun shareFullContent2Clipboard(context: Context, guid: String?): Int {
         try {
             if (guid == null) return -1
+            val profile = MmkvManager.decodeServerConfig(guid)
+            if (profile?.configType == EConfigType.AETHER) {
+                Utils.setClipboard(context, EConfigType.AETHER.protocolScheme + com.v2ray.ang.fmt.AetherFmt.toUri(profile))
+                return 0
+            }
             val result = CoreConfigManager.getV2rayConfig(context, guid)
             if (result.status) {
                 Utils.setClipboard(context, result.content)
@@ -156,6 +162,7 @@ object AngConfigManager {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
 
             return config.configType.protocolScheme + when (config.configType) {
+                EConfigType.AETHER -> com.v2ray.ang.fmt.AetherFmt.toUri(config)
                 EConfigType.VMESS -> VmessFmt.toUri(config)
                 EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
                 EConfigType.SOCKS -> SocksFmt.toUri(config)

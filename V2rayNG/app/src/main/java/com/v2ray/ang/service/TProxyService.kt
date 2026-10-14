@@ -51,7 +51,7 @@ class TProxyService(
             writeText(configContent)
         }
 //        LogUtil.i(AppConfig.TAG, "Config file created: ${configFile.absolutePath}")
-        LogUtil.d(AppConfig.TAG, "HevSocks5Tunnel Config content:\n$configContent")
+        // The generated tunnel configuration may contain SOCKS credentials.
 
         try {
 //            LogUtil.i(AppConfig.TAG, "TProxyStartService...")
@@ -60,6 +60,8 @@ class TProxyService(
             LogUtil.e(AppConfig.TAG, "HevSocks5Tunnel exception: ${e.message}")
         }
     }
+
+    fun isTunnelRunning(): Boolean = TProxyIsRunning()
 
     private fun buildConfig(): String {
         val socksPort = SettingsManager.getSocksPort()

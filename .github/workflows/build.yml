@@ -134,6 +134,11 @@ jobs:
           test -s "app/libs/$ABI/libhevsockstun.so"
         done
 
+    - name: Prepare pinned Aether core
+      env:
+        NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/30.0.16248370
+      run: bash prepare-aether.sh
+
     - name: Prepare behradNG project
       shell: bash
       run: |
@@ -167,6 +172,12 @@ jobs:
             unzip -l "$APK_FILE" "lib/$ABI/$LIBRARY" | grep -F "lib/$ABI/$LIBRARY"
           done
         done
+        for ABI in $(jq -r '.assets[].abi' aether-core.lock.json); do
+          for LIBRARY in libaether-core.so libaether-launcher.so; do
+            unzip -l "$APK_FILE" "lib/$ABI/$LIBRARY" | grep -F "lib/$ABI/$LIBRARY"
+          done
+        done
+        unzip -l "$APK_FILE" assets/third_party/AETHER_LICENSE.txt | grep -F assets/third_party/AETHER_LICENSE.txt
 
     - name: Prepare Release APK Artifact
       run: |

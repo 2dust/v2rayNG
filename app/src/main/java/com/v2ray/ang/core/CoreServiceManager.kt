@@ -88,7 +88,7 @@ object CoreServiceManager {
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
      * Starts the V2Ray core service.
      */
-    fun startCoreLoop(vpnInterface: ParcelFileDescriptor?): Boolean {
+    fun startCoreLoop(vpnInterface: ParcelFileDescriptor?, notifyStarted: Boolean = true): Boolean {
         if (isRunning()) {
             LogUtil.w(AppConfig.TAG, "StartCore-Manager: Core already running")
             return false
@@ -101,7 +101,7 @@ object CoreServiceManager {
         }
 
         try {
-            doStartCoreLoop(service, vpnInterface)
+            doStartCoreLoop(service, vpnInterface, notifyStarted)
             return true
         } catch (e: Exception) {
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
@@ -113,7 +113,7 @@ object CoreServiceManager {
     }
 
     @Throws(Exception::class)
-    private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?) {
+    private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?, notifyStarted: Boolean) {
         val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
         mFilter.addAction(Intent.ACTION_SCREEN_ON)
         mFilter.addAction(Intent.ACTION_SCREEN_OFF)
@@ -121,18 +121,23 @@ object CoreServiceManager {
         ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
 
         currentVpnInterface = vpnInterface
-        launchCore(service, vpnInterface)
+        launchCore(service, vpnInterface, notifyStarted = notifyStarted)
         startNetworkMonitor(service)
     }
 
     @Throws(Exception::class)
-    private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false) {
+    private fun launchCore(service: Service, vpnInterface: ParcelFileDescriptor?, isReload: Boolean = false, notifyStarted: Boolean = true) {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
         val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
 
-        LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
+        if (config.configType == com.v2ray.ang.enums.EConfigType.AETHER) {
+            require(service is com.v2ray.ang.service.AetherService && service.hasReadyProfile(guid, config.aetherSettings)) {
+                service.getString(com.v2ray.ang.R.string.aether_start_error)
+            }
+        }
+        LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for guid=$guid")
         val result = CoreConfigManager.getV2rayConfig(service, guid)
-        LogUtil.d(AppConfig.TAG, result.content)
+        // Generated configuration can contain credentials; never log it.
         if (!result.status) {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
         }
@@ -177,7 +182,7 @@ object CoreServiceManager {
             else -> {}
         }
 
-        if (!isReload) {
+        if (!isReload && notifyStarted) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         }
         NotificationManager.startSpeedNotification()
@@ -189,7 +194,7 @@ object CoreServiceManager {
      * Unregisters broadcast receivers, stops notifications, and shuts down plugins.
      * @return True if the core was stopped successfully, false otherwise.
      */
-    fun stopCoreLoop(): Boolean {
+    fun stopCoreLoop(awaitNativeStop: Boolean = false): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
 
@@ -197,7 +202,10 @@ object CoreServiceManager {
         networkMonitor = null
         currentVpnInterface = null
 
-        if (isRunning()) {
+        if (isRunning() && awaitNativeStop) {
+            check(android.os.Looper.myLooper() != android.os.Looper.getMainLooper())
+            coreController.stopLoop()
+        } else if (isRunning()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     coreController.stopLoop()
@@ -487,6 +495,10 @@ object CoreServiceManager {
                     // daemon before stopping it instead of relying on possibly stale UI state.
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
 
+                    if (serviceControl.restartOwnedService()) {
+                        if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
+                        return
+                    }
                     val pendingResult = goAsync()
                     CoroutineScope(Dispatchers.Default).launch {
                         try {

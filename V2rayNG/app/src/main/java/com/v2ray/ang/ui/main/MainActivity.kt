@@ -34,6 +34,7 @@ import com.v2ray.ang.ui.routing.RoutingSettingActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
 import com.v2ray.ang.ui.server.ServerCustomConfigActivity
 import com.v2ray.ang.ui.server.ServerGroupActivity
+import com.v2ray.ang.ui.server.ServerAetherActivity
 import com.v2ray.ang.ui.server.ServerHttpActivity
 import com.v2ray.ang.ui.server.ServerHysteria2Activity
 import com.v2ray.ang.ui.server.ServerProxyChainActivity
@@ -197,6 +198,7 @@ class MainActivity : HelperBaseComponentActivity() {
         val intent = when (createConfigType) {
             EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
             EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)
+            EConfigType.AETHER.value -> Intent(this, ServerAetherActivity::class.java)
             EConfigType.VMESS.value -> Intent(this, ServerVmessActivity::class.java)
             EConfigType.VLESS.value -> Intent(this, ServerVlessActivity::class.java)
             EConfigType.SHADOWSOCKS.value -> Intent(this, ServerShadowsocksActivity::class.java)
@@ -249,6 +251,7 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.CUSTOM -> ServerCustomConfigActivity::class.java
             EConfigType.POLICYGROUP -> ServerGroupActivity::class.java
             EConfigType.PROXYCHAIN -> ServerProxyChainActivity::class.java
+            EConfigType.AETHER -> ServerAetherActivity::class.java
             EConfigType.VMESS -> ServerVmessActivity::class.java
             EConfigType.VLESS -> ServerVlessActivity::class.java
             EConfigType.SHADOWSOCKS -> ServerShadowsocksActivity::class.java

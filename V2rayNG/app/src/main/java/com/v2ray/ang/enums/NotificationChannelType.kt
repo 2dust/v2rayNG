@@ -12,6 +12,11 @@ enum class NotificationChannelType(
     @StringRes val channelNameRes: Int,
     val notificationId: Int
 ) {
+    AETHER(
+        channelId = "aether_core_channel",
+        channelNameRes = R.string.aether_title,
+        notificationId = 14
+    ),
     SUBSCRIPTION_UPDATE(
         channelId = "subscription_update_channel",
         channelNameRes = R.string.notification_channel_subscription_updates,

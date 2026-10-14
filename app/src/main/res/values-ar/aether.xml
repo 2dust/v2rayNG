@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aether_title">aether</string>
+    <string name="aether_loading">Loading…</string>
+    <string name="aether_starting">Connecting to Aether…</string>
+    <string name="aether_protocol">Protocol</string>
+    <string name="aether_protocol_values">masque, wg</string>
+    <string name="aether_carrier">MASQUE transport</string>
+    <string name="aether_carrier_values">h2 (HTTP/2), h3 (HTTP/3)</string>
+    <string name="aether_scan">Endpoint scan mode</string>
+    <string name="aether_scan_values">turbo, balanced, thorough, verified, ironclad</string>
+    <string name="aether_ip">IP version</string>
+    <string name="aether_ip_values">v4, v6, both</string>
+    <string name="aether_noise">Obfuscation profile</string>
+    <string name="aether_noise_values">off, light, firewall, balanced, gfw, aggressive</string>
+    <string name="aether_endpoint">Endpoint (IP:port; leave empty to scan)</string>
+    <string name="aether_dns">Tunnel DNS (comma-separated IP addresses)</string>
+    <string name="aether_fragment">Fragment HTTP/2 ClientHello</string>
+    <string name="aether_fragment_size">Fragment size (bytes; e.g. 16-32)</string>
+    <string name="aether_fragment_delay">Fragment delay (milliseconds; e.g. 2-10)</string>
+    <string name="aether_socks_port">Local Aether proxy port (1024-65535)</string>
+    <string name="aether_cancel">Cancel</string>
+    <string name="aether_save">Save</string>
+    <string name="aether_load_error">Could not load this Aether profile.</string>
+    <string name="aether_save_error">Could not save this Aether profile. Try again.</string>
+    <string name="aether_invalid_settings">Enter a name and valid values for all Aether settings.</string>
+    <string name="aether_start_error">Aether could not connect. Check the profile, network, and local proxy port, then reconnect.</string>
+    <string name="aether_unavailable">Aether requires its packaged core, Android 8 or later, ARM64/ARMv7/x86_64, and 4 KiB memory pages.</string>
+    <string name="aether_root_unsupported">Aether supports VPN and proxy-only modes. Switch out of root mode to use this profile.</string>
+    <string name="aether_standalone_only">Aether must be selected as its own profile; it cannot be a routing target or chain member.</string>
+    <string name="aether_apply_notice">Saved settings apply on the next connection. Disconnect and reconnect to apply changes.</string>
+</resources>
+

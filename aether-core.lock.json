@@ -1,0 +1,12 @@
+{
+  "repository": "CluvexStudio/Aether",
+  "version": "v2.3.0",
+  "sourceRevision": "6175b67df370ab856bcee07fe85b524031903956",
+  "minSdk": 26,
+  "supportedPageSize": 4096,
+  "assets": [
+    {"abi":"arm64-v8a","target":"aarch64-linux-android","archive":"aether-android-arm64.tar.gz","sha256":"038748745244828ea41a808958f16a1c25053dc61db977c95ceb2d3a0b2f7970"},
+    {"abi":"armeabi-v7a","target":"armv7a-linux-androideabi","archive":"aether-android-armv7.tar.gz","sha256":"9e9c59b188ff235053ae22b9f007f31de3e9bc71c8252ef73b0d626b85b64dae"},
+    {"abi":"x86_64","target":"x86_64-linux-android","archive":"aether-android-x86_64.tar.gz","sha256":"9acd35dc7bafd4bbf0f4bd8337cb26c4efe6ab0d84ec01d1a0a9fa68168b09c1"}
+  ]
+}

@@ -106,13 +106,18 @@ object LauncherManager {
             context.toast(R.string.toast_services_start)
         }
 
+        if (config.configType == com.v2ray.ang.enums.EConfigType.AETHER && SettingsManager.isRootMode()) {
+            error(context.getString(R.string.aether_root_unsupported))
+        }
         val isRootMode = SettingsManager.isRootMode()
         if (isRootMode && !RootManager.isRootAvailable()) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: root mode requires root but none available")
             error(context.getString(R.string.toast_root_required))
         }
 
-        val intent = if (isRootMode) {
+        val intent = if (config.configType == com.v2ray.ang.enums.EConfigType.AETHER) {
+            Intent(context.applicationContext, com.v2ray.ang.service.AetherService::class.java)
+        } else if (isRootMode) {
             LogUtil.i(AppConfig.TAG, "LauncherManager: Starting Root service")
             Intent(context.applicationContext, CoreRootService::class.java)
         } else if (SettingsManager.isVpnMode()) {

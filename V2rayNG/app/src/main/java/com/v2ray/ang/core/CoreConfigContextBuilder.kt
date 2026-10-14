@@ -47,6 +47,9 @@ object CoreConfigContextBuilder {
         val resolvedOutbounds = listOf(primaryResolvedOutbound) + routingResolvedOutbounds
         val fallbackResolvedOutbounds = resolveFallbackOutbounds(resolvedOutbounds)
         val routingDomainRules = collectRoutingDomainRulesForDns()
+        require((routingResolvedOutbounds + fallbackResolvedOutbounds + if (config.configType == EConfigType.AETHER) emptyList() else listOf(primaryResolvedOutbound)).none { spec ->
+            spec.resolvedProfiles.any { it.configType == EConfigType.AETHER }
+        }) { context.getString(com.v2ray.ang.R.string.aether_standalone_only) }
 
         return CoreConfigContext(
             context = context,
@@ -67,6 +70,7 @@ object CoreConfigContextBuilder {
         }
 
         val (resolvedProfiles, resolvedType) = when (profile.configType) {
+            EConfigType.AETHER -> Pair(listOf(profile), CoreResolvedType.NORMAL)
             EConfigType.POLICYGROUP -> Pair(
                 resolvePolicyGroupProfiles(profile),
                 CoreResolvedType.POLICYGROUP,
