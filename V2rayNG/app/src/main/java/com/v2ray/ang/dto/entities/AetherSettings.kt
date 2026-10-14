@@ -27,13 +27,20 @@ data class AetherSettings(
             dns.split(',').let { it.isNotEmpty() && it.all { ip -> validIp(ip.trim()) } } &&
             validRange(fragmentSize, 1, 16384) && validRange(fragmentDelay, 0, 1000)
 
-    fun arguments(identityPath: String, bindPort: Int): List<String> {
+    fun arguments(identityDirectory: String, bindPort: Int): List<String> {
         require(isValid()) { "Invalid Aether settings" }
         require(bindPort in 1024..65535) { "Invalid runtime proxy port" }
+        // The core derives per-protocol sibling files from --config; pinning the exact
+        // identity path keeps one stable Cloudflare registration per profile and protocol.
+        val protocolConfig = when (protocol) {
+            "masque" -> listOf("--masque-config", "$identityDirectory/masque.toml")
+            else -> listOf("--wg-config", "$identityDirectory/wireguard.toml")
+        }
         return buildList {
             addAll(listOf("--protocol", protocol, "--scan", scanMode, "--ip", ipVersion,
                 "--noize", noise, "--dns", dns, "--bind", "127.0.0.1:$bindPort",
-                "--config", identityPath))
+                "--config", "$identityDirectory/aether.toml"))
+            addAll(protocolConfig)
             add(if (carrier == "h2") "--h2" else "--h3")
             add(if (fragment) "--fragment" else "--no-fragment")
             addAll(listOf("--fragment-size", fragmentSize, "--fragment-delay", fragmentDelay))
