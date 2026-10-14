@@ -55,7 +55,7 @@ object CoreOutboundBuilder {
                 || protocol.equals(EConfigType.HYSTERIA.name, true)
             ) {
                 muxEnabled = false
-            } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
+            } else if (!supportsAdditionalMux(outbound.streamSettings?.network)) {
                 muxEnabled = false
             }
 
@@ -77,6 +77,17 @@ object CoreOutboundBuilder {
             return false
         }
         return true
+    }
+
+    // These transports multiplex their own streams. Layering mux.cool over them
+    // adds contention instead of improving throughput:
+    // https://xtls.github.io/en/config/transports/grpc.html
+    internal fun supportsAdditionalMux(network: String?): Boolean = when (network) {
+        NetworkType.XHTTP.type,
+        NetworkType.GRPC.type,
+        NetworkType.H2.type,
+        NetworkType.HTTP.type -> false
+        else -> true
     }
 
     /** Creates an initial outbound template for a protocol type. */

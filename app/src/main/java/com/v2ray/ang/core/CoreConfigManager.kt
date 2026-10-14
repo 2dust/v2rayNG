@@ -1079,8 +1079,22 @@ object CoreConfigManager {
 
         val proxyOutboundList = v2rayConfig.getAllProxyOutbound()
         val dns = v2rayConfig.dns ?: return
-        val newHosts = dns.hosts?.toMutableMap() ?: mutableMapOf()
         val preferIpv6 = MmkvManager.decodeSettingsBool(AppConfig.PREF_PREFER_IPV6) == true
+
+        resolveOutboundHosts(proxyOutboundList, dns, preferIpv6, HttpUtil::resolveHostToIP)
+    }
+
+    internal fun resolveOutboundHosts(
+        proxyOutboundList: List<V2rayConfig.OutboundBean>,
+        dns: V2rayConfig.DnsBean,
+        preferIpv6: Boolean,
+        resolve: (String, Boolean) -> List<String>?,
+    ) {
+        val newHosts = dns.hosts?.toMutableMap() ?: mutableMapOf()
+        // A policy group or chain can repeat a hostname on several ports. Do not
+        // repeat a failed lookup for each outbound during the same config build.
+        // Keep this set local so reconnects and network changes retry resolution.
+        val unresolvedDomains = mutableSetOf<String>()
 
         for (item in proxyOutboundList) {
             val domain = item.getServerAddress()
@@ -1097,8 +1111,12 @@ object CoreConfigManager {
                 continue
             }
 
-            val resolvedIps = HttpUtil.resolveHostToIP(domain, preferIpv6)
+            if (domain in unresolvedDomains) {
+                continue
+            }
+            val resolvedIps = resolve(domain, preferIpv6)
             if (resolvedIps.isNullOrEmpty()) {
+                unresolvedDomains.add(domain)
                 continue
             }
 

@@ -31,6 +31,8 @@ V2rayNG/app/libs
 # Ignore signing properties
 signing.properties
 /tmp/behradNG-release-signing/
+/.local-apk-build/
+/local-apks/
 
 # Ignore shared object files
 *.so
