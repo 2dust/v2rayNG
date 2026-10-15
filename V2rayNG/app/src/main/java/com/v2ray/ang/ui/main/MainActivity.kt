@@ -1,10 +1,12 @@
-
 package com.v2ray.ang.ui.main
 
+import android.Manifest
+import android.content.ClipboardManager
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Bundle
 import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -12,6 +14,7 @@ import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -39,6 +42,9 @@ class MainActivity : HelperBaseComponentActivity() {
     private var gozarWebView: WebView? = null
 
     @Volatile
+    private var pendingCameraRequest: PermissionRequest? = null
+
+    @Volatile
     private var pendingGuid: String? = null
 
     @Volatile
@@ -57,6 +63,22 @@ class MainActivity : HelperBaseComponentActivity() {
             } else {
                 lastBridgeError = "مجوز اتصال VPN تأیید نشد."
                 startRequestedAt = 0L
+            }
+        }
+
+    private val requestCameraPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            val request = pendingCameraRequest
+            pendingCameraRequest = null
+            if (request == null) return@registerForActivityResult
+
+            if (granted) {
+                val allowed = request.resources.filter {
+                    it == PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                }.toTypedArray()
+                if (allowed.isNotEmpty()) request.grant(allowed) else request.deny()
+            } else {
+                request.deny()
             }
         }
 
@@ -92,7 +114,36 @@ class MainActivity : HelperBaseComponentActivity() {
                     settings.allowFileAccessFromFileURLs = false
                     settings.allowUniversalAccessFromFileURLs = false
 
-                    webChromeClient = WebChromeClient()
+                    webChromeClient = object : WebChromeClient() {
+                        override fun onPermissionRequest(request: PermissionRequest) {
+                            runOnUiThread {
+                                // Only allow camera access requested by the QR scanner.
+                                val cameraResources = request.resources.filter {
+                                    it == PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                                }.toTypedArray()
+                                if (cameraResources.isEmpty()) {
+                                    request.deny()
+                                    return@runOnUiThread
+                                }
+
+                                if (ContextCompat.checkSelfPermission(
+                                        this@MainActivity,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    request.grant(cameraResources)
+                                } else {
+                                    pendingCameraRequest?.deny()
+                                    pendingCameraRequest = request
+                                    requestCameraPermission.launch(Manifest.permission.CAMERA)
+                                }
+                            }
+                        }
+
+                        override fun onPermissionRequestCanceled(request: PermissionRequest) {
+                            if (pendingCameraRequest === request) pendingCameraRequest = null
+                        }
+                    }
 
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(
@@ -119,6 +170,25 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private inner class GozarBridge {
+
+        /** Read clipboard only when the user explicitly taps the import option. */
+        @JavascriptInterface
+        fun readClipboard(): String {
+            return try {
+                val clipboard =
+                    getSystemService(CLIPBOARD_SERVICE) as? ClipboardManager
+                        ?: return ""
+                val clip = clipboard.primaryClip ?: return ""
+                if (clip.itemCount <= 0) return ""
+
+                clip.getItemAt(0)
+                    .coerceToText(this@MainActivity)
+                    .toString()
+                    .take(2_000_000)
+            } catch (_: Exception) {
+                ""
+            }
+        }
 
         @JavascriptInterface
         fun startVpn(json: String?): String {
@@ -284,6 +354,8 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     override fun onDestroy() {
+        pendingCameraRequest?.deny()
+        pendingCameraRequest = null
         gozarWebView?.apply {
             removeJavascriptInterface("GozarAndroid")
             stopLoading()
