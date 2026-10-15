@@ -17,6 +17,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.webkit.WebViewAssetLoader
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -111,6 +112,10 @@ class MainActivity : HelperBaseComponentActivity() {
             }
         }
 
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
@@ -174,14 +179,23 @@ class MainActivity : HelperBaseComponentActivity() {
                     }
 
                     webViewClient = object : WebViewClient() {
+                        override fun shouldInterceptRequest(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): android.webkit.WebResourceResponse? {
+                            val uri = request?.url ?: return null
+                            return if (uri.host == "appassets.androidplatform.net") assetLoader.shouldInterceptRequest(uri) else null
+                        }
+
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): Boolean {
                             val uri = request?.url ?: return true
                             return !(
-                                uri.scheme == "file" &&
-                                uri.path?.startsWith("/android_asset/") == true
+                                uri.scheme == "https" &&
+                                uri.host == "appassets.androidplatform.net" &&
+                                uri.path?.startsWith("/assets/") == true
                             )
                         }
                     }
@@ -191,7 +205,7 @@ class MainActivity : HelperBaseComponentActivity() {
                         "GozarAndroid"
                     )
 
-                    loadUrl("file:///android_asset/index.html")
+                    loadUrl("https://appassets.androidplatform.net/assets/index.html")
                 }
             }
         )
