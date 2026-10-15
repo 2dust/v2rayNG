@@ -121,7 +121,7 @@
   .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
   .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
   .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
-  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;width:min(420px,calc(100vw - 20px));min-width:0;max-width:calc(100vw - 20px);max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;scrollbar-gutter:stable}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
   .pop.open{display:block;animation:popin .14s}
   @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
   .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
@@ -134,7 +134,7 @@
   .pop-title{font-size:10.5px;font-weight:800;color:var(--faint);padding:8px 12px 4px}
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:74;display:none}
   .scrim.open{display:block}
-  .drawer{position:fixed;top:0;bottom:0;right:0;width:min(330px,88vw);height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;box-sizing:border-box;z-index:75;background:#121b16;border-left:1px solid var(--line);transform:translateX(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain;touch-action:pan-y}
+  .drawer{position:fixed;top:0;bottom:0;right:0;width:min(330px,88vw);z-index:75;background:#121b16;border-left:1px solid var(--line);transform:translateX(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column;overflow-y:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain}
   .drawer.open{transform:none}
   .dr-head{display:flex;align-items:center;gap:12px;padding:16px 14px 14px 20px;border-bottom:1px solid var(--line)}
   .dr-head>div:not(.dr-logo){flex:1;min-width:0}
@@ -153,21 +153,21 @@
   .lang-row .tabbtn{flex:1;text-align:center}
   .dr-foot{margin-top:auto;padding:14px 20px;font-size:10.5px;color:var(--faint);border-top:1px solid var(--line);line-height:1.9}
   .dr-foot b{color:var(--acc)}
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:82;background:var(--panel);border-top:1px solid var(--line2);border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding-bottom:calc(env(safe-area-inset-bottom) + 10px)}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:82;background:var(--panel);border-top:1px solid var(--line2);border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);max-height:84vh;display:flex;flex-direction:column;padding-bottom:calc(env(safe-area-inset-bottom) + 10px)}
   .sheet.open{transform:none}
   .sh-handle{width:42px;height:4px;border-radius:4px;background:var(--line2);margin:10px auto 2px;flex-shrink:0}
   .sh-head{display:flex;align-items:flex-start;gap:8px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
   .sh-head>div{flex:1;min-width:0}
   .sh-head h4{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .sh-head .m{font-family:var(--mono);font-size:11px;color:var(--sub);direction:ltr;text-align:right;margin-top:2px;word-break:break-all}
-  .sh-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 16px;overflow-x:hidden;overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+  .sh-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 16px;overflow-y:auto;overscroll-behavior:contain}
   .sh-btn{display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px 4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:var(--txt)}
   .sh-btn:active{transform:scale(.96)}
   .sh-btn svg{width:20px;height:20px;color:var(--acc)}
   .sh-btn.danger svg{color:var(--err)}
   .overlay{position:fixed;inset:0;background:rgba(4,8,6,.74);z-index:85;display:none;align-items:center;justify-content:center;padding:16px}
   .overlay.open{display:flex}
-  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px);min-height:0;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;animation:mup .2s}
+  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100dvh - 28px);display:flex;flex-direction:column;animation:mup .2s}
   @keyframes mup{from{transform:translateY(14px) scale(.98);opacity:0}}
   .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
   .m-head h4{font-size:14.5px;font-weight:800}
@@ -1682,36 +1682,37 @@ click('#shConnect2',function(){ closeSheet(); });
 /* منوها */
 function closePops(){ document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); }); }
 function openPop(pop,btn){
-  if(!pop||!btn) return;
+  if(!pop || !btn) return;
   const was=pop.classList.contains('open');
   closePops(); closeDrawer();
   if(was) return;
+
+  // Measure the full menu first, then place it where the screen has room.
   pop.style.maxHeight='';
+  pop.style.visibility='hidden';
   pop.style.left='8px'; pop.style.top='8px';
   pop.classList.add('open');
   const r=btn.getBoundingClientRect();
-  const vh=window.visualViewport?window.visualViewport.height:(window.innerHeight||document.documentElement.clientHeight);
-  const vw=window.visualViewport?window.visualViewport.width:window.innerWidth;
+  const vh=window.innerHeight||document.documentElement.clientHeight;
+  const vw=window.innerWidth||document.documentElement.clientWidth;
   const gap=8, anchorGap=6;
   const pw=pop.offsetWidth||280;
-  let left=Math.max(gap,Math.min(r.left,vw-pw-gap));
+  const left=Math.max(gap,Math.min(r.left,vw-pw-gap));
   pop.style.left=left+'px';
-  const available=Math.max(1,vh-gap*2);
-  const desired=Math.min(pop.scrollHeight||pop.offsetHeight||320,available);
+
+  const fullHeight=pop.scrollHeight||pop.offsetHeight||320;
+  const desired=Math.min(fullHeight,Math.max(1,vh-gap*2));
   const below=Math.max(0,vh-r.bottom-anchorGap-gap);
   const above=Math.max(0,r.top-anchorGap-gap);
-  let top;
-  if(desired<=below || below>=above){
-    top=r.bottom+anchorGap;
-    if(top+desired>vh-gap) top=Math.max(gap,vh-desired-gap);
-  }else{
-    top=Math.max(gap,r.top-Math.min(desired,above)-anchorGap);
-  }
-  top=Math.max(gap,Math.min(top,vh-gap-1));
-  const maxH=Math.max(1,Math.min(available,vh-top-gap));
+  const placeBelow=(desired<=below || below>=above);
+  const room=placeBelow?below:above;
+  const maxH=Math.max(1,Math.min(desired,room,vh-gap*2));
+  let top=placeBelow?r.bottom+anchorGap:r.top-anchorGap-maxH;
+  top=Math.max(gap,Math.min(top,vh-gap-maxH));
   pop.style.maxHeight=maxH+'px';
   pop.style.top=top+'px';
   pop.scrollTop=0;
+  pop.style.visibility='';
 }
 document.querySelectorAll('[data-pop]').forEach(function(b){
   b.addEventListener('click',function(e){ e.stopPropagation(); openPop($(b.getAttribute('data-pop')),b); });
@@ -2830,29 +2831,29 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
     var wasOpen=pop.classList.contains('open');
     closePops(); closeDrawer();
     if(wasOpen) return;
+
+    // Measure the full menu, then cap it to the available viewport space.
     pop.style.maxHeight='';
     pop.style.visibility='hidden';
     pop.style.left='8px'; pop.style.top='8px';
     pop.classList.add('open');
     var r=btn.getBoundingClientRect();
-    var vv=window.visualViewport;
-    var vh=vv?vv.height:(window.innerHeight||document.documentElement.clientHeight);
-    var vw=vv?vv.width:window.innerWidth;
-    var gap=8, anchorGap=6, w=pop.offsetWidth||280;
+    var vh=window.innerHeight||document.documentElement.clientHeight;
+    var vw=window.innerWidth||document.documentElement.clientWidth;
+    var gap=8, anchorGap=6;
+    var w=pop.offsetWidth||280;
     pop.style.left=Math.max(gap,Math.min(r.left,vw-w-gap))+'px';
-    var available=Math.max(1,vh-gap*2);
-    var desired=Math.min(pop.scrollHeight||pop.offsetHeight||320,available);
+
+    var fullHeight=pop.scrollHeight||pop.offsetHeight||320;
+    var desired=Math.min(fullHeight,Math.max(1,vh-gap*2));
     var below=Math.max(0,vh-r.bottom-anchorGap-gap);
     var above=Math.max(0,r.top-anchorGap-gap);
-    var top;
-    if(desired<=below || below>=above){
-      top=r.bottom+anchorGap;
-      if(top+desired>vh-gap) top=Math.max(gap,vh-desired-gap);
-    }else{
-      top=Math.max(gap,r.top-Math.min(desired,above)-anchorGap);
-    }
-    top=Math.max(gap,Math.min(top,vh-gap-1));
-    pop.style.maxHeight=Math.max(1,Math.min(available,vh-top-gap))+'px';
+    var placeBelow=(desired<=below || below>=above);
+    var room=placeBelow?below:above;
+    var maxH=Math.max(1,Math.min(desired,room,vh-gap*2));
+    var top=placeBelow?r.bottom+anchorGap:r.top-anchorGap-maxH;
+    top=Math.max(gap,Math.min(top,vh-gap-maxH));
+    pop.style.maxHeight=maxH+'px';
     pop.style.top=top+'px';
     pop.scrollTop=0;
     pop.style.visibility='';
