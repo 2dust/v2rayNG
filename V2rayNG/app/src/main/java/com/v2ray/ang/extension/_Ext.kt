@@ -72,10 +72,22 @@ fun EConfigType.isGroupType(): Boolean {
 /**
  * Checks if the config type is a complex type (Custom, PolicyGroup, or ProxyChain).
  *
- * @return True if the config type is Custom, PolicyGroup, or ProxyChain, false otherwise.
+ * @return True if the config type is Custom, Custom Outbound, PolicyGroup, or ProxyChain, false otherwise.
  */
 fun EConfigType.isComplexType(): Boolean {
-    return this == EConfigType.CUSTOM || this == EConfigType.POLICYGROUP || this == EConfigType.PROXYCHAIN
+    return this == EConfigType.CUSTOM || this == EConfigType.CUSTOM_OUTBOUND
+        || this == EConfigType.POLICYGROUP || this == EConfigType.PROXYCHAIN
+}
+
+/**
+ * Checks whether a profile of this config type can be exported as a single share link.
+ *
+ * Custom outbounds qualify even though they are complex, because their outbound object
+ * encodes into a v2rayn:// link. Other complex types have no single-link form, so the
+ * link and QR code share actions are never offered for them.
+ */
+fun EConfigType.isShareableAsLink(): Boolean {
+    return !isComplexType() || this == EConfigType.CUSTOM_OUTBOUND
 }
 
 /**

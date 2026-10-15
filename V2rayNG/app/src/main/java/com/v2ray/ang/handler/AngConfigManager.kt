@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import com.google.gson.JsonObject
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.dto.SubscriptionUpdateResult
@@ -155,15 +156,25 @@ object AngConfigManager {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
 
-            return config.configType.protocolScheme + when (config.configType) {
-                EConfigType.VMESS -> VmessFmt.toUri(config)
-                EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
-                EConfigType.SOCKS -> SocksFmt.toUri(config)
-                EConfigType.VLESS -> VlessFmt.toUri(config)
-                EConfigType.TROJAN -> TrojanFmt.toUri(config)
-                EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
-                EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
-                else -> {}
+            return when (config.configType) {
+                EConfigType.CUSTOM -> {
+                    val raw = MmkvManager.decodeServerRaw(guid).orEmpty()
+                    if (raw.isBlank()) ""
+                    else JsonUtil.toJsonPretty(JsonUtil.parseString(raw)) ?: raw
+                }
+                EConfigType.CUSTOM_OUTBOUND -> {
+                    CustomFmt.toUri(config, MmkvManager.decodeServerRaw(guid).orEmpty())
+                }
+                else -> config.configType.protocolScheme + when (config.configType) {
+                    EConfigType.VMESS -> VmessFmt.toUri(config)
+                    EConfigType.SHADOWSOCKS -> ShadowsocksFmt.toUri(config)
+                    EConfigType.SOCKS -> SocksFmt.toUri(config)
+                    EConfigType.VLESS -> VlessFmt.toUri(config)
+                    EConfigType.TROJAN -> TrojanFmt.toUri(config)
+                    EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                    EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
+                    else -> ""
+                }
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to share config for GUID: $guid", e)
@@ -249,12 +260,15 @@ object AngConfigManager {
             // Parse all configs first (no I/O during parsing)
             val configs = mutableListOf<ProfileItem>()
             val v2raynLines = mutableListOf<String>()
+            val outboundLines = mutableListOf<String>()
 
             servers.lines()
                 .distinct()
                 .reversed()
                 .forEach {
-                    if (it.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)) {
+                    if (it.startsWith(AppConfig.V2RAYNFMTS + "outbound/", ignoreCase = true)) {
+                        outboundLines.add(it)
+                    } else if (it.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)) {
                         v2raynLines.add(it)
                     } else {
                         val config = parseConfig(it, subid, subItem)
@@ -263,6 +277,10 @@ object AngConfigManager {
                         }
                     }
                 }
+
+            val outboundCount = outboundLines.sumOf { line ->
+                parseCustomConfigServer(line, subid, append)
+            }
 
             val v2raynConfigs = V2rayNFmt.parse(v2raynLines, subid)
             val allConfigs = v2raynConfigs + configs
@@ -275,7 +293,7 @@ object AngConfigManager {
                 )
             }
 
-            return allConfigs.size
+            return allConfigs.size + outboundCount
         } catch (e: ProfileStorageException) {
             throw e
         } catch (e: Exception) {
@@ -322,25 +340,38 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseCustomConfigServer(server: String?, subid: String, append: Boolean): Int {
-        if (server == null) {
+        var effectiveServer = server ?: return 0
+        if (effectiveServer.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)) {
+            val payload = Utils.decode(effectiveServer.substringAfterLast('/')).trim()
+            val json = JsonUtil.parseString(payload)?.takeIf { it.isJsonObject }?.asJsonObject
+            val customOutboundJson = json?.get("CustomOutboundObj")
+            effectiveServer = when {
+                customOutboundJson == null -> payload
+                customOutboundJson.isJsonObject -> JsonUtil.toJsonPretty(customOutboundJson.asJsonObject) ?: payload
+                customOutboundJson.isJsonPrimitive -> JsonUtil.toJsonPretty(customOutboundJson.asString) ?: payload
+                else -> payload
+            }
+        }
+        if (effectiveServer.isBlank()) {
             return 0
         }
-        if (server.contains("inbounds")
-            && server.contains("outbounds")
-            && server.contains("routing")
+        if (effectiveServer.contains("inbounds")
+            && effectiveServer.contains("outbounds")
+            && effectiveServer.contains("routing")
         ) {
             try {
                 val serverList: Array<Any> =
-                    JsonUtil.fromJson(server, Array<Any>::class.java) ?: arrayOf()
+                    JsonUtil.fromJson(effectiveServer, Array<Any>::class.java) ?: arrayOf()
 
                 if (serverList.isNotEmpty()) {
                     val configs = serverList.reversed().map { srv ->
-                        val config = CustomFmt.parse(JsonUtil.toJson(srv))
+                        val normalized = CustomFmt.normalize(JsonUtil.toJson(srv)) ?: JsonUtil.toJsonPretty(srv) ?: ""
+                        val config = CustomFmt.parse(normalized)
                         config.subscriptionId = subid
                         config.description = generateDescription(config)
                         ParsedProfile(
                             profile = config,
-                            rawConfig = JsonUtil.toJsonPretty(srv) ?: "",
+                            rawConfig = normalized,
                         )
                     }
                     commitProfiles(configs, subid, append)
@@ -354,11 +385,12 @@ object AngConfigManager {
 
             try {
                 // For compatibility
-                val config = CustomFmt.parse(server)
+                val normalized = CustomFmt.normalize(effectiveServer) ?: effectiveServer
+                val config = CustomFmt.parse(normalized)
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
                 commitProfiles(
-                    configs = listOf(ParsedProfile(config, server)),
+                    configs = listOf(ParsedProfile(config, normalized)),
                     subid = subid,
                     append = append,
                 )
@@ -369,13 +401,34 @@ object AngConfigManager {
                 LogUtil.e(AppConfig.TAG, "Failed to parse custom config server as single config", e)
             }
             return 0
-        } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
+        } else if (CustomFmt.isOutboundJson(effectiveServer)) {
             try {
-                val config = WireguardFmt.parseWireguardConfFile(server)
+                val normalized = CustomFmt.normalize(effectiveServer)
+                if (normalized == null) {
+                    return 0
+                }
+                val config = CustomFmt.parse(normalized, EConfigType.CUSTOM_OUTBOUND)
                 config.subscriptionId = subid
                 config.description = generateDescription(config)
                 commitProfiles(
-                    configs = listOf(ParsedProfile(config, server)),
+                    configs = listOf(ParsedProfile(config, normalized)),
+                    subid = subid,
+                    append = append,
+                )
+                return 1
+            } catch (e: ProfileStorageException) {
+                throw e
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to parse outbound object as custom config", e)
+            }
+            return 0
+        } else if (effectiveServer.startsWith("[Interface]") && effectiveServer.contains("[Peer]")) {
+            try {
+                val config = WireguardFmt.parseWireguardConfFile(effectiveServer)
+                config.subscriptionId = subid
+                config.description = generateDescription(config)
+                commitProfiles(
+                    configs = listOf(ParsedProfile(config, effectiveServer)),
                     subid = subid,
                     append = append,
                 )

@@ -69,6 +69,7 @@ import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.horizontalScrollbar
 import com.v2ray.ang.ui.compose.verticalScrollbar
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 
@@ -88,7 +89,17 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         super.onCreate(savedInstanceState)
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
-        initialContent = MmkvManager.decodeServerRaw(editGuid).orEmpty()
+        initialContent = run {
+            val raw = MmkvManager.decodeServerRaw(editGuid).orEmpty()
+            val prettyRaw = JsonUtil.toJsonPretty(JsonUtil.parseString(raw)) ?: raw
+            if (config?.configType == EConfigType.CUSTOM_OUTBOUND) {
+                val root = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject
+                val outbound = root?.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray?.firstOrNull()
+                if (outbound != null) JsonUtil.toJsonPretty(outbound) ?: prettyRaw else prettyRaw
+            } else {
+                prettyRaw
+            }
+        }
     }
 
     @Composable
@@ -112,8 +123,9 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             return false
         }
 
+        val normalizedContent = CustomFmt.normalize(content) ?: content
         val parsedProfile = try {
-            CustomFmt.parse(content)
+            CustomFmt.parse(normalizedContent)
         } catch (e: Exception) {
             LogUtil.e(
                 AppConfig.TAG,
@@ -134,7 +146,13 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         val config =
             MmkvManager.decodeServerConfig(editGuid)
-                ?: ProfileItem.create(EConfigType.CUSTOM)
+                ?: ProfileItem.create(
+                    if (CustomFmt.isOutboundJson(content)) {
+                        EConfigType.CUSTOM_OUTBOUND
+                    } else {
+                        EConfigType.CUSTOM
+                    }
+                )
 
         config.remarks =
             remarks.ifEmpty { parsedProfile?.remarks.orEmpty() }
@@ -151,7 +169,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         MmkvManager.encodeServerRaw(
             savedGuid,
-            content
+            normalizedContent
         )
 
         toastSuccess(R.string.toast_success)

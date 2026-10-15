@@ -6,7 +6,7 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.isShareableAsLink
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.SelectListDialog
 
@@ -51,11 +51,19 @@ internal enum class ServerMenuAction(
     Delete(R.string.action_delete, isShareAction = false, supportsComplexProfiles = true),
 }
 
+/**
+ * Actions offered for one profile.
+ *
+ * Share actions need a share link, so they are filtered out for types that have none
+ * (see [isShareableAsLink]); `supportsComplexProfiles` marks the share action that works
+ * on the stored configuration instead of a link.
+ */
 internal fun serverMenuActions(
-    isComplexProfile: Boolean,
+    configType: EConfigType,
     includeManagementActions: Boolean,
 ): List<ServerMenuAction> = ServerMenuAction.entries.filter { action ->
-    (includeManagementActions || action.isShareAction) && (!isComplexProfile || action.supportsComplexProfiles)
+    (includeManagementActions || action.isShareAction) &&
+        (action.supportsComplexProfiles || configType.isShareableAsLink())
 }
 
 @Composable
@@ -82,7 +90,7 @@ fun ShareMethodDialog(
     onRemove: (String, String) -> Unit,
 ) {
     val menuActions = serverMenuActions(
-        isComplexProfile = profile.configType.isComplexType(),
+        configType = profile.configType,
         includeManagementActions = more,
     )
     SelectListDialog(

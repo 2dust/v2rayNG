@@ -9,6 +9,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
@@ -23,6 +24,20 @@ object CoreOutboundBuilder {
 
     /** Dispatches a profile to protocol-specific outbound builder. */
     fun convert(profileItem: ProfileItem): OutboundBean? {
+        if (profileItem.configType == EConfigType.CUSTOM_OUTBOUND) {
+            val guid = MmkvManager.decodeAllServerList().firstOrNull { id ->
+                MmkvManager.decodeServerConfig(id)?.duplicateIdentity() == profileItem.duplicateIdentity()
+            }
+            val raw = guid?.let(MmkvManager::decodeServerRaw) ?: return null
+            val json = JsonUtil.parseString(raw)?.takeIf { it.isJsonObject }?.asJsonObject ?: return null
+            val outbounds = json.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray ?: return null
+            val first = outbounds.firstOrNull()?.takeIf { it.isJsonObject }?.asJsonObject ?: return null
+            // Xray accepts exactly one vnext/servers member per outbound; trim
+            // any leftover multi-endpoint export before the core sees it.
+            CustomFmt.simplifyOutboundEndpoints(first)
+            return JsonUtil.fromJson(JsonUtil.toJson(first), OutboundBean::class.java)
+        }
+
         val outbound = when (profileItem.configType) {
             EConfigType.VMESS -> toOutboundVmess(profileItem)
             EConfigType.SHADOWSOCKS -> toOutboundShadowsocks(profileItem)

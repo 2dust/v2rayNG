@@ -32,6 +32,9 @@ object CoreConfigContextBuilder {
         val config = MmkvManager.decodeServerConfig(guid) ?: return null
 
         // CUSTOM: return immediately — CoreConfigManager handles this path on its own.
+        // CUSTOM_OUTBOUND is intentionally NOT here: it must flow through the
+        // normal analysis so CoreOutboundBuilder can lift the stored outbound
+        // into the full unified config (inbounds, routing, dns, ...).
         if (config.configType == EConfigType.CUSTOM) {
             return CoreConfigContext(context = context, guid = guid, isCustom = true)
         }
@@ -67,6 +70,11 @@ object CoreConfigContextBuilder {
         }
 
         val (resolvedProfiles, resolvedType) = when (profile.configType) {
+            EConfigType.CUSTOM_OUTBOUND -> Pair(
+                listOf(profile),
+                CoreResolvedType.NORMAL,
+            )
+
             EConfigType.POLICYGROUP -> Pair(
                 resolvePolicyGroupProfiles(profile),
                 CoreResolvedType.POLICYGROUP,

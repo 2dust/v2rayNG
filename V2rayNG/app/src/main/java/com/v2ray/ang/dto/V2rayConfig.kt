@@ -86,6 +86,10 @@ data class V2rayConfig(
             var id: String? = null,
             var security: String? = null,
             var encryption: String? = null,
+            /*VLESS/VMess endpoint list, kept verbatim for imported outbounds*/
+            var vnext: Any? = null,
+            /*Trojan endpoint list, kept verbatim for imported outbounds*/
+            var servers: Any? = null,
             /*VLESS*/
             var flow: String? = null,
             /*Trojan/Shadowsocks*/
