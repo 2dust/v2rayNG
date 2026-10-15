@@ -121,7 +121,7 @@
   .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
   .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
   .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
-  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:72vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:calc(100dvh - 16px);max-height:calc(100vh - 16px);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px}
   .pop.open{display:block;animation:popin .14s}
   @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
   .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
@@ -167,11 +167,29 @@
   .sh-btn.danger svg{color:var(--err)}
   .overlay{position:fixed;inset:0;background:rgba(4,8,6,.74);z-index:85;display:none;align-items:center;justify-content:center;padding:16px}
   .overlay.open{display:flex}
-  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100dvh - 28px);display:flex;flex-direction:column;animation:mup .2s}
+  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;animation:mup .2s}
+  /* Long hamburger-menu panels: explicit height is also set in JS for Android WebView. */
+  #ovSettings .modal,#ovSources .modal,#ovSubs .modal,.modal.tall-content{
+    height:calc(100vh - 16px);
+    max-height:calc(100vh - 16px);
+    min-height:0;
+    overflow:hidden;
+  }
+  @supports (height: 100dvh) {
+    #ovSettings .modal,#ovSources .modal,#ovSubs .modal,.modal.tall-content{
+      height:calc(100dvh - 16px);
+      max-height:calc(100dvh - 16px);
+    }
+  }
+  #ovSettings.overlay,#ovSources.overlay,#ovSubs.overlay,#ovConfirm.overlay:has(.modal.tall-content){
+    padding:8px;
+    box-sizing:border-box;
+    overflow-y:auto;
+  }
   @keyframes mup{from{transform:translateY(14px) scale(.98);opacity:0}}
   .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
   .m-head h4{font-size:14.5px;font-weight:800}
-  .m-body{padding:16px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;overscroll-behavior:contain;touch-action:pan-y;scroll-behavior:smooth}
+  .m-body{padding:16px 18px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-height:0;max-height:100%;overscroll-behavior:contain;touch-action:pan-y;scroll-behavior:smooth}
   .m-foot{padding:11px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;flex-shrink:0}
   .tabs-v{display:flex;gap:5px;margin-bottom:14px;background:var(--inset);border-radius:11px;padding:4px;border:1px solid var(--line);flex-wrap:wrap}
   .tabv{flex:1;border:none;background:transparent;color:var(--sub);font-family:inherit;font-size:12px;font-weight:700;padding:8px 6px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.15s;touch-action:manipulation;min-height:42px;min-width:88px}
@@ -1632,9 +1650,9 @@ on('#cfgList','click',function(e){
     else if(act==='share') shareText(c.raw);
     return;
   }
-  // Selecting a configuration must not open the details sheet.
   state.activeId=c.id; save(); disconnect();
   renderList(); renderActiveBar(); renderMetrics(); renderActions();
+  openSheet(c);
 });
 function shareText(txt){ if(navigator.share) navigator.share({text:txt}).catch(function(){}); else copyText(txt,t('m_share_f')); }
 
@@ -1682,17 +1700,53 @@ click('#shConnect2',function(){ closeSheet(); });
 /* منوها */
 function closePops(){ document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); }); }
 function openPop(pop,btn){
-  if(!pop) return;
+  if(!pop || !btn) return;
   const was=pop.classList.contains('open');
   closePops(); closeDrawer();
   if(was) return;
+
+  // Let the menu measure its full content before limiting it to the viewport.
+  pop.style.maxHeight='none';
+  pop.style.visibility='hidden';
+  pop.style.left='8px'; pop.style.top='8px';
   pop.classList.add('open');
+
   const r=btn.getBoundingClientRect();
-  let left=r.left;
-  const pw=pop.offsetWidth||280;
-  if(left+pw>window.innerWidth-8) left=window.innerWidth-8-pw;
-  if(left<8) left=8;
-  pop.style.left=left+'px'; pop.style.top=(r.bottom+6)+'px';
+  const vw=document.documentElement.clientWidth || window.innerWidth;
+  const vh=document.documentElement.clientHeight || window.innerHeight;
+  const gap=8, anchorGap=6;
+  const pw=pop.offsetWidth || 280;
+  const left=Math.max(gap, Math.min(r.left, vw-pw-gap));
+  pop.style.left=left+'px';
+
+  const fullHeight=pop.scrollHeight || pop.offsetHeight || 320;
+  const maxViewportHeight=Math.max(1, vh-gap*2);
+  const desired=Math.min(fullHeight, maxViewportHeight);
+  const below=Math.max(0, vh-r.bottom-anchorGap-gap);
+  const above=Math.max(0, r.top-anchorGap-gap);
+  let top, maxH;
+
+  if(desired <= below){
+    top=r.bottom+anchorGap;
+    maxH=Math.min(desired, vh-top-gap);
+  }else if(desired <= above){
+    maxH=desired;
+    top=r.top-anchorGap-maxH;
+  }else if(below >= above){
+    // If neither side fits, use the largest available area and keep it scrollable.
+    top=Math.max(gap, Math.min(r.bottom+anchorGap, vh-gap-Math.min(desired, maxViewportHeight)));
+    maxH=Math.min(desired, vh-top-gap);
+  }else{
+    maxH=Math.min(desired, maxViewportHeight);
+    top=gap;
+  }
+
+  maxH=Math.max(1, Math.min(maxH, vh-gap*2));
+  top=Math.max(gap, Math.min(top, vh-gap-maxH));
+  pop.style.maxHeight=maxH+'px';
+  pop.style.top=top+'px';
+  pop.scrollTop=0;
+  pop.style.visibility='';
 }
 document.querySelectorAll('[data-pop]').forEach(function(b){
   b.addEventListener('click',function(e){ e.stopPropagation(); openPop($(b.getAttribute('data-pop')),b); });
@@ -1734,6 +1788,8 @@ click('#drCoreLog',function(){
   openConfirm(t('d_corelog'),null,
     '<pre dir="ltr" style="max-height:320px;overflow:auto;font-family:var(--mono);font-size:10px;white-space:pre-wrap">'+esc(txt)+'</pre>',
     t('c_close'));
+  var coreLogModal=document.querySelector('#ovConfirm .modal');
+  if(coreLogModal){ coreLogModal.classList.add('tall-content'); fitTallPanel(document.querySelector('#ovConfirm')); }
 });
 click('#drBackup',function(){ closeDrawer(); openSettings('st1'); });
 click('#drUpdate',function(){ closeDrawer(); updateAllSources(); });
@@ -1775,9 +1831,7 @@ click('#mDelInvalid',function(){
 });
 click('#mDelAll',function(){
   closePops();
-  const list=state.configs.filter(function(c){
-    return state.tab==='all' || groupOf(c)===state.tab;
-  });
+  const list=currentList();
   if(!list.length){ toast(t('m_gempty'),'warn'); return; }
   openConfirm(t('m_cdelall',{n:list.length}),function(){
     const ids={}; for(var i=0;i<list.length;i++) ids[list[i].id]=1;
@@ -1823,9 +1877,6 @@ function renderManualList(){
       closePops();
       openOv('#ovAdd'); switchTabV($('#ovAdd'),'t3');
       $('#f_proto').value=b.getAttribute('data-manual');
-      ['#f_name','#f_server','#f_port','#f_secret','#f_sni','#f_path','#f_method','#f_pass'].forEach(function(s){ $(s).value=''; });
-      switchTabV($('#ovAdd'),'t3');
-      requestAnimationFrame(function(){ fitTallPanel($('#ovAdd')); $('#f_server').focus(); });
       icons();
     };
   });
@@ -1835,14 +1886,20 @@ click('#aClip',async function(){
   closePops();
   try{
     let txt='';
-    if(window.GozarAndroid && typeof window.GozarAndroid.readClipboard==='function') txt=window.GozarAndroid.readClipboard()||'';
-    else if(navigator.clipboard && navigator.clipboard.readText) txt=await navigator.clipboard.readText();
-    if(!txt.trim()){ toast(t('m_clipe'),'warn'); return; }
+    if(window.GozarAndroid && typeof window.GozarAndroid.readClipboard==='function'){
+      txt=window.GozarAndroid.readClipboard() || '';
+    }else if(navigator.clipboard && typeof navigator.clipboard.readText==='function'){
+      txt=await navigator.clipboard.readText();
+    }
+    if(!txt || !txt.trim()){ toast(t('m_clipe'),'warn'); return; }
     await importAnyText(txt,'clipboard');
-  }catch(e){ openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons(); toast(t('m_clipd'),'warn'); }
+  }catch(e){
+    openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons();
+    toast(t('m_clipd'),'warn');
+  }
 });
-click('#aFile',function(){ closePops(); try { $('#fileOne').click(); } catch(e) { openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); toast(t('m_read'),'err'); } });
-click('#aLink',function(){ closePops(); $('#inMulti').value=''; openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); requestAnimationFrame(function(){ fitTallPanel($('#ovAdd')); $('#inMulti').focus(); }); icons(); });
+click('#aFile',function(){ closePops(); $('#fileOne').click(); });
+click('#aLink',function(){ closePops(); openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons(); });
 
 /* فیلتر */
 function renderFilterChips(){
@@ -1862,8 +1919,7 @@ on('#fq','input',function(e){ state.fQuery=e.target.value; renderList(); });
 
 /* تست گروهی */
 async function testAll(timeout,real){
-  // Snapshot the group and reduce concurrent native bridge calls to keep UI responsive.
-  const list=currentList().slice();
+  const list=currentList();
   if(!list.length){ toast(t('m_gempty'),'warn'); return; }
   toast(real?t('m_grtest',{n:list.length}):t('m_gtest',{n:list.length}),'warn');
   let done=0,okc=0;
@@ -1874,11 +1930,11 @@ async function testAll(timeout,real){
       c.ping=r.ok?{ok:true,ms:Math.round(r.ms)}:{ok:false,ms:-1};
       if(r.ok) okc++;
       done++;
-      if(done===list.length || done%12===0) { renderList(); await new Promise(function(resolve){ setTimeout(resolve,0); }); }
+      if(done%5===0||done===list.length) renderList();
       $('#tbSub').textContent=t('tb_testing',{a:done,b:list.length});
     };
   });
-  await pool(tasks,real?1:2);
+  await pool(tasks,real?2:4);
   $('#tbSub').textContent=IS_ANDROID_APP?t('tb_sub_android'):t('tb_sub_default');
   save(); renderList();
   toast(t('m_gdone',{a:okc,b:list.length}));
@@ -1915,35 +1971,6 @@ function extractLinks(text){
   }
   return text.split(/\s+/).filter(function(l){ return /^[a-z0-9+]+:\/\//i.test(l); });
 }
-async function importAnyText(raw,label){
-  let text=String(raw||'').trim();
-  if(!text){ toast(t('m_empty'),'warn'); return 0; }
-  if(/^https?:\/\//i.test(text) && !/\s/.test(text)){
-    try{ text=(await fetchSub(text)).text||''; }
-    catch(e){ toast(t('m_fail'),'err'); return 0; }
-  }
-  // Accept a Base64 subscription response as well as plain share links.
-  if(text.indexOf('://')===-1 && /^[A-Za-z0-9+/=_-]{20,}$/.test(text)){
-    try{ const decoded=b64d(text); if(decoded.indexOf('://')!==-1) text=decoded; }catch(e){}
-  }
-  try{
-    const obj=JSON.parse(text);
-    const arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.configs)?obj.configs:null);
-    if(arr){
-      const seen={}; state.configs.forEach(function(c){ seen[c.raw]=1; });
-      let count=0;
-      arr.forEach(function(item){
-        const rawLink=typeof item==='string'?item:(item&&item.raw);
-        if(!rawLink||seen[rawLink]) return;
-        const c=parseLink(rawLink);
-        if(c){ if(item&&item.name) c.name=item.name; if(addParsed(c)){ seen[rawLink]=1; count++; } }
-      });
-      if(count) afterAdd(count); else toast(t('m_nf_in',{x:label}),'warn');
-      return count;
-    }
-  }catch(e){}
-  return importFromText(text,label);
-}
 function importFromText(text,label){
   const links=extractLinks(text);
   const seen={};
@@ -1957,6 +1984,41 @@ function importFromText(text,label){
   if(n) afterAdd(n);
   else toast(t('m_nf_in',{x:label}),'warn');
   return n;
+}
+// Common entry point for clipboard and local files: supports raw links, base64
+// subscription payloads, and a single HTTPS subscription URL.
+async function importAnyText(raw,label){
+  let text=String(raw||'').trim();
+  if(!text){ toast(t('m_empty'),'warn'); return 0; }
+  if(/^https?:\/\//i.test(text) && !/\s/.test(text)){
+    try{
+      const result=await fetchSub(text);
+      text=result.text||'';
+      if(result.info){
+        const tag='custom-'+Date.now().toString(36);
+        subMeta[tag]={url:raw.trim(),up:result.info.up,down:result.info.down,total:result.info.total,expire:result.info.expire,updated:Date.now()};
+        saveSubMeta();
+      }
+    }catch(err){ toast(t('m_fail'),'err'); return 0; }
+  }
+  // JSON backup files exported by Gozar are handled without losing config names.
+  try{
+    const obj=JSON.parse(text);
+    const arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.configs)?obj.configs:null);
+    if(arr){
+      let count=0; const seen={};
+      state.configs.forEach(function(c){ if(c.raw) seen[c.raw]=1; });
+      arr.forEach(function(item){
+        const rawLink=typeof item==='string'?item:(item&&item.raw);
+        if(!rawLink||seen[rawLink]) return;
+        const parsed=parseLink(rawLink);
+        if(parsed){ if(item&&item.name) parsed.name=item.name; if(addParsed(parsed)){seen[rawLink]=1;count++;} }
+      });
+      if(count) afterAdd(count); else toast(t('m_nf_in',{x:label}),'warn');
+      return count;
+    }
+  }catch(e){}
+  return importFromText(text,label);
 }
 click('#btnAddMulti',async function(){
   const raw=$('#inMulti').value.trim();
@@ -2001,7 +2063,7 @@ click('#btnAddForm',function(){
 on('#fileOne','change',async function(e){
   const f=e.target.files[0]; e.target.value='';
   if(!f) return;
-  try{ importFromText(await fileToText(f),f.name); }catch(err){ toast(t('m_read'),'err'); }
+  try{ await importAnyText(await fileToText(f),f.name); }catch(err){ toast(t('m_read'),'err'); }
 });
 
 /* درگ‌اند‌دراپ */
@@ -2025,20 +2087,63 @@ window.addEventListener('drop',function(e){
 
 /* اسکنر QR */
 let scanStream=null,scanRAF=null;
-function openScanner(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast(t('m_cam'),'err'); return; }
-  if(typeof jsQR==='undefined'){ toast(t('m_jsqr'),'err'); return; }
+function loadJsQrFallback(){
+  if(typeof jsQR!=='undefined') return Promise.resolve(true);
+  return new Promise(function(resolve){
+    const sources=[
+      'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
+      'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js'
+    ];
+    let i=0;
+    function next(){
+      if(typeof jsQR!=='undefined'){ resolve(true); return; }
+      if(i>=sources.length){ resolve(false); return; }
+      const src=sources[i++],script=document.createElement('script');
+      let settled=false;
+      const finish=function(ok){
+        if(settled) return; settled=true;
+        script.onload=script.onerror=null;
+        if(ok&&typeof jsQR!=='undefined') resolve(true); else next();
+      };
+      script.onload=function(){ finish(typeof jsQR!=='undefined'); };
+      script.onerror=function(){ finish(false); };
+      script.src=src;
+      document.head.appendChild(script);
+      setTimeout(function(){ finish(typeof jsQR!=='undefined'); },8000);
+    }
+    next();
+  });
+}
+async function openScanner(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    toast(t('m_cam')+' (WebView/Android camera permission)', 'err');
+    return;
+  }
+  if(typeof jsQR==='undefined' && !(await loadJsQrFallback())){
+    toast(t('m_jsqr')+' — check internet connection', 'err');
+    return;
+  }
   openOv('#ovScan'); icons();
   startScan();
 }
 async function startScan(){
   try{
-    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    scanStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}});
     const v=$('#scanVideo');
+    v.setAttribute('playsinline','');
+    v.muted=true;
     v.srcObject=scanStream;
     await v.play();
     tickScan();
-  }catch(e){ toast(t('m_camd'),'err'); closeOv($('#ovScan')); }
+  }catch(e){
+    const msg=(e&&e.name==='NotAllowedError')?'اجازهٔ دوربین را برای برنامه فعال کنید.':
+      (e&&e.name==='NotFoundError')?'دوربین قابل استفاده پیدا نشد.':
+      (e&&e.name==='NotReadableError')?'دوربین در برنامهٔ دیگری مشغول است.':
+      'باز کردن دوربین ناموفق بود'+(e&&e.name?' ('+e.name+')':'');
+    toast(msg,'err');
+    stopScan();
+    closeOv($('#ovScan'));
+  }
 }
 function tickScan(){
   if(!scanStream) return;
@@ -2110,13 +2215,38 @@ on('#bkFile','change',async function(e){
 
 /* QR / جزئیات / تحلیل */
 let qrRaw='';
-function openQr(c){
-  if(typeof QRCode==='undefined'){ toast(t('m_qrlib'),'err'); return; }
+async function ensureQrLibrary(){
+  if(typeof QRCode!=='undefined' && typeof QRCode.toCanvas==='function') return true;
+  const urls=[
+    'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/lib/browser.min.js'
+  ];
+  for(const url of urls){
+    const loaded=await new Promise(function(resolve){
+      const script=document.createElement('script');
+      script.src=url;
+      script.async=true;
+      script.onload=function(){ resolve(typeof QRCode!=='undefined' && typeof QRCode.toCanvas==='function'); };
+      script.onerror=function(){ script.remove(); resolve(false); };
+      document.head.appendChild(script);
+    });
+    if(loaded) return true;
+  }
+  return false;
+}
+async function openQr(c){
+  if(!c || !c.raw){ toast(t('m_qrfail'),'err'); return; }
+  if(!(await ensureQrLibrary())){ toast(t('m_qrlib'),'err'); return; }
   qrRaw=c.raw;
   $('#qrTitle').textContent='QR — '+c.name;
   $('#qrLink').textContent=c.raw.length>80?c.raw.slice(0,80)+'…':c.raw;
+  const canvas=$('#qrCanvas');
+  const ctx=canvas.getContext('2d');
+  if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height);
   openOv('#ovQr');
-  QRCode.toCanvas($('#qrCanvas'),c.raw,{width:220,margin:2,color:{dark:'#0b1512',light:'#e9f4ee'}},function(err){ if(err) toast(t('m_qrfail'),'err'); });
+  QRCode.toCanvas(canvas,c.raw,{width:220,margin:2,color:{dark:'#0b1512',light:'#e9f4ee'}},function(err){
+    if(err){ console.error('Gozar QR generation failed:',err); toast(t('m_qrfail'),'err'); }
+  });
 }
 click('#qrCopy',function(){ copyText(qrRaw); });
 click('#qrDl',function(){ $('#qrCanvas').toBlob(function(b){ if(b) download('gozar-qr.png',b); }); });
@@ -2367,17 +2497,21 @@ function log(msg,level){
 }
 function openLogs(){
   openConfirm(t('d_logs'),null,
-    '<div style="max-height:300px;overflow-y:auto;font-family:var(--mono);font-size:10.5px;line-height:2">'+
+    '<div style="max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px);overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:10.5px;line-height:2">'+
     logLines.map(function(l){
       const col=l.level==='ok'?'var(--acc)':l.level==='err'?'var(--err)':l.level==='warn'?'var(--warn)':'var(--sub)';
       return '<div style="color:'+col+'"><span style="color:var(--faint);font-size:9.5px">'+l.tm+'</span> '+esc(l.msg)+'</div>';
     }).join('')+'</div>',
     t('c_close'));
+  const logModal=document.querySelector('#ovConfirm .modal');
+  if(logModal){ logModal.classList.add('tall-content'); fitTallPanel(document.querySelector('#ovConfirm')); }
 }
 
 /* تایید / نام */
 let confirmCb=null;
 function openConfirm(html,cb,customBody,okLabel){
+  const confirmModal=document.querySelector('#ovConfirm .modal');
+  if(confirmModal) confirmModal.classList.remove('tall-content');
   const box=$('#confirmTxt');
   if(customBody) box.innerHTML=customBody; else box.innerHTML=html;
   $('#confirmOkLbl').textContent=okLabel||t('c_ok');
@@ -2407,11 +2541,50 @@ function anyOverlayOpen(){
 function syncLock(){
   document.body.classList.toggle('locked', anyOverlayOpen());
 }
+function fitTallPanel(ov){
+  if(!ov) return;
+  const modal=ov.querySelector('.modal');
+  if(!modal) return;
+  const tallIds=['ovSettings','ovSources','ovSubs'];
+  const isTall=tallIds.indexOf(ov.id)!==-1 || modal.classList.contains('tall-content');
+  if(!isTall) return;
+  const vv=window.visualViewport;
+  const viewportH=Math.round((vv && vv.height) || document.documentElement.clientHeight || window.innerHeight || 0);
+  if(viewportH<1) return;
+  const gap=16;
+  const panelH=Math.max(240,viewportH-gap);
+  ov.style.padding='8px';
+  ov.style.boxSizing='border-box';
+  ov.style.overflowY='auto';
+  modal.style.height=panelH+'px';
+  modal.style.minHeight='0';
+  modal.style.maxHeight=panelH+'px';
+  modal.style.boxSizing='border-box';
+  modal.style.overflow='hidden';
+  const body=modal.querySelector('.m-body');
+  if(body){
+    body.style.flex='1 1 0%';
+    body.style.minHeight='0';
+    body.style.maxHeight='none';
+    body.style.overflowY='auto';
+    body.style.overflowX='hidden';
+    body.style.webkitOverflowScrolling='touch';
+  }
+}
 function openOv(id){
   const ov=$(id); if(!ov) return;
   ov.classList.add('open');
+  fitTallPanel(ov);
   const mb=ov.querySelector('.m-body'); if(mb) mb.scrollTop=0;
   syncLock();
+}
+window.addEventListener('resize',function(){
+  document.querySelectorAll('.overlay.open').forEach(fitTallPanel);
+});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',function(){
+    document.querySelectorAll('.overlay.open').forEach(fitTallPanel);
+  });
 }
 function closeOv(el){
   if(!el) return;
@@ -2845,12 +3018,48 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
     var wasOpen=pop.classList.contains('open');
     closePops(); closeDrawer();
     if(wasOpen) return;
-    pop.classList.add('open');
+
+    // Let the menu measure its full content before limiting it to the viewport.
+    pop.style.maxHeight='none';
     pop.style.visibility='hidden';
     pop.style.left='8px'; pop.style.top='8px';
-    var r=btn.getBoundingClientRect(), w=pop.offsetWidth||280, h=pop.offsetHeight||320;
-    pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
-    pop.style.top=Math.max(8,Math.min(r.bottom+6,window.innerHeight-h-8))+'px';
+    pop.classList.add('open');
+
+    var r=btn.getBoundingClientRect();
+    var vw=document.documentElement.clientWidth || window.innerWidth;
+    var vh=document.documentElement.clientHeight || window.innerHeight;
+    var gap=8, anchorGap=6;
+    var w=pop.offsetWidth || 280;
+    var left=Math.max(gap, Math.min(r.left, vw-w-gap));
+    pop.style.left=left+'px';
+
+    var fullHeight=pop.scrollHeight || pop.offsetHeight || 320;
+    var maxViewportHeight=Math.max(1, vh-gap*2);
+    var desired=Math.min(fullHeight, maxViewportHeight);
+    var below=Math.max(0, vh-r.bottom-anchorGap-gap);
+    var above=Math.max(0, r.top-anchorGap-gap);
+    var top, maxH;
+
+    if(desired <= below){
+      top=r.bottom+anchorGap;
+      maxH=Math.min(desired, vh-top-gap);
+    }else if(desired <= above){
+      maxH=desired;
+      top=r.top-anchorGap-maxH;
+    }else if(below >= above){
+      // If neither side fits, use the largest available area and keep it scrollable.
+      top=Math.max(gap, Math.min(r.bottom+anchorGap, vh-gap-Math.min(desired, maxViewportHeight)));
+      maxH=Math.min(desired, vh-top-gap);
+    }else{
+      maxH=Math.min(desired, maxViewportHeight);
+      top=gap;
+    }
+
+    maxH=Math.max(1, Math.min(maxH, vh-gap*2));
+    top=Math.max(gap, Math.min(top, vh-gap-maxH));
+    pop.style.maxHeight=maxH+'px';
+    pop.style.top=top+'px';
+    pop.scrollTop=0;
     pop.style.visibility='';
   }
   function toggleDrawer(){
