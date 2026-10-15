@@ -168,14 +168,23 @@
   .overlay{position:fixed;inset:0;background:rgba(4,8,6,.74);z-index:85;display:none;align-items:center;justify-content:center;padding:16px}
   .overlay.open{display:flex}
   .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;animation:mup .2s}
-  /* Tall, scrollable panels opened from the hamburger menu. Keep the header visible and scroll only the body. */
+  /* Long hamburger-menu panels: explicit height is also set in JS for Android WebView. */
   #ovSettings .modal,#ovSources .modal,#ovSubs .modal,.modal.tall-content{
-    height:calc(100vh - 24px);
-    height:calc(100dvh - 24px);
-    max-height:calc(100vh - 24px);
-    max-height:calc(100dvh - 24px);
+    height:calc(100vh - 16px);
+    max-height:calc(100vh - 16px);
     min-height:0;
     overflow:hidden;
+  }
+  @supports (height: 100dvh) {
+    #ovSettings .modal,#ovSources .modal,#ovSubs .modal,.modal.tall-content{
+      height:calc(100dvh - 16px);
+      max-height:calc(100dvh - 16px);
+    }
+  }
+  #ovSettings.overlay,#ovSources.overlay,#ovSubs.overlay,#ovConfirm.overlay:has(.modal.tall-content){
+    padding:8px;
+    box-sizing:border-box;
+    overflow-y:auto;
   }
   @keyframes mup{from{transform:translateY(14px) scale(.98);opacity:0}}
   .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
@@ -1779,6 +1788,8 @@ click('#drCoreLog',function(){
   openConfirm(t('d_corelog'),null,
     '<pre dir="ltr" style="max-height:320px;overflow:auto;font-family:var(--mono);font-size:10px;white-space:pre-wrap">'+esc(txt)+'</pre>',
     t('c_close'));
+  var coreLogModal=document.querySelector('#ovConfirm .modal');
+  if(coreLogModal){ coreLogModal.classList.add('tall-content'); fitTallPanel(document.querySelector('#ovConfirm')); }
 });
 click('#drBackup',function(){ closeDrawer(); openSettings('st1'); });
 click('#drUpdate',function(){ closeDrawer(); updateAllSources(); });
@@ -2385,7 +2396,7 @@ function openLogs(){
     }).join('')+'</div>',
     t('c_close'));
   const logModal=document.querySelector('#ovConfirm .modal');
-  if(logModal) logModal.classList.add('tall-content');
+  if(logModal){ logModal.classList.add('tall-content'); fitTallPanel(document.querySelector('#ovConfirm')); }
 }
 
 /* تایید / نام */
@@ -2422,11 +2433,50 @@ function anyOverlayOpen(){
 function syncLock(){
   document.body.classList.toggle('locked', anyOverlayOpen());
 }
+function fitTallPanel(ov){
+  if(!ov) return;
+  const modal=ov.querySelector('.modal');
+  if(!modal) return;
+  const tallIds=['ovSettings','ovSources','ovSubs'];
+  const isTall=tallIds.indexOf(ov.id)!==-1 || modal.classList.contains('tall-content');
+  if(!isTall) return;
+  const vv=window.visualViewport;
+  const viewportH=Math.round((vv && vv.height) || document.documentElement.clientHeight || window.innerHeight || 0);
+  if(viewportH<1) return;
+  const gap=16;
+  const panelH=Math.max(240,viewportH-gap);
+  ov.style.padding='8px';
+  ov.style.boxSizing='border-box';
+  ov.style.overflowY='auto';
+  modal.style.height=panelH+'px';
+  modal.style.minHeight='0';
+  modal.style.maxHeight=panelH+'px';
+  modal.style.boxSizing='border-box';
+  modal.style.overflow='hidden';
+  const body=modal.querySelector('.m-body');
+  if(body){
+    body.style.flex='1 1 0%';
+    body.style.minHeight='0';
+    body.style.maxHeight='none';
+    body.style.overflowY='auto';
+    body.style.overflowX='hidden';
+    body.style.webkitOverflowScrolling='touch';
+  }
+}
 function openOv(id){
   const ov=$(id); if(!ov) return;
   ov.classList.add('open');
+  fitTallPanel(ov);
   const mb=ov.querySelector('.m-body'); if(mb) mb.scrollTop=0;
   syncLock();
+}
+window.addEventListener('resize',function(){
+  document.querySelectorAll('.overlay.open').forEach(fitTallPanel);
+});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',function(){
+    document.querySelectorAll('.overlay.open').forEach(fitTallPanel);
+  });
 }
 function closeOv(el){
   if(!el) return;
