@@ -1885,8 +1885,19 @@ click('#aQrScan',function(){ closePops(); openScanner(); });
 click('#aClip',async function(){
   closePops();
   try{
-    const txt=await navigator.clipboard.readText();
-    if(!txt||!txt.trim()){ toast(t('m_clipe'),'warn'); return; }
+    let txt='';
+    // داخل اپ اندروید، کلیپ‌بورد را از پل بومی بخوان؛ Clipboard API در WebView
+    // برای file:// معمولاً در دسترس نیست یا به مجوز/secure context وابسته است.
+    if(window.GozarAndroid && typeof window.GozarAndroid.readClipboard==='function'){
+      txt=window.GozarAndroid.readClipboard() || '';
+    }else if(navigator.clipboard && typeof navigator.clipboard.readText==='function'){
+      txt=await navigator.clipboard.readText();
+    }
+    if(!txt || !txt.trim()){
+      toast(t('m_clipe'),'warn');
+      return;
+    }
+    // کانفیگ کپی‌شده را مستقیماً تشخیص بده و به فهرست کانفیگ‌ها وارد کن.
     importFromText(txt,'clip');
   }catch(e){
     openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons();
@@ -2047,20 +2058,63 @@ window.addEventListener('drop',function(e){
 
 /* اسکنر QR */
 let scanStream=null,scanRAF=null;
-function openScanner(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast(t('m_cam'),'err'); return; }
-  if(typeof jsQR==='undefined'){ toast(t('m_jsqr'),'err'); return; }
+function loadJsQrFallback(){
+  if(typeof jsQR!=='undefined') return Promise.resolve(true);
+  return new Promise(function(resolve){
+    const sources=[
+      'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
+      'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js'
+    ];
+    let i=0;
+    function next(){
+      if(typeof jsQR!=='undefined'){ resolve(true); return; }
+      if(i>=sources.length){ resolve(false); return; }
+      const src=sources[i++],script=document.createElement('script');
+      let settled=false;
+      const finish=function(ok){
+        if(settled) return; settled=true;
+        script.onload=script.onerror=null;
+        if(ok&&typeof jsQR!=='undefined') resolve(true); else next();
+      };
+      script.onload=function(){ finish(typeof jsQR!=='undefined'); };
+      script.onerror=function(){ finish(false); };
+      script.src=src;
+      document.head.appendChild(script);
+      setTimeout(function(){ finish(typeof jsQR!=='undefined'); },8000);
+    }
+    next();
+  });
+}
+async function openScanner(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    toast(t('m_cam')+' (WebView/Android camera permission)', 'err');
+    return;
+  }
+  if(typeof jsQR==='undefined' && !(await loadJsQrFallback())){
+    toast(t('m_jsqr')+' — check internet connection', 'err');
+    return;
+  }
   openOv('#ovScan'); icons();
   startScan();
 }
 async function startScan(){
   try{
-    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    scanStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'}}});
     const v=$('#scanVideo');
+    v.setAttribute('playsinline','');
+    v.muted=true;
     v.srcObject=scanStream;
     await v.play();
     tickScan();
-  }catch(e){ toast(t('m_camd'),'err'); closeOv($('#ovScan')); }
+  }catch(e){
+    const msg=(e&&e.name==='NotAllowedError')?'اجازهٔ دوربین را برای برنامه فعال کنید.':
+      (e&&e.name==='NotFoundError')?'دوربین قابل استفاده پیدا نشد.':
+      (e&&e.name==='NotReadableError')?'دوربین در برنامهٔ دیگری مشغول است.':
+      'باز کردن دوربین ناموفق بود'+(e&&e.name?' ('+e.name+')':'');
+    toast(msg,'err');
+    stopScan();
+    closeOv($('#ovScan'));
+  }
 }
 function tickScan(){
   if(!scanStream) return;
@@ -2132,13 +2186,38 @@ on('#bkFile','change',async function(e){
 
 /* QR / جزئیات / تحلیل */
 let qrRaw='';
-function openQr(c){
-  if(typeof QRCode==='undefined'){ toast(t('m_qrlib'),'err'); return; }
+async function ensureQrLibrary(){
+  if(typeof QRCode!=='undefined' && typeof QRCode.toCanvas==='function') return true;
+  const urls=[
+    'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/lib/browser.min.js'
+  ];
+  for(const url of urls){
+    const loaded=await new Promise(function(resolve){
+      const script=document.createElement('script');
+      script.src=url;
+      script.async=true;
+      script.onload=function(){ resolve(typeof QRCode!=='undefined' && typeof QRCode.toCanvas==='function'); };
+      script.onerror=function(){ script.remove(); resolve(false); };
+      document.head.appendChild(script);
+    });
+    if(loaded) return true;
+  }
+  return false;
+}
+async function openQr(c){
+  if(!c || !c.raw){ toast(t('m_qrfail'),'err'); return; }
+  if(!(await ensureQrLibrary())){ toast(t('m_qrlib'),'err'); return; }
   qrRaw=c.raw;
   $('#qrTitle').textContent='QR — '+c.name;
   $('#qrLink').textContent=c.raw.length>80?c.raw.slice(0,80)+'…':c.raw;
+  const canvas=$('#qrCanvas');
+  const ctx=canvas.getContext('2d');
+  if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height);
   openOv('#ovQr');
-  QRCode.toCanvas($('#qrCanvas'),c.raw,{width:220,margin:2,color:{dark:'#0b1512',light:'#e9f4ee'}},function(err){ if(err) toast(t('m_qrfail'),'err'); });
+  QRCode.toCanvas(canvas,c.raw,{width:220,margin:2,color:{dark:'#0b1512',light:'#e9f4ee'}},function(err){
+    if(err){ console.error('Gozar QR generation failed:',err); toast(t('m_qrfail'),'err'); }
+  });
 }
 click('#qrCopy',function(){ copyText(qrRaw); });
 click('#qrDl',function(){ $('#qrCanvas').toBlob(function(b){ if(b) download('gozar-qr.png',b); }); });
