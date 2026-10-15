@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
+import android.webkit.ValueCallback
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -40,6 +42,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private var gozarWebView: WebView? = null
+    private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
 
     @Volatile
     private var pendingCameraRequest: PermissionRequest? = null
@@ -64,6 +67,13 @@ class MainActivity : HelperBaseComponentActivity() {
                 lastBridgeError = "مجوز اتصال VPN تأیید نشد."
                 startRequestedAt = 0L
             }
+        }
+
+    private val pickConfigFile =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            val callback = pendingFileChooser
+            pendingFileChooser = null
+            callback?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
         }
 
     private val requestCameraPermission =
@@ -109,12 +119,30 @@ class MainActivity : HelperBaseComponentActivity() {
 
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
+                    settings.mediaPlaybackRequiresUserGesture = false
                     settings.allowFileAccess = true
                     settings.allowContentAccess = false
                     settings.allowFileAccessFromFileURLs = false
                     settings.allowUniversalAccessFromFileURLs = false
 
                     webChromeClient = object : WebChromeClient() {
+                        override fun onShowFileChooser(
+                            webView: WebView?,
+                            filePathCallback: ValueCallback<Array<Uri>>?,
+                            fileChooserParams: FileChooserParams?
+                        ): Boolean {
+                            pendingFileChooser?.onReceiveValue(null)
+                            pendingFileChooser = filePathCallback
+                            return try {
+                                pickConfigFile.launch(arrayOf("text/*", "application/json", "application/octet-stream"))
+                                true
+                            } catch (_: Exception) {
+                                pendingFileChooser = null
+                                filePathCallback?.onReceiveValue(null)
+                                false
+                            }
+                        }
+
                         override fun onPermissionRequest(request: PermissionRequest) {
                             runOnUiThread {
                                 // Only allow camera access requested by the QR scanner.
@@ -356,6 +384,8 @@ class MainActivity : HelperBaseComponentActivity() {
     override fun onDestroy() {
         pendingCameraRequest?.deny()
         pendingCameraRequest = null
+        pendingFileChooser?.onReceiveValue(null)
+        pendingFileChooser = null
         gozarWebView?.apply {
             removeJavascriptInterface("GozarAndroid")
             stopLoading()
