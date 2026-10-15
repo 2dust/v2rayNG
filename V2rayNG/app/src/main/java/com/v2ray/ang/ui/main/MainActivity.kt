@@ -1,97 +1,68 @@
+
 package com.v2ray.ang.ui.main
 
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.foundation.layout.fillMaxSize
 import com.v2ray.ang.AngApplication
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
 import com.v2ray.ang.core.LauncherManager
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.AboutActivity
-import com.v2ray.ang.ui.backup.BackupActivity
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
-import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
-import com.v2ray.ang.ui.logcat.LogcatActivity
-import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
-import com.v2ray.ang.ui.routing.RoutingSettingActivity
-import com.v2ray.ang.ui.server.ProfileEditorResult
-import com.v2ray.ang.ui.server.ServerCustomConfigActivity
-import com.v2ray.ang.ui.server.ServerGroupActivity
-import com.v2ray.ang.ui.server.ServerHttpActivity
-import com.v2ray.ang.ui.server.ServerHysteria2Activity
-import com.v2ray.ang.ui.server.ServerProxyChainActivity
-import com.v2ray.ang.ui.server.ServerShadowsocksActivity
-import com.v2ray.ang.ui.server.ServerSocksActivity
-import com.v2ray.ang.ui.server.ServerTrojanActivity
-import com.v2ray.ang.ui.server.ServerVlessActivity
-import com.v2ray.ang.ui.server.ServerVmessActivity
-import com.v2ray.ang.ui.server.ServerWireguardActivity
-import com.v2ray.ang.ui.settings.SettingsActivity
-import com.v2ray.ang.ui.subscription.SubSettingActivity
-import com.v2ray.ang.ui.userasset.UserAssetActivity
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.net.InetSocketAddress
+import java.net.Socket
+import org.json.JSONArray
 
 class MainActivity : HelperBaseComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Factory(application, MainRepository(application as AngApplication))
+        MainViewModel.Factory(
+            application,
+            MainRepository(application as AngApplication)
+        )
     }
 
+    private var gozarWebView: WebView? = null
+
+    @Volatile
+    private var pendingGuid: String? = null
+
+    @Volatile
+    private var startRequestedAt = 0L
+
+    @Volatile
+    private var lastBridgeError = ""
+
     private val requestVpnPermission =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) startV2Ray()
-        }
-
-    private val profileEditorLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode != RESULT_OK) return@registerForActivityResult
-            val data = result.data ?: return@registerForActivityResult
-            val action = data.getStringExtra(ProfileEditorResult.EXTRA_ACTION)
-                ?: return@registerForActivityResult
-            if (action != ProfileEditorResult.ACTION_SAVED &&
-                action != ProfileEditorResult.ACTION_DELETED
-            ) return@registerForActivityResult
-            val restartService = data.getBooleanExtra(
-                ProfileEditorResult.EXTRA_RESTART_SERVICE, false
-            )
-            val selectedProfileSaved = action == ProfileEditorResult.ACTION_SAVED &&
-                    data.getStringExtra(ProfileEditorResult.EXTRA_GUID) == mainViewModel.uiState.value.selectedGuid
-            mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService || selectedProfileSaved) LauncherManager.restartService(this)
-        }
-
-    private val settingsActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            val restartService = SettingsChangeManager.consumeRestartService()
-            val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
-            mainViewModel.refreshUiSettings()
-            if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
-            if (restartService) LauncherManager.restartService(this)
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val guid = pendingGuid
+            if (result.resultCode == RESULT_OK && !guid.isNullOrBlank()) {
+                LauncherManager.startService(this, guid)
+            } else {
+                lastBridgeError = "مجوز اتصال VPN تأیید نشد."
+                startRequestedAt = 0L
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
@@ -99,188 +70,226 @@ class MainActivity : HelperBaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        BackHandler { moveTaskToBack(false) }
-        MainScreen(
-            mainViewModel = mainViewModel,
-            onAction = { action ->
-                when (action) {
-                    MainAction.ToggleService -> handleFabAction()
-                    MainAction.TestCurrentServer -> handleLayoutTestClick()
-                    MainAction.ImportQRcode -> importQRcode()
-                    MainAction.ImportClipboard -> importClipboard()
-                    MainAction.ImportConfigLocal -> importConfigLocal()
-                    is MainAction.ImportManually -> importManually(action.type)
-                    MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
-                    MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
-                    is MainAction.SelectServer -> setSelectServer(action.guid)
-                    is MainAction.EditServer -> editServer(action.guid, action.profile)
-                    is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                    is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
-                    else -> mainViewModel.onAction(action)
+        BackHandler {
+            val web = gozarWebView
+            if (web?.canGoBack() == true) {
+                web.goBack()
+            } else {
+                moveTaskToBack(false)
+            }
+        }
+
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                WebView(context).apply {
+                    gozarWebView = this
+
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.allowFileAccess = true
+                    settings.allowContentAccess = false
+                    settings.allowFileAccessFromFileURLs = false
+                    settings.allowUniversalAccessFromFileURLs = false
+
+                    webChromeClient = WebChromeClient()
+
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): Boolean {
+                            val uri = request?.url ?: return true
+                            return !(
+                                uri.scheme == "file" &&
+                                uri.path?.startsWith("/android_asset/") == true
+                            )
+                        }
+                    }
+
+                    addJavascriptInterface(
+                        GozarBridge(),
+                        "GozarAndroid"
+                    )
+
+                    loadUrl("file:///android_asset/index.html")
                 }
-            },
-            onNavigate = { route -> navigateTo(route) },
+            }
         )
     }
 
-    private fun shareToClipboard(guid: String): Boolean =
-        AngConfigManager.share2Clipboard(this, guid) == 0
+    private inner class GozarBridge {
 
-    private fun shareFullContentAsync(guid: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
-            withContext(Dispatchers.Main) {
-                if (result == 0) toastSuccess(R.string.toast_success)
-                else toastError(R.string.toast_failure)
+        @JavascriptInterface
+        fun startVpn(json: String?): String {
+            if (json.isNullOrBlank() || json.length > 2_000_000) {
+                lastBridgeError = "کانفیگ خالی یا نامعتبر است."
+                return "invalid"
             }
-        }
-    }
 
-    private fun navigateTo(destination: MainDestination) {
-        val intent = when (destination) {
-            MainDestination.Subscriptions -> Intent(this, SubSettingActivity::class.java)
-            MainDestination.PerAppProxy -> Intent(this, PerAppProxyActivity::class.java)
-            MainDestination.Routing -> Intent(this, RoutingSettingActivity::class.java)
-            MainDestination.UserAssets -> Intent(this, UserAssetActivity::class.java)
-            MainDestination.Settings -> Intent(this, SettingsActivity::class.java)
-            MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
-            MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
-            MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
-            MainDestination.About -> Intent(this, AboutActivity::class.java)
-            MainDestination.Promotion -> {
-                Utils.openUri(
-                    this,
-                    "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}"
+            return try {
+                lastBridgeError = ""
+
+                val before = MmkvManager
+                    .decodeAllServerList()
+                    .toSet()
+
+                val result = AngConfigManager.importBatchConfig(
+                    json,
+                    "",
+                    true
                 )
-                return
-            }
-        }
-        settingsActivityLauncher.launch(intent)
-    }
 
-    private fun handleFabAction() {
-        if (mainViewModel.uiState.value.isRunning) {
-            LauncherManager.stopService(this)
-        } else {
-            requestServiceStart()
-        }
-    }
-
-    private fun requestServiceStart() {
-        if (!SettingsManager.isVpnMode()) {
-            startV2Ray()
-            return
-        }
-        val intent = VpnService.prepare(this)
-        if (intent == null) startV2Ray() else requestVpnPermission.launch(intent)
-    }
-
-    private fun handleLayoutTestClick() {
-        if (mainViewModel.uiState.value.isRunning) {
-            mainViewModel.testCurrentServerRealPing()
-        }
-    }
-
-    private fun startV2Ray() {
-        if (mainViewModel.uiState.value.selectedGuid.isNullOrEmpty()) {
-            toast(R.string.title_file_chooser)
-            return
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN
-        ) {
-            checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
-        }
-        LauncherManager.startService(this)
-    }
-
-    private fun importManually(createConfigType: Int) {
-        val intent = when (createConfigType) {
-            EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
-            EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)
-            EConfigType.VMESS.value -> Intent(this, ServerVmessActivity::class.java)
-            EConfigType.VLESS.value -> Intent(this, ServerVlessActivity::class.java)
-            EConfigType.SHADOWSOCKS.value -> Intent(this, ServerShadowsocksActivity::class.java)
-            EConfigType.SOCKS.value -> Intent(this, ServerSocksActivity::class.java)
-            EConfigType.HTTP.value -> Intent(this, ServerHttpActivity::class.java)
-            EConfigType.TROJAN.value -> Intent(this, ServerTrojanActivity::class.java)
-            EConfigType.WIREGUARD.value -> Intent(this, ServerWireguardActivity::class.java)
-            EConfigType.HYSTERIA2.value -> Intent(this, ServerHysteria2Activity::class.java)
-            else -> Intent(this, ServerHttpActivity::class.java).apply {
-                putExtra("createConfigType", createConfigType)
-            }
-        }.apply {
-            putExtra("subscriptionId", mainViewModel.uiState.value.selectedGroupId)
-        }
-        profileEditorLauncher.launch(intent)
-    }
-
-    private fun importQRcode() {
-        launchQRCodeScanner { scanResult ->
-            if (scanResult != null) {
-                mainViewModel.onAction(MainAction.ImportBatchConfig(scanResult))
-            }
-        }
-    }
-
-    private fun importClipboard() {
-        try {
-            val text = Utils.getClipboard(this)
-            mainViewModel.onAction(MainAction.ImportBatchConfig(text))
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to import config from clipboard", e)
-        }
-    }
-
-    private fun importConfigLocal() {
-        launchFileChooser { uri ->
-            if (uri == null) return@launchFileChooser
-            try {
-                contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
-                    mainViewModel.onAction(MainAction.ImportBatchConfig(reader.readText()))
+                if (result.first <= 0) {
+                    lastBridgeError = "کانفیگ قابل واردکردن نیست."
+                    return "invalid"
                 }
+
+                val after = MmkvManager.decodeAllServerList()
+
+                val guid = after.firstOrNull { it !in before }
+                    ?: MmkvManager.getSelectServer()
+                    ?: return "invalid"
+
+                MmkvManager.setSelectServer(guid)
+                pendingGuid = guid
+                startRequestedAt = System.currentTimeMillis()
+
+                runOnUiThread {
+                    try {
+                        if (SettingsManager.isVpnMode()) {
+                            val permissionIntent = VpnService.prepare(this@MainActivity)
+
+                            if (permissionIntent != null) {
+                                requestVpnPermission.launch(permissionIntent)
+                            } else {
+                                LauncherManager.startService(
+                                    this@MainActivity,
+                                    guid
+                                )
+                            }
+                        } else {
+                            LauncherManager.startService(
+                                this@MainActivity,
+                                guid
+                            )
+                        }
+                    } catch (e: Exception) {
+                        lastBridgeError =
+                            e.message ?: "شروع سرویس VPN ناموفق بود."
+                        startRequestedAt = 0L
+                    }
+                }
+
+                "ok"
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to read content from URI", e)
+                lastBridgeError =
+                    e.message ?: "خطا در واردکردن کانفیگ."
+                "invalid"
+            }
+        }
+
+        @JavascriptInterface
+        fun stopVpn() {
+            runOnUiThread {
+                try {
+                    LauncherManager.stopService(this@MainActivity)
+                    pendingGuid = null
+                    startRequestedAt = 0L
+                    lastBridgeError = ""
+                } catch (e: Exception) {
+                    lastBridgeError =
+                        e.message ?: "قطع اتصال ناموفق بود."
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun vpnStatus(): String {
+            if (mainViewModel.uiState.value.isRunning) {
+                pendingGuid = null
+                startRequestedAt = 0L
+                lastBridgeError = ""
+                return "on"
+            }
+
+            if (lastBridgeError.isNotBlank()) {
+                return "error"
+            }
+
+            val started = startRequestedAt
+            if (
+                started > 0L &&
+                System.currentTimeMillis() - started < 20_000L
+            ) {
+                return "connecting"
+            }
+
+            return "off"
+        }
+
+        @JavascriptInterface
+        fun setVpnParams(json: String?) {
+            // اتصال تنظیمات پیشرفتهٔ تونل به سرویس بومی
+            // در مرحلهٔ بعد پیاده‌سازی می‌شود.
+        }
+
+        @JavascriptInterface
+        fun tcpPing(server: String, port: Int): String {
+            return try {
+                val elapsed = System.currentTimeMillis()
+                Socket().use { socket ->
+                    socket.connect(
+                        InetSocketAddress(server, port),
+                        2000
+                    )
+                }
+                "ok,${System.currentTimeMillis() - elapsed}"
+            } catch (e: Exception) {
+                "error,${e.message.orEmpty()}"
+            }
+        }
+
+        @JavascriptInterface
+        fun coreLog(): String {
+            return lastBridgeError
+        }
+
+        @JavascriptInterface
+        fun getApps(): String {
+            return try {
+                val result = JSONArray()
+
+                packageManager
+                    .getInstalledApplications(
+                        PackageManager.GET_META_DATA
+                    )
+                    .forEach { app ->
+                        val label = packageManager
+                            .getApplicationLabel(app)
+                            .toString()
+
+                        result.put(
+                            org.json.JSONObject()
+                                .put("n", label)
+                                .put("p", app.packageName)
+                        )
+                    }
+
+                result.toString()
+            } catch (e: Exception) {
+                "[]"
             }
         }
     }
 
-    private fun editServer(guid: String, profile: ProfileItem) {
-        val activityClass = when (profile.configType) {
-            EConfigType.CUSTOM -> ServerCustomConfigActivity::class.java
-            EConfigType.POLICYGROUP -> ServerGroupActivity::class.java
-            EConfigType.PROXYCHAIN -> ServerProxyChainActivity::class.java
-            EConfigType.VMESS -> ServerVmessActivity::class.java
-            EConfigType.VLESS -> ServerVlessActivity::class.java
-            EConfigType.SHADOWSOCKS -> ServerShadowsocksActivity::class.java
-            EConfigType.SOCKS -> ServerSocksActivity::class.java
-            EConfigType.HTTP -> ServerHttpActivity::class.java
-            EConfigType.TROJAN -> ServerTrojanActivity::class.java
-            EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
-            EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
-            else -> ServerHttpActivity::class.java
+    override fun onDestroy() {
+        gozarWebView?.apply {
+            removeJavascriptInterface("GozarAndroid")
+            stopLoading()
+            destroy()
         }
-        val intent = Intent(this, activityClass).apply {
-            putExtra("guid", guid)
-            putExtra("isRunning", mainViewModel.uiState.value.isRunning)
-            putExtra("createConfigType", profile.configType.value)
-            putExtra("subscriptionId", mainViewModel.uiState.value.selectedGroupId)
-        }
-        profileEditorLauncher.launch(intent)
-    }
-
-    private fun setSelectServer(guid: String) {
-        val selected = mainViewModel.uiState.value.selectedGuid
-        if (guid != selected) {
-            mainViewModel.updateSelectedGuid(guid)
-            LauncherManager.restartService(this)
-        }
-    }
-
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
-            moveTaskToBack(false)
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
+        gozarWebView = null
+        super.onDestroy()
     }
 }
