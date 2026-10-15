@@ -121,7 +121,7 @@
   .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
   .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
   .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
-  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:72vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;width:min(420px,calc(100vw - 20px));min-width:0;max-width:calc(100vw - 20px);max-height:72vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
   .pop.open{display:block;animation:popin .14s}
   @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
   .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
@@ -1104,12 +1104,23 @@ function parseURLish(raw,scheme){
   const c={proto:proto,name:name,server:host,port:port,raw:raw};
   const net=(sp.get('type')||sp.get('network')||'tcp').toLowerCase();
   const sec=(sp.get('security')||'').toLowerCase();
+  c.security=sec;
   c.net=(net==='ws'||net==='grpc')?net:'tcp';
-  c.sni=sp.get('sni')||sp.get('peer')||''; c.fp=sp.get('fp')||''; c.flow=sp.get('flow')||''; c.alpn=sp.get('alpn')||'';
-  c.path=sp.get('path')||sp.get('serviceName')||''; c.hostHeader=sp.get('host')||'';
+  c.sni=sp.get('sni')||sp.get('serverName')||sp.get('peer')||'';
+  c.fp=sp.get('fp')||''; c.flow=sp.get('flow')||''; c.alpn=sp.get('alpn')||'';
+  c.path=sp.get('path')||sp.get('serviceName')||'';
+  c.hostHeader=sp.get('host')||sp.get('authority')||'';
   c.insecure=(sp.get('insecure')==='1'||sp.get('insecure')==='true'||sp.get('allowInsecure')==='1'||sp.get('allowInsecure')==='true');
-  c.tls=proto==='trojan'||proto==='hysteria2'||proto==='tuic'||sec==='tls'||sec==='reality'||!!c.sni;
-  if(proto==='vless'){ c.secret=safeDecode(u.username); if(sec==='reality'){ c.pbk=sp.get('pbk')||''; c.sid=sp.get('sid')||''; } if(!c.secret) return null; }
+  c.tls=proto==='trojan'||proto==='hysteria2'||proto==='tuic'||sec==='tls'||sec==='reality'||(!sec&&!!c.sni);
+  if(proto==='vless'){
+    c.secret=safeDecode(u.username);
+    if(sec==='reality'){
+      c.pbk=sp.get('pbk')||sp.get('publicKey')||'';
+      c.sid=sp.get('sid')||sp.get('shortId')||'';
+      c.spx=sp.get('spx')||sp.get('spiderX')||'';
+    }
+    if(!c.secret) return null;
+  }
   else if(proto==='trojan'){ c.secret=safeDecode(u.username); if(!c.secret) return null; }
   else if(proto==='hysteria2'){ c.secret=safeDecode(u.username)||safeDecode(u.password); c.obfs=sp.get('obfs')||''; c.obfsPass=sp.get('obfs-password')||''; if(!c.secret) return null; }
   else if(proto==='tuic'){ c.secret=safeDecode(u.username); c.pass=safeDecode(u.password); if(!c.secret) return null; }
@@ -1180,9 +1191,17 @@ function xrayOut(c){
   else if(c.proto==='vmess') proxy={tag:'proxy',protocol:'vmess',settings:{vnext:[{address:c.server,port:c.port,users:[{id:c.secret,alterId:c.alterId||0,security:c.cipher||'auto'}]}]}};
   else if(c.proto==='trojan') proxy={tag:'proxy',protocol:'trojan',settings:{servers:[{address:c.server,port:c.port,password:c.secret}]}};
   else proxy={tag:'proxy',protocol:'shadowsocks',settings:{servers:[{address:c.server,port:c.port,method:c.method,password:c.secret}]}};
-  const st={network:c.net||'tcp',security:c.pbk?'reality':(c.tls?'tls':'none')};
+  const security=(c.security==='reality'||!!c.pbk)?'reality':((c.security==='tls'||c.tls)?'tls':'none');
+  const st={network:c.net||'tcp',security:security};
   if(st.security==='tls') st.tlsSettings=tlsBlock(c);
-  if(st.security==='reality'){ st.realitySettings=tlsBlock(c); st.realitySettings.publicKey=c.pbk||''; st.realitySettings.shortId=c.sid||''; }
+  if(st.security==='reality'){
+    // Reality has its own Xray schema; do not pass TLS-only fields such as allowInsecure.
+    const rs={serverName:c.sni||c.server,publicKey:c.pbk||'',shortId:c.sid||''};
+    const rfp=c.fp||settings.adv.fp;
+    if(rfp&&rfp!=='none') rs.fingerprint=rfp;
+    if(c.spx) rs.spiderX=c.spx;
+    st.realitySettings=rs;
+  }
   if(c.net==='ws') st.wsSettings={path:c.path||'/',headers:{Host:c.hostHeader||c.server}};
   if(c.net==='grpc') st.grpcSettings={serviceName:c.path||''};
   proxy.streamSettings=st;
@@ -2770,6 +2789,63 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
       }
     }catch(e){ showError('اتصال خودکار ناموفق بود.'); }
   },1500);
+})();
+</script>
+
+<script>
+/* Gozar WebView fallback for top-bar popups and drawer. */
+(function(){
+  'use strict';
+  function id(s){ return document.getElementById(s); }
+  function closePops(){
+    document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); });
+  }
+  function closeDrawer(){
+    var d=id('drawer'), s=id('scrim');
+    if(d) d.classList.remove('open');
+    if(s) s.classList.remove('open');
+    document.body.classList.remove('locked');
+  }
+  function openPop(pop, btn){
+    if(!pop || !btn) return;
+    var wasOpen=pop.classList.contains('open');
+    closePops(); closeDrawer();
+    if(wasOpen) return;
+    pop.classList.add('open');
+    pop.style.visibility='hidden';
+    pop.style.left='8px'; pop.style.top='8px';
+    var r=btn.getBoundingClientRect(), w=pop.offsetWidth||280, h=pop.offsetHeight||320;
+    pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
+    pop.style.top=Math.max(8,Math.min(r.bottom+6,window.innerHeight-h-8))+'px';
+    pop.style.visibility='';
+  }
+  function toggleDrawer(){
+    var d=id('drawer'), s=id('scrim');
+    if(!d || !s) return;
+    var opening=!d.classList.contains('open');
+    closePops();
+    d.classList.toggle('open',opening);
+    s.classList.toggle('open',opening);
+    document.body.classList.toggle('locked',opening);
+  }
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(!t || !t.closest) return;
+    var drawerBtn=t.closest('#btnDrawer');
+    if(drawerBtn){ e.preventDefault(); e.stopImmediatePropagation(); toggleDrawer(); return; }
+    if(t.closest('#scrim')){ e.preventDefault(); e.stopImmediatePropagation(); closeDrawer(); return; }
+    var popBtn=t.closest('[data-pop]');
+    if(popBtn){
+      e.preventDefault(); e.stopImmediatePropagation();
+      var pop=null;
+      try{ pop=document.querySelector(popBtn.getAttribute('data-pop')); }catch(err){}
+      openPop(pop,popBtn); return;
+    }
+    if(!t.closest('.pop')) closePops();
+  },true);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){ closePops(); closeDrawer(); }
+  });
 })();
 </script>
 
