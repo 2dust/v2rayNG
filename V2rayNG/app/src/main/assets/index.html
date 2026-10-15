@@ -1886,19 +1886,13 @@ click('#aClip',async function(){
   closePops();
   try{
     let txt='';
-    // داخل اپ اندروید، کلیپ‌بورد را از پل بومی بخوان؛ Clipboard API در WebView
-    // برای file:// معمولاً در دسترس نیست یا به مجوز/secure context وابسته است.
     if(window.GozarAndroid && typeof window.GozarAndroid.readClipboard==='function'){
       txt=window.GozarAndroid.readClipboard() || '';
     }else if(navigator.clipboard && typeof navigator.clipboard.readText==='function'){
       txt=await navigator.clipboard.readText();
     }
-    if(!txt || !txt.trim()){
-      toast(t('m_clipe'),'warn');
-      return;
-    }
-    // کانفیگ کپی‌شده را مستقیماً تشخیص بده و به فهرست کانفیگ‌ها وارد کن.
-    importFromText(txt,'clip');
+    if(!txt || !txt.trim()){ toast(t('m_clipe'),'warn'); return; }
+    await importAnyText(txt,'clipboard');
   }catch(e){
     openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons();
     toast(t('m_clipd'),'warn');
@@ -1991,6 +1985,41 @@ function importFromText(text,label){
   else toast(t('m_nf_in',{x:label}),'warn');
   return n;
 }
+// Common entry point for clipboard and local files: supports raw links, base64
+// subscription payloads, and a single HTTPS subscription URL.
+async function importAnyText(raw,label){
+  let text=String(raw||'').trim();
+  if(!text){ toast(t('m_empty'),'warn'); return 0; }
+  if(/^https?:\/\//i.test(text) && !/\s/.test(text)){
+    try{
+      const result=await fetchSub(text);
+      text=result.text||'';
+      if(result.info){
+        const tag='custom-'+Date.now().toString(36);
+        subMeta[tag]={url:raw.trim(),up:result.info.up,down:result.info.down,total:result.info.total,expire:result.info.expire,updated:Date.now()};
+        saveSubMeta();
+      }
+    }catch(err){ toast(t('m_fail'),'err'); return 0; }
+  }
+  // JSON backup files exported by Gozar are handled without losing config names.
+  try{
+    const obj=JSON.parse(text);
+    const arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.configs)?obj.configs:null);
+    if(arr){
+      let count=0; const seen={};
+      state.configs.forEach(function(c){ if(c.raw) seen[c.raw]=1; });
+      arr.forEach(function(item){
+        const rawLink=typeof item==='string'?item:(item&&item.raw);
+        if(!rawLink||seen[rawLink]) return;
+        const parsed=parseLink(rawLink);
+        if(parsed){ if(item&&item.name) parsed.name=item.name; if(addParsed(parsed)){seen[rawLink]=1;count++;} }
+      });
+      if(count) afterAdd(count); else toast(t('m_nf_in',{x:label}),'warn');
+      return count;
+    }
+  }catch(e){}
+  return importFromText(text,label);
+}
 click('#btnAddMulti',async function(){
   const raw=$('#inMulti').value.trim();
   if(!raw){ toast(t('m_empty'),'warn'); return; }
@@ -2034,7 +2063,7 @@ click('#btnAddForm',function(){
 on('#fileOne','change',async function(e){
   const f=e.target.files[0]; e.target.value='';
   if(!f) return;
-  try{ importFromText(await fileToText(f),f.name); }catch(err){ toast(t('m_read'),'err'); }
+  try{ await importAnyText(await fileToText(f),f.name); }catch(err){ toast(t('m_read'),'err'); }
 });
 
 /* درگ‌اند‌دراپ */
