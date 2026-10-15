@@ -121,7 +121,7 @@
   .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
   .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
   .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
-  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:calc(100dvh - 16px);max-height:calc(100vh - 16px);box-sizing:border-box;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px}
   .pop.open{display:block;animation:popin .14s}
   @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
   .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
@@ -1687,28 +1687,44 @@ function openPop(pop,btn){
   closePops(); closeDrawer();
   if(was) return;
 
-  // Measure the full menu first, then place it where the screen has room.
-  pop.style.maxHeight='';
+  // Let the menu measure its full content before limiting it to the viewport.
+  pop.style.maxHeight='none';
   pop.style.visibility='hidden';
   pop.style.left='8px'; pop.style.top='8px';
   pop.classList.add('open');
+
   const r=btn.getBoundingClientRect();
-  const vh=window.innerHeight||document.documentElement.clientHeight;
-  const vw=window.innerWidth||document.documentElement.clientWidth;
+  const vw=document.documentElement.clientWidth || window.innerWidth;
+  const vh=document.documentElement.clientHeight || window.innerHeight;
   const gap=8, anchorGap=6;
-  const pw=pop.offsetWidth||280;
-  const left=Math.max(gap,Math.min(r.left,vw-pw-gap));
+  const pw=pop.offsetWidth || 280;
+  const left=Math.max(gap, Math.min(r.left, vw-pw-gap));
   pop.style.left=left+'px';
 
-  const fullHeight=pop.scrollHeight||pop.offsetHeight||320;
-  const desired=Math.min(fullHeight,Math.max(1,vh-gap*2));
-  const below=Math.max(0,vh-r.bottom-anchorGap-gap);
-  const above=Math.max(0,r.top-anchorGap-gap);
-  const placeBelow=(desired<=below || below>=above);
-  const room=placeBelow?below:above;
-  const maxH=Math.max(1,Math.min(desired,room,vh-gap*2));
-  let top=placeBelow?r.bottom+anchorGap:r.top-anchorGap-maxH;
-  top=Math.max(gap,Math.min(top,vh-gap-maxH));
+  const fullHeight=pop.scrollHeight || pop.offsetHeight || 320;
+  const maxViewportHeight=Math.max(1, vh-gap*2);
+  const desired=Math.min(fullHeight, maxViewportHeight);
+  const below=Math.max(0, vh-r.bottom-anchorGap-gap);
+  const above=Math.max(0, r.top-anchorGap-gap);
+  let top, maxH;
+
+  if(desired <= below){
+    top=r.bottom+anchorGap;
+    maxH=Math.min(desired, vh-top-gap);
+  }else if(desired <= above){
+    maxH=desired;
+    top=r.top-anchorGap-maxH;
+  }else if(below >= above){
+    // If neither side fits, use the largest available area and keep it scrollable.
+    top=Math.max(gap, Math.min(r.bottom+anchorGap, vh-gap-Math.min(desired, maxViewportHeight)));
+    maxH=Math.min(desired, vh-top-gap);
+  }else{
+    maxH=Math.min(desired, maxViewportHeight);
+    top=gap;
+  }
+
+  maxH=Math.max(1, Math.min(maxH, vh-gap*2));
+  top=Math.max(gap, Math.min(top, vh-gap-maxH));
   pop.style.maxHeight=maxH+'px';
   pop.style.top=top+'px';
   pop.scrollTop=0;
@@ -2832,27 +2848,44 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
     closePops(); closeDrawer();
     if(wasOpen) return;
 
-    // Measure the full menu, then cap it to the available viewport space.
-    pop.style.maxHeight='';
+    // Let the menu measure its full content before limiting it to the viewport.
+    pop.style.maxHeight='none';
     pop.style.visibility='hidden';
     pop.style.left='8px'; pop.style.top='8px';
     pop.classList.add('open');
-    var r=btn.getBoundingClientRect();
-    var vh=window.innerHeight||document.documentElement.clientHeight;
-    var vw=window.innerWidth||document.documentElement.clientWidth;
-    var gap=8, anchorGap=6;
-    var w=pop.offsetWidth||280;
-    pop.style.left=Math.max(gap,Math.min(r.left,vw-w-gap))+'px';
 
-    var fullHeight=pop.scrollHeight||pop.offsetHeight||320;
-    var desired=Math.min(fullHeight,Math.max(1,vh-gap*2));
-    var below=Math.max(0,vh-r.bottom-anchorGap-gap);
-    var above=Math.max(0,r.top-anchorGap-gap);
-    var placeBelow=(desired<=below || below>=above);
-    var room=placeBelow?below:above;
-    var maxH=Math.max(1,Math.min(desired,room,vh-gap*2));
-    var top=placeBelow?r.bottom+anchorGap:r.top-anchorGap-maxH;
-    top=Math.max(gap,Math.min(top,vh-gap-maxH));
+    var r=btn.getBoundingClientRect();
+    var vw=document.documentElement.clientWidth || window.innerWidth;
+    var vh=document.documentElement.clientHeight || window.innerHeight;
+    var gap=8, anchorGap=6;
+    var w=pop.offsetWidth || 280;
+    var left=Math.max(gap, Math.min(r.left, vw-w-gap));
+    pop.style.left=left+'px';
+
+    var fullHeight=pop.scrollHeight || pop.offsetHeight || 320;
+    var maxViewportHeight=Math.max(1, vh-gap*2);
+    var desired=Math.min(fullHeight, maxViewportHeight);
+    var below=Math.max(0, vh-r.bottom-anchorGap-gap);
+    var above=Math.max(0, r.top-anchorGap-gap);
+    var top, maxH;
+
+    if(desired <= below){
+      top=r.bottom+anchorGap;
+      maxH=Math.min(desired, vh-top-gap);
+    }else if(desired <= above){
+      maxH=desired;
+      top=r.top-anchorGap-maxH;
+    }else if(below >= above){
+      // If neither side fits, use the largest available area and keep it scrollable.
+      top=Math.max(gap, Math.min(r.bottom+anchorGap, vh-gap-Math.min(desired, maxViewportHeight)));
+      maxH=Math.min(desired, vh-top-gap);
+    }else{
+      maxH=Math.min(desired, maxViewportHeight);
+      top=gap;
+    }
+
+    maxH=Math.max(1, Math.min(maxH, vh-gap*2));
+    top=Math.max(gap, Math.min(top, vh-gap-maxH));
     pop.style.maxHeight=maxH+'px';
     pop.style.top=top+'px';
     pop.scrollTop=0;
