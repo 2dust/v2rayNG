@@ -167,11 +167,20 @@
   .sh-btn.danger svg{color:var(--err)}
   .overlay{position:fixed;inset:0;background:rgba(4,8,6,.74);z-index:85;display:none;align-items:center;justify-content:center;padding:16px}
   .overlay.open{display:flex}
-  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100dvh - 28px);display:flex;flex-direction:column;animation:mup .2s}
+  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;animation:mup .2s}
+  /* Tall, scrollable panels opened from the hamburger menu. Keep the header visible and scroll only the body. */
+  #ovSettings .modal,#ovSources .modal,#ovSubs .modal,.modal.tall-content{
+    height:calc(100vh - 24px);
+    height:calc(100dvh - 24px);
+    max-height:calc(100vh - 24px);
+    max-height:calc(100dvh - 24px);
+    min-height:0;
+    overflow:hidden;
+  }
   @keyframes mup{from{transform:translateY(14px) scale(.98);opacity:0}}
   .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
   .m-head h4{font-size:14.5px;font-weight:800}
-  .m-body{padding:16px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;overscroll-behavior:contain;touch-action:pan-y;scroll-behavior:smooth}
+  .m-body{padding:16px 18px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;flex:1 1 auto;min-height:0;max-height:100%;overscroll-behavior:contain;touch-action:pan-y;scroll-behavior:smooth}
   .m-foot{padding:11px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;flex-shrink:0}
   .tabs-v{display:flex;gap:5px;margin-bottom:14px;background:var(--inset);border-radius:11px;padding:4px;border:1px solid var(--line);flex-wrap:wrap}
   .tabv{flex:1;border:none;background:transparent;color:var(--sub);font-family:inherit;font-size:12px;font-weight:700;padding:8px 6px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.15s;touch-action:manipulation;min-height:42px;min-width:88px}
@@ -2369,17 +2378,21 @@ function log(msg,level){
 }
 function openLogs(){
   openConfirm(t('d_logs'),null,
-    '<div style="max-height:300px;overflow-y:auto;font-family:var(--mono);font-size:10.5px;line-height:2">'+
+    '<div style="max-height:calc(100vh - 220px);max-height:calc(100dvh - 220px);overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:10.5px;line-height:2">'+
     logLines.map(function(l){
       const col=l.level==='ok'?'var(--acc)':l.level==='err'?'var(--err)':l.level==='warn'?'var(--warn)':'var(--sub)';
       return '<div style="color:'+col+'"><span style="color:var(--faint);font-size:9.5px">'+l.tm+'</span> '+esc(l.msg)+'</div>';
     }).join('')+'</div>',
     t('c_close'));
+  const logModal=document.querySelector('#ovConfirm .modal');
+  if(logModal) logModal.classList.add('tall-content');
 }
 
 /* تایید / نام */
 let confirmCb=null;
 function openConfirm(html,cb,customBody,okLabel){
+  const confirmModal=document.querySelector('#ovConfirm .modal');
+  if(confirmModal) confirmModal.classList.remove('tall-content');
   const box=$('#confirmTxt');
   if(customBody) box.innerHTML=customBody; else box.innerHTML=html;
   $('#confirmOkLbl').textContent=okLabel||t('c_ok');
