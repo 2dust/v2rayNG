@@ -121,7 +121,7 @@
   .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
   .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
   .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
-  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;width:min(420px,calc(100vw - 20px));min-width:0;max-width:calc(100vw - 20px);max-height:72vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;width:min(420px,calc(100vw - 20px));min-width:0;max-width:calc(100vw - 20px);max-height:calc(100dvh - 16px);max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px}
   .pop.open{display:block;animation:popin .14s}
   @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
   .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
@@ -1686,13 +1686,28 @@ function openPop(pop,btn){
   const was=pop.classList.contains('open');
   closePops(); closeDrawer();
   if(was) return;
+  pop.style.maxHeight='';
   pop.classList.add('open');
   const r=btn.getBoundingClientRect();
+  const vh=window.innerHeight||document.documentElement.clientHeight;
   let left=r.left;
   const pw=pop.offsetWidth||280;
   if(left+pw>window.innerWidth-8) left=window.innerWidth-8-pw;
   if(left<8) left=8;
-  pop.style.left=left+'px'; pop.style.top=(r.bottom+6)+'px';
+  pop.style.left=left+'px';
+  const gap=8;
+  const below=Math.max(0,vh-r.bottom-gap-6);
+  const above=Math.max(0,r.top-gap-6);
+  const desired=Math.min(pop.scrollHeight,vh-2*gap);
+  let top=r.bottom+6;
+  if(desired>below && above>below){
+    top=Math.max(gap,r.top-Math.min(desired,above)-6);
+  }else if(top+desired>vh-gap){
+    top=Math.max(gap,vh-Math.min(desired,vh-2*gap)-gap);
+  }
+  const maxH=Math.max(120,Math.min(vh-top-gap,vh-2*gap));
+  pop.style.maxHeight=maxH+'px';
+  pop.style.top=top+'px';
 }
 document.querySelectorAll('[data-pop]').forEach(function(b){
   b.addEventListener('click',function(e){ e.stopPropagation(); openPop($(b.getAttribute('data-pop')),b); });
