@@ -292,6 +292,35 @@
     .sheet.open{transform:translate(-50%,0)}
     .page{padding-top:calc(env(safe-area-inset-top) + 70px)}
   }
+
+  /* Gozar: consistent vertical layout for every menu and dialog */
+  :root{--gozar-view-height:100dvh;--gozar-view-top:0px}
+  .overlay{
+    top:var(--gozar-view-top);bottom:auto;height:var(--gozar-view-height);
+    padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left));
+    overflow:hidden;align-items:center;justify-content:center;
+  }
+  .overlay.open{display:flex}
+  .overlay .modal{
+    height:calc(var(--gozar-view-height) - 16px);
+    max-height:calc(var(--gozar-view-height) - 16px);
+    min-height:0;max-width:min(100%,520px);overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .overlay .m-head,.overlay .m-foot{flex:0 0 auto;min-height:0}
+  .overlay .m-body{flex:1 1 0%;min-height:0;max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .overlay .m-body > *{max-width:100%}
+  .overlay .tabs-v{position:relative;flex-shrink:0}
+  .overlay input,.overlay textarea,.overlay select{max-width:100%;min-width:0}
+  .drawer{top:var(--gozar-view-top);bottom:auto;height:var(--gozar-view-height);max-height:var(--gozar-view-height);min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sheet{bottom:auto;top:calc(var(--gozar-view-top) + var(--gozar-view-height));height:min(84vh,calc(var(--gozar-view-height) - 8px));max-height:calc(var(--gozar-view-height) - 8px);min-height:0;transform:translateY(0)}
+  .sheet.open{transform:translateY(-100%)}
+  .sheet .sh-grid{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .pop{max-height:calc(var(--gozar-view-height) - 16px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  @media(min-width:700px){
+    .sheet{left:50%;right:auto;transform:translate(-50%,0)}
+    .sheet.open{transform:translate(-50%,-100%)}
+  }
 </style>
 </head>
 <body>
@@ -1707,18 +1736,35 @@ click('#shConnect2',function(){ closeSheet(); });
 
 /* منوها */
 function closePops(){ document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); }); }
+function positionGozarPop(pop,btn){
+  if(!pop||!btn||!pop.classList.contains('open')) return;
+  const vv=window.visualViewport;
+  const top=(vv&&vv.offsetTop)||0;
+  const height=(vv&&vv.height)||window.innerHeight;
+  const width=(vv&&vv.width)||window.innerWidth;
+  const leftEdge=(vv&&vv.offsetLeft)||0;
+  const margin=8;
+  const r=btn.getBoundingClientRect();
+  pop.style.maxHeight=Math.max(80,height-2*margin)+'px';
+  const pw=pop.offsetWidth||280;
+  const left=Math.max(leftEdge+margin,Math.min(r.left,leftEdge+width-pw-margin));
+  pop.style.left=left+'px';
+  const availableBelow=top+height-r.bottom-margin-6;
+  const availableAbove=r.top-top-margin-6;
+  const openAbove=availableAbove>availableBelow&&availableAbove>160;
+  const space=Math.max(80,openAbove?availableAbove:availableBelow);
+  pop.style.maxHeight=Math.min(height-2*margin,space)+'px';
+  const ph=pop.offsetHeight;
+  pop.style.top=Math.max(top+margin,Math.min(openAbove?r.top-ph-6:r.bottom+6,top+height-ph-margin))+'px';
+}
 function openPop(pop,btn){
-  if(!pop) return;
+  if(!pop||!btn) return;
   const was=pop.classList.contains('open');
-  closePops(); closeDrawer();
+  closePops();closeDrawer();
   if(was) return;
   pop.classList.add('open');
-  const r=btn.getBoundingClientRect();
-  let left=r.left;
-  const pw=pop.offsetWidth||280;
-  if(left+pw>window.innerWidth-8) left=window.innerWidth-8-pw;
-  if(left<8) left=8;
-  pop.style.left=left+'px'; pop.style.top=(r.bottom+6)+'px';
+  pop._gozarAnchor=btn;
+  positionGozarPop(pop,btn);
 }
 document.querySelectorAll('[data-pop]').forEach(function(b){
   b.addEventListener('click',function(e){ e.stopPropagation(); openPop($(b.getAttribute('data-pop')),b); });
@@ -2433,23 +2479,44 @@ function anyOverlayOpen(){
 function syncLock(){
   document.body.classList.toggle('locked', anyOverlayOpen());
 }
+function updateGozarViewport(){
+  const vv=window.visualViewport;
+  const height=Math.max(1,Math.round((vv&&vv.height)||window.innerHeight||document.documentElement.clientHeight));
+  const top=Math.max(0,Math.round((vv&&vv.offsetTop)||0));
+  document.documentElement.style.setProperty('--gozar-view-height',height+'px');
+  document.documentElement.style.setProperty('--gozar-view-top',top+'px');
+  document.querySelectorAll('.pop.open').forEach(function(pop){
+    if(pop._gozarAnchor) positionGozarPop(pop,pop._gozarAnchor);
+  });
+}
+function fitTallPanel(ov){
+  if(!ov) return;
+  updateGozarViewport();
+  const modal=ov.querySelector('.modal');
+  if(!modal) return;
+  // Clear obsolete per-dialog sizing; the shared CSS now sizes all dialogs.
+  modal.style.removeProperty('height');
+  modal.style.removeProperty('max-height');
+  modal.style.removeProperty('min-height');
+  modal.style.removeProperty('overflow');
+  const body=modal.querySelector('.m-body');
+  if(body) body.style.removeProperty('max-height');
+}
 function openOv(id){
   const ov=$(id); if(!ov) return;
+  updateGozarViewport();
   ov.classList.add('open');
-  // Keep the add/import forms within the visible Android WebView viewport.
-  if(ov.id==='ovAdd'){
-    const modal=ov.querySelector('.modal');
-    if(modal){
-      const height=Math.max(240,Math.round((window.visualViewport&&window.visualViewport.height)||window.innerHeight)-24);
-      modal.style.height=height+'px';
-      modal.style.maxHeight=height+'px';
-      modal.style.minHeight='0';
-      modal.style.overflow='hidden';
-    }
-  }
+  fitTallPanel(ov);
   const mb=ov.querySelector('.m-body'); if(mb) mb.scrollTop=0;
   syncLock();
 }
+window.addEventListener('resize',updateGozarViewport,{passive:true});
+window.addEventListener('orientationchange',updateGozarViewport,{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateGozarViewport,{passive:true});
+  window.visualViewport.addEventListener('scroll',updateGozarViewport,{passive:true});
+}
+updateGozarViewport();
 function closeOv(el){
   if(!el) return;
   el.classList.remove('open');
@@ -2863,62 +2930,7 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
 })();
 </script>
 
-<script>
-/* Gozar WebView fallback for top-bar popups and drawer. */
-(function(){
-  'use strict';
-  function id(s){ return document.getElementById(s); }
-  function closePops(){
-    document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); });
-  }
-  function closeDrawer(){
-    var d=id('drawer'), s=id('scrim');
-    if(d) d.classList.remove('open');
-    if(s) s.classList.remove('open');
-    document.body.classList.remove('locked');
-  }
-  function openPop(pop, btn){
-    if(!pop || !btn) return;
-    var wasOpen=pop.classList.contains('open');
-    closePops(); closeDrawer();
-    if(wasOpen) return;
-    pop.classList.add('open');
-    pop.style.visibility='hidden';
-    pop.style.left='8px'; pop.style.top='8px';
-    var r=btn.getBoundingClientRect(), w=pop.offsetWidth||280, h=pop.offsetHeight||320;
-    pop.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
-    pop.style.top=Math.max(8,Math.min(r.bottom+6,window.innerHeight-h-8))+'px';
-    pop.style.visibility='';
-  }
-  function toggleDrawer(){
-    var d=id('drawer'), s=id('scrim');
-    if(!d || !s) return;
-    var opening=!d.classList.contains('open');
-    closePops();
-    d.classList.toggle('open',opening);
-    s.classList.toggle('open',opening);
-    document.body.classList.toggle('locked',opening);
-  }
-  document.addEventListener('click',function(e){
-    var t=e.target;
-    if(!t || !t.closest) return;
-    var drawerBtn=t.closest('#btnDrawer');
-    if(drawerBtn){ e.preventDefault(); e.stopImmediatePropagation(); toggleDrawer(); return; }
-    if(t.closest('#scrim')){ e.preventDefault(); e.stopImmediatePropagation(); closeDrawer(); return; }
-    var popBtn=t.closest('[data-pop]');
-    if(popBtn){
-      e.preventDefault(); e.stopImmediatePropagation();
-      var pop=null;
-      try{ pop=document.querySelector(popBtn.getAttribute('data-pop')); }catch(err){}
-      openPop(pop,popBtn); return;
-    }
-    if(!t.closest('.pop')) closePops();
-  },true);
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){ closePops(); closeDrawer(); }
-  });
-})();
-</script>
+
 
 <script>
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))
