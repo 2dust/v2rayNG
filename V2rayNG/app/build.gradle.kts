@@ -170,6 +170,7 @@ dependencies {
     // AndroidX Core Libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation("androidx.webkit:webkit:1.12.1")
 
     // Compose Libraries
     implementation(platform(libs.androidx.compose.bom))
