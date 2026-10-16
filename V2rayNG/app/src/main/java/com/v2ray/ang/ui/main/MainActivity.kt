@@ -17,6 +17,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.webkit.WebViewAssetLoader
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -31,6 +32,9 @@ import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import java.net.InetSocketAddress
 import java.net.Socket
 import org.json.JSONArray
+import org.json.JSONObject
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class MainActivity : HelperBaseComponentActivity() {
 
@@ -40,6 +44,8 @@ class MainActivity : HelperBaseComponentActivity() {
             MainRepository(application as AngApplication)
         )
     }
+
+    private val pingWorkers = Executors.newFixedThreadPool(2)
 
     private var gozarWebView: WebView? = null
     private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
@@ -111,6 +117,10 @@ class MainActivity : HelperBaseComponentActivity() {
             }
         }
 
+        val assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
@@ -174,14 +184,23 @@ class MainActivity : HelperBaseComponentActivity() {
                     }
 
                     webViewClient = object : WebViewClient() {
+                        override fun shouldInterceptRequest(
+                            view: WebView?,
+                            request: WebResourceRequest?
+                        ): android.webkit.WebResourceResponse? {
+                            val uri = request?.url ?: return null
+                            return if (uri.host == "appassets.androidplatform.net") assetLoader.shouldInterceptRequest(uri) else null
+                        }
+
                         override fun shouldOverrideUrlLoading(
                             view: WebView?,
                             request: WebResourceRequest?
                         ): Boolean {
                             val uri = request?.url ?: return true
                             return !(
-                                uri.scheme == "file" &&
-                                uri.path?.startsWith("/android_asset/") == true
+                                uri.scheme == "https" &&
+                                uri.host == "appassets.androidplatform.net" &&
+                                uri.path?.startsWith("/assets/") == true
                             )
                         }
                     }
@@ -191,7 +210,7 @@ class MainActivity : HelperBaseComponentActivity() {
                         "GozarAndroid"
                     )
 
-                    loadUrl("file:///android_asset/index.html")
+                    loadUrl("https://appassets.androidplatform.net/assets/index.html")
                 }
             }
         )
@@ -333,6 +352,28 @@ class MainActivity : HelperBaseComponentActivity() {
         }
 
         @JavascriptInterface
+        fun tcpPingAsync(server: String, port: Int, requestId: String, timeoutMs: Int) {
+            if (requestId.length !in 1..80 || !requestId.matches(Regex("[a-zA-Z0-9_]+"))) return
+            if (port !in 1..65535 || server.length !in 1..253) return
+            val safeTimeout = timeoutMs.coerceIn(500, 10000)
+            pingWorkers.execute {
+                val started = System.currentTimeMillis()
+                val result = try {
+                    Socket().use { socket ->
+                        socket.connect(InetSocketAddress(server, port), safeTimeout)
+                    }
+                    "ok,${System.currentTimeMillis() - started}"
+                } catch (_: Exception) { "error" }
+                runOnUiThread {
+                    gozarWebView?.evaluateJavascript(
+                        "window.gozarPingResult(${JSONObject.quote(requestId)},${JSONObject.quote(result)});",
+                        null
+                    )
+                }
+            }
+        }
+
+        @JavascriptInterface
         fun tcpPing(server: String, port: Int): String {
             return try {
                 val elapsed = System.currentTimeMillis()
@@ -382,6 +423,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     override fun onDestroy() {
+        pingWorkers.shutdownNow()
         pendingCameraRequest?.deny()
         pendingCameraRequest = null
         pendingFileChooser?.onReceiveValue(null)
