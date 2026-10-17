@@ -4,10 +4,14 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+    <!-- Gozar's original three-node connected mark, monochrome for Android status bar. -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M12,1.5 L21,5.2 L21,11.2 C21,16.9 17.4,20.9 12,23 C6.6,20.9 3,16.9 3,11.2 L3,5.2 Z M12,3.7 L5,6.6 L5,11.2 C5,15.5 7.5,18.8 12,20.8 C16.5,18.8 19,15.5 19,11.2 L19,6.6 Z"/>
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M13.5,5.8 L8,13 L11.7,13 L10.5,18.4 L16.2,10.7 L12.5,10.7 Z"/>
+        android:pathData="M12,5.2 L5.1,14.7 L6.65,15.83 L12,8.45 L17.35,15.83 L18.9,14.7 Z"/>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2.1 a2.65,2.65 0,1 0,0 5.3 a2.65,2.65 0,1 0,0 -5.3"/>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M4.7,13.65 a2.65,2.65 0,1 0,0 5.3 a2.65,2.65 0,1 0,0 -5.3"/>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M19.3,13.65 a2.65,2.65 0,1 0,0 5.3 a2.65,2.65 0,1 0,0 -5.3"/>
 </vector>
