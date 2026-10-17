@@ -153,6 +153,10 @@ object CoreConfigContextBuilder {
                     val noEncryption = profile.method.isNullOrEmpty() || profile.method == "none"
                     !(profile.configType == EConfigType.VLESS && noSecurity && noEncryption)
                 }
+                                             .filter { profile ->
+                    // allowInsecure was removed from newer Xray core; such profiles break the whole config
+                    profile.insecure != true
+                }   
                 .filter { profile ->
                     val subscriptionId = config.policyGroupSubscriptionId
                     if (subscriptionId.isNullOrBlank()) {
