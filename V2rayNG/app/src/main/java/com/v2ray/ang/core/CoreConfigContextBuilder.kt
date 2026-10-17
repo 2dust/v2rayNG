@@ -147,6 +147,12 @@ object CoreConfigContextBuilder {
             return serverList
                 .asSequence()
                 .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
+                                .filter { profile ->
+                    // VLESS without TLS/REALITY and without encryption is rejected by Xray
+                    val noSecurity = profile.security.isNullOrEmpty() || profile.security == "none"
+                    val noEncryption = profile.method.isNullOrEmpty() || profile.method == "none"
+                    !(profile.configType == EConfigType.VLESS && noSecurity && noEncryption)
+                }
                 .filter { profile ->
                     val subscriptionId = config.policyGroupSubscriptionId
                     if (subscriptionId.isNullOrBlank()) {
