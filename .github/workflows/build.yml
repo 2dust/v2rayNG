@@ -141,15 +141,44 @@ jobs:
           path: release
 
       - name: Sign APK files
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          printf '%s' "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          KEY=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
-          mkdir -p release-files
+          set -euo pipefail
 
-          find release -type f -name '*.apk' | while read apk; do
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent || true
+
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --import
+
+          KEY=$(gpg --list-secret-keys --with-colons \
+            | awk -F: '/^fpr:/ {print $10; exit}')
+
+          if [ -z "$KEY" ]; then
+            echo "GPG private key was not found"
+            exit 1
+          fi
+
+          mkdir -p release-files
+          find release -type f -name '*.apk' -print -quit | grep -q . || {
+            echo "No APK files found"
+            exit 1
+          }
+
+          while IFS= read -r -d '' apk; do
             cp "$apk" release-files/
-            gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
-          done
+
+            gpg --batch --yes \
+              --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --local-user "$KEY" \
+              --detach-sign \
+              --output "release-files/$(basename "$apk").sig" \
+              "$apk"
+          done < <(find release -type f -name '*.apk' -print0)
 
           gpg --armor --export "$KEY" > release-files/v2rayN-public-key.asc
 

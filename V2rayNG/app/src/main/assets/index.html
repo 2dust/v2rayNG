@@ -1,0 +1,2940 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f0d">
+<meta name="mobile-web-app-capable" content="yes">
+<title>گذر — فایل کانفیگ</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/index.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root{--bg:#0a0f0d;--panel:#0f1714;--panel2:#121c18;--inset:#0c1310;--line:#1c2b25;--line2:#2a4238;--txt:#dfeae4;--sub:#8aa296;--faint:#5c7268;--acc:#2fe6a8;--acc-dark:#0d3a2b;--warn:#f0b45a;--err:#ff7369;--ok:#4be3a5;--mono:'JetBrains Mono',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{overscroll-behavior:none}
+  body{background:var(--bg);color:var(--txt);font-family:'Vazirmatn',sans-serif;font-size:14px;line-height:1.7;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+  body.locked{overflow:hidden}
+  #bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+  html.no-icons i[data-lucide]{display:none!important}
+  .page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 62px) 12px calc(150px + env(safe-area-inset-bottom))}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(17,24,20,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:2px;padding:calc(env(safe-area-inset-top) + 6px) 8px 6px}
+  .tb-btn{width:42px;height:42px;border:none;background:transparent;color:var(--txt);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .tb-btn:hover{background:rgba(255,255,255,.06)}.tb-btn:active{transform:scale(.94)}
+  .tb-btn svg{width:21px;height:21px}
+  .tb-title{flex:1;min-width:0;font-size:16.5px;font-weight:800;margin:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+  .tb-title small{display:block;font-size:10px;font-weight:600;color:var(--faint);margin-top:-4px}
+  .tabs{display:flex;gap:4px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabbtn{flex-shrink:0;border:1px solid var(--line);background:transparent;color:var(--sub);border-radius:99px;padding:5px 15px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+  .tabbtn.on{background:var(--acc-dark);border-color:var(--acc);color:var(--acc)}
+  .tabbtn b{font-family:var(--mono);font-size:10px;opacity:.75;font-weight:600;margin-right:5px}
+  .conncard{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+  .conncard.on{border-color:#1a5c45}
+  .conn-head{display:flex;align-items:center;gap:12px;padding:11px 13px;cursor:pointer;-webkit-user-select:none;user-select:none}
+  .conn-info{flex:1;min-width:0}
+  .conn-info .lbl{font-size:10px;color:var(--faint);font-weight:700}
+  .conn-info .nm{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conn-info .hs{font-family:var(--mono);font-size:10.5px;color:var(--sub);direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chev{width:20px;height:20px;color:var(--faint);flex-shrink:0;transition:transform .2s}
+  .conncard.open .chev{transform:rotate(180deg)}
+  .conn-body{display:none;padding:0 14px 14px;text-align:center}
+  .conncard.open .conn-body{display:block}
+  .ring-wrap{display:flex;justify-content:center;padding:14px 0 4px}
+  .ring{position:relative;width:210px;height:210px;cursor:pointer;user-select:none;touch-action:manipulation}
+  .ring svg{width:100%;height:100%;overflow:visible}
+  .ring .track{fill:none;stroke:var(--line);stroke-width:5}
+  .ring .prog{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;stroke-dasharray:653.45;stroke-dashoffset:653.45;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .7s cubic-bezier(.3,.8,.3,1)}
+  .ring.err .prog{stroke:var(--err)}
+  .ring .arc1,.ring .arc2{fill:none;stroke-width:2.5;stroke-linecap:round}
+  .ring .arc1{stroke:var(--acc);stroke-dasharray:80 498;opacity:.55}
+  .ring .arc2{stroke:var(--faint);stroke-dasharray:170 408;opacity:.5}
+  .ring g.spin1,.ring g.spin2{transform-origin:center}
+  .ring g.spin1{animation:spin 10s linear infinite}
+  .ring g.spin2{animation:spin 14s linear infinite reverse}
+  .ring.busy g.spin1{animation-duration:1.1s}.ring.busy g.spin2{animation-duration:1.7s}.ring.busy .arc1{opacity:1}
+  .ring.on .arc1,.ring.on .arc2,.ring.err .arc1,.ring.err .arc2{opacity:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ring-core{position:absolute;inset:24px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px}
+  .ring.on .ring-core{border-color:#1a5c45;box-shadow:0 0 26px rgba(47,230,168,.12)}
+  .ring-core svg{width:24px;height:24px;color:var(--sub)}
+  .ring-core .word{font-size:17px;font-weight:800}
+  .ring-core small{font-size:9.5px;color:var(--faint);line-height:1.5}
+  .ring-core .ms{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--acc);direction:ltr}
+  .ring-core .spinning{animation:spin 1.4s linear infinite}
+  .badge-ic{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .badge-ic svg{width:20px;height:20px;color:inherit}
+  .badge-ic.ok{background:var(--acc-dark);color:var(--acc)}
+  .badge-ic.bad{background:#3a1613;color:var(--err)}
+  .metrics{display:flex;justify-content:center;margin:12px 0 2px;border-top:1px solid var(--line)}
+  .metric{flex:1;padding:10px 4px 2px;border-left:1px solid var(--line)}
+  .metric:last-child{border-left:none}
+  .metric span{display:block;font-size:10px;color:var(--faint);font-weight:600}
+  .metric b{font-size:13px;font-weight:800;font-family:var(--mono);direction:ltr;display:inline-block}
+  .metric b.t{font-family:'Vazirmatn'}
+  #spark{display:block;margin:2px auto 0;width:150px;height:32px}
+  .cp-actions{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .cp-actions .btn{padding:6px 11px;font-size:11.5px}
+  .hint{display:flex;align-items:flex-start;gap:7px;text-align:right;font-size:11px;color:var(--faint);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+  .hint svg{width:13px;height:13px;flex-shrink:0;margin-top:3px}
+  .cfg-list{display:flex;flex-direction:column}
+  .cfg{display:flex;align-items:stretch;gap:8px;border-bottom:1px solid var(--line);padding:11px 4px;cursor:pointer;position:relative;transition:background .15s}
+  .cfg:active{background:rgba(255,255,255,.03)}
+  .cfg.active{background:rgba(47,230,168,.05)}
+  .cfg.active::before{content:'';position:absolute;right:-12px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--acc)}
+  .cfg-main{flex:1;min-width:0;align-self:center}
+  .cfg-name{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cfg-host{font-family:var(--mono);font-size:11px;color:var(--sub);direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .proto{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--acc);border:1px solid #1a5c45;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+  .grade{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;margin-left:6px;vertical-align:1px;border:1px solid transparent}
+  .g-A{color:#06130d;background:var(--acc)}.g-B{color:var(--acc);background:var(--acc-dark);border-color:#1a5c45}
+  .g-C{color:var(--warn);background:#3a2b12;border-color:#5c4419}.g-D{color:#ff9459;background:#36200f;border-color:#5c3719}.g-E{color:var(--err);background:#3a1613;border-color:#5c2320}
+  .cfg-side{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;flex-shrink:0}
+  .cfg-acts{display:flex;gap:2px}
+  .ibtn{width:32px;height:32px;border-radius:9px;border:none;background:transparent;color:var(--sub);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .ibtn:hover{background:var(--inset);color:var(--txt)}
+  .ibtn.danger:hover{color:var(--err)}
+  .ibtn svg{width:16px;height:16px}
+  .cfg-ping{font-family:var(--mono);font-size:11px;font-weight:600;direction:ltr}
+  .cfg-ping .tag{font-family:'Vazirmatn';font-size:9.5px;color:var(--faint);font-weight:700;margin-left:4px}
+  .p-ok{color:var(--ok)}.p-bad{color:var(--err)}.p-na{color:var(--faint)}
+  .empty{text-align:center;padding:44px 16px;color:var(--faint);border:1px dashed var(--line);border-radius:14px;margin-top:8px}
+  .empty p{font-size:13px;margin-bottom:12px}
+  .empty .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 13px;border:1px solid var(--line);background:var(--panel);color:var(--txt);transition:.15s}
+  .btn:hover{border-color:var(--line2);background:var(--panel2)}.btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--acc);border-color:var(--acc);color:#06130d}
+  .btn.danger{color:var(--err)}
+  .btn svg{width:14px;height:14px;flex-shrink:0}
+  .btn[disabled]{opacity:.5;pointer-events:none}
+  .bottombar{position:fixed;bottom:0;left:0;right:0;z-index:55;pointer-events:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px calc(env(safe-area-inset-bottom) + 14px)}
+  .fab{pointer-events:auto;width:66px;height:66px;border-radius:50%;background:#232e28;border:1px solid var(--line2);color:var(--txt);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.45);transition:.2s}
+  .fab:active{transform:scale(.94)}
+  .fab.on{background:var(--acc);color:#06130d;border-color:var(--acc)}
+  .fab.busy{background:#3a2b12;border-color:var(--warn);color:var(--warn)}
+  .fab svg{width:28px;height:28px}
+  .fab .spinning{animation:spin 1.4s linear infinite}
+  .status-chip{pointer-events:auto;background:rgba(15,23,20,.94);border:1px solid var(--line);border-radius:99px;padding:7px 16px;font-size:12px;font-weight:700;color:var(--sub);display:flex;align-items:center;gap:7px}
+  .status-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+  .status-chip.on{color:var(--acc)}.status-chip.on .dot{background:var(--acc)}
+  .status-chip.busy{color:var(--warn)}.status-chip.busy .dot{background:var(--warn)}
+  .status-chip.err{color:var(--err)}.status-chip.err .dot{background:var(--err)}
+  .pop{position:fixed;z-index:80;background:#161f1a;border:1px solid var(--line2);border-radius:14px;min-width:265px;max-width:calc(100vw - 20px);max-height:72vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.55);display:none;padding:6px;overscroll-behavior:contain}
+  .pop.open{display:block;animation:popin .14s}
+  @keyframes popin{from{opacity:0;transform:translateY(-6px) scale(.98)}}
+  .pop-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px 2px}
+  .pop-head b{font-size:12px;color:var(--faint)}
+  .pop-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:600}
+  .pop-item:hover{background:rgba(255,255,255,.05)}.pop-item:active{background:var(--inset)}
+  .pop-item svg{width:18px;height:18px;color:var(--sub);flex-shrink:0}
+  .pop-item.danger,.pop-item.danger svg{color:var(--err)}
+  .pop-sep{height:1px;background:var(--line);margin:6px 8px}
+  .pop-title{font-size:10.5px;font-weight:800;color:var(--faint);padding:8px 12px 4px}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:74;display:none}
+  .scrim.open{display:block}
+  .drawer{position:fixed;top:0;bottom:0;right:0;width:min(330px,88vw);z-index:75;background:#121b16;border-left:1px solid var(--line);transform:translateX(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column;overflow-y:auto;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain}
+  .drawer.open{transform:none}
+  .dr-head{display:flex;align-items:center;gap:12px;padding:16px 14px 14px 20px;border-bottom:1px solid var(--line)}
+  .dr-head>div:not(.dr-logo){flex:1;min-width:0}
+  .dr-logo{width:42px;height:42px;border-radius:12px;background:var(--acc);color:#06130d;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .dr-logo svg{width:21px;height:21px}
+  .dr-head b{font-size:17px;font-weight:800;display:block}
+  .dr-head small{font-size:10.5px;color:var(--faint)}
+  .dr-item{display:flex;align-items:center;gap:14px;padding:11px 20px;cursor:pointer}
+  .dr-item:hover{background:rgba(255,255,255,.04)}.dr-item:active{background:var(--inset)}
+  .dr-item svg{width:19px;height:19px;color:var(--sub);flex-shrink:0}
+  .dr-txt{flex:1;min-width:0}
+  .dr-txt b{font-size:13.5px;font-weight:700;display:block}
+  .dr-txt small{font-size:10.5px;color:var(--faint);display:block;line-height:1.5;margin-top:-2px}
+  .dr-sep{height:1px;background:var(--line);margin:8px 14px}
+  .lang-row{display:flex;gap:6px;padding:4px 16px 8px}
+  .lang-row .tabbtn{flex:1;text-align:center}
+  .dr-foot{margin-top:auto;padding:14px 20px;font-size:10.5px;color:var(--faint);border-top:1px solid var(--line);line-height:1.9}
+  .dr-foot b{color:var(--acc)}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:82;background:var(--panel);border-top:1px solid var(--line2);border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .26s cubic-bezier(.3,.8,.3,1);max-height:84vh;display:flex;flex-direction:column;padding-bottom:calc(env(safe-area-inset-bottom) + 10px)}
+  .sheet.open{transform:none}
+  .sh-handle{width:42px;height:4px;border-radius:4px;background:var(--line2);margin:10px auto 2px;flex-shrink:0}
+  .sh-head{display:flex;align-items:flex-start;gap:8px;padding:6px 16px 12px;border-bottom:1px solid var(--line)}
+  .sh-head>div{flex:1;min-width:0}
+  .sh-head h4{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sh-head .m{font-family:var(--mono);font-size:11px;color:var(--sub);direction:ltr;text-align:right;margin-top:2px;word-break:break-all}
+  .sh-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 16px;overflow-y:auto;overscroll-behavior:contain}
+  .sh-btn{display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px 4px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:var(--txt)}
+  .sh-btn:active{transform:scale(.96)}
+  .sh-btn svg{width:20px;height:20px;color:var(--acc)}
+  .sh-btn.danger svg{color:var(--err)}
+  .overlay{position:fixed;inset:0;background:rgba(4,8,6,.74);z-index:85;display:none;align-items:center;justify-content:center;padding:16px}
+  .overlay.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line2);border-radius:18px;width:100%;max-width:520px;max-height:calc(100dvh - 28px);display:flex;flex-direction:column;animation:mup .2s}
+  @keyframes mup{from{transform:translateY(14px) scale(.98);opacity:0}}
+  .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
+  .m-head h4{font-size:14.5px;font-weight:800}
+  .m-body{padding:16px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;overscroll-behavior:contain;touch-action:pan-y;scroll-behavior:smooth}
+  .m-foot{padding:11px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;flex-shrink:0}
+  .tabs-v{display:flex;gap:5px;margin-bottom:14px;background:var(--inset);border-radius:11px;padding:4px;border:1px solid var(--line);flex-wrap:wrap}
+  .tabv{flex:1;border:none;background:transparent;color:var(--sub);font-family:inherit;font-size:12px;font-weight:700;padding:8px 6px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:.15s;touch-action:manipulation;min-height:42px;min-width:88px}
+  .tabv.on{background:var(--acc);color:#06130d}
+  .tpane{display:none}.tpane.on{display:block}
+  input,textarea,select{background:var(--inset);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-family:inherit;font-size:13px;padding:9px 12px;width:100%;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+  input::placeholder,textarea::placeholder{color:var(--faint)}
+  textarea{resize:vertical;min-height:100px;font-family:var(--mono);font-size:12px}
+  label.fld{display:block;font-size:11.5px;color:var(--sub);margin:10px 0 4px;font-weight:700}
+  select option{background:var(--panel);color:var(--txt)}
+  .kv{width:100%;border-collapse:collapse;font-size:12px}
+  .kv td{padding:6px 4px;border-bottom:1px solid var(--line)}
+  .kv td:first-child{color:var(--faint);width:105px;font-size:11px}
+  .kv td:last-child{font-family:var(--mono);direction:ltr;text-align:left;word-break:break-all}
+  .qr-box{display:flex;justify-content:center;padding:6px 0}
+  .qr-box canvas{border-radius:12px;max-width:100%}
+  .fmt-row{display:flex;gap:8px;align-items:center;margin:12px 0 8px}
+  .fmt-row select{flex:1}
+  .outbox{width:100%;min-height:140px;font-family:var(--mono);font-size:10.5px;direction:ltr;background:var(--inset)}
+  .sgroup{border:1px solid var(--line);border-radius:13px;padding:4px 14px 6px;margin-top:12px}
+  .sgroup>.sg-title{font-size:10.5px;font-weight:800;color:var(--faint);padding:9px 0 2px}
+  .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .srow:last-child{border-bottom:none}
+  .srow .st{min-width:0}
+  .srow .st b{font-size:12.5px;font-weight:700;display:block}
+  .srow .st small{font-size:10.5px;color:var(--faint);line-height:1.6;display:block;margin-top:1px}
+  .srow>select,.srow>input{width:145px;flex-shrink:0;padding:6px 9px;font-size:12px}
+  .srow>input.num{width:76px;text-align:center;direction:ltr}
+  .srow>.btn{flex-shrink:0;padding:6px 11px;font-size:12px}
+  .sw{position:relative;width:40px;height:22px;flex-shrink:0}
+  .sw input{display:none}
+  .sw i{position:absolute;inset:0;background:var(--inset);border:1px solid var(--line2);border-radius:99px;cursor:pointer;transition:.15s}
+  .sw i::after{content:'';position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--faint);transition:.15s}
+  .sw input:checked+i{background:var(--acc-dark);border-color:var(--acc)}
+  .sw input:checked+i::after{background:var(--acc);transform:translateX(-18px)}
+  .frag-fields{display:none;padding:9px 0 3px}
+  .frag-fields.show{display:block}
+  .ff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .ff-grid label{font-size:10px;color:var(--faint);display:block;margin-bottom:3px}
+  .ff-grid input,.ff-grid select{padding:6px 8px;font-size:11px;font-family:var(--mono);direction:ltr}
+  .sec-top{display:flex;align-items:center;gap:16px;margin-bottom:13px}
+  .sec-donut{position:relative;width:96px;height:96px;flex-shrink:0}
+  .sec-donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .sec-donut .tr{fill:none;stroke:var(--line);stroke-width:8}
+  .sec-donut .fl{fill:none;stroke:var(--acc);stroke-width:8;stroke-linecap:round}
+  .sec-donut .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .sec-donut .ctr b{font-family:var(--mono);font-size:21px;direction:ltr}
+  .sec-donut .ctr span{font-size:9.5px;color:var(--faint)}
+  .sec-grade{font-family:var(--mono);font-size:23px;font-weight:600;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;margin-top:4px}
+  .sec-cats{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+  .bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
+  .bar-row span{width:60px;color:var(--sub);flex-shrink:0}
+  .bar{flex:1;height:6px;background:var(--inset);border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--acc);border-radius:6px}
+  .bar-row b{font-family:var(--mono);font-size:10.5px;width:26px;direction:ltr;text-align:left}
+  .sec-item{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;padding:5px 0;border-bottom:1px solid var(--line)}
+  .sec-item:last-child{border-bottom:none}
+  .sec-item svg{width:13px;height:13px;flex-shrink:0;margin-top:3px}
+  .sec-item.good{color:#bdeedd}.sec-item.good svg{color:var(--acc)}
+  .sec-item.bad{color:#f3c1bd}.sec-item.bad svg{color:var(--err)}
+  .sec-item.warn{color:#f0d9b4}.sec-item.warn svg{color:var(--warn)}
+  .smart-sum{font-size:12px;color:var(--sub);margin-bottom:7px}
+  .sm-bar{height:5px;background:var(--inset);border-radius:5px;overflow:hidden;margin-bottom:10px}
+  .sm-bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .4s}
+  .sm-list{display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto;overscroll-behavior:contain}
+  .sm-row{display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:12px}
+  .sm-row.best{border-color:var(--acc)}
+  .sm-row .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+  .sm-row .pv{font-family:var(--mono);font-size:10.5px;color:var(--sub);direction:ltr;flex-shrink:0}
+  .sm-row .sc{font-family:var(--mono);font-size:10.5px;color:var(--acc);direction:ltr;flex-shrink:0;width:30px;text-align:left}
+  .sm-tag{font-size:9px;background:var(--acc);color:#06130d;border-radius:5px;padding:1px 6px;font-weight:800;flex-shrink:0}
+  .src-row{display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px solid var(--line)}
+  .src-row:last-child{border-bottom:none}
+  .src-ic{width:36px;height:36px;border-radius:10px;background:var(--acc-dark);color:var(--acc);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .src-ic svg{width:17px;height:17px}
+  .src-main{flex:1;min-width:0}
+  .src-main b{font-size:12.5px;display:block}
+  .src-main small{font-size:10.5px;color:var(--faint);display:block;line-height:1.5}
+  .src-row .btn{padding:5px 11px;font-size:11.5px;flex-shrink:0}
+  .subcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px}
+  .subhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .subhead b{font-size:13.5px;font-weight:800}
+  .subhead .cnt{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .qbar{height:8px;background:var(--inset);border-radius:8px;overflow:hidden;margin:4px 0 10px}
+  .qbar i{display:block;height:100%;border-radius:8px;transition:width .6s}
+  .qrow{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:3px 0}
+  .qrow span{color:var(--sub)}
+  .qrow b{font-family:var(--mono);direction:ltr}
+  .subacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .subacts .btn{padding:5px 10px;font-size:11px}
+  .qnoinfo{font-size:11.5px;color:var(--faint)}
+  #scanVideo{width:100%;max-width:340px;border-radius:14px;background:#000;display:block;margin:0 auto}
+  #scanCanvas{display:none}
+  .scan-hint{text-align:center;font-size:12px;color:var(--sub);margin-top:10px}
+  #toasts{position:fixed;bottom:calc(96px + env(safe-area-inset-bottom));left:16px;z-index:99;display:flex;flex-direction:column;gap:7px;max-width:calc(100vw - 32px)}
+  .toast{background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:10px 15px;font-size:12.5px;display:flex;align-items:center;gap:8px;animation:tin .22s;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .toast svg{width:15px;height:15px;color:var(--acc)}
+  .toast.warn svg{color:var(--warn)}.toast.err svg{color:var(--err)}
+  @keyframes tin{from{transform:translateY(8px);opacity:0}}
+  .toast.out{transition:.3s;opacity:0;transform:translateY(6px)}
+  #dnd{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;background:rgba(6,12,9,.85)}
+  #dnd.show{display:flex}
+  #dnd .box{border:2px dashed var(--acc);border-radius:18px;padding:32px 40px;color:var(--acc);font-weight:800}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+  [dir="ltr"] .cfg.active::before{right:auto;left:-12px}
+  [dir="ltr"] .metric{border-left:none;border-right:1px solid var(--line)}
+  [dir="ltr"] .metric:first-child{border-right:none}
+  [dir="ltr"] .tb-title,[dir="ltr"] .cfg-host{text-align:left}
+  [dir="ltr"] .drawer{right:auto;left:0;border-left:none;border-right:1px solid var(--line);transform:translateX(-105%)}
+  [dir="ltr"] .drawer.open{transform:none}
+  [dir="ltr"] .conn-info .hs,[dir="ltr"] .sh-head .m{text-align:left}
+  [dir="ltr"] .sh-head .m{direction:rtl}
+  [dir="ltr"] .dr-head{padding:16px 20px 14px 14px}
+  @media(min-width:700px){
+    .sheet{left:50%;right:auto;transform:translate(-50%,105%);width:560px;border:1px solid var(--line2);border-bottom:none}
+    .sheet.open{transform:translate(-50%,0)}
+    .page{padding-top:calc(env(safe-area-inset-top) + 70px)}
+  }
+
+  /* Gozar: consistent vertical layout for every menu and dialog */
+  :root{--gozar-view-height:100dvh;--gozar-view-top:0px}
+  .overlay{
+    top:var(--gozar-view-top);bottom:auto;height:var(--gozar-view-height);
+    padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left));
+    overflow:hidden;align-items:center;justify-content:center;
+  }
+  .overlay.open{display:flex}
+  .overlay .modal{
+    height:calc(var(--gozar-view-height) - 16px);
+    max-height:calc(var(--gozar-view-height) - 16px);
+    min-height:0;max-width:min(100%,520px);overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .overlay .m-head,.overlay .m-foot{flex:0 0 auto;min-height:0}
+  .overlay .m-body{flex:1 1 0%;min-height:0;max-height:none;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .overlay .m-body > *{max-width:100%}
+  .overlay .tabs-v{position:relative;flex-shrink:0}
+  .overlay input,.overlay textarea,.overlay select{max-width:100%;min-width:0}
+  .drawer{top:var(--gozar-view-top);bottom:auto;height:var(--gozar-view-height);max-height:var(--gozar-view-height);min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .sheet{bottom:auto;top:calc(var(--gozar-view-top) + var(--gozar-view-height));height:min(84vh,calc(var(--gozar-view-height) - 8px));max-height:calc(var(--gozar-view-height) - 8px);min-height:0;transform:translateY(0)}
+  .sheet.open{transform:translateY(-100%)}
+  .sheet .sh-grid{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .pop{max-height:calc(var(--gozar-view-height) - 16px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  @media(min-width:700px){
+    .sheet{left:50%;right:auto;transform:translate(-50%,0)}
+    .sheet.open{transform:translate(-50%,-100%)}
+  }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="topbar">
+  <button class="tb-btn" id="btnMore" data-pop="#popMore"><i data-lucide="more-vertical"></i></button>
+  <button class="tb-btn" id="btnAddM" data-pop="#popAdd"><i data-lucide="plus"></i></button>
+  <button class="tb-btn" id="btnFilter" data-pop="#popFilter"><i data-lucide="filter"></i></button>
+  <div class="tb-title"><span data-i18n="tb_title">فایل کانفیگ</span><small id="tbSub"></small></div>
+  <button class="tb-btn" id="btnDrawer"><i data-lucide="menu"></i></button>
+</div>
+
+<div class="page">
+  <div class="tabs" id="tabRow"></div>
+
+  <div class="conncard open" id="connCard">
+    <div class="conn-head" id="connHead">
+      <div class="conn-info">
+        <div class="lbl" data-i18n="lbl_active">کانفیگ فعال</div>
+        <div class="nm" id="acName"></div>
+        <div class="hs" id="acHost"></div>
+      </div>
+      <i data-lucide="chevron-down" class="chev"></i>
+    </div>
+    <div class="conn-body">
+      <div class="ring-wrap">
+        <div class="ring idle" id="ring" role="button" tabindex="0" data-conn>
+          <svg viewBox="0 0 240 240">
+            <circle class="track" cx="120" cy="120" r="104"/>
+            <circle class="prog" id="ringProg" cx="120" cy="120" r="104"/>
+            <g class="spin1"><circle class="arc1" cx="120" cy="120" r="92"/></g>
+            <g class="spin2"><circle class="arc2" cx="120" cy="120" r="92"/></g>
+          </svg>
+          <div class="ring-core" id="ringCore"></div>
+        </div>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <canvas id="spark" width="150" height="32"></canvas>
+      <div class="cp-actions" id="cpActions"></div>
+      <div class="hint"><i data-lucide="info"></i><span id="hintTxt"></span></div>
+    </div>
+  </div>
+
+  <div class="cfg-list" id="cfgList"></div>
+
+  <footer style="display:flex;align-items:center;justify-content:center;gap:8px;padding:22px 0 6px;border-top:1px solid var(--line);margin-top:18px;font-size:12px;color:var(--faint)">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2fe6a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17 L12 8 L18 17"/><circle cx="12" cy="7" r="1.6" fill="#2fe6a8" stroke="none"/><circle cx="5.5" cy="18" r="1.4" fill="#2fe6a8" stroke="none"/><circle cx="18.5" cy="18" r="1.4" fill="#2fe6a8" stroke="none"/></svg>
+    <span><span data-i18n="credit">برنامه‌نویسی‌شده توسط</span> <b style="color:var(--acc)">محمد حسین زاده</b></span>
+  </footer>
+</div>
+
+<div class="bottombar">
+  <button class="fab" id="fab" data-conn><i data-lucide="play"></i></button>
+  <div class="status-chip" id="statusChip"><span class="dot"></span><span id="statusTxt"></span></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer">
+  <div class="dr-head">
+    <div class="dr-logo"><i data-lucide="waypoints"></i></div>
+    <div><b data-i18n="app">گذر</b><small data-i18n="d_ver"></small></div>
+    <button class="ibtn" data-close-drawer><i data-lucide="x"></i></button>
+  </div>
+  <div class="dr-item" id="drSubs2"><i data-lucide="battery-charging"></i><div class="dr-txt"><b data-i18n="d_subs2"></b><small data-i18n="d_subs2_s"></small></div></div>
+  <div class="dr-item" id="drGroup"><i data-lucide="layers"></i><div class="dr-txt"><b data-i18n="d_group"></b><small data-i18n="d_group_s"></small></div></div>
+  <div class="dr-item" id="drRouting"><i data-lucide="map"></i><div class="dr-txt"><b data-i18n="d_routing"></b><small data-i18n="d_routing_s"></small></div></div>
+  <div class="dr-item" id="drDpi"><i data-lucide="sliders-horizontal"></i><div class="dr-txt"><b data-i18n="d_dpi"></b><small data-i18n="d_dpi_s"></small></div></div>
+  <div class="dr-item" id="drRules2"><i data-lucide="git-branch"></i><div class="dr-txt"><b data-i18n="st_g5"></b><small data-i18n="st_g5_s"></small></div></div>
+  <div class="dr-item" id="drGeo"><i data-lucide="file-plus"></i><div class="dr-txt"><b data-i18n="d_geo"></b><small data-i18n="d_geo_s"></small></div></div>
+  <div class="dr-item" id="drSettings"><i data-lucide="settings"></i><div class="dr-txt"><b data-i18n="d_set"></b><small data-i18n="d_set_s"></small></div></div>
+  <div class="dr-sep"></div>
+  <div class="dr-item" id="drLogs"><i data-lucide="terminal"></i><div class="dr-txt"><b data-i18n="d_logs"></b><small data-i18n="d_logs_s"></small></div></div>
+  <div class="dr-item" id="drCoreLog"><i data-lucide="file-code"></i><div class="dr-txt"><b data-i18n="d_corelog"></b><small data-i18n="d_corelog_s"></small></div></div>
+  <div class="dr-item" id="drBackup"><i data-lucide="download"></i><div class="dr-txt"><b data-i18n="d_backup"></b><small data-i18n="d_backup_s"></small></div></div>
+  <div class="dr-item" id="drUpdate"><i data-lucide="refresh-cw"></i><div class="dr-txt"><b data-i18n="d_update"></b><small data-i18n="d_update_s"></small></div></div>
+  <div class="dr-item" id="drAbout"><i data-lucide="info"></i><div class="dr-txt"><b data-i18n="d_about"></b><small data-i18n="d_about_s"></small></div></div>
+  <div class="dr-sep"></div>
+  <div class="pop-title" style="padding:4px 20px 0" data-i18n="d_lang">زبان</div>
+  <div class="lang-row">
+    <button class="tabbtn lang-b" data-lang="fa">فارسی</button>
+    <button class="tabbtn lang-b" data-lang="ar">العربية</button>
+    <button class="tabbtn lang-b" data-lang="en">English</button>
+  </div>
+  <div class="dr-foot" id="drFoot"></div>
+</nav>
+
+<div class="pop" id="popMore">
+  <div class="pop-item" id="mRestart"><i data-lucide="rotate-cw"></i><span data-i18n="p_restart"></span></div>
+  <div class="pop-sep"></div>
+  <div class="pop-item danger" id="mDelDupes"><i data-lucide="trash-2"></i><span data-i18n="p_deldup"></span></div>
+  <div class="pop-item danger" id="mDelInvalid"><i data-lucide="shield-x"></i><span data-i18n="p_delinv"></span></div>
+  <div class="pop-item danger" id="mDelAll"><i data-lucide="trash-2"></i><span data-i18n="p_delall"></span></div>
+  <div class="pop-sep"></div>
+  <div class="pop-item" id="mExport"><i data-lucide="upload"></i><span data-i18n="p_export"></span></div>
+  <div class="pop-item" id="mSmart"><i data-lucide="sparkles"></i><span data-i18n="p_smart"></span></div>
+  <div class="pop-sep"></div>
+  <div class="pop-item" id="mTcping"><i data-lucide="activity"></i><span data-i18n="p_tcping"></span></div>
+  <div class="pop-item" id="mReal"><i data-lucide="gauge"></i><span data-i18n="p_real"></span></div>
+  <div class="pop-item" id="mSort"><i data-lucide="arrow-down-up"></i><span data-i18n="p_sort"></span></div>
+  <div class="pop-sep"></div>
+  <div class="pop-item" id="mUpdateSub"><i data-lucide="refresh-cw"></i><span data-i18n="p_upd"></span></div>
+</div>
+
+<div class="pop" id="popAdd">
+  <div class="pop-title" data-i18n="pa_imp"></div>
+  <div class="pop-item" id="aQrScan"><i data-lucide="camera"></i><span data-i18n="pa_qr"></span></div>
+  <div class="pop-item" id="aClip"><i data-lucide="clipboard"></i><span data-i18n="pa_clip"></span></div>
+  <div class="pop-item" id="aFile"><i data-lucide="file-up"></i><span data-i18n="pa_file"></span></div>
+  <div class="pop-item" id="aLink"><i data-lucide="link"></i><span data-i18n="pa_link"></span></div>
+  <div class="pop-sep"></div>
+  <div class="pop-title" data-i18n="pa_man"></div>
+  <div id="manualList"></div>
+</div>
+
+<div class="pop" id="popFilter" style="min-width:290px">
+  <div class="pop-head"><b data-i18n="pf_t"></b><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+  <div style="padding:4px 10px 10px">
+    <input id="fq" data-i18n-ph="pf_q">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px" id="fProtoChips"></div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;font-weight:700;cursor:pointer">
+      <input type="checkbox" id="fAlive" style="width:16px;height:16px"><span data-i18n="pf_alive"></span>
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;font-weight:700;cursor:pointer">
+      <input type="checkbox" id="fSecure" style="width:16px;height:16px"><span data-i18n="pf_sec"></span>
+    </label>
+  </div>
+</div>
+
+<div class="scrim" id="sheetScrim" style="z-index:81"></div>
+<div class="sheet" id="sheet">
+  <div class="sh-handle"></div>
+  <div class="sh-head">
+    <div><h4 id="shTitle"></h4><div class="m" id="shMeta"></div></div>
+    <button class="ibtn" data-close-sheet><i data-lucide="x"></i></button>
+  </div>
+  <div class="sh-grid">
+    <button class="sh-btn" id="shConnect2"><i data-lucide="play"></i><span data-i18n="sh_conn"></span></button>
+    <button class="sh-btn" id="shTest"><i data-lucide="activity"></i><span data-i18n="sh_test"></span></button>
+    <button class="sh-btn" id="shSec"><i data-lucide="shield-check"></i><span data-i18n="sh_sec"></span></button>
+    <button class="sh-btn" id="shQr"><i data-lucide="qr-code"></i><span>QR</span></button>
+    <button class="sh-btn" id="shDetail"><i data-lucide="settings-2"></i><span data-i18n="sh_det"></span></button>
+    <button class="sh-btn" id="shCopy"><i data-lucide="copy"></i><span data-i18n="sh_copy"></span></button>
+    <button class="sh-btn" id="shShare"><i data-lucide="share-2"></i><span data-i18n="sh_share"></span></button>
+    <button class="sh-btn" id="shRename"><i data-lucide="pencil"></i><span data-i18n="sh_ren"></span></button>
+    <button class="sh-btn danger" id="shDel"><i data-lucide="trash-2"></i><span data-i18n="sh_del"></span></button>
+  </div>
+</div>
+
+<div class="overlay" id="ovAdd">
+  <div class="modal">
+    <div class="m-head"><h4 data-i18n="add_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div class="tabs-v">
+        <button class="tabv on" data-tab="t1" data-i18n="add_t1"></button>
+        <button class="tabv" data-tab="t3" data-i18n="add_t3"></button>
+      </div>
+      <div class="tpane on" id="t1">
+        <label class="fld" data-i18n="f_link"></label>
+        <textarea id="inMulti" dir="ltr" placeholder="vless://…&#10;https://example.com/sub"></textarea>
+        <input type="file" id="fileOne" accept=".txt,.json,.conf,text/plain" hidden>
+        <button class="btn primary" id="btnAddMulti" style="margin-top:12px;width:100%;justify-content:center"><i data-lucide="upload"></i><span data-i18n="f_fetch"></span></button>
+        <p style="font-size:11px;color:var(--faint);margin-top:8px" data-i18n="f_note"></p>
+      </div>
+      <div class="tpane" id="t3">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px">
+          <div style="grid-column:1/-1"><label class="fld" data-i18n="f_name"></label><input id="f_name"></div>
+          <div><label class="fld" data-i18n="f_proto"></label>
+            <select id="f_proto"><option value="vless">VLESS</option><option value="vmess">VMess</option><option value="trojan">Trojan</option><option value="ss">Shadowsocks</option><option value="hysteria2">Hysteria2</option><option value="tuic">TUIC</option></select></div>
+          <div><label class="fld" data-i18n="f_server"></label><input id="f_server" dir="ltr"></div>
+          <div><label class="fld" data-i18n="f_port"></label><input id="f_port" dir="ltr" placeholder="443" inputmode="numeric"></div>
+          <div><label class="fld" data-i18n="f_secret"></label><input id="f_secret" dir="ltr"></div>
+          <div><label class="fld" data-i18n="f_net"></label>
+            <select id="f_net"><option value="tcp">TCP</option><option value="ws">WebSocket</option><option value="grpc">gRPC</option></select></div>
+          <div><label class="fld" data-i18n="f_tc"></label>
+            <select id="f_sec"><option value="tls">TLS</option><option value="reality">Reality (VLESS)</option><option value="none" data-i18n="none_opt"></option></select></div>
+          <div><label class="fld">SNI</label><input id="f_sni" dir="ltr"></div>
+          <div><label class="fld">Path</label><input id="f_path" dir="ltr" placeholder="/"></div>
+          <div><label class="fld" data-i18n="f_method"></label><input id="f_method" dir="ltr" placeholder="aes-256-gcm"></div>
+          <div><label class="fld" data-i18n="f_pass"></label><input id="f_pass" dir="ltr"></div>
+        </div>
+        <button class="btn primary" id="btnAddForm" style="margin-top:12px;width:100%;justify-content:center"><i data-lucide="plus"></i><span data-i18n="f_make"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovScan">
+  <div class="modal" style="max-width:400px">
+    <div class="m-head"><h4 data-i18n="sc_t"></h4><button class="ibtn" data-close id="scanClose"><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <video id="scanVideo" playsinline muted></video>
+      <canvas id="scanCanvas"></canvas>
+      <p class="scan-hint" data-i18n="sc_h"></p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovQr">
+  <div class="modal" style="max-width:360px">
+    <div class="m-head"><h4 id="qrTitle"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div class="qr-box"><canvas id="qrCanvas"></canvas></div>
+      <p style="font-size:11px;color:var(--faint);text-align:center;word-break:break-all" dir="ltr" id="qrLink"></p>
+    </div>
+    <div class="m-foot">
+      <button class="btn" id="qrCopy"><i data-lucide="copy"></i><span data-i18n="qr_copy"></span></button>
+      <button class="btn primary" id="qrDl"><i data-lucide="download"></i><span data-i18n="qr_dl"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovDetail">
+  <div class="modal" style="max-width:600px">
+    <div class="m-head"><h4 id="dTitle"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <table class="kv" id="dTable"></table>
+      <div class="fmt-row">
+        <select id="dFmt">
+          <option value="link" data-i18n="fmt_link"></option>
+          <option value="xray" data-i18n="fmt_x"></option>
+          <option value="singbox" data-i18n="fmt_s"></option>
+        </select>
+        <button class="btn" id="dCopy"><i data-lucide="copy"></i><span data-i18n="d_copy"></span></button>
+      </div>
+      <textarea class="outbox" id="dOut" readonly dir="ltr"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSec">
+  <div class="modal" style="max-width:470px">
+    <div class="m-head"><h4 id="secTitle"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body" id="secBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSmart">
+  <div class="modal" style="max-width:550px">
+    <div class="m-head"><h4 data-i18n="sm_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div class="smart-sum" id="smSum"></div>
+      <div class="sm-bar"><i id="smFill"></i></div>
+      <div class="sm-list" id="smList"></div>
+      <p style="font-size:10.5px;color:var(--faint);margin-top:9px" data-i18n="sm_note"></p>
+    </div>
+    <div class="m-foot">
+      <button class="btn" id="smAgain"><i data-lucide="refresh-cw"></i><span data-i18n="sm_again"></span></button>
+      <button class="btn primary" id="smApply" disabled><i data-lucide="zap"></i><span data-i18n="sm_apply"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSources">
+  <div class="modal" style="max-width:540px">
+    <div class="m-head"><h4 data-i18n="src_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div id="srcList"></div>
+      <div style="margin-top:14px">
+        <label class="fld" data-i18n="src_c"></label>
+        <div style="display:flex;gap:8px">
+          <input id="srcCustom" dir="ltr" placeholder="https://…">
+          <button class="btn" id="srcCustomBtn" style="flex-shrink:0"><i data-lucide="download"></i><span data-i18n="src_get"></span></button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--faint);margin-top:12px;padding:9px 12px;background:var(--inset);border:1px solid var(--line);border-radius:10px" data-i18n="src_note"></p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSubs">
+  <div class="modal" style="max-width:540px">
+    <div class="m-head"><h4 data-i18n="sub_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div id="subList"></div>
+      <div class="sgroup" style="margin-top:16px">
+        <div class="sg-title" data-i18n="sub_add_t"></div>
+        <div style="padding:8px 0 4px">
+          <label class="fld" data-i18n="sub_nm"></label>
+          <input id="subNm">
+          <label class="fld" data-i18n="sub_url"></label>
+          <input id="subUrl" dir="ltr" placeholder="https://…">
+          <button class="btn primary" id="subAddBtn" style="margin-top:10px;width:100%;justify-content:center"><i data-lucide="download"></i><span data-i18n="sub_add"></span></button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--faint);margin-top:12px;padding:9px 12px;background:var(--inset);border:1px solid var(--line);border-radius:10px">
+        <b style="color:var(--warn)" data-i18n="sub_buy"></b> <span data-i18n="sub_buy_p"></span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSubEdit">
+  <div class="modal" style="max-width:380px">
+    <div class="m-head"><h4 data-i18n="sub_et"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <label class="fld" data-i18n="sub_tgb"></label>
+      <input id="se_gb" type="number" min="0" step="0.01" dir="ltr">
+      <label class="fld" data-i18n="sub_dt"></label>
+      <input id="se_dt" type="date" dir="ltr">
+    </div>
+    <div class="m-foot">
+      <button class="btn" data-close><span data-i18n="c_cancel"></span></button>
+      <button class="btn primary" id="seSave"><i data-lucide="check"></i><span data-i18n="sub_save"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovGeo">
+  <div class="modal" style="max-width:460px">
+    <div class="m-head"><h4 data-i18n="geo_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body" style="font-size:12.5px">
+      <p data-i18n="geo_p1"></p>
+      <p style="margin-top:8px;font-family:var(--mono);font-size:11px;direction:ltr;text-align:left;word-break:break-all;color:var(--sub)">geosite:category-ir · geoip:ir · geosite:category-ads-all</p>
+      <p style="margin-top:10px" data-i18n="geo_p2"></p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovAbout">
+  <div class="modal" style="max-width:380px">
+    <div class="m-head"><h4 data-i18n="d_about"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body" style="font-size:13px;text-align:center">
+      <div style="width:64px;height:64px;border-radius:18px;background:var(--acc);color:#06130d;display:flex;align-items:center;justify-content:center;margin:6px auto 12px">
+        <i data-lucide="waypoints" style="width:32px;height:32px"></i>
+      </div>
+      <b style="font-size:16px" data-i18n="app"></b>
+      <p style="color:var(--sub);margin-top:6px" data-i18n="about_d"></p>
+      <p style="margin-top:12px;color:var(--faint);font-size:12px"><span data-i18n="credit"></span><br><b style="color:var(--acc);font-size:14px">محمد حسین زاده</b></p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSettings">
+  <div class="modal" style="max-width:560px">
+    <div class="m-head"><h4 data-i18n="d_set"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <div class="tabs-v">
+        <button class="tabv on" data-tab="st1" data-i18n="st_g1"></button>
+        <button class="tabv" data-tab="st2" data-i18n="st_g2"></button>
+        <button class="tabv" data-tab="st3" data-i18n="st_g3"></button>
+        <button class="tabv" data-tab="st4" data-i18n="st_g4"></button>
+        <button class="tabv" data-tab="st5" data-i18n="st_g5"></button>
+      </div>
+      <div class="tpane on" id="st1">
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_bk"></div>
+          <div class="srow"><div class="st"><b data-i18n="bk_exp"></b><small data-i18n="bk_exp_s"></small></div>
+            <button class="btn" id="bkExport"><i data-lucide="download"></i><span data-i18n="bk_get"></span></button></div>
+          <div class="srow"><div class="st"><b data-i18n="bk_copy"></b><small data-i18n="bk_copy_s"></small></div>
+            <button class="btn" id="bkCopy"><i data-lucide="copy"></i><span data-i18n="bk_cp"></span></button></div>
+          <div class="srow"><div class="st"><b data-i18n="bk_imp"></b><small data-i18n="bk_imp_s"></small></div>
+            <button class="btn" id="bkImport"><i data-lucide="upload"></i><span data-i18n="bk_up"></span></button></div>
+        </div>
+        <input type="file" id="bkFile" accept=".json,.txt,text/plain,application/json" hidden>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_net"></div>
+          <div class="srow"><div class="st"><b data-i18n="s_dns"></b><small data-i18n="s_dns_s"></small></div>
+            <select id="s_dns"><option value="1.1.1.1">Cloudflare</option><option value="8.8.8.8">Google</option><option value="9.9.9.9">Quad9</option><option value="178.22.122.100">Shecan 1</option><option value="185.51.200.2">Shecan 2</option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="s_ping"></b><small data-i18n="s_ping_s"></small></div>
+            <input class="num" id="s_pingInt" type="number" min="3" max="60"></div>
+          <div class="srow"><div class="st"><b data-i18n="s_to"></b><small data-i18n="s_to_s"></small></div>
+            <select id="s_timeout"><option value="4">4s</option><option value="6">6s</option><option value="10">10s</option></select></div>
+        </div>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_ui"></div>
+          <div class="srow"><div class="st"><b data-i18n="s_mon"></b><small data-i18n="s_mon_s"></small></div>
+            <label class="sw"><input type="checkbox" id="s_monitor"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="s_bg"></b><small data-i18n="s_bg_s"></small></div>
+            <label class="sw"><input type="checkbox" id="s_bg"><i></i></label></div>
+        </div>
+      </div>
+      <div class="tpane" id="st2">
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_dpi"></div>
+          <div class="srow"><div class="st"><b data-i18n="r_frag"></b><small data-i18n="r_frag_s"></small></div>
+            <label class="sw"><input type="checkbox" id="r_frag"><i></i></label></div>
+          <div class="frag-fields" id="fragFields">
+            <div class="ff-grid">
+              <div><label>packets</label><select id="r_packets"><option value="tlshello">tlshello</option><option value="1-3">1-3</option></select></div>
+              <div><label>length</label><input id="r_length" dir="ltr" placeholder="100-200"></div>
+              <div><label>interval</label><input id="r_interval" dir="ltr" placeholder="10-20"></div>
+            </div>
+          </div>
+          <div class="srow"><div class="st"><b>Mux</b><small data-i18n="r_mux_s"></small></div>
+            <label class="sw"><input type="checkbox" id="r_mux"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="r_muxconc"></b><small data-i18n="r_muxconc_s"></small></div>
+            <input class="num" id="r_muxconc" type="number" min="1" max="128"></div>
+          <div class="srow"><div class="st"><b data-i18n="r_quic"></b><small data-i18n="r_quic_s"></small></div>
+            <label class="sw"><input type="checkbox" id="r_quic"><i></i></label></div>
+        </div>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_rt"></div>
+          <div class="srow"><div class="st"><b data-i18n="r_dir"></b><small data-i18n="r_dir_s"></small></div>
+            <label class="sw"><input type="checkbox" id="r_directIr"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="r_ads"></b><small data-i18n="r_ads_s"></small></div>
+            <label class="sw"><input type="checkbox" id="r_ads"><i></i></label></div>
+        </div>
+      </div>
+      <div class="tpane" id="st3">
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_adv"></div>
+          <div class="srow"><div class="st"><b data-i18n="a_fp"></b><small data-i18n="a_fp_s"></small></div>
+            <select id="a_fp"><option value="chrome">chrome</option><option value="firefox">firefox</option><option value="safari">safari</option><option value="ios">ios</option><option value="android">android</option><option value="edge">edge</option><option value="random">random</option></select></div>
+          <div class="srow"><div class="st"><b>ALPN</b><small data-i18n="a_alpn_s"></small></div>
+            <input id="a_alpn" dir="ltr" placeholder="h2,http/1.1"></div>
+          <div class="srow"><div class="st"><b data-i18n="a_fmt"></b><small data-i18n="a_fmt_s"></small></div>
+            <select id="a_fmt"><option value="link" data-i18n="fmt_link"></option><option value="xray">Xray</option><option value="singbox">sing-box</option></select></div>
+        </div>
+      </div>
+      <div class="tpane" id="st4">
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_core"></div>
+          <div class="srow"><div class="st"><b data-i18n="c_sniff"></b><small data-i18n="c_sniff_s"></small></div>
+            <label class="sw"><input type="checkbox" id="c_sniff"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="c_routeonly"></b><small data-i18n="c_routeonly_s"></small></div>
+            <label class="sw"><input type="checkbox" id="c_routeonly"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="c_auto"></b><small data-i18n="c_auto_s"></small></div>
+            <label class="sw"><input type="checkbox" id="c_auto"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="c_loglvl"></b></div>
+            <select id="c_loglvl"><option value="debug">debug</option><option value="info">info</option><option value="warning">warning</option><option value="error">error</option><option value="none">none</option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="c_preres"></b></div>
+            <select id="c_preres"><option value="usePlatformResolvers">usePlatformResolvers</option><option value="useIP">useIP</option><option value="useNonIP">useNonIP</option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="c_testurl"></b></div>
+            <input id="c_testurl" dir="ltr" style="width:190px;padding:6px 9px;font-size:11px"></div>
+          <div class="srow"><div class="st"><b data-i18n="c_sport"></b></div>
+            <input class="num" id="c_sport" type="number" min="1024" max="65535"></div>
+          <div class="srow"><div class="st"><b data-i18n="c_rdns"></b><small data-i18n="c_rproto"></small></div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <input id="c_rdns" dir="ltr" style="width:110px;padding:6px 9px;font-size:12px">
+              <select id="c_rproto" style="width:86px;padding:6px 4px;font-size:11px"><option value="https">https</option><option value="udp">udp</option><option value="tcp">tcp</option><option value="quic">quic</option></select>
+            </div></div>
+          <div class="srow"><div class="st"><b data-i18n="c_ddns"></b></div>
+            <input id="c_ddns" dir="ltr" style="width:145px;padding:6px 9px;font-size:12px"></div>
+          <div style="padding:8px 0 4px">
+            <label class="fld" data-i18n="c_dhost"></label>
+            <textarea id="c_dhost" style="min-height:70px" dir="ltr" placeholder="example.com=1.2.3.4"></textarea>
+            <small style="font-size:10px;color:var(--faint)" data-i18n="c_dhost_s"></small>
+          </div>
+        </div>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_vpn"></div>
+          <div class="srow"><div class="st"><b data-i18n="v_dns"></b></div>
+            <input id="v_dns" dir="ltr" style="width:145px;padding:6px 9px;font-size:12px"></div>
+          <div class="srow"><div class="st"><b data-i18n="v_mtu"></b></div>
+            <input class="num" id="v_mtu" type="number" min="1280" max="9000"></div>
+          <div class="srow"><div class="st"><b data-i18n="v_ipv6"></b><small data-i18n="v_ipv6_s"></small></div>
+            <label class="sw"><input type="checkbox" id="v_ipv6"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="v_tun"></b><small data-i18n="v_tun_s"></small></div>
+            <select id="v_tun"><option value="hev">hev-socks5-tunnel</option><option value="aar">AAR loop</option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="v_hlvl"></b></div>
+            <select id="v_hlvl"><option value="warn">warn</option><option value="info">info</option><option value="error">error</option><option value="debug">debug</option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="v_hto"></b><small data-i18n="v_hto_s"></small></div>
+            <input id="v_hto" dir="ltr" style="width:100px;padding:6px 9px;font-size:12px" placeholder="300,60"></div>
+        </div>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="sg_apps"></div>
+          <div class="srow"><div class="st"><b data-i18n="apps_mode"></b><small data-i18n="apps_hint"></small></div>
+            <select id="apps_mode"><option value="none" data-i18n="apps_none"></option><option value="allow" data-i18n="apps_allow"></option><option value="disallow" data-i18n="apps_disallow"></option></select></div>
+          <div class="srow"><div class="st"><b data-i18n="apps_pick"></b></div>
+            <button class="btn" id="btnAppsPick"><i data-lucide="list"></i><span data-i18n="apps_open"></span></button></div>
+        </div>
+      </div>
+      <div class="tpane" id="st5">
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="ru_preset"></div>
+          <div class="srow"><div class="st"><b data-i18n="ru_udp443"></b><small>443 · udp → block</small></div>
+            <label class="sw"><input type="checkbox" id="ru_udp443"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="ru_google"></b><small>geosite:google → proxy</small></div>
+            <label class="sw"><input type="checkbox" id="ru_google"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="ru_lanip"></b><small>geoip:private → direct</small></div>
+            <label class="sw"><input type="checkbox" id="ru_lanip"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="ru_landom"></b><small>geosite:private → direct</small></div>
+            <label class="sw"><input type="checkbox" id="ru_landom"><i></i></label></div>
+          <div class="srow"><div class="st"><b data-i18n="ru_ddns"></b><small data-i18n="ru_ddns_s"></small></div>
+            <label class="sw"><input type="checkbox" id="ru_ddns"><i></i></label></div>
+        </div>
+        <div class="sgroup">
+          <div class="sg-title" data-i18n="ru_custom"></div>
+          <div id="ruleList"></div>
+          <div style="padding:8px 0 4px">
+            <div style="display:grid;grid-template-columns:1fr 90px;gap:6px">
+              <input id="ru_name" data-i18n-ph="ru_name">
+              <input id="ru_port" dir="ltr" placeholder="port" inputmode="numeric">
+              <input id="ru_doms" dir="ltr" placeholder="geosite:google, example.com" style="grid-column:1/-1">
+              <input id="ru_ips" dir="ltr" placeholder="geoip:private, 8.8.8.8" style="grid-column:1/-1">
+              <select id="ru_net"><option value="any">tcp+udp</option><option value="tcp">tcp</option><option value="udp">udp</option></select>
+              <select id="ru_out"><option value="proxy">proxy</option><option value="direct">direct</option><option value="block">block</option></select>
+            </div>
+            <button class="btn primary" id="ruAddBtn" style="margin-top:8px;width:100%;justify-content:center"><i data-lucide="plus"></i><span data-i18n="ru_add"></span></button>
+            <small style="font-size:10px;color:var(--faint);display:block;margin-top:6px" data-i18n="ru_hint"></small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn" id="setReset"><i data-lucide="rotate-ccw"></i><span data-i18n="btn_reset"></span></button>
+      <button class="btn primary" data-close><i data-lucide="check"></i><span data-i18n="btn_save"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovApps">
+  <div class="modal" style="max-width:440px">
+    <div class="m-head"><h4 data-i18n="apps_pick"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body">
+      <input id="appsQ" data-i18n-ph="apps_search">
+      <div id="appsList" style="max-height:320px;overflow-y:auto;margin-top:10px;display:flex;flex-direction:column;gap:4px"></div>
+      <p style="font-size:10.5px;color:var(--faint);margin-top:8px" id="appsCnt"></p>
+    </div>
+    <div class="m-foot">
+      <button class="btn" data-close><span data-i18n="c_cancel"></span></button>
+      <button class="btn primary" id="appsSave"><i data-lucide="check"></i><span data-i18n="btn_save"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovGuide">
+  <div class="modal">
+    <div class="m-head"><h4 data-i18n="g_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body" style="font-size:12.5px">
+      <p data-i18n="g_p1"></p>
+      <p style="margin-top:10px" data-i18n="g_p2"></p>
+      <p style="margin-top:10px;padding:10px 13px;background:var(--inset);border:1px solid var(--line);border-radius:10px"><b style="color:var(--warn)" data-i18n="g_warn"></b> <span data-i18n="g_warn_p"></span></p>
+      <p style="font-size:10px;color:var(--faint);margin-top:8px" id="verLine"></p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovConfirm">
+  <div class="modal" style="max-width:400px">
+    <div class="m-head"><h4 data-i18n="c_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body"><div id="confirmTxt" style="font-size:13px"></div></div>
+    <div class="m-foot">
+      <button class="btn" data-close><span data-i18n="c_cancel"></span></button>
+      <button class="btn primary" id="btnConfirmYes"><i data-lucide="check"></i><span id="confirmOkLbl"></span></button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovRename">
+  <div class="modal" style="max-width:380px">
+    <div class="m-head"><h4 data-i18n="r_t"></h4><button class="ibtn" data-close><i data-lucide="x"></i></button></div>
+    <div class="m-body"><input id="renameInput"></div>
+    <div class="m-foot">
+      <button class="btn" data-close><span data-i18n="c_cancel"></span></button>
+      <button class="btn primary" id="btnRenameOk"><i data-lucide="check"></i><span data-i18n="btn_save"></span></button>
+    </div>
+  </div>
+</div>
+
+<div id="dnd"><div class="box" data-i18n="dnd_t"></div></div>
+<div id="toasts"></div>
+
+<script>
+/* ═══════════ i18n ═══════════ */
+const I18N={
+fa:{
+ app:"گذر",credit:"برنامه‌نویسی‌شده توسط",tb_title:"گذر",tb_sub_default:"گذر · پنل هوشمند",tb_sub_android:"عبور از هسته اختصاصی",tb_testing:"تست {a}/{b}",
+ tab_all:"همه",lbl_active:"کانفیگ فعال",none_sel:"هیچ کانفیگی انتخاب نشده",
+ ring_conn:"اتصال",ring_disc:"قطع اتصال",ring_chk:"در حال بررسی",ring_hint:"برای بررسی بزنید",ring_retry:"برای تلاش مجدد بزنید",
+ m_ping:"پینگ",m_status:"وضعیت",m_sec:"امنیت",m_proto:"پروتکل",st_ok:"در دسترس",st_down:"قطع",
+ a_test:"تست سریع",a_sec:"تحلیل امنیتی",a_detail:"جزئیات",a_copy:"کپی",
+ hint_browser:'حلقه، دستیابی به سرور را <b>واقعاً</b> می‌سنجد. در مرورگر برای تونل واقعی، خروجی را در Hiddify / v2rayNG وارد کنید.',
+ hint_android:'ترافیک اندروید از هسته اختصاصی می‌گذرد اتصال پایدار و مطمئن',
+ empty_none:"هنوز کانفیگی اضافه نشده است.",empty_f:"کانفیگی با این فیلتر/گروه نیست.",b_add:"افزودن",b_free:"سرورهای رایگان",manual:"دستی",
+ sc_none:"متصل نیست",sc_busy:"در حال بررسی…",sc_on:"متصل",sc_tun:"تونل فعال",sc_err:"عدم دسترسی",
+ d_ver:"پنل هوشمند کانفیگ · نسخهٔ ۲٫۶",
+ d_subs2:"اشتراک و حجم باقی‌مانده",d_subs2_s:"نمایش مصرف/باقی‌مانده و روزهای انقضای هر اشتراک",
+ d_group:"گروه‌های اشتراک",d_group_s:"دریافت سرورهای رایگان و افزودن منبع دلخواه",
+ d_routing:"تنظیمات مسیریابی (ایران)",d_routing_s:"مسیر مستقیم سایت‌های ایرانی، تبلیغات و QUIC",
+ d_dpi:"تنظیمات عبور از اختلال",d_dpi_s:"Fragment، Mux و تنظیمات ضد اختلال اپراتور",
+ d_geo:"فایل‌های منبع جغرافیایی",d_geo_s:"دربارهٔ فایل‌های geosite/geoip مورد نیاز مسیریابی",
+ d_set:"تنظیمات",d_set_s:"DNS، هسته، VPN، قوانین و برنامه‌ها",
+ d_logs:"گزارشات",d_logs_s:"۱۵۰ رویداد آخر برنامه",
+ d_corelog:"لاگ هسته اختصاصی",d_corelog_s:"خروجی داخلی هسته — برای عیب‌یابی تونل",
+ d_backup:"پشتیبان‌گیری / بازیابی",d_backup_s:"انتقال کانفیگ‌ها بین اندروید و کامپیوتر",
+ d_update:"بروزرسانی همهٔ گروه‌ها",d_update_s:"دریافت تازه از همهٔ منابع اشتراک",
+ d_about:"درباره",d_about_s:"نسخه، سازنده و توضیحات برنامه",d_lang:"زبان",
+ st_g5_s:"قوانین آماده و سفارشی مسیریابی",
+ dr_foot:'تحلیل و خروجی‌ها همگی محلی‌اند.<br><span>برنامه‌نویسی‌شده توسط</span> <b>محمد حسین زاده</b>',
+ p_restart:"راه‌اندازی مجدد خدمات",p_deldup:"حذف کانفیگ‌های تکراری گروه فعلی",p_delinv:"حذف کانفیگ‌های نامعتبر گروه فعلی",p_delall:"حذف تمام کانفیگ‌های گروه فعلی",p_export:"خروجی گرفتن کانفیگ‌های گروه فعلی",p_smart:"انتخاب هوشمند برای گروه فعال",p_tcping:"تست سریع (TCPing) گروه فعلی",p_real:"تأخیر واقعی گروه فعلی",p_sort:"مرتب‌سازی بر اساس نتایج آزمایش",p_upd:"بروزرسانی گروه فعلی اشتراک",
+ pa_imp:"وارد کردن کانفیگ",pa_qr:"کانفیگ را از QRcode وارد کنید",pa_clip:"کانفیگ را از کلیپ‌بورد وارد کنید",pa_file:"کانفیگ را از فایل محلی وارد کنید",pa_link:"وارد کردن لینک / اشتراک",pa_man:"تایپ دستی",
+ pf_t:"فیلتر کانفیگ‌ها",pf_q:"جستجوی نام یا سرور…",pf_alive:"فقط سرورهای پاسخگو (آخرین تست)",pf_sec:"فقط نمرهٔ امنیت A و B",
+ sh_conn:"اتصال / قطع",sh_test:"تست تأخیر",sh_sec:"تحلیل امنیتی",sh_det:"جزئیات و خروجی",sh_copy:"کپی لینک",sh_share:"اشتراک",sh_ren:"تغییر نام",sh_del:"حذف",
+ add_t:"افزودن کانفیگ",add_t1:"لینک / اشتراک",add_t3:"فرم دستی",f_link:"لینک کانفیگ یا اشتراک یا چند لینک (هر خط یکی)",f_fetch:"دریافت و افزودن",f_note:"لینک اشتراک ابتدا مستقیم و در صورت محدودیت CORS از واسط عمومی دریافت می‌شود.",
+ f_name:"نام",f_proto:"پروتکل",f_server:"آدرس سرور",f_port:"پورت",f_secret:"UUID / رمز عبور",f_net:"شبکه",f_tc:"امنیت",f_method:"روش رمز (SS)",f_pass:"رمز دوم (TUIC)",f_make:"ساخت و افزودن",none_opt:"بدون",
+ qr_copy:"کپی لینک",qr_dl:"دانلود PNG",fmt_link:"لینک کانفیگ",fmt_x:"JSON کامل — Xray",fmt_s:"JSON کامل — sing-box",d_copy:"کپی",
+ sec_t:"تحلیل امنیتی",sec_enc:"رمزنگاری",sec_st:"پنهان‌کاری",sec_int:"سلامت",sec_of:"از ۱۰۰",sec_note:"تحلیل کاملاً محلی است؛ هیچ کانفیگی ارسال نمی‌شود.",
+ sm_t:"انتخاب هوشمند سرور",sm_note:"انتخاب = نمرهٔ امنیت (۶۰٪) + پینگ واقعی (۴۰٪).",sm_again:"بررسی مجدد",sm_apply:"اتصال به بهترین",sm_best:"بهترین",
+ src_t:"گروه‌های اشتراک (سرورهای رایگان)",src_c:"افزودن منبع دلخواه",src_get:"دریافت",src_note:"هر منبع حداکثر ۱۵۰ کانفیگ تصادفی اضافه می‌کند؛ تکراری‌ها حذف می‌شوند. کانفیگ‌های عمومی ممکن است ترافیک را ثبت کنند.",
+ geo_t:"فایل‌های منبع جغرافیایی",geo_p1:"مسیریابی «سایت‌های ایرانی» در خروجی هسته اختصاصی به داده‌های geosite/geoip تکیه دارد.",geo_p2:"منبع رسمی:",
+ about_d:"پنل هوشمند مدیریت کانفیگ با تحلیل امنیتی هر کانفیگ و اتصال امن ، پشتیبانی از 6 پروتکل ، بهینه شده برای اتصال پایدار در اختلالات اینترنت با هسته اختصاصی و قدرتمند",
+ st_g1:"عمومی",st_g2:"مسیریابی ایران",st_g3:"پیشرفته",st_g4:"هسته و VPN",st_g5:"قوانین و برنامه‌ها",
+ sg_net:"شبکه و بررسی",sg_ui:"رابط کاربری",sg_bk:"انتقال بین دستگاه‌ها",sg_dpi:"عبور از اختلال (DPI)",sg_rt:"مسیریابی",sg_adv:"پیش‌فرض‌های TLS و خروجی",sg_core:"هستهٔ Xray",sg_vpn:"تنظیمات VPN",sg_apps:"پروکسی هر برنامه",
+ s_dns:"سرور DNS",s_dns_s:"در خروجی JSON تونل اعمال می‌شود",s_ping:"فاصلهٔ پایش پینگ",s_ping_s:"هر چند ثانیه وضعیت سرور فعال دوباره سنجیده شود",s_to:"تایم‌اوت تست",s_to_s:"مدت انتظار برای پاسخ سرور",s_mon:"پایش خودکار پس از اتصال",s_mon_s:"پینگ زنده و هشدار قطعی",s_bg:"انیمیشن پس‌زمینه",s_bg_s:"برای گوشی‌های ضعیف قابل خاموشی",
+ bk_exp:"خروجی پشتیبان (JSON)",bk_exp_s:"فایل پشتیبان از همهٔ کانفیگ‌ها",bk_copy:"کپی همهٔ لینک‌ها",bk_copy_s:"برای پیست در دستگاه دیگر",bk_imp:"بازیابی از فایل",bk_imp_s:"JSON یا فهرست لینک — تکراری‌ها حذف می‌شوند",bk_get:"خروجی",bk_cp:"کپی همه",bk_up:"بازیابی",
+ r_frag:"Fragment بسته‌های TLS",r_frag_s:"ضد DPI — مؤثرترین گزینه در ایران (فقط خروجی Xray)",r_mux_s:"چند اتصال روی یک تونل",r_muxconc:"تعداد اتصال Mux",r_muxconc_s:"حداکثر اتصال‌های موازی روی تونل",r_quic:"مسدودسازی QUIC",r_quic_s:"اجبار ترافیک به TCP",r_dir:"مستقیم‌کردن سایت‌های ایرانی",r_dir_s:"geosite:category-ir و .ir بدون فیلترشکن",r_ads:"مسدودسازی تبلیغات",r_ads_s:"دامنه‌های تبلیغاتی مسدود می‌شوند",
+ a_fp:"اثر انگشت uTLS",a_fp_s:"برای کانفیگ‌های بدون fingerprint",a_alpn_s:"خالی یعنی پیش‌فرض",a_fmt:"قالب خروجی پیش‌فرض",a_fmt_s:"قالب پیش‌فرض در «جزئیات»",
+ c_sniff:"فعال‌کردن Sniffing",c_sniff_s:"تشخیص نام دامنه از ترافیک — برای مسیریابی درست (توصیه می‌شود)",c_routeonly:"فقط مسیریابی (RouteOnly)",c_routeonly_s:"نام Sniff شده فقط برای مسیریابی، نه مقصد واقعی",c_auto:"اتصال خودکار هنگام باز شدن",c_auto_s:"آخرین کانفیگ فعال خودکار وصل شود",c_loglvl:"سطح لاگ هسته",c_preres:"روش پیش‌حل آدرس خروجی",c_testurl:"آدرس تست تأخیر",c_sport:"پورت SOCKS محلی",c_rdns:"DNS دور (اختیاری)",c_rproto:"پروتکل",c_ddns:"DNS داخلی",c_dhost:"مستقیم‌هاست DNS (دامنه=IP)",c_dhost_s:"هر خط: example.com=1.2.3.4",
+ v_dns:"DNS تونل VPN (IPv4)",v_mtu:"MTU تونل (پیش‌فرض 1500)",v_ipv6:"ترجیح IPv6",v_ipv6_s:"مسیرهای IPv6 هم به تونل اضافه شود",v_tun:"موتور TUN",v_tun_s:"hev-socks5-tunnel یا پل داخلی AAR",v_hlvl:"سطح لاگ Hev",v_hto:"زمان خواب/تایم‌اوت Hev (ثانیه)",v_hto_s:"tcp,udp — پیش‌فرض 300,60",
+ apps_mode:"حالت پروکسی هر برنامه",apps_hint:"فقط برنامه‌های انتخابی از تونل استفاده کنند یا همه به‌جز آن‌ها",apps_none:"غیرفعال (همه)",apps_allow:"فقط این‌ها",apps_disallow:"همه به‌جز این‌ها",apps_pick:"انتخاب برنامه‌ها",apps_open:"بازکردن فهرست",apps_search:"جستجوی برنامه…",apps_empty:"برنامه‌ای یافت نشد",apps_cnt:"{n} برنامه",
+ ru_preset:"قوانین آماده",ru_udp443:"مسدودکردن udp443",ru_google:"پروکسی Google",ru_lanip:"دورزدن IP شبکه محلی",ru_landom:"دورزدن دامنه‌های محلی",ru_ddns:"دورزدن DNS داخلی",ru_ddns_s:"سرورهای DNS داخلی مستقیم",ru_custom:"قوانین سفارشی",ru_add:"افزودن قانون",ru_name:"نام قانون",ru_hint:"قوانین سفارشی بعد از قوانین آماده اعمال می‌شوند",
+ btn_reset:"بازنشانی",btn_save:"ذخیره",
+ g_t:"راهنمای اتصال",g_p1:"در اپ اندروید: انتخاب کانفیگ → دکمهٔ پخش → تونل واقعی روی کل ترافیک.",g_p2:"در مرورگر: حلقه فقط دستیابی سرور را می‌سنجد. برای تونل واقعی، لینک/QR را در Hiddify یا v2rayNG وارد کنید.",g_warn:"توصیهٔ امنیتی:",g_warn_p:"برای استفادهٔ جدی، سرور شخصی بهترین گزینه است. اگر اختلال دارید، Fragment و «مستقیم‌کردن سایت‌های ایرانی» را فعال کنید.",
+ c_cancel:"انصراف",c_ok:"انجام بده",c_close:"بستن",c_t:"تایید",r_t:"تغییر نام",
+ sc_t:"اسکن QR کانفیگ",sc_h:"QR کانفیگ را مقابل دوربین بگیرید…",dnd_t:"فایل را رها کنید تا کانفیگ‌ها اضافه شوند",
+ sub_t:"اشتراک و حجم باقی‌مانده",sub_add_t:"افزودن اشتراک خریداری‌شده",sub_nm:"نام گروه",sub_url:"لینک اشتراک (URL)",sub_add:"افزودن و دریافت",sub_used:"مصرف‌شده",sub_left:"باقی‌مانده",sub_exp:"انقضا",sub_days:"{n} روز",sub_expd:"منقضی",sub_unk:"نامشخص",sub_upd:"بروزرسانی",sub_edit:"ویرایش دستی",sub_del:"حذف گروه",sub_et:"ویرایش دستی حجم / انقضا",sub_tgb:"حجم کل (GB)",sub_dt:"تاریخ انقضا",sub_save:"ذخیره",sub_buy:"خرید اشتراک:",sub_buy_p:"این برنامه اشتراک نمی‌فروشد. اشتراک را از سرویس‌دهندهٔ معتبر بخرید و «لینک اشتراک» آن را اینجا وارد کنید؛ حجم و انقضا خودکار (در صورت پشتیبانی) یا با «ویرایش دستی» وارد می‌شود.",sub_noinfo:"اطلاعات حجمی از سرور دریافت نشد — با «ویرایش دستی» وارد کنید.",sub_none:"هنوز گروه اشتراکی نیست — از «سرورهای رایگان» دریافت کنید یا اشتراک خودتان را اضافه کنید.",
+ m_added:"{n} کانفیگ افزوده شد",m_empty:"چیزی وارد نشده",m_nf:"کانفیگ قابل شناسایی پیدا نشد",m_nf_in:"کانفیگ قابل شناسایی در «{x}» پیدا نشد",m_fail:"دریافت ناموفق بود",m_req:"آدرس، پورت و شناسه الزامی است",m_mkfail:"ساخت کانفیگ ناموفق بود",m_pick:"ابتدا یک کانفیگ را انتخاب کنید (لمس ردیف)",m_testing:"در حال تست {x}…",m_pok:"پینگ: {n}ms",m_pfail:"سرور پاسخگو نبود",m_del:"کانفیگ حذف شد",m_copied:"در کلیپ‌بورد کپی شد",m_copn:"{n} لینک کپی شد",m_share_f:"لینک کپی شد (اشتراک سیستمی در دسترس نیست)",
+ m_cdel:"کانفیگ «{x}» حذف شود؟",m_cdelall:"تمام {n} کانفیگ گروه فعلی حذف شود؟ بازگشت‌پذیر نیست.",m_cdinv:"{n} کانفیگِ نامعتبر از گروه فعلی حذف شود؟",m_noinv:"کانفیگ نامعتبری در این گروه نیست",m_invdel:"{n} کانفیگ نامعتبر حذف شد",m_gempty:"این گروه خالی است",m_gclear:"گروه فعلی خالی شد",m_dup:"{n} کانفیگ تکراری حذف شد",m_noexp:"چیزی برای خروجی نیست",
+ m_gtest:"تست سریع {n} کانفیگ…",m_grtest:"تست تأخیر واقعی {n} کانفیگ…",m_gdone:"تست کامل شد — {a} از {b} پاسخگو",m_sorted:"مرتب‌سازی انجام شد",m_pickg:"ابتدا یک گروه اشتراک را از تب‌ها انتخاب کنید",m_nosrc:"این گروه منبع شناخته‌شده‌ای ندارد",m_fetch:"دریافت گروه «{x}»…",m_nonew:"کانفیگ جدیدی در «{x}» نبود",m_srcfail:"دریافت «{x}» ناموفق بود",m_upall:"بروزرسانی همهٔ گروه‌ها…",
+ m_rest:"در حال راه‌اندازی مجدد…",m_rester:"خطا در راه‌اندازی مجدد",m_restbr:"راه‌اندازی مجدد فقط در اپ اندروید معنا دارد",m_clipe:"کلیپ‌بورد خالی است",m_clipd:"دسترسی به کلیپ‌بورد نشد — لینک را در کادر پیست کنید",m_cam:"دوربین در این مرورگر در دسترس نیست",m_jsqr:"کتابخانهٔ اسکنر بارگیری نشده",m_camd:"دسترسی به دوربین داده نشد",m_qrbad:"QR شامل کانفیگ معتبر نبود",m_qrlib:"کتابخانهٔ QR بارگیری نشده",m_qrfail:"ساخت QR ناموفق بود",m_rfail:"بازیابی ناموفق: {x}",m_nonewf:"مورد جدیدی در فایل نبود",m_ufmt:"ساختار فایل شناخته نشد",m_reset:"تنظیمات بازنشانی شد",
+ m_sb:"این پروتکل نیازمند هستهٔ sing-box است",m_ask:"مجوز VPN را تایید کنید",m_verr:"خطا در شروع تونل",m_von:"تونل فعال شد",m_cap:"سقف ۴۰۰ کانفیگ",m_read:"خواندن فایل ممکن نشد",
+ m_subadd:"اشتراک «{x}» افزوده شد",m_subsave:"اطلاعات اشتراک ذخیره شد",m_subdel:"گروه اشتراک حذف شد",m_subneed:"نام و لینک را وارد کنید",m_cdelg:"گروه «{x}» و همهٔ {n} کانفیگ آن حذف شود؟",
+ m_ruleadd:"قانون اضافه شد",m_ruledel:"قانون حذف شد",m_ruledup:"قانون تکراری یا خالی",m_appsload:"در حال دریافت فهرست برنامه‌ها…",
+ log_ready:"گذر {v} آماده است — محیط: {e}",log_bk:"پشتیبان با {n} کانفیگ دانلود شد.",
+ env_mob:"مرورگر موبایل",env_desk:"دسکتاپ",env_pwa:"اپ نصب‌شده (PWA)",env_app:"اپ اندروید · تونل"
+},
+ar:{
+ app:"جواز",credit:"تمت البرمجة بواسطة",tb_title:"ملف الإعدادات",tb_sub_default:"جواز · لوحة ذكية",tb_sub_android:"تطبيق أندرويد · نواة Xray",tb_testing:"فحص {a}/{b}",
+ tab_all:"الكل",lbl_active:"الإعداد النشط",none_sel:"لم يتم تحديد إعداد",
+ ring_conn:"اتصال",ring_disc:"قطع الاتصال",ring_chk:"جارٍ الفحص",ring_hint:"اضغط للفحص",ring_retry:"اضغط لإعادة المحاولة",
+ m_ping:"الزمن",m_status:"الحالة",m_sec:"الأمان",m_proto:"البروتوكول",st_ok:"متاح",st_down:"منقطع",
+ a_test:"فحص سريع",a_sec:"تحليل أمني",a_detail:"التفاصيل",a_copy:"نسخ",
+ hint_browser:'الحلقة تقيس إمكانية الوصول فعلياً. أدخل المخرجات في Hiddify / v2rayNG.',
+ hint_android:'<b>النفق الحقيقي نشط</b> — كل حركة الجهاز عبر نواة Xray. زر التشغيل = قطع.',
+ empty_none:"لا إعدادات بعد.",empty_f:"لا نتائج.",b_add:"إضافة",b_free:"خوادم مجانية",manual:"يدوي",
+ sc_none:"غير متصل",sc_busy:"جارٍ الفحص…",sc_on:"متصل",sc_tun:"النفق نشط",sc_err:"لا يمكن الوصول",
+ d_ver:"لوحة ذكية · ٢٫٦",
+ d_subs2:"الاشتراك والحجم",d_subs2_s:"الاستهلاك والانتهاء",d_group:"مجموعات الاشتراك",d_group_s:"خوادم مجانية ومصادر",d_routing:"التوجيه (إيران)",d_routing_s:"المواقع الإيرانية مباشرة",d_dpi:"تجاوز التشويش",d_dpi_s:"Fragment و Mux",d_geo:"ملفات geo",d_geo_s:"geosite/geoip",d_set:"الإعدادات",d_set_s:"DNS والنواة وقوانين",d_logs:"السجلات",d_logs_s:"١٥٠ حدثاً",d_corelog:"سجل النواة",d_corelog_s:"لتشخيص النفق",d_backup:"نسخ/استعادة",d_backup_s:"نقل بين الأجهزة",d_update:"تحديث الكل",d_update_s:"كل المصادر",d_about:"حول",d_about_s:"الإصدار والمطور",d_lang:"اللغة",st_g5_s:"قواعد جاهزة ومخصصة",
+ dr_foot:'كل شيء محلي.<br><span>تمت البرمجة بواسطة</span> <b>محمد حسين زاده</b>',
+ p_restart:"إعادة تشغيل",p_deldup:"حذف المكرر",p_delinv:"حذف غير الصالح",p_delall:"حذف الكل",p_export:"تصدير",p_smart:"اختيار ذكي",p_tcping:"فحص سريع",p_real:"زمن حقيقي",p_sort:"فرز",p_upd:"تحديث المجموعة",
+ pa_imp:"استيراد",pa_qr:"من QRcode",pa_clip:"من الحافظة",pa_file:"من ملف",pa_link:"رابط/اشتراك",pa_man:"إدخال يدوي",
+ pf_t:"تصفية",pf_q:"ابحث…",pf_alive:"المستجيبة فقط",pf_sec:"A و B فقط",
+ sh_conn:"اتصال/قطع",sh_test:"فحص",sh_sec:"تحليل",sh_det:"تفاصيل",sh_copy:"نسخ",sh_share:"مشاركة",sh_ren:"تسمية",sh_del:"حذف",
+ add_t:"إضافة",add_t1:"رابط",add_t3:"يدوي",f_link:"رابط أو روابط",f_fetch:"جلب وإضافة",f_note:"يُجلب مباشرة ثم عبر وسيط.",f_name:"الاسم",f_proto:"البروتوكول",f_server:"الخادم",f_port:"المنفذ",f_secret:"UUID/كلمة",f_net:"الشبكة",f_tc:"الأمان",f_method:"التشفير",f_pass:"كلمة ثانية",f_make:"إنشاء",none_opt:"بدون",
+ qr_copy:"نسخ",qr_dl:"PNG",fmt_link:"رابط",fmt_x:"Xray",fmt_s:"sing-box",d_copy:"نسخ",
+ sec_t:"تحليل أمني",sec_enc:"تشفير",sec_st:"تخفي",sec_int:"سلامة",sec_of:"من ١٠٠",sec_note:"محلي بالكامل.",
+ sm_t:"اختيار ذكي",sm_note:"أمنية ٦٠٪ + زمن ٤٠٪",sm_again:"إعادة",sm_apply:"الأفضل",sm_best:"الأفضل",
+ src_t:"مجموعات مجانية",src_c:"مصدر مخصص",src_get:"جلب",src_note:"١٥٠ كحد أقصى.",
+ geo_t:"ملفات geo",geo_p1:"يعتمد التوجيه على geosite/geoip.",geo_p2:"مدمجة في Hiddify و v2rayNG.",
+ about_d:"لوحة ذكية بتحليل محلي ونواة Xray.",
+ st_g1:"عام",st_g2:"توجيه إيران",st_g3:"متقدم",st_g4:"النواة و VPN",st_g5:"قواعد وتطبيقات",
+ sg_net:"شبكة",sg_ui:"واجهة",sg_bk:"نقل",sg_dpi:"تشويش",sg_rt:"توجيه",sg_adv:"TLS",sg_core:"نواة Xray",sg_vpn:"VPN",sg_apps:"لكل تطبيق",
+ s_dns:"DNS",s_dns_s:"يُطبق في JSON",s_ping:"فاصل المراقبة",s_ping_s:"ثانية",s_to:"مهلة",s_to_s:"انتظار",s_mon:"مراقبة تلقائية",s_mon_s:"تنبيه انقطاع",s_bg:"خلفية",s_bg_s:"للأجهزة الضعيفة",
+ bk_exp:"نسخة احتياطية",bk_exp_s:"ملف JSON",bk_copy:"نسخ الكل",bk_copy_s:"لجهاز آخر",bk_imp:"استعادة",bk_imp_s:"JSON أو روابط",bk_get:"تصدير",bk_cp:"نسخ",bk_up:"استعادة",
+ r_frag:"تقطيع TLS",r_frag_s:"مضاد للتشويش",r_mux_s:"اتصالات متعددة",r_muxconc:"عدد Mux",r_muxconc_s:"أقصى اتصالات",r_quic:"حظر QUIC",r_quic_s:"إجبار TCP",r_dir:"المواقع الإيرانية مباشرة",r_dir_s:"geosite:category-ir",r_ads:"حظر الإعلانات",r_ads_s:"category-ads-all",
+ a_fp:"بصمة uTLS",a_fp_s:"للإعدادات بدون بصمة",a_alpn_s:"فارغ = افتراضي",a_fmt:"صيغة المخرجات",a_fmt_s:"في التفاصيل",
+ c_sniff:"Sniffing",c_sniff_s:"كشف النطاق (موصى به)",c_routeonly:"RouteOnly",c_routeonly_s:"للتوجيه فقط",c_auto:"اتصال تلقائي",c_auto_s:"عند الفتح",c_loglvl:"مستوى السجل",c_preres:"الحل المسبق",c_testurl:"رابط الفحص",c_sport:"منفذ SOCKS",c_rdns:"DNS بعيد",c_rproto:"بروتوكول",c_ddns:"DNS محلي",c_dhost:"مضيفات DNS",c_dhost_s:"سطر لكل: domain=ip",
+ v_dns:"DNS للنفق",v_mtu:"MTU",v_ipv6:"تفضيل IPv6",v_ipv6_s:"إضافة مسارات IPv6",v_tun:"محرك TUN",v_tun_s:"hev أو AAR",v_hlvl:"سجل Hev",v_hto:"مهلات Hev",v_hto_s:"tcp,udp",
+ apps_mode:"وضع التطبيقات",apps_hint:"تطبيقات محددة فقط أو الكل عداها",apps_none:"معطل",apps_allow:"هذه فقط",apps_disallow:"الكل عداها",apps_pick:"اختيار التطبيقات",apps_open:"قائمة",apps_search:"ابحث…",apps_empty:"لا تطبيقات",apps_cnt:"{n}",
+ ru_preset:"قواعد جاهزة",ru_udp443:"حظر udp443",ru_google:"بروكسي Google",ru_lanip:"تجاوز LAN",ru_landom:"تجاوز نطاقات LAN",ru_ddns:"تجاوز DNS المحلي",ru_ddns_s:"مباشر",ru_custom:"قواعد مخصصة",ru_add:"إضافة",ru_name:"الاسم",ru_hint:"بعد الجاهزة",
+ btn_reset:"استعادة",btn_save:"حفظ",
+ g_t:"دليل",g_p1:"اختر ← تشغيل ← نفق حقيقي.",g_p2:"في المتصفح قياس فقط.",g_warn:"نصيحة:",g_warn_p:"الخادم الشخصي أفضل.",
+ c_cancel:"إلغاء",c_ok:"تنفيذ",c_close:"إغلاق",c_t:"تأكيد",r_t:"تسمية",
+ sc_t:"مسح QR",sc_h:"وجّه الكاميرا…",dnd_t:"أفلت الملف",
+ sub_t:"الاشتراك والحجم",sub_add_t:"إضافة اشتراك",sub_nm:"الاسم",sub_url:"الرابط",sub_add:"إضافة",sub_used:"المستهلك",sub_left:"المتبقي",sub_exp:"الانتهاء",sub_days:"{n} يوم",sub_expd:"منتهٍ",sub_unk:"؟",sub_upd:"تحديث",sub_edit:"تعديل",sub_del:"حذف",sub_et:"تعديل يدوي",sub_tgb:"الحجم GB",sub_dt:"التاريخ",sub_save:"حفظ",sub_buy:"شراء:",sub_buy_p:"من مزود موثوق ثم أدخل الرابط هنا.",sub_noinfo:"لا بيانات — يدوياً.",sub_none:"لا مجموعات بعد.",
+ m_added:"أُضيف {n}",m_empty:"فارغ",m_nf:"لا نتائج",m_nf_in:"لا شيء في «{x}»",m_fail:"فشل",m_req:"حقول مطلوبة",m_mkfail:"فشل",m_pick:"اختر أولاً",m_testing:"فحص {x}…",m_pok:"{n}ms",m_pfail:"لا استجابة",m_del:"حُذف",m_copied:"نُسخ",m_copn:"{n}",m_share_f:"نُسخ",
+ m_cdel:"حذف «{x}»؟",m_cdelall:"حذف {n}؟",m_cdinv:"حذف {n}؟",m_noinv:"لا شيء",m_invdel:"حُذف {n}",m_gempty:"فارغة",m_gclear:"فُرِّغت",m_dup:"{n}",m_noexp:"لا شيء",
+ m_gtest:"فحص {n}…",m_grtest:"زمن {n}…",m_gdone:"{a}/{b}",m_sorted:"تم",m_pickg:"اختر مجموعة",m_nosrc:"لا مصدر",m_fetch:"جلب {x}…",m_nonew:"لا جديد",m_srcfail:"فشل {x}",m_upall:"الكل…",
+ m_rest:"جارٍ…",m_rester:"خطأ",m_restbr:"أندرويد فقط",m_clipe:"فارغة",m_clipd:"تعذر",m_cam:"لا كاميرا",m_jsqr:"مكتبة مفقودة",m_camd:"مرفوض",m_qrbad:"غير صالح",m_qrlib:"مفقودة",m_qrfail:"فشل",m_rfail:"فشل: {x}",m_nonewf:"لا جديد",m_ufmt:"غير معروف",m_reset:"أُعيد",
+ m_sb:"يحتاج sing-box",m_ask:"وافق على VPN",m_verr:"خطأ",m_von:"النفق نشط",m_cap:"حد ٤٠٠",m_read:"تعذر القراءة",
+ m_subadd:"أُضيف",m_subsave:"حُفظ",m_subdel:"حُذفت",m_subneed:"الاسم والرابط",m_cdelg:"حذف {x}؟",
+ m_ruleadd:"أُضيفت",m_ruledel:"حُذفت",m_ruledup:"مكررة",m_appsload:"جارٍ الجلب…",
+ log_ready:"جواز {v} — {e}",log_bk:"نسخة {n}.",
+ env_mob:"جوال",env_desk:"حاسوب",env_pwa:"مثبت",env_app:"أندرويد · نفق"
+},
+en:{
+ app:"Gozar",credit:"Developed by",tb_title:"Config File",tb_sub_default:"Gozar · Smart Panel",tb_sub_android:"Android app · Xray core",tb_testing:"Testing {a}/{b}",
+ tab_all:"All",lbl_active:"Active config",none_sel:"No config selected",
+ ring_conn:"Connect",ring_disc:"Disconnect",ring_chk:"Checking",ring_hint:"Tap to test",ring_retry:"Tap to retry",
+ m_ping:"Ping",m_status:"Status",m_sec:"Security",m_proto:"Proto",st_ok:"Reachable",st_down:"Down",
+ a_test:"Quick test",a_sec:"Security audit",a_detail:"Details",a_copy:"Copy",
+ hint_browser:'The ring <b>really</b> tests reachability. For a real tunnel, import the output into Hiddify / v2rayNG.',
+ hint_android:'<b>Real tunnel active</b> — all traffic via Xray core. Play = disconnect.',
+ empty_none:"No configs added yet.",empty_f:"No matches.",b_add:"Add",b_free:"Free servers",manual:"Manual",
+ sc_none:"Not connected",sc_busy:"Checking…",sc_on:"Connected",sc_tun:"Tunnel active",sc_err:"Unreachable",
+ d_ver:"Smart config panel · v2.6",
+ d_subs2:"Subscription & quota",d_subs2_s:"Usage/expiry per subscription",d_group:"Subscription groups",d_group_s:"Free servers & sources",d_routing:"Routing (Iran)",d_routing_s:"Iran direct, ads, QUIC",d_dpi:"DPI bypass",d_dpi_s:"Fragment, Mux",d_geo:"Geo files",d_geo_s:"geosite/geoip",d_set:"Settings",d_set_s:"DNS, core, rules, apps",d_logs:"Logs",d_logs_s:"Last 150 events",d_corelog:"Xray core log",d_corelog_s:"Internal core output for debugging",d_backup:"Backup / Restore",d_backup_s:"Transfer between devices",d_update:"Update all groups",d_update_s:"Re-fetch sources",d_about:"About",d_about_s:"Version & developer",d_lang:"Language",st_g5_s:"Preset & custom rules",
+ dr_foot:'All local.<br><span>Developed by</span> <b>Mohammad Hosseinzadeh</b>',
+ p_restart:"Restart service",p_deldup:"Remove duplicates",p_delinv:"Remove invalid",p_delall:"Remove all in group",p_export:"Export group",p_smart:"Smart select",p_tcping:"Quick test group",p_real:"Real latency group",p_sort:"Sort by results",p_upd:"Update group",
+ pa_imp:"Import config",pa_qr:"From QRcode",pa_clip:"From clipboard",pa_file:"From local file",pa_link:"Link / subscription",pa_man:"Manual input",
+ pf_t:"Filter",pf_q:"Search…",pf_alive:"Reachable only",pf_sec:"Grade A & B only",
+ sh_conn:"Connect / Disconnect",sh_test:"Latency test",sh_sec:"Security audit",sh_det:"Details & export",sh_copy:"Copy link",sh_share:"Share",sh_ren:"Rename",sh_del:"Delete",
+ add_t:"Add config",add_t1:"Link / subscription",add_t3:"Manual form",f_link:"Config link, subscription or links (one per line)",f_fetch:"Fetch & add",f_note:"Fetched directly first, via CORS proxy if blocked.",f_name:"Name",f_proto:"Protocol",f_server:"Server address",f_port:"Port",f_secret:"UUID / password",f_net:"Network",f_tc:"Security",f_method:"Cipher (SS)",f_pass:"Second password (TUIC)",f_make:"Build & add",none_opt:"None",
+ qr_copy:"Copy link",qr_dl:"Download PNG",fmt_link:"Config link",fmt_x:"Full JSON — Xray",fmt_s:"Full JSON — sing-box",d_copy:"Copy",
+ sec_t:"Security audit",sec_enc:"Encryption",sec_st:"Stealth",sec_int:"Integrity",sec_of:"of 100",sec_note:"Fully local analysis.",
+ sm_t:"Smart selection",sm_note:"Security (60%) + ping (40%).",sm_again:"Re-test",sm_apply:"Connect to best",sm_best:"Best",
+ src_t:"Subscription groups (free)",src_c:"Add custom source",src_get:"Fetch",src_note:"Up to 150 random configs each; dedup.",
+ geo_t:"Geo resource files",geo_p1:"Iran-direct routing relies on geosite/geoip.",geo_p2:"From v2fly repos; pre-bundled in Hiddify & v2rayNG.",
+ about_d:"Smart config manager with local security audit, 6 protocols and Xray core.",
+ st_g1:"General",st_g2:"Iran routing",st_g3:"Advanced",st_g4:"Core & VPN",st_g5:"Rules & Apps",
+ sg_net:"Network & testing",sg_ui:"Interface",sg_bk:"Transfer between devices",sg_dpi:"DPI bypass",sg_rt:"Routing",sg_adv:"TLS & export defaults",sg_core:"Xray core",sg_vpn:"VPN settings",sg_apps:"Per-app proxy",
+ s_dns:"DNS server",s_dns_s:"Applied in tunnel JSON",s_ping:"Ping monitor interval",s_ping_s:"Seconds between re-tests",s_to:"Test timeout",s_to_s:"Server response wait",s_mon:"Auto-monitor after connect",s_mon_s:"Live ping & alerts",s_bg:"Background animation",s_bg_s:"Can be disabled on weak phones",
+ bk_exp:"Backup export (JSON)",bk_exp_s:"Backup file of all configs",bk_copy:"Copy all links",bk_copy_s:"Paste on another device",bk_imp:"Restore from file",bk_imp_s:"JSON or link list — dedup",bk_get:"Export",bk_cp:"Copy all",bk_up:"Restore",
+ r_frag:"TLS fragment",r_frag_s:"Anti-DPI — most effective in Iran (Xray only)",r_mux_s:"Multiple connections over one tunnel",r_muxconc:"Mux concurrency",r_muxconc_s:"Max parallel streams on tunnel",r_quic:"Block QUIC",r_quic_s:"Force TCP",r_dir:"Iran sites direct",r_dir_s:"geosite:category-ir & .ir without VPN",r_ads:"Block ads",r_ads_s:"Ad domains blocked",
+ a_fp:"uTLS fingerprint",a_fp_s:"For configs without fingerprint",a_alpn_s:"Empty = default",a_fmt:"Default export format",a_fmt_s:"Format in “Details”",
+ c_sniff:"Enable sniffing",c_sniff_s:"Detect domain from traffic — recommended for routing",c_routeonly:"Route only",c_routeonly_s:"Sniffed name used for routing only, not destination",c_auto:"Auto-connect on launch",c_auto_s:"Connect last active config automatically",c_loglvl:"Core log level",c_preres:"Outbound domain pre-resolve",c_testurl:"Latency test URL",c_sport:"Local SOCKS port",c_rdns:"Remote DNS (optional)",c_rproto:"protocol",c_ddns:"Domestic DNS",c_dhost:"DNS direct hosts (domain=IP)",c_dhost_s:"One per line: example.com=1.2.3.4",
+ v_dns:"VPN tunnel DNS (IPv4)",v_mtu:"Tunnel MTU (default 1500)",v_ipv6:"Prefer IPv6",v_ipv6_s:"Add IPv6 routes to tunnel",v_tun:"TUN engine",v_tun_s:"hev-socks5-tunnel or built-in AAR loop",v_hlvl:"Hev log level",v_hto:"Hev idle/udp timeout (seconds)",v_hto_s:"tcp,udp — default 300,60",
+ apps_mode:"Per-app proxy mode",apps_hint:"Only selected apps use the tunnel, or all except them",apps_none:"Disabled (all apps)",apps_allow:"Only these",apps_disallow:"All except these",apps_pick:"Select apps",apps_open:"Open list",apps_search:"Search apps…",apps_empty:"No apps found",apps_cnt:"{n} apps",
+ ru_preset:"Preset rules",ru_udp443:"Block udp443",ru_google:"Proxy Google",ru_lanip:"Bypass LAN IPs",ru_landom:"Bypass LAN domains",ru_ddns:"Bypass domestic DNS",ru_ddns_s:"Local DNS servers go direct",ru_custom:"Custom rules",ru_add:"Add rule",ru_name:"Rule name",ru_hint:"Custom rules apply after presets",
+ btn_reset:"Reset",btn_save:"Save",
+ g_t:"Connection guide",g_p1:"Android app: pick a config → play → real tunnel for all traffic.",g_p2:"Browser: ring tests reachability only. For a real tunnel import link/QR into Hiddify or v2rayNG.",g_warn:"Security tip:",g_warn_p:"A private server is best for serious use. Enable Fragment and “Iran direct” if throttled.",
+ c_cancel:"Cancel",c_ok:"Confirm",c_close:"Close",c_t:"Confirm",r_t:"Rename",
+ sc_t:"Scan config QR",sc_h:"Point camera at config QR…",dnd_t:"Drop a file to import configs",
+ sub_t:"Subscription & quota",sub_add_t:"Add purchased subscription",sub_nm:"Group name",sub_url:"Subscription URL",sub_add:"Add & fetch",sub_used:"Used",sub_left:"Remaining",sub_exp:"Expiry",sub_days:"{n} days",sub_expd:"Expired",sub_unk:"Unknown",sub_upd:"Update",sub_edit:"Manual edit",sub_del:"Delete group",sub_et:"Edit quota / expiry",sub_tgb:"Total quota (GB)",sub_dt:"Expiry date",sub_save:"Save",sub_buy:"Buying a subscription:",sub_buy_p:"This app does not sell subscriptions. Buy from a trusted provider and paste the subscription URL here; usage/expiry read automatically if supported, or via Manual edit.",sub_noinfo:"No quota info from server — use Manual edit.",sub_none:"No subscription group yet.",
+ m_added:"{n} configs added",m_empty:"Nothing entered",m_nf:"No recognizable config found",m_nf_in:"None in “{x}”",m_fail:"Fetch failed",m_req:"Address, port and secret required",m_mkfail:"Build failed",m_pick:"Select a config first (tap a row)",m_testing:"Testing {x}…",m_pok:"Ping: {n}ms",m_pfail:"Server unreachable",m_del:"Deleted",m_copied:"Copied to clipboard",m_copn:"{n} links copied",m_share_f:"Link copied",
+ m_cdel:"Delete “{x}”?",m_cdelall:"Delete all {n}? Cannot be undone.",m_cdinv:"Remove {n} invalid?",m_noinv:"No invalid configs here",m_invdel:"{n} removed",m_gempty:"Group is empty",m_gclear:"Group cleared",m_dup:"{n} duplicates removed",m_noexp:"Nothing to export",
+ m_gtest:"Quick-testing {n}…",m_grtest:"Real-latency testing {n}…",m_gdone:"Done — {a} of {b} reachable",m_sorted:"Sorted",m_pickg:"Pick a group first",m_nosrc:"No known source",m_fetch:"Fetching “{x}”…",m_nonew:"No new in “{x}”",m_srcfail:"Failed to fetch “{x}”",m_upall:"Updating all…",
+ m_rest:"Restarting…",m_rester:"Restart failed",m_restbr:"Android app only",m_clipe:"Clipboard empty",m_clipd:"Clipboard denied — paste manually",m_cam:"Camera unavailable",m_jsqr:"Scanner library missing",m_camd:"Camera denied",m_qrbad:"QR has no valid config",m_qrlib:"QR library missing",m_qrfail:"QR generation failed",m_rfail:"Restore failed: {x}",m_nonewf:"Nothing new",m_ufmt:"Unknown structure",m_reset:"Settings reset",
+ m_sb:"Needs sing-box core",m_ask:"Approve VPN permission",m_verr:"Tunnel start failed",m_von:"Tunnel active",m_cap:"400-config limit",m_read:"Cannot read file",
+ m_subadd:"“{x}” added",m_subsave:"Info saved",m_subdel:"Group deleted",m_subneed:"Enter name and URL",m_cdelg:"Delete group “{x}” and {n} configs?",
+ m_ruleadd:"Rule added",m_ruledel:"Rule deleted",m_ruledup:"Duplicate or empty rule",m_appsload:"Loading app list…",
+ log_ready:"Gozar {v} ready — {e}",log_bk:"Backup with {n} configs downloaded.",
+ env_mob:"Mobile browser",env_desk:"Desktop",env_pwa:"Installed app",env_app:"Android app · tunnel"
+}};
+let LANG='fa';
+try{ LANG=localStorage.getItem('gozar.lang')||'fa'; }catch(e){}
+if(!I18N[LANG]) LANG='fa';
+function t(k,p){ let s=(I18N[LANG]&&I18N[LANG][k])||I18N.fa[k]||k; if(p) for(const key in p) s=s.split('{'+key+'}').join(p[key]); return s; }
+
+/* ═══════════ ابزارها ═══════════ */
+const APP_VERSION='2.6.0';
+const $=function(s){ return document.querySelector(s); };
+const esc=function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); };
+const wait=function(ms){ return new Promise(function(r){ setTimeout(r,ms); }); };
+const uid=function(){ if(window.crypto&&crypto.randomUUID) return crypto.randomUUID(); return 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2); };
+const icons=function(){ try{ if(window.lucide) lucide.createIcons(); }catch(e){} };
+const shuffle=function(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;} return a; };
+function click(id,fn){ const el=$(id); if(el) el.onclick=fn; return el; }
+function on(id,ev,fn){ const el=$(id); if(el) el.addEventListener(ev,fn); return el; }
+function b64d(s){ s=String(s).trim().replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4)s+='='; const bin=atob(s); try{ return new TextDecoder('utf-8',{fatal:false}).decode(Uint8Array.from(bin,function(c){return c.charCodeAt(0);})); }catch(e){ return bin; } }
+function b64e(s){ const b=new TextEncoder().encode(s); let bin=''; for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]); return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function toast(msg,type){
+  type=type||'ok';
+  const el=document.createElement('div'); el.className='toast '+type;
+  const ic=type==='ok'?'check':type==='warn'?'alert-triangle':'x';
+  el.innerHTML='<i data-lucide="'+ic+'"></i><span>'+esc(msg)+'</span>';
+  $('#toasts').appendChild(el); icons();
+  setTimeout(function(){ el.classList.add('out'); setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },320); },3200);
+}
+function copyText(txt,msg){
+  msg=msg||t('m_copied');
+  function fb(){ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast(msg); }catch(e){} document.body.removeChild(ta); }
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){ toast(msg); }).catch(fb); else fb();
+}
+function splitHostPort(hp){ hp=hp.trim(); if(hp.charAt(0)==='['){ const m=hp.match(/^\[([^\]]+)\]:(\d+)$/); return m?[m[1],+m[2]]:[hp,443]; } const i=hp.lastIndexOf(':'); if(i>0) return [hp.slice(0,i),+hp.slice(i+1)||443]; return [hp,443]; }
+function pool(tasks,n){ let i=0; const w=[]; for(var x=0;x<n;x++){ w.push((async function(){ while(i<tasks.length){ const tk=tasks[i++]; try{ await tk(); }catch(e){} } })()); } return Promise.all(w); }
+function fileToText(f){ return new Promise(function(res,rej){ const r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=function(){rej(new Error(t('m_read')));}; r.readAsText(f); }); }
+function download(name,blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); },4000); }
+
+const ICON_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0a0f0d"/><path d="M160 340 L256 190 L352 340" fill="none" stroke="#2fe6a8" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/><circle cx="256" cy="176" r="30" fill="#2fe6a8"/><circle cx="152" cy="348" r="24" fill="#2fe6a8"/><circle cx="360" cy="348" r="24" fill="#2fe6a8"/></svg>';
+const ICON_DATA='data:image/svg+xml,'+encodeURIComponent(ICON_SVG);
+(function(){ try{
+  const fav=document.createElement('link'); fav.rel='icon'; fav.type='image/svg+xml'; fav.href=ICON_DATA; document.head.appendChild(fav);
+  if(location.protocol.indexOf('http')===0){
+    const man={name:'Gozar',short_name:'Gozar',start_url:location.href.split('#')[0],display:'standalone',background_color:'#0a0f0d',theme_color:'#0a0f0d',icons:[{src:ICON_DATA,sizes:'any',type:'image/svg+xml',purpose:'any maskable'}]};
+    const l=document.createElement('link'); l.rel='manifest'; l.href='data:application/manifest+json;charset=utf-8,'+encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
+  }
+}catch(e){} })();
+
+const IS_ANDROID_APP=!!window.GozarAndroid;
+const IS_TOUCH=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)||('ontouchstart' in window);
+
+/* ═══════════ تنظیمات ═══════════ */
+const DEFAULTS={
+  net:{dns:'1.1.1.1',pingInt:8,timeout:6},
+  ui:{monitor:true,bg:true},
+  ir:{frag:false,packets:'tlshello',length:'100-200',interval:'10-20',mux:false,muxConc:8,quic:false,directIr:true,ads:true},
+  adv:{fp:'chrome',alpn:'',fmt:'link'},
+  core:{sniffing:true,routeOnly:false,autoConn:false,logLevel:'warning',preResolve:'usePlatformResolvers',testUrl:'https://www.gstatic.com/generate_204',socksPort:10808,remoteDns:'1.1.1.1',remoteProto:'https',domesticDns:'223.5.5.5',dnsHosts:''},
+  vpn:{dns:'1.1.1.1',mtu:1500,ipv6:false,tunEngine:'hev',hevLogLevel:'warn',hevTimeouts:'300,60'},
+  apps:{mode:'none',list:[]},
+  rules:{blockUdp443:false,proxyGoogle:false,bypassLanIp:true,bypassLanDom:true,bypassDomesticDns:false,custom:[]}
+};
+let settings=JSON.parse(JSON.stringify(DEFAULTS));
+function loadSettings(){
+  try{
+    const d=JSON.parse(localStorage.getItem('gozar.settings.v1'));
+    if(d){
+      ['net','ui','ir','adv','core','vpn','apps','rules'].forEach(function(k){
+        if(d[k]&&settings[k]) Object.assign(settings[k],d[k]);
+      });
+    }
+  }catch(e){}
+}
+function saveSettings(){ try{ localStorage.setItem('gozar.settings.v1',JSON.stringify(settings)); }catch(e){} }
+
+/* پارسر */
+function safeDecode(s){ try{ return decodeURIComponent(s||''); }catch(e){ return s||''; } }
+function parseLink(raw){
+  raw=String(raw||'').trim(); if(!raw) return null;
+  const scheme=raw.split('://')[0].toLowerCase();
+  try{
+    if(scheme==='vmess'){
+      try{ const j=JSON.parse(b64d(raw.slice(8))); if(!j.add) return null;
+        return {proto:'vmess',name:j.ps||'',server:j.add,port:+j.port||443,secret:j.id||'',alterId:+j.aid||0,cipher:j.scy||'auto',net:j.net||'tcp',tls:j.tls==='tls',sni:j.sni||'',hostHeader:j.host||'',path:j.path||'',raw:raw};
+      }catch(_){ return parseURLish(raw,'vmess'); }
+    }
+    if(['vless','trojan','ss','hysteria2','hy2','tuic'].indexOf(scheme)!==-1) return parseURLish(raw,scheme);
+  }catch(e){}
+  return null;
+}
+function parseURLish(raw,scheme){
+  const u=new URL(raw);
+  const proto=scheme==='hy2'?'hysteria2':scheme;
+  const host=u.hostname,port=+u.port||443,sp=u.searchParams;
+  let name=''; try{ name=decodeURIComponent(u.hash.slice(1)); }catch(e){ name=u.hash.slice(1); }
+  name=name||(proto+'-'+host+':'+port);
+  const c={proto:proto,name:name,server:host,port:port,raw:raw};
+  const net=(sp.get('type')||sp.get('network')||'tcp').toLowerCase();
+  const sec=(sp.get('security')||'').toLowerCase();
+  c.security=sec;
+  c.net=(net==='ws'||net==='grpc')?net:'tcp';
+  c.sni=sp.get('sni')||sp.get('serverName')||sp.get('peer')||'';
+  c.fp=sp.get('fp')||''; c.flow=sp.get('flow')||''; c.alpn=sp.get('alpn')||'';
+  c.path=sp.get('path')||sp.get('serviceName')||'';
+  c.hostHeader=sp.get('host')||sp.get('authority')||'';
+  c.insecure=(sp.get('insecure')==='1'||sp.get('insecure')==='true'||sp.get('allowInsecure')==='1'||sp.get('allowInsecure')==='true');
+  c.tls=proto==='trojan'||proto==='hysteria2'||proto==='tuic'||sec==='tls'||sec==='reality'||(!sec&&!!c.sni);
+  if(proto==='vless'){
+    c.secret=safeDecode(u.username);
+    if(sec==='reality'){
+      c.pbk=sp.get('pbk')||sp.get('publicKey')||'';
+      c.sid=sp.get('sid')||sp.get('shortId')||'';
+      c.spx=sp.get('spx')||sp.get('spiderX')||'';
+    }
+    if(!c.secret) return null;
+  }
+  else if(proto==='trojan'){ c.secret=safeDecode(u.username); if(!c.secret) return null; }
+  else if(proto==='hysteria2'){ c.secret=safeDecode(u.username)||safeDecode(u.password); c.obfs=sp.get('obfs')||''; c.obfsPass=sp.get('obfs-password')||''; if(!c.secret) return null; }
+  else if(proto==='tuic'){ c.secret=safeDecode(u.username); c.pass=safeDecode(u.password); if(!c.secret) return null; }
+  else if(proto==='ss'){
+    const rest=raw.slice(5); const hi=rest.lastIndexOf('#');
+    let body=hi>=0?rest.slice(0,hi):rest;
+    const qi=body.indexOf('?'); if(qi>=0) body=body.slice(0,qi);
+    const at=body.lastIndexOf('@');
+    if(at>=0){
+      const ui=body.slice(0,at); let method=null,pass=null;
+      try{ const d=b64d(ui); const p1=d.indexOf(':'); if(p1!==-1){ method=d.slice(0,p1); pass=d.slice(p1+1); } }catch(_){}
+      if(method===null){ const s2=safeDecode(ui); const p2=s2.indexOf(':'); if(p2!==-1){ method=s2.slice(0,p2); pass=s2.slice(p2+1); } }
+      const hp=splitHostPort(body.slice(at+1));
+      c.server=hp[0]; c.port=hp[1]; c.method=method; c.secret=pass;
+    }else{
+      const d=b64d(body); const m=d.match(/^(.+?):(.+)@(\[?[^\]]+\]?[^@]*):(\d+)$/);
+      if(!m) return null; c.method=m[1]; c.secret=m[2]; c.server=m[3]; c.port=+m[4];
+    }
+    if(!c.method||!c.server) return null;
+  }
+  return c;
+}
+function buildFromForm(f){
+  const name=encodeURIComponent(f.name||''); const q=[];
+  if(f.proto==='vless'){
+    q.push('security='+f.sec);
+    if(f.sec!=='none'&&f.sni) q.push('sni='+encodeURIComponent(f.sni));
+    q.push('type='+f.net);
+    if(f.net==='ws'&&f.path) q.push('path='+encodeURIComponent(f.path));
+    if(f.net==='grpc'&&f.path) q.push('serviceName='+encodeURIComponent(f.path));
+    return 'vless://'+f.secret+'@'+f.server+':'+f.port+'?'+q.join('&')+'#'+name;
+  }
+  if(f.proto==='vmess'){ const j={v:'2',ps:f.name,add:f.server,port:String(f.port),id:f.secret,aid:'0',scy:'auto',net:f.net,type:'none',host:f.sni||'',path:f.net==='ws'?f.path:'',tls:f.sec==='none'?'':'tls',sni:f.sni||''}; return 'vmess://'+b64e(JSON.stringify(j)); }
+  if(f.proto==='trojan'){ if(f.sni) q.push('sni='+encodeURIComponent(f.sni)); q.push('type='+f.net); if(f.net==='ws'&&f.path) q.push('path='+encodeURIComponent(f.path)); if(f.net==='grpc'&&f.path) q.push('serviceName='+encodeURIComponent(f.path)); return 'trojan://'+encodeURIComponent(f.secret)+'@'+f.server+':'+f.port+'?'+q.join('&')+'#'+name; }
+  if(f.proto==='ss') return 'ss://'+b64e(f.method+':'+f.secret)+'@'+f.server+':'+f.port+'#'+name;
+  if(f.proto==='hysteria2'){ if(f.sni) q.push('sni='+encodeURIComponent(f.sni)); return 'hysteria2://'+encodeURIComponent(f.secret)+'@'+f.server+':'+f.port+'?'+q.join('&')+'#'+name; }
+  if(f.proto==='tuic'){ if(f.sni) q.push('sni='+encodeURIComponent(f.sni)); q.push('congestion_control=bbr'); return 'tuic://'+encodeURIComponent(f.secret)+':'+encodeURIComponent(f.pass||'')+'@'+f.server+':'+f.port+'?'+q.join('&')+'#'+name; }
+  return null;
+}
+
+/* ═══════════ خروجی‌ها — پورت SOCKS پویا ═══════════ */
+function tlsBlock(c){
+  const tt={serverName:c.sni||c.server,allowInsecure:!!c.insecure};
+  const fp=c.fp||settings.adv.fp;
+  if(fp&&fp!=='none') tt.fingerprint=fp;
+  const alpn=(c.alpn||settings.adv.alpn).trim();
+  if(alpn) tt.alpn=alpn.split(',').map(function(x){return x.trim();}).filter(function(x){return !!x;});
+  return tt;
+}
+function parseHosts(txt){
+  const h={};
+  String(txt||'').split('\n').forEach(function(l){
+    const i=l.indexOf('=');
+    if(i>0){ const k=l.slice(0,i).trim(),v=l.slice(i+1).trim(); if(k&&v) h[k]=v; }
+  });
+  return Object.keys(h).length?h:undefined;
+}
+function splitList(s){
+  return String(s||'').split(',').map(function(x){ return x.trim(); }).filter(function(x){ return !!x; });
+}
+function xrayOut(c){
+  if(['vless','vmess','trojan','ss'].indexOf(c.proto)===-1) return null;
+  /* ═══ پورت SOCKS محلی پویا ═══ */
+  const LPORT=Math.max(1024,+settings.core.socksPort||10808);
+  const LPORT_H=LPORT+1;
+  let proxy;
+  if(c.proto==='vless') proxy={tag:'proxy',protocol:'vless',settings:{vnext:[{address:c.server,port:c.port,users:[{id:c.secret,encryption:'none',flow:c.flow||''}]}]}};
+  else if(c.proto==='vmess') proxy={tag:'proxy',protocol:'vmess',settings:{vnext:[{address:c.server,port:c.port,users:[{id:c.secret,alterId:c.alterId||0,security:c.cipher||'auto'}]}]}};
+  else if(c.proto==='trojan') proxy={tag:'proxy',protocol:'trojan',settings:{servers:[{address:c.server,port:c.port,password:c.secret}]}};
+  else proxy={tag:'proxy',protocol:'shadowsocks',settings:{servers:[{address:c.server,port:c.port,method:c.method,password:c.secret}]}};
+  const security=(c.security==='reality'||!!c.pbk)?'reality':((c.security==='tls'||c.tls)?'tls':'none');
+  const st={network:c.net||'tcp',security:security};
+  if(st.security==='tls') st.tlsSettings=tlsBlock(c);
+  if(st.security==='reality'){
+    // Reality has its own Xray schema; do not pass TLS-only fields such as allowInsecure.
+    const rs={serverName:c.sni||c.server,publicKey:c.pbk||'',shortId:c.sid||''};
+    const rfp=c.fp||settings.adv.fp;
+    if(rfp&&rfp!=='none') rs.fingerprint=rfp;
+    if(c.spx) rs.spiderX=c.spx;
+    st.realitySettings=rs;
+  }
+  if(c.net==='ws') st.wsSettings={path:c.path||'/',headers:{Host:c.hostHeader||c.server}};
+  if(c.net==='grpc') st.grpcSettings={serviceName:c.path||''};
+  proxy.streamSettings=st;
+  const outbounds=[proxy];
+  if(settings.ir.frag&&(c.tls||c.pbk)){
+    proxy.streamSettings.sockopt={dialerProxy:'fragment'};
+    outbounds.push({tag:'fragment',protocol:'blackhole',settings:{fragment:{packets:settings.ir.packets,length:settings.ir.length||'100-200',interval:settings.ir.interval||'10-20'}}});
+  }
+  if(settings.ir.mux) proxy.mux={enabled:true,concurrency:Math.max(1,+settings.ir.muxConc||8)};
+  outbounds.push({tag:'direct',protocol:'freedom',settings:{}});
+  outbounds.push({tag:'block',protocol:'blackhole',settings:{response:{type:'http'}}});
+  const rules=[];
+  const R=settings.rules||{};
+  if(settings.ir.ads) rules.push({type:'field',domain:['geosite:category-ads-all'],outboundTag:'block'});
+  if(settings.ir.quic||R.blockUdp443) rules.push({type:'field',port:'443',network:'udp',outboundTag:'block'});
+  if(R.bypassLanIp) rules.push({type:'field',ip:['geoip:private'],outboundTag:'direct'});
+  if(R.bypassLanDom) rules.push({type:'field',domain:['geosite:private'],outboundTag:'direct'});
+  if(R.proxyGoogle) rules.push({type:'field',domain:['geosite:google'],outboundTag:'proxy'});
+  if(R.bypassDomesticDns){
+    var dd=splitList(settings.core.domesticDns);
+    if(dd.length) rules.push({type:'field',ip:dd,outboundTag:'direct'});
+  }
+  if(settings.ir.directIr){
+    rules.push({type:'field',domain:['geosite:category-ir','domain:ir'],outboundTag:'direct'});
+    rules.push({type:'field',ip:['geoip:ir'],outboundTag:'direct'});
+  }
+  (R.custom||[]).forEach(function(r){
+    const o={type:'field',outboundTag:(r.outbound||'proxy')};
+    const d=splitList(r.domains), ip=splitList(r.ips);
+    if(d.length) o.domain=d;
+    if(ip.length) o.ip=ip;
+    if(r.port) o.port=String(r.port);
+    if(r.network&&r.network!=='any') o.network=r.network;
+    if(o.domain||o.ip||o.port) rules.push(o);
+  });
+  let dstrat='AsIs';
+  if(settings.ir.directIr||R.bypassLanIp) dstrat='IPIfNonMatch';
+  if(settings.core.preResolve==='useIP') dstrat='UseIP';
+  else if(settings.core.preResolve==='useNonIP') dstrat='UseIPv4';
+  const dnsServers=[];
+  if(settings.core.remoteDns) dnsServers.push(settings.core.remoteDns);
+  if(settings.core.domesticDns) dnsServers.push(settings.core.domesticDns);
+  if(!dnsServers.length) dnsServers.push(settings.net.dns);
+  const hosts=parseHosts(settings.core.dnsHosts);
+  const dnsObj={servers:dnsServers};
+  if(hosts) dnsObj.hosts=hosts;
+  let sniff;
+  if(settings.core.sniffing){
+    sniff={enabled:true,destOverride:['http','tls','quic'],routeOnly:!!settings.core.routeOnly};
+  }
+  return JSON.stringify({
+    log:{loglevel:settings.core.logLevel||'warning'},
+    dns:dnsObj,
+    inbounds:[
+      /* Android VpnService creates the TUN interface. The bundled HEV JNI bridge
+         reads its fd and forwards packets through this local SOCKS inbound. */
+      {tag:'socks-in',listen:'127.0.0.1',port:LPORT,protocol:'socks',settings:{udp:true},sniffing:sniff},
+      {tag:'http-in',listen:'127.0.0.1',port:LPORT_H,protocol:'http',settings:{}}
+    ],
+    outbounds:outbounds,
+    routing:{domainStrategy:dstrat,rules:rules}
+  },null,2);
+}
+function vpnOut(){
+  return JSON.stringify({
+    dns:settings.vpn.dns||'1.1.1.1',
+    mtu:+settings.vpn.mtu||1500,
+    ipv6:!!settings.vpn.ipv6,
+    tunEngine:settings.vpn.tunEngine||'hev',
+    hevLogLevel:settings.vpn.hevLogLevel||'warn',
+    hevTimeouts:settings.vpn.hevTimeouts||'300,60',
+    socksPort:Math.max(1024,+settings.core.socksPort||10808)
+  });
+}
+function singboxOut(c){
+  if(['vless','vmess','trojan','ss','hysteria2','tuic'].indexOf(c.proto)===-1) return null;
+  const tr=function(){ if(c.net==='ws'){ const w={type:'ws',path:c.path||'/'}; if(c.hostHeader) w.headers={Host:c.hostHeader}; return w; } if(c.net==='grpc') return {type:'grpc',service_name:c.path||''}; return undefined; };
+  let s=null;
+  if(c.proto==='vless'){ s={type:'vless',tag:'proxy',server:c.server,server_port:c.port,uuid:c.secret,flow:c.flow||''}; s.tls=tlsBlock(c); s.tls.enabled=true; s.transport=tr(); }
+  else if(c.proto==='vmess'){ s={type:'vmess',tag:'proxy',server:c.server,server_port:c.port,uuid:c.secret,alter_id:c.alterId||0,security:c.cipher||'auto'}; s.tls=tlsBlock(c); s.tls.enabled=!!c.tls; s.transport=tr(); }
+  else if(c.proto==='trojan'){ s={type:'trojan',tag:'proxy',server:c.server,server_port:c.port,password:c.secret}; s.tls=tlsBlock(c); s.tls.enabled=true; s.transport=tr(); }
+  else if(c.proto==='ss') s={type:'shadowsocks',tag:'proxy',server:c.server,server_port:c.port,method:c.method,password:c.secret};
+  else if(c.proto==='hysteria2'){ s={type:'hysteria2',tag:'proxy',server:c.server,server_port:c.port,password:c.secret}; s.tls=tlsBlock(c); s.tls.enabled=true; }
+  else if(c.proto==='tuic'){ s={type:'tuic',tag:'proxy',server:c.server,server_port:c.port,uuid:c.secret,password:c.pass||'',congestion_control:'bbr'}; s.tls=tlsBlock(c); s.tls.enabled=true; s.tls.alpn=['h3']; }
+  if(settings.ir.mux&&s) s.multiplex={enabled:true,concurrency:Math.max(1,+settings.ir.muxConc||8)};
+  const rules=[];
+  const R=settings.rules||{};
+  if(settings.ir.ads) rules.push({geosite:['category-ads-all'],outbound:'block'});
+  if(settings.ir.quic||R.blockUdp443) rules.push({port:443,network:'udp',outbound:'block'});
+  if(R.bypassLanIp) rules.push({geoip:['private'],outbound:'direct'});
+  if(R.bypassLanDom) rules.push({geosite:['private'],outbound:'direct'});
+  if(R.bypassDomesticDns){ var dd=splitList(settings.core.domesticDns); if(dd.length) rules.push({ip:dd,outbound:'direct'}); }
+  if(settings.ir.directIr){
+    rules.push({geosite:['category-ir'],outbound:'direct'});
+    rules.push({domain_suffix:['.ir'],outbound:'direct'});
+    rules.push({geoip:['ir'],outbound:'direct'});
+  }
+  (R.custom||[]).forEach(function(r){
+    const o={outbound:(r.outbound||'proxy')};
+    const d=splitList(r.domains), ip=splitList(r.ips);
+    if(d.length) o.domain=d;
+    if(ip.length) o.ip_cidr=ip;
+    if(o.domain||o.ip_cidr) rules.push(o);
+  });
+  return JSON.stringify({log:{level:settings.core.logLevel==='warning'?'warn':(settings.core.logLevel||'warn')},dns:{servers:[{address:settings.net.dns}]},inbounds:[{type:'mixed',tag:'mixed-in',listen:'127.0.0.1',listen_port:Math.max(1024,+settings.core.socksPort||10808)}],outbounds:[s,{type:'block',tag:'block'},{type:'direct',tag:'direct'}],route:{rules:rules}},null,2);
+}
+
+/* تحلیل امنیتی */
+function secAnalyze(c){
+  const goods=[],bads=[],warns=[]; let enc=0,stealth=0,integrity=100;
+  if(c.proto==='vless'){ if(c.pbk){enc+=40;stealth+=14;goods.push('Reality');} else if(c.tls){enc+=26;goods.push('TLS');} else {enc+=6;bads.push('no TLS');} if(c.flow==='xtls-rprx-vision') enc+=8; }
+  else if(c.proto==='vmess'){ enc+=c.tls?24:10; if(c.alterId>0) bads.push('AlterID'); }
+  else if(c.proto==='trojan') enc+=28;
+  else if(c.proto==='ss'){ if(/gcm|chacha|2022/i.test(c.method||'')) enc+=22; else { enc+=8; bads.push(c.method||'?'); } }
+  else if(c.proto==='hysteria2'){ enc+=30; if(c.obfs) stealth+=8; }
+  else if(c.proto==='tuic') enc+=28;
+  if(c.port===443) stealth+=18;
+  else if(c.port===80||c.port===8080||c.port===8880){ stealth+=4; warns.push(':'+c.port); }
+  else stealth+=10;
+  if(c.net==='ws'&&c.tls) stealth+=8;
+  if(c.net==='grpc'&&c.tls) stealth+=8;
+  if(c.sni) stealth+=6;
+  if(/cloudflare|workers\.dev|cdn|fastly|akamai/i.test(c.server)) stealth+=6;
+  if(c.insecure){ integrity-=45; bads.push('allowInsecure'); }
+  if(/^\d+\.\d+\.\d+\.\d+$/.test(c.server||'')&&!c.pbk) integrity-=10;
+  const secret=String(c.secret||'');
+  if(secret.length&&secret.length<12&&c.proto!=='ss') integrity-=15;
+  if(c.src) warns.push(c.src);
+  enc=Math.min(100,enc); stealth=Math.min(100,stealth); integrity=Math.max(0,Math.min(100,integrity));
+  const score=Math.round(enc*.45+stealth*.25+integrity*.30);
+  const grade=score>=80?'A':score>=64?'B':score>=48?'C':score>=32?'D':'E';
+  return {score:score,grade:grade,enc:enc,stealth:stealth,integrity:integrity,goods:goods,bads:bads,warns:warns};
+}
+const gradeCls=function(g){ return 'g-'+g; };
+
+/* اشتراک */
+let subMeta={};
+function loadSubMeta(){ try{ subMeta=JSON.parse(localStorage.getItem('gozar.submeta.v1')||'{}'); }catch(e){ subMeta={}; } }
+function saveSubMeta(){ try{ localStorage.setItem('gozar.submeta.v1',JSON.stringify(subMeta)); }catch(e){} }
+function fmtBytes(b){ if(!b||b<=0) return '0'; const tb=b/1099511627776,gb=b/1073741824; if(tb>=1) return tb.toFixed(2)+' TB'; if(gb>=1) return gb.toFixed(2)+' GB'; return Math.round(b/1048576)+' MB'; }
+function daysLeft(sec){ if(!sec) return null; return Math.ceil((sec*1000-Date.now())/86400000); }
+function parseUserinfo(h){ if(!h) return null; const o={}; h.split(';').forEach(function(p){ const kv=p.split('='); if(kv.length===2) o[kv[0].trim()]=parseInt(kv[1].trim(),10)||0; }); if(!o.total&&!o.expire) return null; return {up:o.upload||0,down:o.download||0,total:o.total||0,expire:o.expire||0}; }
+async function fetchSub(url){
+  try{
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    let info=null; try{ info=parseUserinfo(r.headers.get('subscription-userinfo')); }catch(e){}
+    return {text:await r.text(),info:info};
+  }catch(e){
+    log('CORS proxy…','warn');
+    const r2=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{cache:'no-store'});
+    if(!r2.ok) throw new Error('HTTP '+r2.status);
+    return {text:await r2.text(),info:null};
+  }
+}
+
+/* وضعیت */
+const state={configs:[],activeId:null,tab:'all',fProto:'all',fAlive:false,fSecure:false,fQuery:''};
+const session={mode:'idle',reason:'',pingMs:null,history:[],timer:null,failCount:0};
+function save(){ try{ localStorage.setItem('gozar.configs.v1',JSON.stringify(state.configs)); }catch(e){} }
+function load(){ try{ const d=JSON.parse(localStorage.getItem('gozar.configs.v1')); if(Array.isArray(d)) state.configs=d; }catch(e){} }
+function activeCfg(){ for(var i=0;i<state.configs.length;i++) if(state.configs[i].id===state.activeId) return state.configs[i]; return null; }
+function findCfg(id){ for(var i=0;i<state.configs.length;i++) if(state.configs[i].id===id) return state.configs[i]; return null; }
+function groupOf(c){ return c.src||'manual'; }
+function gLabel(g){ return g==='manual'?t('manual'):g; }
+function groups(){ const seen={},out=[]; for(var i=0;i<state.configs.length;i++){ const g=groupOf(state.configs[i]); if(!seen[g]){ seen[g]=1; out.push(g); } } return out; }
+function currentList(){
+  return state.configs.filter(function(c){
+    if(state.tab!=='all'&&groupOf(c)!==state.tab) return false;
+    if(state.fProto!=='all'&&c.proto!==state.fProto) return false;
+    if(state.fAlive&&!(c.ping&&c.ping.ok)) return false;
+    if(state.fSecure){ const g=secAnalyze(c).grade; if(g!=='A'&&g!=='B') return false; }
+    const q=state.fQuery.trim().toLowerCase();
+    if(q&&!(c.name.toLowerCase().indexOf(q)!==-1||(c.server||'').toLowerCase().indexOf(q)!==-1)) return false;
+    return true;
+  });
+}
+function seeds(){
+  const mk=function(raw){ const p=parseLink(raw); if(!p) return null; p.id=uid(); p.ping=null; p.addedAt=Date.now(); return p; };
+  const l=[
+    mk('vless://d342d11e-d424-4583-b36e-524ab1f0afa4@example.com:443?encryption=none&security=reality&sni=www.speedtest.net&fp=chrome&pbk=Ks8n0VvFqZT2WmYb3Hc1JdXe5RgU7Ao9PiLkN4MxQyE1&sid=a1b2c3d4&type=tcp&flow=xtls-rprx-vision#Demo — VLESS + Reality'),
+    mk('vmess://'+b64e(JSON.stringify({v:'2',ps:'Demo — VMess + WS + TLS',add:'cloudflare.com',port:'443',id:'b831381d-6324-4d53-ad4f-8cda48b30811',aid:'0',scy:'auto',net:'ws',type:'none',host:'cloudflare.com',path:'/cdn',tls:'tls',sni:'cloudflare.com'}))),
+    mk('trojan://SamplePass123@www.wikipedia.org:443?security=tls&sni=www.wikipedia.org&type=tcp#Demo — Trojan'),
+    mk('ss://'+b64e('aes-256-gcm:SamplePassW0rd')+'@example.com:8388#Demo — Shadowsocks')
+  ];
+  return l.filter(function(x){ return !!x; });
+}
+
+/* ═══════════ probe — اپ: پینگ TCP نیتیو (تونل-مستقل) / مرورگر: fetch ═══════════ */
+window.gozarPingSeq=0;
+window.gozarPingCallbacks=Object.create(null);
+window.gozarPingResult=function(id,result){
+  const cb=window.gozarPingCallbacks[id];
+  if(typeof cb==='function')cb(result);
+};
+function probe(server,port,timeout){
+  timeout=timeout||settings.net.timeout*1000;
+  /* داخل اپ اندروید: پینگ TCP نیتیو — دقیق مثل v2rayNG، مستقل از تونل و پروتکل */
+  if(window.GozarAndroid&&typeof window.GozarAndroid.tcpPingAsync==='function'){
+    const started=performance.now();
+    return new Promise(function(resolve){
+      const id='ping_'+(++window.gozarPingSeq);
+      let finished=false;
+      const timer=setTimeout(function(){
+        if(finished)return;
+        finished=true;delete window.gozarPingCallbacks[id];
+        resolve({ok:false,ms:performance.now()-started,kind:'timeout'});
+      },timeout);
+      window.gozarPingCallbacks[id]=function(result){
+        if(finished)return;
+        finished=true;clearTimeout(timer);delete window.gozarPingCallbacks[id];
+        resolve({ok:typeof result==='string'&&result.indexOf('ok,')===0,
+          ms:performance.now()-started,kind:'tcp'});
+      };
+      try{window.GozarAndroid.tcpPingAsync(server,Number(port),id,Math.min(timeout,10000));}
+      catch(e){window.gozarPingCallbacks[id]('error');}
+    });
+  }
+  if(window.GozarAndroid&&window.GozarAndroid.tcpPing){
+    const t0=performance.now();
+    return new Promise(function(resolve){
+      let done=false;
+      const to=setTimeout(function(){
+        if(!done){ done=true;
+          resolve({ok:false,ms:performance.now()-t0,kind:'timeout'});
+        }
+      }, timeout);
+      try{
+        const r=window.GozarAndroid.tcpPing(server, port);
+        clearTimeout(to);
+        if(done) return;
+        done=true;
+        if(r&&r.indexOf('ok,')===0){
+          resolve({ok:true, ms:performance.now()-t0, kind:'tcp'});
+        }else{
+          resolve({ok:false, ms:performance.now()-t0, kind:'refused'});
+        }
+      }catch(e){
+        clearTimeout(to);
+        if(!done){ done=true; resolve({ok:false,ms:performance.now()-t0,kind:'refused'}); }
+      }
+    });
+  }
+  /* مرورگر/PWA: fetch */
+  const t0=performance.now();
+  const url='https://'+server+':'+port+'/';
+  if(typeof AbortController==='undefined'){
+    return new Promise(function(resolve){
+      let done=false;
+      const to=setTimeout(function(){ if(!done){done=true;resolve({ok:false,ms:performance.now()-t0,kind:'timeout'});} },timeout);
+      fetch(url,{mode:'no-cors',cache:'no-store'})
+        .then(function(){ if(!done){done=true;clearTimeout(to);resolve({ok:true,ms:performance.now()-t0,kind:'http'});} })
+        .catch(function(){ if(!done){done=true;clearTimeout(to);resolve({ok:false,ms:performance.now()-t0,kind:'refused'});} });
+    });
+  }
+  const ctrl=new AbortController();
+  const to=setTimeout(function(){ ctrl.abort(); },timeout);
+  return fetch(url,{mode:'no-cors',signal:ctrl.signal,cache:'no-store'})
+    .then(function(){ return {ok:true,ms:performance.now()-t0,kind:'http'}; })
+    .catch(function(e){ const dt=performance.now()-t0; if(e&&e.name==='AbortError') return {ok:false,ms:dt,kind:'timeout'}; return {ok:false,ms:dt,kind:'refused'}; })
+    .then(function(r){ clearTimeout(to); return r; });
+}
+
+/* اتصال */
+const CIRC=653.45;
+const ringEl=$('#ring'),coreEl=$('#ringCore'),progEl=$('#ringProg');
+function setProgress(p){ progEl.style.strokeDashoffset=CIRC*(1-Math.max(0,Math.min(1,p))); }
+function setMode(m){ session.mode=m; ringEl.className='ring '+m; renderCore(); renderChrome(); renderActions(); renderActiveBar(); }
+function renderCore(){
+  if(session.mode==='idle') coreEl.innerHTML='<i data-lucide="power"></i><b class="word">'+t('ring_conn')+'</b><small>'+t('ring_hint')+'</small>';
+  else if(session.mode==='busy') coreEl.innerHTML='<i data-lucide="rotate-cw" class="spinning"></i><b class="word">'+t('ring_chk')+'</b><small>'+esc(session.reason||'')+'</small>';
+  else if(session.mode==='on') coreEl.innerHTML='<span class="badge-ic ok"><i data-lucide="check"></i></span><b class="word">'+t('ring_disc')+'</b><span class="ms">'+(session.pingMs!=null?session.pingMs+' ms':'—')+'</span>';
+  else coreEl.innerHTML='<span class="badge-ic bad"><i data-lucide="x"></i></span><b class="word">'+t('ring_conn')+'</b><small>'+esc(session.reason||t('ring_retry'))+'</small>';
+  icons();
+}
+function renderChrome(){
+  const chip=$('#statusChip'),txt=$('#statusTxt'),fab=$('#fab');
+  chip.className='status-chip'; fab.className='fab';
+  let icon='play',spin=false;
+  if(session.mode==='busy'){ chip.classList.add('busy'); txt.textContent=t('sc_busy'); icon='rotate-cw'; spin=true; fab.classList.add('busy'); }
+  else if(session.mode==='on'){ chip.classList.add('on'); txt.textContent=IS_ANDROID_APP?t('sc_tun'):(t('sc_on')+(session.pingMs!=null?' · '+session.pingMs+'ms':'')); icon='square'; fab.classList.add('on'); }
+  else if(session.mode==='err'){ chip.classList.add('err'); txt.textContent=t('sc_err'); }
+  else txt.textContent=t('sc_none');
+  fab.innerHTML='<i data-lucide="'+icon+'"'+(spin?' class="spinning"':'')+'></i>';
+  icons();
+}
+function renderActions(){
+  const c=activeCfg(),box=$('#cpActions');
+  if(!c){ box.innerHTML=''; return; }
+  box.innerHTML='<button class="btn" id="aTest"><i data-lucide="activity"></i>'+t('a_test')+'</button>'+
+    '<button class="btn" id="aSec"><i data-lucide="shield-check"></i>'+t('a_sec')+'</button>'+
+    '<button class="btn" id="aQr"><i data-lucide="qr-code"></i>QR</button>'+
+    '<button class="btn" id="aDetail"><i data-lucide="settings-2"></i>'+t('a_detail')+'</button>'+
+    '<button class="btn" id="aCopy"><i data-lucide="copy"></i>'+t('a_copy')+'</button>';
+  icons();
+  click('#aTest',async function(){ const r=await probe(c.server,c.port); toast(r.ok?t('m_pok',{n:Math.round(r.ms)}):t('m_pfail'),r.ok?'ok':'err'); });
+  click('#aSec',function(){ openSec(c); });
+  click('#aQr',function(){ openQr(c); });
+  click('#aDetail',function(){ openDetail(c); });
+  click('#aCopy',function(){ copyText(c.raw); });
+}
+function bgPulse(){ const r=ringEl.getBoundingClientRect(); if(window.__bgPulse) window.__bgPulse(r.left+r.width/2,r.top+r.height/2); }
+let pulseTimer=null;
+function startPulseLoop(iv){ stopPulseLoop(); bgPulse(); pulseTimer=setInterval(bgPulse,iv); }
+function stopPulseLoop(){ if(pulseTimer){ clearInterval(pulseTimer); pulseTimer=null; } }
+async function connect(){
+  const c=activeCfg();
+  if(!c){ toast(t('m_pick'),'warn'); return; }
+  if(session.mode==='busy') return;
+  session.failCount=0; session.pingMs=null; session.history=[];
+  setMode('busy'); setProgress(0.06);
+  session.reason=c.proto.toUpperCase()+' · '+c.server+':'+c.port;
+  renderCore(); log('▶ '+c.name,'info');
+  startPulseLoop(900);
+  await wait(350); setProgress(0.3);
+  let r=await probe(c.server,c.port);
+  setProgress(0.75);
+  if(!r.ok) r=await probe(c.server,c.port,10000);
+  stopPulseLoop(); setProgress(1);
+  if(r.ok){
+    session.pingMs=Math.round(r.ms);
+    c.ping={ok:true,ms:session.pingMs};
+    session.history.push(session.pingMs);
+    setMode('on');
+    if(settings.ui.monitor&&!IS_ANDROID_APP) startMonitor();
+    renderMetrics(); drawSpark(); renderList();
+    bgPulse(); startPulseLoop(2600);
+  }else{
+    c.ping={ok:false,ms:-1};
+    session.reason=t('st_down');
+    setMode('err'); stopMonitor(); renderMetrics(); renderList();
+  }
+  save();
+}
+function disconnect(){
+  stopMonitor(); stopPulseLoop();
+  setMode('idle'); setProgress(0);
+  session.pingMs=null; session.history=[];
+  renderMetrics(); drawSpark();
+}
+function startMonitor(){
+  stopMonitor();
+  session.timer=setInterval(async function(){
+    const c=activeCfg(); if(!c||session.mode!=='on') return;
+    const r=await probe(c.server,c.port);
+    if(r.ok){
+      session.failCount=0; session.pingMs=Math.round(r.ms);
+      c.ping={ok:true,ms:session.pingMs};
+      session.history.push(session.pingMs);
+      if(session.history.length>24) session.history.shift();
+      renderCore(); renderMetrics(); drawSpark(); renderChrome(); bgPulse();
+    }else{
+      session.failCount++;
+      if(session.failCount>=2){ c.ping={ok:false,ms:-1}; session.reason=t('st_down'); setMode('err'); stopMonitor(); renderMetrics(); renderList(); save(); }
+    }
+  },Math.max(3,settings.net.pingInt)*1000);
+}
+function stopMonitor(){ if(session.timer) clearInterval(session.timer); }
+function renderMetrics(){
+  const c=activeCfg();
+  let stTxt;
+  if(session.mode==='on') stTxt='<b style="color:var(--acc)" class="t">'+t('st_ok')+'</b>';
+  else if(session.mode==='err') stTxt='<b style="color:var(--err)" class="t">'+t('st_down')+'</b>';
+  else stTxt='<b class="t">—</b>';
+  let secHtml='<b class="t">—</b>';
+  if(c){ const s=secAnalyze(c); const col=(s.grade==='A'||s.grade==='B')?'acc':(s.grade==='C'?'warn':'err'); secHtml='<b class="t" style="color:var(--'+col+')">'+s.grade+' · '+s.score+'</b>'; }
+  $('#metrics').innerHTML='<div class="metric"><span>'+t('m_ping')+'</span><b>'+(session.pingMs!=null?session.pingMs+'<small style="font-size:9px">ms</small>':'—')+'</b></div>'+
+    '<div class="metric"><span>'+t('m_status')+'</span>'+stTxt+'</div>'+
+    '<div class="metric"><span>'+t('m_sec')+'</span>'+secHtml+'</div>'+
+    '<div class="metric"><span>'+t('m_proto')+'</span><b class="t">'+(c?c.proto.toUpperCase():'—')+'</b></div>';
+}
+function drawSpark(){
+  const cv=$('#spark'),ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const h=session.history; if(h.length<2) return;
+  let min=h[0],max=h[0];
+  for(var i=1;i<h.length;i++){ if(h[i]<min)min=h[i]; if(h[i]>max)max=h[i]; }
+  const rng=(max-min)||1;
+  ctx.beginPath();
+  for(var j=0;j<h.length;j++){
+    const x=4+j*(cv.width-8)/(h.length-1);
+    const y=cv.height-5-(h[j]-min)/rng*(cv.height-10);
+    if(j) ctx.lineTo(x,y); else ctx.moveTo(x,y);
+  }
+  ctx.strokeStyle='#2fe6a8'; ctx.lineWidth=1.6; ctx.lineJoin='round'; ctx.stroke();
+}
+function renderActiveBar(){
+  const c=activeCfg();
+  $('#acName').textContent=c?c.name:t('none_sel');
+  $('#acHost').textContent=c?(c.server+':'+c.port):'';
+  const card=$('#connCard');
+  if(c&&session.mode==='on') card.classList.add('on'); else card.classList.remove('on');
+}
+
+/* تب‌ها و لیست */
+function renderTabs(){
+  const gs=groups(); const tabs=['all'].concat(gs);
+  $('#tabRow').innerHTML=tabs.map(function(tp){
+    const label=tp==='all'?t('tab_all'):gLabel(tp);
+    let count=0;
+    for(var i=0;i<state.configs.length;i++) if(tp==='all'||groupOf(state.configs[i])===tp) count++;
+    let badge='';
+    const sm=subMeta[tp];
+    if(sm&&sm.expire){ const dl=daysLeft(sm.expire); badge='<b>·'+(dl!=null&&dl>=0?dl+'d':'0d')+'</b>'; }
+    return '<button class="tabbtn '+(state.tab===tp?'on':'')+'" data-tab="'+esc(tp)+'">'+esc(label)+badge+'<b>'+count+'</b></button>';
+  }).join('');
+}
+on('#tabRow','click',function(e){
+  const b=e.target.closest('[data-tab]'); if(!b) return;
+  state.tab=b.getAttribute('data-tab');
+  renderTabs(); renderList();
+});
+function renderList(){
+  const list=currentList(); const box=$('#cfgList');
+  if(!list.length){
+    box.innerHTML='<div class="empty"><p>'+esc(state.configs.length?t('empty_f'):t('empty_none'))+'</p>'+
+      '<div class="row"><button class="btn primary" id="emptyAdd"><i data-lucide="plus"></i>'+t('b_add')+'</button>'+
+      '<button class="btn" id="emptySrc"><i data-lucide="globe"></i>'+t('b_free')+'</button></div></div>';
+    icons();
+    click('#emptyAdd',function(){ openPop($('#popAdd'),$('#btnAddM')); });
+    click('#emptySrc',function(){ openSources(); });
+    return;
+  }
+  box.innerHTML=list.map(function(c){
+    const s=secAnalyze(c);
+    let pingHtml='<span class="p-na">—</span>';
+    if(c.ping){ pingHtml=c.ping.ok?'<span class="p-ok">'+Math.round(c.ping.ms)+'ms</span>':'<span class="p-bad">-1ms</span>'; }
+    const tag=groupOf(c)==='manual'?c.proto.toUpperCase():esc(gLabel(groupOf(c)));
+    return '<div class="cfg '+(c.id===state.activeId?'active':'')+'" data-id="'+c.id+'">'+
+      '<div class="cfg-main"><div class="cfg-name"><span class="grade '+gradeCls(s.grade)+'">'+s.grade+'</span><span class="proto">'+c.proto.toUpperCase()+'</span>'+esc(c.name)+'</div>'+
+      '<div class="cfg-host">'+esc(c.server)+':'+c.port+'</div></div>'+
+      '<div class="cfg-side"><div class="cfg-acts">'+
+      '<button class="ibtn danger" data-act="del"><i data-lucide="trash-2"></i></button>'+
+      '<button class="ibtn" data-act="edit"><i data-lucide="pencil"></i></button>'+
+      '<button class="ibtn" data-act="share"><i data-lucide="share-2"></i></button>'+
+      '</div><div class="cfg-ping">'+pingHtml+'<span class="tag">'+tag+'</span></div></div></div>';
+  }).join('');
+  icons();
+}
+on('#cfgList','click',function(e){
+  const btn=e.target.closest('[data-act]');
+  const row=e.target.closest('.cfg');
+  if(!row) return;
+  const c=findCfg(row.getAttribute('data-id')); if(!c) return;
+  if(btn){
+    const act=btn.getAttribute('data-act');
+    if(act==='del') openConfirm(t('m_cdel',{x:c.name}),function(){
+      state.configs=state.configs.filter(function(x){ return x.id!==c.id; });
+      if(state.activeId===c.id){ state.activeId=null; disconnect(); }
+      save(); renderTabs(); renderList(); renderActiveBar(); renderMetrics(); renderActions();
+      toast(t('m_del'));
+    });
+    else if(act==='edit') openRename(c);
+    else if(act==='share') shareText(c.raw);
+    return;
+  }
+  // Selecting a configuration must not open the details sheet.
+  state.activeId=c.id; save(); disconnect();
+  renderList(); renderActiveBar(); renderMetrics(); renderActions();
+});
+function shareText(txt){ if(navigator.share) navigator.share({text:txt}).catch(function(){}); else copyText(txt,t('m_share_f')); }
+
+/* شیت */
+let sheetCfg=null;
+function openSheet(c){
+  sheetCfg=c;
+  const s=secAnalyze(c);
+  $('#shTitle').textContent=c.name;
+  $('#shMeta').textContent=c.server+':'+c.port+' · '+c.proto.toUpperCase()+' · '+s.grade;
+  $('#sheetScrim').classList.add('open');
+  $('#sheet').classList.add('open');
+  syncLock();
+  icons();
+}
+function closeSheet(){ $('#sheet').classList.remove('open'); $('#sheetScrim').classList.remove('open'); sheetCfg=null; syncLock(); }
+on('#sheetScrim','click',closeSheet);
+click('#shTest',async function(){
+  if(!sheetCfg) return;
+  const c=sheetCfg;
+  toast(t('m_testing',{x:c.server}),'warn');
+  const r=await probe(c.server,c.port);
+  c.ping=r.ok?{ok:true,ms:Math.round(r.ms)}:{ok:false,ms:-1};
+  save(); renderList();
+  toast(r.ok?t('m_pok',{n:Math.round(r.ms)}):t('m_pfail'),r.ok?'ok':'err');
+});
+click('#shSec',function(){ if(sheetCfg){ const c=sheetCfg; closeSheet(); openSec(c); } });
+click('#shQr',function(){ if(sheetCfg) openQr(sheetCfg); });
+click('#shDetail',function(){ if(sheetCfg) openDetail(sheetCfg); });
+click('#shCopy',function(){ if(sheetCfg) copyText(sheetCfg.raw); });
+click('#shShare',function(){ if(sheetCfg) shareText(sheetCfg.raw); });
+click('#shRename',function(){ if(sheetCfg){ const c=sheetCfg; closeSheet(); openRename(c); } });
+click('#shDel',function(){
+  if(!sheetCfg) return;
+  const c=sheetCfg;
+  openConfirm(t('m_cdel',{x:c.name}),function(){
+    state.configs=state.configs.filter(function(x){ return x.id!==c.id; });
+    if(state.activeId===c.id){ state.activeId=null; disconnect(); }
+    save(); renderTabs(); renderList(); renderActiveBar(); renderMetrics(); renderActions();
+    closeSheet(); toast(t('m_del'));
+  });
+});
+click('#shConnect2',function(){ closeSheet(); });
+
+/* منوها */
+function closePops(){ document.querySelectorAll('.pop.open').forEach(function(p){ p.classList.remove('open'); }); }
+function positionGozarPop(pop,btn){
+  if(!pop||!btn||!pop.classList.contains('open')) return;
+  const vv=window.visualViewport;
+  const top=(vv&&vv.offsetTop)||0;
+  const height=(vv&&vv.height)||window.innerHeight;
+  const width=(vv&&vv.width)||window.innerWidth;
+  const leftEdge=(vv&&vv.offsetLeft)||0;
+  const margin=8;
+  const r=btn.getBoundingClientRect();
+  pop.style.maxHeight=Math.max(80,height-2*margin)+'px';
+  const pw=pop.offsetWidth||280;
+  const left=Math.max(leftEdge+margin,Math.min(r.left,leftEdge+width-pw-margin));
+  pop.style.left=left+'px';
+  const availableBelow=top+height-r.bottom-margin-6;
+  const availableAbove=r.top-top-margin-6;
+  const openAbove=availableAbove>availableBelow&&availableAbove>160;
+  const space=Math.max(80,openAbove?availableAbove:availableBelow);
+  pop.style.maxHeight=Math.min(height-2*margin,space)+'px';
+  const ph=pop.offsetHeight;
+  pop.style.top=Math.max(top+margin,Math.min(openAbove?r.top-ph-6:r.bottom+6,top+height-ph-margin))+'px';
+}
+function openPop(pop,btn){
+  if(!pop||!btn) return;
+  const was=pop.classList.contains('open');
+  closePops();closeDrawer();
+  if(was) return;
+  pop.classList.add('open');
+  pop._gozarAnchor=btn;
+  positionGozarPop(pop,btn);
+}
+document.querySelectorAll('[data-pop]').forEach(function(b){
+  b.addEventListener('click',function(e){ e.stopPropagation(); openPop($(b.getAttribute('data-pop')),b); });
+});
+window.addEventListener('click',function(e){
+  if(!e.target.closest('.pop')&&!e.target.closest('[data-pop]')) closePops();
+});
+function openDrawer(){ $('#drawer').classList.add('open'); $('#scrim').classList.add('open'); closePops(); syncLock(); }
+function closeDrawer(){ $('#drawer').classList.remove('open'); $('#scrim').classList.remove('open'); syncLock(); }
+click('#btnDrawer',openDrawer);
+on('#scrim','click',closeDrawer);
+
+/* بستن سراسری */
+document.addEventListener('click',function(e){
+  const tg=e.target;
+  if(!tg||!tg.closest) return;
+  if(tg.closest('[data-close-sheet]')){ closeSheet(); return; }
+  if(tg.closest('[data-close-drawer]')){ closeDrawer(); return; }
+  const dc=tg.closest('[data-close]');
+  if(dc){
+    const ov=dc.closest('.overlay');
+    if(ov){ closeOv(ov); if(ov.id==='ovScan') stopScan(); }
+    closePops();
+  }
+},true);
+
+/* Drawer */
+click('#drSubs2',function(){ closeDrawer(); openSubs(); });
+click('#drGroup',function(){ closeDrawer(); openSources(); });
+click('#drRouting',function(){ closeDrawer(); openSettings('st2'); });
+click('#drDpi',function(){ closeDrawer(); openSettings('st2'); });
+click('#drRules2',function(){ closeDrawer(); openSettings('st5'); });
+click('#drGeo',function(){ closeDrawer(); openOv('#ovGeo'); icons(); });
+click('#drSettings',function(){ closeDrawer(); openSettings('st1'); });
+click('#drLogs',function(){ closeDrawer(); openLogs(); });
+click('#drCoreLog',function(){
+  closeDrawer();
+  var txt=(window.GozarAndroid&&window.GozarAndroid.coreLog)?window.GozarAndroid.coreLog():'— (فقط داخل اپ اندروید)';
+  openConfirm(t('d_corelog'),null,
+    '<pre dir="ltr" style="max-height:320px;overflow:auto;font-family:var(--mono);font-size:10px;white-space:pre-wrap">'+esc(txt)+'</pre>',
+    t('c_close'));
+});
+click('#drBackup',function(){ closeDrawer(); openSettings('st1'); });
+click('#drUpdate',function(){ closeDrawer(); updateAllSources(); });
+click('#drAbout',function(){ closeDrawer(); openOv('#ovAbout'); icons(); });
+document.querySelectorAll('.lang-b').forEach(function(b){
+  b.onclick=function(){ LANG=b.getAttribute('data-lang'); applyLang(); toast((LANG==='fa'?'زبان فارسی':LANG==='ar'?'العربية':'English')+' ✓'); };
+});
+
+/* منوی سه‌نقطه */
+click('#mRestart',function(){
+  closePops();
+  if(IS_ANDROID_APP&&window.GozarAndroid){
+    try{
+      window.GozarAndroid.stopVpn();
+      toast(t('m_rest'),'warn');
+      const c=activeCfg();
+      if(c) setTimeout(function(){ try{ if(window.GozarAndroid.setVpnParams) window.GozarAndroid.setVpnParams(vpnOut()); window.GozarAndroid.startVpn(xrayOut(c)); }catch(e){} },900);
+    }catch(e){ toast(t('m_rester'),'err'); }
+  } else toast(t('m_restbr'),'warn');
+});
+click('#mDelDupes',function(){
+  closePops();
+  const list=currentList(); const seen={},rm={}; let n=0;
+  for(var i=0;i<list.length;i++){ if(seen[list[i].raw]) rm[list[i].id]=1; else seen[list[i].raw]=1; }
+  state.configs=state.configs.filter(function(c){ if(rm[c.id]){ n++; return false; } return true; });
+  save(); renderTabs(); renderList(); renderActiveBar();
+  toast(t('m_dup',{n:n}));
+});
+click('#mDelInvalid',function(){
+  closePops();
+  const list=currentList(); const rm={}; let n=0;
+  for(var i=0;i<list.length;i++) if(list[i].ping&&!list[i].ping.ok){ rm[list[i].id]=1; n++; }
+  if(!n){ toast(t('m_noinv'),'warn'); return; }
+  openConfirm(t('m_cdinv',{n:n}),function(){
+    state.configs=state.configs.filter(function(c){ return !rm[c.id]; });
+    save(); renderTabs(); renderList(); renderActiveBar();
+    toast(t('m_invdel',{n:n}));
+  });
+});
+click('#mDelAll',function(){
+  closePops();
+  const list=state.configs.filter(function(c){
+    return state.tab==='all' || groupOf(c)===state.tab;
+  });
+  if(!list.length){ toast(t('m_gempty'),'warn'); return; }
+  openConfirm(t('m_cdelall',{n:list.length}),function(){
+    const ids={}; for(var i=0;i<list.length;i++) ids[list[i].id]=1;
+    state.configs=state.configs.filter(function(c){ return !ids[c.id]; });
+    if(state.activeId&&ids[state.activeId]){ state.activeId=null; disconnect(); }
+    save(); renderTabs(); renderList(); renderActiveBar();
+    toast(t('m_gclear'));
+  });
+});
+click('#mExport',function(){
+  closePops();
+  const list=currentList();
+  if(!list.length){ toast(t('m_noexp'),'warn'); return; }
+  copyText(list.map(function(c){ return c.raw; }).join('\n'),t('m_copn',{n:list.length}));
+});
+click('#mSmart',function(){ closePops(); openSmart(); });
+click('#mTcping',function(){ closePops(); testAll(3500,false); });
+click('#mReal',function(){ closePops(); testAll(settings.net.timeout*1000,true); });
+click('#mSort',function(){
+  closePops();
+  state.configs.sort(function(a,b){
+    const pa=a.ping&&a.ping.ok?a.ping.ms:(a.ping?99999:1e9);
+    const pb=b.ping&&b.ping.ok?b.ping.ms:(b.ping?99999:1e9);
+    return pa-pb;
+  });
+  save(); renderList(); toast(t('m_sorted'));
+});
+click('#mUpdateSub',function(){
+  closePops();
+  if(state.tab==='all'||state.tab==='manual'){ toast(t('m_pickg'),'warn'); return; }
+  updateGroup(state.tab);
+});
+
+/* منوی + */
+function renderManualList(){
+  const protos=['vless','vmess','trojan','ss','hysteria2','tuic'];
+  $('#manualList').innerHTML=protos.map(function(p){
+    return '<div class="pop-item" data-manual="'+p+'"><i data-lucide="keyboard"></i><span>'+t('pa_man')+' ['+p.toUpperCase()+']</span></div>';
+  }).join('');
+  icons();
+  document.querySelectorAll('[data-manual]').forEach(function(b){
+    b.onclick=function(){
+      closePops();
+      openOv('#ovAdd'); switchTabV($('#ovAdd'),'t3');
+      $('#f_proto').value=b.getAttribute('data-manual');
+      ['#f_name','#f_server','#f_port','#f_secret','#f_sni','#f_path','#f_method','#f_pass'].forEach(function(s){ $(s).value=''; });
+      switchTabV($('#ovAdd'),'t3');
+      requestAnimationFrame(function(){ fitTallPanel($('#ovAdd')); $('#f_server').focus(); });
+      icons();
+    };
+  });
+}
+click('#aQrScan',function(){ closePops(); openScanner(); });
+click('#aClip',async function(){
+  closePops();
+  try{
+    let txt='';
+    if(window.GozarAndroid && typeof window.GozarAndroid.readClipboard==='function') txt=window.GozarAndroid.readClipboard()||'';
+    else if(navigator.clipboard && navigator.clipboard.readText) txt=await navigator.clipboard.readText();
+    if(!txt.trim()){ toast(t('m_clipe'),'warn'); return; }
+    await importAnyText(txt,'clipboard');
+  }catch(e){ openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); icons(); toast(t('m_clipd'),'warn'); }
+});
+click('#aFile',function(){ closePops(); try { $('#fileOne').click(); } catch(e) { openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); toast(t('m_read'),'err'); } });
+click('#aLink',function(){ closePops(); $('#inMulti').value=''; openOv('#ovAdd'); switchTabV($('#ovAdd'),'t1'); requestAnimationFrame(function(){ fitTallPanel($('#ovAdd')); $('#inMulti').focus(); }); icons(); });
+
+/* فیلتر */
+function renderFilterChips(){
+  const protos=['all','vless','vmess','trojan','ss','hysteria2','tuic'];
+  $('#fProtoChips').innerHTML=protos.map(function(p){
+    return '<button class="tabbtn '+(state.fProto===p?'on':'')+'" data-fp="'+p+'" style="padding:3px 11px;font-size:11px">'+(p==='all'?t('tab_all'):p.toUpperCase())+'</button>';
+  }).join('');
+}
+on('#fProtoChips','click',function(e){
+  const b=e.target.closest('[data-fp]'); if(!b) return;
+  state.fProto=b.getAttribute('data-fp');
+  renderFilterChips(); renderList();
+});
+on('#fAlive','change',function(e){ state.fAlive=e.target.checked; renderList(); });
+on('#fSecure','change',function(e){ state.fSecure=e.target.checked; renderList(); });
+on('#fq','input',function(e){ state.fQuery=e.target.value; renderList(); });
+
+/* تست گروهی */
+async function testAll(timeout,real){
+  // Snapshot the group and reduce concurrent native bridge calls to keep UI responsive.
+  const list=currentList().slice();
+  if(!list.length){ toast(t('m_gempty'),'warn'); return; }
+  toast(real?t('m_grtest',{n:list.length}):t('m_gtest',{n:list.length}),'warn');
+  let done=0,okc=0;
+  const tasks=list.map(function(c){
+    return async function(){
+      let r=await probe(c.server,c.port,timeout);
+      if(!r.ok&&real) r=await probe(c.server,c.port,timeout+3000);
+      c.ping=r.ok?{ok:true,ms:Math.round(r.ms)}:{ok:false,ms:-1};
+      if(r.ok) okc++;
+      done++;
+      if(done===list.length || done%12===0) { renderList(); await new Promise(function(resolve){ setTimeout(resolve,0); }); }
+      $('#tbSub').textContent=t('tb_testing',{a:done,b:list.length});
+    };
+  });
+  await pool(tasks,real?1:2);
+  $('#tbSub').textContent=IS_ANDROID_APP?t('tb_sub_android'):t('tb_sub_default');
+  save(); renderList();
+  toast(t('m_gdone',{a:okc,b:list.length}));
+}
+async function updateGroup(tag){
+  const m=subMeta[tag];
+  const src=SOURCES.find(function(s){ return s.tag===tag; });
+  const url=(m&&m.url)||(src&&src.url);
+  if(!url){ toast(t('m_nosrc'),'warn'); return; }
+  await importSource({name:tag,url:url,tag:tag},null);
+  renderTabs();
+}
+async function updateAllSources(){
+  toast(t('m_upall'),'warn');
+  for(var i=0;i<SOURCES.length;i++){ try{ await importSource(SOURCES[i],null); }catch(e){} }
+  renderTabs();
+}
+
+/* افزودن */
+function addParsed(p){
+  if(!p) return false;
+  p.id=uid(); p.ping=null; p.addedAt=Date.now();
+  state.configs.unshift(p); return true;
+}
+function afterAdd(n){
+  if(state.configs.length>400){ state.configs=state.configs.slice(0,400); log(t('m_cap'),'warn'); }
+  save(); renderTabs(); renderList(); renderActiveBar();
+  toast(t('m_added',{n:n}));
+}
+function extractLinks(text){
+  text=String(text||'').trim();
+  if(text.indexOf('://')===-1&&/^[A-Za-z0-9+/=_-]{20,}$/.test(text)){
+    try{ const d=b64d(text); if(d.indexOf('://')!==-1) text=d; }catch(e){}
+  }
+  return text.split(/\s+/).filter(function(l){ return /^[a-z0-9+]+:\/\//i.test(l); });
+}
+async function importAnyText(raw,label){
+  let text=String(raw||'').trim();
+  if(!text){ toast(t('m_empty'),'warn'); return 0; }
+  if(/^https?:\/\//i.test(text) && !/\s/.test(text)){
+    try{ text=(await fetchSub(text)).text||''; }
+    catch(e){ toast(t('m_fail'),'err'); return 0; }
+  }
+  // Accept a Base64 subscription response as well as plain share links.
+  if(text.indexOf('://')===-1 && /^[A-Za-z0-9+/=_-]{20,}$/.test(text)){
+    try{ const decoded=b64d(text); if(decoded.indexOf('://')!==-1) text=decoded; }catch(e){}
+  }
+  try{
+    const obj=JSON.parse(text);
+    const arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.configs)?obj.configs:null);
+    if(arr){
+      const seen={}; state.configs.forEach(function(c){ seen[c.raw]=1; });
+      let count=0;
+      arr.forEach(function(item){
+        const rawLink=typeof item==='string'?item:(item&&item.raw);
+        if(!rawLink||seen[rawLink]) return;
+        const c=parseLink(rawLink);
+        if(c){ if(item&&item.name) c.name=item.name; if(addParsed(c)){ seen[rawLink]=1; count++; } }
+      });
+      if(count) afterAdd(count); else toast(t('m_nf_in',{x:label}),'warn');
+      return count;
+    }
+  }catch(e){}
+  return importFromText(text,label);
+}
+function importFromText(text,label){
+  const links=extractLinks(text);
+  const seen={};
+  for(var i=0;i<state.configs.length;i++) seen[state.configs[i].raw]=1;
+  let n=0;
+  for(var j=0;j<links.length;j++){
+    if(seen[links[j]]) continue;
+    const p=parseLink(links[j]);
+    if(p){ if(addParsed(p)){ seen[links[j]]=1; n++; } }
+  }
+  if(n) afterAdd(n);
+  else toast(t('m_nf_in',{x:label}),'warn');
+  return n;
+}
+click('#btnAddMulti',async function(){
+  const raw=$('#inMulti').value.trim();
+  if(!raw){ toast(t('m_empty'),'warn'); return; }
+  const btn=$('#btnAddMulti'); btn.disabled=true;
+  try{
+    let text=raw;
+    const first=raw.split(/\s+/)[0];
+    if(/^https?:\/\//i.test(first)&&raw.split(/\s+/).length===1){
+      log(t('m_fetch',{x:first}),'info');
+      const res=await fetchSub(first);
+      text=res.text;
+      if(res.info){
+        const tag='custom-'+Date.now().toString(36);
+        subMeta[tag]={url:first,up:res.info.up,down:res.info.down,total:res.info.total,expire:res.info.expire,updated:Date.now()};
+        saveSubMeta();
+      }
+    }
+    const links=extractLinks(text);
+    let n=0;
+    for(var i=0;i<links.length;i++){ if(addParsed(parseLink(links[i]))) n++; }
+    if(n){ $('#inMulti').value=''; closeOv($('#ovAdd')); afterAdd(n); renderTabs(); }
+    else toast(t('m_nf'),'err');
+  }catch(e){ toast(t('m_fail'),'err'); }
+  btn.disabled=false;
+});
+click('#btnAddForm',function(){
+  const f={
+    name:$('#f_name').value.trim(),proto:$('#f_proto').value,
+    server:$('#f_server').value.trim(),port:+$('#f_port').value,
+    secret:$('#f_secret').value.trim(),net:$('#f_net').value,
+    sec:$('#f_sec').value,sni:$('#f_sni').value.trim(),path:$('#f_path').value.trim(),
+    method:$('#f_method').value.trim()||'aes-256-gcm',pass:$('#f_pass').value.trim()
+  };
+  if(!f.server||!f.port||!f.secret){ toast(t('m_req'),'warn'); return; }
+  const p=parseLink(buildFromForm(f));
+  if(!p){ toast(t('m_mkfail'),'err'); return; }
+  addParsed(p);
+  ['#f_name','#f_server','#f_port','#f_secret','#f_sni','#f_path','#f_pass'].forEach(function(s){ $(s).value=''; });
+  closeOv($('#ovAdd')); afterAdd(1);
+});
+on('#fileOne','change',async function(e){
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  try{ importFromText(await fileToText(f),f.name); }catch(err){ toast(t('m_read'),'err'); }
+});
+
+/* درگ‌اند‌دراپ */
+let dndDepth=0;
+window.addEventListener('dragenter',function(e){
+  if(!e.dataTransfer||!e.dataTransfer.types) return;
+  let has=false;
+  for(var i=0;i<e.dataTransfer.types.length;i++){ if(e.dataTransfer.types[i]==='Files'){ has=true; break; } }
+  if(!has) return;
+  dndDepth++; $('#dnd').classList.add('show');
+});
+window.addEventListener('dragover',function(e){ if($('#dnd').classList.contains('show')) e.preventDefault(); });
+window.addEventListener('dragleave',function(){ dndDepth=Math.max(0,dndDepth-1); if(dndDepth===0) $('#dnd').classList.remove('show'); });
+window.addEventListener('drop',function(e){
+  e.preventDefault(); dndDepth=0; $('#dnd').classList.remove('show');
+  if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length){
+    const files=[].slice.call(e.dataTransfer.files);
+    (async function(){ for(var i=0;i<files.length;i++){ try{ importFromText(await fileToText(files[i]),files[i].name); }catch(e){} } })();
+  }
+});
+
+/* اسکنر QR */
+let scanStream=null,scanRAF=null;
+function openScanner(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast(t('m_cam'),'err'); return; }
+  if(typeof jsQR==='undefined'){ toast(t('m_jsqr'),'err'); return; }
+  openOv('#ovScan'); icons();
+  startScan();
+}
+async function startScan(){
+  try{
+    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=$('#scanVideo');
+    v.srcObject=scanStream;
+    await v.play();
+    tickScan();
+  }catch(e){ toast(t('m_camd'),'err'); closeOv($('#ovScan')); }
+}
+function tickScan(){
+  if(!scanStream) return;
+  const v=$('#scanVideo'),c=$('#scanCanvas');
+  if(v.readyState===v.HAVE_ENOUGH_DATA&&v.videoWidth){
+    c.width=v.videoWidth; c.height=v.videoHeight;
+    const ctx=c.getContext('2d');
+    ctx.drawImage(v,0,0);
+    const img=ctx.getImageData(0,0,c.width,c.height);
+    let code=null;
+    try{ code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'}); }catch(e){}
+    if(code&&code.data){
+      stopScan(); closeOv($('#ovScan'));
+      const links=extractLinks(code.data);
+      let n=0;
+      for(var i=0;i<links.length;i++){ if(addParsed(parseLink(links[i]))) n++; }
+      if(n) afterAdd(n);
+      else toast(t('m_qrbad'),'err');
+      return;
+    }
+  }
+  scanRAF=requestAnimationFrame(tickScan);
+}
+function stopScan(){
+  if(scanRAF){ cancelAnimationFrame(scanRAF); scanRAF=null; }
+  if(scanStream){ try{ scanStream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){} scanStream=null; }
+}
+on('#scanClose','click',stopScan);
+
+/* پشتیبان */
+click('#bkExport',function(){
+  const arr=state.configs.map(function(c){ return {raw:c.raw,name:c.name,src:c.src||''}; });
+  const data={app:'gozar',version:1,exportedAt:new Date().toISOString(),configs:arr};
+  download('gozar-backup-'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  log(t('log_bk',{n:state.configs.length}),'ok');
+});
+click('#bkCopy',function(){
+  if(!state.configs.length){ toast(t('m_gempty'),'warn'); return; }
+  copyText(state.configs.map(function(c){ return c.raw; }).join('\n'),t('m_copn',{n:state.configs.length}));
+});
+click('#bkImport',function(){ $('#bkFile').click(); });
+on('#bkFile','change',async function(e){
+  const f=e.target.files[0]; e.target.value='';
+  if(!f) return;
+  try{
+    const text=await fileToText(f);
+    if(f.name.slice(-5)==='.json'||text.trim().charAt(0)==='{'){
+      const j=JSON.parse(text);
+      const arr=Array.isArray(j)?j:(Array.isArray(j.configs)?j.configs:null);
+      if(!arr) throw new Error(t('m_ufmt'));
+      const seen={};
+      for(var i=0;i<state.configs.length;i++) seen[state.configs[i].raw]=1;
+      let n=0;
+      for(var k=0;k<arr.length;k++){
+        const item=arr[k];
+        const raw=(typeof item==='string')?item:item.raw;
+        if(!raw||seen[raw]) continue;
+        const p=parseLink(raw);
+        if(p){
+          if(typeof item==='object'&&item.name) p.name=item.name;
+          if(typeof item==='object'&&item.src&&!p.src) p.src=item.src;
+          if(addParsed(p)){ seen[raw]=1; n++; }
+        }
+      }
+      if(n) afterAdd(n); else toast(t('m_nonewf'),'warn');
+    }else importFromText(text,f.name);
+  }catch(err){ toast(t('m_rfail',{x:err.message}),'err'); }
+});
+
+/* QR / جزئیات / تحلیل */
+let qrRaw='';
+function openQr(c){
+  if(typeof QRCode==='undefined'){ toast(t('m_qrlib'),'err'); return; }
+  qrRaw=c.raw;
+  $('#qrTitle').textContent='QR — '+c.name;
+  $('#qrLink').textContent=c.raw.length>80?c.raw.slice(0,80)+'…':c.raw;
+  openOv('#ovQr');
+  QRCode.toCanvas($('#qrCanvas'),c.raw,{width:220,margin:2,color:{dark:'#0b1512',light:'#e9f4ee'}},function(err){ if(err) toast(t('m_qrfail'),'err'); });
+}
+click('#qrCopy',function(){ copyText(qrRaw); });
+click('#qrDl',function(){ $('#qrCanvas').toBlob(function(b){ if(b) download('gozar-qr.png',b); }); });
+
+let dCur=null;
+function openDetail(c){
+  dCur=c;
+  $('#dTitle').textContent=t('a_detail')+' — '+c.name;
+  const rows=[['Proto',c.proto],['Server',c.server],['Port',c.port],[c.proto==='ss'?'Cipher':'UUID',c.secret]];
+  if(c.proto==='tuic'&&c.pass) rows.push(['TUIC pass',c.pass]);
+  if(c.proto==='vmess') rows.push(['Security',c.cipher||'auto'],['AlterID',c.alterId||0]);
+  rows.push(['Net',c.net||'tcp'],['TLS',c.tls?(c.pbk?'Reality':'TLS'):'—']);
+  if(c.sni) rows.push(['SNI',c.sni]);
+  if(c.path) rows.push(['Path',c.path]);
+  if(c.hostHeader) rows.push(['Host',c.hostHeader]);
+  if(c.flow) rows.push(['Flow',c.flow]);
+  if(c.fp) rows.push(['FP',c.fp]);
+  if(c.pbk) rows.push(['pbk',c.pbk]);
+  if(c.sid) rows.push(['sid',c.sid]);
+  if(c.src) rows.push(['Group',c.src]);
+  if(c.insecure) rows.push(['Insecure','⚠']);
+  $('#dTable').innerHTML=rows.map(function(r){ return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>'; }).join('');
+  $('#dFmt').value=settings.adv.fmt;
+  updateDetailOut();
+  openOv('#ovDetail'); icons();
+}
+function updateDetailOut(){
+  if(!dCur) return;
+  const f=$('#dFmt').value;
+  let out=dCur.raw;
+  if(f==='xray') out=xrayOut(dCur)||'—';
+  if(f==='singbox') out=singboxOut(dCur)||'—';
+  $('#dOut').value=out;
+}
+on('#dFmt','change',updateDetailOut);
+click('#dCopy',function(){ copyText($('#dOut').value); });
+
+function openSec(c){
+  const s=secAnalyze(c);
+  $('#secTitle').textContent=t('sec_t')+' — '+c.name;
+  const C=2*Math.PI*44;
+  const col=(s.grade==='A'||s.grade==='B')?'var(--acc)':(s.grade==='C'?'var(--warn)':'var(--err)');
+  $('#secBody').innerHTML='<div class="sec-top">'+
+    '<div class="sec-donut"><svg viewBox="0 0 100 100"><circle class="tr" cx="50" cy="50" r="44"/>'+
+    '<circle class="fl" cx="50" cy="50" r="44" style="stroke:'+col+';stroke-dasharray:'+C+';stroke-dashoffset:'+(C*(1-s.score/100))+'"/></svg>'+
+    '<div class="ctr"><b style="color:'+col+'">'+s.score+'</b><span>'+t('sec_of')+'</span></div></div>'+
+    '<div class="sec-cats">'+
+    '<div class="bar-row"><span>'+t('sec_enc')+'</span><div class="bar"><i style="width:'+s.enc+'%"></i></div><b>'+s.enc+'</b></div>'+
+    '<div class="bar-row"><span>'+t('sec_st')+'</span><div class="bar"><i style="width:'+s.stealth+'%"></i></div><b>'+s.stealth+'</b></div>'+
+    '<div class="bar-row"><span>'+t('sec_int')+'</span><div class="bar"><i style="width:'+s.integrity+'%"></i></div><b>'+s.integrity+'</b></div>'+
+    '<div><span class="sec-grade '+gradeCls(s.grade)+'">'+s.grade+'</span></div>'+
+    '</div></div>'+
+    '<p style="font-size:10.5px;color:var(--faint);margin-top:9px">'+t('sec_note')+'</p>';
+  openOv('#ovSec'); icons();
+}
+
+/* هوشمند */
+let smRun=0,smBest=null;
+function openSmart(){
+  smBest=null; $('#smApply').disabled=true;
+  openOv('#ovSmart'); icons();
+  runSmart();
+}
+async function runSmart(){
+  const my=++smRun;
+  const list=currentList();
+  if(!list.length){ $('#smSum').textContent=t('m_gempty'); return; }
+  $('#smList').innerHTML=list.map(function(c){
+    const s=secAnalyze(c);
+    return '<div class="sm-row" id="smr-'+c.id+'"><span class="grade '+gradeCls(s.grade)+'">'+s.grade+'</span><span class="nm">'+esc(c.name)+'</span><span class="pv">…</span><span class="sc">—</span></div>';
+  }).join('');
+  let done=0;
+  $('#smSum').textContent=t('m_gtest',{n:list.length});
+  const tasks=list.map(function(c){
+    return async function(){
+      const r=await probe(c.server,c.port,Math.min(4500,settings.net.timeout*1000));
+      if(my!==smRun) return;
+      const s=secAnalyze(c);
+      const ps=r.ok?Math.max(0,Math.round(50-r.ms/30)):0;
+      const total=s.score+ps;
+      const row=document.getElementById('smr-'+c.id);
+      if(row){
+        row.querySelector('.pv').textContent=r.ok?Math.round(r.ms)+'ms':'✗';
+        row.querySelector('.sc').textContent=r.ok?total:'—';
+      }
+      if(r.ok&&(!smBest||total>smBest.total)){
+        if(smBest){ const prev=document.getElementById('smr-'+smBest.id); if(prev){ prev.classList.remove('best'); const tg=prev.querySelector('.sm-tag'); if(tg&&tg.parentNode) tg.parentNode.removeChild(tg); } }
+        smBest={id:c.id,ms:Math.round(r.ms),name:c.name};
+        if(row){ row.classList.add('best'); row.insertAdjacentHTML('afterbegin','<span class="sm-tag">'+t('sm_best')+'</span>'); }
+      }
+      done++;
+      $('#smFill').style.width=(done/list.length*100)+'%';
+      $('#smSum').textContent=t('tb_testing',{a:done,b:list.length});
+    };
+  });
+  await pool(tasks,4);
+  if(my!==smRun) return;
+  if(smBest){ $('#smSum').textContent=t('sm_best')+': «'+smBest.name+'» ('+smBest.ms+'ms)'; $('#smApply').disabled=false; }
+  else $('#smSum').textContent=t('m_pfail');
+}
+click('#smAgain',runSmart);
+click('#smApply',function(){
+  if(!smBest) return;
+  closeOv($('#ovSmart'));
+  state.activeId=smBest.id;
+  save(); renderList(); renderActiveBar(); renderMetrics(); renderActions();
+  connect();
+});
+
+/* منابع */
+const SOURCES=[
+  {name:'V2RayAggregator',desc:'all protocols · 6h',url:'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt',tag:'mahdibland'},
+  {name:'Epodonios',desc:'daily archive',url:'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt',tag:'Epodonios'},
+  {name:'barry-far — VLESS',desc:'by protocol',url:'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Splitted-By-Protocol/vless.txt',tag:'barry-far'},
+  {name:'barry-far — VMess',desc:'by protocol',url:'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Splitted-By-Protocol/vmess.txt',tag:'barry-far'},
+  {name:'barry-far — Trojan',desc:'by protocol',url:'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Splitted-By-Protocol/trojan.txt',tag:'barry-far'}
+];
+function openSources(){ renderSources(); openOv('#ovSources'); icons(); }
+function renderSources(){
+  $('#srcList').innerHTML=SOURCES.map(function(s,i){
+    return '<div class="src-row"><div class="src-ic"><i data-lucide="server"></i></div>'+
+      '<div class="src-main"><b>'+esc(s.name)+'</b><small>'+esc(s.desc)+'</small></div>'+
+      '<button class="btn" data-src="'+i+'"><i data-lucide="download"></i>'+t('src_get')+'</button></div>';
+  }).join('');
+  icons();
+  const btns=$('#srcList').querySelectorAll('[data-src]');
+  for(var i=0;i<btns.length;i++){
+    (function(b){ b.onclick=function(){ importSource(SOURCES[+b.getAttribute('data-src')],b); }; })(btns[i]);
+  }
+}
+async function importSource(src,btn){
+  if(btn){ btn.disabled=true; btn.innerHTML='<i data-lucide="loader-2"></i>…'; icons(); }
+  log(t('m_fetch',{x:src.name}),'info');
+  try{
+    const res=await fetchSub(src.url);
+    if(res.info){
+      subMeta[src.tag]={url:src.url,up:res.info.up,down:res.info.down,total:res.info.total,expire:res.info.expire,updated:Date.now()};
+      saveSubMeta();
+    }
+    const links=shuffle(extractLinks(res.text)).slice(0,150);
+    const seen={};
+    for(var i=0;i<state.configs.length;i++) seen[state.configs[i].raw]=1;
+    let n=0;
+    for(var j=0;j<links.length;j++){
+      if(seen[links[j]]) continue;
+      const p=parseLink(links[j]);
+      if(p){ p.src=src.tag; if(addParsed(p)){ seen[links[j]]=1; n++; } }
+    }
+    if(n) afterAdd(n);
+    else toast(t('m_nonew',{x:src.name}),'warn');
+  }catch(e){
+    toast(t('m_srcfail',{x:src.name}),'err');
+  }
+  if(btn){ btn.disabled=false; btn.innerHTML='<i data-lucide="download"></i>'+t('src_get'); icons(); }
+  renderTabs();
+}
+click('#srcCustomBtn',async function(){
+  const url=$('#srcCustom').value.trim();
+  if(!url) return;
+  await importSource({name:'custom',url:url,tag:'custom'},$('#srcCustomBtn'));
+  $('#srcCustom').value='';
+});
+
+/* اشتراک */
+let editTag=null;
+function openSubs(){ renderSubs(); openOv('#ovSubs'); icons(); }
+function renderSubs(){
+  const box=$('#subList');
+  const tags=groups().filter(function(g){ return g!=='manual'; });
+  if(!tags.length){ box.innerHTML='<p style="font-size:12.5px;color:var(--faint);text-align:center;padding:14px 0">'+esc(t('sub_none'))+'</p>'; return; }
+  box.innerHTML=tags.map(function(g){
+    const m=subMeta[g];
+    let bar='',lines='';
+    if(m&&(m.total||m.expire)){
+      const used=(m.up||0)+(m.down||0);
+      const pct=m.total?Math.min(100,Math.round(used/m.total*100)):0;
+      const left=m.total?Math.max(0,m.total-used):0;
+      const dl=daysLeft(m.expire);
+      const col=pct>85?'var(--err)':pct>60?'var(--warn)':'var(--acc)';
+      bar='<div class="qbar"><i style="width:'+pct+'%;background:'+col+'"></i></div>';
+      lines='<div class="qrow"><span>'+t('sub_used')+'</span><b>'+fmtBytes(used)+(m.total?' / '+fmtBytes(m.total):'')+'</b></div>'+
+        (m.total?'<div class="qrow"><span>'+t('sub_left')+'</span><b>'+fmtBytes(left)+'</b></div>':'')+
+        '<div class="qrow"><span>'+t('sub_exp')+'</span><b>'+(m.expire?(dl!=null&&dl>=0?t('sub_days',{n:dl}):t('sub_expd')):t('sub_unk'))+'</b></div>';
+    }else{
+      lines='<p class="qnoinfo">'+esc(t('sub_noinfo'))+'</p>';
+    }
+    let cnt=0;
+    for(var i=0;i<state.configs.length;i++) if(groupOf(state.configs[i])===g) cnt++;
+    return '<div class="subcard"><div class="subhead"><b>'+esc(gLabel(g))+'</b><span class="cnt">'+cnt+' cfg</span></div>'+bar+lines+
+      '<div class="subacts">'+
+      '<button class="btn" data-supd="'+esc(g)+'"><i data-lucide="refresh-cw"></i>'+t('sub_upd')+'</button>'+
+      '<button class="btn" data-sed="'+esc(g)+'"><i data-lucide="pencil"></i>'+t('sub_edit')+'</button>'+
+      '<button class="btn danger" data-sdel="'+esc(g)+'"><i data-lucide="trash-2"></i>'+t('sub_del')+'</button>'+
+      '</div></div>';
+  }).join('');
+  icons();
+  box.querySelectorAll('[data-supd]').forEach(function(b){ b.onclick=function(){ updateGroup(b.getAttribute('data-supd')).then(renderSubs); }; });
+  box.querySelectorAll('[data-sed]').forEach(function(b){ b.onclick=function(){ openSubEdit(b.getAttribute('data-sed')); }; });
+  box.querySelectorAll('[data-sdel]').forEach(function(b){
+    b.onclick=function(){
+      const g=b.getAttribute('data-sdel');
+      let n=0;
+      for(var i=0;i<state.configs.length;i++) if(groupOf(state.configs[i])===g) n++;
+      openConfirm(t('m_cdelg',{x:g,n:n}),function(){
+        state.configs=state.configs.filter(function(c){ return groupOf(c)!==g; });
+        if(state.tab===g) state.tab='all';
+        delete subMeta[g]; saveSubMeta();
+        save(); renderTabs(); renderList(); renderActiveBar(); renderSubs();
+        toast(t('m_subdel'));
+      });
+    };
+  });
+}
+function openSubEdit(tag){
+  editTag=tag;
+  const m=subMeta[tag]||{};
+  $('#se_gb').value=m.total?(m.total/1073741824).toFixed(2):'';
+  $('#se_dt').value=m.expire?new Date(m.expire*1000).toISOString().slice(0,10):'';
+  openOv('#ovSubEdit'); icons();
+}
+click('#seSave',function(){
+  if(!editTag) return;
+  const m=subMeta[editTag]||(subMeta[editTag]={});
+  const gb=parseFloat($('#se_gb').value)||0;
+  const dt=$('#se_dt').value;
+  if(gb>0) m.total=Math.round(gb*1073741824);
+  if(dt){ const d=new Date(dt+'T23:59:59'); if(!isNaN(d.getTime())) m.expire=Math.floor(d.getTime()/1000); }
+  m.updated=Date.now();
+  saveSubMeta(); renderSubs(); renderTabs();
+  toast(t('m_subsave'));
+  closeOv($('#ovSubEdit'));
+});
+click('#subAddBtn',async function(){
+  const nm=$('#subNm').value.trim(),url=$('#subUrl').value.trim();
+  if(!nm||!url){ toast(t('m_subneed'),'warn'); return; }
+  await importSource({name:nm,url:url,tag:nm},null);
+  $('#subNm').value=''; $('#subUrl').value='';
+  renderSubs();
+  toast(t('m_subadd',{x:nm}));
+});
+
+/* لاگ */
+let logLines=[];
+function log(msg,level){
+  level=level||'info';
+  logLines.push({tm:new Date().toLocaleTimeString('fa-IR'),msg:msg,level:level});
+  if(logLines.length>150) logLines.shift();
+}
+function openLogs(){
+  openConfirm(t('d_logs'),null,
+    '<div style="max-height:300px;overflow-y:auto;font-family:var(--mono);font-size:10.5px;line-height:2">'+
+    logLines.map(function(l){
+      const col=l.level==='ok'?'var(--acc)':l.level==='err'?'var(--err)':l.level==='warn'?'var(--warn)':'var(--sub)';
+      return '<div style="color:'+col+'"><span style="color:var(--faint);font-size:9.5px">'+l.tm+'</span> '+esc(l.msg)+'</div>';
+    }).join('')+'</div>',
+    t('c_close'));
+}
+
+/* تایید / نام */
+let confirmCb=null;
+function openConfirm(html,cb,customBody,okLabel){
+  const box=$('#confirmTxt');
+  if(customBody) box.innerHTML=customBody; else box.innerHTML=html;
+  $('#confirmOkLbl').textContent=okLabel||t('c_ok');
+  confirmCb=cb||null;
+  openOv('#ovConfirm'); icons();
+}
+click('#btnConfirmYes',function(){
+  if(confirmCb) confirmCb();
+  confirmCb=null;
+  closeOv($('#ovConfirm'));
+});
+let renId=null;
+function openRename(c){
+  renId=c.id; $('#renameInput').value=c.name;
+  openOv('#ovRename'); icons();
+}
+click('#btnRenameOk',function(){
+  const c=findCfg(renId);
+  if(c){ const v=$('#renameInput').value.trim(); if(v) c.name=v; save(); renderList(); renderActiveBar(); }
+  closeOv($('#ovRename'));
+});
+
+/* ═══════════ مودال + تب‌ها ═══════════ */
+function anyOverlayOpen(){
+  return !!document.querySelector('.overlay.open, .drawer.open, .sheet.open');
+}
+function syncLock(){
+  document.body.classList.toggle('locked', anyOverlayOpen());
+}
+function updateGozarViewport(){
+  const vv=window.visualViewport;
+  const height=Math.max(1,Math.round((vv&&vv.height)||window.innerHeight||document.documentElement.clientHeight));
+  const top=Math.max(0,Math.round((vv&&vv.offsetTop)||0));
+  document.documentElement.style.setProperty('--gozar-view-height',height+'px');
+  document.documentElement.style.setProperty('--gozar-view-top',top+'px');
+  document.querySelectorAll('.pop.open').forEach(function(pop){
+    if(pop._gozarAnchor) positionGozarPop(pop,pop._gozarAnchor);
+  });
+}
+function fitTallPanel(ov){
+  if(!ov) return;
+  updateGozarViewport();
+  const modal=ov.querySelector('.modal');
+  if(!modal) return;
+  // Clear obsolete per-dialog sizing; the shared CSS now sizes all dialogs.
+  modal.style.removeProperty('height');
+  modal.style.removeProperty('max-height');
+  modal.style.removeProperty('min-height');
+  modal.style.removeProperty('overflow');
+  const body=modal.querySelector('.m-body');
+  if(body) body.style.removeProperty('max-height');
+}
+function openOv(id){
+  const ov=$(id); if(!ov) return;
+  updateGozarViewport();
+  ov.classList.add('open');
+  fitTallPanel(ov);
+  const mb=ov.querySelector('.m-body'); if(mb) mb.scrollTop=0;
+  syncLock();
+}
+window.addEventListener('resize',updateGozarViewport,{passive:true});
+window.addEventListener('orientationchange',updateGozarViewport,{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateGozarViewport,{passive:true});
+  window.visualViewport.addEventListener('scroll',updateGozarViewport,{passive:true});
+}
+updateGozarViewport();
+function closeOv(el){
+  if(!el) return;
+  el.classList.remove('open');
+  syncLock();
+}
+document.querySelectorAll('.overlay').forEach(function(ov){
+  ov.addEventListener('click',function(e){
+    if(e.target===ov){ closeOv(ov); if(ov.id==='ovScan') stopScan(); }
+  });
+});
+function activateTab(btn){
+  try{
+    if(!btn) return;
+    const modal=btn.closest('.modal'); if(!modal) return;
+    const id=btn.getAttribute('data-tab'); if(!id) return;
+    modal.querySelectorAll('.tabv').forEach(function(b){ b.classList.remove('on'); });
+    modal.querySelectorAll('.tpane').forEach(function(p){ p.classList.remove('on'); });
+    btn.classList.add('on');
+    const pane=modal.querySelector('.tpane#'+id)||modal.querySelector('#'+id);
+    if(pane) pane.classList.add('on');
+    const mb=modal.querySelector('.m-body'); if(mb) mb.scrollTop=0;
+  }catch(e){}
+}
+function bindTabs(){
+  document.querySelectorAll('.tabv').forEach(function(b){
+    if(b.__tabBound) return;
+    b.__tabBound=true;
+    b.addEventListener('click',function(e){ e.stopPropagation(); activateTab(b); });
+  });
+}
+document.addEventListener('click',function(e){
+  const b=(e.target&&e.target.closest)?e.target.closest('.tabv'):null;
+  if(b) activateTab(b);
+});
+function switchTabV(modalEl,tabId){
+  const modal=(typeof modalEl==='string')?$(modalEl):modalEl;
+  if(!modal) return;
+  const btn=modal.querySelector('.tabv[data-tab="'+tabId+'"]');
+  if(btn){ activateTab(btn); return; }
+  modal.querySelectorAll('.tabv').forEach(function(b){ b.classList.remove('on'); });
+  modal.querySelectorAll('.tpane').forEach(function(p){ p.classList.remove('on'); });
+  const pn=modal.querySelector('#'+tabId); if(pn) pn.classList.add('on');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    closePops(); closeDrawer(); closeSheet();
+    document.querySelectorAll('.overlay.open').forEach(function(ov){ closeOv(ov); });
+    stopScan();
+  }
+});
+
+/* تنظیمات */
+function openSettings(tab){
+  fillSettingsUI();
+  openOv('#ovSettings');
+  if(tab) switchTabV($('#ovSettings'),tab);
+  icons();
+}
+function fillSettingsUI(){
+  $('#s_dns').value=settings.net.dns;
+  $('#s_pingInt').value=settings.net.pingInt;
+  $('#s_timeout').value=settings.net.timeout;
+  $('#s_monitor').checked=settings.ui.monitor;
+  $('#s_bg').checked=settings.ui.bg;
+  $('#r_frag').checked=settings.ir.frag;
+  $('#r_packets').value=settings.ir.packets;
+  $('#r_length').value=settings.ir.length;
+  $('#r_interval').value=settings.ir.interval;
+  $('#fragFields').classList.toggle('show',settings.ir.frag);
+  $('#r_mux').checked=settings.ir.mux;
+  $('#r_muxconc').value=settings.ir.muxConc;
+  $('#r_quic').checked=settings.ir.quic;
+  $('#r_directIr').checked=settings.ir.directIr;
+  $('#r_ads').checked=settings.ir.ads;
+  $('#a_fp').value=settings.adv.fp;
+  $('#a_alpn').value=settings.adv.alpn;
+  $('#a_fmt').value=settings.adv.fmt;
+  $('#c_sniff').checked=settings.core.sniffing;
+  $('#c_routeonly').checked=settings.core.routeOnly;
+  $('#c_routeonly').disabled=!settings.core.sniffing;
+  $('#c_auto').checked=settings.core.autoConn;
+  $('#c_loglvl').value=settings.core.logLevel;
+  $('#c_preres').value=settings.core.preResolve;
+  $('#c_testurl').value=settings.core.testUrl;
+  $('#c_sport').value=settings.core.socksPort;
+  $('#c_rdns').value=settings.core.remoteDns;
+  $('#c_rproto').value=settings.core.remoteProto;
+  $('#c_ddns').value=settings.core.domesticDns;
+  $('#c_dhost').value=settings.core.dnsHosts;
+  $('#v_dns').value=settings.vpn.dns;
+  $('#v_mtu').value=settings.vpn.mtu;
+  $('#v_ipv6').checked=settings.vpn.ipv6;
+  $('#v_tun').value=settings.vpn.tunEngine;
+  $('#v_hlvl').value=settings.vpn.hevLogLevel;
+  $('#v_hto').value=settings.vpn.hevTimeouts;
+  $('#apps_mode').value=settings.apps.mode;
+  $('#ru_udp443').checked=settings.rules.blockUdp443;
+  $('#ru_google').checked=settings.rules.proxyGoogle;
+  $('#ru_lanip').checked=settings.rules.bypassLanIp;
+  $('#ru_landom').checked=settings.rules.bypassLanDom;
+  $('#ru_ddns').checked=settings.rules.bypassDomesticDns;
+  renderRuleList();
+}
+function bindToggle(id,path){
+  on(id,'change',function(e){
+    const p=path.split('.'); settings[p[0]][p[1]]=e.target.checked; saveSettings();
+    if(path==='ir.frag') $('#fragFields').classList.toggle('show',settings.ir.frag);
+    if(path==='ui.monitor'&&!settings.ui.monitor&&session.mode==='on') stopMonitor();
+    if(path==='core.sniffing') $('#c_routeonly').disabled=!settings.core.sniffing;
+  });
+}
+function bindVal(id,path){
+  on(id,'change',function(e){
+    const p=path.split('.'); settings[p[0]][p[1]]=e.target.value; saveSettings();
+  });
+}
+bindVal('#s_dns','net.dns');
+on('#s_pingInt','change',function(e){ settings.net.pingInt=Math.max(3,Math.min(60,+e.target.value||8)); e.target.value=settings.net.pingInt; saveSettings(); });
+bindVal('#s_timeout','net.timeout');
+bindToggle('#s_monitor','ui.monitor');
+bindToggle('#s_bg','ui.bg');
+bindToggle('#r_frag','ir.frag');
+bindVal('#r_packets','ir.packets');
+bindVal('#r_length','ir.length');
+bindVal('#r_interval','ir.interval');
+bindToggle('#r_mux','ir.mux');
+on('#r_muxconc','change',function(e){ settings.ir.muxConc=Math.max(1,Math.min(128,+e.target.value||8)); e.target.value=settings.ir.muxConc; saveSettings(); });
+bindToggle('#r_quic','ir.quic');
+bindToggle('#r_directIr','ir.directIr');
+bindToggle('#r_ads','ir.ads');
+bindVal('#a_fp','adv.fp');
+bindVal('#a_alpn','adv.alpn');
+bindVal('#a_fmt','adv.fmt');
+bindToggle('#c_sniff','core.sniffing');
+bindToggle('#c_routeonly','core.routeOnly');
+bindToggle('#c_auto','core.autoConn');
+bindVal('#c_loglvl','core.logLevel');
+bindVal('#c_preres','core.preResolve');
+on('#c_testurl','change',function(e){ settings.core.testUrl=e.target.value.trim()||'https://www.gstatic.com/generate_204'; e.target.value=settings.core.testUrl; saveSettings(); });
+on('#c_sport','change',function(e){ settings.core.socksPort=Math.max(1024,Math.min(65535,+e.target.value||10808)); e.target.value=settings.core.socksPort; saveSettings(); });
+bindVal('#c_rdns','core.remoteDns');
+bindVal('#c_rproto','core.remoteProto');
+bindVal('#c_ddns','core.domesticDns');
+on('#c_dhost','change',function(e){ settings.core.dnsHosts=e.target.value; saveSettings(); });
+bindVal('#v_dns','vpn.dns');
+on('#v_mtu','change',function(e){ settings.vpn.mtu=Math.max(1280,Math.min(9000,+e.target.value||1500)); e.target.value=settings.vpn.mtu; saveSettings(); });
+bindToggle('#v_ipv6','vpn.ipv6');
+bindVal('#v_tun','vpn.tunEngine');
+bindVal('#v_hlvl','vpn.hevLogLevel');
+on('#v_hto','change',function(e){ settings.vpn.hevTimeouts=e.target.value.trim()||'300,60'; e.target.value=settings.vpn.hevTimeouts; saveSettings(); });
+bindVal('#apps_mode','apps.mode');
+bindToggle('#ru_udp443','rules.blockUdp443');
+bindToggle('#ru_google','rules.proxyGoogle');
+bindToggle('#ru_lanip','rules.bypassLanIp');
+bindToggle('#ru_landom','rules.bypassLanDom');
+bindToggle('#ru_ddns','rules.bypassDomesticDns');
+click('#setReset',function(){ settings=JSON.parse(JSON.stringify(DEFAULTS)); saveSettings(); fillSettingsUI(); toast(t('m_reset')); });
+
+/* قوانین سفارشی */
+function renderRuleList(){
+  const box=$('#ruleList');
+  const arr=settings.rules.custom||[];
+  if(!arr.length){ box.innerHTML='<p style="font-size:11px;color:var(--faint);padding:6px 0">—</p>'; return; }
+  box.innerHTML=arr.map(function(r,i){
+    const parts=[];
+    if(r.domains) parts.push('d: '+r.domains);
+    if(r.ips) parts.push('ip: '+r.ips);
+    if(r.port) parts.push('p: '+r.port);
+    if(r.network&&r.network!=='any') parts.push(r.network);
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)">'+
+      '<b style="font-size:11.5px;flex-shrink:0">'+esc(r.name||('#'+(i+1)))+'</b>'+
+      '<span style="font-family:var(--mono);font-size:9.5px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;text-align:left">'+esc(parts.join(' · '))+'</span>'+
+      '<span class="grade g-A" style="margin:0">'+esc(r.outbound||'proxy')+'</span>'+
+      '<button class="ibtn danger" data-rdel="'+i+'"><i data-lucide="trash-2"></i></button></div>';
+  }).join('');
+  icons();
+  box.querySelectorAll('[data-rdel]').forEach(function(b){
+    b.onclick=function(){
+      settings.rules.custom.splice(+b.getAttribute('data-rdel'),1);
+      saveSettings(); renderRuleList(); toast(t('m_ruledel'));
+    };
+  });
+}
+click('#ruAddBtn',function(){
+  const r={
+    name:$('#ru_name').value.trim(),
+    domains:$('#ru_doms').value.trim(),
+    ips:$('#ru_ips').value.trim(),
+    port:+$('#ru_port').value||0,
+    network:$('#ru_net').value,
+    outbound:$('#ru_out').value
+  };
+  if(!r.domains&&!r.ips&&!r.port){ toast(t('m_ruledup'),'warn'); return; }
+  if(!r.name) r.name=t('ru_name');
+  settings.rules.custom.push(r);
+  saveSettings(); renderRuleList();
+  $('#ru_name').value=''; $('#ru_doms').value=''; $('#ru_ips').value=''; $('#ru_port').value='';
+  toast(t('m_ruleadd'));
+});
+
+/* پروکسی هر برنامه */
+let appCache=[];
+function openApps(){
+  if(!(window.GozarAndroid&&window.GozarAndroid.getApps)){ toast(t('m_restbr'),'warn'); return; }
+  openOv('#ovApps'); icons();
+  $('#appsList').innerHTML='<p style="text-align:center;color:var(--faint);font-size:12px;padding:20px 0">'+esc(t('m_appsload'))+'</p>';
+  try{ appCache=JSON.parse(window.GozarAndroid.getApps())||[]; }catch(e){ appCache=[]; }
+  renderAppList('');
+}
+function renderAppList(q){
+  const box=$('#appsList');
+  q=String(q||'').toLowerCase();
+  const sel={};
+  (settings.apps.list||[]).forEach(function(p){ sel[p]=1; });
+  const shown=appCache.filter(function(a){ return !q||a.n.toLowerCase().indexOf(q)!==-1||a.p.toLowerCase().indexOf(q)!==-1; });
+  if(!shown.length){ box.innerHTML='<p style="text-align:center;color:var(--faint);font-size:12px;padding:16px 0">'+esc(t('apps_empty'))+'</p>'; $('#appsCnt').textContent=''; return; }
+  box.innerHTML=shown.map(function(a){
+    return '<label style="display:flex;align-items:center;gap:9px;padding:7px 8px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:12px">'+
+      '<input type="checkbox" class="appcb" value="'+esc(a.p)+'"'+(sel[a.p]?' checked':'')+' style="width:16px;height:16px;flex-shrink:0">'+
+      '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.n)+'</span>'+
+      '<span dir="ltr" style="font-family:var(--mono);font-size:9px;color:var(--faint);flex-shrink:0;max-width:110px;overflow:hidden;text-overflow:ellipsis">'+esc(a.p)+'</span></label>';
+  }).join('');
+  $('#appsCnt').textContent=t('apps_cnt',{n:shown.length});
+}
+on('#appsQ','input',function(e){ renderAppList(e.target.value); });
+click('#btnAppsPick',function(){ openApps(); });
+click('#appsSave',function(){
+  const sel=[];
+  document.querySelectorAll('#appsList .appcb:checked').forEach(function(cb){ sel.push(cb.value); });
+  settings.apps.list=sel;
+  saveSettings();
+  closeOv($('#ovApps'));
+  toast(t('btn_save')+' ('+sel.length+')');
+});
+
+/* پس‌زمینه */
+(function(){
+  const cv=$('#bg'),ctx=cv.getContext('2d');
+  let W,H,dpr,dots=[],pulses=[];
+  const mouse={x:-9999,y:-9999};
+  function resize(){
+    dpr=window.devicePixelRatio||1;
+    W=window.innerWidth;H=window.innerHeight;
+    cv.width=W*dpr;cv.height=H*dpr;
+    cv.style.width=W+'px';cv.style.height=H+'px';
+    dots=[];
+    const gap=W<640?78:64;
+    for(let x=gap/2;x<W;x+=gap) for(let y=gap/2;y<H;y+=gap) dots.push({x:x,y:y,ph:Math.random()*6.28});
+  }
+  window.__bgPulse=function(x,y){ pulses.push({x:x*dpr,y:y*dpr,r:0,v:4.2*dpr,a:.9}); if(pulses.length>12) pulses.shift(); };
+  window.addEventListener('mousemove',function(e){ mouse.x=e.clientX*dpr; mouse.y=e.clientY*dpr; });
+  window.addEventListener('resize',resize);
+  resize();
+  function frame(tm){
+    requestAnimationFrame(frame);
+    if(!settings.ui.bg){ ctx.clearRect(0,0,cv.width,cv.height); return; }
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var i=0;i<pulses.length;i++){ pulses[i].r+=pulses[i].v; pulses[i].a*=.98; }
+    pulses=pulses.filter(function(p){ return p.a>.03; });
+    for(var d=0;d<dots.length;d++){
+      const dot=dots[d];
+      const wob=Math.sin(tm/1600+dot.ph)*1.5*dpr;
+      const x=dot.x*dpr,y=dot.y*dpr+wob;
+      const dx=x-mouse.x,dy=y-mouse.y;
+      const near=Math.max(0,1-Math.sqrt(dx*dx+dy*dy)/(130*dpr));
+      let a=.05+Math.sin(tm/900+dot.ph)*.02+near*.35;
+      let r=(1.1+near)*dpr;
+      let col='rgba(138,162,150,'+a.toFixed(3)+')';
+      for(var p=0;p<pulses.length;p++){
+        const px=x-pulses[p].x,py=y-pulses[p].y;
+        const dp=Math.abs(Math.sqrt(px*px+py*py)-pulses[p].r);
+        if(dp<30*dpr){ const b=(1-dp/(30*dpr))*pulses[p].a; a=Math.min(1,a+b*.9); r+=b*1.5*dpr; col='rgba(47,230,168,'+a.toFixed(3)+')'; }
+      }
+      ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fillStyle=col; ctx.fill();
+    }
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* اعمال زبان */
+function applyLang(){
+  document.documentElement.setAttribute('dir',LANG==='en'?'ltr':'rtl');
+  document.documentElement.setAttribute('lang',LANG);
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent=t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder=t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('.lang-b').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-lang')===LANG); });
+  $('#drFoot').innerHTML=t('dr_foot');
+  $('#hintTxt').innerHTML=IS_ANDROID_APP?t('hint_android'):t('hint_browser');
+  $('#tbSub').textContent=IS_ANDROID_APP?t('tb_sub_android'):t('tb_sub_default');
+  $('#verLine').textContent='Gozar '+APP_VERSION+' — '+t('credit')+' Mohammad Hosseinzadeh';
+  renderManualList();
+  renderFilterChips();
+  renderTabs(); renderList(); renderActiveBar(); renderCore(); renderChrome(); renderMetrics(); renderActions();
+  bindTabs();
+  try{ localStorage.setItem('gozar.lang',LANG); }catch(e){}
+}
+
+/* راه‌اندازی */
+loadSettings();
+loadSubMeta();
+load();
+// Remove old built-in demo entries: reserved/example endpoints cannot provide a real VPN.
+const oldDemoCount=state.configs.length;
+state.configs=state.configs.filter(function(c){ return !/^Demo\s*[—-]/i.test(String(c.name||'')); });
+if(state.activeId&&!state.configs.some(function(c){ return c.id===state.activeId; })) state.activeId=null;
+if(state.configs.length!==oldDemoCount) save();
+if(state.configs.length&&!state.activeId) state.activeId=state.configs[0].id;
+const envLabel=IS_ANDROID_APP?t('env_app'):(IS_TOUCH?t('env_mob'):t('env_desk'));
+applyLang();
+bindTabs();
+syncLock();
+log(t('log_ready',{v:APP_VERSION,e:envLabel}),'info');
+icons();
+
+on('#connHead','click',function(){ $('#connCard').classList.toggle('open'); });
+
+/* اتصال از حلقه و FAB (مرورگر) */
+document.addEventListener('click',function(e){
+  const el=e.target.closest('[data-conn]');
+  if(!el) return;
+  if(el.id==='shConnect2') return;
+  if(session.mode==='busy') return;
+  if(session.mode==='on') disconnect(); else connect();
+});
+ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(); });
+</script>
+
+<!-- پل اندروید -->
+<script>
+/* پل اندروید — اتصال واقعی و نمایش صریح وضعیت */
+(function(){
+  const B=window.GozarAndroid;
+  if(!B) return;
+  const tbSub=document.getElementById('tbSub');
+  if(tbSub) tbSub.textContent=(typeof t==='function')?t('tb_sub_android'):'Android · Xray';
+  let vpnOn=false, lastStartAt=0, lastError='', errorShown=false;
+  function pushParams(){
+    try{ if(B.setVpnParams) B.setVpnParams((typeof vpnOut==='function')?vpnOut():'{}'); }catch(e){}
+  }
+  function showError(msg){
+    msg=String(msg||'راه‌اندازی VPN ناموفق بود.');
+    session.reason=msg; setMode('err'); stopPulseLoop(); setProgress(0);
+    if(msg!==lastError || !errorShown){ toast(msg,'err'); lastError=msg; errorShown=true; }
+  }
+  function setVpn(on){
+    if(on===vpnOn && session.mode===(on?'on':'idle')) return;
+    vpnOn=on;
+    if(on){
+      lastError=''; errorShown=false; session.pingMs=null; session.history=[];
+      setMode('on'); setProgress(1); startPulseLoop(2600); renderMetrics(); drawSpark();
+      document.getElementById('connCard').classList.add('on');
+      const h=document.getElementById('hintTxt');
+      if(h&&typeof t==='function') h.innerHTML=t('hint_android');
+      log(typeof t==='function'?t('m_von'):'VPN tunnel active','ok');
+    }else{
+      document.getElementById('connCard').classList.remove('on');
+      if(session.mode==='on'||session.mode==='busy') disconnect();
+    }
+  }
+  function pollStatus(){
+    let status='off';
+    try{ status=B.vpnStatus(); }catch(e){ return; }
+    if(status==='on'){ setVpn(true); return; }
+    if(status==='connecting'){
+      vpnOn=false;
+      if(session.mode!=='busy') setMode('busy');
+      session.reason='در حال راه‌اندازی هستهٔ VPN…'; renderCore(); renderChrome();
+      return;
+    }
+    if(status==='error'){
+      vpnOn=false;
+      let msg='خطا در راه‌اندازی VPN';
+      try{ if(B.coreLog) msg=B.coreLog()||msg; }catch(e){}
+      showError(msg); return;
+    }
+    if(status==='off' && session.mode==='busy' && Date.now()-lastStartAt>7000){
+      vpnOn=false; session.reason='اتصال شروع نشد؛ کانفیگ را بررسی و دوباره تلاش کن.';
+      setMode('err'); stopPulseLoop(); setProgress(0);
+    }else if(status==='off' && vpnOn){ setVpn(false); }
+  }
+  setInterval(pollStatus,700);
+  document.addEventListener('click',function(e){
+    const el=e.target.closest('[data-conn]');
+    if(!el||el.id==='shConnect2') return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    if(session.mode==='busy') return;
+    if(vpnOn){ try{ B.stopVpn(); toast('در حال قطع اتصال…'); }catch(err){ showError('قطع اتصال ناموفق بود: '+err.message); } return; }
+    const c=activeCfg();
+    if(!c){ toast('هنوز سروری اضافه نشده؛ از «افزودن کانفیگ» لینک یا اشتراک معتبر وارد کن.','warn'); return; }
+    const json=xrayOut(c);
+    if(!json){ toast('این پروتکل در نسخهٔ فعلی پشتیبانی نمی‌شود؛ VLESS، VMess، Trojan یا Shadowsocks را انتخاب کن.','warn'); return; }
+    lastStartAt=Date.now(); lastError=''; errorShown=false;
+    session.reason='در حال درخواست مجوز و راه‌اندازی VPN…'; setMode('busy'); setProgress(0.15); startPulseLoop(900);
+    pushParams();
+    try{
+      const res=B.startVpn(json);
+      if(res==='ask') toast('در پنجرهٔ اندروید، اجازهٔ اتصال VPN را تأیید کن.','warn');
+      else if(res==='invalid'){ showError('کانفیگ خالی یا نامعتبر است.'); }
+      else if(res==='not_ready'){ showError('هستهٔ VPN آماده نیست.'); }
+      else toast('درخواست اتصال ارسال شد؛ وضعیت در حال بررسی است.');
+    }catch(err){ showError('ارسال درخواست اتصال ناموفق بود: '+(err&&err.message?err.message:String(err))); }
+  },true);
+  setTimeout(function(){
+    try{
+      if(typeof settings!=='undefined'&&settings.core&&settings.core.autoConn&&B.vpnStatus()!=='on'){
+        const c=activeCfg(), json=c&&xrayOut(c);
+        if(json){ lastStartAt=Date.now(); setMode('busy'); pushParams(); B.startVpn(json); }
+      }
+    }catch(e){ showError('اتصال خودکار ناموفق بود.'); }
+  },1500);
+})();
+</script>
+
+
+
+<script>
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))
+  addEventListener('load',function(){ navigator.serviceWorker.register('./sw.js').catch(function(){}); });
+</script>
+</body>
+</html>
