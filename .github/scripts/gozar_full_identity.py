@@ -6,7 +6,7 @@ Designed for Gozar's feature/gozar-webview-integration branch.
 from pathlib import Path
 import sys
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / 'V2rayNG' / 'app'
 SRC = APP / 'src'
 OLD = 'com.v2ray.ang'
