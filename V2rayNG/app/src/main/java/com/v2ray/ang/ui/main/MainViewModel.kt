@@ -284,6 +284,7 @@ class MainViewModel(
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
             MainAction.SortByTestResults -> sortByTestResultsAsync()
             MainAction.UpdateSubscriptions -> importConfigViaSub()
+            MainAction.RefreshHealthy -> refreshHealthy()
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
