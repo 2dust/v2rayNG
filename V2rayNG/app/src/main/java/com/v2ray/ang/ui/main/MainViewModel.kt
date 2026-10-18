@@ -1119,7 +1119,7 @@ class MainViewModel(
         }
     }
 
-    private suspend fun testGroupAndWait(groupId: String) {
+     suspend fun testGroupAndWait(groupId: String) {
         val guids = withContext(ioDispatcher) { dataSource.getServerGuidList(groupId) }
         if (guids.isEmpty()) return
         withContext(ioDispatcher) { dataSource.clearAllTestDelayResults(guids) }
