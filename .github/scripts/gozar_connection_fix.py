@@ -5,7 +5,7 @@ Run from any working directory. Applies strictly to feature/gozar-webview-integr
 from pathlib import Path
 import subprocess
 
-root = Path(__file__).resolve().parents[3]
+root = Path(__file__).resolve().parents[2]
 app = root / 'V2rayNG/app'
 html = app / 'src/main/assets/index.html'
 main = app / 'src/main/java/com/gozar/vpn/ui/main/MainActivity.kt'
