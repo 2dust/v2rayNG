@@ -1,0 +1,27 @@
+name: Gozar branding cleanup
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  branding:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Update display names and Quick Settings icon
+        run: python3 .github/scripts/fix_gozar_brand.py
+      - name: Commit changes only when needed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add V2rayNG/app/src/main/res V2rayNG/app/src/dev/res/values/strings.xml V2rayNG/app/src/pre_release/res/values/strings.xml V2rayNG/app/src/fdroid/res/values/strings.xml
+          if git diff --cached --quiet; then
+            echo "No changes required"
+          else
+            git commit -m "Brand Android display names and quick settings icon as Gozar"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
