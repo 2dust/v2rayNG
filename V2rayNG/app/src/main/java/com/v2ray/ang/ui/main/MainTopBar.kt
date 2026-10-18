@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -107,6 +109,13 @@ fun MainTopBar(
                         .heightIn(max = maxMenuHeight)
                         .verticalScrollbar(moreMenuScrollState)
                 ) {
+                   DropdownMenuItem(
+                        text = { Text("Refresh Healthy") },
+                        onClick = {
+                            showMenu = false
+                            onAction(MainAction.RefreshHealthy)
+                        }
+                    )
                     MoreMenuContent { action ->
                         showMenu = false
                         onMoreMenuAction(action)
