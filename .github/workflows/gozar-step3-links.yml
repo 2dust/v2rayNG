@@ -1,0 +1,27 @@
+name: Gozar Step 3 - App links
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update-app-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Update AppConfig links
+        run: python3 .github/scripts/gozar_step3_links.py
+      - name: Commit minimal changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt
+          if git diff --cached --quiet; then
+            echo "No changes required"
+          else
+            git commit -m "Point Gozar app and release URLs to Gozar repository"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
