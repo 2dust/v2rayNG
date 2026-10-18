@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package com.gozar.vpn.service
 
 import android.content.Context
 import android.os.Handler

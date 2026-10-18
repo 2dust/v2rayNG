@@ -1,6 +1,6 @@
-package com.v2ray.ang
+package com.gozar.vpn
 
-import com.v2ray.ang.util.Utils
+import com.gozar.vpn.util.Utils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

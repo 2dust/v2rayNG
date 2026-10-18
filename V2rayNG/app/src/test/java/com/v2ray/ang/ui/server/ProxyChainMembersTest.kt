@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.server
+package com.gozar.vpn.ui.server
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame

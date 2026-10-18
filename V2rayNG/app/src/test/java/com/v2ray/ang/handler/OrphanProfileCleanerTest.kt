@@ -1,6 +1,6 @@
-package com.v2ray.ang.handler
+package com.gozar.vpn.handler
 
-import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
+import com.gozar.vpn.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

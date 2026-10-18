@@ -1,4 +1,4 @@
-package com.v2ray.ang.extension
+package com.gozar.vpn.extension
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

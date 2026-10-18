@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.v2ray.ang"
+    namespace = "com.gozar.vpn"
     compileSdk = 37
 
     defaultConfig {

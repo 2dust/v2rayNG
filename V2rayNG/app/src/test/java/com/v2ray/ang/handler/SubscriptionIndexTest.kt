@@ -1,9 +1,9 @@
-package com.v2ray.ang.handler
+package com.gozar.vpn.handler
 
 import android.util.Log
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.dto.entities.SubscriptionItem
-import com.v2ray.ang.util.JsonUtil
+import com.gozar.vpn.dto.entities.SubscriptionItem
+import com.gozar.vpn.util.JsonUtil
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

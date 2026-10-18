@@ -1,6 +1,6 @@
-package com.v2ray.ang.service
+package com.gozar.vpn.service
 
-import com.v2ray.ang.enums.EConfigType
+import com.gozar.vpn.enums.EConfigType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

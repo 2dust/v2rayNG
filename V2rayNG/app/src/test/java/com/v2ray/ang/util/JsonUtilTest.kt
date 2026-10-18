@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package com.gozar.vpn.util
 
 import com.google.gson.JsonParser
 import org.junit.jupiter.api.Assertions.assertEquals

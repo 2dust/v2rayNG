@@ -1,9 +1,9 @@
-package com.v2ray.ang.ui.userasset
+package com.gozar.vpn.ui.userasset
 
 import android.app.Application
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.entities.AssetUrlCache
-import com.v2ray.ang.dto.entities.AssetUrlItem
+import com.gozar.vpn.AppConfig
+import com.gozar.vpn.dto.entities.AssetUrlCache
+import com.gozar.vpn.dto.entities.AssetUrlItem
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

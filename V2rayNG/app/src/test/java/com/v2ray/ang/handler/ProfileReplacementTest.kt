@@ -1,7 +1,7 @@
-package com.v2ray.ang.handler
+package com.gozar.vpn.handler
 
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
+import com.gozar.vpn.dto.entities.ProfileItem
+import com.gozar.vpn.enums.EConfigType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

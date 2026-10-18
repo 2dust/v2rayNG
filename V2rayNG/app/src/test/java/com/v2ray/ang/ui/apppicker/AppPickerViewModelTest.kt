@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.apppicker
+package com.gozar.vpn.ui.apppicker
 
 import android.app.Application
 import org.junit.jupiter.api.Assertions.assertEquals

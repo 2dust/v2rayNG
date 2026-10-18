@@ -1,9 +1,9 @@
-package com.v2ray.ang.fmt
+package com.gozar.vpn.fmt
 
 import android.util.Base64
 import android.util.Log
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.dto.entities.ProfileItem
+import com.gozar.vpn.enums.EConfigType
+import com.gozar.vpn.dto.entities.ProfileItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

@@ -1,0 +1,235 @@
+package com.gozar.vpn.ui.main
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
+import com.gozar.vpn.AngApplication
+import com.gozar.vpn.AppConfig
+import com.gozar.vpn.R
+import com.gozar.vpn.dto.ConnectionTestResult
+import com.gozar.vpn.dto.RealPingResult
+import com.gozar.vpn.dto.SubscriptionUpdateResult
+import com.gozar.vpn.dto.TestServiceMessage
+import com.gozar.vpn.dto.entities.ProfileItem
+import com.gozar.vpn.dto.entities.ServerAffiliationInfo
+import com.gozar.vpn.dto.entities.SubscriptionCache
+import com.gozar.vpn.dto.entities.SubscriptionItem
+import com.gozar.vpn.extension.serializable
+import com.gozar.vpn.handler.AngConfigManager
+import com.gozar.vpn.handler.AppLocaleManager
+import com.gozar.vpn.handler.MmkvManager
+import com.gozar.vpn.handler.SettingsManager
+import com.gozar.vpn.handler.SubscriptionUpdater
+import com.gozar.vpn.helper.MessageHelper
+import com.gozar.vpn.util.LogUtil
+import com.gozar.vpn.util.Utils
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
+import java.util.concurrent.atomic.AtomicBoolean
+
+class MainRepository(
+    private val app: AngApplication
+) : MainDataSource {
+
+    private val localizedContext: Context
+        get() = AppLocaleManager.localizedContext(app)
+
+    private val closed = AtomicBoolean(false)
+
+    // Probe results are finite and must remain lossless until the ViewModel coalesces them.
+    private val mainServiceEventChannel = Channel<MainServiceEvent>(Channel.UNLIMITED)
+
+    override val mainServiceEvent: Flow<MainServiceEvent> = mainServiceEventChannel.receiveAsFlow()
+
+    private val serviceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val safeIntent = intent ?: return
+            val requestId = safeIntent.getStringExtra(MessageHelper.EXTRA_REQUEST_ID).orEmpty()
+            val event = when (safeIntent.getIntExtra("key", 0)) {
+                AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
+                AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
+                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
+                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
+                    safeIntent.getStringExtra("content")
+                )
+
+                AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
+                AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
+                    .serializable<ConnectionTestResult>("content")
+                    ?.let { MainServiceEvent.MeasureDelayResult(it, requestId) }
+                AppConfig.MSG_MEASURE_DELAY_CANCEL -> MainServiceEvent.MeasureDelayCancelled(requestId)
+
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> safeIntent
+                    .serializable<RealPingResult>("content")
+                    ?.let { MainServiceEvent.MeasureConfigSuccess(it, requestId) }
+                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
+                    safeIntent.getStringExtra("content").orEmpty(), requestId
+                )
+
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
+                    requestId
+                )
+                AppConfig.MSG_MEASURE_CONFIG_CANCEL -> MainServiceEvent.MeasureConfigCancelled(requestId)
+
+                else -> null
+            }
+            event?.let { mainServiceEventChannel.trySend(it) }
+        }
+    }
+
+    init {
+        ContextCompat.registerReceiver(
+            app,
+            serviceReceiver,
+            IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
+            Utils.receiverFlags()
+        )
+        MessageHelper.sendMsg2Service(app, AppConfig.MSG_REGISTER_CLIENT, "")
+    }
+
+    override fun close() {
+        if (!closed.compareAndSet(false, true)) return
+        runCatching {
+            MessageHelper.sendMsg2Service(app, AppConfig.MSG_UNREGISTER_CLIENT, "")
+        }.onFailure {
+            LogUtil.e(AppConfig.TAG, "Failed to unregister service client", it)
+        }
+        runCatching {
+            app.unregisterReceiver(serviceReceiver)
+        }.onFailure {
+            LogUtil.e(AppConfig.TAG, "Failed to unregister main service receiver", it)
+        }
+        mainServiceEventChannel.close()
+    }
+
+    override fun getSelectedSubscriptionId(): String =
+        MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
+
+    override fun setSelectedSubscriptionId(id: String) {
+        MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, id)
+    }
+
+    override fun getSelectServer(): String? = MmkvManager.getSelectServer()
+
+    override fun setSelectServer(guid: String) = MmkvManager.setSelectServer(guid)
+
+    override fun getConfirmRemove(): Boolean =
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+
+    override fun getDoubleColumnDisplay(): Boolean =
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
+
+    override fun isGroupAllDisplayEnabled(): Boolean =
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)
+
+    override fun getString(resId: Int): String = localizedContext.getString(resId)
+
+    override fun getString(resId: Int, vararg formatArgs: Any): String =
+        localizedContext.getString(resId, *formatArgs)
+
+    override fun getSubscriptions(): List<SubscriptionCache> {
+        val result = mutableListOf<SubscriptionCache>()
+        if (isGroupAllDisplayEnabled()) {
+            result += SubscriptionCache(
+                guid = "",
+                subscription = SubscriptionItem().apply {
+                    remarks = localizedContext.getString(R.string.filter_config_all)
+                }
+            )
+        }
+        result += MmkvManager.decodeSubscriptions()
+        return result
+    }
+
+    override fun getSubscriptionItem(id: String): SubscriptionItem? =
+        MmkvManager.decodeSubscription(id)
+
+    override fun getServerGuidList(groupId: String): List<String> =
+        if (groupId.isEmpty()) {
+            MmkvManager.decodeAllServerList()
+        } else {
+            MmkvManager.decodeServerList(groupId)
+        }
+
+    override fun decodeServerConfig(guid: String): ProfileItem? =
+        MmkvManager.decodeServerConfig(guid)
+
+    override fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? =
+        MmkvManager.decodeServerAffiliationInfo(guid)
+
+    override fun encodeServerList(guids: List<String>, groupId: String) =
+        MmkvManager.encodeServerList(ArrayList(guids), groupId)
+
+    override fun removeServer(guid: String) = MmkvManager.removeServer(guid)
+
+    override fun removeAllServer(): Int = MmkvManager.removeAllServer()
+
+    override fun removeInvalidServerByGuid(guid: String): Int =
+        MmkvManager.removeInvalidServer(guid)
+
+    override fun removeInvalidServersInGroup(groupId: String): Int =
+        if (groupId.isEmpty()) {
+            MmkvManager.removeInvalidServer("")
+        } else {
+            getServerGuidList(groupId).sumOf(::removeInvalidServerByGuid)
+        }
+
+    override fun clearAllTestDelayResults(guids: List<String>) =
+        MmkvManager.clearAllTestDelayResults(guids)
+
+    override fun sortByTestResultsForSub(subId: String) {
+        AngConfigManager.sortByTestResultsForSub(subId)
+    }
+
+    override fun getSubsList(): List<String> = MmkvManager.decodeSubsList()
+
+    override suspend fun importBatchConfig(
+        server: String?,
+        subscriptionId: String,
+        updateUI: Boolean
+    ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI)
+
+    override fun updateConfigViaSubAll(): SubscriptionUpdateResult =
+        AngConfigManager.updateConfigViaSubAll()
+
+    override fun updateConfigViaSub(subscriptionCache: SubscriptionCache): SubscriptionUpdateResult =
+        AngConfigManager.updateConfigViaSub(subscriptionCache)
+
+    override fun shareNonCustomConfigsToClipboard(guids: List<String>): Int =
+        AngConfigManager.shareNonCustomConfigsToClipboard(app, guids)
+
+    override fun share2QRCode(guid: String): android.graphics.Bitmap? =
+        AngConfigManager.share2QRCode(guid)
+
+    override fun share2Clipboard(guid: String): Boolean =
+        AngConfigManager.share2Clipboard(app, guid) == 0
+
+    override fun sendMsg2Service(msgId: Int, content: String) =
+        MessageHelper.sendMsg2Service(app, msgId, content)
+
+    override fun sendMsg2TestService(msg: TestServiceMessage, requestId: String?) =
+        MessageHelper.sendMsg2TestService(app, msg, requestId)
+
+    override fun cancelAllPing() {
+        sendMsg2TestService(
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+        )
+    }
+
+    override fun testCurrentServerRealPing(requestId: String) {
+        MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_MEASURE_DELAY, requestId) { handled ->
+            if (!handled) mainServiceEventChannel.trySend(MainServiceEvent.MeasureDelayCancelled(requestId))
+        }
+    }
+
+    override fun syncSubscriptions() {
+        SubscriptionUpdater.sync(app)
+    }
+
+    override fun initAssets() {
+        SettingsManager.initAssets(app, app.assets)
+    }
+}
