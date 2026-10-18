@@ -934,12 +934,21 @@ class MainViewModel(
                 val healthyName = "Healthy" // name of the pool group
                 val maxHealthy = 50         // max servers kept in the pool
 
-                val subs = withContext(ioDispatcher) { dataSource.getSubscriptions() }
-                val healthy = subs.firstOrNull { it.subscription.remarks == healthyName }
-                if (healthy == null) {
-                    toastError("Create a group named $healthyName first")
-                    return@launch
+                               var subs = withContext(ioDispatcher) { dataSource.getSubscriptions() }
+                if (subs.none { it.subscription.remarks == healthyName }) {
+                    withContext(ioDispatcher) {
+                        com.v2ray.ang.handler.MmkvManager.encodeSubscription(
+                            com.v2ray.ang.util.Utils.getUuid(),
+                            com.v2ray.ang.dto.entities.SubscriptionItem(
+                                remarks = healthyName,
+                                enabled = false,
+                                autoUpdate = false
+                            )
+                        )
+                    }
+                    subs = withContext(ioDispatcher) { dataSource.getSubscriptions() }
                 }
+                val healthy = subs.first { it.subscription.remarks == healthyName }
                 val sources = subs.filter {
                     it.guid != healthy.guid && it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID
                 }
