@@ -920,6 +920,122 @@ class MainViewModel(
         _uiState.update { it.copy(locateTarget = null) }
     }
 
+        // ---------- Healthy pool refresh ----------
+    private var refreshHealthyJob: Job? = null
+
+    fun refreshHealthy() {
+        if (refreshHealthyJob?.isActive == true) {
+            toast("Healthy refresh is already running")
+            return
+        }
+        refreshHealthyJob = viewModelScope.launch {
+            try {
+                val healthyName = "Healthy" // name of the pool group
+                val maxHealthy = 50         // max servers kept in the pool
+
+                val subs = withContext(ioDispatcher) { dataSource.getSubscriptions() }
+                val healthy = subs.firstOrNull { it.subscription.remarks == healthyName }
+                if (healthy == null) {
+                    toastError("Create a group named $healthyName first")
+                    return@launch
+                }
+                val sources = subs.filter {
+                    it.guid != healthy.guid && it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID
+                }
+
+                toast("Updating subscriptions...")
+                withContext(ioDispatcher) { dataSource.updateConfigViaSubAll() }
+
+                for (group in sources + healthy) {
+                    testGroupAndWait(group.guid)
+                }
+
+                val summary = withContext(ioDispatcher) {
+                    fun delayOf(guid: String): Long =
+                        dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+
+                    val sourceResults = sources
+                        .flatMap { dataSource.getServerGuidList(it.guid) }
+                        .mapNotNull { guid ->
+                            val profile = dataSource.decodeServerConfig(guid) ?: return@mapNotNull null
+                            profile to delayOf(guid)
+                        }
+                    val healthyGuids = dataSource.getServerGuidList(healthy.guid)
+
+                    val anyWorking = sourceResults.any { it.second > 0L } ||
+                            healthyGuids.any { delayOf(it) > 0L }
+                    if (!anyWorking) {
+                        return@withContext "No working server found (network down?). Nothing changed."
+                    }
+
+                    var removed = 0
+                    healthyGuids.forEach { guid ->
+                        if (delayOf(guid) < 0L) {
+                            dataSource.removeServer(guid)
+                            removed++
+                        }
+                    }
+
+                    val keptGuids = dataSource.getServerGuidList(healthy.guid)
+                    val existing = HashSet<ProfileItem>()
+                    keptGuids.forEach { guid ->
+                        dataSource.decodeServerConfig(guid)?.let { existing.add(it.duplicateIdentity()) }
+                    }
+
+                    var added = 0
+                    for ((profile, ms) in sourceResults.filter { it.second > 0L }.sortedBy { it.second }) {
+                        if (keptGuids.size + added >= maxHealthy) break
+                        if (profile.configType.isComplexType()) continue
+                        if (!existing.add(profile.duplicateIdentity())) continue
+                        val newGuid = com.v2ray.ang.handler.MmkvManager.encodeServerConfig(
+                            "",
+                            profile.copy(
+                                subscriptionId = healthy.guid,
+                                addedTime = System.currentTimeMillis()
+                            )
+                        )
+                        com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(newGuid, ms)
+                        added++
+                    }
+
+                    dataSource.sortByTestResultsForSub(healthy.guid)
+                    "Healthy: -$removed dead, +$added new, total ${keptGuids.size + added}"
+                }
+
+                cacheMutex.withLock { groupDataCache.clear() }
+                setupGroupTab(forceRefresh = true)
+                toast(summary)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Healthy refresh failed", e)
+                toastError(R.string.toast_failure)
+            }
+        }
+    }
+
+    private suspend fun testGroupAndWait(groupId: String) {
+        val guids = withContext(ioDispatcher) { dataSource.getServerGuidList(groupId) }
+        if (guids.isEmpty()) return
+        withContext(ioDispatcher) { dataSource.clearAllTestDelayResults(guids) }
+        val request = testRequests.beginBulk(groupId)
+        _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
+        dataSource.sendMsg2TestService(
+            TestServiceMessage(
+                key = AppConfig.MSG_MEASURE_CONFIG_START,
+                subscriptionId = groupId,
+                serverGuids = emptyList(),
+                onlyTcp = false
+            ),
+            request.id
+        )
+        var waited = 0
+        while (testRequests.bulk?.id == request.id && waited < 600) { // up to 5 minutes
+            delay(500)
+            waited++
+        }
+        delay(500)
+    }
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
         if (!running || clearTestingText) testRequests.invalidateCurrent()
