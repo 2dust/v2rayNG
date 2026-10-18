@@ -1,0 +1,39 @@
+name: Gozar Step 5 - Full identity migration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Check required branch
+        shell: bash
+        run: |
+          test "${{ github.ref_name }}" = "feature/gozar-webview-integration" || { echo "Run only on feature/gozar-webview-integration"; exit 1; }
+      - name: Repackage app first-party source
+        run: python3 .github/scripts/gozar_full_identity.py
+      - name: Check change consistency
+        run: |
+          git diff --check
+          git status --short
+          grep -F 'namespace = "com.gozar.vpn"' V2rayNG/app/build.gradle.kts
+          grep -F 'applicationId = "com.gozar.vpn"' V2rayNG/app/build.gradle.kts
+          test -f V2rayNG/app/src/main/java/com/gozar/vpn/ui/main/MainActivity.kt
+          test ! -d V2rayNG/app/src/main/java/com/v2ray/ang
+      - name: Commit identity migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A V2rayNG/app
+          if ! git diff --cached --quiet; then
+            git commit -m 'Migrate Gozar Android first-party Kotlin namespace and paths'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
