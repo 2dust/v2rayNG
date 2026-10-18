@@ -1824,7 +1824,7 @@ click('#mRestart',function(){
       window.GozarAndroid.stopVpn();
       toast(t('m_rest'),'warn');
       const c=activeCfg();
-      if(c) setTimeout(function(){ try{ if(window.GozarAndroid.setVpnParams) window.GozarAndroid.setVpnParams(vpnOut()); window.GozarAndroid.startVpn(xrayOut(c)); }catch(e){} },900);
+      if(c) setTimeout(function(){ try{ if(window.GozarAndroid.setVpnParams) window.GozarAndroid.setVpnParams(vpnOut()); window.GozarAndroid.startVpn(/^(vless|vmess|trojan|ss):\/\//i.test(String(c.raw||''))?c.raw:xrayOut(c)); }catch(e){} },900);
     }catch(e){ toast(t('m_rester'),'err'); }
   } else toast(t('m_restbr'),'warn');
 });
@@ -2925,12 +2925,14 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
     if(status==='error'){
       vpnOn=false;
       let msg='خطا در راه‌اندازی VPN';
-      try{ if(B.coreLog) msg=B.coreLog()||msg; }catch(e){}
+      try{ if(B.connectionError) msg=B.connectionError()||msg; }catch(e){}
       showError(msg); return;
     }
     if(status==='off' && session.mode==='busy' && Date.now()-lastStartAt>7000){
-      vpnOn=false; session.reason='اتصال شروع نشد؛ کانفیگ را بررسی و دوباره تلاش کن.';
-      setMode('err'); stopPulseLoop(); setProgress(0);
+      vpnOn=false;
+      let msg='سرویس VPN شروع نشد. مجوز VPN و لاگ هسته را بررسی کن.';
+      try{ if(B.connectionError) msg=B.connectionError()||msg; }catch(_){}
+      showError(msg);
     }else if(status==='off' && vpnOn){ setVpn(false); }
   }
   setInterval(pollStatus,700);
@@ -2942,15 +2944,20 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
     if(vpnOn){ try{ B.stopVpn(); toast('در حال قطع اتصال…'); }catch(err){ showError('قطع اتصال ناموفق بود: '+err.message); } return; }
     const c=activeCfg();
     if(!c){ toast('هنوز سروری اضافه نشده؛ از «افزودن کانفیگ» لینک یا اشتراک معتبر وارد کن.','warn'); return; }
-    const json=xrayOut(c);
-    if(!json){ toast('این پروتکل در نسخهٔ فعلی پشتیبانی نمی‌شود؛ VLESS، VMess، Trojan یا Shadowsocks را انتخاب کن.','warn'); return; }
+    const raw=String(c.raw||'').trim();
+    const nativeInput=/^(vless|vmess|trojan|ss):\/\//i.test(raw) ? raw : xrayOut(c);
+    if(!nativeInput){ toast('این پروتکل در نسخهٔ فعلی پشتیبانی نمی‌شود؛ VLESS، VMess، Trojan یا Shadowsocks را انتخاب کن.','warn'); return; }
     lastStartAt=Date.now(); lastError=''; errorShown=false;
     session.reason='در حال درخواست مجوز و راه‌اندازی VPN…'; setMode('busy'); setProgress(0.15); startPulseLoop(900);
     pushParams();
     try{
-      const res=B.startVpn(json);
+      const res=B.startVpn(nativeInput);
       if(res==='ask') toast('در پنجرهٔ اندروید، اجازهٔ اتصال VPN را تأیید کن.','warn');
-      else if(res==='invalid'){ showError('کانفیگ خالی یا نامعتبر است.'); }
+      else if(res==='invalid'){
+        let why='کانفیگ توسط موتور اندروید پذیرفته نشد.';
+        try{ if(B.connectionError) why=B.connectionError()||why; }catch(_){}
+        showError(why);
+      }
       else if(res==='not_ready'){ showError('هستهٔ VPN آماده نیست.'); }
       else toast('درخواست اتصال ارسال شد؛ وضعیت در حال بررسی است.');
     }catch(err){ showError('ارسال درخواست اتصال ناموفق بود: '+(err&&err.message?err.message:String(err))); }
@@ -2958,8 +2965,9 @@ ringEl.addEventListener('keydown',function(e){ if(e.key==='Enter') ringEl.click(
   setTimeout(function(){
     try{
       if(typeof settings!=='undefined'&&settings.core&&settings.core.autoConn&&B.vpnStatus()!=='on'){
-        const c=activeCfg(), json=c&&xrayOut(c);
-        if(json){ lastStartAt=Date.now(); setMode('busy'); pushParams(); B.startVpn(json); }
+        const c=activeCfg(), raw=c&&String(c.raw||'').trim();
+        const nativeInput=(raw&&/^(vless|vmess|trojan|ss):\/\//i.test(raw)) ? raw : (c&&xrayOut(c));
+        if(nativeInput){ lastStartAt=Date.now(); setMode('busy'); pushParams(); B.startVpn(nativeInput); }
       }
     }catch(e){ showError('اتصال خودکار ناموفق بود.'); }
   },1500);

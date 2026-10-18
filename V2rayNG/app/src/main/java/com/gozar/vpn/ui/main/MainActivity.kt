@@ -311,7 +311,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 )
 
                 if (result.first <= 0) {
-                    lastBridgeError = "کانفیگ قابل واردکردن نیست."
+                    lastBridgeError = "لینک کانفیگ در موتور اندروید قابل واردکردن نیست."
                     return "invalid"
                 }
 
@@ -373,6 +373,10 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             }
         }
+
+        /** Return a connection-start error to the app UI, without exposing config contents. */
+        @JavascriptInterface
+        fun connectionError(): String = lastBridgeError.take(240)
 
         @JavascriptInterface
         fun vpnStatus(): String {
