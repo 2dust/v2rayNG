@@ -1,0 +1,28 @@
+name: Gozar Step 4 - MMKV ZIP backup
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Connect native backup screen to Gozar WebView
+        run: python3 .github/scripts/gozar_step4_mmkv_bridge.py
+      - name: Validate patch
+        run: |
+          git diff --check
+          git diff --stat
+      - name: Commit source changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add V2rayNG/app/src/main/java/com/v2ray/ang/ui/main/MainActivity.kt V2rayNG/app/src/main/assets/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Expose native MMKV ZIP backup and restore from Gozar UI'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
