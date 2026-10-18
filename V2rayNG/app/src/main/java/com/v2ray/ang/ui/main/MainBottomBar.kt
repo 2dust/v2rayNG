@@ -27,6 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
@@ -50,10 +58,21 @@ fun MainBottomBar(
 ) {
     val scope = rememberCoroutineScope()
     val rotationAnim = remember { Animatable(0f) }
+    // TV / D-pad support: give the start/stop FAB initial focus so remote
+    // users can toggle the VPN with DPAD_CENTER without a mouse.
+    // Retry briefly: the first request can run before the node is attached.
+    val fabFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(isRunning) {
         if (!isRunning) {
             rotationAnim.snapTo(0f)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        repeat(20) {
+            if (fabFocusRequester.requestFocus()) return@LaunchedEffect
+            kotlinx.coroutines.delay(100)
         }
     }
 
@@ -63,6 +82,18 @@ fun MainBottomBar(
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
                 .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
+                // TV / D-pad: the FAB floats above-right of this bar and 2D
+                // focus search skips it, trapping D-pad users here. Route
+                // DPAD_DOWN explicitly to the start/stop FAB, both via
+                // focus order and via a direct key handler as fallback.
+                .focusProperties { down = fabFocusRequester }
+                .onPreviewKeyEvent { event ->
+                    if (event.key == Key.DirectionDown && event.type == KeyEventType.KeyDown) {
+                        fabFocusRequester.requestFocus()
+                    } else {
+                        false
+                    }
+                }
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             AppDivider()
@@ -99,7 +130,8 @@ fun MainBottomBar(
                 .align(Alignment.TopEnd)
                 .padding(end = 24.dp)
                 .offset(y = (-28).dp)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .focusRequester(fabFocusRequester),
             containerColor = if (isRunning) colorFabActive
             else if (isDarkTheme) colorFabInactiveDark
             else colorFabInactiveLight
