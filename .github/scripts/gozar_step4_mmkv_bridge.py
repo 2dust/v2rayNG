@@ -4,7 +4,7 @@ No package ID, VPN core, or storage schema modifications.
 """
 from pathlib import Path
 
-root = Path(__file__).resolve().parents[3]
+root = Path(__file__).resolve().parents[2]
 main = root / 'V2rayNG/app/src/main/java/com/v2ray/ang/ui/main/MainActivity.kt'
 html = root / 'V2rayNG/app/src/main/assets/index.html'
 
