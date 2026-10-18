@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">Kết nối ngay</string>
     <string name="app_tile_name">Kết nối ngay</string>
-    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào v2rayNG để sử dụng!</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào Gozar để sử dụng!</string>
     <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
     <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
     <string name="migration_success">Đã chuyển dữ liệu!</string>
@@ -14,20 +14,20 @@
     <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Dịch vụ v2rayNG</string>
+    <string name="notification_channel_service">Dịch vụ Gozar</string>
     <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
     <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
-    <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
-    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
+    <string name="notification_action_stop_v2ray">Ngắt kết nối Gozar</string>
+    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho Gozar. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
     <string name="notification_action_more">Nhấn để biết thêm…</string>
-    <string name="toast_services_start">Đang khởi động v2rayNG…</string>
-    <string name="toast_services_stop">Đã dừng v2rayNG!</string>
-    <string name="toast_services_success">Đã khởi động v2rayNG!</string>
-    <string name="toast_services_failure">Không thể khởi động v2rayNG, kiểm tra lại cấu hình!</string>
+    <string name="toast_services_start">Đang khởi động Gozar…</string>
+    <string name="toast_services_stop">Đã dừng Gozar!</string>
+    <string name="toast_services_success">Đã khởi động Gozar!</string>
+    <string name="toast_services_failure">Không thể khởi động Gozar, kiểm tra lại cấu hình!</string>
 
     <!--ServerActivity-->
-    <string name="title_server">v2rayNG</string>
+    <string name="title_server">Gozar</string>
     <string name="menu_item_add_config">Thêm cấu hình</string>
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_edit_config">Chỉnh sửa cấu hình</string>
@@ -366,7 +366,7 @@
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
     <string name="title_locate_selected_config">Tìm cấu hình đã chọn</string>
 
-    <string name="tasker_start_service">Khởi động v2rayNG</string>
+    <string name="tasker_start_service">Khởi động Gozar</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <!-- RoutingSettingActivity -->

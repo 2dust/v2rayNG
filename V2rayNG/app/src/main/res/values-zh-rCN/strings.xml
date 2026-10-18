@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
     <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG 服务</string>
+    <string name="notification_channel_service">Gozar 服务</string>
     <string name="notification_channel_subscription_updates">订阅更新</string>
     <string name="notification_channel_connection_checks">连接检查</string>
     <string name="notification_action_stop_v2ray">停止</string>

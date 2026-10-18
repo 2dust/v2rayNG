@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">خدمة v2rayNG</string>
+    <string name="notification_channel_service">خدمة Gozar</string>
     <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
     <string name="notification_channel_connection_checks">فحوص الاتصال</string>
     <string name="notification_action_stop_v2ray">إيقاف</string>

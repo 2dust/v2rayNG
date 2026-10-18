@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
     <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">سرویس v2rayNG</string>
+    <string name="notification_channel_service">سرویس Gozar</string>
     <string name="notification_channel_subscription_updates">ورۊ کردن اشتراکا</string>
     <string name="notification_channel_connection_checks">واجۊری منپیز</string>
     <string name="notification_action_stop_v2ray">واڌاشتن</string>

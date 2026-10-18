@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
-    <string name="app_widget_name">v2rayNG</string>
-    <string name="app_tile_name">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
+    <string name="app_widget_name">Gozar</string>
+    <string name="app_tile_name">Gozar</string>
     <string name="app_tile_first_use">Добавьте профиль в приложении перед использованием этой функции.</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Служба v2rayNG</string>
+    <string name="notification_channel_service">Служба Gozar</string>
     <string name="notification_channel_subscription_updates">Обновления подписок</string>
     <string name="notification_channel_connection_checks">Проверки соединения</string>
     <string name="notification_action_stop_v2ray">Остановить</string>

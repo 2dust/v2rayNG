@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">Keçid</string>
     <string name="app_tile_name">Keçid</string>
     <string name="app_tile_first_use">Bu funksiyanı istifadə etməzdən əvvəl tətbiqə profil əlavə edin.</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Yeniləmək üçün aşağı çəkin!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG xidməti</string>
+    <string name="notification_channel_service">Gozar xidməti</string>
     <string name="notification_channel_subscription_updates">Abunəlik yenilənmələri</string>
     <string name="notification_channel_connection_checks">Bağlantı yoxlamaları</string>
     <string name="notification_action_stop_v2ray">Dayandır</string>

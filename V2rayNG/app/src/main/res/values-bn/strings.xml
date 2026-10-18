@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">v2rayNG</string>
+    <string name="app_name" translatable="false">Gozar</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>
     <string name="app_tile_first_use">এই ফিচারটি প্রথম ব্যবহার করা হচ্ছে, সার্ভার যোগ করতে অ্যাপটি ব্যবহার করুন</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">v2rayNG সার্ভিস</string>
+    <string name="notification_channel_service">Gozar সার্ভিস</string>
     <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
     <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
