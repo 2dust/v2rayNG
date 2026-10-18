@@ -1,0 +1,28 @@
+name: Gozar Step 4A - Migration preparation
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Add migration backup support
+        run: python3 .github/scripts/gozar_migration_prepare.py
+      - name: Check patch scope
+        run: |
+          git diff --check
+          git diff --stat
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add V2rayNG/app/src/main/java/com/v2ray/ang/ui/main/MainActivity.kt V2rayNG/app/src/main/assets/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Prepare migration backup for Gozar WebView data'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
