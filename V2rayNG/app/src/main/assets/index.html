@@ -670,6 +670,8 @@
           <div class="sg-title" data-i18n="sg_bk"></div>
           <div class="srow"><div class="st"><b data-i18n="bk_exp"></b><small data-i18n="bk_exp_s"></small></div>
             <button class="btn" id="bkExport"><i data-lucide="download"></i><span data-i18n="bk_get"></span></button></div>
+          <div class="srow"><div class="st"><b>پشتیبان‌گیری کامل اندروید (ZIP)</b><small>انتقال کانفیگ‌ها و تنظیمات بومی؛ فایل محرمانه است</small></div>
+            <button class="btn" id="bkNativeZip" type="button"><i data-lucide="archive"></i>باز کردن</button></div>
           <div class="srow"><div class="st"><b data-i18n="bk_copy"></b><small data-i18n="bk_copy_s"></small></div>
             <button class="btn" id="bkCopy"><i data-lucide="copy"></i><span data-i18n="bk_cp"></span></button></div>
           <div class="srow"><div class="st"><b data-i18n="bk_imp"></b><small data-i18n="bk_imp_s"></small></div>
@@ -2160,6 +2162,12 @@ click('#bkExport',function(){
 });
 window.addEventListener('gozar-migration-export',function(e){
   toast(e.detail&&e.detail.ok?'فایل پشتیبان ذخیره شد':'ذخیره فایل لغو شد یا ناموفق بود',e.detail&&e.detail.ok?'ok':'warn');
+});
+click('#bkNativeZip',function(){
+  if(!(window.GozarAndroid && typeof GozarAndroid.openNativeBackup === 'function')) {
+    toast('پشتیبان ZIP فقط در برنامه اندروید در دسترس است','warn'); return;
+  }
+  GozarAndroid.openNativeBackup();
 });
 click('#bkCopy',function(){
   if(!state.configs.length){ toast(t('m_gempty'),'warn'); return; }

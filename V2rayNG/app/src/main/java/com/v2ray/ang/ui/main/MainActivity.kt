@@ -1,6 +1,8 @@
 package com.v2ray.ang.ui.main
 
 import android.Manifest
+import android.content.Intent
+import com.v2ray.ang.ui.backup.BackupActivity
 import android.content.ClipboardManager
 import android.content.pm.PackageManager
 import android.net.VpnService
@@ -238,6 +240,19 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private inner class GozarBridge {
+
+        /** Open the app's existing ZIP/MMKV export/restore screen, on UI thread. */
+        @JavascriptInterface
+        fun openNativeBackup(): String {
+            runOnUiThread {
+                try {
+                    startActivity(Intent(this@MainActivity, BackupActivity::class.java))
+                } catch (_: Exception) {
+                    // A missing native screen must not disturb the running VPN.
+                }
+            }
+            return "pending"
+        }
 
         /** Export the WebView backup using Android's system document picker. */
         @JavascriptInterface
