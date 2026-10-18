@@ -82,6 +82,27 @@ class MainActivity : HelperBaseComponentActivity() {
             callback?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
         }
 
+    // Gozar one-time migration: SAF keeps credentials in a user-selected local file.
+    private var pendingMigrationJson: String? = null
+    private val exportMigrationDocument =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            var saved = false
+            val payload = pendingMigrationJson
+            pendingMigrationJson = null
+            if (uri != null && payload != null) {
+                saved = try {
+                    contentResolver.openOutputStream(uri)?.use { stream ->
+                        stream.write(payload.toByteArray(Charsets.UTF_8))
+                        stream.flush()
+                    } != null
+                } catch (_: Exception) { false }
+            }
+            gozarWebView?.evaluateJavascript(
+                "window.dispatchEvent(new CustomEvent('gozar-migration-export'," +
+                    "{detail:{ok:" + saved.toString() + "}}))", null
+            )
+        }
+
     private val requestCameraPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             val request = pendingCameraRequest
@@ -131,7 +152,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     settings.domStorageEnabled = true
                     settings.mediaPlaybackRequiresUserGesture = false
                     settings.allowFileAccess = true
-                    settings.allowContentAccess = false
+                    settings.allowContentAccess = true
                     settings.allowFileAccessFromFileURLs = false
                     settings.allowUniversalAccessFromFileURLs = false
 
@@ -217,6 +238,23 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private inner class GozarBridge {
+
+        /** Export the WebView backup using Android's system document picker. */
+        @JavascriptInterface
+        fun saveMigrationBackup(json: String?): String {
+            if (json.isNullOrBlank() || json.length > 5_000_000) return "invalid"
+            return try {
+                val data = JSONObject(json)
+                if (data.optString("app") != "gozar" ||
+                    data.optInt("migrationVersion") != 1 ||
+                    !data.has("storage")) return "invalid"
+                runOnUiThread {
+                    pendingMigrationJson = json
+                    exportMigrationDocument.launch("Gozar-migration-backup.json")
+                }
+                "pending"
+            } catch (_: Exception) { "invalid" }
+        }
 
         /** Read clipboard only when the user explicitly taps the import option. */
         @JavascriptInterface
