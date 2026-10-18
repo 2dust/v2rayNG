@@ -1,0 +1,31 @@
+name: Gozar Step 4B - New package ID
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+      - name: Verify migration and apply new application ID
+        run: python3 .github/scripts/gozar_step4b_package.py
+      - name: Verify narrow change set
+        run: |
+          git diff --check
+          git diff -- V2rayNG/app/build.gradle.kts
+          if [ -n "$(git diff --name-only | grep -v '^V2rayNG/app/build.gradle.kts$')" ]; then
+            echo 'Unexpected modified file'; exit 1
+          fi
+      - name: Commit package ID change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add V2rayNG/app/build.gradle.kts
+          if ! git diff --cached --quiet; then
+            git commit -m 'Use Gozar app ID for migration pilot'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
