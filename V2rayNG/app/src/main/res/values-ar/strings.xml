@@ -568,5 +568,8 @@
     <string name="tasker_blurb_stop">إيقاف %1$s</string>
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
+    <string name="sub_info_open_support">فتح رابط الدعم</string>
+    <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
+    <string name="sub_info_unlimited">غير محدود</string>
 
 </resources>

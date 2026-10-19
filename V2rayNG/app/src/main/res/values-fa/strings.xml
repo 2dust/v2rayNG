@@ -560,5 +560,8 @@
     <string name="tasker_blurb_stop">توقف %1$s</string>
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
+    <string name="sub_info_open_support">باز کردن لینک پشتیبانی</string>
+    <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
+    <string name="sub_info_unlimited">نامحدود</string>
 
 </resources>

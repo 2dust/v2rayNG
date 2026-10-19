@@ -558,5 +558,8 @@
     <string name="tasker_blurb_stop">停止 %1$s</string>
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
+    <string name="sub_info_open_support">打开支持链接</string>
+    <string name="sub_info_open_page">打开订阅信息页面</string>
+    <string name="sub_info_unlimited">无限制</string>
 
 </resources>

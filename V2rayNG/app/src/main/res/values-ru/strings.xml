@@ -564,5 +564,8 @@
     <string name="tasker_blurb_stop">Остановить %1$s</string>
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
+    <string name="sub_info_open_support">Открыть ссылку поддержки</string>
+    <string name="sub_info_open_page">Открыть страницу подписки</string>
+    <string name="sub_info_unlimited">Без ограничений</string>
 
 </resources>

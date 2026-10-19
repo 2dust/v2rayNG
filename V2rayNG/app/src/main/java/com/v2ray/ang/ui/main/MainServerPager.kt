@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
@@ -76,6 +77,9 @@ fun GroupPagerPage(
     onShareServer: (String, ProfileItem) -> Unit,
     onMoreServer: (String, ProfileItem) -> Unit,
     onRemoveServer: (String, String) -> Unit,
+    usageInfo: SubscriptionUsageInfo?,
+    groupTitle: String,
+    onOpenLink: (String) -> Unit,
     contentPadding: PaddingValues
 ) {
     val groupStateFlow = remember(groupId) {
@@ -98,22 +102,35 @@ fun GroupPagerPage(
             remove = onRemoveServer,
         )
     }
-    ServerListPage(
-        rows = groupState.rows,
-        selectedGuid = selectedGuid,
-        locateTarget = locateTarget?.takeIf { it.groupId == groupId },
-        canReorder = canReorder,
-        doubleColumnDisplay = doubleColumnDisplay,
-        groupId = groupId,
-        lazyListStates = lazyListStates,
-        lazyGridStates = lazyGridStates,
-        actions = actions,
-        onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
-        onMoveServer = { fromIndex, toIndex ->
-            mainViewModel.moveServer(groupId, fromIndex, toIndex)
-        },
-        contentPadding = contentPadding
-    )
+    Column(Modifier.fillMaxSize()) {
+        // Kept outside the lazy list so the box stays fixed while the servers scroll.
+        if (usageInfo != null) {
+            SubscriptionInfoCard(
+                info = usageInfo,
+                fallbackTitle = groupTitle,
+                onOpenLink = onOpenLink,
+                onRefresh = { mainViewModel.onAction(MainAction.UpdateGroupSubscription(groupId)) }
+            )
+        }
+        Box(Modifier.weight(1f)) {
+            ServerListPage(
+                rows = groupState.rows,
+                selectedGuid = selectedGuid,
+                locateTarget = locateTarget?.takeIf { it.groupId == groupId },
+                canReorder = canReorder,
+                doubleColumnDisplay = doubleColumnDisplay,
+                groupId = groupId,
+                lazyListStates = lazyListStates,
+                lazyGridStates = lazyGridStates,
+                actions = actions,
+                onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
+                onMoveServer = { fromIndex, toIndex ->
+                    mainViewModel.moveServer(groupId, fromIndex, toIndex)
+                },
+                contentPadding = contentPadding
+            )
+        }
+    }
 }
 
 private class ServerRowActions(

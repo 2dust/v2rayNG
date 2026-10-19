@@ -560,5 +560,8 @@
     <string name="tasker_blurb_stop">%1$s বন্ধ করুন</string>
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
+    <string name="sub_info_open_support">সাপোর্ট লিঙ্ক খুলুন</string>
+    <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
+    <string name="sub_info_unlimited">সীমাহীন</string>
 
 </resources>
