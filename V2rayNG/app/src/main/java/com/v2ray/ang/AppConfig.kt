@@ -277,6 +277,9 @@ object AppConfig {
     const val TLS = "tls"
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
+    const val XDRIVE_SERVICE_GOOGLE_DRIVE = "google-drive"
+    const val XDRIVE_SERVICE_YANDEX_DISK = "yandex-disk"
+    const val XDRIVE_SERVICE_TEMPLATE = "template"
 
     const val UNIDENTIFIED_PACKAGE = "__unknown_app__"
 

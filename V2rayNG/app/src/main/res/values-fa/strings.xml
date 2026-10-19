@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
     <string name="server_lab_final_mask">JSON خام finalMask، قالب: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">سرویس XDRIVE</string>
+    <string name="server_lab_xdrive_folder">پوشه راه دور XDRIVE (شناسه پوشه Google Drive یا نام پوشه)</string>
+    <string name="server_lab_xdrive_secrets_google">کلیدهای مخفی، جدا شده با ویرگول: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">کلیدهای مخفی، جدا شده با ویرگول: نام کاربری, رمز برنامه</string>
+    <string name="server_lab_xdrive_secrets">کلیدهای مخفی، جدا شده با ویرگول: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">خام JSON XDRIVE Extra، قالب: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE به رمزنگاری VLESS نیاز دارد (نه none)</string>
+    <string name="toast_xdrive_flow">XDRIVE از flow پشتیبانی نمی‌کند</string>
+    <string name="toast_xdrive_secrets">تعداد کلیدهای مخفی XDRIVE برای سرویس انتخاب‌شده نادرست است</string>
+    <string name="toast_xdrive_template">سرویس template به شیء template در XDRIVE Extra نیاز دارد</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تأیید گواهی همتا بر اساس نام</string>
     <string name="server_lab_pinned_ca256">اثر انگشت گواهی (SHA-256)</string>

@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">Chế độ XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON thô của XHTTP Extra, định dạng: { XHTTPObject }</string>
     <string name="server_lab_final_mask">JSON thô của finalMask, định dạng: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">Dịch vụ XDRIVE</string>
+    <string name="server_lab_xdrive_folder">Thư mục từ xa XDRIVE (ID thư mục Google Drive hoặc tên thư mục)</string>
+    <string name="server_lab_xdrive_secrets_google">Khóa bí mật, cách nhau bằng dấu phẩy: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">Khóa bí mật, cách nhau bằng dấu phẩy: tên đăng nhập, mật khẩu ứng dụng</string>
+    <string name="server_lab_xdrive_secrets">Khóa bí mật, cách nhau bằng dấu phẩy: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">JSON thô của XDRIVE Extra, định dạng: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE yêu cầu mã hóa VLESS (không phải none)</string>
+    <string name="toast_xdrive_flow">XDRIVE không hỗ trợ flow</string>
+    <string name="toast_xdrive_secrets">Số lượng khóa bí mật XDRIVE không đúng với dịch vụ đã chọn</string>
+    <string name="toast_xdrive_template">Dịch vụ template cần đối tượng template trong XDRIVE Extra</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Xác minh chứng chỉ ngang hàng theo tên</string>
     <string name="server_lab_pinned_ca256">Dấu vân tay chứng chỉ (SHA-256)</string>

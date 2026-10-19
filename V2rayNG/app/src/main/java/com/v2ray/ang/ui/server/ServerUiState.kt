@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
@@ -46,6 +47,9 @@ class ServerUiState(
     host: String = "",
     path: String = "",
     xhttpExtra: String = "",
+    xdriveService: String = AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE,
+    xdriveSecrets: String = "",
+    xdriveExtra: String = "",
     finalMask: String = "",
     seed: String = "",
     kcpMtu: String = "",
@@ -95,6 +99,9 @@ class ServerUiState(
     var host by mutableStateOf(host)
     var path by mutableStateOf(path)
     var xhttpExtra by mutableStateOf(xhttpExtra)
+    var xdriveService by mutableStateOf(xdriveService)
+    var xdriveSecrets by mutableStateOf(xdriveSecrets)
+    var xdriveExtra by mutableStateOf(xdriveExtra)
     var finalMask by mutableStateOf(finalMask)
     var seed by mutableStateOf(seed)
     var kcpMtu by mutableStateOf(kcpMtu)
@@ -126,6 +133,7 @@ class ServerUiState(
         val isSocksOrHttp = configType == EConfigType.SOCKS || configType == EConfigType.HTTP
         val isWireguard = configType == EConfigType.WIREGUARD
         val isHysteria2 = configType == EConfigType.HYSTERIA2
+        val isXdrive = network == NetworkType.XDRIVE.type
 
         return initialConfig.copy(
             configType = configType,
@@ -165,6 +173,9 @@ class ServerUiState(
             host = host,
             path = path,
             xhttpExtra = xhttpExtra.nullIfBlank(),
+            xdriveService = if (isXdrive) xdriveService.nullIfBlank() else null,
+            xdriveSecrets = if (isXdrive) xdriveSecrets.nullIfBlank() else null,
+            xdriveExtra = if (isXdrive) xdriveExtra.nullIfBlank() else null,
             finalMask = finalMask.nullIfBlank(),
             seed = seed.nullIfBlank(),
             kcpMtu = kcpMtu.toIntOrNull(),
@@ -223,6 +234,9 @@ class ServerUiState(
                 host = initialConfig.host ?: "",
                 path = initialConfig.path ?: "",
                 xhttpExtra = initialConfig.xhttpExtra ?: "",
+                xdriveService = initialConfig.xdriveService ?: AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE,
+                xdriveSecrets = initialConfig.xdriveSecrets ?: "",
+                xdriveExtra = initialConfig.xdriveExtra ?: "",
                 finalMask = initialConfig.finalMask ?: "",
                 seed = initialConfig.seed ?: "",
                 kcpMtu = initialConfig.kcpMtu?.toString() ?: "",

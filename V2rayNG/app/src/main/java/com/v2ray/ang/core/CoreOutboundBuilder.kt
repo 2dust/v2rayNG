@@ -44,6 +44,10 @@ object CoreOutboundBuilder {
     /** Applies global outbound options (mux, protocol-specific tweaks, etc.). */
     private fun updateOutboundWithGlobalSettings(outbound: OutboundBean): Boolean {
         try {
+            if (outbound.streamSettings?.network == NetworkType.XDRIVE.type) {
+                applyXdriveMux(outbound)
+                return true
+            }
             var muxEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
             val protocol = outbound.protocol
             if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
@@ -78,6 +82,45 @@ object CoreOutboundBuilder {
         }
         return true
     }
+
+    /** XDRIVE requires mux regardless of the global switch, with no negative concurrency and no xudpProxyUDP443 "skip". */
+    private fun applyXdriveMux(outbound: OutboundBean) {
+        val mux = outbound.mux ?: OutboundBean.MuxBean(true).also { outbound.mux = it }
+        mux.enabled = true
+        mux.concurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY)
+            ?.toIntOrNull()?.takeIf { it >= 0 } ?: 8
+        mux.xudpConcurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY)
+            ?.toIntOrNull()?.takeIf { it >= 0 } ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt()
+        mux.xudpProxyUDP443 = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC)
+            ?.takeIf { it.isNotEmpty() && it != "skip" } ?: "reject"
+    }
+
+    /** Builds the xdriveSettings object: [ProfileItem.xdriveExtra] is the base, typed fields override it. */
+    internal fun buildXdriveSettings(profileItem: ProfileItem): JsonObject {
+        val settings = JsonUtil.parseString(profileItem.xdriveExtra.nullIfBlank()) ?: JsonObject()
+        when (val service = profileItem.xdriveService.nullIfBlank() ?: AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE) {
+            AppConfig.XDRIVE_SERVICE_YANDEX_DISK -> {
+                settings.addProperty("service", AppConfig.XDRIVE_SERVICE_TEMPLATE)
+                if (!settings.has("template")) {
+                    settings.add("template", JsonUtil.parseString(YANDEX_DISK_TEMPLATE))
+                }
+            }
+
+            else -> settings.addProperty("service", service)
+        }
+        settings.addProperty("remoteFolder", profileItem.path.orEmpty().trim())
+        val secrets = JsonArray()
+        parseXdriveSecrets(profileItem.xdriveSecrets).forEach { secrets.add(it) }
+        settings.add("secrets", secrets)
+        return settings
+    }
+
+    internal fun parseXdriveSecrets(secrets: String?): List<String> =
+        secrets.orEmpty().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+    // Yandex Disk over WebDAV, secrets: login, app password. Mirrors yandex_live_test.go in Xray-core.
+    private const val YANDEX_DISK_TEMPLATE =
+        """{"flatten":true,"auth":{"type":"basic","username":"{secret0}","password":"{secret1}"},"put":{"method":"PUT","url":"https://webdav.yandex.ru/{folder}/{name}"},"get":{"method":"GET","url":"https://webdav.yandex.ru/{folder}/{name}"},"delete":{"method":"DELETE","url":"https://webdav.yandex.ru/{folder}/{name}"},"list":{"method":"PROPFIND","url":"https://webdav.yandex.ru/{folder}/","headers":{"Depth":"1"},"namesRegex":"<d:href>[^<]*/([^/<]+)</d:href>"},"retry":{"status":[429,500,502,503]}}"""
 
     /** Creates an initial outbound template for a protocol type. */
     fun createInitOutbound(configType: EConfigType): OutboundBean? {
@@ -532,6 +575,10 @@ object CoreOutboundBuilder {
                 streamSettings.hysteriaSettings = hysteriaSetting
                 streamSettings.finalmask = finalmask
             }
+
+            NetworkType.XDRIVE.type -> {
+                streamSettings.xdriveSettings = buildXdriveSettings(profileItem)
+            }
         }
         finalMask?.let {
             val parsedFinalMask = JsonUtil.parseString(finalMask)
@@ -558,6 +605,8 @@ object CoreOutboundBuilder {
         val allowInsecure = profileItem.insecure == true && profileItem.pinnedCA256.isNullOrEmpty()
         val sni = if (profileItem.sni.isNullOrEmpty()) {
             when {
+                // XDRIVE dials the storage service; the VLESS address is not a TLS peer
+                profileItem.network == NetworkType.XDRIVE.type -> null
                 sniExt.isNotNullEmpty() && Utils.isDomainName(sniExt) -> sniExt
                 profileItem.server.isNotNullEmpty() && Utils.isDomainName(profileItem.server) -> profileItem.server
                 else -> sniExt

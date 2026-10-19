@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">XHTTP মোড</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra-এর কাঁচা JSON, ফরম্যাট: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">XDRIVE পরিষেবা</string>
+    <string name="server_lab_xdrive_folder">XDRIVE রিমোট ফোল্ডার (Google Drive ফোল্ডার ID বা ফোল্ডারের নাম)</string>
+    <string name="server_lab_xdrive_secrets_google">সিক্রেট, কমা দিয়ে আলাদা: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">সিক্রেট, কমা দিয়ে আলাদা: লগইন, অ্যাপ পাসওয়ার্ড</string>
+    <string name="server_lab_xdrive_secrets">সিক্রেট, কমা দিয়ে আলাদা: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">XDRIVE Extra-এর কাঁচা JSON, ফরম্যাট: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE-এর জন্য VLESS এনক্রিপশন প্রয়োজন (none নয়)</string>
+    <string name="toast_xdrive_flow">XDRIVE flow সমর্থন করে না</string>
+    <string name="toast_xdrive_secrets">নির্বাচিত পরিষেবার জন্য XDRIVE সিক্রেটের সংখ্যা ভুল</string>
+    <string name="toast_xdrive_template">template পরিষেবার জন্য XDRIVE Extra-তে template অবজেক্ট প্রয়োজন</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">নাম দিয়ে পিয়ার সার্টিফিকেট যাচাই করুন</string>
     <string name="server_lab_pinned_ca256">সার্টিফিকেট ফিঙ্গারপ্রিন্ট (SHA-256)</string>

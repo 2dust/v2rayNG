@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">XHTTP Rejimi</string>
     <string name="server_lab_xhttp_extra">XHTTP Əlavə xam JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask xam JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">XDRIVE xidməti</string>
+    <string name="server_lab_xdrive_folder">XDRIVE uzaq qovluğu (Google Drive qovluq ID-si və ya qovluq adı)</string>
+    <string name="server_lab_xdrive_secrets_google">Gizli açarlar, vergüllə ayrılmış: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">Gizli açarlar, vergüllə ayrılmış: login, tətbiq parolu</string>
+    <string name="server_lab_xdrive_secrets">Gizli açarlar, vergüllə ayrılmış: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">XDRIVE Əlavə xam JSON, format: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE VLESS şifrələməsi tələb edir (none olmamalıdır)</string>
+    <string name="toast_xdrive_flow">XDRIVE flow dəstəkləmir</string>
+    <string name="toast_xdrive_secrets">Seçilmiş xidmət üçün XDRIVE gizli açarlarının sayı yanlışdır</string>
+    <string name="toast_xdrive_template">template xidməti XDRIVE Extra daxilində template obyekti tələb edir</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Qarşı tərəf sertifikatını ada görə doğrulayın</string>
     <string name="server_lab_pinned_ca256">Sertifikatın barmaq izi (SHA-256)</string>

@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">وضع XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
     <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">خدمة XDRIVE</string>
+    <string name="server_lab_xdrive_folder">المجلد البعيد لـ XDRIVE (معرّف مجلد Google Drive أو اسم المجلد)</string>
+    <string name="server_lab_xdrive_secrets_google">الأسرار مفصولة بفواصل: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">الأسرار مفصولة بفواصل: اسم المستخدم, كلمة مرور التطبيق</string>
+    <string name="server_lab_xdrive_secrets">الأسرار مفصولة بفواصل: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">JSON خام لحقل XDRIVE Extra، بالتنسيق: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">يتطلب XDRIVE تشفير VLESS (ليس none)</string>
+    <string name="toast_xdrive_flow">لا يدعم XDRIVE خاصية flow</string>
+    <string name="toast_xdrive_secrets">عدد أسرار XDRIVE غير صحيح للخدمة المحددة</string>
+    <string name="toast_xdrive_template">تتطلب خدمة template كائن template في XDRIVE Extra</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>
     <string name="server_lab_pinned_ca256">بصمة الشهادة (SHA-256)</string>

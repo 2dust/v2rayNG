@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">XDRIVE service</string>
+    <string name="server_lab_xdrive_folder">XDRIVE remote folder (Google Drive folder ID or folder name)</string>
+    <string name="server_lab_xdrive_secrets_google">Secrets, comma-separated: ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">Secrets, comma-separated: login, app password</string>
+    <string name="server_lab_xdrive_secrets">Secrets, comma-separated: {secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">XDRIVE Extra raw JSON, format: { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE requires VLESS encryption (not none)</string>
+    <string name="toast_xdrive_flow">XDRIVE does not support flow</string>
+    <string name="toast_xdrive_secrets">Wrong number of XDRIVE secrets for the selected service</string>
+    <string name="toast_xdrive_template">The template service requires a template object in XDRIVE Extra</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer certificate by name</string>
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>

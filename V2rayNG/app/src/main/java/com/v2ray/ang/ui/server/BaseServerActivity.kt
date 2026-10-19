@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.R
@@ -84,7 +85,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             streamSecurityOptions = stringArrayResource(R.array.streamsecurityxs).toList(),
             uTlsOptions = stringArrayResource(R.array.streamsecurity_utls).toList(),
             alpnOptions = stringArrayResource(R.array.streamsecurity_alpn).toList(),
-            browserDialerOptions = stringArrayResource(R.array.browser_dialer_mode_value).toList()
+            browserDialerOptions = stringArrayResource(R.array.browser_dialer_mode_value).toList(),
+            xdriveServiceOptions = stringArrayResource(R.array.xdrive_service).toList()
         )
 
     data class FieldOptions(
@@ -96,7 +98,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         val streamSecurityOptions: List<String>,
         val uTlsOptions: List<String>,
         val alpnOptions: List<String>,
-        val browserDialerOptions: List<String>
+        val browserDialerOptions: List<String>,
+        val xdriveServiceOptions: List<String>
     )
 
     @Composable
@@ -171,22 +174,31 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 )
             }
 
-            FormTextField(
-                stringResource(
-                    when (state.network) {
-                        NetworkType.TCP.type,
-                        NetworkType.HTTP_UPGRADE.type,
-                        NetworkType.XHTTP.type,
-                        NetworkType.H2.type -> R.string.server_lab_request_host_http
+            if (state.network == NetworkType.XDRIVE.type) {
+                FormDropdownField(
+                    stringResource(R.string.server_lab_xdrive_service),
+                    state.xdriveService,
+                    options.xdriveServiceOptions,
+                    { state.xdriveService = it }
+                )
+            } else {
+                FormTextField(
+                    stringResource(
+                        when (state.network) {
+                            NetworkType.TCP.type,
+                            NetworkType.HTTP_UPGRADE.type,
+                            NetworkType.XHTTP.type,
+                            NetworkType.H2.type -> R.string.server_lab_request_host_http
 
-                        NetworkType.WS.type -> R.string.server_lab_request_host_ws
-                        NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
-                        else -> R.string.server_lab_request_host6
-                    }
-                ),
-                if (state.network == NetworkType.GRPC.type) state.authority else state.host,
-                { if (state.network == NetworkType.GRPC.type) state.authority = it else state.host = it }
-            )
+                            NetworkType.WS.type -> R.string.server_lab_request_host_ws
+                            NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
+                            else -> R.string.server_lab_request_host6
+                        }
+                    ),
+                    if (state.network == NetworkType.GRPC.type) state.authority else state.host,
+                    { if (state.network == NetworkType.GRPC.type) state.authority = it else state.host = it }
+                )
+            }
 
             if (state.network != NetworkType.KCP.type) {
                 FormTextField(
@@ -197,6 +209,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                             NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
                             NetworkType.H2.type -> R.string.server_lab_path_h2
                             NetworkType.GRPC.type -> R.string.server_lab_path_grpc
+                            NetworkType.XDRIVE.type -> R.string.server_lab_xdrive_folder
                             else -> R.string.server_lab_path
                         }
                     ),
@@ -210,6 +223,24 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     stringResource(R.string.server_lab_xhttp_extra),
                     state.xhttpExtra,
                     { state.xhttpExtra = it }
+                )
+            }
+            if (state.network == NetworkType.XDRIVE.type) {
+                FormTextField(
+                    stringResource(
+                        when (state.xdriveService) {
+                            AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE -> R.string.server_lab_xdrive_secrets_google
+                            AppConfig.XDRIVE_SERVICE_YANDEX_DISK -> R.string.server_lab_xdrive_secrets_yandex
+                            else -> R.string.server_lab_xdrive_secrets
+                        }
+                    ),
+                    state.xdriveSecrets,
+                    { state.xdriveSecrets = it }
+                )
+                FormTextField(
+                    stringResource(R.string.server_lab_xdrive_extra),
+                    state.xdriveExtra,
+                    { state.xdriveExtra = it }
                 )
             }
             if (state.network == NetworkType.KCP.type) {
@@ -413,6 +444,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
             toast(R.string.server_lab_final_mask)
+            return false
+        }
+        xdriveValidationError(config)?.let {
+            toast(it)
             return false
         }
         return true

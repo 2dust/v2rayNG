@@ -131,6 +131,16 @@
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
+    <string name="server_lab_xdrive_service">XDRIVE 服务</string>
+    <string name="server_lab_xdrive_folder">XDRIVE 远程文件夹（Google Drive 文件夹 ID 或文件夹名称）</string>
+    <string name="server_lab_xdrive_secrets_google">密钥，以逗号分隔：ClientID, ClientSecret, RefreshToken</string>
+    <string name="server_lab_xdrive_secrets_yandex">密钥，以逗号分隔：登录名, 应用密码</string>
+    <string name="server_lab_xdrive_secrets">密钥，以逗号分隔：{secret0}, {secret1}, …</string>
+    <string name="server_lab_xdrive_extra">XDRIVE Extra 原始 JSON，格式： { XDriveObject }</string>
+    <string name="toast_xdrive_encryption">XDRIVE 需要 VLESS 加密（不能为 none）</string>
+    <string name="toast_xdrive_flow">XDRIVE 不支持 flow</string>
+    <string name="toast_xdrive_secrets">所选服务的 XDRIVE 密钥数量不正确</string>
+    <string name="toast_xdrive_template">template 服务需要在 XDRIVE Extra 中提供 template 对象</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
     <string name="server_lab_pinned_ca256">证书指纹 (SHA-256)</string>
