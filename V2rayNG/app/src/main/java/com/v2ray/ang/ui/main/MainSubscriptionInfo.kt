@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import com.v2ray.ang.util.Utils
 
 private const val MILLIS_PER_SECOND = 1000L
 private const val EXPIRY_DATE_PATTERN = "yyyy-MM-dd"
+private const val CARD_ALPHA = 0.97f
 
 /** Locale-neutral values the subscription information box renders. */
 internal data class SubscriptionInfoUiModel(
@@ -94,7 +96,9 @@ internal fun SubscriptionInfoCard(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        // Almost opaque: the list scrolls underneath without showing through readably.
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = CARD_ALPHA),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
     ) {
         Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 2.dp, bottom = 10.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
