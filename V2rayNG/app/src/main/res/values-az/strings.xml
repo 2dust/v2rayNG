@@ -357,7 +357,6 @@
     <string name="title_export_config_count">%d konfiqurasiya ixrac edilsin</string>
     <plurals name="title_update_config_count">
         <item quantity="one">%1$d konfiqurasiya yeniləndi</item>
-
         <item quantity="other">%1$d konfiqurasiya yeniləndi</item>
     </plurals>
     <plurals name="title_update_asset_count">
