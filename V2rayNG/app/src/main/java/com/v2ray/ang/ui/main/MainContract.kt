@@ -46,6 +46,8 @@ sealed interface MainAction {
     data object SortByTestResults : MainAction
     data object UpdateSubscriptions : MainAction
     data class UpdateGroupSubscription(val groupId: String) : MainAction
+    data class EditSubscription(val groupId: String) : MainAction
+    data class DeleteSubscription(val groupId: String) : MainAction
     data object ExportAll : MainAction
 
     data object ImportQRcode : MainAction
