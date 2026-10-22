@@ -32,7 +32,6 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
 
     fun checkForUpdates() {
         launchLoading {
-            toast(R.string.update_checking_for_update)
             try {
                 val result = UpdateCheckerManager.checkForUpdate(_checkPreRelease.value)
                 if (result.hasUpdate) {

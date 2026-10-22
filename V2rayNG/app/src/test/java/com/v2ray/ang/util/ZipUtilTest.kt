@@ -1,12 +1,11 @@
 package com.v2ray.ang.util
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertThrows
-import org.junit.Assert.assertTrue
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
@@ -14,13 +13,13 @@ import java.util.zip.ZipOutputStream
 
 class ZipUtilTest {
 
-    @get:Rule
-    val temporaryFolder = TemporaryFolder()
+    @TempDir
+    lateinit var tempDir: File
 
     @Test
     fun unzipToFolderExtractsNestedFile() {
         val archive = createArchive("nested/config" to "value".toByteArray())
-        val destination = File(temporaryFolder.root, "destination")
+        val destination = File(tempDir, "destination")
 
         assertTrue(ZipUtil.unzipToFolder(archive, destination.absolutePath))
         assertEquals("value", File(destination, "nested/config").readText())
@@ -29,7 +28,7 @@ class ZipUtilTest {
     @Test
     fun extractArchiveRejectsPathTraversal() {
         val archive = createArchive("../outside" to "overwrite".toByteArray())
-        val outside = File(temporaryFolder.root, "outside")
+        val outside = File(tempDir, "outside")
 
         assertArchiveRejected(archive)
 
@@ -100,7 +99,7 @@ class ZipUtilTest {
         archive: File,
         limits: ZipUtil.ExtractionLimits = extractionLimits(),
     ) {
-        val destination = File(temporaryFolder.root, "destination")
+        val destination = File(tempDir, "destination")
         assertThrows(ZipException::class.java) {
             ZipUtil.extractArchive(archive, destination, limits)
         }
@@ -108,7 +107,7 @@ class ZipUtilTest {
     }
 
     private fun createArchive(vararg entries: Pair<String, ByteArray>): File {
-        val archive = temporaryFolder.newFile()
+        val archive = File.createTempFile("archive", ".zip", tempDir)
         ZipOutputStream(archive.outputStream()).use { output ->
             entries.forEach { (name, contents) ->
                 output.putNextEntry(ZipEntry(name))
