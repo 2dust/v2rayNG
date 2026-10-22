@@ -386,6 +386,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Import ruleset from QR code</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Export ruleset to clipboard</string>
     <string name="routing_settings_locked">Locked; keep this rule when importing presets</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Locked</string>
+    <string name="acc_routing_rule_blocked">is blocked</string>
+    <string name="acc_routing_rule_routed_through">routed through %1$s</string>
+    <string name="acc_routing_rule_routed_directly">routed directly</string>
+    <string name="acc_routing_rule_enabled">The rule is on</string>
+    <string name="acc_routing_rule_disabled">The rule is off</string>
+    <string name="acc_enable_routing_rule">Enable rule</string>
+    <string name="acc_disable_routing_rule">Disable rule</string>
+    <string name="acc_edit_routing_rule_named">Edit %1$s</string>
+    <string name="acc_delete_routing_rule_named">Delete %1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (Package Name — only supported when using Xray TUN, routeOnly enabled, and Android 10+)</string>
@@ -534,6 +545,11 @@
     <string name="acc_search">Search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
+    <string name="acc_move_to_top">Move to top</string>
+    <string name="acc_move_up">Move up</string>
+    <string name="acc_move_down">Move down</string>
+    <string name="acc_move_to_bottom">Move to bottom</string>
+    <string name="acc_moved">Moved</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
     <string name="acc_share_log">Share log</string>
