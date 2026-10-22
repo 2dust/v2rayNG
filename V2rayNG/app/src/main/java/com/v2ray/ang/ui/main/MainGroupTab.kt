@@ -18,6 +18,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -91,6 +92,7 @@ fun GroupTabBar(
             Row(
                 Modifier
                     .horizontalScroll(rememberScrollState())
+                    .selectableGroup()
                     .padding(TAB_BAR_PADDING)
             ) {
                 EqualOrNaturalTabsLayout(availablePx = availablePx) {
