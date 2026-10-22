@@ -563,5 +563,7 @@
     <string name="sub_info_open_support">সাপোর্ট লিঙ্ক খুলুন</string>
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
+    <string name="title_pref_sub_panel_interval">স্বয়ংক্রিয় আপডেটের ব্যবধান গ্রহণ করুন</string>
+    <string name="summary_pref_sub_panel_interval">চালু করলে সাবস্ক্রিপশনের স্বয়ংক্রিয় আপডেট ও এর সময়ের ব্যবধান সাবস্ক্রিপশন প্রদানকারী নির্ধারণ করবে। বন্ধ থাকলে আগের মতোই সবকিছু আপনি নিজে হাতে ঠিক করবেন।</string>
 
 </resources>

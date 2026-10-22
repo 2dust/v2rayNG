@@ -156,6 +156,7 @@ fun SettingsScreen(
 
     var speedEnabled by rememberMmkvBool(AppConfig.PREF_SPEED_ENABLED, false)
     var confirmRemove by rememberMmkvBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+    var subPanelInterval by rememberMmkvBool(AppConfig.PREF_SUB_PANEL_INTERVAL, false)
     var doubleColumnDisplay by rememberMmkvBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
     var groupAllDisplay by rememberMmkvBool(AppConfig.PREF_GROUP_ALL_DISPLAY, false)
     var language by remember {
@@ -643,6 +644,12 @@ fun SettingsScreen(
                     summary = stringResource(R.string.summary_pref_is_booted),
                     checked = isBooted,
                     onCheckedChange = { isBooted = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_pref_sub_panel_interval),
+                    summary = stringResource(R.string.summary_pref_sub_panel_interval),
+                    checked = subPanelInterval,
+                    onCheckedChange = { subPanelInterval = it }
                 )
                 if (systemVpnSettingsAvailable) {
                     SettingsMenuItem(

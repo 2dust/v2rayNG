@@ -563,5 +563,7 @@
     <string name="sub_info_open_support">باز کردن لینک پشتیبانی</string>
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
+    <string name="title_pref_sub_panel_interval">دریافت بازه به‌روزرسانی خودکار</string>
+    <string name="summary_pref_sub_panel_interval">با فعال کردن این گزینه، به‌روزرسانی خودکار اشتراک و بازهٔ آن توسط ارائه‌دهندهٔ اشتراک تنظیم می‌شود. اگر غیرفعال باشد، همه‌چیز مثل قبل می‌ماند و به‌صورت دستی توسط شما تنظیم می‌شود.</string>
 
 </resources>
