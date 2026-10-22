@@ -164,6 +164,14 @@ class MainViewModel(
             is MainServiceEvent.MeasureConfigSuccess -> {
                 val request = testRequests.bulk?.takeIf { it.id == event.requestId } ?: return
                 queueTestResult(event.result, request)
+                if (autoConnectOnFirstGood &&
+                    !uiState.value.isRunning &&
+                    event.result.delayMillis in 1L..firstGoodMaxDelayMs
+                ) {
+                    autoConnectOnFirstGood = false
+                    toast("Connecting to first fast server...")
+                    connectToServer(event.result.guid)
+                }
             }
 
             is MainServiceEvent.MeasureConfigNotify -> {
@@ -935,6 +943,9 @@ class MainViewModel(
 
         // ---------- Healthy pool refresh ----------
     private var refreshHealthyJob: Job? = null
+        @Volatile
+    private var autoConnectOnFirstGood = false
+    private val firstGoodMaxDelayMs = 1500L
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -965,6 +976,20 @@ class MainViewModel(
                     it.guid != healthy.guid && it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID
                 }
 
+                if (!uiState.value.isRunning) {
+                    val bestGuid = withContext(ioDispatcher) {
+                        dataSource.getServerGuidList(healthy.guid)
+                            .map { it to (dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L) }
+                            .filter { it.second > 0L }
+                            .minByOrNull { it.second }?.first
+                    }
+                    if (bestGuid != null) {
+                        toast("Connecting to best saved server...")
+                        connectToServer(bestGuid)
+                    } else {
+                        autoConnectOnFirstGood = true
+                    }
+                }
                 toast("Updating subscriptions...")
                 withContext(ioDispatcher) { dataSource.updateConfigViaSubAll() }
 
@@ -1027,11 +1052,32 @@ class MainViewModel(
                 cacheMutex.withLock { groupDataCache.clear() }
                 setupGroupTab(forceRefresh = true)
                 toast(summary)
+                
+                val fastestGuid = withContext(ioDispatcher) {
+                    dataSource.getServerGuidList(healthy.guid)
+                        .map { it to (dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L) }
+                        .filter { it.second > 0L }
+                        .minByOrNull { it.second }?.first
+                }
+                if (fastestGuid != null) {
+                    val currentGuid = uiState.value.selectedGuid
+                    val sameServer = withContext(ioDispatcher) {
+                        val best = dataSource.decodeServerConfig(fastestGuid)?.duplicateIdentity()
+                        val current = currentGuid?.let { dataSource.decodeServerConfig(it)?.duplicateIdentity() }
+                        best != null && best == current
+                    }
+                    if (!sameServer || !uiState.value.isRunning) {
+                        toast("Switching to the fastest server...")
+                        connectToServer(fastestGuid)
+                    }
+                }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Healthy refresh failed", e)
                 toastError(R.string.toast_failure)
+            } finally {
+                autoConnectOnFirstGood = false
             }
         }
     }
