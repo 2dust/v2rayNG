@@ -17,6 +17,7 @@
     <string name="notification_channel_service">v2rayNG xidməti</string>
     <string name="notification_channel_subscription_updates">Abunəlik yenilənmələri</string>
     <string name="notification_channel_connection_checks">Bağlantı yoxlamaları</string>
+    <string name="notification_channel_other">Digər bildirişlər</string>
     <string name="notification_action_stop_v2ray">Dayandır</string>
     <string name="toast_permission_denied">İcazə rədd edildi</string>
     <string name="toast_permission_denied_notification">Bildiriş icazəsi rədd edildi</string>
@@ -24,6 +25,7 @@
     <string name="toast_services_start">Xidmət başladılır</string>
     <string name="toast_services_stop">Xidmət dayandırıldı</string>
     <string name="toast_services_success">Xidmət uğurla başladıldı</string>
+    <string name="acc_service_started_connected_to">Xidmət uğurla başladıldı. İndi %1$s serverinə qoşulub.</string>
     <string name="toast_services_failure">Xidməti başlatmaq olmadı</string>
 
     <!--ServerActivity-->
@@ -564,6 +566,4 @@
     <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <string name="notification_channel_other">Digər bildirişlər</string>
-    <string name="acc_service_started_connected_to">Xidmət uğurla başladıldı. İndi %1$s serverinə qoşulub.</string>
 </resources>
