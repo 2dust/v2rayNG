@@ -390,6 +390,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Импорт правил из QR-кода</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Экспорт правил в буфер обмена</string>
     <string name="routing_settings_locked">Постоянное (сохранится при импорте правил)</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Закреплено</string>
+    <string name="acc_routing_rule_blocked">заблокировано</string>
+    <string name="acc_routing_rule_routed_through">маршрутизируется через %1$s</string>
+    <string name="acc_routing_rule_routed_directly">маршрутизируется напрямую</string>
+    <string name="acc_routing_rule_enabled">Правило включено</string>
+    <string name="acc_routing_rule_disabled">Правило выключено</string>
+    <string name="acc_enable_routing_rule">Включить правило</string>
+    <string name="acc_disable_routing_rule">Выключить правило</string>
+    <string name="acc_edit_routing_rule_named">Изменить %1$s</string>
+    <string name="acc_delete_routing_rule_named">Удалить %1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (имя пакета — поддерживается только при использовании Xray TUN, включённой функции «Домен только для маршрутизации (routeOnly)» и Android 10+)</string>
@@ -532,17 +543,6 @@
     <string name="acc_copy_log">Копировать журнал</string>
     <string name="acc_clear_log">Очистить журнал</string>
     <string name="acc_add_rule">Добавить правило маршрутизации</string>
-    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
-    <string name="acc_routing_rule_locked_summary">%1$s. Закреплено</string>
-    <string name="acc_routing_rule_blocked">заблокировано</string>
-    <string name="acc_routing_rule_routed_through">маршрутизируется через %1$s</string>
-    <string name="acc_routing_rule_routed_directly">маршрутизируется напрямую</string>
-    <string name="acc_routing_rule_enabled">Правило включено</string>
-    <string name="acc_routing_rule_disabled">Правило выключено</string>
-    <string name="acc_enable_routing_rule">Включить правило</string>
-    <string name="acc_disable_routing_rule">Выключить правило</string>
-    <string name="acc_edit_routing_rule_named">Изменить %1$s</string>
-    <string name="acc_delete_routing_rule_named">Удалить %1$s</string>
     <string name="acc_start">Запустить службу</string>
     <string name="acc_stop">Остановить службу</string>
     <string name="acc_back">Назад</string>

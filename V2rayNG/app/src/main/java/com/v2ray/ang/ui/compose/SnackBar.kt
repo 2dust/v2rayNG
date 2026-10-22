@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -118,6 +119,10 @@ private data class AppSnackbarVisuals(
     override val withDismissAction: Boolean = false
 ) : SnackbarVisuals
 
+val LocalAppSnackbar = staticCompositionLocalOf<AppSnackbarController> {
+    error("AppSnackbarController not provided. Wrap your content in AppTheme.")
+}
+
 @Composable
 fun rememberAppSnackbarController(): AppSnackbarController {
     val hostState = remember { SnackbarHostState() }
@@ -154,7 +159,7 @@ private const val SnackbarThrottleMs = 2000L
 
 @Composable
 fun AppSnackbarHost(
-    controller: AppSnackbarController,
+    hostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -165,7 +170,7 @@ fun AppSnackbarHost(
         }
 
         SnackbarHost(
-            hostState = controller.hostState,
+            hostState = hostState,
             modifier = Modifier.fillMaxSize()
         ) { data ->
             val type = (data.visuals as? AppSnackbarVisuals)?.type ?: ToastType.NORMAL

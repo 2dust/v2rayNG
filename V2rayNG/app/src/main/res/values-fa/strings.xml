@@ -386,6 +386,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">وارد کردن مجموعه قوانین از کد QR</string>
     <string name="routing_settings_export_rulesets_to_clipboard">صادر کردن مجموعه قوانین به کلیپ بورد</string>
     <string name="routing_settings_locked">قفل است، این قانون را هنگام وارد کردن از پیش تنظیم‌ ها حفظ کنید</string>
+    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s، قفل است</string>
+    <string name="acc_routing_rule_blocked">مسدود است</string>
+    <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>
+    <string name="acc_routing_rule_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
+    <string name="acc_routing_rule_enabled">قانون روشن است</string>
+    <string name="acc_routing_rule_disabled">قانون خاموش است</string>
+    <string name="acc_enable_routing_rule">فعال کردن قانون</string>
+    <string name="acc_disable_routing_rule">غیرفعال کردن قانون</string>
+    <string name="acc_edit_routing_rule_named">ویرایش %1$s</string>
+    <string name="acc_delete_routing_rule_named">حذف %1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (نام بسته — فقط هنگام استفاده از Xray TUN، فعال بودن routeOnly و Android 10+ پشتیبانی می‌شود)</string>
@@ -528,17 +539,6 @@
     <string name="acc_copy_log">کپی گزارش</string>
     <string name="acc_clear_log">پاک کردن گزارش</string>
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
-    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
-    <string name="acc_routing_rule_locked_summary">%1$s، قفل است</string>
-    <string name="acc_routing_rule_blocked">مسدود است</string>
-    <string name="acc_routing_rule_routed_through">از طریق %1$s مسیریابی می‌شود</string>
-    <string name="acc_routing_rule_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
-    <string name="acc_routing_rule_enabled">قانون روشن است</string>
-    <string name="acc_routing_rule_disabled">قانون خاموش است</string>
-    <string name="acc_enable_routing_rule">فعال کردن قانون</string>
-    <string name="acc_disable_routing_rule">غیرفعال کردن قانون</string>
-    <string name="acc_edit_routing_rule_named">ویرایش %1$s</string>
-    <string name="acc_delete_routing_rule_named">حذف %1$s</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
     <string name="acc_back">بازگشت</string>

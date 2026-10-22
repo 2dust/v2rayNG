@@ -384,6 +384,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">从二维码导入规则集</string>
     <string name="routing_settings_export_rulesets_to_clipboard">导出规则集至剪贴板</string>
     <string name="routing_settings_locked">锁定中，导入预设时不删除此规则</string>
+    <string name="acc_routing_rule_summary">%1$s。%2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s。已锁定</string>
+    <string name="acc_routing_rule_blocked">已拦截</string>
+    <string name="acc_routing_rule_routed_through">通过%1$s路由</string>
+    <string name="acc_routing_rule_routed_directly">直接路由</string>
+    <string name="acc_routing_rule_enabled">规则已开启</string>
+    <string name="acc_routing_rule_disabled">规则已关闭</string>
+    <string name="acc_enable_routing_rule">启用规则</string>
+    <string name="acc_disable_routing_rule">禁用规则</string>
+    <string name="acc_edit_routing_rule_named">编辑%1$s</string>
+    <string name="acc_delete_routing_rule_named">删除%1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (包名 — 仅在使用 Xray TUN、开启 routeOnly 且 Android 10+ 时可用)</string>
@@ -526,17 +537,6 @@
     <string name="acc_copy_log">复制日志</string>
     <string name="acc_clear_log">清除日志</string>
     <string name="acc_add_rule">添加路由规则</string>
-    <string name="acc_routing_rule_summary">%1$s。%2$s</string>
-    <string name="acc_routing_rule_locked_summary">%1$s。已锁定</string>
-    <string name="acc_routing_rule_blocked">已拦截</string>
-    <string name="acc_routing_rule_routed_through">通过%1$s路由</string>
-    <string name="acc_routing_rule_routed_directly">直接路由</string>
-    <string name="acc_routing_rule_enabled">规则已开启</string>
-    <string name="acc_routing_rule_disabled">规则已关闭</string>
-    <string name="acc_enable_routing_rule">启用规则</string>
-    <string name="acc_disable_routing_rule">禁用规则</string>
-    <string name="acc_edit_routing_rule_named">编辑%1$s</string>
-    <string name="acc_delete_routing_rule_named">删除%1$s</string>
     <string name="acc_start">启动服务</string>
     <string name="acc_stop">停止服务</string>
     <string name="acc_back">返回</string>

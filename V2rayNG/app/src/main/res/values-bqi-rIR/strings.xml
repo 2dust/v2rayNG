@@ -386,6 +386,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">و من ٱووردن قانووا ز کود QR</string>
     <string name="routing_settings_export_rulesets_to_clipboard">و در کشیڌن قانووا وو زفت کردن من کلیپ بورد</string>
     <string name="routing_settings_locked">چفت هڌ، ای قانووݩ ن مجال و من ٱووردن ز پؽش سامووا زفت کۊنین</string>
+    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s، چفت هڌ</string>
+    <string name="acc_routing_rule_blocked">مسدود هڌ</string>
+    <string name="acc_routing_rule_routed_through">وا %1$s ره اڌه</string>
+    <string name="acc_routing_rule_routed_directly">موستقیم ره اڌه</string>
+    <string name="acc_routing_rule_enabled">ای قانووݩ روشن هڌ</string>
+    <string name="acc_routing_rule_disabled">ای قانووݩ خاموش هڌ</string>
+    <string name="acc_enable_routing_rule">روشن کردن قانووݩ</string>
+    <string name="acc_disable_routing_rule">خاموش کردن قانووݩ</string>
+    <string name="acc_edit_routing_rule_named">آلشتکاری %1$s</string>
+    <string name="acc_delete_routing_rule_named">پاک کردن %1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (نوم بسته — تینا مجال و کار گرؽڌن Xray TUN، ره وسته بیڌن routeOnly وو ٱندروید 10+ لادراری ابۊ)</string>
@@ -528,17 +539,6 @@
     <string name="acc_copy_log">لف گیری گوزارش</string>
     <string name="acc_clear_log">روفتن گوزارش</string>
     <string name="acc_add_rule">ٱووردن قانووݩ</string>
-    <string name="acc_routing_rule_summary">%1$s، %2$s</string>
-    <string name="acc_routing_rule_locked_summary">%1$s، چفت هڌ</string>
-    <string name="acc_routing_rule_blocked">مسدود هڌ</string>
-    <string name="acc_routing_rule_routed_through">وا %1$s ره اڌه</string>
-    <string name="acc_routing_rule_routed_directly">موستقیم ره اڌه</string>
-    <string name="acc_routing_rule_enabled">ای قانووݩ روشن هڌ</string>
-    <string name="acc_routing_rule_disabled">ای قانووݩ خاموش هڌ</string>
-    <string name="acc_enable_routing_rule">روشن کردن قانووݩ</string>
-    <string name="acc_disable_routing_rule">خاموش کردن قانووݩ</string>
-    <string name="acc_edit_routing_rule_named">آلشتکاری %1$s</string>
-    <string name="acc_delete_routing_rule_named">پاک کردن %1$s</string>
     <string name="acc_start">ره وستن سرویس</string>
     <string name="acc_stop">واڌاشتن سرویس</string>
     <string name="acc_back">وورگشتن</string>
