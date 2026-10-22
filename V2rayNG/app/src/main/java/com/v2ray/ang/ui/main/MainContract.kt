@@ -51,6 +51,7 @@ sealed interface MainAction {
     data object RemoveInvalidServers : MainAction
     data object SortByTestResults : MainAction
     data object UpdateSubscriptions : MainAction
+    data class UpdateGroupSubscription(val groupId: String) : MainAction
     data object ExportAll : MainAction
 
     data object ImportQRcode : MainAction
@@ -69,6 +70,7 @@ sealed interface MainAction {
     data class ShareClipboard(val guid: String) : MainAction
     data class ShareFullContent(val guid: String) : MainAction
     data object DismissQRCodeDialog : MainAction
+    data class OpenSubscriptionLink(val url: String) : MainAction
 
     data class ImportBatchConfig(val configText: String) : MainAction
 
