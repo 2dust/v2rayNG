@@ -558,5 +558,8 @@
     <string name="tasker_blurb_stop">Dừng %1$s</string>
     <string name="connection_test_empty_message">không có thông tin chi tiết</string>
     <string name="value_unknown">không xác định</string>
+    <string name="sub_info_open_support">Mở liên kết hỗ trợ</string>
+    <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
+    <string name="sub_info_unlimited">Không giới hạn</string>
 
 </resources>
