@@ -212,7 +212,7 @@
     <string name="summary_pref_route_only_enabled">Təyin edilmiş domen adını yalnız marşrutlaşdırma üçün istifadə edin və hədəf ünvanını IP ünvanı olaraq saxlayın.</string>
 
     <string name="title_pref_local_dns_enabled">Yerli DNS-i aktivləşdir</string>
-    <string name="summary_pref_local_dns_enabled">DNS nüvənin DNS modulu tərəfindən emal olunur LAN və ölkə daxili ünvanları yan keçmək lazımdırsa tövsiyə olunur)</string>
+    <string name="summary_pref_local_dns_enabled">DNS nüvənin DNS modulu tərəfindən emal olunur (LAN və ölkə daxili ünvanları yan keçmək lazımdırsa tövsiyə olunur)</string>
 
     <string name="title_pref_fake_dns_enabled">FakeDNS aktivləşdir</string>
     <string name="summary_pref_fake_dns_enabled">FakeDNS domen sorğuları üçün süni IP ünvanları qaytarır (daha sürətlidir, lakin bəzi tətbiqlərlə işləməyə bilər).</string>
@@ -357,7 +357,6 @@
     <string name="title_export_config_count">%d konfiqurasiya ixrac edilsin</string>
     <plurals name="title_update_config_count">
         <item quantity="one">%1$d konfiqurasiya yeniləndi</item>
-
         <item quantity="other">%1$d konfiqurasiya yeniləndi</item>
     </plurals>
     <plurals name="title_update_asset_count">
