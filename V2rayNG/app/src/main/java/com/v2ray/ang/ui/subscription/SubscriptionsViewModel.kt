@@ -129,6 +129,9 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
                             ),
                         )
                 }
+                if (result.configCount > 0) {
+                    SettingsChangeManager.makeSetupGroupTab()
+                }
                 reload()
             } catch (cancelled: CancellationException) {
                 throw cancelled
