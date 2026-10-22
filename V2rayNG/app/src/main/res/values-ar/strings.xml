@@ -103,7 +103,7 @@
     <string name="server_lab_reserved">Reserved (اختياري، مفصول بفواصل)</string>
     <string name="server_lab_local_address">العنوان المحلي (اختياري IPv4/IPv6، مفصولة بفواصل)</string>
     <string name="server_lab_local_mtu">MTU (اختياري، الافتراضي 1420)</string>
-    <string name="server_lab_remote_dns">remoteDNS (اختياري، عناوين IPv4/IPv6 مفصولة بفواصل، أو "local" لاستخدام DNS الجهاز)</string>
+    <string name="server_lab_remote_dns">remoteDNS (اختياري، عناوين IPv4/IPv6 مفصولة بفواصل)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختياري، الافتراضي 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختياري، الافتراضي 50 مللي ثانية)</string>
     <string name="toast_success">نجاح</string>
@@ -568,5 +568,8 @@
     <string name="tasker_blurb_stop">إيقاف %1$s</string>
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
+    <string name="sub_info_open_support">فتح رابط الدعم</string>
+    <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
+    <string name="sub_info_unlimited">غير محدود</string>
 
 </resources>

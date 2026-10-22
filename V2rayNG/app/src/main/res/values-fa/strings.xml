@@ -103,7 +103,7 @@
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش‌فرض 1420)</string>
-    <string name="server_lab_remote_dns">remoteDNS (اختیاری، آدرس‌های IPv4/IPv6 جدا شده با کاما، یا "local" برای استفاده از DNS دستگاه)</string>
+    <string name="server_lab_remote_dns">remoteDNS (اختیاری، آدرس‌های IPv4/IPv6 جدا شده با کاما)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (اختیاری، پیش‌فرض 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (اختیاری، پیش‌فرض 50 میلی‌ثانیه)</string>
     <string name="toast_success">موفقیت‌آمیز</string>
@@ -560,5 +560,8 @@
     <string name="tasker_blurb_stop">توقف %1$s</string>
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
+    <string name="sub_info_open_support">باز کردن لینک پشتیبانی</string>
+    <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
+    <string name="sub_info_unlimited">نامحدود</string>
 
 </resources>
