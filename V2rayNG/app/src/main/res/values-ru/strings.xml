@@ -106,7 +106,7 @@
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
-    <string name="server_lab_remote_dns">remoteDNS (необязательно, IPv4/IPv6-адреса через запятую, либо "local" для использования локального DNS)</string>
+    <string name="server_lab_remote_dns">remoteDNS (необязательно, IPv4/IPv6-адреса через запятую)</string>
     <string name="server_lab_kcp_mtu">mKCP MTU (необязательно, по умолчанию 1350)</string>
     <string name="server_lab_kcp_tti">mKCP TTI (необязательно, по умолчанию 50 мс)</string>
     <string name="toast_success">Успешно</string>
@@ -567,6 +567,9 @@
     <string name="tasker_blurb_stop">Остановить %1$s</string>
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
+    <string name="sub_info_open_support">Открыть ссылку поддержки</string>
+    <string name="sub_info_open_page">Открыть страницу подписки</string>
+    <string name="sub_info_unlimited">Без ограничений</string>
 
     <string name="title_remote_control">Доступ приложений автоматизации</string>
     <string name="summary_remote_control">Разрешить другим приложениям управлять v2rayNG</string>
