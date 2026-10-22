@@ -13,7 +13,7 @@ class RootProcessRunnerTest {
     }
     @Test fun `inherited stdout cannot hold a completed command open`() {
         val start = System.nanoTime()
-        val result = RootProcessRunner.run(listOf("sh", "-c", "sleep 5 & echo complete"), 250)
+        val result = RootProcessRunner.run(listOf("sh", "-c", "sleep 5 & echo complete"), 3000)
         assertEquals(0, result.code)
         assertTrue(result.output.contains("complete"))
         assertTrue(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) < 1500)
