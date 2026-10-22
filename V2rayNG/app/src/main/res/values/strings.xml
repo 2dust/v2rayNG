@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">Display the profile list in two columns to fit more content on screen.</string>
 
     <string name="title_pref_group_all_display">Show an "All" group tab</string>
+    <string name="acc_settings_group_expanded">%1$s. Group is expanded</string>
+    <string name="acc_settings_group_collapsed">%1$s. Group is collapsed</string>
     <string name="summary_pref_group_all_display">Combine profiles from every subscription group in one tab.</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
+    <string name="acc_toggle_on">On</string>
+    <string name="acc_toggle_off">Off</string>
     <string name="title_pref_ui_mode_night">UI mode settings</string>
     <string name="title_pref_dynamic_color">Enable dynamic color</string>
     <string name="summary_pref_dynamic_color">Only works on Android 12+ devices</string>
@@ -545,8 +549,6 @@
     <string name="acc_turn_torch_off">Turn flashlight off</string>
     <string name="acc_select_image">Select image to scan</string>
     <string name="acc_locked">This rule is kept when importing presets</string>
-    <string name="acc_settings_group_expanded">%1$s. Group is expanded</string>
-    <string name="acc_settings_group_collapsed">%1$s. Group is collapsed</string>
     <string name="acc_open_menu">Open navigation menu</string>
     <string name="acc_edit">Edit</string>
     <string name="acc_delete">Delete</string>
@@ -567,6 +569,4 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
 
-    <string name="acc_toggle_on">On</string>
-    <string name="acc_toggle_off">Off</string>
 </resources>

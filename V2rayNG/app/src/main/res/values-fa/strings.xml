@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">فهرست پروفایل‌ها در دو ستون نمایش داده می‌شود تا محتوای بیشتری در صفحه دیده شود.</string>
 
     <string name="title_pref_group_all_display">نمایش زبانهٔ «همه»</string>
+    <string name="acc_settings_group_expanded">%1$s، گروه باز است</string>
+    <string name="acc_settings_group_collapsed">%1$s، گروه بسته است</string>
     <string name="summary_pref_group_all_display">نمایش پروفایل‌های همهٔ گروه‌های اشتراک در یک زبانه.</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
     <string name="title_pref_dynamic_color">فعال‌سازی رنگ پویا</string>
     <string name="summary_pref_dynamic_color">فقط روی اندروید ۱۲+ کار می‌کند</string>
@@ -545,8 +549,6 @@
     <string name="acc_turn_torch_off">خاموش کردن چراغ‌قوه</string>
     <string name="acc_select_image">انتخاب تصویر برای اسکن</string>
     <string name="acc_locked">این قانون هنگام وارد کردن تنظیمات از پیش تعیین‌شده حفظ می‌شود</string>
-    <string name="acc_settings_group_expanded">%1$s، گروه باز است</string>
-    <string name="acc_settings_group_collapsed">%1$s، گروه بسته است</string>
     <string name="acc_open_menu">باز کردن منوی پیمایش</string>
     <string name="acc_edit">ویرایش</string>
     <string name="acc_delete">حذف</string>
@@ -566,6 +568,4 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
-    <string name="acc_toggle_on">روشن</string>
-    <string name="acc_toggle_off">خاموش</string>
 </resources>

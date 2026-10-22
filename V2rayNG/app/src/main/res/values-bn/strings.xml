@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">প্রোফাইল তালিকা দুই কলামে দেখায়, ফলে পর্দায় আরও বিষয়বস্তু দেখা যায়।</string>
 
     <string name="title_pref_group_all_display">“সব” গ্রুপ ট্যাব দেখান</string>
+    <string name="acc_settings_group_expanded">%1$s। গ্রুপটি প্রসারিত</string>
+    <string name="acc_settings_group_collapsed">%1$s। গ্রুপটি সংকুচিত</string>
     <string name="summary_pref_group_all_display">সব সাবস্ক্রিপশন গ্রুপের কনফিগ একটি ট্যাবে দেখান।</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
     <string name="title_ui_settings">ইউআই সেটিংস</string>
+    <string name="acc_toggle_on">চালু</string>
+    <string name="acc_toggle_off">বন্ধ</string>
     <string name="title_pref_ui_mode_night">ইউআই মোড সেটিংস</string>
     <string name="title_pref_dynamic_color">ডায়নামিক রঙ চালু করুন</string>
     <string name="summary_pref_dynamic_color">শুধুমাত্র Android 12+ ডিভাইসে কাজ করে</string>
@@ -545,8 +549,6 @@
     <string name="acc_turn_torch_off">ফ্ল্যাশলাইট বন্ধ করুন</string>
     <string name="acc_select_image">স্ক্যান করার জন্য ছবি নির্বাচন করুন</string>
     <string name="acc_locked">প্রিসেট আমদানি করলে নিয়মটি রাখা হবে</string>
-    <string name="acc_settings_group_expanded">%1$s। গ্রুপটি প্রসারিত</string>
-    <string name="acc_settings_group_collapsed">%1$s। গ্রুপটি সংকুচিত</string>
     <string name="acc_open_menu">নেভিগেশন মেনু খুলুন</string>
     <string name="acc_edit">সম্পাদনা করুন</string>
     <string name="acc_delete">মুছুন</string>
@@ -566,6 +568,4 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
-    <string name="acc_toggle_on">চালু</string>
-    <string name="acc_toggle_off">বন্ধ</string>
 </resources>

@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">Ekrana daha çox məzmun sığdırmaq üçün profil siyahısını iki sütunda göstərin.</string>
 
     <string name="title_pref_group_all_display">"Hamısı" qrup vərəqini göstər</string>
+    <string name="acc_settings_group_expanded">%1$s. Qrup açılıb</string>
+    <string name="acc_settings_group_collapsed">%1$s. Qrup yığılıb</string>
     <string name="summary_pref_group_all_display">Hər abunəlik qrupundakı profilləri bir vərəqdə birləşdirin.</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">Ətraflı kömək üçün toxunun</string>
     <string name="title_language">Dil</string>
     <string name="title_ui_settings">İstifadəçi interfeysi tənzimləmələri</string>
+    <string name="acc_toggle_on">Aktiv</string>
+    <string name="acc_toggle_off">Deaktiv</string>
     <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejim tənzimləmələri</string>
     <string name="title_pref_dynamic_color">Dinamik rəngi aktivləşdir</string>
     <string name="summary_pref_dynamic_color">Yalnız Android 12+ cihazlarında işləyir</string>
@@ -545,8 +549,6 @@
     <string name="acc_turn_torch_off">Fənəri söndür</string>
     <string name="acc_select_image">Skan etmək üçün şəkil seçin</string>
     <string name="acc_locked">Hazır tənzimləmələri idxal edərkən bu qayda saxlanılır</string>
-    <string name="acc_settings_group_expanded">%1$s. Qrup açılıb</string>
-    <string name="acc_settings_group_collapsed">%1$s. Qrup yığılıb</string>
     <string name="acc_open_menu">Naviqasiya menyusunu açın</string>
     <string name="acc_edit">Düzəliş et</string>
     <string name="acc_delete">Sil</string>
@@ -566,6 +568,4 @@
     <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <string name="acc_toggle_on">Aktiv</string>
-    <string name="acc_toggle_off">Deaktiv</string>
 </resources>
