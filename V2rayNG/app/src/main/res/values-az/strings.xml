@@ -45,6 +45,19 @@
     <string name="menu_item_import_config_manually_trojan">[Trojan] əlavə et</string>
     <string name="menu_item_import_config_manually_wireguard">[WireGuard] əlavə et</string>
     <string name="menu_item_import_config_manually_hysteria2">[Hysteria2] əlavə et</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. %2$d server var</item>
+        <item quantity="other">%1$s. %2$d server var</item>
+    </plurals>
+    <string name="acc_server_test_failed">Bağlantı sınağı uğursuz oldu</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisaniyə</item>
+        <item quantity="other">%1$d millisaniyə</item>
+    </plurals>
+    <string name="acc_share_config_named">%1$s konfiqurasiyasını paylaş</string>
+    <string name="acc_edit_config_named">%1$s konfiqurasiyasını redaktə et</string>
+    <string name="acc_delete_config_named">%1$s konfiqurasiyasını sil</string>
+    <string name="acc_select_server">Seç</string>
     <string name="confirm_delete_visible_profiles">Hazırda göstərilən bütün profilləri silmək istədiyinizə əminsiniz?</string>
     <string name="confirm_delete_duplicate_profiles">Hazırda göstərilən bütün təkrar profilləri silmək istədiyinizə əminsiniz?</string>
     <string name="confirm_delete_invalid_profiles">Zəhmət olmasa əvvəlcə profilləri sınaqdan keçirin. Hazırda göstərilən bütün yararsız profilləri silmək istədiyinizə əminsiniz?</string>
@@ -534,6 +547,11 @@
     <string name="acc_search">Axtar</string>
     <string name="acc_add">Konfiqurasiya əlavə et</string>
     <string name="acc_more">Əlavə seçimlər</string>
+    <string name="acc_move_to_top">Ən yuxarıya köçür</string>
+    <string name="acc_move_up">Yuxarı köçür</string>
+    <string name="acc_move_down">Aşağı köçür</string>
+    <string name="acc_move_to_bottom">Ən aşağıya köçür</string>
+    <string name="acc_moved">Köçürüldü</string>
     <string name="acc_selected_server">Seçildi</string>
     <string name="acc_share_subscription">Abunəlik keçidini paylaş</string>
     <string name="acc_share_log">Jurnalı paylaş</string>
@@ -564,22 +582,4 @@
     <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <plurals name="acc_group_tab">
-        <item quantity="one">%1$s. %2$d server var</item>
-        <item quantity="other">%1$s. %2$d server var</item>
-    </plurals>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d millisaniyə</item>
-        <item quantity="other">%1$d millisaniyə</item>
-    </plurals>
-    <string name="acc_server_test_failed">Bağlantı sınağı uğursuz oldu</string>
-    <string name="acc_share_config_named">%1$s konfiqurasiyasını paylaş</string>
-    <string name="acc_edit_config_named">%1$s konfiqurasiyasını redaktə et</string>
-    <string name="acc_delete_config_named">%1$s konfiqurasiyasını sil</string>
-    <string name="acc_move_to_top">Ən yuxarıya köçür</string>
-    <string name="acc_move_up">Yuxarı köçür</string>
-    <string name="acc_move_down">Aşağı köçür</string>
-    <string name="acc_move_to_bottom">Ən aşağıya köçür</string>
-    <string name="acc_moved">Köçürüldü</string>
-    <string name="acc_select_server">Seç</string>
 </resources>

@@ -26,11 +26,6 @@
     <string name="toast_services_success">ره وستن سرویس وا مووفقیت ٱنجوم وابی</string>
     <string name="toast_services_failure">ره وستن سرویس وا مووفقیت ٱنجوم نوابی</string>
 
-    <plurals name="acc_group_tab">
-        <item quantity="one">%1$s. %2$d سرور منس هڌ</item>
-        <item quantity="other">%1$s. %2$d سرور منس هڌ</item>
-    </plurals>
-
     <!--ServerActivity-->
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">ٱووردن کانفیگ</string>
@@ -50,6 +45,19 @@
     <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ٱووردن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
+    <plurals name="acc_group_tab">
+        <item quantity="one">%1$s. %2$d سرور منس هڌ</item>
+        <item quantity="other">%1$s. %2$d سرور منس هڌ</item>
+    </plurals>
+    <string name="acc_server_test_failed">آزمایش منپیز مووفق نوابی</string>
+    <plurals name="server_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌سانیه</item>
+        <item quantity="other">%1$d میلی‌سانیه</item>
+    </plurals>
+    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
+    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
+    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
+    <string name="acc_select_server">پسند کردن</string>
     <string name="confirm_delete_visible_profiles">پوی کانفیگا ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_duplicate_profiles">پوی کانفیگا تکراری ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_invalid_profiles">ٱول کانفیگا ن آزمایش کۊنین. پوی کانفیگا نا موئتبر ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
@@ -65,14 +73,6 @@
     <string name="server_lab_port">پورت</string>
     <string name="server_lab_id">نوم منتوری</string>
     <string name="server_lab_alterid">شناسه جایگۊزین</string>
-    <string name="acc_server_test_failed">آزمایش منپیز مووفق نوابی</string>
-    <plurals name="server_test_delay_accessibility_value">
-        <item quantity="one">%1$d میلی‌سانیه</item>
-        <item quantity="other">%1$d میلی‌سانیه</item>
-    </plurals>
-    <string name="acc_share_config_named">یک رسۊوی کانفیگ %1$s</string>
-    <string name="acc_edit_config_named">آلشتکاری کانفیگ %1$s</string>
-    <string name="acc_delete_config_named">پاک کردن کانفیگ %1$s</string>
     <string name="server_lab_security">ٱمنیت</string>
     <string name="server_lab_network">شبکه</string>
     <string name="server_lab_more_function">جاگورو</string>
@@ -553,7 +553,6 @@
     <string name="acc_move_to_bottom">آلشت و ته نومگه</string>
     <string name="acc_moved">آلشت وابید</string>
     <string name="acc_selected_server">پسند وابیڌه</string>
-    <string name="acc_select_server">پسند کردن</string>
     <string name="acc_share_subscription">یک رسۊوی لینگ اشتراک</string>
     <string name="acc_share_log">یک رسۊوی گوزارش</string>
     <string name="acc_remove">پاک کردن عوزو زنجیره پروکسی</string>
