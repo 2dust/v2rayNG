@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.os.ResultReceiver
 import android.system.OsConstants
@@ -402,31 +403,37 @@ object CoreServiceManager {
             AppConfig.TAG_PROXY
         }
 
-    private fun downloadUrlThroughCore(request: CoreUrlDownloadRequest): Int {
+    private fun downloadUrlThroughCore(request: CoreUrlDownloadRequest): Pair<Int, Bundle?> {
         if (
             !isRunning() ||
             !SettingsManager.shouldUseCoreForAppRequests()
         ) {
-            return Activity.RESULT_CANCELED
+            return Activity.RESULT_CANCELED to null
         }
-        val service = getService() ?: return Activity.RESULT_CANCELED
+        val service = getService() ?: return Activity.RESULT_CANCELED to null
         val targetFile = CoreDownloadManager.targetFile(service, request.requestId)
-            ?: return CoreDownloadManager.RESULT_FAILED
+            ?: return CoreDownloadManager.RESULT_FAILED to null
         targetFile.delete()
 
         return try {
-            coreController.downloadUrlToFile(
+            val headers = coreController.downloadUrlToFileWithHeaders(
                 request.url,
                 currentOutboundTag(),
                 request.headersJson,
                 targetFile.absolutePath,
                 request.timeoutMillis,
             )
-            if (targetFile.isFile) Activity.RESULT_OK else CoreDownloadManager.RESULT_FAILED
+            if (targetFile.isFile) {
+                Activity.RESULT_OK to Bundle().apply {
+                    putString(CoreUrlDownloadRequest.RESULT_HEADERS, headers)
+                }
+            } else {
+                CoreDownloadManager.RESULT_FAILED to null
+            }
         } catch (e: Exception) {
             targetFile.delete()
             LogUtil.e(AppConfig.TAG, "Failed to download URL through core", e)
-            CoreDownloadManager.RESULT_FAILED
+            CoreDownloadManager.RESULT_FAILED to null
         }
     }
 
@@ -583,9 +590,9 @@ object CoreServiceManager {
                     } ?: return
                     resultCode = Activity.RESULT_OK
                     scope.launch {
-                        val result = downloadUrlThroughCore(request)
+                        val (code, data) = downloadUrlThroughCore(request)
                         ensureActive()
-                        resultReceiver.send(result, null)
+                        resultReceiver.send(code, data)
                     }
                 }
             }

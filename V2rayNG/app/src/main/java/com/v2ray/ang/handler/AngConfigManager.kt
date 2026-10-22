@@ -11,6 +11,7 @@ import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
@@ -27,6 +28,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import okhttp3.Headers
 import java.net.URI
 
 object AngConfigManager {
@@ -483,12 +485,22 @@ object AngConfigManager {
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
-            LogUtil.i(AppConfig.TAG, url)
+            LogUtil.i(AppConfig.TAG, "Updating subscription ${it.guid}")
             val userAgent = it.subscription.userAgent
             val requestHeaders = it.subscription.requestHeaders
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
+            // Capture metadata from the same successful response as the imported body.
+            var usageInfo: SubscriptionUsageInfo? = null
+            val captureUsageInfo: (Headers) -> Unit = { headers ->
+                usageInfo = SubscriptionInfoParser.parse(
+                    userInfo = headers["Subscription-Userinfo"],
+                    profileTitle = headers["Profile-Title"],
+                    supportUrl = headers["Support-Url"],
+                    webPageUrl = headers["Profile-Web-Page-Url"],
+                )
+            }
             val configText = downloadSubscription(
                 UrlContentRequest(
                     url = url,
@@ -498,7 +510,8 @@ object AngConfigManager {
                     httpPort = SettingsManager.getHttpPort(),
                     proxyUsername = proxyUsername,
                     proxyPassword = proxyPassword,
-                )
+                ),
+                captureUsageInfo,
             )
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
@@ -507,6 +520,8 @@ object AngConfigManager {
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
+                // Replaced on every successful update so the box disappears if the panel stops sending the headers.
+                it.subscription.usageInfo = usageInfo
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
@@ -523,22 +538,30 @@ object AngConfigManager {
         }
     }
 
-    private fun downloadSubscription(request: UrlContentRequest): String {
+    internal fun downloadSubscription(
+        request: UrlContentRequest,
+        onResponseHeaders: (Headers) -> Unit,
+        coreFetch: ((Headers) -> Unit) -> CoreFetchResult<String> = { capture ->
+            CoreDownloadManager.fetchText(
+                AngApplication.application,
+                request,
+                includeDefaultUserAgent = true,
+                onResponseHeaders = capture,
+            )
+        },
+        httpFetch: (UrlContentRequest, (Headers) -> Unit) -> String = { candidate, capture ->
+            HttpUtil.getUrlContentWithUserAgent(candidate, capture)
+        },
+    ): String {
         val directRequest = request.copy(
             httpPort = 0,
             proxyUsername = null,
             proxyPassword = null,
         )
-        val fallbackRequests = when (
-            val result = CoreDownloadManager.fetchText(
-                AngApplication.application,
-                request,
-                includeDefaultUserAgent = true,
-            )
-        ) {
+        val fallbackRequests = when (val result = coreFetch(onResponseHeaders)) {
             is CoreFetchResult.Success -> return result.value
             CoreFetchResult.Failed -> return ""
-            CoreFetchResult.Unavailable -> listOf(directRequest)
+            CoreFetchResult.Unavailable -> return ""
             CoreFetchResult.NotApplicable -> if (request.httpPort == 0) {
                 listOf(request)
             } else {
@@ -548,7 +571,7 @@ object AngConfigManager {
 
         for (candidate in fallbackRequests) {
             try {
-                val content = HttpUtil.getUrlContentWithUserAgent(candidate)
+                val content = httpFetch(candidate, onResponseHeaders)
                 if (content.isNotEmpty()) return content
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content", e)

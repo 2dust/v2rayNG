@@ -11,6 +11,7 @@ import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
+import okhttp3.Headers
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.ArrayBlockingQueue
@@ -30,19 +31,24 @@ internal object CoreDownloadManager {
     private const val COMPLETION_GRACE_MILLIS = 5_000L
     private const val STALE_FILE_AGE_MILLIS = 60 * 60 * 1_000L
 
+    private data class Response(val file: File, val headers: Headers)
+
     fun fetchText(
         context: Context,
         request: UrlContentRequest,
         includeDefaultUserAgent: Boolean,
+        onResponseHeaders: ((Headers) -> Unit)? = null,
     ): CoreFetchResult<String> = when (val result = fetch(context, request, includeDefaultUserAgent)) {
         is CoreFetchResult.Success -> {
             try {
-                CoreFetchResult.Success(result.value.readText())
+                val content = result.value.file.readText()
+                onResponseHeaders?.invoke(result.value.headers)
+                CoreFetchResult.Success(content)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to read core URL response", e)
                 CoreFetchResult.Failed
             } finally {
-                result.value.delete()
+                result.value.file.delete()
             }
         }
 
@@ -58,14 +64,14 @@ internal object CoreDownloadManager {
     ): CoreFetchResult<Unit> = when (val result = fetch(context, request, false)) {
         is CoreFetchResult.Success -> {
             try {
-                result.value.copyTo(targetFile, overwrite = true)
+                result.value.file.copyTo(targetFile, overwrite = true)
                 CoreFetchResult.Success(Unit)
             } catch (e: Exception) {
                 targetFile.delete()
                 LogUtil.e(AppConfig.TAG, "Failed to store core URL response", e)
                 CoreFetchResult.Failed
             } finally {
-                result.value.delete()
+                result.value.file.delete()
             }
         }
 
@@ -87,17 +93,17 @@ internal object CoreDownloadManager {
         context: Context,
         request: UrlContentRequest,
         includeDefaultUserAgent: Boolean,
-    ): CoreFetchResult<File> {
+    ): CoreFetchResult<Response> {
         if (!shouldUseCore()) return CoreFetchResult.NotApplicable
         val url = request.url ?: return CoreFetchResult.Failed
         val requestId = UUID.randomUUID().toString()
         val targetFile = targetFile(context, requestId) ?: return CoreFetchResult.Failed
         cleanupStaleFiles(targetFile.parentFile)
 
-        val results = ArrayBlockingQueue<Int>(1)
+        val results = ArrayBlockingQueue<Pair<Int, Bundle?>>(1)
         val resultReceiver = object : ResultReceiver(null) {
             override fun onReceiveResult(code: Int, resultData: Bundle?) {
-                results.offer(code)
+                results.offer(code to resultData)
             }
         }
         val coreRequest = CoreUrlDownloadRequest(
@@ -109,10 +115,10 @@ internal object CoreDownloadManager {
             timeoutMillis = request.timeout.toLong(),
         )
         MessageHelper.sendCoreUrlDownloadRequest(context, coreRequest, resultReceiver) { accepted ->
-            if (!accepted) results.offer(Activity.RESULT_CANCELED)
+            if (!accepted) results.offer(Activity.RESULT_CANCELED to null)
         }
 
-        val resultCode = try {
+        val result = try {
             results.poll(
                 request.timeout.toLong().coerceAtLeast(1_000L) + COMPLETION_GRACE_MILLIS,
                 TimeUnit.MILLISECONDS,
@@ -121,14 +127,21 @@ internal object CoreDownloadManager {
             Thread.currentThread().interrupt()
             null
         }
-        if (resultCode == null) {
+        if (result == null) {
             targetFile.delete()
             return CoreFetchResult.Failed
         }
 
-        return when (resultCode) {
+        return when (result.first) {
             Activity.RESULT_OK -> if (targetFile.isFile) {
-                CoreFetchResult.Success(targetFile)
+                try {
+                    val headers = parseResponseHeaders(result.second?.getString(CoreUrlDownloadRequest.RESULT_HEADERS))
+                    CoreFetchResult.Success(Response(targetFile, headers))
+                } catch (e: Exception) {
+                    targetFile.delete()
+                    LogUtil.e(AppConfig.TAG, "Failed to read core URL response headers", e)
+                    CoreFetchResult.Failed
+                }
             } else {
                 CoreFetchResult.Failed
             }
@@ -139,6 +152,14 @@ internal object CoreDownloadManager {
     }
 
     private fun shouldUseCore(): Boolean = SettingsManager.shouldUseCoreForAppRequests()
+
+    internal fun parseResponseHeaders(headersJson: String?): Headers {
+        val headers = Headers.Builder()
+        JsonUtil.parseString(headersJson)?.entrySet()?.forEach { (name, values) ->
+            values.asJsonArray.forEach { value -> headers.addUnsafeNonAscii(name, value.asString) }
+        }
+        return headers.build()
+    }
 
     private fun cleanupStaleFiles(directory: File?) {
         val staleBefore = System.currentTimeMillis() - STALE_FILE_AGE_MILLIS

@@ -10,5 +10,6 @@ data class CoreUrlDownloadRequest(
 ) : Serializable {
     companion object {
         const val EXTRA_RESULT_RECEIVER = "core_url_result_receiver"
+        const val RESULT_HEADERS = "core_url_response_headers"
     }
 }
