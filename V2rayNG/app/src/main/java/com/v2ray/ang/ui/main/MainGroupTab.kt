@@ -19,10 +19,6 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,10 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
@@ -90,13 +87,14 @@ fun GroupTabBar(
     // The plain surface color equals the screen background in dark mode, so the bar needs its own tone there.
     val dark = colors.surface.luminance() < 0.5f
     var deleteTarget by remember { mutableStateOf<GroupMapItem?>(null) }
+    var menuRequest by remember { mutableStateOf<TabMenuRequest?>(null) }
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 6.dp),
         shape = CircleShape,
-        color = if (dark) colors.surfaceContainerHigh else colors.surface,
+        color = groupTabBarColor(),
         border = BorderStroke(0.5.dp, colors.outlineVariant.copy(alpha = if (dark) 0.6f else 0.35f)),
         shadowElevation = 3.dp
     ) {
@@ -119,8 +117,7 @@ fun GroupTabBar(
                                 selected = index == selectedIndex,
                                 serverFlow = serverFlow,
                                 onClick = { onTabClick(index) },
-                                onEdit = { onEditGroup(group.id) },
-                                onDelete = { deleteTarget = group }
+                                onLongPress = { menuRequest = it }
                             )
                         }
                     }
@@ -129,7 +126,21 @@ fun GroupTabBar(
         }
     }
 
-    // Hosted here, outside the tab layout, so the dialog never becomes an extra layout child of the tabs.
+    // Hosted here, outside the tab layout, so the dialogs never become extra layout children of the tabs.
+    menuRequest?.let { request ->
+        GroupTabContextMenu(
+            request = request,
+            onDismiss = { menuRequest = null },
+            onEdit = {
+                menuRequest = null
+                onEditGroup(request.group.id)
+            },
+            onDelete = {
+                menuRequest = null
+                deleteTarget = request.group
+            }
+        )
+    }
     deleteTarget?.let { target ->
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_subscription_group),
@@ -186,6 +197,13 @@ private fun EqualOrNaturalTabsLayout(
     }
 }
 
+/** Surface tone of the tab bar; in dark mode the plain surface equals the screen background, so it is lifted. */
+@Composable
+internal fun groupTabBarColor(): Color {
+    val colors = MaterialTheme.colorScheme
+    return if (colors.surface.luminance() < 0.5f) colors.surfaceContainerHigh else colors.surface
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GroupTabItem(
@@ -193,8 +211,7 @@ private fun GroupTabItem(
     selected: Boolean,
     serverFlow: StateFlow<List<ServersCache>>,
     onClick: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onLongPress: (TabMenuRequest) -> Unit
 ) {
     val servers by serverFlow.collectAsStateWithLifecycle()
     // The default group (empty id) never showed a count and has no subscription to edit or delete.
@@ -204,8 +221,9 @@ private fun GroupTabItem(
     val bringIntoView = remember { BringIntoViewRequester() }
     var size by remember { mutableStateOf(IntSize.Zero) }
     val marginPx = with(LocalDensity.current) { SELECTED_TAB_MARGIN.toPx() }
-    var menuExpanded by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
+    // Read only when the long press happens, so it is deliberately not observable state.
+    val windowBounds = remember { arrayOf(Rect.Zero) }
 
     // Bring the tab in with some room around it so the pill never ends up flush against the bar's
     // rounded edge; at the first and last tab the scroll stops at the bar's own inner padding.
@@ -217,93 +235,65 @@ private fun GroupTabItem(
         }
     }
 
-    // The box passes the tab layout's fixed size through to the pill and anchors the long-press menu.
-    Box(propagateMinConstraints = true) {
-        // One clickable node: name, count and selected state are announced together; long press opens the menu.
-        Row(
-            modifier = Modifier
-                .bringIntoViewRequester(bringIntoView)
-                .onSizeChanged { size = it }
-                .clip(CircleShape)
-                .background(if (selected) colors.primary.copy(alpha = 0.12f) else Color.Transparent)
-                .semantics { this.selected = selected }
-                .combinedClickable(
-                    role = Role.Tab,
-                    onClick = onClick,
-                    onLongClickLabel = if (hasSubscription) stringResource(R.string.title_sub_setting) else null,
-                    onLongClick = if (hasSubscription) {
-                        {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                            menuExpanded = true
-                        }
-                    } else {
-                        null
+    // One clickable node: name, count and selected state are announced together; long press opens the menu.
+    Row(
+        modifier = Modifier
+            .bringIntoViewRequester(bringIntoView)
+            .onSizeChanged { size = it }
+            .onGloballyPositioned { windowBounds[0] = it.boundsInWindow() }
+            .clip(CircleShape)
+            .background(if (selected) colors.primary.copy(alpha = 0.12f) else Color.Transparent)
+            .semantics { this.selected = selected }
+            .combinedClickable(
+                role = Role.Tab,
+                onClick = onClick,
+                onLongClickLabel = if (hasSubscription) stringResource(R.string.title_sub_setting) else null,
+                onLongClick = if (hasSubscription) {
+                    {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onLongPress(TabMenuRequest(group, windowBounds[0], selected, count))
                     }
-                )
-                .padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                } else {
+                    null
+                }
+            )
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GroupTabContent(remarks = group.remarks, count = count, selected = selected)
+    }
+}
+
+/** Name and count badge of a tab; shared by the tab itself and the lifted copy in its context menu. */
+@Composable
+internal fun GroupTabContent(remarks: String, count: Int, selected: Boolean) {
+    val colors = MaterialTheme.colorScheme
+    Text(
+        text = remarks,
+        style = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.Medium,
+        color = if (selected) colors.primary else colors.onSurfaceVariant,
+        maxLines = 1,
+        softWrap = false,
+        overflow = TextOverflow.Ellipsis
+    )
+    if (count > 0) {
+        Spacer(Modifier.width(3.dp))
+        Box(
+            modifier = Modifier
+                .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
+                .clip(CircleShape)
+                .background(if (selected) colors.primary else colors.onSurfaceVariant.copy(alpha = 0.55f))
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = group.remarks,
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium,
-                color = if (selected) colors.primary else colors.onSurfaceVariant,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis
+                text = count.toString(),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
+                color = if (selected) colors.onPrimary else colors.surface,
+                maxLines = 1
             )
-            if (count > 0) {
-                Spacer(Modifier.width(3.dp))
-                Box(
-                    modifier = Modifier
-                        .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
-                        .clip(CircleShape)
-                        .background(if (selected) colors.primary else colors.onSurfaceVariant.copy(alpha = 0.55f))
-                        .padding(horizontal = 4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = count.toString(),
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
-                        color = if (selected) colors.onPrimary else colors.surface,
-                        maxLines = 1
-                    )
-                }
-            }
-        }
-
-        if (hasSubscription) {
-            DropdownMenu(
-                expanded = menuExpanded,
-                onDismissRequest = { menuExpanded = false },
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_edit)) },
-                    leadingIcon = {
-                        Icon(painterResource(R.drawable.ic_edit_24dp), contentDescription = null)
-                    },
-                    onClick = {
-                        menuExpanded = false
-                        onEdit()
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_delete), color = colors.error) },
-                    leadingIcon = {
-                        Icon(
-                            painterResource(R.drawable.ic_delete_24dp),
-                            contentDescription = null,
-                            tint = colors.error
-                        )
-                    },
-                    onClick = {
-                        menuExpanded = false
-                        onDelete()
-                    }
-                )
-            }
         }
     }
 }
