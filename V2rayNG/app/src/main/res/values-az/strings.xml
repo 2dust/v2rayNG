@@ -408,6 +408,12 @@
     <string name="connection_connected">Qoşuldu. Bağlantını yoxlamaq üçün toxunun.</string>
     <string name="connection_not_connected">Qoşulmayıb</string>
     <string name="connection_running_task_left">İcra olunan sınaqlar: %s</string>
+    <string name="connection_test_complete">Sınaq tamamlandı</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="one">%1$d millisaniyə</item>
+        <item quantity="other">%1$d millisaniyə</item>
+    </plurals>
+    <string name="connection_connected_accessibility">Qoşulub</string>
 
     <string name="import_subscription_success">Abunəlik uğurla idxal edildi</string>
     <string name="import_subscription_failure">Abunəlik idxalı uğursuz oldu</string>
@@ -564,10 +570,4 @@
     <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <string name="connection_test_complete">Sınaq tamamlandı</string>
-    <string name="connection_connected_accessibility">Qoşulub</string>
-    <plurals name="connection_test_delay_accessibility_value">
-        <item quantity="one">%1$d millisaniyə</item>
-        <item quantity="other">%1$d millisaniyə</item>
-    </plurals>
 </resources>
