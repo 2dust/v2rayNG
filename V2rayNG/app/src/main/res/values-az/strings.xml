@@ -561,7 +561,8 @@
     <string name="connection_test_empty_message">ətraflı məlumat yoxdur</string>
     <string name="value_unknown">naməlum</string>
     <string name="sub_info_open_support">Dəstək linkini aç</string>
-    <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
+    <string name="sub_info_open_page">Abunəlik səhifəsini aç</string>
+    <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
 </resources>
