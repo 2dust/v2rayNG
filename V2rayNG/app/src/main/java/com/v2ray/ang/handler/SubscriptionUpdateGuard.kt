@@ -14,7 +14,8 @@ internal object SubscriptionUpdateGuard {
     /**
      * Returns the value to persist, or null if the subscription no longer matches the request.
      * Settings edits preserve current refresh metadata. A refresh supplies [updatedAt] and must
-     * also match the initiating timestamp; a fresh timestamp may move backwards with the clock.
+     * also match the initiating timestamp and usage info; a fresh timestamp may move backwards
+     * with the clock.
      */
     fun prepare(
         isIndexed: Boolean,
@@ -24,8 +25,13 @@ internal object SubscriptionUpdateGuard {
         updatedAt: Long? = null,
     ): SubscriptionItem? {
         if (!isIndexed || current == null) return null
-        if (current.copy(lastUpdated = expected.lastUpdated) != expected) return null
-        if (updatedAt != null && current.lastUpdated != expected.lastUpdated) return null
-        return replacement.copy(lastUpdated = updatedAt ?: current.lastUpdated)
+        if (current.copy(lastUpdated = expected.lastUpdated, usageInfo = expected.usageInfo) != expected) return null
+        if (updatedAt != null &&
+            (current.lastUpdated != expected.lastUpdated || current.usageInfo != expected.usageInfo)
+        ) return null
+        return replacement.copy(
+            lastUpdated = updatedAt ?: current.lastUpdated,
+            usageInfo = if (updatedAt != null) replacement.usageInfo else current.usageInfo,
+        )
     }
 }

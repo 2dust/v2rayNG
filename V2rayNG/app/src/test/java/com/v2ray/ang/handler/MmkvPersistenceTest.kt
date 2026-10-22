@@ -2,6 +2,7 @@ package com.v2ray.ang.handler
 
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.util.JsonUtil
 import org.junit.jupiter.api.AfterEach
@@ -94,6 +95,97 @@ class MmkvPersistenceTest {
         assertEquals(300L, MmkvManager.decodeSubscription("s")!!.lastUpdated)
         assertTrue(MmkvManager.decodeServerList("s").isEmpty())
         assertNull(MmkvManager.decodeServerConfig("p"))
+    }
+
+    @Test fun `refresh publishes profiles timestamp and usage info together and clears missing headers`() {
+        var expected = SubscriptionItem(lastUpdated = 100)
+        MmkvManager.encodeSubscription("s", expected)
+        val usageInfo = SubscriptionUsageInfo(download = 42, total = 100, title = "Account")
+        listOf(usageInfo, null).forEachIndexed { index, responseInfo ->
+            val guid = "new-$index"
+            val replacement = expected.copy(lastUpdated = expected.lastUpdated + 100, usageInfo = responseInfo)
+            val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+
+            MmkvManager.saveServerProfiles(mapOf(guid to profile), mapOf(guid to "raw-$guid"), "s", false,
+                SubscriptionUpdateCommit(expected, replacement))
+
+            assertEquals(replacement, MmkvManager.decodeSubscription("s"))
+            assertEquals(listOf(guid), MmkvManager.decodeServerList("s"))
+            assertEquals(guid, MmkvManager.getSelectServer())
+            assertEquals("raw-$guid", stores.raw.values[guid])
+            expected = replacement
+        }
+    }
+
+    @Test fun `failed refresh restores usage metadata profiles raw payloads indexes and selection`() {
+        val affectedStores = listOf(stores.main, stores.profiles, stores.raw, stores.affiliations, stores.subscriptions)
+        val oldUsage = SubscriptionUsageInfo(download = 42, total = 100)
+        // Fail before metadata, at metadata, and after it; repeat for responses that clear it.
+        listOf(SubscriptionUsageInfo(download = 84, total = 100), null).forEach { responseInfo ->
+            listOf(stores.profiles, stores.subscriptions, stores.main).forEach { failedStore ->
+                affectedStores.forEach { it.values.clear() }
+                seedReplacementWithGroups()
+                val expected = SubscriptionItem(lastUpdated = 100, usageInfo = oldUsage)
+                MmkvManager.encodeSubscription("s", expected)
+                val before = affectedStores.map { it.values.toMap() }
+                var failNextWrite = true
+                failedStore.failWrite = { key ->
+                    (failNextWrite && key in setOf("new", "s", "SUB_SERVERS_s")).also { fail ->
+                        if (fail) failNextWrite = false
+                    }
+                }
+                val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+
+                assertThrows(ProfileStorageException::class.java) {
+                    MmkvManager.saveServerProfiles(mapOf("new" to profile), mapOf("new" to "new-raw"), "s", false,
+                        SubscriptionUpdateCommit(expected, expected.copy(lastUpdated = 200, usageInfo = responseInfo)))
+                }
+
+                assertFalse(failNextWrite)
+                assertEquals(before, affectedStores.map { it.values.toMap() })
+                failedStore.failWrite = { false }
+            }
+        }
+    }
+
+    @Test fun `empty and stale refreshes cannot replace usage metadata`() {
+        val expected = SubscriptionItem(lastUpdated = 100)
+        val current = expected.copy(usageInfo = SubscriptionUsageInfo(download = 42))
+        MmkvManager.encodeSubscription("s", current)
+        val staleUpdate = SubscriptionUpdateCommit(expected, expected.copy(lastUpdated = 200))
+
+        MmkvManager.saveServerProfiles(emptyMap(), emptyMap(), "s", false, staleUpdate)
+        assertEquals(current, MmkvManager.decodeSubscription("s"))
+        val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+        assertThrows(SubscriptionUpdateAbortedException::class.java) {
+            MmkvManager.saveServerProfiles(mapOf("p" to profile), emptyMap(), "s", false, staleUpdate)
+        }
+        assertEquals(current, MmkvManager.decodeSubscription("s"))
+        assertNull(MmkvManager.decodeServerConfig("p"))
+    }
+
+    @Test fun `settings edits preserve usage metadata from a completed refresh`() {
+        val expected = SubscriptionItem(lastUpdated = 100)
+        val current = expected.copy(lastUpdated = 200, usageInfo = SubscriptionUsageInfo(download = 42))
+        MmkvManager.encodeSubscription("s", current)
+
+        assertTrue(MmkvManager.updateSubscription("s", expected, expected.copy(enabled = false)))
+
+        assertEquals(current.copy(enabled = false), MmkvManager.decodeSubscription("s"))
+    }
+
+    @Test fun `legacy subscription without usage info remains readable and updatable`() {
+        stores.main.values["SUB_IDS"] = "[\"s\"]"
+        stores.subscriptions.values["s"] = """{"remarks":"legacy","url":"https://example.com/sub","enabled":true,"addedTime":1,"lastUpdated":100,"autoUpdate":false,"updateInterval":1440,"allowInsecureUrl":false}"""
+        val expected = MmkvManager.decodeSubscription("s")!!
+        assertNull(expected.usageInfo)
+        val replacement = expected.copy(lastUpdated = 200, usageInfo = SubscriptionUsageInfo(download = 42))
+        val profile = ProfileItem.create(EConfigType.VLESS).apply { subscriptionId = "s" }
+
+        MmkvManager.saveServerProfiles(mapOf("p" to profile), emptyMap(), "s", false,
+            SubscriptionUpdateCommit(expected, replacement))
+
+        assertEquals(replacement, MmkvManager.decodeSubscription("s"))
     }
 
     @Test fun `fresh timestamp and batch updates accept a backward clock correction`() {

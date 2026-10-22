@@ -18,6 +18,7 @@ import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
@@ -282,7 +283,8 @@ class MainViewModel(
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
             MainAction.SortByTestResults -> sortByTestResultsAsync()
-            MainAction.UpdateSubscriptions -> importConfigViaSub()
+            MainAction.UpdateSubscriptions -> importConfigViaSub(uiState.value.selectedGroupId)
+            is MainAction.UpdateGroupSubscription -> importConfigViaSub(action.groupId)
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
@@ -309,7 +311,8 @@ class MainViewModel(
             MainAction.LocateSelectedServer,
             is MainAction.EditServer,
             is MainAction.ShareClipboard,
-            is MainAction.ShareFullContent -> {
+            is MainAction.ShareFullContent,
+            is MainAction.OpenSubscriptionLink -> {
                 // Handled by Activity via its onAction lambda
             }
         }
@@ -468,7 +471,13 @@ class MainViewModel(
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
                 val groups = dataSource.getSubscriptions().map {
-                    GroupMapItem(id = it.guid, remarks = it.subscription.remarks)
+                    GroupMapItem(
+                        id = it.guid,
+                        remarks = it.subscription.remarks,
+                        usageInfo = it.subscription.usageInfo?.let { info ->
+                            SubscriptionInfoParser.withWebPageFallback(info, it.subscription.url)
+                        },
+                    )
                 }
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
@@ -546,8 +555,7 @@ class MainViewModel(
         }
     }
 
-    private fun importConfigViaSub() {
-        val subId = uiState.value.selectedGroupId
+    private fun importConfigViaSub(subId: String) {
         launchLoading {
             withContext(ioDispatcher) {
                 try {

@@ -10,6 +10,7 @@ import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
@@ -26,6 +27,7 @@ import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import okhttp3.Headers
 import java.net.URI
 
 object AngConfigManager {
@@ -498,6 +500,17 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
+            // Account info (traffic, expiry, support link) the panel sends in the response headers.
+            var usageInfo: SubscriptionUsageInfo? = null
+            val captureUsageInfo: (Headers) -> Unit = { headers ->
+                usageInfo = SubscriptionInfoParser.parse(
+                    userInfo = headers["Subscription-Userinfo"],
+                    profileTitle = headers["Profile-Title"],
+                    supportUrl = headers["Support-Url"],
+                    webPageUrl = headers["Profile-Web-Page-Url"],
+                )
+            }
+
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(
@@ -509,10 +522,11 @@ object AngConfigManager {
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
                         proxyPassword = proxyPassword
-                    )
+                    ),
+                    captureUsageInfo
                 )
             } catch (e: Exception) {
-                LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
+                LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription ${it.guid}: proxy not ready or other error", e)
                 ""
             }
             if (configText.isEmpty()) {
@@ -522,10 +536,11 @@ object AngConfigManager {
                             url = url,
                             userAgent = userAgent,
                             requestHeaders = requestHeaders
-                        )
+                        ),
+                        captureUsageInfo
                     )
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
+                    LogUtil.e(AppConfig.TAG, "Update subscription ${it.guid}: Failed to get URL content with user agent", e)
                     ""
                 }
             }
@@ -535,6 +550,8 @@ object AngConfigManager {
 
             val updatedSubscription = expectedSubscription.copy(
                 lastUpdated = System.currentTimeMillis(),
+                // Clear old account info when a successful response stops sending the headers.
+                usageInfo = usageInfo,
             )
             val count = parseAndCommitProfiles(
                 server = configText,
@@ -559,7 +576,7 @@ object AngConfigManager {
             LogUtil.i(AppConfig.TAG, "Subscription update skipped after metadata changed: ${it.guid}")
             return SubscriptionUpdateResult(skipCount = 1)
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to update config via subscription", e)
+            LogUtil.e(AppConfig.TAG, "Failed to update config via subscription ${it.guid}", e)
             return SubscriptionUpdateResult(failureCount = 1)
         }
     }

@@ -863,7 +863,7 @@ object MmkvManager {
     }
 
     /**
-     * Replaces unchanged subscription settings, preserving the stored refresh timestamp.
+     * Replaces unchanged subscription settings, preserving the stored timestamp and usage info.
      * A refresh supplies [updatedAt] and additionally requires unchanged refresh metadata.
      */
     fun updateSubscription(

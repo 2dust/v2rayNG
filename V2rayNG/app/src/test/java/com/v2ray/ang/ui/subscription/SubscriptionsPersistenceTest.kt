@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.subscription
 
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvTestStore
 import kotlinx.coroutines.Dispatchers
@@ -63,15 +64,17 @@ class SubscriptionsPersistenceTest {
         assertEquals(listOf("a", "b", "c"), visible())
     }
 
-    @Test fun `toggle reloads merged timestamp from storage`() = runTest(dispatcher) {
+    @Test fun `toggle reloads merged timestamp and usage info from storage`() = runTest(dispatcher) {
         advanceUntilIdle()
         val old = viewModel.subsFlow.value.first().subscription
-        MmkvManager.updateSubscription("a", old, old, updatedAt = 200)
+        val usageInfo = SubscriptionUsageInfo(download = 42, total = 100)
+        MmkvManager.updateSubscription("a", old, old.copy(usageInfo = usageInfo), updatedAt = 200)
         viewModel.update("a", old.copy(enabled = false))
         advanceUntilIdle()
         val displayed = viewModel.subsFlow.value.first().subscription
         assertFalse(displayed.enabled)
         assertEquals(200L, displayed.lastUpdated)
+        assertEquals(usageInfo, displayed.usageInfo)
         viewModel.reload()
         advanceUntilIdle()
         assertEquals(displayed, viewModel.subsFlow.value.first().subscription)
