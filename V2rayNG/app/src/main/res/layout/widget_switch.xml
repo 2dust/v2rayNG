@@ -5,27 +5,38 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="2dp">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/layout_background"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_rounded_corner_inactive">
 
         <ImageView
             android:id="@+id/image_switch"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:padding="@dimen/padding_spacing_dp16"
-            android:src="@drawable/ic_stat_name" />
-    </LinearLayout>
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_play_24dp" />
+    </FrameLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:shadowColor="#C0000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="4"
         android:text="@string/app_name"
-        android:textAppearance="@android:style/TextAppearance.Small"
-        android:textColor="@android:color/white" />
+        android:textColor="#FFFFFF"
+        android:textSize="11sp"
+        android:textStyle="bold" />
 </LinearLayout>

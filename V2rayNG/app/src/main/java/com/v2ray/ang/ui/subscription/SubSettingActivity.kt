@@ -225,7 +225,7 @@ fun SubSettingScreen(
                             subscriptionName = subscriptionName,
                             actions = accessibilityActions,
                             onUpdate = { checked ->
-                                viewModel.update(subCache.guid, subCache.subscription.copy(enabled = checked))
+                                viewModel.setEnabled(subCache.guid, checked)
                             },
                             onShare = { shareUrl = subCache.subscription.url },
                             onEdit = { onEditSub(subCache.guid) },

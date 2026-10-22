@@ -37,6 +37,13 @@ internal fun subscriptionAutoUpdateChange(
     ?.takeIf { it.url.isNotEmpty() && it.autoUpdate != enabled }
     ?.copy(autoUpdate = enabled)
 
+internal fun subscriptionEnabledChange(
+    current: SubscriptionItem?,
+    enabled: Boolean,
+): SubscriptionItem? = current
+    ?.takeIf { it.enabled != enabled }
+    ?.copy(enabled = enabled)
+
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
     private val pendingAutoUpdates = mutableSetOf<String>()
     // Ephemeral acknowledgements: completion must not wait for a screen to resume or replay
@@ -71,13 +78,28 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         return changed
     }
 
-    fun update(subId: String, item: SubscriptionItem) {
-        val idx = subscriptions.indexOfFirst { it.guid == subId }
-        if (idx >= 0) {
-            subscriptions[idx] = SubscriptionCache(subId, item)
-            MmkvManager.encodeSubscription(subId, item)
+    internal fun setEnabled(subId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            try {
+                val updated = withContext(Dispatchers.IO) {
+                    // A background refresh can replace usage metadata after the row was loaded.
+                    val current = MmkvManager.decodeSubscription(subId)
+                    subscriptionEnabledChange(current, enabled)?.also {
+                        MmkvManager.encodeSubscription(subId, it)
+                    } ?: current
+                } ?: return@launch
+                val index = subscriptions.indexOfFirst { it.guid == subId }
+                if (index >= 0) {
+                    subscriptions[index] = SubscriptionCache(subId, updated)
+                    _subsFlow.value = subscriptions.toList()
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Subscription update toggle failed: $subId", e)
+                toastError(R.string.toast_failure)
+            }
         }
-        _subsFlow.value = subscriptions.toList()
     }
 
     internal fun setAutoUpdate(subId: String, enabled: Boolean): Boolean {
@@ -180,6 +202,9 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
 
                     else ->
                         toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                }
+                if (result.configCount > 0) {
+                    SettingsChangeManager.makeSetupGroupTab()
                 }
                 reload()
             } catch (cancelled: CancellationException) {
