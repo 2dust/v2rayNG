@@ -5,6 +5,7 @@ import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.UrlContentRequest
 import okhttp3.Credentials
+import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -139,11 +140,15 @@ object HttpUtil {
      * @param url The URL to fetch content from.
      * @param timeout The timeout value in milliseconds.
      * @param httpPort The HTTP port to use.
+     * @param onResponseHeaders Receives the headers of the successful response that produced the returned content.
      * @return The content of the URL as a string.
      * @throws IOException If an I/O error occurs.
      */
     @Throws(IOException::class)
-    fun getUrlContentWithUserAgent(request: UrlContentRequest): String {
+    fun getUrlContentWithUserAgent(
+        request: UrlContentRequest,
+        onResponseHeaders: ((Headers) -> Unit)? = null
+    ): String {
         var currentUrl = request.url
         var redirects = 0
         val maxRedirects = 3
@@ -193,6 +198,7 @@ object HttpUtil {
                     }
 
                     response.isSuccessful -> {
+                        onResponseHeaders?.invoke(response.headers)
                         return response.body?.string() ?: ""
                     }
 
