@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -202,7 +201,7 @@ fun ProxyChainScreen(
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var members by rememberSaveable { mutableStateOf(initialMembers) }
     var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
-    var showProfileDeleteConfirm by remember { mutableStateOf(false) }
+    var showProfileDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     var memberToDeleteKey by rememberSaveable { mutableStateOf<String?>(null) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
