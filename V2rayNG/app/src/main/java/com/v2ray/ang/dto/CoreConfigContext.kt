@@ -16,6 +16,23 @@ data class CoreConfigContext(
         val profile: ProfileItem,
         val resolvedProfiles: List<ProfileItem>,
         val resolvedType: CoreResolvedType,
+        val policyGroup: ResolvedPolicyGroup? = null,
+    )
+
+    /** Runtime identities and chains; never persisted as part of a profile. */
+    data class ResolvedProfile(val guid: String, val profile: ProfileItem)
+
+    data class PolicyGroupMember(
+        val guid: String,
+        // Destination-facing hop first, followed by its dialers.
+        val chain: List<ResolvedProfile>,
+    )
+
+    data class ResolvedPolicyGroup(
+        val guid: String,
+        val members: List<PolicyGroupMember>,
+        val hasSubscriptionChain: Boolean,
+        val fallback: PolicyGroupMember? = null,
     )
 
     data class RoutingDomainRule(

@@ -564,4 +564,5 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
+    <string name="toast_policy_group_chain_invalid">زنجیرهٔ گروه سیاست نامعتبر است. اعضا، پراکسی ورودی، پراکسی خروجی و مسیر جایگزین را بررسی کنید.</string>
 </resources>
