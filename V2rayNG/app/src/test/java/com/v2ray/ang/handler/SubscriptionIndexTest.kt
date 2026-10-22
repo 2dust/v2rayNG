@@ -4,10 +4,10 @@ import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.util.JsonUtil
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -20,7 +20,7 @@ class SubscriptionIndexTest {
     private val mainValues = mutableMapOf<String, String>()
     private val subValues = mutableMapOf<String, String>()
 
-    @Before
+    @BeforeEach
     fun prepareStorage() {
         for ((storage, values) in listOf(main to mainValues, subs to subValues)) {
             reset(storage)
@@ -99,7 +99,7 @@ class SubscriptionIndexTest {
         private val subs: MMKV = mock()
         private val settings: MMKV = mock()
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun initializeHandles() {
             mockStatic(MMKV::class.java).use {

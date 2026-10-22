@@ -1,9 +1,9 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.runtime.saveable.SaverScope
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
 
 class ServerDeleteTargetTest {
     @Test
