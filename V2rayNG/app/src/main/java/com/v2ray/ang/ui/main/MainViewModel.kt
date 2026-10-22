@@ -35,6 +35,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -110,6 +113,15 @@ class MainViewModel(
     private var bulkTestJob: Job? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
+    
+    // One-shot request telling the Activity to (re)start the VPN
+    private val _connectRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val connectRequests: SharedFlow<Unit> = _connectRequests.asSharedFlow()
+
+    fun connectToServer(guid: String) {
+        updateSelectedGuid(guid)
+        _connectRequests.tryEmit(Unit)
+    }
 
     // ---------- Service events ----------
     init {
