@@ -29,6 +29,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toLongEx
+import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -45,6 +46,7 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SubEditActivity : BaseComponentActivity() {
     private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
@@ -71,45 +73,63 @@ class SubEditActivity : BaseComponentActivity() {
             initial = subItem,
             profileSuggestions = suggestions,
             onBackClick = { finish() },
-            onSave = { saveServer(it) },
-            onDelete = { deleteServer() }
+            onSave = ::saveSubscription,
+            onDelete = ::deleteSubscription,
         )
     }
 
-    private fun saveServer(subItem: SubscriptionItem): Boolean {
+    private fun saveSubscription(subItem: SubscriptionItem) {
         if (TextUtils.isEmpty(subItem.remarks)) {
-            return false
+            return
         }
         if (subItem.url.isNotEmpty()) {
             if (!Utils.isValidUrl(subItem.url)) {
-                return false
+                return
             }
             if (!Utils.isValidSubUrl(subItem.url) && !subItem.allowInsecureUrl) {
-                return false
+                return
             }
         }
 
         if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-            return false
+            return
         }
 
-        MmkvManager.encodeSubscription(editSubId, subItem)
-        SubscriptionUpdater.syncOne(subId = editSubId)
+        val savedSubId = if (editSubId.isEmpty()) {
+            MmkvManager.encodeSubscription(editSubId, subItem)
+        } else if (MmkvManager.updateSubscription(editSubId, this.subItem, subItem)) {
+            editSubId
+        } else {
+            null
+        }
+        if (savedSubId == null) {
+            toast(R.string.toast_failure)
+            return
+        }
+
+        SubscriptionUpdater.syncOne(subId = savedSubId)
         SettingsChangeManager.makeSetupGroupTab()
         toastSuccess(R.string.toast_success)
         finish()
-        return true
     }
 
-    private fun deleteServer(): Boolean {
-        if (editSubId.isNotEmpty()) {
-            lifecycleScope.launch(Dispatchers.IO) {
+    private fun deleteSubscription() {
+        if (editSubId.isEmpty()) return
+
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
                 SettingsManager.removeSubscriptionWithDefault(editSubId)
-                SettingsChangeManager.makeSetupGroupTab()
-                launch(Dispatchers.Main) { finish() }
             }
+            if (result == SettingsManager.SubscriptionRemovalResult.FAILED) {
+                toast(R.string.toast_failure)
+                return@launch
+            }
+            SettingsChangeManager.makeSetupGroupTab()
+            if (result == SettingsManager.SubscriptionRemovalResult.REMOVED_WITHOUT_DEFAULT) {
+                toast(R.string.toast_failure)
+            }
+            finish()
         }
-        return true
     }
 }
 
@@ -119,7 +139,7 @@ fun SubEditScreen(
     initial: SubscriptionItem,
     profileSuggestions: List<String>,
     onBackClick: () -> Unit,
-    onSave: (SubscriptionItem) -> Boolean,
+    onSave: (SubscriptionItem) -> Unit,
     onDelete: () -> Unit
 ) {
     //val context = LocalContext.current
