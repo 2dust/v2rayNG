@@ -332,6 +332,18 @@
     <string name="sub_setting_remarks">Qeydlər</string>
     <string name="sub_setting_url">İstəyə bağlı URL</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
+    <string name="acc_last_updated">Son yenilənmə: %1$s</string>
+    <string name="acc_subscription_update_on">Yeniləmə aktivdir</string>
+    <string name="acc_subscription_update_off">Yeniləmə deaktivdir</string>
+    <string name="acc_enable_subscription_update">Yeniləməni aktiv et</string>
+    <string name="acc_disable_subscription_update">Yeniləməni deaktiv et</string>
+    <string name="acc_enable_subscription_auto_update">Dövri avtomatik yeniləməni aktiv et</string>
+    <string name="acc_disable_subscription_auto_update">Dövri avtomatik yeniləməni deaktiv et</string>
+    <string name="acc_subscription_auto_update_enabled">Dövri avtomatik yeniləmə aktiv edildi</string>
+    <string name="acc_subscription_auto_update_disabled">Dövri avtomatik yeniləmə deaktiv edildi</string>
+    <string name="acc_unnamed_subscription">Adsız.</string>
+    <string name="acc_edit_named">%1$s üçün düzəliş et</string>
+    <string name="acc_delete_named">%1$s sil</string>
     <string name="sub_setting_request_headers">Sorğu Başlıqları (JSON formatında)</string>
     <string name="sub_setting_filter">Qeyd filtri (müntəzəm ifadə / regex)</string>
     <string name="sub_setting_enable">Yenilənməni aktivləşdir</string>
@@ -541,18 +553,6 @@
     <string name="acc_moved">Köçürüldü</string>
     <string name="acc_selected_server">Seçildi</string>
     <string name="acc_share_subscription">Abunəlik keçidini paylaş</string>
-    <string name="acc_last_updated">Son yenilənmə: %1$s</string>
-    <string name="acc_subscription_update_on">Yeniləmə aktivdir</string>
-    <string name="acc_subscription_update_off">Yeniləmə deaktivdir</string>
-    <string name="acc_enable_subscription_update">Yeniləməni aktiv et</string>
-    <string name="acc_disable_subscription_update">Yeniləməni deaktiv et</string>
-    <string name="acc_enable_subscription_auto_update">Dövri avtomatik yeniləməni aktiv et</string>
-    <string name="acc_disable_subscription_auto_update">Dövri avtomatik yeniləməni deaktiv et</string>
-    <string name="acc_subscription_auto_update_enabled">Dövri avtomatik yeniləmə aktiv edildi</string>
-    <string name="acc_subscription_auto_update_disabled">Dövri avtomatik yeniləmə deaktiv edildi</string>
-    <string name="acc_unnamed_subscription">Adsız.</string>
-    <string name="acc_edit_named">%1$s üçün düzəliş et</string>
-    <string name="acc_delete_named">%1$s sil</string>
     <string name="acc_share_log">Jurnalı paylaş</string>
     <string name="acc_remove">Proksi zənciri üzvünü çıxar</string>
     <string name="acc_add_member">Proksi zənciri üzvü əlavə et</string>

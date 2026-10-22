@@ -332,6 +332,18 @@
     <string name="sub_setting_remarks">Remarks</string>
     <string name="sub_setting_url">Optional URL</string>
     <string name="sub_setting_user_agent" translatable="false">User Agent</string>
+    <string name="acc_last_updated">Last updated on %1$s</string>
+    <string name="acc_subscription_update_on">Update is on</string>
+    <string name="acc_subscription_update_off">Update is off</string>
+    <string name="acc_enable_subscription_update">Enable update</string>
+    <string name="acc_disable_subscription_update">Disable update</string>
+    <string name="acc_enable_subscription_auto_update">Enable periodic auto-update</string>
+    <string name="acc_disable_subscription_auto_update">Disable periodic auto-update</string>
+    <string name="acc_subscription_auto_update_enabled">Periodic auto-update enabled</string>
+    <string name="acc_subscription_auto_update_disabled">Periodic auto-update disabled</string>
+    <string name="acc_unnamed_subscription">Unnamed.</string>
+    <string name="acc_edit_named">Edit %1$s</string>
+    <string name="acc_delete_named">Delete %1$s</string>
     <string name="sub_setting_request_headers">Request Headers (JSON format)</string>
     <string name="sub_setting_filter">Remarks filter (regular expression)</string>
     <string name="sub_setting_enable">Enable update</string>
@@ -541,18 +553,6 @@
     <string name="acc_moved">Moved</string>
     <string name="acc_selected_server">Selected</string>
     <string name="acc_share_subscription">Share subscription link</string>
-    <string name="acc_last_updated">Last updated on %1$s</string>
-    <string name="acc_subscription_update_on">Update is on</string>
-    <string name="acc_subscription_update_off">Update is off</string>
-    <string name="acc_enable_subscription_update">Enable update</string>
-    <string name="acc_disable_subscription_update">Disable update</string>
-    <string name="acc_enable_subscription_auto_update">Enable periodic auto-update</string>
-    <string name="acc_disable_subscription_auto_update">Disable periodic auto-update</string>
-    <string name="acc_subscription_auto_update_enabled">Periodic auto-update enabled</string>
-    <string name="acc_subscription_auto_update_disabled">Periodic auto-update disabled</string>
-    <string name="acc_unnamed_subscription">Unnamed.</string>
-    <string name="acc_edit_named">Edit %1$s</string>
-    <string name="acc_delete_named">Delete %1$s</string>
     <string name="acc_share_log">Share log</string>
     <string name="acc_remove">Remove proxy chain member</string>
     <string name="acc_add_member">Add proxy chain member</string>
