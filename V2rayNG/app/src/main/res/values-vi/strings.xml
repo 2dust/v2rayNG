@@ -561,5 +561,7 @@
     <string name="sub_info_open_support">Mở liên kết hỗ trợ</string>
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
+    <string name="title_pref_sub_panel_interval">Nhận khoảng thời gian tự động cập nhật</string>
+    <string name="summary_pref_sub_panel_interval">Khi bật, tính năng tự động cập nhật của đăng ký và khoảng thời gian cập nhật sẽ do nhà cung cấp đăng ký thiết lập. Khi tắt, mọi thứ giữ nguyên như trước và do bạn tự thiết lập thủ công.</string>
 
 </resources>

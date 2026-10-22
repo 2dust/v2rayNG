@@ -567,5 +567,7 @@
     <string name="sub_info_open_support">Открыть ссылку поддержки</string>
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
+    <string name="title_pref_sub_panel_interval">Получать интервал автообновления</string>
+    <string name="summary_pref_sub_panel_interval">Если включено, автообновление подписки и его интервал задаёт поставщик подписки. Если выключено, всё остаётся как раньше и настраивается вручную.</string>
 
 </resources>
