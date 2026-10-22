@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">عرض قائمة التكوينات في عمودين لإظهار محتوى أكبر على الشاشة.</string>
 
     <string name="title_pref_group_all_display">إظهار علامة تبويب «الكل»</string>
+    <string name="acc_settings_group_expanded">%1$s، المجموعة موسّعة</string>
+    <string name="acc_settings_group_collapsed">%1$s، المجموعة مطوية</string>
     <string name="summary_pref_group_all_display">جمع تكوينات جميع مجموعات الاشتراك في علامة تبويب واحدة.</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
     <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
+    <string name="acc_toggle_on">مفعّل</string>
+    <string name="acc_toggle_off">غير مفعّل</string>
     <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
     <string name="title_pref_dynamic_color">تفعيل الألوان الديناميكية</string>
     <string name="summary_pref_dynamic_color">يعمل فقط على أندرويد 12+</string>
