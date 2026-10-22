@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">এই ফিচারটি প্রথম ব্যবহার করা হচ্ছে, সার্ভার যোগ করতে অ্যাপটি ব্যবহার করুন</string>
     <string name="navigation_drawer_open">নেভিগেশন ড্রয়ার খোলুন</string>
     <string name="navigation_drawer_close">নেভিগেশন ড্রয়ার বন্ধ করুন</string>
+    <string name="acc_connect">সংযোগ করুন</string>
+    <string name="acc_disconnect">সংযোগ বিচ্ছিন্ন করুন</string>
+    <string name="acc_clear_search">অনুসন্ধান মুছুন</string>
     <string name="migration_success">ডেটা স্থানান্তর সফল!</string>
     <string name="action_stop_service">সেবা বন্ধ করুন</string>
     <string name="action_ok">ঠিক আছে</string>
@@ -525,7 +528,7 @@
     <string name="acc_add_asset">অ্যাসেট উৎস যোগ করুন</string>
     <string name="acc_download_file">অ্যাসেট ফাইল ডাউনলোড করুন</string>
     <string name="acc_qr_code">QR কোড</string>
-    <string name="acc_copy_log">লগ কপি করুন</string>
+    <string name="acc_copy_log">ক্লিপবোর্ডে লগ কপি করুন</string>
     <string name="acc_clear_log">লগ মুছুন</string>
     <string name="acc_add_rule">রাউটিং নিয়ম যোগ করুন</string>
     <string name="acc_start">সার্ভিস শুরু করুন</string>

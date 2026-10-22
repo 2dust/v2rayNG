@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">Bu funksiyanı istifadə etməzdən əvvəl tətbiqə profil əlavə edin.</string>
     <string name="navigation_drawer_open">Naviqasiya menyusunu açın</string>
     <string name="navigation_drawer_close">Naviqasiya menyusunu bağlayın</string>
+    <string name="acc_connect">Qoşul</string>
+    <string name="acc_disconnect">Bağlantını kəs</string>
+    <string name="acc_clear_search">Axtarışı təmizlə</string>
     <string name="migration_success">Məlumatların köçürülməsi uğurla başa çatdı!</string>
     <string name="action_stop_service">Xidməti saxla</string>
     <string name="action_ok">Oldu</string>
@@ -525,7 +528,7 @@
     <string name="acc_add_asset">Resurs mənbəyi əlavə et</string>
     <string name="acc_download_file">Resurs fayllarını endir</string>
     <string name="acc_qr_code">QR kod</string>
-    <string name="acc_copy_log">Jurnalı kopyala</string>
+    <string name="acc_copy_log">Jurnalı mübadilə buferinə kopyala</string>
     <string name="acc_clear_log">Jurnalı təmizlə</string>
     <string name="acc_add_rule">Marşrutlaşdırma qaydası əlavə et</string>
     <string name="acc_start">Xidməti başlat</string>
