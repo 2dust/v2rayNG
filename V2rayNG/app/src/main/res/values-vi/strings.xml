@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">Không tìm thấy tập tin!</string>
     <string name="msg_remark_is_duplicate">Tên này đã tồn tại!</string>
     <string name="asset_geo_files_sources">Nguồn tệp Geo (tùy chọn)</string>
+    <string name="acc_asset_file_details">Kích thước tệp %1$s. Đã cập nhật vào %2$s</string>
+    <string name="acc_edit_asset_named">Chỉnh sửa %1$s</string>
+    <string name="acc_delete_asset_named">Xóa %1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Đang tải…</string>

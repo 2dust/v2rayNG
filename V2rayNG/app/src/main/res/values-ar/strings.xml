@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">الملف غير موجود</string>
     <string name="msg_remark_is_duplicate">الملاحظات موجودة بالفعل</string>
     <string name="asset_geo_files_sources">مصدر ملفات Geo (اختياري)</string>
+    <string name="acc_asset_file_details">حجم الملف %1$s. تم التحديث في %2$s</string>
+    <string name="acc_edit_asset_named">تعديل %1$s</string>
+    <string name="acc_delete_asset_named">حذف %1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">جار التحميل</string>

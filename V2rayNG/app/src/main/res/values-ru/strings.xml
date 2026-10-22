@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Название уже существует</string>
     <string name="asset_geo_files_sources">Источник геофайлов (необязательно)</string>
+    <string name="acc_asset_file_details">Размер файла: %1$s. Обновлено %2$s</string>
+    <string name="acc_edit_asset_named">Изменить %1$s</string>
+    <string name="acc_delete_asset_named">Удалить %1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>

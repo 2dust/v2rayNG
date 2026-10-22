@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">找不到檔案</string>
     <string name="msg_remark_is_duplicate">名稱已存在</string>
     <string name="asset_geo_files_sources">Geo 檔案來源 (可選)</string>
+    <string name="acc_asset_file_details">檔案大小：%1$s。更新於%2$s</string>
+    <string name="acc_edit_asset_named">編輯%1$s</string>
+    <string name="acc_delete_asset_named">刪除%1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">載入</string>
