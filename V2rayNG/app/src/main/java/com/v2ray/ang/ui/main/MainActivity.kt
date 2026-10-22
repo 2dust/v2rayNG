@@ -95,6 +95,15 @@ class MainActivity : HelperBaseComponentActivity() {
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
+        
+        lifecycleScope.launch {
+            mainViewModel.connectRequests.collect {
+                LauncherManager.restartServiceOrStart(
+                    this@MainActivity,
+                    this@MainActivity::requestServiceStart
+                )
+            }
+        }
     }
 
     @Composable
