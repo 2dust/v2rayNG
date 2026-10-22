@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">Nhập từ bảng tạm</string>
     <string name="per_app_proxy_settings">Cài đặt theo ứng dụng</string>
     <string name="per_app_proxy_settings_enable">Bật cài đặt theo ứng dụng</string>
+    <string name="acc_app_checked">Đã chọn</string>
+    <string name="acc_app_not_checked">Chưa chọn</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">được định tuyến trực tiếp</string>
+    <string name="acc_app_routed_through">được định tuyến qua ứng dụng</string>
+    <string name="acc_per_app_routing_disabled">định tuyến theo ứng dụng chưa được bật</string>
     <string name="app_picker_unknown_app">Ứng dụng không xác định (không nhận dạng được UID)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt UI</string>
+    <string name="acc_toggle_on">Bật</string>
+    <string name="acc_toggle_off">Tắt</string>
     <string name="title_pref_ui_mode_night">Cài đặt chế độ UI</string>
     <string name="title_pref_dynamic_color">Bật màu động</string>
     <string name="summary_pref_dynamic_color">Chỉ hoạt động trên Android 12+</string>
@@ -549,12 +557,6 @@
     <string name="acc_save">Lưu</string>
     <string name="acc_update_subscriptions">Cập nhật các gói đăng ký</string>
     <string name="acc_per_app_proxy_information">Thông tin proxy theo ứng dụng</string>
-    <string name="acc_app_checked">Đã chọn</string>
-    <string name="acc_app_not_checked">Chưa chọn</string>
-    <string name="acc_app_routing_state">%1$s. %2$s</string>
-    <string name="acc_app_routed_directly">được định tuyến trực tiếp</string>
-    <string name="acc_app_routed_through">được định tuyến qua ứng dụng</string>
-    <string name="acc_per_app_routing_disabled">định tuyến theo ứng dụng chưa được bật</string>
     <string name="permission_camera">Máy ảnh</string>
     <string name="permission_notification">Thông báo</string>
     <string name="permission_local_network">Mạng cục bộ</string>
@@ -568,6 +570,4 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
-    <string name="acc_toggle_on">Bật</string>
-    <string name="acc_toggle_off">Tắt</string>
 </resources>

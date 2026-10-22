@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">وارد کردن از کلیپ‌ بورد</string>
     <string name="per_app_proxy_settings">تنظیمات به تفکیک برنامه</string>
     <string name="per_app_proxy_settings_enable">فعال‌سازی به تفکیک برنامه</string>
+    <string name="acc_app_checked">علامت‌خورده</string>
+    <string name="acc_app_not_checked">علامت‌نخورده</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
+    <string name="acc_app_routed_through">از طریق برنامه مسیریابی می‌شود</string>
+    <string name="acc_per_app_routing_disabled">مسیریابی به تفکیک برنامه فعال نیست</string>
     <string name="app_picker_unknown_app">برنامه ناشناس (UID شناسایی‌نشده)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">برای اطلاعات و راهنمایی بیشتر، روی این متن کلیک کنید</string>
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
     <string name="title_pref_ui_mode_night">تنظیمات حالت رابط کاربری</string>
     <string name="title_pref_dynamic_color">فعال‌سازی رنگ پویا</string>
     <string name="summary_pref_dynamic_color">فقط روی اندروید ۱۲+ کار می‌کند</string>
@@ -551,12 +559,6 @@
     <string name="acc_save">ذخیره</string>
     <string name="acc_update_subscriptions">به‌روزرسانی اشتراک‌ها</string>
     <string name="acc_per_app_proxy_information">اطلاعات پروکسی به تفکیک برنامه</string>
-    <string name="acc_app_checked">علامت‌خورده</string>
-    <string name="acc_app_not_checked">علامت‌نخورده</string>
-    <string name="acc_app_routing_state">%1$s. %2$s</string>
-    <string name="acc_app_routed_directly">به‌طور مستقیم مسیریابی می‌شود</string>
-    <string name="acc_app_routed_through">از طریق برنامه مسیریابی می‌شود</string>
-    <string name="acc_per_app_routing_disabled">مسیریابی به تفکیک برنامه فعال نیست</string>
     <string name="permission_camera">دوربین</string>
     <string name="permission_notification">اعلان</string>
     <string name="permission_local_network">شبکه محلی</string>
@@ -570,6 +572,4 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
-    <string name="acc_toggle_on">روشن</string>
-    <string name="acc_toggle_off">خاموش</string>
 </resources>

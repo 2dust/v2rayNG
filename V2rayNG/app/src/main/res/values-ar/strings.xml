@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">استيراد من الحافظة</string>
     <string name="per_app_proxy_settings">إعدادات كل تطبيق</string>
     <string name="per_app_proxy_settings_enable">تمكين الإعدادات لكل تطبيق</string>
+    <string name="acc_app_checked">محدّد</string>
+    <string name="acc_app_not_checked">غير محدّد</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">موجّه مباشرةً</string>
+    <string name="acc_app_routed_through">موجّه عبر التطبيق</string>
+    <string name="acc_per_app_routing_disabled">التوجيه حسب التطبيق غير مفعّل</string>
     <string name="app_picker_unknown_app">تطبيق غير معروف (UID غير محدد)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
     <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
+    <string name="acc_toggle_on">مفعّل</string>
+    <string name="acc_toggle_off">غير مفعّل</string>
     <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
     <string name="title_pref_dynamic_color">تفعيل الألوان الديناميكية</string>
     <string name="summary_pref_dynamic_color">يعمل فقط على أندرويد 12+</string>
@@ -559,12 +567,6 @@
     <string name="acc_save">حفظ</string>
     <string name="acc_update_subscriptions">تحديث الاشتراكات</string>
     <string name="acc_per_app_proxy_information">معلومات الوكيل لكل تطبيق</string>
-    <string name="acc_app_checked">محدّد</string>
-    <string name="acc_app_not_checked">غير محدّد</string>
-    <string name="acc_app_routing_state">%1$s. %2$s</string>
-    <string name="acc_app_routed_directly">موجّه مباشرةً</string>
-    <string name="acc_app_routed_through">موجّه عبر التطبيق</string>
-    <string name="acc_per_app_routing_disabled">التوجيه حسب التطبيق غير مفعّل</string>
     <string name="permission_camera">الكاميرا</string>
     <string name="permission_notification">الإشعارات</string>
     <string name="permission_local_network">الشبكة المحلية</string>
@@ -578,6 +580,4 @@
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
 
-    <string name="acc_toggle_on">مفعّل</string>
-    <string name="acc_toggle_off">غير مفعّل</string>
 </resources>

@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">و من ٱووردن ز کلیپ بورد</string>
     <string name="per_app_proxy_settings">سامووا ب تفکیک برنومه</string>
     <string name="per_app_proxy_settings_enable">ره وندن ب تفکیک برنومه</string>
+    <string name="acc_app_checked">پسند وابیڌه</string>
+    <string name="acc_app_not_checked">پسند نوابیڌه</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">موستقیم ره اڌه</string>
+    <string name="acc_app_routed_through">وا برنومه ره اڌه</string>
+    <string name="acc_per_app_routing_disabled">ره وندن و ری برنومه روون نید</string>
     <string name="app_picker_unknown_app">برنومه ناشناس (UID شناسایی نوابیڌه)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">سی دووسمندیا وو هیاری قلوه، ری ای هؽل بزݩ</string>
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_dynamic_color">ره وندن رنگ پۊیا</string>
     <string name="summary_pref_dynamic_color">فقت ری ٱندروید 12+ کار اکونه</string>
@@ -551,12 +559,6 @@
     <string name="acc_save">زفت کردن</string>
     <string name="acc_update_subscriptions">ورۊ کردن اشتراکا</string>
     <string name="acc_per_app_proxy_information">دووسمندی پروکسی و ری برنومه</string>
-    <string name="acc_app_checked">پسند وابیڌه</string>
-    <string name="acc_app_not_checked">پسند نوابیڌه</string>
-    <string name="acc_app_routing_state">%1$s. %2$s</string>
-    <string name="acc_app_routed_directly">موستقیم ره اڌه</string>
-    <string name="acc_app_routed_through">وا برنومه ره اڌه</string>
-    <string name="acc_per_app_routing_disabled">ره وندن و ری برنومه روون نید</string>
     <string name="permission_camera">شؽواتگر</string>
     <string name="permission_notification">وارسۊوی</string>
     <string name="permission_local_network">شبکه مهلی</string>
@@ -570,6 +572,4 @@
     <string name="sub_info_open_page">واز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">بی‌حد</string>
 
-    <string name="acc_toggle_on">روشن</string>
-    <string name="acc_toggle_off">خاموش</string>
 </resources>

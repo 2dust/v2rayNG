@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">从剪贴板导入</string>
     <string name="per_app_proxy_settings">分应用设置</string>
     <string name="per_app_proxy_settings_enable">启用分应用</string>
+    <string name="acc_app_checked">已勾选</string>
+    <string name="acc_app_not_checked">未勾选</string>
+    <string name="acc_app_routing_state">%1$s。%2$s</string>
+    <string name="acc_app_routed_directly">直接路由</string>
+    <string name="acc_app_routed_through">通过应用路由</string>
+    <string name="acc_per_app_routing_disabled">未启用分应用路由</string>
     <string name="app_picker_unknown_app">未知应用（无法识别 UID）</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
+    <string name="acc_toggle_on">开启</string>
+    <string name="acc_toggle_off">关闭</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
     <string name="title_pref_dynamic_color">开启莫奈取色</string>
     <string name="summary_pref_dynamic_color">仅在 Android 12+ 设备上工作</string>
@@ -549,12 +557,6 @@
     <string name="acc_save">保存</string>
     <string name="acc_update_subscriptions">更新订阅</string>
     <string name="acc_per_app_proxy_information">分应用代理信息</string>
-    <string name="acc_app_checked">已勾选</string>
-    <string name="acc_app_not_checked">未勾选</string>
-    <string name="acc_app_routing_state">%1$s。%2$s</string>
-    <string name="acc_app_routed_directly">直接路由</string>
-    <string name="acc_app_routed_through">通过应用路由</string>
-    <string name="acc_per_app_routing_disabled">未启用分应用路由</string>
     <string name="permission_camera">相机</string>
     <string name="permission_notification">通知</string>
     <string name="permission_local_network">局域网</string>
@@ -568,6 +570,4 @@
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
 
-    <string name="acc_toggle_on">开启</string>
-    <string name="acc_toggle_off">关闭</string>
 </resources>

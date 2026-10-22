@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">從剪貼簿匯入</string>
     <string name="per_app_proxy_settings">個別應用程式設定</string>
     <string name="per_app_proxy_settings_enable">啟用個別應用程式代理</string>
+    <string name="acc_app_checked">已勾選</string>
+    <string name="acc_app_not_checked">未勾選</string>
+    <string name="acc_app_routing_state">%1$s。%2$s</string>
+    <string name="acc_app_routed_directly">直接路由</string>
+    <string name="acc_app_routed_through">透過應用程式路由</string>
+    <string name="acc_per_app_routing_disabled">未啟用個別應用程式路由</string>
     <string name="app_picker_unknown_app">未知應用程式（無法識別 UID）</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顯示設定</string>
+    <string name="acc_toggle_on">開啟</string>
+    <string name="acc_toggle_off">關閉</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
     <string name="title_pref_dynamic_color">開啟莫奈取色</string>
     <string name="summary_pref_dynamic_color">僅在 Android 12+ 裝置上工作</string>
@@ -549,12 +557,6 @@
     <string name="acc_save">儲存</string>
     <string name="acc_update_subscriptions">更新訂閱</string>
     <string name="acc_per_app_proxy_information">個別應用程式代理資訊</string>
-    <string name="acc_app_checked">已勾選</string>
-    <string name="acc_app_not_checked">未勾選</string>
-    <string name="acc_app_routing_state">%1$s。%2$s</string>
-    <string name="acc_app_routed_directly">直接路由</string>
-    <string name="acc_app_routed_through">透過應用程式路由</string>
-    <string name="acc_per_app_routing_disabled">未啟用個別應用程式路由</string>
     <string name="permission_camera">相機</string>
     <string name="permission_notification">通知</string>
     <string name="permission_local_network">區域網路</string>
@@ -568,6 +570,4 @@
     <string name="sub_info_open_page">開啟訂閱資訊頁面</string>
     <string name="sub_info_unlimited">無限制</string>
 
-    <string name="acc_toggle_on">開啟</string>
-    <string name="acc_toggle_off">關閉</string>
 </resources>

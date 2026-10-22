@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">ক্লিপবোর্ড থেকে আমদানি করুন</string>
     <string name="per_app_proxy_settings">অ্যাপভিত্তিক সেটিংস</string>
     <string name="per_app_proxy_settings_enable">অ্যাপভিত্তিক সেটিংস চালু করুন</string>
+    <string name="acc_app_checked">চিহ্নিত</string>
+    <string name="acc_app_not_checked">চিহ্নিত নয়</string>
+    <string name="acc_app_routing_state">%1$s। %2$s</string>
+    <string name="acc_app_routed_directly">সরাসরি রাউট করা হয়েছে</string>
+    <string name="acc_app_routed_through">অ্যাপের মাধ্যমে রাউট করা হয়েছে</string>
+    <string name="acc_per_app_routing_disabled">অ্যাপভিত্তিক রাউটিং চালু নেই</string>
     <string name="app_picker_unknown_app">অজানা অ্যাপ (UID শনাক্ত করা যায়নি)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
     <string name="title_ui_settings">ইউআই সেটিংস</string>
+    <string name="acc_toggle_on">চালু</string>
+    <string name="acc_toggle_off">বন্ধ</string>
     <string name="title_pref_ui_mode_night">ইউআই মোড সেটিংস</string>
     <string name="title_pref_dynamic_color">ডায়নামিক রঙ চালু করুন</string>
     <string name="summary_pref_dynamic_color">শুধুমাত্র Android 12+ ডিভাইসে কাজ করে</string>
@@ -551,12 +559,6 @@
     <string name="acc_save">সংরক্ষণ করুন</string>
     <string name="acc_update_subscriptions">সাবস্ক্রিপশন আপডেট করুন</string>
     <string name="acc_per_app_proxy_information">প্রতি-অ্যাপ প্রক্সির তথ্য</string>
-    <string name="acc_app_checked">চিহ্নিত</string>
-    <string name="acc_app_not_checked">চিহ্নিত নয়</string>
-    <string name="acc_app_routing_state">%1$s। %2$s</string>
-    <string name="acc_app_routed_directly">সরাসরি রাউট করা হয়েছে</string>
-    <string name="acc_app_routed_through">অ্যাপের মাধ্যমে রাউট করা হয়েছে</string>
-    <string name="acc_per_app_routing_disabled">অ্যাপভিত্তিক রাউটিং চালু নেই</string>
     <string name="permission_camera">ক্যামেরা</string>
     <string name="permission_notification">বিজ্ঞপ্তি</string>
     <string name="permission_local_network">স্থানীয় নেটওয়ার্ক</string>
@@ -570,6 +572,4 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
-    <string name="acc_toggle_on">চালু</string>
-    <string name="acc_toggle_off">বন্ধ</string>
 </resources>

@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">Mübadilə buferindən idxal et</string>
     <string name="per_app_proxy_settings">Tətbiq üzrə proksi tənzimləmələri</string>
     <string name="per_app_proxy_settings_enable">Tətbiq üzrə proksini aktivləşdir</string>
+    <string name="acc_app_checked">Seçilib</string>
+    <string name="acc_app_not_checked">Seçilməyib</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">birbaşa yönləndirilir</string>
+    <string name="acc_app_routed_through">tətbiq vasitəsilə yönləndirilir</string>
+    <string name="acc_per_app_routing_disabled">tətbiq üzrə marşrutlaşdırma aktiv deyil</string>
     <string name="app_picker_unknown_app">Bilinməyən tətbiq (UID tanınmadı)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">Ətraflı kömək üçün toxunun</string>
     <string name="title_language">Dil</string>
     <string name="title_ui_settings">İstifadəçi interfeysi tənzimləmələri</string>
+    <string name="acc_toggle_on">Aktiv</string>
+    <string name="acc_toggle_off">Deaktiv</string>
     <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejim tənzimləmələri</string>
     <string name="title_pref_dynamic_color">Dinamik rəngi aktivləşdir</string>
     <string name="summary_pref_dynamic_color">Yalnız Android 12+ cihazlarında işləyir</string>
@@ -551,12 +559,6 @@
     <string name="acc_save">Saxla</string>
     <string name="acc_update_subscriptions">Abunəlikləri yenilə</string>
     <string name="acc_per_app_proxy_information">Tətbiq üzrə proksi məlumatı</string>
-    <string name="acc_app_checked">Seçilib</string>
-    <string name="acc_app_not_checked">Seçilməyib</string>
-    <string name="acc_app_routing_state">%1$s. %2$s</string>
-    <string name="acc_app_routed_directly">birbaşa yönləndirilir</string>
-    <string name="acc_app_routed_through">tətbiq vasitəsilə yönləndirilir</string>
-    <string name="acc_per_app_routing_disabled">tətbiq üzrə marşrutlaşdırma aktiv deyil</string>
     <string name="permission_camera">Kamera</string>
     <string name="permission_notification">Bildiriş</string>
     <string name="permission_local_network">Yerli şəbəkə</string>
@@ -570,6 +572,4 @@
     <string name="sub_info_open_page">Abunəlik məlumat səhifəsini aç</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <string name="acc_toggle_on">Aktiv</string>
-    <string name="acc_toggle_off">Deaktiv</string>
 </resources>
