@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">Fayl tapılmadı</string>
     <string name="msg_remark_is_duplicate">Bu ad artıq mövcuddur</string>
     <string name="asset_geo_files_sources">Geo fayl mənbəyi (istəyə bağlı)</string>
+    <string name="acc_asset_file_details">Faylın ölçüsü: %1$s. Yenilənmə tarixi: %2$s</string>
+    <string name="acc_edit_asset_named">%1$s üçün düzəliş et</string>
+    <string name="acc_delete_asset_named">%1$s sil</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Yüklənir</string>
@@ -524,9 +527,6 @@
     <string name="toast_malformed_json_detail">Yanlış konfiqurasiya: %1$s</string>
     <string name="acc_add_asset">Resurs mənbəyi əlavə et</string>
     <string name="acc_download_file">Resurs fayllarını endir</string>
-    <string name="acc_asset_file_details">Faylın ölçüsü: %1$s. Yenilənmə tarixi: %2$s</string>
-    <string name="acc_edit_asset_named">%1$s üçün düzəliş et</string>
-    <string name="acc_delete_asset_named">%1$s sil</string>
     <string name="acc_qr_code">QR kod</string>
     <string name="acc_copy_log">Jurnalı kopyala</string>
     <string name="acc_clear_log">Jurnalı təmizlə</string>

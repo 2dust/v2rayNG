@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">ফাইল খুঁজে পাওয়া যায়নি</string>
     <string name="msg_remark_is_duplicate">মন্তব্য ইতিমধ্যে বিদ্যমান</string>
     <string name="asset_geo_files_sources">Geo ফাইলের উৎস (ঐচ্ছিক)</string>
+    <string name="acc_asset_file_details">ফাইলের আকার %1$s। আপডেট করা হয়েছে %2$s-এ</string>
+    <string name="acc_edit_asset_named">%1$s সম্পাদনা করুন</string>
+    <string name="acc_delete_asset_named">%1$s মুছুন</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">লোড হচ্ছে</string>
@@ -524,9 +527,6 @@
     <string name="toast_malformed_json_detail">কনফিগারেশন ফরম্যাট সঠিক নয়: %1$s</string>
     <string name="acc_add_asset">অ্যাসেট উৎস যোগ করুন</string>
     <string name="acc_download_file">অ্যাসেট ফাইল ডাউনলোড করুন</string>
-    <string name="acc_asset_file_details">ফাইলের আকার %1$s। আপডেট করা হয়েছে %2$s-এ</string>
-    <string name="acc_edit_asset_named">%1$s সম্পাদনা করুন</string>
-    <string name="acc_delete_asset_named">%1$s মুছুন</string>
     <string name="acc_qr_code">QR কোড</string>
     <string name="acc_copy_log">লগ কপি করুন</string>
     <string name="acc_clear_log">লগ মুছুন</string>
