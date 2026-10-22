@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">Bu funksiyanı istifadə etməzdən əvvəl tətbiqə profil əlavə edin.</string>
     <string name="navigation_drawer_open">Naviqasiya menyusunu açın</string>
     <string name="navigation_drawer_close">Naviqasiya menyusunu bağlayın</string>
+    <string name="acc_connect">Qoşul</string>
+    <string name="acc_disconnect">Bağlantını kəs</string>
+    <string name="acc_clear_search">Axtarışı təmizlə</string>
     <string name="migration_success">Məlumatların köçürülməsi uğurla başa çatdı!</string>
     <string name="action_stop_service">Xidməti saxla</string>
     <string name="action_ok">Oldu</string>
@@ -530,11 +533,8 @@
     <string name="acc_add_rule">Marşrutlaşdırma qaydası əlavə et</string>
     <string name="acc_start">Xidməti başlat</string>
     <string name="acc_stop">Xidməti dayandır</string>
-    <string name="acc_connect">Qoşul</string>
-    <string name="acc_disconnect">Bağlantını kəs</string>
     <string name="acc_back">Geri</string>
     <string name="acc_search">Axtar</string>
-    <string name="acc_clear_search">Axtarışı təmizlə</string>
     <string name="acc_add">Konfiqurasiya əlavə et</string>
     <string name="acc_more">Əlavə seçimlər</string>
     <string name="acc_selected_server">Seçildi</string>

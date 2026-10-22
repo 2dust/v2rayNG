@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
     <string name="navigation_drawer_open">開啟導覽匣</string>
     <string name="navigation_drawer_close">關閉導覽匣</string>
+    <string name="acc_connect">連線</string>
+    <string name="acc_disconnect">中斷連線</string>
+    <string name="acc_clear_search">清除搜尋</string>
     <string name="migration_success">資料遷移成功！</string>
     <string name="action_stop_service">停止服務</string>
     <string name="action_ok">確定</string>
@@ -528,11 +531,8 @@
     <string name="acc_add_rule">新增路由規則</string>
     <string name="acc_start">啟動服務</string>
     <string name="acc_stop">停止服務</string>
-    <string name="acc_connect">連線</string>
-    <string name="acc_disconnect">中斷連線</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜尋</string>
-    <string name="acc_clear_search">清除搜尋</string>
     <string name="acc_add">新增設定</string>
     <string name="acc_more">更多選項</string>
     <string name="acc_selected_server">Selected</string>

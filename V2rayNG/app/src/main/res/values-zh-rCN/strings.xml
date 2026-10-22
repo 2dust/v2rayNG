@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
     <string name="navigation_drawer_open">打开导航栏</string>
     <string name="navigation_drawer_close">关闭导航栏</string>
+    <string name="acc_connect">连接</string>
+    <string name="acc_disconnect">断开连接</string>
+    <string name="acc_clear_search">清除搜索</string>
     <string name="migration_success">数据迁移成功!</string>
     <string name="action_stop_service">停止服务</string>
     <string name="action_ok">确定</string>
@@ -528,11 +531,8 @@
     <string name="acc_add_rule">添加路由规则</string>
     <string name="acc_start">启动服务</string>
     <string name="acc_stop">停止服务</string>
-    <string name="acc_connect">连接</string>
-    <string name="acc_disconnect">断开连接</string>
     <string name="acc_back">返回</string>
     <string name="acc_search">搜索</string>
-    <string name="acc_clear_search">清除搜索</string>
     <string name="acc_add">添加配置</string>
     <string name="acc_more">更多选项</string>
     <string name="acc_selected_server">Selected</string>

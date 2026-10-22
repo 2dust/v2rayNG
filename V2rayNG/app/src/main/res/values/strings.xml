@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">Add a profile in the app before using this feature.</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="acc_connect">Connect</string>
+    <string name="acc_disconnect">Disconnect</string>
+    <string name="acc_clear_search">Clear search</string>
     <string name="migration_success">Data migration succeeded!</string>
     <string name="action_stop_service">Stop service</string>
     <string name="action_ok">OK</string>
@@ -530,11 +533,8 @@
     <string name="acc_add_rule">Add routing rule</string>
     <string name="acc_start">Start service</string>
     <string name="acc_stop">Stop service</string>
-    <string name="acc_connect">Connect</string>
-    <string name="acc_disconnect">Disconnect</string>
     <string name="acc_back">Back</string>
     <string name="acc_search">Search</string>
-    <string name="acc_clear_search">Clear search</string>
     <string name="acc_add">Add configuration</string>
     <string name="acc_more">More options</string>
     <string name="acc_selected_server">Selected</string>

@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">برای اولین استفاده از این قابلیت، لطفاً ابتدا از داخل برنامه یک سرور اضافه کنید</string>
     <string name="navigation_drawer_open">باز کردن منو کشویی</string>
     <string name="navigation_drawer_close">بستن منو کشویی</string>
+    <string name="acc_connect">اتصال</string>
+    <string name="acc_disconnect">قطع اتصال</string>
+    <string name="acc_clear_search">پاک کردن جستجو</string>
     <string name="migration_success">انتقال داده‌ها با موفقیت انجام شد!</string>
     <string name="action_stop_service">توقف سرویس</string>
     <string name="action_ok">تأیید</string>
@@ -530,11 +533,8 @@
     <string name="acc_add_rule">افزودن قانون مسیریابی</string>
     <string name="acc_start">شروع سرویس</string>
     <string name="acc_stop">توقف سرویس</string>
-    <string name="acc_connect">اتصال</string>
-    <string name="acc_disconnect">قطع اتصال</string>
     <string name="acc_back">بازگشت</string>
     <string name="acc_search">جستجو</string>
-    <string name="acc_clear_search">پاک کردن جستجو</string>
     <string name="acc_add">افزودن کانفیگ</string>
     <string name="acc_more">گزینه‌های بیشتر</string>
     <string name="acc_selected_server">انتخاب شده</string>

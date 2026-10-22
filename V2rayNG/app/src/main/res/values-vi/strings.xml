@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào v2rayNG để sử dụng!</string>
     <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
     <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
+    <string name="acc_connect">Kết nối</string>
+    <string name="acc_disconnect">Ngắt kết nối</string>
+    <string name="acc_clear_search">Xóa tìm kiếm</string>
     <string name="migration_success">Đã chuyển dữ liệu!</string>
     <string name="action_stop_service">Dừng dịch vụ</string>
     <string name="action_ok">OK</string>
@@ -528,11 +531,8 @@
     <string name="acc_add_rule">Thêm quy tắc định tuyến</string>
     <string name="acc_start">Khởi động dịch vụ</string>
     <string name="acc_stop">Dừng dịch vụ</string>
-    <string name="acc_connect">Kết nối</string>
-    <string name="acc_disconnect">Ngắt kết nối</string>
     <string name="acc_back">Quay lại</string>
     <string name="acc_search">Tìm kiếm</string>
-    <string name="acc_clear_search">Xóa tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
     <string name="acc_selected_server">Selected</string>
