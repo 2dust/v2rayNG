@@ -162,7 +162,7 @@ class MainViewModel(
                 onWatchdogResult(event.result.delayMillis)
             }
 
-            is MainServiceEvent.MeasureConfigSuccess -> {
+             is MainServiceEvent.MeasureConfigSuccess -> {
                 val request = testRequests.bulk?.takeIf { it.id == event.requestId } ?: return
                 queueTestResult(event.result, request)
                 if (autoConnectOnFirstGood &&
@@ -172,6 +172,19 @@ class MainViewModel(
                     autoConnectOnFirstGood = false
                     toast("Connecting to first fast server...")
                     connectToServer(event.result.guid)
+                }
+                if (candidateSwitchActive &&
+                    uiState.value.isRunning &&
+                    event.result.guid in candidateGuids &&
+                    event.result.delayMillis in 1L..candidateMaxDelayMs
+                ) {
+                    candidateSwitchActive = false
+                    candidateJob?.cancel()
+                    val guid = event.result.guid
+                    cancelAllPing()
+                    lastSwitchMs = System.currentTimeMillis()
+                    toast("Switching to a verified server...")
+                    connectToServer(guid)
                 }
             }
 
@@ -914,6 +927,11 @@ class MainViewModel(
 
     private fun onTestsFinished(requestId: String) {
         if (testRequests.completeBulk(requestId) == null) return
+        if (candidateSwitchActive) {
+            candidateSwitchActive = false
+            candidateJob?.cancel()
+            toast("No healthy backup found, staying on current server")
+        }
         resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
             cacheMutex.withLock { groupDataCache.clear() }
@@ -949,7 +967,7 @@ class MainViewModel(
     private val firstGoodMaxDelayMs = 1500L
     private var watchdogJob: Job? = null
     private var lastSwitchMs = 0L
-    private val watchdogIntervalMs = 30_000L   // when everything is fine
+    private val watchdogIntervalMs = 90_000L   // when everything is fine
     private val watchdogRetryMs = 10_000L       // after a bad sample
     private val watchdogMaxDelayMs = 4000L
     private val watchdogWindowMs = 120_000L     // how far back samples count
@@ -958,6 +976,14 @@ class MainViewModel(
     @Volatile
     private var watchdogGotResult = false
     private val switchCooldownMs = 60_000L
+    
+    @Volatile
+    private var candidateSwitchActive = false
+    private var candidateGuids: Set<String> = emptySet()
+    private var candidateJob: Job? = null
+    private val candidateMaxDelayMs = 2500L
+    private val candidateTimeoutMs = 40_000L
+    private val candidateCount = 5
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -1175,9 +1201,10 @@ class MainViewModel(
         }
     }
     private fun switchToBestServer() {
+        if (candidateSwitchActive) return
         if (System.currentTimeMillis() - lastSwitchMs < switchCooldownMs) return
         viewModelScope.launch {
-            val target: String? = withContext(ioDispatcher) {
+            val prepared: Pair<String, List<String>>? = withContext(ioDispatcher) {
                 val healthy = dataSource.getSubscriptions()
                     .firstOrNull { it.subscription.remarks == "Healthy" }
                     ?: return@withContext null
@@ -1185,7 +1212,7 @@ class MainViewModel(
                 val currentId = currentGuid?.let {
                     dataSource.decodeServerConfig(it)?.duplicateIdentity()
                 }
-                val best = dataSource.getServerGuidList(healthy.guid)
+                val top = dataSource.getServerGuidList(healthy.guid)
                     .mapNotNull { guid ->
                         val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
                         if (ms <= 0L) return@mapNotNull null
@@ -1193,20 +1220,44 @@ class MainViewModel(
                         if (id != null && id == currentId) return@mapNotNull null
                         guid to ms
                     }
-                    .minByOrNull { it.second }
-                    ?.first
-                if (best != null && currentGuid != null) {
+                    .sortedBy { it.second }
+                    .take(candidateCount)
+                    .map { it.first }
+                if (top.isEmpty()) return@withContext null
+                if (currentGuid != null) {
                     com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(currentGuid, -1L)
                 }
-                best
+                dataSource.clearAllTestDelayResults(top)
+                healthy.guid to top
             }
-            if (target != null) {
-                lastSwitchMs = System.currentTimeMillis()
-                toast("Connection weak, switching to a better server...")
-                connectToServer(target)
+            if (prepared == null) return@launch
+            if (testRequests.bulk != null || !uiState.value.isRunning) return@launch
+
+            val (healthyId, guids) = prepared
+            candidateGuids = guids.toHashSet()
+            candidateSwitchActive = true
+            lastSwitchMs = System.currentTimeMillis()
+            val request = testRequests.beginBulk(healthyId)
+            toast("Checking backup servers...")
+            dataSource.sendMsg2TestService(
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_CONFIG_START,
+                    subscriptionId = healthyId,
+                    serverGuids = guids,
+                    onlyTcp = false
+                ),
+                request.id
+            )
+            candidateJob = launch {
+                delay(candidateTimeoutMs)
+                if (candidateSwitchActive) {
+                    candidateSwitchActive = false
+                    cancelAllPing()
+                    toast("No healthy backup found, staying on current server")
+                }
             }
         }
-    } 
+    }
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
         if (running) startWatchdog() else stopWatchdog()
