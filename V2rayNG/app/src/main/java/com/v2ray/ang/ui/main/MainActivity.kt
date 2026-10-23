@@ -5,6 +5,11 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -98,6 +103,7 @@ class MainActivity : HelperBaseComponentActivity() {
         
         lifecycleScope.launch {
             mainViewModel.connectRequests.collect {
+                registerNetworkWatcher()
                 LauncherManager.restartServiceOrStart(
                     this@MainActivity,
                     this@MainActivity::requestServiceStart
@@ -132,6 +138,43 @@ class MainActivity : HelperBaseComponentActivity() {
         )
     }
 
+       private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var networkSeen = false
+
+    private fun registerNetworkWatcher() {
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val request = NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                .build()
+            val callback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    // The first callback is just the current network, not a change
+                    if (networkSeen) mainViewModel.onNetworkChanged() else networkSeen = true
+                }
+
+                override fun onLost(network: Network) {
+                    mainViewModel.onNetworkChanged()
+                }
+            }
+            cm.registerNetworkCallback(request, callback)
+            networkCallback = callback
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Network watcher failed", e)
+        }
+    }
+
+    override fun onDestroy() {
+        try {
+            networkCallback?.let {
+                (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+                    .unregisterNetworkCallback(it)
+            }
+        } catch (_: Exception) {
+        }
+        super.onDestroy()
+    }
     private fun shareToClipboard(guid: String): Boolean =
         AngConfigManager.share2Clipboard(this, guid) == 0
 
