@@ -24,6 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.min
 
 object NotificationManager {
@@ -33,6 +37,13 @@ object NotificationManager {
     private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
     private const val QUERY_INTERVAL_MS = 3000L
+    
+    // Proxy traffic of the last interval: (uplink bytes, downlink bytes)
+    private val _proxyTraffic = MutableSharedFlow<Pair<Long, Long>>(
+        extraBufferCapacity = 8,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val proxyTraffic: SharedFlow<Pair<Long, Long>> = _proxyTraffic.asSharedFlow()
 
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
@@ -263,6 +274,7 @@ object NotificationManager {
             }
         }
 
+        _proxyTraffic.tryEmit(proxyUplink to proxyDownlink)
         val proxyTotal = proxyUplink + proxyDownlink
         val directTotal = directUplink + directDownlink
         val zeroSpeed = proxyTotal + directTotal == 0L
