@@ -126,6 +126,7 @@ class MainViewModel(
     // ---------- Service events ----------
     init {
         collectServiceEvents()
+        collectTraffic()
         setupGroupTab()
     }
 
@@ -984,6 +985,13 @@ class MainViewModel(
     private val candidateMaxDelayMs = 2500L
     private val candidateTimeoutMs = 40_000L
     private val candidateCount = 5
+    private var stallSamples = 0
+    private var lastProbeMs = 0L
+    private var trafficSeen = false
+    private val stallMinUpBytes = 500L
+    private val stallMaxDownBytes = 100L
+    private val stallSamplesNeeded = 4      // 4 samples x 3 s = about 12 s
+    private val probeCooldownMs = 15_000L
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -1227,7 +1235,7 @@ class MainViewModel(
                 if (currentGuid != null) {
                     com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(currentGuid, -1L)
                 }
-                dataSource.clearAllTestDelayResults(top)
+                
                 healthy.guid to top
             }
             if (prepared == null) return@launch
@@ -1255,6 +1263,49 @@ class MainViewModel(
                     cancelAllPing()
                     toast("No healthy backup found, staying on current server")
                 }
+            }
+        }
+    }
+    
+        // ---------- Traffic stall detection ----------
+    private fun collectTraffic() {
+        viewModelScope.launch {
+            com.v2ray.ang.handler.NotificationManager.proxyTraffic.collect { (up, down) ->
+                if (!uiState.value.isRunning) {
+                    stallSamples = 0
+                    trafficSeen = false
+                    return@collect
+                }
+                if (!trafficSeen) {
+                    trafficSeen = true
+                    toast("Traffic monitor active") // temporary diagnostic
+                }
+                if (up >= stallMinUpBytes && down <= stallMaxDownBytes) {
+                    stallSamples++
+                    if (stallSamples >= stallSamplesNeeded) {
+                        stallSamples = 0
+                        onTrafficStall()
+                    }
+                } else {
+                    stallSamples = 0
+                }
+            }
+        }
+    }
+
+    private fun onTrafficStall() {
+        val now = System.currentTimeMillis()
+        if (!uiState.value.isRunning || testRequests.bulk != null || candidateSwitchActive) return
+        if (now - lastProbeMs < probeCooldownMs) return
+        lastProbeMs = now
+        toast("Traffic stalled, checking connection...")
+        watchdogGotResult = false
+        testCurrentServerRealPing()
+        viewModelScope.launch {
+            delay(watchdogTimeoutMs)
+            if (uiState.value.isRunning && !watchdogGotResult) {
+                cancelAllPing()
+                recordWatchdogSample(true)
             }
         }
     }
