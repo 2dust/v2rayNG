@@ -968,7 +968,6 @@ class MainViewModel(
     private val firstGoodMaxDelayMs = 1500L
     private var watchdogJob: Job? = null
     private var lastSwitchMs = 0L
-    private val watchdogIntervalMs = 90_000L   // when everything is fine
     private val watchdogRetryMs = 10_000L       // after a bad sample
     private val watchdogMaxDelayMs = 4000L
     private val watchdogWindowMs = 120_000L     // how far back samples count
@@ -992,6 +991,14 @@ class MainViewModel(
     private val stallMaxDownBytes = 100L
     private val stallSamplesNeeded = 4      // 4 samples x 3 s = about 12 s
     private val probeCooldownMs = 15_000L
+    private val watchdogCheckMs = 30_000L        // how often the watchdog looks at the traffic
+    private val smartMinDownBytes = 2048L        // enough download in the window = connection is alive
+    private val smartTrafficWindowMs = 30_000L
+    private val smartIdleTestMs = 300_000L       // test every 5 min when there is no traffic
+    private var lastTestMs = 0L
+    private var lastRxBytes = -1L
+    private var lastTxBytes = -1L
+    private val rxHistory = ArrayDeque<Pair<Long, Long>>() // (time, bytes downloaded in that interval)
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -1148,12 +1155,24 @@ class MainViewModel(
     private fun startWatchdog() {
         if (watchdogJob?.isActive == true) return
         watchdogSamples.clear()
+        lastTestMs = 0L
         watchdogJob = viewModelScope.launch {
             while (true) {
                 val trouble = watchdogSamples.any { it.second }
-                delay(if (trouble) watchdogRetryMs else watchdogIntervalMs)
+                delay(if (trouble) watchdogRetryMs else watchdogCheckMs)
                 if (!uiState.value.isRunning) break
                 if (testRequests.bulk != null) continue
+                val now = System.currentTimeMillis()
+                if (!trouble) {
+                    // Real traffic flowing = connection works, no extra test needed
+                    if (rxHistory.sumOf { it.second } >= smartMinDownBytes) {
+                        watchdogSamples.clear()
+                        continue
+                    }
+                    // No traffic: test only every few minutes
+                    if (now - lastTestMs < smartIdleTestMs) continue
+                }
+                lastTestMs = now
                 watchdogGotResult = false
                 testCurrentServerRealPing()
                 delay(watchdogTimeoutMs)
@@ -1268,17 +1287,36 @@ class MainViewModel(
     }
     
         // ---------- Traffic stall detection ----------
-    private fun collectTraffic() {
+   private fun collectTraffic() {
         viewModelScope.launch {
-            com.v2ray.ang.handler.NotificationManager.proxyTraffic.collect { (up, down) ->
+            val uid = android.os.Process.myUid()
+            while (true) {
+                delay(3000)
+                val rx = android.net.TrafficStats.getUidRxBytes(uid)
+                val tx = android.net.TrafficStats.getUidTxBytes(uid)
+                if (rx < 0 || tx < 0) continue // -1 = not supported on this device
+                val up = if (lastTxBytes >= 0) tx - lastTxBytes else 0L
+                val down = if (lastRxBytes >= 0) rx - lastRxBytes else 0L
+                lastTxBytes = tx
+                lastRxBytes = rx
+                val now = System.currentTimeMillis()
                 if (!uiState.value.isRunning) {
                     stallSamples = 0
                     trafficSeen = false
-                    return@collect
+                    rxHistory.clear()
+                    continue
                 }
                 if (!trafficSeen) {
                     trafficSeen = true
                     toast("Traffic monitor active") // temporary diagnostic
+                }
+                // Ignore the bytes of our own test, so it does not look like real traffic
+                if (now - lastTestMs < 8000) continue
+                rxHistory.addLast(now to down.coerceAtLeast(0L))
+                while (rxHistory.isNotEmpty() &&
+                    now - rxHistory.first().first > smartTrafficWindowMs
+                ) {
+                    rxHistory.removeFirst()
                 }
                 if (up >= stallMinUpBytes && down <= stallMaxDownBytes) {
                     stallSamples++
@@ -1298,6 +1336,7 @@ class MainViewModel(
         if (!uiState.value.isRunning || testRequests.bulk != null || candidateSwitchActive) return
         if (now - lastProbeMs < probeCooldownMs) return
         lastProbeMs = now
+        lastTestMs = now
         toast("Traffic stalled, checking connection...")
         watchdogGotResult = false
         testCurrentServerRealPing()
