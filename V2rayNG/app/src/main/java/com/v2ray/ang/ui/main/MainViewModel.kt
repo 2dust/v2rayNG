@@ -119,6 +119,7 @@ class MainViewModel(
     val connectRequests: SharedFlow<Unit> = _connectRequests.asSharedFlow()
 
     fun connectToServer(guid: String) {
+        autoConnectGuid = guid
         updateSelectedGuid(guid)
         _connectRequests.tryEmit(Unit)
     }
@@ -144,6 +145,7 @@ class MainViewModel(
             MainServiceEvent.StateNotRunning -> updateRunningState(false, clearTestingText = false)
             MainServiceEvent.StateStartSuccess -> {
                 toastSuccess(R.string.toast_services_success)
+                autoConnectRetries = 0
                 updateRunningState(true)
             }
 
@@ -154,6 +156,7 @@ class MainViewModel(
                     toastError(R.string.toast_services_failure)
                 }
                 updateRunningState(false)
+                onAutoConnectFailed()
             }
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
@@ -991,6 +994,8 @@ class MainViewModel(
     private val stallMaxDownBytes = 100L
     private val stallSamplesNeeded = 4      // 4 samples x 3 s = about 12 s
     private val probeCooldownMs = 15_000L
+    private var autoConnectGuid: String? = null
+    private var autoConnectRetries = 0
     private val watchdogCheckMs = 30_000L        // how often the watchdog looks at the traffic
     private val smartMinDownBytes = 2048L        // enough download in the window = connection is alive
     private val smartTrafficWindowMs = 30_000L
@@ -1155,37 +1160,40 @@ class MainViewModel(
     private fun startWatchdog() {
         if (watchdogJob?.isActive == true) return
         watchdogSamples.clear()
-        lastTestMs = 0L
+        // first test about 30 s after connecting
+        lastTestMs = System.currentTimeMillis() - smartIdleTestMs + watchdogCheckMs
         watchdogJob = viewModelScope.launch {
             while (true) {
-                val trouble = watchdogSamples.any { it.second }
-                delay(if (trouble) watchdogRetryMs else watchdogCheckMs)
+                delay(5_000)
                 if (!uiState.value.isRunning) break
-                if (testRequests.bulk != null) continue
+                if (testRequests.bulk != null || candidateSwitchActive) continue
                 val now = System.currentTimeMillis()
-                if (!trouble) {
-                    // Real traffic flowing = connection works, no extra test needed
-                    if (rxHistory.sumOf { it.second } >= smartMinDownBytes) {
-                        watchdogSamples.clear()
-                        continue
-                    }
-                    // No traffic: test only every few minutes
-                    if (now - lastTestMs < smartIdleTestMs) continue
+                val trouble = watchdogSamples.any { it.second }
+                val due = if (trouble) {
+                    // there was a bad sample: re-test fast, whatever the traffic is
+                    now - lastTestMs >= watchdogRetryMs
+                } else {
+                    // healthy traffic is proof enough; only test when it is quiet
+                    rxHistory.sumOf { it.second } < smartMinDownBytes &&
+                        now - lastTestMs >= smartIdleTestMs
                 }
-                lastTestMs = now
-                watchdogGotResult = false
-                testCurrentServerRealPing()
-                delay(watchdogTimeoutMs)
-                if (!uiState.value.isRunning) break
-                if (!watchdogGotResult) {
-                    // No answer at all: count it as a bad sample and clear the stuck "Testing" state
-                    cancelAllPing()
-                    recordWatchdogSample(true)
-                }
+                if (due) probeCurrentServer()
             }
         }
     }
 
+    private suspend fun probeCurrentServer() {
+        if (!uiState.value.isRunning) return
+        lastTestMs = System.currentTimeMillis()
+        watchdogGotResult = false
+        testCurrentServerRealPing()
+        delay(watchdogTimeoutMs)
+        if (uiState.value.isRunning && !watchdogGotResult) {
+            // No answer at all: count it as a bad sample and clear the stuck "Testing" state
+            cancelAllPing()
+            recordWatchdogSample(true)
+        }
+    }
     private fun stopWatchdog() {
         watchdogJob?.cancel()
         watchdogJob = null
@@ -1222,7 +1230,7 @@ class MainViewModel(
             networkJob = launch {
                 delay(3000) // let the new network settle
                 if (uiState.value.isRunning && testRequests.bulk == null) {
-                    testCurrentServerRealPing()
+                    probeCurrentServer()
                 }
             }
         }
@@ -1257,7 +1265,10 @@ class MainViewModel(
                 
                 healthy.guid to top
             }
-            if (prepared == null) return@launch
+            if (prepared == null) {
+                toast("No backup server with a good test result in Healthy")
+                return@launch
+            }
             if (testRequests.bulk != null || !uiState.value.isRunning) return@launch
 
             val (healthyId, guids) = prepared
@@ -1338,15 +1349,7 @@ class MainViewModel(
         lastProbeMs = now
         lastTestMs = now
         toast("Traffic stalled, checking connection...")
-        watchdogGotResult = false
-        testCurrentServerRealPing()
-        viewModelScope.launch {
-            delay(watchdogTimeoutMs)
-            if (uiState.value.isRunning && !watchdogGotResult) {
-                cancelAllPing()
-                recordWatchdogSample(true)
-            }
-        }
+        viewModelScope.launch { probeCurrentServer() }
     }
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
@@ -1362,6 +1365,40 @@ class MainViewModel(
         }
     }
 
+    private fun onAutoConnectFailed() {
+        val failed = autoConnectGuid ?: return
+        if (failed != uiState.value.selectedGuid) return
+        autoConnectGuid = null
+        if (autoConnectRetries >= 3) {
+            autoConnectRetries = 0
+            toast("Auto-connect failed, please choose a server manually")
+            return
+        }
+        autoConnectRetries++
+        viewModelScope.launch {
+            val next = withContext(ioDispatcher) {
+                val healthy = dataSource.getSubscriptions()
+                    .firstOrNull { it.subscription.remarks == "Healthy" }
+                    ?: return@withContext null
+                val failedId = dataSource.decodeServerConfig(failed)?.duplicateIdentity()
+                com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(failed, -1L)
+                dataSource.getServerGuidList(healthy.guid)
+                    .mapNotNull { guid ->
+                        val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                        if (ms <= 0L) return@mapNotNull null
+                        val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                        if (id != null && id == failedId) return@mapNotNull null
+                        guid to ms
+                    }
+                    .minByOrNull { it.second }
+                    ?.first
+            }
+            if (next != null) {
+                toast("Server failed to start, trying another...")
+                connectToServer(next)
+            }
+        }
+    }
     override fun onCleared() {
         setupGroupJob?.cancel()
         preloadJob?.cancel()
