@@ -954,6 +954,9 @@ class MainViewModel(
     private val watchdogMaxDelayMs = 4000L
     private val watchdogWindowMs = 120_000L     // how far back samples count
     private val watchdogSamples = ArrayDeque<Pair<Long, Boolean>>() // (time, isBad)
+    private val watchdogTimeoutMs = 10_000L
+    @Volatile
+    private var watchdogGotResult = false
     private val switchCooldownMs = 60_000L
 
     fun refreshHealthy() {
@@ -1108,7 +1111,7 @@ class MainViewModel(
         delay(500)
     }
     // ---------- Connection watchdog ----------
-   private fun startWatchdog() {
+    private fun startWatchdog() {
         if (watchdogJob?.isActive == true) return
         watchdogSamples.clear()
         watchdogJob = viewModelScope.launch {
@@ -1117,7 +1120,15 @@ class MainViewModel(
                 delay(if (trouble) watchdogRetryMs else watchdogIntervalMs)
                 if (!uiState.value.isRunning) break
                 if (testRequests.bulk != null) continue
+                watchdogGotResult = false
                 testCurrentServerRealPing()
+                delay(watchdogTimeoutMs)
+                if (!uiState.value.isRunning) break
+                if (!watchdogGotResult) {
+                    // No answer at all: count it as a bad sample and clear the stuck "Testing" state
+                    cancelAllPing()
+                    recordWatchdogSample(true)
+                }
             }
         }
     }
@@ -1129,8 +1140,12 @@ class MainViewModel(
     }
 
     private fun onWatchdogResult(delayMillis: Long) {
+        watchdogGotResult = true
+        recordWatchdogSample(delayMillis !in 1L..watchdogMaxDelayMs)
+    }
+
+    private fun recordWatchdogSample(bad: Boolean) {
         val now = System.currentTimeMillis()
-        val bad = delayMillis !in 1L..watchdogMaxDelayMs
         watchdogSamples.addLast(now to bad)
         while (watchdogSamples.isNotEmpty() &&
             now - watchdogSamples.first().first > watchdogWindowMs
