@@ -948,11 +948,13 @@ class MainViewModel(
     private var autoConnectOnFirstGood = false
     private val firstGoodMaxDelayMs = 1500L
     private var watchdogJob: Job? = null
-    private var watchdogFailures = 0
     private var lastSwitchMs = 0L
-    private val watchdogIntervalMs = 200_000L
+    private val watchdogIntervalMs = 30_000L   // when everything is fine
+    private val watchdogRetryMs = 10_000L       // after a bad sample
     private val watchdogMaxDelayMs = 4000L
-    private val switchCooldownMs = 120_000L
+    private val watchdogWindowMs = 120_000L     // how far back samples count
+    private val watchdogSamples = ArrayDeque<Pair<Long, Boolean>>() // (time, isBad)
+    private val switchCooldownMs = 60_000L
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -1106,12 +1108,13 @@ class MainViewModel(
         delay(500)
     }
     // ---------- Connection watchdog ----------
-    private fun startWatchdog() {
+   private fun startWatchdog() {
         if (watchdogJob?.isActive == true) return
-        watchdogFailures = 0
+        watchdogSamples.clear()
         watchdogJob = viewModelScope.launch {
             while (true) {
-                delay(watchdogIntervalMs)
+                val trouble = watchdogSamples.any { it.second }
+                delay(if (trouble) watchdogRetryMs else watchdogIntervalMs)
                 if (!uiState.value.isRunning) break
                 if (testRequests.bulk != null) continue
                 testCurrentServerRealPing()
@@ -1122,21 +1125,40 @@ class MainViewModel(
     private fun stopWatchdog() {
         watchdogJob?.cancel()
         watchdogJob = null
-        watchdogFailures = 0
+        watchdogSamples.clear()
     }
 
     private fun onWatchdogResult(delayMillis: Long) {
-        if (delayMillis in 1L..watchdogMaxDelayMs) {
-            watchdogFailures = 0
-            return
+        val now = System.currentTimeMillis()
+        val bad = delayMillis !in 1L..watchdogMaxDelayMs
+        watchdogSamples.addLast(now to bad)
+        while (watchdogSamples.isNotEmpty() &&
+            now - watchdogSamples.first().first > watchdogWindowMs
+        ) {
+            watchdogSamples.removeFirst()
         }
-        watchdogFailures++
-        if (watchdogFailures >= 2) {
-            watchdogFailures = 0
+        val total = watchdogSamples.size
+        val badCount = watchdogSamples.count { it.second }
+        if (total >= 3 && badCount * 100 / total >= 60) {
+            watchdogSamples.clear()
             switchToBestServer()
         }
     }
+     private var networkJob: Job? = null
 
+    // Called by the Activity when the underlying network changes (Wi-Fi <-> mobile, lost, back)
+    fun onNetworkChanged() {
+        viewModelScope.launch {
+            if (!uiState.value.isRunning) return@launch
+            networkJob?.cancel()
+            networkJob = launch {
+                delay(3000) // let the new network settle
+                if (uiState.value.isRunning && testRequests.bulk == null) {
+                    testCurrentServerRealPing()
+                }
+            }
+        }
+    }
     private fun switchToBestServer() {
         if (System.currentTimeMillis() - lastSwitchMs < switchCooldownMs) return
         viewModelScope.launch {
