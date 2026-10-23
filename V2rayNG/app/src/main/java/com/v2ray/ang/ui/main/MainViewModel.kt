@@ -159,6 +159,7 @@ class MainViewModel(
             is MainServiceEvent.MeasureDelayResult -> {
                 if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return
                 _uiState.update { it.copy(isTesting = testRequests.isTesting, status = MainStatus.ConnectionTest(event.result)) }
+                onWatchdogResult(event.result.delayMillis)
             }
 
             is MainServiceEvent.MeasureConfigSuccess -> {
@@ -946,6 +947,12 @@ class MainViewModel(
         @Volatile
     private var autoConnectOnFirstGood = false
     private val firstGoodMaxDelayMs = 1500L
+    private var watchdogJob: Job? = null
+    private var watchdogFailures = 0
+    private var lastSwitchMs = 0L
+    private val watchdogIntervalMs = 200_000L
+    private val watchdogMaxDelayMs = 4000L
+    private val switchCooldownMs = 120_000L
 
     fun refreshHealthy() {
         if (refreshHealthyJob?.isActive == true) {
@@ -976,24 +983,18 @@ class MainViewModel(
                     it.guid != healthy.guid && it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID
                 }
 
+                              var healthyTestedFirst = false
                 if (!uiState.value.isRunning) {
-                    val bestGuid = withContext(ioDispatcher) {
-                        dataSource.getServerGuidList(healthy.guid)
-                            .map { it to (dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L) }
-                            .filter { it.second > 0L }
-                            .minByOrNull { it.second }?.first
-                    }
-                    if (bestGuid != null) {
-                        toast("Connecting to best saved server...")
-                        connectToServer(bestGuid)
-                    } else {
-                        autoConnectOnFirstGood = true
-                    }
+                    autoConnectOnFirstGood = true
+                    toast("Testing Healthy servers first...")
+                    testGroupAndWait(healthy.guid)
+                    healthyTestedFirst = true
                 }
                 toast("Updating subscriptions...")
                 withContext(ioDispatcher) { dataSource.updateConfigViaSubAll() }
 
                 for (group in sources + healthy) {
+                    if (group.guid == healthy.guid && healthyTestedFirst) continue
                     testGroupAndWait(group.guid)
                 }
 
@@ -1104,8 +1105,74 @@ class MainViewModel(
         }
         delay(500)
     }
+    // ---------- Connection watchdog ----------
+    private fun startWatchdog() {
+        if (watchdogJob?.isActive == true) return
+        watchdogFailures = 0
+        watchdogJob = viewModelScope.launch {
+            while (true) {
+                delay(watchdogIntervalMs)
+                if (!uiState.value.isRunning) break
+                if (testRequests.bulk != null) continue
+                testCurrentServerRealPing()
+            }
+        }
+    }
+
+    private fun stopWatchdog() {
+        watchdogJob?.cancel()
+        watchdogJob = null
+        watchdogFailures = 0
+    }
+
+    private fun onWatchdogResult(delayMillis: Long) {
+        if (delayMillis in 1L..watchdogMaxDelayMs) {
+            watchdogFailures = 0
+            return
+        }
+        watchdogFailures++
+        if (watchdogFailures >= 2) {
+            watchdogFailures = 0
+            switchToBestServer()
+        }
+    }
+
+    private fun switchToBestServer() {
+        if (System.currentTimeMillis() - lastSwitchMs < switchCooldownMs) return
+        viewModelScope.launch {
+            val target: String? = withContext(ioDispatcher) {
+                val healthy = dataSource.getSubscriptions()
+                    .firstOrNull { it.subscription.remarks == "Healthy" }
+                    ?: return@withContext null
+                val currentGuid = dataSource.getSelectServer()
+                val currentId = currentGuid?.let {
+                    dataSource.decodeServerConfig(it)?.duplicateIdentity()
+                }
+                val best = dataSource.getServerGuidList(healthy.guid)
+                    .mapNotNull { guid ->
+                        val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                        if (ms <= 0L) return@mapNotNull null
+                        val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                        if (id != null && id == currentId) return@mapNotNull null
+                        guid to ms
+                    }
+                    .minByOrNull { it.second }
+                    ?.first
+                if (best != null && currentGuid != null) {
+                    com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(currentGuid, -1L)
+                }
+                best
+            }
+            if (target != null) {
+                lastSwitchMs = System.currentTimeMillis()
+                toast("Connection weak, switching to a better server...")
+                connectToServer(target)
+            }
+        }
+    } 
     // ---------- Running state ----------
     private fun updateRunningState(running: Boolean, clearTestingText: Boolean = true) {
+        if (running) startWatchdog() else stopWatchdog()
         if (!running || clearTestingText) testRequests.invalidateCurrent()
         _uiState.update { state ->
             state.copy(
