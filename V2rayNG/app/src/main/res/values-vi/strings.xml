@@ -406,6 +406,11 @@
     <string name="connection_connected">Đã kết nối.\nNhấn để kiểm tra kết nối.</string>
     <string name="connection_not_connected">Chưa kết nối</string>
     <string name="connection_running_task_left">Số lượt kiểm tra đang chạy: %s</string>
+    <string name="connection_test_complete">Đã kiểm tra xong</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="other">%1$d mili giây</item>
+    </plurals>
+    <string name="connection_connected_accessibility">Đã kết nối</string>
 
     <string name="import_subscription_success">Nhập gói đăng ký thành công!</string>
     <string name="import_subscription_failure">Nhập gói đăng ký không thành công!</string>
