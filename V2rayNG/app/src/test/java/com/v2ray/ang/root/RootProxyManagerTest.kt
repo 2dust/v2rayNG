@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test
 class RootProxyManagerTest {
 
     @Test
-    fun `LAN forwarding disables jumbo while preserving other offload defaults`() {
+    fun `IPv6 LAN forwarding disables jumbo and TSO`() {
         val config = RootProxyManager.buildHevConfig(null, null, 10808, true, 1500, true)
 
         assertTrue(config.contains("  offload:\n    jumbo: false\n"))
         assertTrue(config.contains("  multi-queue: true\n"))
-        assertFalse(config.contains("tso:"))
+        assertTrue(config.contains("    tso: false\n"))
         assertFalse(config.contains("uso:"))
     }
 
@@ -31,6 +31,7 @@ class RootProxyManagerTest {
         val config = RootProxyManager.buildHevConfig("user'name", "pa'ss", 10809, false, 1500, true)
 
         assertTrue(config.contains("  offload:\n    jumbo: false\n"))
+        assertFalse(config.contains("tso:"))
         assertFalse(config.contains("  ipv6:"))
         assertTrue(config.contains("  port: 10809\n"))
         assertTrue(config.contains("  username: 'user''name'\n"))

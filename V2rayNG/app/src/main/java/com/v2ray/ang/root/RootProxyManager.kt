@@ -225,10 +225,11 @@ object RootProxyManager {
             appendLine("  mtu: $mtu")
             appendLine("  multi-queue: true")
             if (lanSharing) {
-                // If an Android kernel rejects IFF_VNET_HDR, plain-TUN jumbo IPv6 stalls LAN forwarding.
-                // Remove when forced plain-TUN IPv6 forwarding passes with jumbo enabled.
+                // VNET setup or TCP-GSO EINVAL on Android can leave IPv6 packets above the LAN MTU.
+                // Remove when both fallback forwarding tests pass with jumbo and TSO enabled.
                 appendLine("  offload:")
                 appendLine("    jumbo: false")
+                if (ipv6) appendLine("    tso: false")
             }
             appendLine("  ipv4: '$v4'")
             if (ipv6) appendLine("  ipv6: '$v6'")
