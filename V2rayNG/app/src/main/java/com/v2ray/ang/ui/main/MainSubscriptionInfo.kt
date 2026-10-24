@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -36,6 +37,7 @@ import com.v2ray.ang.util.Utils
 
 private const val MILLIS_PER_SECOND = 1000L
 private const val EXPIRY_DATE_PATTERN = "yyyy-MM-dd"
+private const val NO_EXPIRY_SYMBOL = "\u221E"
 private const val CARD_ALPHA = 0.97f
 
 /** Locale-neutral values the subscription information box renders. */
@@ -175,23 +177,25 @@ private fun StatsRow(model: SubscriptionInfoUiModel) {
     } else {
         stringResource(R.string.sub_info_unlimited)
     }
+    // Figures and the slash between them always read left to right, also in right-to-left languages;
+    // otherwise the bidi algorithm swaps "used / total" around the slash.
+    val figuresStyle = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Ltr)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
             text = stringResource(R.string.sub_info_traffic, model.usedBytes.toTrafficString(), totalText),
             modifier = Modifier.weight(1f, fill = false),
-            style = MaterialTheme.typography.bodySmall,
+            style = figuresStyle,
             color = if (model.trafficLow) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        model.expireMillis?.let { expireMillis ->
-            Spacer(Modifier.size(8.dp))
-            Text(
-                text = Utils.formatTimestamp(expireMillis, EXPIRY_DATE_PATTERN),
-                style = MaterialTheme.typography.bodySmall,
-                color = if (model.expired) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-            )
-        }
+        Spacer(Modifier.size(8.dp))
+        Text(
+            // No expiry date means the subscription never expires.
+            text = model.expireMillis?.let { Utils.formatTimestamp(it, EXPIRY_DATE_PATTERN) } ?: NO_EXPIRY_SYMBOL,
+            style = figuresStyle,
+            color = if (model.expired) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+        )
     }
 }
