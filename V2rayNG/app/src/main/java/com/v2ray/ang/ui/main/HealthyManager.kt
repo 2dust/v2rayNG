@@ -35,7 +35,7 @@ interface HealthyHost {
 
 /**
  * All Healthy-pool logic: refresh, fast connect, connection watchdog,
- * quick switch, traffic stall detection, auto-connect retry.
+ * quick switch, periodic Healthy testing, traffic stall detection, auto-connect retry.
  */
 class HealthyManager(
     private val scope: CoroutineScope,
@@ -71,6 +71,9 @@ class HealthyManager(
 
     @Volatile
     private var lastProbeDelay = 0L
+
+    @Volatile
+    private var lastSampleBad = false
     private val switchCooldownMs = 60_000L
     private val watchdogCheckMs = 30_000L       // first test after connecting
     private val smartMinDownBytes = 2048L       // enough download in the window = connection is alive
@@ -78,9 +81,24 @@ class HealthyManager(
     private val smartIdleTestMs = 300_000L      // test every 5 min when there is no traffic
     private var lastTestMs = 0L
 
-    // ---------- Suspect list ----------
+    // ---------- Suspect list (used by quick switch) ----------
     private val suspectGuids = ConcurrentHashMap<String, Long>() // guid -> time it was marked suspect
     private val suspectMs = 300_000L
+
+    // ---------- Periodic Healthy testing ----------
+    private var periodicJob: Job? = null
+    private val periodicIntervalMs = 300_000L   // one batch every 5 minutes
+    private val periodicCheckMs = 30_000L       // how often we check whether a batch is due
+    private val periodicBatchSize = 10
+    private val periodicMaxWaitMs = 60_000L
+    private val heavyTrafficBytes = 3_000_000L  // downloaded in the traffic window = busy, do not test
+    private val failsToCondemn = 3              // consecutive failed batches before a server gets -1
+    private var lastPeriodicMs = 0L
+    private var periodicCursor = 0
+    private val failStreak = ConcurrentHashMap<String, Int>()
+
+    @Volatile
+    private var periodicRunning = false
 
     // ---------- Traffic stall ----------
     private var stallSamples = 0
@@ -103,6 +121,7 @@ class HealthyManager(
 
     fun start() {
         collectTraffic()
+        startPeriodic()
     }
 
     fun noteConnectRequest(guid: String) {
@@ -114,7 +133,12 @@ class HealthyManager(
     }
 
     fun onRunningChanged(running: Boolean) {
-        if (running) startWatchdog() else stopWatchdog()
+        if (running) {
+            lastPeriodicMs = System.currentTimeMillis() // first batch 5 minutes after connecting
+            startWatchdog()
+        } else {
+            stopWatchdog()
+        }
     }
 
     fun onDelayResult(delayMillis: Long) {
@@ -273,6 +297,7 @@ class HealthyManager(
                     healthyGuids.forEach { guid ->
                         if (delayOf(guid) < 0L) {
                             dataSource.removeServer(guid)
+                            failStreak.remove(guid)
                             removed++
                         }
                     }
@@ -336,6 +361,7 @@ class HealthyManager(
             } finally {
                 autoConnectOnFirstGood = false
                 refreshActive = false
+                lastPeriodicMs = System.currentTimeMillis() // the refresh just tested everything
             }
         }
     }
@@ -370,6 +396,7 @@ class HealthyManager(
     private fun startWatchdog() {
         if (watchdogJob?.isActive == true) return
         watchdogSamples.clear()
+        lastSampleBad = false
         // first test about 30 s after connecting
         lastTestMs = System.currentTimeMillis() - smartIdleTestMs + watchdogCheckMs
         watchdogJob = scope.launch {
@@ -421,6 +448,7 @@ class HealthyManager(
     }
 
     private fun recordWatchdogSample(bad: Boolean) {
+        lastSampleBad = bad
         val now = System.currentTimeMillis()
         watchdogSamples.addLast(now to bad)
         while (watchdogSamples.isNotEmpty() &&
@@ -455,6 +483,7 @@ class HealthyManager(
                         if (guid == currentGuid) return@mapNotNull null
                         val markedAt = suspectGuids[guid]
                         if (markedAt != null && now - markedAt < suspectMs) return@mapNotNull null
+                        if ((failStreak[guid] ?: 0) > 0) return@mapNotNull null // failed its last periodic test
                         val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
                         if (ms <= 0L) return@mapNotNull null
                         val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
@@ -497,6 +526,130 @@ class HealthyManager(
     }
 
     // =====================================================================
+    // Periodic Healthy testing: keep ready servers fresh while connected
+    // =====================================================================
+
+    private fun startPeriodic() {
+        if (periodicJob?.isActive == true) return
+        periodicJob = scope.launch {
+            while (true) {
+                delay(periodicCheckMs)
+                val now = System.currentTimeMillis()
+                if (!host.isRunning || refreshActive || host.hasBulkTest || periodicRunning) continue
+                if (lastSampleBad) continue                          // current server has a problem, do not add load
+                if (now - lastSwitchMs < switchCooldownMs) continue  // VPN is still settling after a switch
+                if (now - lastPeriodicMs < periodicIntervalMs) continue
+                if (rxHistory.sumOf { it.second } >= heavyTrafficBytes) continue // user is busy
+                lastPeriodicMs = now
+                try {
+                    runPeriodicBatch()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Periodic Healthy test failed", e)
+                }
+            }
+        }
+    }
+
+    private suspend fun runPeriodicBatch() {
+        val prepared: Triple<String, List<String>, Map<String, Long>> = withContext(io) {
+            val healthy = dataSource.getSubscriptions()
+                .firstOrNull { it.subscription.remarks == healthyName }
+                ?: return@withContext null
+            val currentGuid = host.selectedGuid
+            val currentId = currentGuid?.let { dataSource.decodeServerConfig(it)?.duplicateIdentity() }
+            val candidates = dataSource.getServerGuidList(healthy.guid).filter { guid ->
+                if (guid == currentGuid) return@filter false
+                val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                if (ms < 0L) return@filter false // already condemned, the next Refresh removes it
+                val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                !(id != null && id == currentId)
+            }
+            if (candidates.isEmpty()) return@withContext null
+            val start = periodicCursor % candidates.size
+            val batch = (0 until minOf(periodicBatchSize, candidates.size))
+                .map { candidates[(start + it) % candidates.size] }
+            periodicCursor = (start + batch.size) % candidates.size
+            val previous = batch.associateWith {
+                dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L
+            }
+            Triple(healthy.guid, batch, previous)
+        } ?: return
+
+        val (healthyId, batch, previous) = prepared
+        periodicRunning = true
+        try {
+            val requestId = host.beginBulkTest(healthyId)
+            dataSource.sendMsg2TestService(
+                TestServiceMessage(
+                    key = AppConfig.MSG_MEASURE_CONFIG_START,
+                    subscriptionId = healthyId,
+                    serverGuids = batch,
+                    onlyTcp = false
+                ),
+                requestId
+            )
+            var waited = 0L
+            while (host.isBulkTest(requestId) && waited < periodicMaxWaitMs) {
+                delay(500)
+                waited += 500
+            }
+            if (host.isBulkTest(requestId)) host.cancelAllTests()
+            delay(500)
+            applyPenaltyRule(batch, previous)
+        } finally {
+            periodicRunning = false
+            lastTestMs = System.currentTimeMillis() // our own test bytes must not look like user traffic
+        }
+    }
+
+    /**
+     * The test service writes -1 for every failure. Here a single failure is softened:
+     * - every server of the batch failed (3 or more): network problem, restore everything, count nothing;
+     * - otherwise a failed server gets its old result back until it fails [failsToCondemn] times in a row.
+     */
+    private suspend fun applyPenaltyRule(batch: List<String>, previous: Map<String, Long>) {
+        val outcome = withContext(io) {
+            val results = batch.associateWith {
+                dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L
+            }
+            val failedCount = results.values.count { it < 0L }
+            val networkProblem = batch.size >= 3 && failedCount == batch.size
+            var changed = false
+            var condemned = 0
+            for (guid in batch) {
+                val now = results[guid] ?: 0L
+                val old = previous[guid] ?: 0L
+                when {
+                    now < 0L && networkProblem -> {
+                        com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(guid, old)
+                        changed = true
+                    }
+
+                    now < 0L -> {
+                        val streak = (failStreak[guid] ?: 0) + 1
+                        failStreak[guid] = streak
+                        if (streak < failsToCondemn) {
+                            com.v2ray.ang.handler.MmkvManager.encodeServerTestDelayMillis(guid, old)
+                            changed = true
+                        } else {
+                            condemned++
+                        }
+                    }
+
+                    now > 0L -> failStreak.remove(guid)
+                }
+            }
+            Triple(changed, networkProblem, condemned)
+        }
+        val (changed, networkProblem, condemned) = outcome
+        if (changed) host.reloadGroups()
+        if (networkProblem) host.toast("Healthy check: all servers failed, ignoring (network problem?)")
+        else if (condemned > 0) host.toast("Healthy check: $condemned server(s) marked dead")
+    }
+
+    // =====================================================================
     // Traffic stall detection
     // =====================================================================
 
@@ -518,8 +671,8 @@ class HealthyManager(
                     rxHistory.clear()
                     continue
                 }
-                // Ignore the bytes of our own test, so it does not look like real traffic
-                if (now - lastTestMs < 8000) continue
+                // Ignore the bytes of our own tests, so they do not look like real traffic
+                if (periodicRunning || now - lastTestMs < 8000) continue
                 rxHistory.addLast(now to down.coerceAtLeast(0L))
                 while (rxHistory.isNotEmpty() &&
                     now - rxHistory.first().first > smartTrafficWindowMs
