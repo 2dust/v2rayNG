@@ -170,7 +170,6 @@ class MainViewModel(
                 val request = testRequests.bulk?.takeIf { it.id == event.requestId } ?: return
                 queueTestResult(event.result, request)
                 if (autoConnectOnFirstGood &&
-                    !uiState.value.isRunning &&
                     event.result.delayMillis in 1L..firstGoodMaxDelayMs
                 ) {
                     autoConnectOnFirstGood = false
@@ -979,6 +978,8 @@ class MainViewModel(
     @Volatile
     private var watchdogGotResult = false
     private val switchCooldownMs = 60_000L
+        @Volatile
+    private var lastProbeDelay = 0L
     
     @Volatile
     private var candidateSwitchActive = false
@@ -1035,7 +1036,7 @@ class MainViewModel(
                 }
 
                               var healthyTestedFirst = false
-                if (!uiState.value.isRunning) {
+                if (!uiState.value.isRunning || !isCurrentConnectionGood()) {
                     autoConnectOnFirstGood = true
                     toast("Testing Healthy servers first...")
                     testGroupAndWait(healthy.guid)
@@ -1187,12 +1188,21 @@ class MainViewModel(
         lastTestMs = System.currentTimeMillis()
         watchdogGotResult = false
         testCurrentServerRealPing()
-        delay(watchdogTimeoutMs)
+        var waited = 0L
+        while (waited < watchdogTimeoutMs && !watchdogGotResult && uiState.value.isRunning) {
+            delay(250)
+            waited += 250
+        }
         if (uiState.value.isRunning && !watchdogGotResult) {
             // No answer at all: count it as a bad sample and clear the stuck "Testing" state
             cancelAllPing()
             recordWatchdogSample(true)
         }
+    }
+
+    private suspend fun isCurrentConnectionGood(): Boolean {
+        probeCurrentServer()
+        return lastProbeDelay in 1L..watchdogMaxDelayMs
     }
     private fun stopWatchdog() {
         watchdogJob?.cancel()
@@ -1202,6 +1212,7 @@ class MainViewModel(
 
     private fun onWatchdogResult(delayMillis: Long) {
         watchdogGotResult = true
+        lastProbeDelay = delayMillis
         recordWatchdogSample(delayMillis !in 1L..watchdogMaxDelayMs)
     }
 
