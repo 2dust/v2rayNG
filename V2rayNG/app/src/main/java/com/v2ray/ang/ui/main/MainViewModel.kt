@@ -980,7 +980,10 @@ class MainViewModel(
     private val switchCooldownMs = 60_000L
         @Volatile
     private var lastProbeDelay = 0L
-    
+        @Volatile
+    private var refreshActive = false
+    private val suspectGuids = ConcurrentHashMap<String, Long>() // guid -> time it was marked suspect
+    private val suspectMs = 300_000L
     @Volatile
     private var candidateSwitchActive = false
     private var candidateGuids: Set<String> = emptySet()
@@ -1013,6 +1016,7 @@ class MainViewModel(
         }
         refreshHealthyJob = viewModelScope.launch {
             try {
+                refreshActive = true
                 val healthyName = "Healthy" // name of the pool group
                 val maxHealthy = 50         // max servers kept in the pool
 
@@ -1036,11 +1040,35 @@ class MainViewModel(
                 }
 
                               var healthyTestedFirst = false
-                if (!uiState.value.isRunning || !isCurrentConnectionGood()) {
-                    autoConnectOnFirstGood = true
-                    toast("Testing Healthy servers first...")
-                    testGroupAndWait(healthy.guid)
-                    healthyTestedFirst = true
+                val selectedNow = uiState.value.selectedGuid
+                val storedBad = withContext(ioDispatcher) {
+                    val ms = selectedNow?.let { dataSource.decodeAffiliationInfo(it)?.testDelayMillis } ?: 0L
+                    ms < 0L
+                }
+                val needSwitch = !uiState.value.isRunning || storedBad || !isCurrentConnectionGood()
+                if (needSwitch) {
+                    val quickGuid = withContext(ioDispatcher) {
+                        val currentId = selectedNow?.let { dataSource.decodeServerConfig(it)?.duplicateIdentity() }
+                        dataSource.getServerGuidList(healthy.guid)
+                            .mapNotNull { guid ->
+                                val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                                if (ms <= 0L) return@mapNotNull null
+                                val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                                if (id != null && id == currentId) return@mapNotNull null
+                                guid to ms
+                            }
+                            .minByOrNull { it.second }?.first
+                    }
+                    if (quickGuid != null) {
+                        toast("Connecting to the fastest known server...")
+                        connectToServer(quickGuid)
+                        delay(3000) // let the VPN restart settle before the tests start
+                    } else {
+                        autoConnectOnFirstGood = true
+                        toast("Testing Healthy servers first...")
+                        testGroupAndWait(healthy.guid)
+                        healthyTestedFirst = true
+                    }
                 }
                 toast("Updating subscriptions...")
                 withContext(ioDispatcher) { dataSource.updateConfigViaSubAll() }
@@ -1114,12 +1142,16 @@ class MainViewModel(
                 }
                 if (fastestGuid != null) {
                     val currentGuid = uiState.value.selectedGuid
-                    val sameServer = withContext(ioDispatcher) {
+                    val shouldSwitch = withContext(ioDispatcher) {
+                        if (!uiState.value.isRunning) return@withContext true
                         val best = dataSource.decodeServerConfig(fastestGuid)?.duplicateIdentity()
                         val current = currentGuid?.let { dataSource.decodeServerConfig(it)?.duplicateIdentity() }
-                        best != null && best == current
+                        if (best != null && best == current) return@withContext false
+                        val currentMs = currentGuid?.let { dataSource.decodeAffiliationInfo(it)?.testDelayMillis } ?: 0L
+                        val bestMs = dataSource.decodeAffiliationInfo(fastestGuid)?.testDelayMillis ?: 0L
+                        currentMs <= 0L || bestMs * 2 < currentMs
                     }
-                    if (!sameServer || !uiState.value.isRunning) {
+                    if (shouldSwitch) {
                         toast("Switching to the fastest server...")
                         connectToServer(fastestGuid)
                     }
@@ -1131,6 +1163,7 @@ class MainViewModel(
                 toastError(R.string.toast_failure)
             } finally {
                 autoConnectOnFirstGood = false
+                refreshActive = false
             }
         }
     }
@@ -1167,7 +1200,7 @@ class MainViewModel(
             while (true) {
                 delay(5_000)
                 if (!uiState.value.isRunning) break
-                if (testRequests.bulk != null || candidateSwitchActive) continue
+                if (testRequests.bulk != null || candidateSwitchActive || refreshActive) continue
                 val now = System.currentTimeMillis()
                 val trouble = watchdogSamples.any { it.second }
                 val due = if (trouble) {
@@ -1224,11 +1257,9 @@ class MainViewModel(
         ) {
             watchdogSamples.removeFirst()
         }
-        val total = watchdogSamples.size
-        val badCount = watchdogSamples.count { it.second }
-        if (total >= 3 && badCount * 100 / total >= 60) {
+        if (bad && !refreshActive) {
             watchdogSamples.clear()
-            switchToBestServer()
+            quickSwitch()
         }
     }
      private var networkJob: Job? = null
@@ -1243,6 +1274,63 @@ class MainViewModel(
                 if (uiState.value.isRunning && testRequests.bulk == null) {
                     probeCurrentServer()
                 }
+            }
+        }
+    }
+    private fun quickSwitch() {
+        if (candidateSwitchActive || testRequests.bulk != null) return
+        val now = System.currentTimeMillis()
+        if (now - lastSwitchMs < switchCooldownMs) return
+        viewModelScope.launch {
+            val prepared: Triple<String, String, String>? = withContext(ioDispatcher) {
+                val healthy = dataSource.getSubscriptions()
+                    .firstOrNull { it.subscription.remarks == "Healthy" }
+                    ?: return@withContext null
+                val currentGuid = dataSource.getSelectServer() ?: return@withContext null
+                val currentProfile = dataSource.decodeServerConfig(currentGuid)
+                val currentId = currentProfile?.duplicateIdentity()
+                val best = dataSource.getServerGuidList(healthy.guid)
+                    .mapNotNull { guid ->
+                        if (guid == currentGuid) return@mapNotNull null
+                        val markedAt = suspectGuids[guid]
+                        if (markedAt != null && now - markedAt < suspectMs) return@mapNotNull null
+                        val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                        if (ms <= 0L) return@mapNotNull null
+                        val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                        if (id != null && id == currentId) return@mapNotNull null
+                        guid to ms
+                    }
+                    .minByOrNull { it.second }
+                    ?.first
+                    ?: return@withContext null
+                Triple(best, currentGuid, currentProfile?.subscriptionId.orEmpty())
+            }
+            if (prepared == null) {
+                toast("No backup server with a good test result in Healthy")
+                return@launch
+            }
+            if (!uiState.value.isRunning || refreshActive) return@launch
+            val (bestGuid, oldGuid, oldGroupId) = prepared
+            lastSwitchMs = System.currentTimeMillis()
+            suspectGuids[oldGuid] = lastSwitchMs
+            toast("Connection problem, switching to the fastest known server...")
+            connectToServer(bestGuid)
+
+            // Test the old server in the background after the VPN has settled
+            delay(20_000)
+            if (uiState.value.isRunning && testRequests.bulk == null && !refreshActive &&
+                oldGroupId.isNotEmpty()
+            ) {
+                val request = testRequests.beginBulk(oldGroupId)
+                dataSource.sendMsg2TestService(
+                    TestServiceMessage(
+                        key = AppConfig.MSG_MEASURE_CONFIG_START,
+                        subscriptionId = oldGroupId,
+                        serverGuids = listOf(oldGuid),
+                        onlyTcp = false
+                    ),
+                    request.id
+                )
             }
         }
     }
