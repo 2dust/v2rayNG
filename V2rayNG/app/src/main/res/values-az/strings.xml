@@ -18,11 +18,10 @@
     <string name="notification_channel_subscription_updates">Abunəlik yenilənmələri</string>
     <string name="notification_channel_connection_checks">Bağlantı yoxlamaları</string>
     <string name="notification_action_stop_v2ray">Dayandır</string>
-    <string name="toast_permission_denied">İcazə rədd edildi</string>
-    <string name="toast_permission_denied_notification">Bildiriş icazəsi rədd edildi</string>
     <string name="notification_action_more">Daha çoxu üçün toxunun</string>
     <string name="toast_services_start">Xidmət başladılır</string>
-    <string name="toast_services_stop">Xidmət dayandırılır</string>
+    <string name="toast_services_stop">Xidmət dayandırıldı</string>
+    <string name="notification_channel_other">Digər bildirişlər</string>
     <string name="toast_services_success">Xidmət uğurla başladıldı</string>
     <string name="toast_services_failure">Xidməti başlatmaq olmadı</string>
 
@@ -108,15 +107,12 @@
     <string name="server_lab_kcp_tti">mKCP TTI (istəyə bağlı, standart 50 ms)</string>
     <string name="toast_success">Uğurlu</string>
     <string name="toast_failure">Uğursuz</string>
-    <string name="toast_none_data">Əlçatan məlumat yoxdur</string>
-    <string name="toast_incorrect_protocol">Yanlış protokol</string>
     <string name="toast_decoding_failed">Dekodlaşdırma uğursuz oldu</string>
     <string name="title_file_chooser">Konfiqurasiya seçin</string>
     <string name="toast_require_file_manager">Zəhmət olmasa fayl menecerini quraşdırın.</string>
     <string name="server_customize_config">Fərdi konfiqurasiya</string>
     <string name="toast_config_file_invalid">Yanlış konfiqurasiya</string>
     <string name="server_lab_content">Məzmun</string>
-    <string name="toast_none_data_clipboard">Mübadilə buferində məlumat yoxdur</string>
     <string name="toast_invalid_url">Yanlış URL</string>
     <string name="toast_insecure_url_protocol">Təhlükəsiz olmayan HTTP abunəlik URL-indən istifadə etməyin</string>
     <string name="server_lab_need_inbound">Gələn portun tənzimləmələrə uyğun olduğundan əmin olun</string>
@@ -284,7 +280,6 @@
     <string name="title_pref_feedback">Əks-əlaqə</string>
     <string name="summary_pref_feedback">GitHub-da təkliflərinizi bildirin və ya xətaları məruzə edin</string>
     <string name="summary_pref_tg_group">Telegram qrupuna qoşulun</string>
-    <string name="toast_tg_app_not_found">Telegram tətbiqi tapılmadı</string>
     <string name="title_privacy_policy">Məxfilik siyasəti</string>
     <string name="title_qr_code">QR kod</string>
     <string name="title_about">Haqqında</string>
@@ -365,7 +360,6 @@
     </plurals>
     <string name="title_update_subscription_result">%1$d konfiqurasiya yeniləndi (%2$d uğurlu, %3$d uğursuz, %4$d ötürüldü)</string>
     <string name="title_update_subscription_no_subscription">Abunəlik yoxdur</string>
-    <string name="toast_server_not_found_in_group">Seçilmiş server cari qrupda tapılmadı</string>
     <string name="title_locate_selected_config">Seçilmiş konfiqurasiyanı tapın</string>
 
     <string name="tasker_start_service">Xidməti Başlat</string>

@@ -64,7 +64,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.util.LogUtil
@@ -123,13 +123,13 @@ class ScannerActivity : HelperBaseComponentActivity() {
                 inputStream?.close()
                 val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
                 if (text.isNullOrEmpty()) {
-                    toast(R.string.toast_decoding_failed)
+                    toastError(R.string.toast_decoding_failed)
                 } else {
                     finished(text)
                 }
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to decode QR code from file", e)
-                toast(R.string.toast_decoding_failed)
+                toastError(R.string.toast_decoding_failed)
             }
         }
     }
