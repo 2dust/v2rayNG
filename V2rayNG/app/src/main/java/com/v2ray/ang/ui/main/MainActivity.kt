@@ -26,6 +26,7 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.AboutActivity
+import com.v2ray.ang.ui.ShizukuActivity
 import com.v2ray.ang.ui.backup.BackupActivity
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
@@ -154,6 +155,7 @@ class MainActivity : HelperBaseComponentActivity() {
             MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
             MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
             MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
+            MainDestination.Tethering -> Intent(this, ShizukuActivity::class.java)
             MainDestination.About -> Intent(this, AboutActivity::class.java)
             MainDestination.Promotion -> {
                 Utils.openUri(

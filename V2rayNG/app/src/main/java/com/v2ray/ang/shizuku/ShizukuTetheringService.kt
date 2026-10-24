@@ -1,0 +1,1280 @@
+package com.v2ray.ang.shizuku
+
+import android.content.ComponentName
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.IpPrefix
+import android.net.LinkAddress
+import android.net.LinkProperties
+import android.net.Network
+import android.os.Build
+import android.os.IBinder
+import android.os.ParcelFileDescriptor
+import android.util.Log
+import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.service.TProxyService
+import go.Seq
+import libv2ray.CoreCallbackHandler
+import libv2ray.CoreController
+import libv2ray.Libv2ray
+import rikka.shizuku.Shizuku
+import rikka.shizuku.SystemServiceHelper
+import java.io.File
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
+
+/**
+ * Privileged Shizuku process that controls Android tethering and owns its proxy upstream.
+ *
+ * Android's TestNetworkManager creates a real kernel TUN without root when called by the shell
+ * UID. TetheringManager is then told to prefer test networks, so Android's Wi-Fi/USB DHCP,
+ * forwarding, NAT and DNS machinery sends client traffic into that TUN. A process-local HEV
+ * instance consumes the TUN through v2rayNG's SOCKS inbound, or a second Xray controller consumes
+ * it using a configuration derived from the running core.
+ *
+ * Selecting a preferred test network and starting a tethering downstream are separate Android
+ * operations. During that gap, especially while Wi-Fi changes from station to access-point mode,
+ * Tethering may briefly choose a physical default network. Every downstream start is therefore
+ * treated as provisional until Android reports only the owned test TUN as its actual upstream.
+ * Any other non-empty upstream is stopped immediately, keeping the feature fail-closed.
+ */
+@Keep
+class ShizukuTetheringService(context: Context) : IShizukuTetheringService.Stub() {
+
+    // The UserService runs as shell, and framework permission checks also require shell package
+    // attribution. The ordinary app context is retained only for the embedded Xray runtime.
+    private val executor = Executor { command -> command.run() }
+    private val appContext = context.applicationContext
+    private val shellContext = ShellContextCompat.create(context)
+    private val tetheringManager = if (usesPublicTetheringApi()) {
+        TetheringApi36.getManager(shellContext)
+    } else {
+        // API 33-35 do not expose the typed service lookup. Delete this string lookup together with
+        // TetheringPlatformCompat when the feature's minimum supported API becomes 36.
+        requireNotNull(shellContext.getSystemService(TETHERING_SERVICE)) {
+            "TetheringManager is unavailable"
+        }
+    }
+    private val connectivityManager = requireNotNull(
+        shellContext.getSystemService(ConnectivityManager::class.java)
+    ) { "ConnectivityManager is unavailable" }
+    // Serialize lifecycle work under one monitor so profile changes and user toggles cannot
+    // interleave. Only listener registration and emergency downstream stops bypass this lock.
+    // This state describes our routing engine, not whether Android's hotspot or USB is enabled.
+    // ACTIVE owns an engine and TUN; WAITING retains the TUN with the engine stopped so clients
+    // cannot fall back to a direct connection. STARTING/STOPPING may hold partial resources.
+    // ERROR does not imply cleanup: a failed downstream stop must retain its protected route.
+    // Resource ownership (routingSession/testTun), rather than ERROR alone, determines whether
+    // the UI must still offer Stop. DISABLED is reached after protected downstreams are stopped
+    // and our routing resources are released.
+    private var routingState = ROUTING_STATE_DISABLED
+    private var routingProfileName = ""
+    @Volatile private var routingSession: RoutingSession? = null
+    // Only a new process may recover a missing session; an explicit Stop must stay stopped.
+    private var freshUserService = true
+    @Volatile private var testNetworkHandle: TestNetworkHandle? = null
+    private val upstreamMonitor by lazy { createUpstreamMonitor() }
+    private val upstreamRejections = AtomicLong()
+    // Both lifecycle operations and emergency callbacks report warnings here. A successful retry
+    // clears only its downstream type, preserving failures for other restored downstreams.
+    private val wrongUpstreamWarningTypes = AtomicInteger()
+    // Lifecycle events belong to this privileged process, not a UI BroadcastReceiver's timeout.
+    private val coreUpdates = Executors.newSingleThreadScheduledExecutor { command ->
+        Thread(command, "TetheringCoreUpdates").apply { isDaemon = true }
+    }
+    private var engineHealthCheck: ScheduledFuture<*>? = null
+    private val statusListener = AtomicReference<ITetheringStatusListener?>()
+    private var nativeController: CoreController? = null
+    private var hevConfigFile: File? = null
+    // Tethering callbacks can acknowledge a start before the downstream appears in the active
+    // type list. Retain that in-flight intent so concurrent shutdown and failed-start cleanup
+    // still issue stopTethering instead of mistaking the downstream for already stopped.
+    @Volatile private var requestedTetheringTypes = 0
+    private var coreLease: ICoreTetheringLease? = null
+    private var coreLifetime: LifetimeWatch? = null
+    private var stagedAssetFingerprint = ""
+
+    private val routingActive: Boolean
+        get() = routingState == ROUTING_STATE_ACTIVE_HEV ||
+            routingState == ROUTING_STATE_ACTIVE_NATIVE
+
+    private val testTun: ParcelFileDescriptor?
+        get() = testNetworkHandle?.tun
+    private val testInterfaceName: String?
+        get() = testNetworkHandle?.interfaceName
+
+    private data class RoutingSession(
+        val token: String,
+        val xudpKey: String,
+        var dnsServers: List<String>,
+        var ipv6Enabled: Boolean,
+        // What to restore after a core restart, not Android's current active-interface snapshot.
+        // requestedTetheringTypes separately covers starts Android has not yet published.
+        @Volatile var desiredTetheringTypes: Int,
+        // Distinguishes a paused session from a live profile switch, including failed restarts.
+        var coreRestartPending: Boolean = false,
+    )
+
+    private data class LifetimeWatch(
+        val binder: IBinder,
+        val recipient: IBinder.DeathRecipient,
+    ) {
+        fun unlink() {
+            runCatching { binder.unlinkToDeath(recipient, 0) }
+        }
+    }
+
+    /** Owns the UserService side of one test-network TUN. */
+    private class TestNetworkHandle(
+        val manager: Any,
+        // Keep TestNetworkInterface reachable; Android associates its lifetime with this object.
+        private val interfaceLifetime: Any,
+        val tun: ParcelFileDescriptor,
+        val interfaceName: String,
+        private val connectivityManager: ConnectivityManager,
+        val networkLifetimeToken: IBinder,
+    ) {
+        private val published = CountDownLatch(1)
+        var network: Network? = null
+            private set
+
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            private fun capture(network: Network, interfaceName: String?) {
+                if (interfaceName == this@TestNetworkHandle.interfaceName) {
+                    this@TestNetworkHandle.network = network
+                    published.countDown()
+                }
+            }
+
+            override fun onAvailable(network: Network) {
+                capture(network, connectivityManager.getLinkProperties(network)?.interfaceName)
+            }
+
+            override fun onLinkPropertiesChanged(network: Network, properties: LinkProperties) {
+                capture(network, properties.interfaceName)
+            }
+        }
+
+        fun awaitPublished(): Boolean =
+            published.await(TEST_NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+
+        fun release() {
+            runCatching { connectivityManager.unregisterNetworkCallback(callback) }
+            network?.let { publishedNetwork ->
+                runCatching {
+                    manager.javaClass.getMethod("teardownTestNetwork", Network::class.java)
+                        .invoke(manager, publishedNetwork)
+                }.onFailure { Log.w(TAG, "Unable to tear down test network", it) }
+            }
+            runCatching { tun.close() }
+        }
+    }
+
+    @Synchronized
+    override fun setWifiHotspotEnabled(enabled: Boolean): Int {
+        if (enabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return RESULT_ROUTING_FAILED
+        }
+        val result = setTetheringEnabled(TETHERING_TYPE_WIFI, enabled)
+        if (result == RESULT_OK) {
+            val bit = tetheringTypeBit(TETHERING_TYPE_WIFI)
+            routingSession?.let { session ->
+                session.desiredTetheringTypes = if (enabled) {
+                    session.desiredTetheringTypes or bit
+                } else {
+                    session.desiredTetheringTypes and bit.inv()
+                }
+            }
+        }
+        notifyStatusChanged()
+        return result
+    }
+
+    private fun getActiveTetheringTypes(): Int {
+        return try {
+            tetheringTypeMask(getTetheredInterfaces())
+        } catch (error: Throwable) {
+            Log.e(TAG, "Unable to read tethering state", error)
+            TETHERING_TYPES_UNKNOWN
+        }
+    }
+
+    private fun tetheringTypeMask(interfaces: List<ActiveTetheringInterface>): Int {
+        return interfaces.fold(0) { mask, item -> mask or tetheringTypeBit(item.type) }
+    }
+
+    private fun ipv6TetheringTypeMask(interfaces: List<ActiveTetheringInterface>): Int {
+        return interfaces.fold(0) { mask, item ->
+            if (hasDelegatedIpv6Prefix(item.name)) mask or tetheringTypeBit(item.type) else mask
+        }
+    }
+
+    private fun getTetheredInterfaces(): List<ActiveTetheringInterface> {
+        // One registration serves status, lifecycle postconditions and emergency shutdown.
+        // Only the first read waits for Android's initial snapshot; later reads are in-memory.
+        return upstreamMonitor.awaitInterfaces(CALLBACK_TIMEOUT_SECONDS)
+    }
+
+    /**
+     * Android assigns a local DNS address from the delegated upstream /64 to each downstream.
+     * Its presence on that real Wi-Fi or USB interface means Router Advertisement setup has
+     * completed; checking the test TUN itself would only prove that IPv6 was requested.
+     */
+    private fun hasDelegatedIpv6Prefix(interfaceName: String): Boolean {
+        val prefix = TETHERING_IPV6_PREFIX ?: return false
+        val addresses = NetworkInterface.getByName(interfaceName)?.inetAddresses ?: return false
+        return addresses.asSequence().any(prefix::contains)
+    }
+
+    private fun currentRoutingStateLocked(): Int {
+        if (routingActive && !isRoutingReadyLocked()) {
+            val engine = if (routingState == ROUTING_STATE_ACTIVE_HEV) "HEV" else "Native Xray"
+            setRoutingError("$engine tethering engine stopped unexpectedly")
+        }
+        return routingState
+    }
+
+    private fun currentRoutingDetailLocked(): String {
+        // The shell process keeps platform diagnostics in English for logs. Expose only live
+        // interface/profile data; the app maps error states and result codes to localized text.
+        if (!routingActive && routingState != ROUTING_STATE_WAITING) return ""
+        val upstreamInterface = upstreamMonitor.currentInterfaceNames.orEmpty()
+        return formatRoutingDetail(upstreamInterface)
+    }
+
+    private fun consumeWarningLocked(): Int {
+        return if (wrongUpstreamWarningTypes.getAndSet(0) == 0) {
+            RESULT_OK
+        } else {
+            RESULT_UNPROTECTED_UPSTREAM
+        }
+    }
+
+    override fun getStatus(includeIpv6: Boolean): TetheringStatusSnapshot {
+        val interfaces = runCatching { getTetheredInterfaces() }
+            .onFailure { Log.e(TAG, "Unable to read tethering status", it) }
+            .getOrNull()
+        val activeTypes = interfaces?.let(::tetheringTypeMask) ?: TETHERING_TYPES_UNKNOWN
+        val ipv6Types = if (includeIpv6 && interfaces != null) {
+            runCatching { ipv6TetheringTypeMask(interfaces) }
+                .onFailure { Log.e(TAG, "Unable to read tethered IPv6 state", it) }
+                .getOrDefault(TETHERING_TYPES_UNKNOWN)
+        } else {
+            TETHERING_TYPES_UNKNOWN
+        }
+        return synchronized(this) {
+            TetheringStatusSnapshot(
+                routingState = currentRoutingStateLocked(),
+                routingDetail = currentRoutingDetailLocked(),
+                activeTetheringTypes = activeTypes,
+                ipv6TetheringTypes = ipv6Types,
+                warning = consumeWarningLocked(),
+                hasRoutingSession = routingSession != null || testTun != null,
+            )
+        }
+    }
+
+    override fun setStatusListener(listener: ITetheringStatusListener?) {
+        // Listener registration must never wait for the routing lifecycle monitor. The UI also
+        // unregisters through this one-way Binder call while its ViewModel is being cleared.
+        statusListener.set(listener)
+    }
+
+    @Synchronized
+    override fun startRouting(
+        useHev: Boolean,
+        profileName: String,
+        dnsServers: Array<out String>,
+        ipv6Enabled: Boolean,
+        xudpKey: String,
+        syncToken: String,
+        launchId: String,
+        coreLease: ICoreTetheringLease,
+    ): Int {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return RESULT_ROUTING_FAILED
+        if (syncToken.isBlank()) {
+            Log.e(TAG, "Tethering synchronization token is empty")
+            return RESULT_INVALID_SESSION
+        }
+        // Reject duplicate starts before changing any resource owned by the existing session.
+        if (routingSession != null || testTun != null) return RESULT_ALREADY_ACTIVE
+        freshUserService = false
+        val activeTypes = getActiveTetheringTypes()
+        if (activeTypes < 0) {
+            setRoutingError("Unable to determine active tethering before enabling its protected route")
+            return RESULT_ROUTING_FAILED
+        }
+        val engineConfig = runCatching { readEngineConfig(coreLease, launchId) }.getOrElse {
+            setRoutingError(rootCauseMessage(it))
+            return RESULT_ROUTING_FAILED
+        }
+        val launchConfig = HotspotRoutingLaunchConfig(
+            engine = HotspotRoutingEngineConfig(useHev, profileName, engineConfig),
+            dnsServers = dnsServers.toList(),
+            ipv6Enabled = ipv6Enabled,
+            xudpKey = xudpKey,
+        )
+        val newSession = RoutingSession(
+            token = syncToken,
+            xudpKey = launchConfig.xudpKey,
+            dnsServers = launchConfig.dnsServers,
+            ipv6Enabled = launchConfig.ipv6Enabled,
+            desiredTetheringTypes = activeTypes,
+        )
+
+        try {
+            watchCoreLifetimeLocked(coreLease)
+        } catch (error: Throwable) {
+            clearCoreLifetimeWatchLocked()
+            setRoutingError(rootCauseMessage(error))
+            return RESULT_ROUTING_FAILED
+        }
+        val result = startRoutingLocked(launchConfig, activeTypes)
+        if (result == RESULT_OK) {
+            routingSession = newSession
+        } else {
+            clearCoreLifetimeWatchLocked()
+        }
+        return result
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun startRoutingLocked(config: HotspotRoutingLaunchConfig, activeTypes: Int): Int {
+        return try {
+            if (testTun == null) {
+                // A fresh UserService may be replacing one lost with Shizuku. Its core-side lease
+                // can still own the old protected network, but this process has no handle for it.
+                // Stop downstreams before cleanup releases that lease, then restore them only
+                // after the replacement network is ready.
+                check(stopActiveTetheringLocked(clearDesired = false) == RESULT_OK) {
+                    "Unable to stop tethering before replacing its protected route"
+                }
+                createRoutingLocked(config)
+                val failedTypes = restoreTetheringTypesLocked(activeTypes)
+                reportTetheringRestoreFailuresLocked(failedTypes)
+            } else {
+                val failedTypes = rebuildRoutingLocked(config, activeTypes)
+                reportTetheringRestoreFailuresLocked(failedTypes)
+            }
+            RESULT_OK
+        } catch (error: Throwable) {
+            val detail = rootCauseMessage(error)
+            Log.e(TAG, "Unable to start v2rayNG tethering routing: $detail", error)
+            setRoutingError(detail)
+            RESULT_ROUTING_FAILED
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun createRoutingLocked(config: HotspotRoutingLaunchConfig) {
+        cleanupRouting()
+        routingState = ROUTING_STATE_STARTING
+        Log.i(TAG, "Creating Android test-network TUN")
+
+        try {
+            setPreferTestNetworks(true)
+            createTestNetwork(config.dnsServers, config.ipv6Enabled)
+            val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
+            startRoutingEngineLocked(config, tun.fd)
+            setRoutingActiveLocked(config)
+        } catch (error: Throwable) {
+            // A partially published test network is not useful for recovery. Release it here so
+            // callers always see either a complete protected route or no route at all.
+            cleanupRouting()
+            throw error
+        }
+    }
+
+    @Synchronized
+    override fun stopRouting(): Int {
+        freshUserService = false
+        val result = shutdownRoutingLocked()
+        notifyStatusChanged()
+        return result
+    }
+
+    private fun shutdownRoutingLocked(): Int {
+        val tetheringResult = stopActiveTetheringLocked(clearDesired = true)
+        if (tetheringResult != RESULT_OK) {
+            setRoutingError("Unable to disable tethering safely before removing its protected route")
+            return tetheringResult
+        }
+        routingSession = null
+        routingState = ROUTING_STATE_STOPPING
+        Log.i(TAG, "Stopping v2rayNG tethering routing")
+        cleanupRouting()
+        clearCoreLifetimeWatchLocked()
+        routingState = ROUTING_STATE_DISABLED
+        return RESULT_OK
+    }
+
+    private fun stopActiveTetheringLocked(
+        clearDesired: Boolean,
+        activeTypes: Int = getActiveTetheringTypes(),
+    ): Int {
+        // Include accepted starts and the session's last desired state. This both covers Android's
+        // delayed active-state publication and provides a safe fallback if the state query fails.
+        val knownTypes = requestedTetheringTypes or (routingSession?.desiredTetheringTypes ?: 0)
+        if (activeTypes < 0 && knownTypes == 0) return RESULT_INTERNAL_ERROR
+        val typesToStop = activeTypes.coerceAtLeast(0) or knownTypes
+        if (clearDesired) routingSession?.desiredTetheringTypes = 0
+
+        var result = RESULT_OK
+        forEachTetheringType(typesToStop) { type, _ ->
+            val stopResult = stopTetheringTypeLocked(type)
+            if (stopResult != RESULT_OK && result == RESULT_OK) result = stopResult
+        }
+        return result
+    }
+
+    /**
+     * Queues a pause of the secondary engine while retaining the test TUN and downstreams.
+     * Returning from this one-way call does not confirm completion. Once paused, clients remain
+     * on a dead TUN until [synchronizeRouting] supplies the replacement configuration.
+     */
+    override fun notifyCoreStopping(token: String) = enqueueCoreUpdate {
+        findRoutingSession(token)?.let { pauseForCoreRestartLocked(it, "Main core stopping") }
+    }
+
+    private fun pauseForCoreRestartLocked(session: RoutingSession, reason: String) {
+        val activeTypes = getActiveTetheringTypes()
+        if (activeTypes >= 0 && (routingActive || session.desiredTetheringTypes == 0)) {
+            session.desiredTetheringTypes = activeTypes
+        }
+        stopRoutingEngineLocked()
+        session.coreRestartPending = true
+        if (testTun != null) {
+            routingState = ROUTING_STATE_WAITING
+            Log.i(
+                TAG,
+                "$reason; tethering core stopped while preserving the protected test network " +
+                    "and tethering types " +
+                    "0x${session.desiredTetheringTypes.toString(16)}",
+            )
+        } else {
+            val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
+            setRoutingError("Protected test network is unavailable")
+            Log.e(
+                TAG,
+                "$reason without a protected test network; disabled tethering " +
+                    "with result $tetheringResult",
+            )
+        }
+    }
+
+    override fun synchronizeRouting(
+        token: String,
+        useHev: Boolean,
+        profileName: String,
+        dnsServers: Array<out String>,
+        ipv6Enabled: Boolean,
+        xudpKey: String,
+        launchId: String,
+        coreLease: ICoreTetheringLease,
+    ) = enqueueCoreUpdate {
+        // The token identifies the user's enabled tethering session across core restarts;
+        // launchId identifies one main-core configuration. Both must match: a live session alone
+        // does not make a delayed configuration update current.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !coreLease.isCurrentLaunch(launchId)) return@enqueueCoreUpdate
+        if (routingSession == null && freshUserService) {
+            startRouting(useHev, profileName, dnsServers, ipv6Enabled, xudpKey, token, launchId, coreLease)
+            return@enqueueCoreUpdate
+        }
+        // A missing session in an existing service means the user stopped it, not service death.
+        val session = findRoutingSession(token) ?: return@enqueueCoreUpdate
+        runCatching {
+            val launchConfig = HotspotRoutingLaunchConfig(
+                engine = HotspotRoutingEngineConfig(useHev, profileName, readEngineConfig(coreLease, launchId)),
+                dnsServers = dnsServers.toList(),
+                ipv6Enabled = ipv6Enabled,
+                xudpKey = session.xudpKey,
+            )
+            watchCoreLifetimeLocked(coreLease)
+            applyRoutingConfigLocked(launchConfig, session)
+        }.onFailure {
+            // A newer launch/Stop will have its own queued event. Do not turn its stale predecessor
+            // into an error or accidentally apply a configuration from the wrong launch.
+            if (coreLease.isCurrentLaunch(launchId)) failRoutingSynchronizationLocked(it, session)
+        }
+    }
+
+    override fun notifyCoreStartFailed(token: String, detail: String) = enqueueCoreUpdate {
+        val session = findRoutingSession(token) ?: return@enqueueCoreUpdate
+        failRoutingSynchronizationLocked(
+            IllegalStateException(detail.ifBlank { "v2rayNG failed to restart" }),
+            session,
+        )
+    }
+
+    private fun enqueueCoreUpdate(action: () -> Unit) {
+        // The queue orders core events; the monitor also excludes synchronous UI commands.
+        // Neither orders emergency stops, so start operations must check upstreamRejections too.
+        coreUpdates.execute {
+            synchronized(this) {
+                runCatching(action).onFailure { Log.e(TAG, "Unable to apply core lifecycle update", it) }
+                notifyStatusChanged()
+            }
+        }
+    }
+
+    private fun findRoutingSession(token: String): RoutingSession? {
+        val session = routingSession
+        if (session == null || token.isBlank() || token != session.token) {
+            Log.w(TAG, "Ignoring hotspot update for an inactive or invalid session")
+            return null
+        }
+        return session
+    }
+
+    /**
+     * Keep the network request and TUN open in both failure domains. If the app dies, this
+     * UserService retains them; if Shizuku dies, the main core retains the duplicates supplied
+     * through [coreLease]. The lease Binder also reports a main-core death when no event can be sent.
+     */
+    private fun watchCoreLifetimeLocked(coreLease: ICoreTetheringLease) {
+        val binder = coreLease.asBinder()
+        if (coreLifetime?.binder === binder && binder.isBinderAlive) return
+        clearCoreLifetimeWatchLocked()
+        val recipient = IBinder.DeathRecipient {
+            synchronized(this) {
+                if (coreLifetime?.binder !== binder) return@synchronized
+                coreLifetime = null
+                this.coreLease = null
+                routingSession?.let {
+                    Log.w(TAG, "Main core process died without a stop notification")
+                    pauseForCoreRestartLocked(it, "Main core process died")
+                    notifyStatusChanged()
+                }
+            }
+        }
+        this.coreLease = coreLease
+        coreLifetime = LifetimeWatch(binder, recipient)
+        try {
+            binder.linkToDeath(recipient, 0)
+            shareTestNetworkWithCoreLocked()
+        } catch (error: Throwable) {
+            this.coreLease = null
+            coreLifetime = null
+            throw IllegalStateException("Main core is no longer running", error)
+        }
+    }
+
+    private fun shareTestNetworkWithCoreLocked() {
+        val lease = coreLease ?: return
+        val tun = testTun ?: return
+        ParcelFileDescriptor.dup(tun.fileDescriptor).use {
+            lease.holdTestNetwork(it)
+        }
+    }
+
+    private fun clearCoreLifetimeWatchLocked() {
+        runCatching { coreLease?.releaseTestNetwork() }
+        coreLifetime?.unlink()
+        coreLease = null
+        coreLifetime = null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun applyRoutingConfigLocked(
+        launchConfig: HotspotRoutingLaunchConfig,
+        session: RoutingSession,
+    ) {
+        Log.i(
+            TAG,
+            "Synchronizing hotspot routing to profile ${launchConfig.engine.profileName.ifBlank { "<unnamed>" }}",
+        )
+        val currentlyActive = getActiveTetheringTypes().coerceAtLeast(0)
+        val restoreTypes = if (session.coreRestartPending) {
+            session.desiredTetheringTypes or currentlyActive
+        } else {
+            currentlyActive
+        }
+        session.desiredTetheringTypes = restoreTypes
+
+        val switchedInPlace = launchConfig.dnsServers == session.dnsServers &&
+            launchConfig.ipv6Enabled == session.ipv6Enabled &&
+            testTun != null &&
+            (routingActive || routingState == ROUTING_STATE_WAITING) &&
+            runCatching {
+                // Reusing the TUN avoids changing Android's selected tethering upstream during an
+                // ordinary profile switch. Rebuild only if the engine cannot reuse its descriptor.
+                restartRoutingEngineLocked(launchConfig)
+            }.onFailure {
+                Log.w(TAG, "In-place hotspot engine switch failed; rebuilding the test network", it)
+            }.isSuccess
+
+        val failedTypes = if (switchedInPlace) {
+            restoreTetheringTypesLocked(restoreTypes)
+        } else {
+            rebuildRoutingLocked(launchConfig, restoreTypes)
+        }
+        session.dnsServers = launchConfig.dnsServers
+        session.ipv6Enabled = launchConfig.ipv6Enabled
+        session.coreRestartPending = false
+        reportTetheringRestoreFailuresLocked(failedTypes)
+        if (failedTypes == 0) {
+            Log.i(
+                TAG,
+                "Hotspot routing synchronized on ${testInterfaceName.orEmpty()}; tethering types 0x${restoreTypes.toString(16)}",
+            )
+        }
+    }
+
+    private fun restartRoutingEngineLocked(config: HotspotRoutingLaunchConfig) {
+        routingState = ROUTING_STATE_STARTING
+        Log.i(TAG, "Switching tethering to the new v2rayNG connection")
+        stopRoutingEngineLocked()
+        val tun = checkNotNull(testTun) { "Test TUN file descriptor is unavailable" }
+        startRoutingEngineLocked(config, tun.fd)
+        setRoutingActiveLocked(config)
+    }
+
+    private fun restoreTetheringTypesLocked(types: Int): Int {
+        val activeTypes = getActiveTetheringTypes()
+        if (activeTypes < 0) return types
+
+        var failedTypes = 0
+        forEachTetheringType(types) { type, bit ->
+            val result = setTetheringEnabled(type, true, activeTypes)
+            if (result != RESULT_OK) failedTypes = failedTypes or bit
+        }
+        return failedTypes
+    }
+
+    /** Visits exactly the tethering types represented in Android's non-negative bit mask. */
+    private inline fun forEachTetheringType(types: Int, action: (type: Int, bit: Int) -> Unit) {
+        var remaining = types
+        while (remaining > 0) {
+            val bit = Integer.lowestOneBit(remaining)
+            action(Integer.numberOfTrailingZeros(bit), bit)
+            remaining = remaining xor bit
+        }
+    }
+
+    private fun failRoutingSynchronizationLocked(error: Throwable, session: RoutingSession) {
+        val detail = rootCauseMessage(error)
+        Log.e(TAG, "Unable to synchronize hotspot routing: $detail", error)
+        stopRoutingEngineLocked()
+        session.coreRestartPending = true
+        if (testTun != null) {
+            routingState = ROUTING_STATE_WAITING
+            Log.w(TAG, "Tethering remains fail-closed on ${testInterfaceName.orEmpty()}")
+        } else {
+            val tetheringResult = stopActiveTetheringLocked(clearDesired = false)
+            if (tetheringResult == RESULT_OK) cleanupRouting()
+            setRoutingError(detail)
+        }
+    }
+
+    override fun destroy() {
+        val safeToExit = synchronized(this) {
+            shutdownRoutingLocked() == RESULT_OK
+        }
+        if (!safeToExit) {
+            Log.e(TAG, "Refusing to destroy the UserService while tethering may still be active")
+            return
+        }
+        upstreamMonitor.close()
+        coreUpdates.shutdownNow()
+        System.exit(0)
+    }
+
+    /**
+     * Changes one real Android tethering downstream while preserving the protected-upstream
+     * invariant.
+     *
+     * `setPreferTestNetworks(true)` influences Android's upstream choice, but it does not make the
+     * subsequent tethering start atomic. The callback can also arrive before the downstream and
+     * its selected upstream are visible. A successful start is consequently not returned to the
+     * app until the downstream is active and its actual upstream is exactly [testInterfaceName].
+     */
+    private fun setTetheringEnabled(type: Int, enabled: Boolean, activeTypes: Int = getActiveTetheringTypes()): Int {
+        val bit = tetheringTypeBit(type)
+        if (bit == 0) return RESULT_INTERNAL_ERROR
+
+        val result = if (!enabled) {
+            val alreadyStopped = activeTypes >= 0 && activeTypes and bit == 0 &&
+                requestedTetheringTypes and bit == 0
+            if (alreadyStopped) RESULT_OK else stopTetheringTypeLocked(type)
+        } else {
+            startTetheringTypeLocked(type, activeTypes >= 0 && activeTypes and bit != 0)
+        }
+        if (enabled) {
+            when (result) {
+                RESULT_OK -> wrongUpstreamWarningTypes.getAndUpdate { it and bit.inv() }
+                RESULT_UNPROTECTED_UPSTREAM -> wrongUpstreamWarningTypes.getAndUpdate { it or bit }
+            }
+        }
+        return result
+    }
+
+    private fun startTetheringTypeLocked(type: Int, alreadyEnabled: Boolean): Int {
+        val firstResult = startTetheringTypeAttemptLocked(type, alreadyEnabled)
+        if (firstResult != RESULT_UNPROTECTED_UPSTREAM) return firstResult
+
+        // Some Android builds briefly select their physical upstream while applying the test-
+        // network preference. The failed attempt has already been stopped, so it is safe to give
+        // the framework a moment to settle and make one fresh attempt. Never loop indefinitely:
+        // a persistent wrong upstream must remain fail-closed and be reported to the user.
+        Log.w(TAG, "Waiting before retrying protected tethering type $type")
+        if (!sleepForUpstreamRetry()) return firstResult
+        return startTetheringTypeAttemptLocked(type, alreadyEnabled = false)
+    }
+
+    private fun startTetheringTypeAttemptLocked(type: Int, alreadyEnabled: Boolean): Int {
+        val rejection = upstreamRejections.get()
+        val bit = tetheringTypeBit(type)
+        val expectedUpstream = testInterfaceName
+        if (!isRoutingReadyLocked() || testTun == null || expectedUpstream.isNullOrBlank()) {
+            Log.e(TAG, "Refusing to start tethering before protected routing is ready")
+            return RESULT_ROUTING_FAILED
+        }
+
+        // Record the request before crossing into Android. From this point onward every error and
+        // every concurrent shutdown path must explicitly stop the possibly in-flight downstream.
+        requestedTetheringTypes = requestedTetheringTypes or bit
+        val preferenceReady = runCatching { setPreferTestNetworks(true) }
+            .onFailure { Log.e(TAG, "Unable to select the protected tethering upstream", it) }
+            .isSuccess
+        if (!preferenceReady) return stopAfterFailedStartLocked(type, RESULT_INTERNAL_ERROR)
+
+        var needsStart = !alreadyEnabled
+        if (alreadyEnabled && !awaitProtectedUpstream(expectedUpstream)) {
+            // A downstream started outside this protected session may remain latched to its old
+            // physical upstream. Restart it so Android applies the test-network preference while
+            // making the new upstream selection.
+            Log.w(TAG, "Resetting tethering type $type before protected startup")
+            val stopResult = stopTetheringTypeLocked(type)
+            if (stopResult != RESULT_OK) return stopAfterFailedStartLocked(type, stopResult)
+            needsStart = true
+        }
+
+        if (needsStart) {
+            val startResult = changeTetheringEnabled(type, true)
+            if (startResult != RESULT_OK) return stopAfterFailedStartLocked(type, startResult)
+            if (!awaitTetheringTypeState(type, enabled = true)) {
+                return stopAfterFailedStartLocked(type, RESULT_INTERNAL_ERROR)
+            }
+        }
+
+        if (!awaitProtectedUpstream(expectedUpstream) || rejection != upstreamRejections.get()) {
+            // Do not wait for a non-empty physical upstream to hand over later: once Android has
+            // installed that forwarding path, tethered traffic may already bypass v2rayNG.
+            val actualUpstream = readUpstreamInterface()
+            Log.e(
+                TAG,
+                "Refusing tethering type $type on unprotected upstream " +
+                    actualUpstream.ifBlank { "<none>" },
+            )
+            val result = if (actualUpstream.isBlank()) {
+                RESULT_ROUTING_FAILED
+            } else {
+                RESULT_UNPROTECTED_UPSTREAM
+            }
+            return stopAfterFailedStartLocked(type, result)
+        }
+
+        requestedTetheringTypes = requestedTetheringTypes and bit.inv()
+        return RESULT_OK
+    }
+
+    private fun sleepForUpstreamRetry(): Boolean = try {
+        Thread.sleep(UPSTREAM_RETRY_DELAY_MILLIS)
+        true
+    } catch (_: InterruptedException) {
+        Thread.currentThread().interrupt()
+        false
+    }
+
+    private fun readUpstreamInterface(): String = upstreamMonitor.currentInterfaceNames.orEmpty()
+
+    private fun createUpstreamMonitor(): TetheringUpstreamMonitor {
+        return if (usesPublicTetheringApi()) {
+            TetheringApi36.observeUpstream(
+                tetheringManager,
+                connectivityManager,
+                executor,
+                ::onTetheringChanged,
+            )
+        } else {
+            TetheringPlatformCompat.observeUpstreamLegacy(
+                tetheringManager,
+                connectivityManager,
+                executor,
+                ::onTetheringChanged,
+            )
+        }
+    }
+
+    private fun onTetheringChanged() {
+        stopUnprotectedDownstreams()
+        notifyStatusChanged()
+    }
+
+    /**
+     * Safety must not queue behind the lifecycle monitor: native startup and the bounded retry
+     * can take seconds while another downstream is already carrying traffic. Read the callback's
+     * snapshot and dispatch all stops without waiting for any individual acknowledgement.
+     * Normal lifecycle operations still verify Android's final stopped state before releasing a
+     * TUN. The rejection counter also prevents an overlapping start from reporting success.
+     */
+    private fun stopUnprotectedDownstreams() {
+        val expected = testInterfaceName ?: return
+        val actual = upstreamMonitor.currentInterfaceNames ?: return
+        if (actual.isBlank() || TetheringPlatformCompat.isProtectedUpstream(actual, expected)) return
+
+        val activeTypes = upstreamMonitor.currentInterfaces?.let(::tetheringTypeMask) ?: 0
+        val affectedTypes = activeTypes or requestedTetheringTypes or
+            (routingSession?.desiredTetheringTypes ?: 0)
+        if (affectedTypes == 0) return
+
+        upstreamRejections.incrementAndGet()
+        wrongUpstreamWarningTypes.getAndUpdate { it or affectedTypes }
+        Log.e(TAG, "Android moved tethering to unprotected upstream $actual; stopping downstreams")
+        forEachTetheringType(affectedTypes) { type, _ ->
+            runCatching {
+                if (usesPublicTetheringApi()) {
+                    TetheringApi36.requestStopTethering(tetheringManager, type, executor) { result ->
+                        if (result != RESULT_OK) Log.e(TAG, "Emergency stop failed for tethering type $type: $result")
+                    }
+                } else {
+                    TetheringPlatformCompat.stopTethering(tetheringManager, type)
+                }
+            }.onFailure { Log.e(TAG, "Unable to request emergency stop for tethering type $type", it) }
+        }
+    }
+
+    private fun notifyStatusChanged() {
+        val listener = statusListener.get() ?: return
+        runCatching { listener.onStatusChanged() }
+            .onFailure { statusListener.compareAndSet(listener, null) }
+    }
+
+    private fun isRoutingReadyLocked(): Boolean {
+        return when (routingState) {
+            ROUTING_STATE_ACTIVE_NATIVE -> nativeController?.isRunning == true
+            ROUTING_STATE_ACTIVE_HEV -> TProxyService.isExternalTunnelRunning()
+            else -> false
+        }
+    }
+
+    private fun stopAfterFailedStartLocked(type: Int, startResult: Int): Int {
+        // Cleanup is part of the safety contract. Prefer its failure when Android could not be
+        // observed stopping, because the original start error no longer describes the main risk.
+        val stopResult = stopTetheringTypeLocked(type)
+        return if (stopResult == RESULT_OK) startResult else stopResult
+    }
+
+    private fun stopTetheringTypeLocked(type: Int): Int {
+        val bit = tetheringTypeBit(type)
+        val stopResult = changeTetheringEnabled(type, false)
+        if (awaitTetheringTypeState(type, enabled = false)) {
+            // Clear the in-flight marker only after Android confirms the downstream is absent.
+            requestedTetheringTypes = requestedTetheringTypes and bit.inv()
+            return RESULT_OK
+        }
+        Log.e(TAG, "Timed out waiting for tethering type $type to stop")
+        return if (stopResult == RESULT_OK) RESULT_INTERNAL_ERROR else stopResult
+    }
+
+    private fun awaitTetheringTypeState(type: Int, enabled: Boolean): Boolean {
+        val bit = tetheringTypeBit(type)
+        return awaitResult(TETHERING_STATE_TIMEOUT_SECONDS) {
+            val activeTypes = getActiveTetheringTypes()
+            if (activeTypes >= 0 && (activeTypes and bit != 0) == enabled) true else null
+        }
+    }
+
+    private fun awaitProtectedUpstream(expectedInterface: String) = awaitResult(
+        UPSTREAM_SELECTION_TIMEOUT_SECONDS,
+    ) {
+        val actualInterface = readUpstreamInterface()
+        when {
+            TetheringPlatformCompat.isProtectedUpstream(actualInterface, expectedInterface) -> true
+            // An empty value means upstream selection has not completed and is safe to poll. Any
+            // named, unexpected interface is already a usable forwarding path and must fail fast.
+            actualInterface.isNotBlank() -> false
+            else -> null
+        }
+    }
+
+    /** Polls until Android reports success/failure, or returns false on timeout/interruption. */
+    private inline fun awaitResult(timeoutSeconds: Long, poll: () -> Boolean?): Boolean {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSeconds)
+        while (true) {
+            poll()?.let { return it }
+            if (System.nanoTime() >= deadline) return false
+            try {
+                Thread.sleep(TETHERING_STATE_POLL_MILLIS)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                return false
+            }
+        }
+    }
+
+    private fun changeTetheringEnabled(type: Int, enabled: Boolean): Int {
+        return runCatching {
+            when {
+                enabled && usesPublicTetheringApi() -> TetheringApi36.startTethering(
+                    tetheringManager,
+                    type,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
+                enabled -> TetheringPlatformCompat.startTethering(
+                    tetheringManager,
+                    type,
+                    executor,
+                    CALLBACK_TIMEOUT_SECONDS,
+                )
+                usesPublicTetheringApi() ->
+                    TetheringApi36.stopTethering(
+                        tetheringManager,
+                        type,
+                        executor,
+                        CALLBACK_TIMEOUT_SECONDS,
+                    )
+                else -> TetheringPlatformCompat.stopTethering(
+                    tetheringManager,
+                    type,
+                )
+            }
+        }.onFailure {
+            Log.e(TAG, "Unable to set tethering type $type enabled=$enabled", it)
+        }.getOrDefault(RESULT_INTERNAL_ERROR)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun rebuildRoutingLocked(config: HotspotRoutingLaunchConfig, restoreTypes: Int): Int {
+        val stopResult = stopActiveTetheringLocked(clearDesired = false)
+        check(stopResult == RESULT_OK) {
+            "Unable to pause tethering safely before rebuilding its protected route"
+        }
+        createRoutingLocked(config)
+        return restoreTetheringTypesLocked(restoreTypes)
+    }
+
+    private fun reportTetheringRestoreFailuresLocked(failedTypes: Int) {
+        if (failedTypes == 0) return
+        Log.w(TAG, "Unable to restore tethering types 0x${failedTypes.toString(16)}")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun createTestNetwork(dnsServers: List<String>, ipv6Enabled: Boolean) {
+        val manager = checkNotNull(shellContext.getSystemService(TEST_NETWORK_SERVICE)) {
+            "TestNetworkManager is unavailable on this Android build"
+        }
+        // TestNetworkManager installs a default route for every represented address family.
+        // Tethering can then delegate this synthetic /64 while Xray owns the shared TUN fd.
+        val addresses = buildList {
+            add(createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V4))
+            if (ipv6Enabled) add(createLinkAddress(AppConfig.SHIZUKU_TUN_ADDR_V6))
+        }
+        val handle = createTestNetworkHandle(manager, addresses)
+        testNetworkHandle = handle
+
+        // Register the duplicate request and TUN descriptor before publishing the network. From
+        // this point on, either the core process or this UserService can preserve the fail-closed
+        // upstream if the other process disappears.
+        shareTestNetworkWithCoreLocked()
+        connectivityManager.requestNetwork(TetheringPlatformCompat.testNetworkRequest(), handle.callback)
+
+        val properties = LinkProperties().apply {
+            interfaceName = handle.interfaceName
+            setLinkAddresses(addresses)
+            // Mirror CoreVpnService instead of inventing tethering-specific resolvers. The core
+            // configuration decides whether port 53 is handled by v2rayNG's local DNS outbound.
+            val configuredDns = dnsServers.map(InetAddress::getByName)
+            setDnsServers(buildList {
+                addAll(configuredDns)
+                // Android requires an IPv6 DNS server before it will advertise an upstream /64.
+                // Most existing VPN DNS settings are IPv4-only, so append an internal ULA hint;
+                // it is not a hardcoded external resolver and configured servers remain first.
+                if (ipv6Enabled && configuredDns.none { it is Inet6Address }) {
+                    add(InetAddress.getByName(AppConfig.SHIZUKU_TUN_DNS_HINT_V6))
+                }
+            })
+        }
+        val setupMethod = manager.javaClass.getMethod(
+            "setupTestNetwork",
+            LinkProperties::class.java,
+            java.lang.Boolean.TYPE,
+            IBinder::class.java,
+        )
+        setupMethod.invoke(manager, properties, true, handle.networkLifetimeToken)
+
+        check(handle.awaitPublished()) { "Android did not publish the test-network TUN" }
+    }
+
+    /**
+     * TestNetworkManager is a module-library API, not an app API. Remove this reflection only when
+     * the public SDK exposes create/setup/teardown test-network calls with equivalent lifetime-token
+     * semantics and the feature no longer supports an older API without that public replacement.
+     */
+    private fun createTestNetworkHandle(
+        manager: Any,
+        addresses: List<LinkAddress>,
+    ): TestNetworkHandle {
+        val addressArray = addresses.toTypedArray()
+        val testInterface = manager.javaClass
+            .getMethod("createTunInterface", addressArray.javaClass)
+            .invoke(manager, addressArray as Any)
+            ?: error("TestNetworkManager returned no TUN interface")
+        val tun = testInterface.javaClass.getMethod("getFileDescriptor")
+            .invoke(testInterface) as ParcelFileDescriptor
+        return try {
+            val interfaceName = testInterface.javaClass.getMethod("getInterfaceName")
+                .invoke(testInterface) as String
+            TestNetworkHandle(
+                manager = manager,
+                interfaceLifetime = testInterface,
+                tun = tun,
+                interfaceName = interfaceName,
+                connectivityManager = connectivityManager,
+                // The service and normal app are independent failure domains. Let system_server
+                // anchor the published test network so either process can disappear without
+                // Android immediately moving active tethering to a physical upstream.
+                networkLifetimeToken = checkNotNull(SystemServiceHelper.getSystemService(Context.CONNECTIVITY_SERVICE)) {
+                    "Android connectivity service has no Binder"
+                },
+            )
+        } catch (error: Throwable) {
+            runCatching { tun.close() }
+            throw error
+        }
+    }
+
+    private fun setPreferTestNetworks(prefer: Boolean) {
+        // This hidden API is the only way to make tethering consider TRANSPORT_TEST upstreams.
+        // Remove it only when a public API provides the same opt-in on every supported feature API,
+        // or when the design stops using a test network as the protected upstream.
+        tetheringManager.javaClass
+            .getMethod("setPreferTestNetworks", java.lang.Boolean.TYPE)
+            .invoke(tetheringManager, prefer)
+    }
+
+    private fun startRoutingEngineLocked(config: HotspotRoutingLaunchConfig, fd: Int) {
+        val engine = config.engine
+        require(engine.content.isNotBlank()) {
+            "${if (engine.useHev) "HEV" else "Xray"} configuration is empty"
+        }
+        if (engine.useHev) {
+            startHev(engine.content, fd)
+        } else {
+            val lease = checkNotNull(coreLease) { "Core asset lease is unavailable" }
+            startNativeXray(engine.content, fd, stageNativeAssets(lease), config.xudpKey)
+        }
+    }
+
+    /**
+     * The ordinary app now keeps geodata and user assets in app-private storage, which the shell
+     * UserService cannot traverse. Stream those files through the existing private core lease and
+     * cache them in the shell runtime directory. The fingerprint avoids recopying unchanged files
+     * during ordinary profile and network synchronization.
+     */
+    private fun stageNativeAssets(coreLease: ICoreTetheringLease): String {
+        val directory = File(SHELL_RUNTIME_DIR, ASSET_DIRECTORY_NAME).apply { mkdirs() }
+        check(directory.isDirectory) { "Unable to create tethering asset directory" }
+        val names = coreLease.listAssetFiles().toList()
+        require(names.all { it.isNotBlank() && File(it).name == it }) { "Invalid core asset name" }
+        val fingerprint = coreLease.assetFingerprint()
+        if (fingerprint == stagedAssetFingerprint && names.all { File(directory, it).isFile }) {
+            return directory.absolutePath
+        }
+
+        directory.listFiles()?.filter { it.isFile && it.name !in names }?.forEach { it.delete() }
+        names.forEach { name ->
+            val target = File(directory, name)
+            val temporary = File(directory, ".$name.tmp")
+            runCatching {
+                ParcelFileDescriptor.AutoCloseInputStream(coreLease.openAssetFile(name)).use { input ->
+                    temporary.outputStream().use { output -> input.copyTo(output) }
+                }
+                check(!target.exists() || target.delete()) { "Unable to replace tethering asset $name" }
+                check(temporary.renameTo(target)) { "Unable to install tethering asset $name" }
+            }.onFailure {
+                temporary.delete()
+                throw it
+            }
+        }
+        stagedAssetFingerprint = fingerprint
+        return directory.absolutePath
+    }
+
+    private fun readEngineConfig(coreLease: ICoreTetheringLease, launchId: String): String {
+        val descriptor = coreLease.openEngineConfig(launchId)
+        return ParcelFileDescriptor.AutoCloseInputStream(descriptor)
+            .bufferedReader(Charsets.UTF_8)
+            .use { it.readText() }
+            .also { require(it.isNotBlank()) { "Tethering engine configuration is empty" } }
+    }
+
+    private fun setRoutingActiveLocked(config: HotspotRoutingLaunchConfig) {
+        routingProfileName = config.engine.profileName
+        routingState = if (config.engine.useHev) ROUTING_STATE_ACTIVE_HEV else ROUTING_STATE_ACTIVE_NATIVE
+        // HEV's JNI API has no exit callback. Observe the native worker while an engine is owned,
+        // rather than telling an idle screen that an exited worker is still routing traffic.
+        engineHealthCheck = coreUpdates.scheduleWithFixedDelay({
+            synchronized(this) {
+                val previous = routingState
+                if (currentRoutingStateLocked() != previous) notifyStatusChanged()
+                if (routingState == ROUTING_STATE_ERROR) engineHealthCheck?.cancel(false)
+            }
+        }, 2, 2, TimeUnit.SECONDS)
+    }
+
+    private fun setRoutingError(detail: String) {
+        routingState = ROUTING_STATE_ERROR
+        Log.e(TAG, detail)
+    }
+
+    private fun formatRoutingDetail(interfaceName: String): String {
+        return listOf(interfaceName, routingProfileName)
+            .filter(String::isNotBlank)
+            .joinToString(" · ")
+    }
+
+    private fun stopRoutingEngineLocked() {
+        engineHealthCheck?.cancel(false)
+        engineHealthCheck = null
+        runCatching { nativeController?.stopLoop() }
+            .onFailure { Log.w(TAG, "Unable to stop native hotspot core", it) }
+        nativeController = null
+        runCatching { if (hevConfigFile != null) TProxyService.stopExternalTunnel() }
+            .onFailure { Log.w(TAG, "Unable to stop hotspot HEV", it) }
+        hevConfigFile?.let { runCatching { it.delete() } }
+        hevConfigFile = null
+    }
+
+    private fun startHev(config: String, fd: Int) {
+        val file = File(SHELL_RUNTIME_DIR, "v2rayng-hotspot-${android.os.Process.myPid()}.yaml")
+        file.writeText(config)
+        hevConfigFile = file
+        check(TProxyService.startExternalTunnel(file.absolutePath, fd)) { "Unable to start HEV tethering engine" }
+    }
+
+    private fun startNativeXray(
+        config: String,
+        fd: Int,
+        assetPath: String,
+        xudpKey: String,
+    ) {
+        Seq.setContext(appContext)
+        Libv2ray.initCoreEnv(assetPath, xudpKey)
+        val controller = Libv2ray.newCoreController(object : CoreCallbackHandler {
+            override fun startup(): Long = 0
+            override fun shutdown(): Long = 0
+            override fun onEmitStatus(code: Long, status: String?): Long {
+                Log.i(TAG, "Hotspot Xray status $code: ${status.orEmpty()}")
+                return 0
+            }
+        })
+        try {
+            controller.startLoop(config, fd)
+            check(controller.isRunning) { "Native Xray hotspot core did not start" }
+            nativeController = controller
+        } catch (error: Throwable) {
+            runCatching { controller.stopLoop() }
+            throw error
+        }
+    }
+
+    private fun cleanupRouting() {
+        // Callers stop real tethering first. Releasing the engine and TUN in this order then leaves
+        // no downstream that Android could silently move back to a physical upstream.
+        stopRoutingEngineLocked()
+        runCatching { coreLease?.releaseTestNetwork() }
+
+        val handle = testNetworkHandle
+        testNetworkHandle = null
+        handle?.release()
+        routingProfileName = ""
+
+        runCatching { setPreferTestNetworks(false) }
+            .onFailure { Log.w(TAG, "Unable to restore tethering upstream preference", it) }
+    }
+
+    private fun createLinkAddress(cidr: String): LinkAddress {
+        // LinkAddress has no public app-SDK constructor through API 37. Replace this reflection only
+        // after the public SDK gains a CIDR-equivalent factory on every supported feature API.
+        return LinkAddress::class.java.getDeclaredConstructor(String::class.java).run {
+            isAccessible = true
+            newInstance(cidr)
+        }
+    }
+
+    private fun rootCauseMessage(error: Throwable): String {
+        var current = error
+        while (current.cause != null && current.cause !== current) current = current.cause!!
+        return current.message?.takeIf { it.isNotBlank() } ?: current.javaClass.simpleName
+    }
+
+    companion object {
+        private const val TAG = "ShizukuTethering"
+        // Shizuku UserServices can outlive an APK update. Bump this whenever the service
+        // implementation or its AIDL contract changes so an incompatible shell process is
+        // replaced even when a locally rebuilt APK keeps the same Android versionCode.
+        const val USER_SERVICE_VERSION = 20_260_765
+        private const val TETHERING_SERVICE = "tethering"
+        private const val TEST_NETWORK_SERVICE = "test_network"
+        private val TETHERING_IPV6_PREFIX = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            AppConfig.SHIZUKU_TUN_ADDR_V6.let { cidr ->
+                IpPrefix(
+                    InetAddress.getByName(cidr.substringBefore('/')),
+                    cidr.substringAfter('/').toInt(),
+                )
+            }
+        } else null
+        private const val SHELL_RUNTIME_DIR = "/data/local/tmp"
+        private const val ASSET_DIRECTORY_NAME = "v2rayng-tethering-assets"
+        private const val CALLBACK_TIMEOUT_SECONDS = 10L
+        private const val TEST_NETWORK_TIMEOUT_SECONDS = 15L
+        private const val TETHERING_STATE_TIMEOUT_SECONDS = 10L
+        private const val UPSTREAM_SELECTION_TIMEOUT_SECONDS = 5L
+        // Android can take several seconds to dismantle a rejected downstream and reconsider the
+        // preferred test network. Keep the delay type-agnostic so Wi-Fi, USB and other downstreams
+        // all use the same single bounded retry.
+        private const val UPSTREAM_RETRY_DELAY_MILLIS = 8_000L
+        private const val TETHERING_STATE_POLL_MILLIS = 200L
+
+        const val TETHERING_TYPE_WIFI = 0
+        const val TETHERING_TYPE_USB = 1
+        const val TETHERING_TYPES_UNKNOWN = -1
+
+        const val ROUTING_STATE_DISABLED = 0
+        const val ROUTING_STATE_STARTING = 1
+        const val ROUTING_STATE_ACTIVE_HEV = 2
+        const val ROUTING_STATE_ACTIVE_NATIVE = 3
+        const val ROUTING_STATE_STOPPING = 4
+        const val ROUTING_STATE_ERROR = 5
+        const val ROUTING_STATE_WAITING = 6
+
+        const val RESULT_OK = 0
+        const val RESULT_INTERNAL_ERROR = -1
+        const val RESULT_ROUTING_FAILED = -2
+        const val RESULT_INVALID_SESSION = -4
+        const val RESULT_ALREADY_ACTIVE = -5
+        const val RESULT_UNPROTECTED_UPSTREAM = -6
+
+        internal fun createUserServiceArgs() = Shizuku.UserServiceArgs(
+            ComponentName(BuildConfig.APPLICATION_ID, ShizukuTetheringService::class.java.name)
+        )
+            .daemon(true)
+            .processNameSuffix("shizuku_tethering")
+            .debuggable(BuildConfig.DEBUG)
+            .version(USER_SERVICE_VERSION)
+    }
+}
