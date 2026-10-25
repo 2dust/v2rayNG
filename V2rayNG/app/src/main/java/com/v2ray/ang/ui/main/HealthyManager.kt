@@ -31,6 +31,8 @@ interface HealthyHost {
     fun connectToServer(guid: String)
     fun toast(message: String)
     fun toastFailure()
+    fun hasInternet(): Boolean
+    fun copyText(label: String, text: String)
 }
 
 /**
@@ -46,6 +48,30 @@ class HealthyManager(
     private val healthyName = "Healthy"   // name of the pool group
     private val maxHealthy = 50           // max servers kept in the pool
 
+    // ---------- Event log (kept in memory, copied to the clipboard at the end of a refresh) ----------
+    private val logLines = ArrayDeque<String>()
+    private val logTime = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US)
+    private val logMaxLines = 80
+
+    private fun log(message: String) {
+        synchronized(logLines) {
+            logLines.addLast("${logTime.format(java.util.Date())} $message")
+            while (logLines.size > logMaxLines) logLines.removeFirst()
+        }
+    }
+
+    // Log it and show it as a toast
+    private fun say(message: String) {
+        log(message)
+        host.toast(message)
+    }
+
+    fun logText(): String = synchronized(logLines) { logLines.joinToString("\n") }
+
+    private suspend fun nameOf(guid: String): String = withContext(io) {
+        dataSource.decodeServerConfig(guid)?.remarks ?: guid.take(6)
+    }
+
     // ---------- Refresh / fast connect ----------
     private var refreshHealthyJob: Job? = null
 
@@ -59,21 +85,24 @@ class HealthyManager(
     // ---------- Watchdog ----------
     private var watchdogJob: Job? = null
     private var networkJob: Job? = null
+    private var confirmJob: Job? = null
     private var lastSwitchMs = 0L
     private val watchdogRetryMs = 10_000L       // after a bad sample
     private val watchdogMaxDelayMs = 4000L
     private val watchdogWindowMs = 120_000L     // how far back samples count
     private val watchdogSamples = ArrayDeque<Pair<Long, Boolean>>() // (time, isBad)
     private val watchdogTimeoutMs = 10_000L
+    private val confirmDelayMs = 3000L          // wait before re-testing a bad sample
 
     @Volatile
     private var watchdogGotResult = false
 
     @Volatile
-    private var lastProbeDelay = 0L
+    private var lastSampleBad = false
 
     @Volatile
-    private var lastSampleBad = false
+    private var confirming = false
+    private var noInternetLogged = false
     private val switchCooldownMs = 60_000L
     private val watchdogCheckMs = 30_000L       // first test after connecting
     private val smartMinDownBytes = 2048L       // enough download in the window = connection is alive
@@ -99,6 +128,14 @@ class HealthyManager(
 
     @Volatile
     private var periodicRunning = false
+
+    private data class PenaltyOutcome(
+        val changed: Boolean,
+        val networkProblem: Boolean,
+        val condemned: Int,
+        val ok: Int,
+        val failed: Int,
+    )
 
     // ---------- Traffic stall ----------
     private var stallSamples = 0
@@ -143,22 +180,25 @@ class HealthyManager(
 
     fun onDelayResult(delayMillis: Long) {
         watchdogGotResult = true
-        lastProbeDelay = delayMillis
         recordWatchdogSample(delayMillis !in 1L..watchdogMaxDelayMs)
     }
 
     fun onConfigSuccess(guid: String, delayMillis: Long) {
-        if (autoConnectOnFirstGood && delayMillis in 1L..firstGoodMaxDelayMs) {
-            autoConnectOnFirstGood = false
-            host.toast("Connecting to first fast server...")
-            host.connectToServer(guid)
+        if (!autoConnectOnFirstGood || delayMillis !in 1L..firstGoodMaxDelayMs) return
+        autoConnectOnFirstGood = false
+        if (host.isRunning && guid == host.selectedGuid) {
+            log("First good server is the current one, staying")
+            return
         }
+        say("Connecting to first fast server (${delayMillis}ms)...")
+        host.connectToServer(guid)
     }
 
     // Called by the Activity when the underlying network changes (Wi-Fi <-> mobile, lost, back)
     fun onNetworkChanged() {
         scope.launch {
             if (!host.isRunning) return@launch
+            log("Network changed")
             networkJob?.cancel()
             networkJob = launch {
                 delay(3000) // let the new network settle
@@ -175,7 +215,7 @@ class HealthyManager(
         autoConnectGuid = null
         if (autoConnectRetries >= 3) {
             autoConnectRetries = 0
-            host.toast("Auto-connect failed, please choose a server manually")
+            say("Auto-connect failed, please choose a server manually")
             return
         }
         autoConnectRetries++
@@ -198,7 +238,7 @@ class HealthyManager(
                     ?.first
             }
             if (next != null) {
-                host.toast("Server failed to start, trying another...")
+                say("Server failed to start, trying another...")
                 host.connectToServer(next)
             }
         }
@@ -216,6 +256,7 @@ class HealthyManager(
         refreshHealthyJob = scope.launch {
             try {
                 refreshActive = true
+                log("Refresh started (running=${host.isRunning})")
 
                 var subs = withContext(io) { dataSource.getSubscriptions() }
                 if (subs.none { it.subscription.remarks == healthyName }) {
@@ -236,42 +277,18 @@ class HealthyManager(
                     it.guid != healthy.guid && it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID
                 }
 
-                var healthyTestedFirst = false
-                val selectedNow = host.selectedGuid
-                val storedBad = withContext(io) {
-                    val ms = selectedNow?.let { dataSource.decodeAffiliationInfo(it)?.testDelayMillis } ?: 0L
-                    ms < 0L
-                }
-                val needSwitch = !host.isRunning || storedBad || !isCurrentConnectionGood()
-                if (needSwitch) {
-                    val quickGuid = withContext(io) {
-                        val currentId = selectedNow?.let { dataSource.decodeServerConfig(it)?.duplicateIdentity() }
-                        dataSource.getServerGuidList(healthy.guid)
-                            .mapNotNull { guid ->
-                                val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
-                                if (ms <= 0L) return@mapNotNull null
-                                val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
-                                if (id != null && id == currentId) return@mapNotNull null
-                                guid to ms
-                            }
-                            .minByOrNull { it.second }?.first
-                    }
-                    if (quickGuid != null) {
-                        host.toast("Connecting to the fastest known server...")
-                        host.connectToServer(quickGuid)
-                        delay(3000) // let the VPN restart settle before the tests start
-                    } else {
-                        autoConnectOnFirstGood = true
-                        host.toast("Testing Healthy servers first...")
-                        testGroupAndWait(healthy.guid)
-                        healthyTestedFirst = true
-                    }
-                }
-                host.toast("Updating subscriptions...")
+                // Always: test Healthy first and connect to the first fast server,
+                // whether the VPN is off, on a dead server, or on a good one.
+                // If Healthy has no fast server, the first fast server found
+                // while testing the subscriptions is used (the flag stays on).
+                autoConnectOnFirstGood = true
+                say("Testing Healthy servers first...")
+                testGroupAndWait(healthy.guid)
+
+                say("Updating subscriptions...")
                 withContext(io) { dataSource.updateConfigViaSubAll() }
 
-                for (group in sources + healthy) {
-                    if (group.guid == healthy.guid && healthyTestedFirst) continue
+                for (group in sources) {
                     testGroupAndWait(group.guid)
                 }
 
@@ -329,7 +346,7 @@ class HealthyManager(
                 }
 
                 host.reloadGroups()
-                host.toast(summary)
+                say(summary)
 
                 val fastestGuid = withContext(io) {
                     dataSource.getServerGuidList(healthy.guid)
@@ -349,19 +366,23 @@ class HealthyManager(
                         currentMs <= 0L || bestMs * 2 < currentMs
                     }
                     if (shouldSwitch) {
-                        host.toast("Switching to the fastest server...")
+                        say("Switching to the fastest server...")
                         host.connectToServer(fastestGuid)
+                    } else {
+                        log("Refresh done: current server is good enough, staying")
                     }
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Healthy refresh failed", e)
+                log("Refresh failed: ${e.message}")
                 host.toastFailure()
             } finally {
                 autoConnectOnFirstGood = false
                 refreshActive = false
                 lastPeriodicMs = System.currentTimeMillis() // the refresh just tested everything
+                host.copyText("Healthy log", logText()) // temporary: paste it in the chat for diagnosis
             }
         }
     }
@@ -397,6 +418,7 @@ class HealthyManager(
         if (watchdogJob?.isActive == true) return
         watchdogSamples.clear()
         lastSampleBad = false
+        confirming = false
         // first test about 30 s after connecting
         lastTestMs = System.currentTimeMillis() - smartIdleTestMs + watchdogCheckMs
         watchdogJob = scope.launch {
@@ -422,6 +444,9 @@ class HealthyManager(
     private fun stopWatchdog() {
         watchdogJob?.cancel()
         watchdogJob = null
+        confirmJob?.cancel()
+        confirmJob = null
+        confirming = false
         watchdogSamples.clear()
     }
 
@@ -442,11 +467,6 @@ class HealthyManager(
         }
     }
 
-    private suspend fun isCurrentConnectionGood(): Boolean {
-        probeCurrentServer()
-        return lastProbeDelay in 1L..watchdogMaxDelayMs
-    }
-
     private fun recordWatchdogSample(bad: Boolean) {
         lastSampleBad = bad
         val now = System.currentTimeMillis()
@@ -456,20 +476,58 @@ class HealthyManager(
         ) {
             watchdogSamples.removeFirst()
         }
-        if (bad && !refreshActive) {
-            watchdogSamples.clear()
+        if (!bad) {
+            if (confirming) log("Confirmation test passed, staying")
+            confirming = false
+            return
+        }
+        if (refreshActive) return
+        watchdogSamples.clear()
+        if (confirming) {
+            confirming = false
+            log("Bad sample confirmed")
             quickSwitch()
+        } else {
+            startConfirm()
+        }
+    }
+
+    // First bad sample: wait a little and test once more before switching
+    private fun startConfirm() {
+        if (confirming) return
+        confirming = true
+        log("Bad sample, confirming in ${confirmDelayMs / 1000}s")
+        confirmJob?.cancel()
+        confirmJob = scope.launch {
+            delay(confirmDelayMs)
+            if (host.isRunning && !refreshActive && !host.hasBulkTest) {
+                probeCurrentServer()
+            }
+            confirming = false
         }
     }
 
     // =====================================================================
-    // Quick switch: first problem -> fastest known healthy server
+    // Quick switch: confirmed problem -> fastest known healthy server
     // =====================================================================
 
     private fun quickSwitch() {
         if (host.hasBulkTest) return
+        if (!host.hasInternet()) {
+            if (!noInternetLogged) {
+                noInternetLogged = true
+                say("No internet, not switching")
+            }
+            // keep re-testing quickly until the internet is back
+            watchdogSamples.addLast(System.currentTimeMillis() to true)
+            return
+        }
+        noInternetLogged = false
         val now = System.currentTimeMillis()
-        if (now - lastSwitchMs < switchCooldownMs) return
+        if (now - lastSwitchMs < switchCooldownMs) {
+            log("Switch skipped: cooldown")
+            return
+        }
         scope.launch {
             val prepared: Triple<String, String, String>? = withContext(io) {
                 val healthy = dataSource.getSubscriptions()
@@ -496,14 +554,14 @@ class HealthyManager(
                 Triple(best, currentGuid, currentProfile?.subscriptionId.orEmpty())
             }
             if (prepared == null) {
-                host.toast("No backup server with a good test result in Healthy")
+                say("No backup server with a good test result in Healthy")
                 return@launch
             }
             if (!host.isRunning || refreshActive) return@launch
             val (bestGuid, oldGuid, oldGroupId) = prepared
             lastSwitchMs = System.currentTimeMillis()
             suspectGuids[oldGuid] = lastSwitchMs
-            host.toast("Connection problem, switching to the fastest known server...")
+            say("Connection problem, switching: ${nameOf(oldGuid)} -> ${nameOf(bestGuid)}")
             host.connectToServer(bestGuid)
 
             // Test the old server in the background after the VPN has settled
@@ -511,6 +569,7 @@ class HealthyManager(
             if (host.isRunning && !host.hasBulkTest && !refreshActive &&
                 oldGroupId.isNotEmpty()
             ) {
+                log("Background test of the old server")
                 val requestId = host.beginBulkTest(oldGroupId)
                 dataSource.sendMsg2TestService(
                     TestServiceMessage(
@@ -547,6 +606,7 @@ class HealthyManager(
                     throw cancelled
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Periodic Healthy test failed", e)
+                    log("Periodic test failed: ${e.message}")
                 }
             }
         }
@@ -580,6 +640,7 @@ class HealthyManager(
         val (healthyId, batch, previous) = prepared
         periodicRunning = true
         try {
+            log("Periodic test of ${batch.size} Healthy servers")
             val requestId = host.beginBulkTest(healthyId)
             dataSource.sendMsg2TestService(
                 TestServiceMessage(
@@ -615,6 +676,7 @@ class HealthyManager(
                 dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L
             }
             val failedCount = results.values.count { it < 0L }
+            val okCount = results.values.count { it > 0L }
             val networkProblem = batch.size >= 3 && failedCount == batch.size
             var changed = false
             var condemned = 0
@@ -641,12 +703,15 @@ class HealthyManager(
                     now > 0L -> failStreak.remove(guid)
                 }
             }
-            Triple(changed, networkProblem, condemned)
+            PenaltyOutcome(changed, networkProblem, condemned, okCount, failedCount)
         }
-        val (changed, networkProblem, condemned) = outcome
-        if (changed) host.reloadGroups()
-        if (networkProblem) host.toast("Healthy check: all servers failed, ignoring (network problem?)")
-        else if (condemned > 0) host.toast("Healthy check: $condemned server(s) marked dead")
+        log("Periodic done: ${outcome.ok} ok, ${outcome.failed} failed")
+        if (outcome.changed) host.reloadGroups()
+        if (outcome.networkProblem) {
+            say("Healthy check: all servers failed, ignoring (network problem?)")
+        } else if (outcome.condemned > 0) {
+            say("Healthy check: ${outcome.condemned} server(s) marked dead")
+        }
     }
 
     // =====================================================================
@@ -698,7 +763,7 @@ class HealthyManager(
         if (now - lastProbeMs < probeCooldownMs) return
         lastProbeMs = now
         lastTestMs = now
-        host.toast("Traffic stalled, checking connection...")
+        say("Traffic stalled, checking connection...")
         scope.launch { probeCurrentServer() }
     }
 }
