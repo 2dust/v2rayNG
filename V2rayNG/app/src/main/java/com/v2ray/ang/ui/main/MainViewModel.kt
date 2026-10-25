@@ -1,6 +1,11 @@
 package com.v2ray.ang.ui.main
 
 import android.app.Application
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -73,6 +78,8 @@ class MainViewModel(
     application: Application,
     private val dataSource: MainDataSource
 ) : BaseViewModel(application) {
+
+    private val appContext: Context = application.applicationContext
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -169,6 +176,29 @@ class MainViewModel(
 
             override fun toastFailure() {
                 this@MainViewModel.toastError(R.string.toast_failure)
+            }
+
+            // True when any real (non-VPN) network with internet capability exists
+            @Suppress("DEPRECATION")
+            override fun hasInternet(): Boolean = try {
+                val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                cm.allNetworks.any { network ->
+                    val caps = cm.getNetworkCapabilities(network)
+                    caps != null &&
+                        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                        !caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                }
+            } catch (e: Exception) {
+                true
+            }
+
+            override fun copyText(label: String, text: String) {
+                try {
+                    val cm = appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    cm.setPrimaryClip(ClipData.newPlainText(label, text))
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Copy to clipboard failed", e)
+                }
             }
         }
     )
