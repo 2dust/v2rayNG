@@ -87,6 +87,9 @@ class HealthyGuardTest {
 
         override fun connectTo(guid: String) {
             switches.add(now to guid)
+            // like the real app: after a switch the selected server is the one the manager chose,
+            // and it has a good stored result
+            selectionInfo = GuardSelection(guid, 150L, false)
             if (restartOnConnect) {
                 // the VPN restarts: off, then on again
                 scope.backgroundScope.launch {
@@ -193,9 +196,11 @@ class HealthyGuardTest {
         g.onRunning(true)
         advance(9_000)
         assertEquals(1, p.switches.size)
-        // the user now picks a dead (red) server by hand
+        // the user now picks a dead (red) server by hand, right inside the 60 s cooldown
         p.selectionInfo = GuardSelection("B0", -1L, true)
         advance(60_000)
+        // it leaves that server at once; the new server is normal again, so the cooldown applies
+        // to it and there is no rapid switching
         assertEquals(2, p.switches.size)
         assertTrue(p.switches[1].first - p.switches[0].first < 20_000L)
     }
