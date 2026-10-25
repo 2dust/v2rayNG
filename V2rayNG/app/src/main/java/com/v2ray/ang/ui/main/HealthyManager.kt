@@ -36,8 +36,9 @@ interface HealthyHost {
 }
 
 /**
- * All Healthy-pool logic: refresh, fast connect, connection watchdog,
- * quick switch, periodic Healthy testing, traffic stall detection, auto-connect retry.
+ * All Healthy-pool logic: refresh, fast connect, periodic Healthy testing, traffic stall detection,
+ * auto-connect retry. The decisions about the current connection (when to test it, when to switch)
+ * live in [HealthyGuard]; this class connects the guard to the real app.
  */
 class HealthyManager(
     private val scope: CoroutineScope,
@@ -68,10 +69,6 @@ class HealthyManager(
 
     fun logText(): String = synchronized(logLines) { logLines.joinToString("\n") }
 
-    private suspend fun nameOf(guid: String): String = withContext(io) {
-        dataSource.decodeServerConfig(guid)?.remarks ?: guid.take(6)
-    }
-
     // ---------- Refresh / fast connect ----------
     private var refreshHealthyJob: Job? = null
 
@@ -82,39 +79,7 @@ class HealthyManager(
     @Volatile
     private var refreshActive = false
 
-    // ---------- Watchdog ----------
-    private var watchdogJob: Job? = null
-    private var networkJob: Job? = null
-    private var confirmJob: Job? = null
-    private var lastSwitchMs = 0L
-    private val watchdogRetryMs = 10_000L       // after a bad sample
-    private val watchdogMaxDelayMs = 4000L
-    private val watchdogWindowMs = 120_000L     // how far back samples count
-    private val watchdogSamples = ArrayDeque<Pair<Long, Boolean>>() // (time, isBad)
-    private val watchdogTimeoutMs = 10_000L
-    private val confirmDelayMs = 3000L          // wait before re-testing a bad sample
-
-    @Volatile
-    private var watchdogGotResult = false
-
-    @Volatile
-    private var lastSampleBad = false
-
-    @Volatile
-    private var confirming = false
-
-    @Volatile
-    private var probing = false
-    private var noInternetLogged = false
-    private var lastSkipKey: String? = null
-    private val switchCooldownMs = 60_000L
-    private val watchdogCheckMs = 30_000L       // first test after connecting
-    private val smartMinDownBytes = 2048L       // enough download in the window = connection is alive
-    private val smartTrafficWindowMs = 30_000L
-    private val smartIdleTestMs = 300_000L      // test every 5 min when there is no traffic
-    private var lastTestMs = 0L
-
-    // ---------- Suspect list (used by quick switch) ----------
+    // ---------- Suspect list (servers we just left; tested first by the periodic test) ----------
     private val suspectGuids = ConcurrentHashMap<String, Long>() // guid -> time it was marked suspect
     private val suspectMs = 300_000L
 
@@ -129,6 +94,7 @@ class HealthyManager(
     private var lastPeriodicMs = 0L
     private var periodicCursor = 0
     private val failStreak = ConcurrentHashMap<String, Int>()
+    private var quietUntilMs = 0L               // bytes of our own tests must not look like user traffic
 
     @Volatile
     private var periodicRunning = false
@@ -143,11 +109,10 @@ class HealthyManager(
 
     // ---------- Traffic stall ----------
     private var stallSamples = 0
-    private var lastProbeMs = 0L
     private val stallMinUpBytes = 500L
     private val stallMaxDownBytes = 100L
     private val stallSamplesNeeded = 4          // 4 samples x 3 s = about 12 s
-    private val probeCooldownMs = 15_000L
+    private val smartTrafficWindowMs = 30_000L
     private var lastRxBytes = -1L
     private var lastTxBytes = -1L
     private val rxHistory = ArrayDeque<Pair<Long, Long>>() // (time, bytes downloaded in that interval)
@@ -155,6 +120,86 @@ class HealthyManager(
     // ---------- Auto connect ----------
     private var autoConnectGuid: String? = null
     private var autoConnectRetries = 0
+
+    // ---------- The connection guard ----------
+    private val guard = HealthyGuard(scope, Ports())
+
+    private inner class Ports : GuardPorts {
+        override val now: Long get() = System.currentTimeMillis()
+        override val isRunning: Boolean get() = host.isRunning
+        override val refreshActive: Boolean get() = this@HealthyManager.refreshActive
+        override val hasBulkTest: Boolean get() = host.hasBulkTest
+
+        override fun hasInternet(): Boolean = host.hasInternet()
+
+        override fun recentDownBytes(): Long = rxHistory.sumOf { it.second }
+
+        override fun log(message: String) {
+            this@HealthyManager.log(message)
+        }
+
+        override fun say(message: String) {
+            this@HealthyManager.say(message)
+        }
+
+        override fun startProbe() {
+            host.startCurrentServerTest()
+        }
+
+        override fun cancelProbe() {
+            host.cancelAllTests()
+        }
+
+        override suspend fun selection(): GuardSelection? {
+            val guid = host.selectedGuid ?: return null
+            val storedMs = withContext(io) {
+                dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+            }
+            // not chosen by this manager = chosen by the user
+            return GuardSelection(guid, storedMs, guid != autoConnectGuid)
+        }
+
+        override suspend fun pickBackup(): GuardSwitch? = withContext(io) {
+            val healthy = dataSource.getSubscriptions()
+                .firstOrNull { it.subscription.remarks == healthyName }
+                ?: return@withContext null
+            val currentGuid = dataSource.getSelectServer() ?: return@withContext null
+            val currentProfile = dataSource.decodeServerConfig(currentGuid)
+            val currentId = currentProfile?.duplicateIdentity()
+            val nowMs = System.currentTimeMillis()
+            val best = dataSource.getServerGuidList(healthy.guid)
+                .mapNotNull { guid ->
+                    if (guid == currentGuid) return@mapNotNull null
+                    val markedAt = suspectGuids[guid]
+                    if (markedAt != null && nowMs - markedAt < suspectMs) return@mapNotNull null
+                    if ((failStreak[guid] ?: 0) > 0) return@mapNotNull null // failed its last periodic test
+                    val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
+                    if (ms <= 0L) return@mapNotNull null
+                    val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
+                    if (id != null && id == currentId) return@mapNotNull null
+                    guid to ms
+                }
+                .minByOrNull { it.second }
+                ?.first
+                ?: return@withContext null
+            GuardSwitch(
+                bestGuid = best,
+                bestName = dataSource.decodeServerConfig(best)?.remarks ?: best.take(6),
+                oldGuid = currentGuid,
+                oldName = currentProfile?.remarks ?: currentGuid.take(6),
+            )
+        }
+
+        override fun markSuspect(guid: String) {
+            suspectGuids[guid] = System.currentTimeMillis()
+        }
+
+        override fun connectTo(guid: String) {
+            host.connectToServer(guid)
+        }
+
+        override fun startAutoRefresh(): Boolean = startRefresh(auto = true)
+    }
 
     // =====================================================================
     // Entry points called by MainViewModel
@@ -174,17 +219,12 @@ class HealthyManager(
     }
 
     fun onRunningChanged(running: Boolean) {
-        if (running) {
-            lastPeriodicMs = System.currentTimeMillis() // first batch 5 minutes after connecting
-            startWatchdog()
-        } else {
-            stopWatchdog()
-        }
+        if (running) lastPeriodicMs = System.currentTimeMillis() // first batch 5 minutes after connecting
+        guard.onRunning(running)
     }
 
     fun onDelayResult(delayMillis: Long) {
-        watchdogGotResult = true
-        recordWatchdogSample(delayMillis !in 1L..watchdogMaxDelayMs)
+        guard.onProbeResult(delayMillis)
     }
 
     fun onConfigSuccess(guid: String, delayMillis: Long) {
@@ -203,13 +243,7 @@ class HealthyManager(
         scope.launch {
             if (!host.isRunning) return@launch
             log("Network changed")
-            networkJob?.cancel()
-            networkJob = launch {
-                delay(3000) // let the new network settle
-                if (host.isRunning && !host.hasBulkTest) {
-                    probeCurrentServer()
-                }
-            }
+            guard.onNetworkChanged()
         }
     }
 
@@ -253,14 +287,20 @@ class HealthyManager(
     // =====================================================================
 
     fun refresh() {
+        startRefresh(auto = false)
+    }
+
+    /** Returns false (and does nothing) when a refresh is already running. */
+    private fun startRefresh(auto: Boolean): Boolean {
         if (refreshHealthyJob?.isActive == true) {
-            host.toast("Healthy refresh is already running")
-            return
+            if (!auto) host.toast("Healthy refresh is already running")
+            return false
         }
         refreshHealthyJob = scope.launch {
+            var foundBackup = false
             try {
                 refreshActive = true
-                log("Refresh started (running=${host.isRunning})")
+                log("Refresh started (running=${host.isRunning}, auto=$auto)")
 
                 var subs = withContext(io) { dataSource.getSubscriptions() }
                 if (subs.none { it.subscription.remarks == healthyName }) {
@@ -314,9 +354,15 @@ class HealthyManager(
                         return@withContext "No working server found (network down?). Nothing changed."
                     }
 
+                    val connectedGuid = host.selectedGuid
                     var removed = 0
                     healthyGuids.forEach { guid ->
                         if (delayOf(guid) < 0L) {
+                            if (guid == connectedGuid) {
+                                // never delete the server we are connected to; the next Refresh removes it
+                                log("Dead server is the current one, keeping it for now")
+                                return@forEach
+                            }
                             dataSource.removeServer(guid)
                             failStreak.remove(guid)
                             removed++
@@ -358,6 +404,7 @@ class HealthyManager(
                         .filter { it.second > 0L }
                         .minByOrNull { it.second }?.first
                 }
+                foundBackup = fastestGuid != null
                 if (fastestGuid != null) {
                     val currentGuid = host.selectedGuid
                     val shouldSwitch = withContext(io) {
@@ -387,8 +434,10 @@ class HealthyManager(
                 refreshActive = false
                 lastPeriodicMs = System.currentTimeMillis() // the refresh just tested everything
                 host.copyText("Healthy log", logText()) // temporary: paste it in the chat for diagnosis
+                guard.onRefreshFinished(foundBackup)
             }
         }
+        return true
     }
 
     private suspend fun testGroupAndWait(groupId: String) {
@@ -411,234 +460,9 @@ class HealthyManager(
             delay(500)
             waited++
         }
+        // A test that never ends would block the guard for good, so stop it
+        if (host.isBulkTest(requestId)) host.cancelAllTests()
         delay(500)
-    }
-
-    // =====================================================================
-    // Connection watchdog
-    // =====================================================================
-
-    private fun startWatchdog() {
-        if (watchdogJob?.isActive == true) return
-        watchdogSamples.clear()
-        lastSampleBad = false
-        confirming = false
-        // first test about 30 s after connecting
-        lastTestMs = System.currentTimeMillis() - smartIdleTestMs + watchdogCheckMs
-        watchdogJob = scope.launch {
-            earlyCheck()
-            while (true) {
-                delay(5_000)
-                if (!host.isRunning) break
-                if (host.hasBulkTest || refreshActive) continue
-                val now = System.currentTimeMillis()
-                val trouble = watchdogSamples.any { it.second }
-                val due = if (trouble) {
-                    // there was a bad sample: re-test fast, whatever the traffic is
-                    now - lastTestMs >= watchdogRetryMs
-                } else {
-                    // healthy traffic is proof enough; only test when it is quiet
-                    rxHistory.sumOf { it.second } < smartMinDownBytes &&
-                        now - lastTestMs >= smartIdleTestMs
-                }
-                if (due) probeCurrentServer()
-            }
-        }
-    }
-
-    private fun stopWatchdog() {
-        watchdogJob?.cancel()
-        watchdogJob = null
-        confirmJob?.cancel()
-        confirmJob = null
-        confirming = false
-        watchdogSamples.clear()
-    }
-
-    private suspend fun probeCurrentServer() {
-        // Two overlapping probes would invalidate each other and produce a false "no answer"
-        if (!host.isRunning || probing) return
-        probing = true
-        try {
-            lastTestMs = System.currentTimeMillis()
-            watchdogGotResult = false
-            host.startCurrentServerTest()
-            var waited = 0L
-            while (waited < watchdogTimeoutMs && !watchdogGotResult && host.isRunning) {
-                delay(250)
-                waited += 250
-            }
-            if (host.isRunning && !watchdogGotResult) {
-                // No answer at all: count it as a bad sample and clear the stuck "Testing" state
-                host.cancelAllTests()
-                recordWatchdogSample(true)
-            }
-        } finally {
-            probing = false
-        }
-    }
-
-    // Right after the tunnel is up: check the new server once, instead of waiting for the idle test
-    private suspend fun earlyCheck() {
-        delay(5_000) // let the tunnel come up
-        var waited = 0L
-        while (host.hasBulkTest && waited < 30_000L && host.isRunning) {
-            delay(500)
-            waited += 500
-        }
-        if (!host.isRunning || refreshActive || host.hasBulkTest) return
-        val guid = host.selectedGuid ?: return
-        val storedMs = withContext(io) {
-            dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
-        }
-        val manual = guid != autoConnectGuid // not chosen by this manager = chosen by the user
-        if (manual || storedMs < 0L) lastSwitchMs = 0L // leaving it must not wait for the cooldown
-        if (storedMs < 0L) {
-            log("Selected server is marked dead, checking it now")
-            confirming = true // one bad sample is enough
-        } else {
-            log("Checking the new connection")
-        }
-        probeCurrentServer()
-        confirming = false
-    }
-
-    // Keep the watchdog in fast re-test mode, so a skipped switch is retried soon
-    private fun keepTrouble() {
-        watchdogSamples.addLast(System.currentTimeMillis() to true)
-    }
-
-    // Log a skip reason only when it changes, so retries do not flood the log
-    private fun logSkip(key: String, message: String) {
-        if (lastSkipKey == key) return
-        lastSkipKey = key
-        log(message)
-    }
-
-    private fun recordWatchdogSample(bad: Boolean) {
-        lastSampleBad = bad
-        val now = System.currentTimeMillis()
-        watchdogSamples.addLast(now to bad)
-        while (watchdogSamples.isNotEmpty() &&
-            now - watchdogSamples.first().first > watchdogWindowMs
-        ) {
-            watchdogSamples.removeFirst()
-        }
-        if (!bad) {
-            if (confirming) log("Confirmation test passed, staying")
-            confirming = false
-            lastSkipKey = null
-            return
-        }
-        if (refreshActive) return
-        watchdogSamples.clear()
-        if (confirming) {
-            confirming = false
-            log("Bad sample confirmed")
-            quickSwitch()
-        } else {
-            startConfirm()
-        }
-    }
-
-    // First bad sample: wait a little and test once more before switching
-    private fun startConfirm() {
-        if (confirming) return
-        confirming = true
-        log("Bad sample, confirming in ${confirmDelayMs / 1000}s")
-        confirmJob?.cancel()
-        confirmJob = scope.launch {
-            delay(confirmDelayMs)
-            if (host.isRunning && !refreshActive && !host.hasBulkTest) {
-                probeCurrentServer()
-            }
-            confirming = false
-        }
-    }
-
-    // =====================================================================
-    // Quick switch: confirmed problem -> fastest known healthy server
-    // =====================================================================
-
-    private fun quickSwitch() {
-        if (host.hasBulkTest) {
-            logSkip("bulk", "Switch postponed: another test is running")
-            keepTrouble()
-            return
-        }
-        if (!host.hasInternet()) {
-            if (!noInternetLogged) {
-                noInternetLogged = true
-                say("No internet, not switching")
-            }
-            // keep re-testing quickly until the internet is back
-            keepTrouble()
-            return
-        }
-        noInternetLogged = false
-        val now = System.currentTimeMillis()
-        if (now - lastSwitchMs < switchCooldownMs) {
-            logSkip("cooldown", "Switch postponed: cooldown after the last switch")
-            keepTrouble()
-            return
-        }
-        scope.launch {
-            val prepared: Triple<String, String, String>? = withContext(io) {
-                val healthy = dataSource.getSubscriptions()
-                    .firstOrNull { it.subscription.remarks == healthyName }
-                    ?: return@withContext null
-                val currentGuid = dataSource.getSelectServer() ?: return@withContext null
-                val currentProfile = dataSource.decodeServerConfig(currentGuid)
-                val currentId = currentProfile?.duplicateIdentity()
-                val best = dataSource.getServerGuidList(healthy.guid)
-                    .mapNotNull { guid ->
-                        if (guid == currentGuid) return@mapNotNull null
-                        val markedAt = suspectGuids[guid]
-                        if (markedAt != null && now - markedAt < suspectMs) return@mapNotNull null
-                        if ((failStreak[guid] ?: 0) > 0) return@mapNotNull null // failed its last periodic test
-                        val ms = dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
-                        if (ms <= 0L) return@mapNotNull null
-                        val id = dataSource.decodeServerConfig(guid)?.duplicateIdentity()
-                        if (id != null && id == currentId) return@mapNotNull null
-                        guid to ms
-                    }
-                    .minByOrNull { it.second }
-                    ?.first
-                    ?: return@withContext null
-                Triple(best, currentGuid, currentProfile?.subscriptionId.orEmpty())
-            }
-            if (prepared == null) {
-                if (lastSkipKey != "nobackup") say("No backup server with a good test result in Healthy")
-                logSkip("nobackup", "No backup server with a good test result in Healthy")
-                keepTrouble() // a backup may appear after the next test or Refresh
-                return@launch
-            }
-            if (!host.isRunning || refreshActive) return@launch
-            val (bestGuid, oldGuid, oldGroupId) = prepared
-            lastSkipKey = null
-            lastSwitchMs = System.currentTimeMillis()
-            suspectGuids[oldGuid] = lastSwitchMs
-            say("Connection problem, switching: ${nameOf(oldGuid)} -> ${nameOf(bestGuid)}")
-            host.connectToServer(bestGuid)
-
-            // Test the old server in the background after the VPN has settled
-            delay(20_000)
-            if (host.isRunning && !host.hasBulkTest && !refreshActive &&
-                oldGroupId.isNotEmpty()
-            ) {
-                log("Background test of the old server")
-                val requestId = host.beginBulkTest(oldGroupId)
-                dataSource.sendMsg2TestService(
-                    TestServiceMessage(
-                        key = AppConfig.MSG_MEASURE_CONFIG_START,
-                        subscriptionId = oldGroupId,
-                        serverGuids = listOf(oldGuid),
-                        onlyTcp = false
-                    ),
-                    requestId
-                )
-            }
-        }
     }
 
     // =====================================================================
@@ -652,8 +476,8 @@ class HealthyManager(
                 delay(periodicCheckMs)
                 val now = System.currentTimeMillis()
                 if (!host.isRunning || refreshActive || host.hasBulkTest || periodicRunning) continue
-                if (lastSampleBad) continue                          // current server has a problem, do not add load
-                if (now - lastSwitchMs < switchCooldownMs) continue  // VPN is still settling after a switch
+                if (guard.isTroubled) continue                        // current server has a problem, do not add load
+                if (guard.recentlySwitched()) continue                // VPN is still settling after a switch
                 if (now - lastPeriodicMs < periodicIntervalMs) continue
                 if (rxHistory.sumOf { it.second } >= heavyTrafficBytes) continue // user is busy
                 lastPeriodicMs = now
@@ -684,10 +508,14 @@ class HealthyManager(
                 !(id != null && id == currentId)
             }
             if (candidates.isEmpty()) return@withContext null
-            val start = periodicCursor % candidates.size
-            val batch = (0 until minOf(periodicBatchSize, candidates.size))
-                .map { candidates[(start + it) % candidates.size] }
-            periodicCursor = (start + batch.size) % candidates.size
+            // Servers we just left come first, then the rotating part of the pool
+            val suspects = candidates.filter { suspectGuids.containsKey(it) }.take(periodicBatchSize)
+            val rest = candidates.filter { it !in suspects }
+            val fillCount = minOf(periodicBatchSize - suspects.size, rest.size)
+            val start = if (rest.isEmpty()) 0 else periodicCursor % rest.size
+            val fill = (0 until fillCount).map { rest[(start + it) % rest.size] }
+            periodicCursor = if (rest.isEmpty()) 0 else (start + fillCount) % rest.size
+            val batch = suspects + fill
             val previous = batch.associateWith {
                 dataSource.decodeAffiliationInfo(it)?.testDelayMillis ?: 0L
             }
@@ -718,7 +546,7 @@ class HealthyManager(
             applyPenaltyRule(batch, previous)
         } finally {
             periodicRunning = false
-            lastTestMs = System.currentTimeMillis() // our own test bytes must not look like user traffic
+            quietUntilMs = System.currentTimeMillis() + 8_000L
         }
     }
 
@@ -757,7 +585,10 @@ class HealthyManager(
                         }
                     }
 
-                    now > 0L -> failStreak.remove(guid)
+                    now > 0L -> {
+                        failStreak.remove(guid)
+                        suspectGuids.remove(guid) // it answered again, it may be a backup again
+                    }
                 }
             }
             PenaltyOutcome(changed, networkProblem, condemned, okCount, failedCount)
@@ -772,7 +603,7 @@ class HealthyManager(
     }
 
     // =====================================================================
-    // Traffic stall detection
+    // Traffic stall detection (the guard decides what to do about it)
     // =====================================================================
 
     private fun collectTraffic() {
@@ -794,7 +625,7 @@ class HealthyManager(
                     continue
                 }
                 // Ignore the bytes of our own tests, so they do not look like real traffic
-                if (periodicRunning || now - lastTestMs < 8000) continue
+                if (periodicRunning || now < quietUntilMs || now - guard.lastProbeAt < 8000) continue
                 rxHistory.addLast(now to down.coerceAtLeast(0L))
                 while (rxHistory.isNotEmpty() &&
                     now - rxHistory.first().first > smartTrafficWindowMs
@@ -805,22 +636,12 @@ class HealthyManager(
                     stallSamples++
                     if (stallSamples >= stallSamplesNeeded) {
                         stallSamples = 0
-                        onTrafficStall()
+                        guard.onStall()
                     }
                 } else {
                     stallSamples = 0
                 }
             }
         }
-    }
-
-    private fun onTrafficStall() {
-        val now = System.currentTimeMillis()
-        if (!host.isRunning || host.hasBulkTest) return
-        if (now - lastProbeMs < probeCooldownMs) return
-        lastProbeMs = now
-        lastTestMs = now
-        say("Traffic stalled, checking connection...")
-        scope.launch { probeCurrentServer() }
     }
 }
