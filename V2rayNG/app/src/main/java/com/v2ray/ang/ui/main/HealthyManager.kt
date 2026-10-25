@@ -102,7 +102,11 @@ class HealthyManager(
 
     @Volatile
     private var confirming = false
+
+    @Volatile
+    private var probing = false
     private var noInternetLogged = false
+    private var lastSkipKey: String? = null
     private val switchCooldownMs = 60_000L
     private val watchdogCheckMs = 30_000L       // first test after connecting
     private val smartMinDownBytes = 2048L       // enough download in the window = connection is alive
@@ -422,6 +426,7 @@ class HealthyManager(
         // first test about 30 s after connecting
         lastTestMs = System.currentTimeMillis() - smartIdleTestMs + watchdogCheckMs
         watchdogJob = scope.launch {
+            earlyCheck()
             while (true) {
                 delay(5_000)
                 if (!host.isRunning) break
@@ -451,20 +456,63 @@ class HealthyManager(
     }
 
     private suspend fun probeCurrentServer() {
-        if (!host.isRunning) return
-        lastTestMs = System.currentTimeMillis()
-        watchdogGotResult = false
-        host.startCurrentServerTest()
+        // Two overlapping probes would invalidate each other and produce a false "no answer"
+        if (!host.isRunning || probing) return
+        probing = true
+        try {
+            lastTestMs = System.currentTimeMillis()
+            watchdogGotResult = false
+            host.startCurrentServerTest()
+            var waited = 0L
+            while (waited < watchdogTimeoutMs && !watchdogGotResult && host.isRunning) {
+                delay(250)
+                waited += 250
+            }
+            if (host.isRunning && !watchdogGotResult) {
+                // No answer at all: count it as a bad sample and clear the stuck "Testing" state
+                host.cancelAllTests()
+                recordWatchdogSample(true)
+            }
+        } finally {
+            probing = false
+        }
+    }
+
+    // Right after the tunnel is up: check the new server once, instead of waiting for the idle test
+    private suspend fun earlyCheck() {
+        delay(5_000) // let the tunnel come up
         var waited = 0L
-        while (waited < watchdogTimeoutMs && !watchdogGotResult && host.isRunning) {
-            delay(250)
-            waited += 250
+        while (host.hasBulkTest && waited < 30_000L && host.isRunning) {
+            delay(500)
+            waited += 500
         }
-        if (host.isRunning && !watchdogGotResult) {
-            // No answer at all: count it as a bad sample and clear the stuck "Testing" state
-            host.cancelAllTests()
-            recordWatchdogSample(true)
+        if (!host.isRunning || refreshActive || host.hasBulkTest) return
+        val guid = host.selectedGuid ?: return
+        val storedMs = withContext(io) {
+            dataSource.decodeAffiliationInfo(guid)?.testDelayMillis ?: 0L
         }
+        val manual = guid != autoConnectGuid // not chosen by this manager = chosen by the user
+        if (manual || storedMs < 0L) lastSwitchMs = 0L // leaving it must not wait for the cooldown
+        if (storedMs < 0L) {
+            log("Selected server is marked dead, checking it now")
+            confirming = true // one bad sample is enough
+        } else {
+            log("Checking the new connection")
+        }
+        probeCurrentServer()
+        confirming = false
+    }
+
+    // Keep the watchdog in fast re-test mode, so a skipped switch is retried soon
+    private fun keepTrouble() {
+        watchdogSamples.addLast(System.currentTimeMillis() to true)
+    }
+
+    // Log a skip reason only when it changes, so retries do not flood the log
+    private fun logSkip(key: String, message: String) {
+        if (lastSkipKey == key) return
+        lastSkipKey = key
+        log(message)
     }
 
     private fun recordWatchdogSample(bad: Boolean) {
@@ -479,6 +527,7 @@ class HealthyManager(
         if (!bad) {
             if (confirming) log("Confirmation test passed, staying")
             confirming = false
+            lastSkipKey = null
             return
         }
         if (refreshActive) return
@@ -512,20 +561,25 @@ class HealthyManager(
     // =====================================================================
 
     private fun quickSwitch() {
-        if (host.hasBulkTest) return
+        if (host.hasBulkTest) {
+            logSkip("bulk", "Switch postponed: another test is running")
+            keepTrouble()
+            return
+        }
         if (!host.hasInternet()) {
             if (!noInternetLogged) {
                 noInternetLogged = true
                 say("No internet, not switching")
             }
             // keep re-testing quickly until the internet is back
-            watchdogSamples.addLast(System.currentTimeMillis() to true)
+            keepTrouble()
             return
         }
         noInternetLogged = false
         val now = System.currentTimeMillis()
         if (now - lastSwitchMs < switchCooldownMs) {
-            log("Switch skipped: cooldown")
+            logSkip("cooldown", "Switch postponed: cooldown after the last switch")
+            keepTrouble()
             return
         }
         scope.launch {
@@ -554,11 +608,14 @@ class HealthyManager(
                 Triple(best, currentGuid, currentProfile?.subscriptionId.orEmpty())
             }
             if (prepared == null) {
-                say("No backup server with a good test result in Healthy")
+                if (lastSkipKey != "nobackup") say("No backup server with a good test result in Healthy")
+                logSkip("nobackup", "No backup server with a good test result in Healthy")
+                keepTrouble() // a backup may appear after the next test or Refresh
                 return@launch
             }
             if (!host.isRunning || refreshActive) return@launch
             val (bestGuid, oldGuid, oldGroupId) = prepared
+            lastSkipKey = null
             lastSwitchMs = System.currentTimeMillis()
             suspectGuids[oldGuid] = lastSwitchMs
             say("Connection problem, switching: ${nameOf(oldGuid)} -> ${nameOf(bestGuid)}")
