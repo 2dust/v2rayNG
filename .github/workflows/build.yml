@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - master
+      - dev
 
 permissions:
   contents: write
@@ -87,12 +88,13 @@ jobs:
         java-version: '21'
 
     - name: Build APK
+      shell: bash
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleDebug
+        ./gradlew licenseFdroidReleaseReport 2>&1 | tee ${{ github.workspace }}/build.log
+        ./gradlew assembleDebug 2>&1 | tee -a ${{ github.workspace }}/build.log
     
     - name: Upload APKs
       uses: actions/upload-artifact@v7
@@ -100,6 +102,55 @@ jobs:
       with:
         name: debug-apks
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/debug/*.apk
+
+    - name: Unit tests (Healthy guard)
+      shell: bash
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        ./gradlew testPlaystoreDebugUnitTest --tests "com.v2ray.ang.ui.main.HealthyGuardTest" 2>&1 | tee ${{ github.workspace }}/test.log
+
+    - name: Publish build status
+      if: always()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        JOB_STATUS: ${{ job.status }}
+      run: |
+        set +e
+        OUT=/tmp/status.md
+        {
+          echo "commit: ${GITHUB_SHA}"
+          echo "ref: ${GITHUB_REF_NAME}"
+          echo "job status: ${JOB_STATUS}"
+          echo "run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          echo
+          echo "## Kotlin compile errors (e: lines)"
+          grep -h '^e: ' build.log test.log 2>/dev/null | sort -u | head -40
+          echo
+          echo "## Failed tests"
+          grep -h -E ' FAILED$|AssertionFailedError|expected:<' test.log 2>/dev/null | head -40
+          echo
+          echo "## Test result counts"
+          grep -h -o -E 'tests="[0-9]+" skipped="[0-9]+" failures="[0-9]+" errors="[0-9]+"' V2rayNG/app/build/test-results/*/*.xml 2>/dev/null
+          echo
+          echo "## Last 40 lines of build.log"
+          tail -n 40 build.log 2>/dev/null
+          echo
+          echo "## Last 40 lines of test.log"
+          tail -n 40 test.log 2>/dev/null
+        } > "$OUT"
+        SAFE_REF="${GITHUB_REF_NAME//\//_}"
+        rm -rf /tmp/bsrepo && mkdir /tmp/bsrepo && cd /tmp/bsrepo
+        git init -q
+        git checkout -q -b build-status
+        git config user.name "github-actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        if git fetch -q --depth 1 origin build-status; then git reset -q --hard FETCH_HEAD; fi
+        cp "$OUT" "status-${SAFE_REF}.md"
+        git add -A
+        git commit -q -m "build ${GITHUB_SHA::7} ${JOB_STATUS} (${GITHUB_REF_NAME})" || true
+        git push -q origin HEAD:build-status || echo "could not push build status"
 
   sign-and-release:
     needs: build

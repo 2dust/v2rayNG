@@ -220,5 +220,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    // Virtual-time coroutine tests (HealthyGuardTest); same version as the coroutines library
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${libs.versions.kotlinxCoroutines.get()}")
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
