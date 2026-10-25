@@ -126,7 +126,7 @@ object RootProxyManager {
         val lanShare = forceLanShare || MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
         val corePid = Process.myPid()
 
-        val config = buildHevConfig(socksUsername, socksPassword, port, ipv6)
+        val config = buildHevConfig(socksUsername, socksPassword, port, ipv6, SettingsManager.getVpnMtu(), lanShare)
         if (!writeHevConfig(cfgFile, config)) {
             return null
         }
@@ -209,14 +209,28 @@ object RootProxyManager {
      * tun address when IPv6 is enabled; whether v6 actually flows in is decided separately by
      * the v6 route into [TABLE].
      */
-    private fun buildHevConfig(socksUsername: String?, socksPassword: String?, socksPort: Int, ipv6: Boolean): String {
+    internal fun buildHevConfig(
+        socksUsername: String?,
+        socksPassword: String?,
+        socksPort: Int,
+        ipv6: Boolean,
+        mtu: Int,
+        lanSharing: Boolean,
+    ): String {
         val v4 = AppConfig.ROOT_TUN_ADDR_V4.substringBefore("/")
         val v6 = AppConfig.ROOT_TUN_ADDR_V6.substringBefore("/")
         return buildString {
             appendLine("tunnel:")
             appendLine("  name: '$TUN'")
-            appendLine("  mtu: ${SettingsManager.getVpnMtu()}")
+            appendLine("  mtu: $mtu")
             appendLine("  multi-queue: true")
+            if (lanSharing) {
+                // VNET setup or TCP-GSO EINVAL on Android can leave IPv6 packets above the LAN MTU.
+                // Remove when both fallback forwarding tests pass with jumbo and TSO enabled.
+                appendLine("  offload:")
+                appendLine("    jumbo: false")
+                if (ipv6) appendLine("    tso: false")
+            }
             appendLine("  ipv4: '$v4'")
             if (ipv6) appendLine("  ipv6: '$v6'")
             appendLine("socks5:")
