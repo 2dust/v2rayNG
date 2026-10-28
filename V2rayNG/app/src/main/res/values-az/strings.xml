@@ -564,5 +564,7 @@
     <string name="sub_info_open_page">Abunəlik səhifəsini aç</string>
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
+    <string name="title_pref_sub_panel_interval">Avtomatik yeniləmə intervalını qəbul et</string>
+    <string name="summary_pref_sub_panel_interval">Aktiv edildikdə abunəliyin avtomatik yenilənməsini və intervalını abunəlik təminatçısı təyin edir. Deaktiv olduqda hər şey əvvəlki kimi qalır və əl ilə təyin edilir.</string>
 
 </resources>

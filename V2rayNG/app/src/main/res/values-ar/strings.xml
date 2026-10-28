@@ -571,5 +571,7 @@
     <string name="sub_info_open_support">فتح رابط الدعم</string>
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
+    <string name="title_pref_sub_panel_interval">استلام فترة التحديث التلقائي</string>
+    <string name="summary_pref_sub_panel_interval">عند التفعيل، يحدد مزوّد الاشتراك التحديث التلقائي للاشتراك وفترته. عند التعطيل يبقى كل شيء كما كان ويُضبط يدويًا من قِبلك.</string>
 
 </resources>

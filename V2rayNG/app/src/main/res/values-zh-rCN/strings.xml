@@ -561,5 +561,7 @@
     <string name="sub_info_open_support">打开支持链接</string>
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
+    <string name="title_pref_sub_panel_interval">接收自动更新间隔</string>
+    <string name="summary_pref_sub_panel_interval">启用后，订阅的自动更新开关和更新间隔将由订阅提供方设置。关闭时保持原样，由您手动设置。</string>
 
 </resources>

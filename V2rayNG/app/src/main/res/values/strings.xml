@@ -564,5 +564,7 @@
     <string name="sub_info_open_page">Open subscription page</string>
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
+    <string name="title_pref_sub_panel_interval">Receive auto-update interval</string>
+    <string name="summary_pref_sub_panel_interval">When enabled, the subscription provider sets the automatic update and its interval for each subscription. When disabled, everything stays as before and is set manually by you.</string>
 
 </resources>
