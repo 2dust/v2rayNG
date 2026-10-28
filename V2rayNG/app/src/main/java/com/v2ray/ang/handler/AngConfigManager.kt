@@ -3,6 +3,7 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.graphics.Bitmap
 import android.text.TextUtils
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.CoreConfigManager
 import com.v2ray.ang.dto.SubscriptionUpdateResult
@@ -484,13 +485,13 @@ object AngConfigManager {
                     return SubscriptionUpdateResult(failureCount = 1)
                 }
             }
-            LogUtil.i(AppConfig.TAG, url)
+            LogUtil.i(AppConfig.TAG, "Updating subscription ${it.guid}")
             val userAgent = it.subscription.userAgent
             val requestHeaders = it.subscription.requestHeaders
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
-            // Account info (traffic, expiry, support link) the panel sends in the response headers.
+            // Capture metadata from the same successful response as the imported body.
             var usageInfo: SubscriptionUsageInfo? = null
             val captureUsageInfo: (Headers) -> Unit = { headers ->
                 usageInfo = SubscriptionInfoParser.parse(
@@ -500,40 +501,18 @@ object AngConfigManager {
                     webPageUrl = headers["Profile-Web-Page-Url"],
                 )
             }
-
-            var configText = try {
-                val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(
-                    UrlContentRequest(
-                        url = url,
-                        userAgent = userAgent,
-                        requestHeaders = requestHeaders,
-                        timeout = 15000,
-                        httpPort = httpPort,
-                        proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
-                    ),
-                    captureUsageInfo
-                )
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
-                ""
-            }
-            if (configText.isEmpty()) {
-                configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(
-                        UrlContentRequest(
-                            url = url,
-                            userAgent = userAgent,
-                            requestHeaders = requestHeaders
-                        ),
-                        captureUsageInfo
-                    )
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
-                    ""
-                }
-            }
+            val configText = downloadSubscription(
+                UrlContentRequest(
+                    url = url,
+                    userAgent = userAgent,
+                    requestHeaders = requestHeaders,
+                    timeout = 15000,
+                    httpPort = SettingsManager.getHttpPort(),
+                    proxyUsername = proxyUsername,
+                    proxyPassword = proxyPassword,
+                ),
+                captureUsageInfo,
+            )
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
@@ -557,6 +536,48 @@ object AngConfigManager {
             LogUtil.e(AppConfig.TAG, "Failed to update config via subscription", e)
             return SubscriptionUpdateResult(failureCount = 1)
         }
+    }
+
+    internal fun downloadSubscription(
+        request: UrlContentRequest,
+        onResponseHeaders: (Headers) -> Unit,
+        coreFetch: ((Headers) -> Unit) -> CoreFetchResult<String> = { capture ->
+            CoreDownloadManager.fetchText(
+                AngApplication.application,
+                request,
+                includeDefaultUserAgent = true,
+                onResponseHeaders = capture,
+            )
+        },
+        httpFetch: (UrlContentRequest, (Headers) -> Unit) -> String = { candidate, capture ->
+            HttpUtil.getUrlContentWithUserAgent(candidate, capture)
+        },
+    ): String {
+        val directRequest = request.copy(
+            httpPort = 0,
+            proxyUsername = null,
+            proxyPassword = null,
+        )
+        val fallbackRequests = when (val result = coreFetch(onResponseHeaders)) {
+            is CoreFetchResult.Success -> return result.value
+            CoreFetchResult.Failed -> return ""
+            CoreFetchResult.Unavailable -> return ""
+            CoreFetchResult.NotApplicable -> if (request.httpPort == 0) {
+                listOf(request)
+            } else {
+                listOf(request, directRequest)
+            }
+        }
+
+        for (candidate in fallbackRequests) {
+            try {
+                val content = httpFetch(candidate, onResponseHeaders)
+                if (content.isNotEmpty()) return content
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content", e)
+            }
+        }
+        return ""
     }
 
     /**
