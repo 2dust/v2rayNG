@@ -397,6 +397,9 @@
     <string name="routing_settings_outbound_tag_hint">proxy / direct / block / &lt;%1$s&gt;</string>
     <string name="routing_settings_outbound_tag" translatable="false">outboundTag</string>
 
+    <string name="widget_name">v2rayNG bağlantısı</string>
+    <string name="widget_description">Seçilmiş profili idarə edin</string>
+    <string name="widget_no_profile">Profil seçilməyib</string>
     <string name="connection_test_pending">Bağlantını yoxlayın</string>
     <string name="connection_test_testing">Yoxlanılır…</string>
     <string name="connection_test_testing_count">%d konfiqurasiya yoxlanılır…</string>
