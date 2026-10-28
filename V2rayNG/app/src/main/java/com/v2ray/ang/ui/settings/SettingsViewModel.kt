@@ -43,7 +43,7 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
 
     /**
      * Validates if the given string is a valid observatory duration.
-     * Shows error toast if invalid.
+     * Shows error feedback if invalid.
      * @return The trimmed value if valid, null otherwise.
      */
     fun validateObservatoryDuration(value: String): String? {
@@ -58,7 +58,7 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
 
     /**
      * Validates if the given string is a valid observatory sampling value.
-     * Shows error toast if invalid.
+     * Shows error feedback if invalid.
      * @return The value if valid, null otherwise.
      */
     fun validateObservatorySampling(value: String): String? {

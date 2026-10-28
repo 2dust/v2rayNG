@@ -230,7 +230,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
                     )
                 )
             } else {
-                toast(getString(R.string.toast_failure))
+                toastError(R.string.toast_failure)
             }
             refreshData().join()
             isLoadingState.value = false
