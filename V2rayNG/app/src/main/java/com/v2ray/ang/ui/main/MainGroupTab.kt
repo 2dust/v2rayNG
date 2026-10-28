@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.main
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,13 +32,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -46,8 +53,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import kotlinx.coroutines.flow.StateFlow
 
 private val TAB_BAR_PADDING = 3.dp
@@ -69,19 +78,23 @@ fun GroupTabBar(
     selectedTabIndex: Int,
     mainViewModel: MainViewModel,
     onTabClick: (Int) -> Unit,
+    onEditGroup: (String) -> Unit,
+    onDeleteGroup: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
     val colors = MaterialTheme.colorScheme
     // The plain surface color equals the screen background in dark mode, so the bar needs its own tone there.
     val dark = colors.surface.luminance() < 0.5f
+    var deleteTarget by remember { mutableStateOf<GroupMapItem?>(null) }
+    var menuRequest by remember { mutableStateOf<TabMenuRequest?>(null) }
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 6.dp),
         shape = CircleShape,
-        color = if (dark) colors.surfaceContainerHigh else colors.surface,
+        color = groupTabBarColor(),
         border = BorderStroke(0.5.dp, colors.outlineVariant.copy(alpha = if (dark) 0.6f else 0.35f)),
         shadowElevation = 3.dp
     ) {
@@ -103,13 +116,41 @@ fun GroupTabBar(
                                 group = group,
                                 selected = index == selectedIndex,
                                 serverFlow = serverFlow,
-                                onClick = { onTabClick(index) }
+                                onClick = { onTabClick(index) },
+                                onLongPress = { menuRequest = it }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    // Hosted here, outside the tab layout, so the dialogs never become extra layout children of the tabs.
+    menuRequest?.let { request ->
+        GroupTabContextMenu(
+            request = request,
+            onDismiss = { menuRequest = null },
+            onEdit = {
+                menuRequest = null
+                onEditGroup(request.group.id)
+            },
+            onDelete = {
+                menuRequest = null
+                deleteTarget = request.group
+            }
+        )
+    }
+    deleteTarget?.let { target ->
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_subscription_group),
+            itemName = target.remarks,
+            onConfirm = {
+                deleteTarget = null
+                onDeleteGroup(target.id)
+            },
+            onDismiss = { deleteTarget = null }
+        )
     }
 }
 
@@ -156,21 +197,33 @@ private fun EqualOrNaturalTabsLayout(
     }
 }
 
+/** Surface tone of the tab bar; in dark mode the plain surface equals the screen background, so it is lifted. */
+@Composable
+internal fun groupTabBarColor(): Color {
+    val colors = MaterialTheme.colorScheme
+    return if (colors.surface.luminance() < 0.5f) colors.surfaceContainerHigh else colors.surface
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
     serverFlow: StateFlow<List<ServersCache>>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongPress: (TabMenuRequest) -> Unit
 ) {
     val servers by serverFlow.collectAsStateWithLifecycle()
-    // The default group (empty id) never showed a count.
-    val count = if (group.id.isEmpty()) 0 else servers.size
+    // The default group (empty id) never showed a count and has no subscription to edit or delete.
+    val hasSubscription = group.id.isNotEmpty()
+    val count = if (hasSubscription) servers.size else 0
     val colors = MaterialTheme.colorScheme
     val bringIntoView = remember { BringIntoViewRequester() }
     var size by remember { mutableStateOf(IntSize.Zero) }
     val marginPx = with(LocalDensity.current) { SELECTED_TAB_MARGIN.toPx() }
+    val haptics = LocalHapticFeedback.current
+    // Read only when the long press happens, so it is deliberately not observable state.
+    val windowBounds = remember { arrayOf(Rect.Zero) }
 
     // Bring the tab in with some room around it so the pill never ends up flush against the bar's
     // rounded edge; at the first and last tab the scroll stops at the bar's own inner padding.
@@ -182,44 +235,65 @@ private fun GroupTabItem(
         }
     }
 
-    // One selectable node: name, count and selected state are announced together.
+    // One clickable node: name, count and selected state are announced together; long press opens the menu.
     Row(
         modifier = Modifier
             .bringIntoViewRequester(bringIntoView)
             .onSizeChanged { size = it }
+            .onGloballyPositioned { windowBounds[0] = it.boundsInWindow() }
             .clip(CircleShape)
             .background(if (selected) colors.primary.copy(alpha = 0.12f) else Color.Transparent)
-            .selectable(selected = selected, role = Role.Tab, onClick = onClick)
+            .semantics { this.selected = selected }
+            .combinedClickable(
+                role = Role.Tab,
+                onClick = onClick,
+                onLongClickLabel = if (hasSubscription) stringResource(R.string.title_sub_setting) else null,
+                onLongClick = if (hasSubscription) {
+                    {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onLongPress(TabMenuRequest(group, windowBounds[0], selected, count))
+                    }
+                } else {
+                    null
+                }
+            )
             .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = group.remarks,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            color = if (selected) colors.primary else colors.onSurfaceVariant,
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Ellipsis
-        )
-        if (count > 0) {
-            Spacer(Modifier.width(3.dp))
-            Box(
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
-                    .clip(CircleShape)
-                    .background(if (selected) colors.primary else colors.onSurfaceVariant.copy(alpha = 0.55f))
-                    .padding(horizontal = 4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = count.toString(),
-                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
-                    color = if (selected) colors.onPrimary else colors.surface,
-                    maxLines = 1
-                )
-            }
+        GroupTabContent(remarks = group.remarks, count = count, selected = selected)
+    }
+}
+
+/** Name and count badge of a tab; shared by the tab itself and the lifted copy in its context menu. */
+@Composable
+internal fun GroupTabContent(remarks: String, count: Int, selected: Boolean) {
+    val colors = MaterialTheme.colorScheme
+    Text(
+        text = remarks,
+        style = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.Medium,
+        color = if (selected) colors.primary else colors.onSurfaceVariant,
+        maxLines = 1,
+        softWrap = false,
+        overflow = TextOverflow.Ellipsis
+    )
+    if (count > 0) {
+        Spacer(Modifier.width(3.dp))
+        Box(
+            modifier = Modifier
+                .defaultMinSize(minWidth = 16.dp, minHeight = 16.dp)
+                .clip(CircleShape)
+                .background(if (selected) colors.primary else colors.onSurfaceVariant.copy(alpha = 0.55f))
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
+                color = if (selected) colors.onPrimary else colors.surface,
+                maxLines = 1
+            )
         }
     }
 }
