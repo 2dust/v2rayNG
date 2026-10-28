@@ -408,6 +408,12 @@
     <string name="connection_connected">متصل است.\nبرای بررسی اتصال ضربه بزنید.</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
+    <string name="connection_test_complete">آزمایش به پایان رسید</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="one">%1$d میلی‌ثانیه</item>
+        <item quantity="other">%1$d میلی‌ثانیه</item>
+    </plurals>
+    <string name="connection_connected_accessibility">متصل است</string>
 
     <string name="import_subscription_success">اشتراک با موفقیت وارد شد</string>
     <string name="import_subscription_failure">وارد کردن اشتراک ناموفق بود</string>

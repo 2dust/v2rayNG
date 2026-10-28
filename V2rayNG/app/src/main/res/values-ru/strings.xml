@@ -412,6 +412,14 @@
     <string name="connection_connected">Подключено.\nНажмите, чтобы проверить соединение.</string>
     <string name="connection_not_connected">Нет соединения</string>
     <string name="connection_running_task_left">Выполняется проверок: %s</string>
+    <string name="connection_test_complete">Проверка завершена</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="one">%1$d миллисекунду</item>
+        <item quantity="few">%1$d миллисекунды</item>
+        <item quantity="many">%1$d миллисекунд</item>
+        <item quantity="other">%1$d миллисекунды</item>
+    </plurals>
+    <string name="connection_connected_accessibility">Подключено</string>
 
     <string name="import_subscription_success">Подписка импортирована</string>
     <string name="import_subscription_failure">Невозможно импортировать подписку</string>

@@ -406,6 +406,11 @@
     <string name="connection_connected">"已连接。点击检查连接。"</string>
     <string name="connection_not_connected">"未连接"</string>
     <string name="connection_running_task_left">正在运行的测试：%s</string>
+    <string name="connection_test_complete">测试完成</string>
+    <plurals name="connection_test_delay_accessibility_value">
+        <item quantity="other">%1$d 毫秒</item>
+    </plurals>
+    <string name="connection_connected_accessibility">已连接</string>
 
     <string name="import_subscription_success">订阅导入成功</string>
     <string name="import_subscription_failure">导入订阅失败</string>
