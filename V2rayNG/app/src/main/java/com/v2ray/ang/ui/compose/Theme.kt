@@ -192,7 +192,6 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
-        LocalAppSnackbar provides snackbarController
     ) {
         MaterialTheme(
             colorScheme = colorScheme
@@ -200,7 +199,7 @@ fun AppTheme(
             Box(modifier = Modifier.fillMaxSize()) {
                 AppSnackbarBridge(controller = snackbarController)
                 content()
-                AppSnackbarHost(hostState = snackbarController.hostState)
+                AppSnackbarHost(controller = snackbarController)
             }
         }
     }
