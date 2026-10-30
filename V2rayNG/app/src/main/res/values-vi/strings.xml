@@ -384,6 +384,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">Nhập bộ quy tắc từ mã QR</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Xuất bộ quy tắc vào bảng tạm</string>
     <string name="routing_settings_locked">Đã khóa; giữ quy tắc này khi nhập cài đặt sẵn</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Đã khóa</string>
+    <string name="acc_routing_rule_blocked">bị chặn</string>
+    <string name="acc_routing_rule_routed_through">được định tuyến qua %1$s</string>
+    <string name="acc_routing_rule_routed_directly">được định tuyến trực tiếp</string>
+    <string name="acc_routing_rule_enabled">Quy tắc đang bật</string>
+    <string name="acc_routing_rule_disabled">Quy tắc đang tắt</string>
+    <string name="acc_enable_routing_rule">Bật quy tắc</string>
+    <string name="acc_disable_routing_rule">Tắt quy tắc</string>
+    <string name="acc_edit_routing_rule_named">Chỉnh sửa %1$s</string>
+    <string name="acc_delete_routing_rule_named">Xóa %1$s</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">process (tên gói — chỉ được hỗ trợ khi dùng Xray TUN, bật routeOnly và chạy Android 10+)</string>
@@ -532,7 +543,12 @@
     <string name="acc_search">Tìm kiếm</string>
     <string name="acc_add">Thêm cấu hình</string>
     <string name="acc_more">Tùy chọn khác</string>
-    <string name="acc_selected_server">Selected</string>
+    <string name="acc_move_to_top">Chuyển lên đầu danh sách</string>
+    <string name="acc_move_up">Chuyển lên</string>
+    <string name="acc_move_down">Chuyển xuống</string>
+    <string name="acc_move_to_bottom">Chuyển xuống cuối danh sách</string>
+    <string name="acc_moved">Đã di chuyển</string>
+    <string name="acc_selected_server">Đã chọn</string>
     <string name="acc_share_subscription">Chia sẻ liên kết đăng ký</string>
     <string name="acc_share_log">Chia sẻ nhật ký</string>
     <string name="acc_remove">Xóa thành viên khỏi chuỗi proxy</string>

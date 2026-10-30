@@ -386,6 +386,17 @@
     <string name="routing_settings_import_rulesets_from_qrcode">QR koddan qayda dəstini idxal et</string>
     <string name="routing_settings_export_rulesets_to_clipboard">Qayda dəstini mübadilə buferinə ixrac et</string>
     <string name="routing_settings_locked">Kilidlənib; hazır tənzimləmələri idxal edərkən bu qaydanı saxlayın</string>
+    <string name="acc_routing_rule_summary">%1$s. %2$s</string>
+    <string name="acc_routing_rule_locked_summary">%1$s. Kilidlidir</string>
+    <string name="acc_routing_rule_blocked">bloklanır</string>
+    <string name="acc_routing_rule_routed_through">%1$s vasitəsilə yönləndirilir</string>
+    <string name="acc_routing_rule_routed_directly">birbaşa yönləndirilir</string>
+    <string name="acc_routing_rule_enabled">Qayda aktivdir</string>
+    <string name="acc_routing_rule_disabled">Qayda deaktivdir</string>
+    <string name="acc_enable_routing_rule">Qaydanı aktiv et</string>
+    <string name="acc_disable_routing_rule">Qaydanı deaktiv et</string>
+    <string name="acc_edit_routing_rule_named">%1$s üçün düzəliş et</string>
+    <string name="acc_delete_routing_rule_named">%1$s sil</string>
     <string name="routing_settings_domain" translatable="false">domain</string>
     <string name="routing_settings_ip" translatable="false">ip</string>
     <string name="routing_settings_process">proses (Paket Adı — yalnız Xray TUN istifadə edildikdə, routeOnly aktiv olduqda və Android 10+ versiyasında dəstəklənir)</string>
@@ -534,6 +545,11 @@
     <string name="acc_search">Axtar</string>
     <string name="acc_add">Konfiqurasiya əlavə et</string>
     <string name="acc_more">Əlavə seçimlər</string>
+    <string name="acc_move_to_top">Ən yuxarıya köçür</string>
+    <string name="acc_move_up">Yuxarı köçür</string>
+    <string name="acc_move_down">Aşağı köçür</string>
+    <string name="acc_move_to_bottom">Ən aşağıya köçür</string>
+    <string name="acc_moved">Köçürüldü</string>
     <string name="acc_selected_server">Seçildi</string>
     <string name="acc_share_subscription">Abunəlik keçidini paylaş</string>
     <string name="acc_share_log">Jurnalı paylaş</string>
