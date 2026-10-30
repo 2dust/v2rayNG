@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_import_title">Konfiqurasiya idxal edilsin?</string>
+    <string name="external_import_message">Başqa bir tətbiq konfiqurasiya idxal etmək istəyir. Yalnız mənbəyə etibar edirsinizsə davam edin. Mövcud profillər saxlanılacaq. Avtomatik yenilənmələr üçün Parametrlər → %1$s bölməsində avtomatlaşdırma tətbiqinə icazə verin.</string>
+    <string name="external_import_confirm">İdxal et</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Keçid</string>
     <string name="app_tile_name">Keçid</string>
@@ -565,4 +568,8 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
+    <string name="title_remote_control">Avtomatlaşdırma tətbiqlərinə giriş icazəsi</string>
+    <string name="summary_remote_control">Digər tətbiqlərə v2rayNG-ni idarə etməyə icazə verin</string>
+    <string name="remote_control_access_required">Parametrlər → Avtomatlaşdırma tətbiqlərinə giriş icazəsi bölməsində bu tətbiqə icazə verin, sonra bu əməliyyatı yenidən açın.</string>
+    <string name="tasker_current_profile">Cari profil</string>
 </resources>
