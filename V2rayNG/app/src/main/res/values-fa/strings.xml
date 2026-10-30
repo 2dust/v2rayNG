@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">این نام از قبل وجود دارد</string>
     <string name="asset_geo_files_sources">منبع فایل های جغرافیایی (اختیاری)</string>
+    <string name="acc_asset_file_details">اندازهٔ فایل %1$s. در %2$s به‌روزرسانی شد</string>
+    <string name="acc_edit_asset_named">ویرایش %1$s</string>
+    <string name="acc_delete_asset_named">حذف %1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">در حال بارگذاری…</string>

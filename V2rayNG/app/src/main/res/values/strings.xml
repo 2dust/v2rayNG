@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">File not found</string>
     <string name="msg_remark_is_duplicate">This name already exists</string>
     <string name="asset_geo_files_sources">Geo file source (optional)</string>
+    <string name="acc_asset_file_details">File size %1$s. Updated on %2$s</string>
+    <string name="acc_edit_asset_named">Edit %1$s</string>
+    <string name="acc_delete_asset_named">Delete %1$s</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Loading</string>

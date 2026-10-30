@@ -153,6 +153,9 @@
     <string name="msg_file_not_found">Fayl tapılmadı</string>
     <string name="msg_remark_is_duplicate">Bu ad artıq mövcuddur</string>
     <string name="asset_geo_files_sources">Geo fayl mənbəyi (istəyə bağlı)</string>
+    <string name="acc_asset_file_details">Faylın ölçüsü: %1$s. Yenilənmə tarixi: %2$s</string>
+    <string name="acc_edit_asset_named">%1$s üçün düzəliş et</string>
+    <string name="acc_delete_asset_named">%1$s sil</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Yüklənir</string>
