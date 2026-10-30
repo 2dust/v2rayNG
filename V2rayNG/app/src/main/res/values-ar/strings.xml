@@ -6,6 +6,9 @@
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
     <string name="navigation_drawer_open">فتح درج التنقل</string>
     <string name="navigation_drawer_close">إغلاق درج التنقل</string>
+    <string name="acc_connect">اتصال</string>
+    <string name="acc_disconnect">قطع الاتصال</string>
+    <string name="acc_clear_search">مسح البحث</string>
     <string name="migration_success">نجحت عملية ترحيل البيانات!</string>
     <string name="action_stop_service">إيقاف الخدمة</string>
     <string name="action_ok">موافق</string>
@@ -533,7 +536,7 @@
     <string name="acc_add_asset">إضافة مصدر موارد</string>
     <string name="acc_download_file">تنزيل ملفات الموارد</string>
     <string name="acc_qr_code">رمز QR</string>
-    <string name="acc_copy_log">نسخ السجل</string>
+    <string name="acc_copy_log">نسخ السجل إلى الحافظة</string>
     <string name="acc_clear_log">مسح السجل</string>
     <string name="acc_add_rule">إضافة قاعدة توجيه</string>
     <string name="acc_start">بدء الخدمة</string>
