@@ -568,4 +568,5 @@
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
 
+    <string name="toast_policy_group_chain_invalid">Недопустимая цепочка группы политик. Проверьте узлы, входной и выходной прокси и резервный маршрут.</string>
 </resources>

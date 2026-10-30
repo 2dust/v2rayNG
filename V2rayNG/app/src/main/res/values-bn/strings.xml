@@ -564,4 +564,5 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
+    <string name="toast_policy_group_chain_invalid">পলিসি গ্রুপের চেইন অবৈধ। সদস্য, প্রাথমিক প্রক্সি, বহির্গমন প্রক্সি ও ফলব্যাক সেটিংস পরীক্ষা করুন।</string>
 </resources>

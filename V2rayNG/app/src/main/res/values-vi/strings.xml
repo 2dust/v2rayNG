@@ -562,4 +562,5 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+    <string name="toast_policy_group_chain_invalid">Chuỗi nhóm chính sách không hợp lệ. Hãy kiểm tra các thành viên, proxy đầu vào, proxy đầu ra và cấu hình dự phòng.</string>
 </resources>

@@ -572,4 +572,5 @@
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
 
+    <string name="toast_policy_group_chain_invalid">سلسلة مجموعة السياسات غير صالحة. تحقق من الأعضاء والوكيل الأولي ووكيل الخروج والمسار الاحتياطي.</string>
 </resources>
