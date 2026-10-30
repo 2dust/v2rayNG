@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">نومگه کانفیگا من دو سۊتۊن نشووݩ داڌه ابۊ تا موئتوا قلوه ای من بلگه جا بگره.</string>
 
     <string name="title_pref_group_all_display">نشووݩ داڌن بلگه «پوی»</string>
+    <string name="acc_settings_group_expanded">%1$s. بونکۊ وا وابیڌه هڌ</string>
+    <string name="acc_settings_group_collapsed">%1$s. بونکۊ بسته وابیڌه هڌ</string>
     <string name="summary_pref_group_all_display">نشووݩ داڌن پوروفایلا پوی بونکۊیل اشتراک من ی بلگه.</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">سی دووسمندیا وو هیاری قلوه، ری ای هؽل بزݩ</string>
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
+    <string name="acc_toggle_on">روشن</string>
+    <string name="acc_toggle_off">خاموش</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
     <string name="title_pref_dynamic_color">ره وندن رنگ پۊیا</string>
     <string name="summary_pref_dynamic_color">فقت ری ٱندروید 12+ کار اکونه</string>

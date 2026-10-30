@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">設定檔清單以雙列顯示，允許在螢幕上顯示更多內容。</string>
 
     <string name="title_pref_group_all_display">顯示「全部」群組分頁</string>
+    <string name="acc_settings_group_expanded">%1$s。群組已展開</string>
+    <string name="acc_settings_group_collapsed">%1$s。群組已收合</string>
     <string name="summary_pref_group_all_display">在一個分頁中彙整所有訂閱群組的設定檔。</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顯示設定</string>
+    <string name="acc_toggle_on">開啟</string>
+    <string name="acc_toggle_off">關閉</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
     <string name="title_pref_dynamic_color">開啟莫奈取色</string>
     <string name="summary_pref_dynamic_color">僅在 Android 12+ 裝置上工作</string>

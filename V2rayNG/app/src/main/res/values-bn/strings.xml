@@ -278,6 +278,8 @@
     <string name="summary_pref_double_column_display">প্রোফাইল তালিকা দুই কলামে দেখায়, ফলে পর্দায় আরও বিষয়বস্তু দেখা যায়।</string>
 
     <string name="title_pref_group_all_display">“সব” গ্রুপ ট্যাব দেখান</string>
+    <string name="acc_settings_group_expanded">%1$s। গ্রুপটি প্রসারিত</string>
+    <string name="acc_settings_group_collapsed">%1$s। গ্রুপটি সংকুচিত</string>
     <string name="summary_pref_group_all_display">সব সাবস্ক্রিপশন গ্রুপের কনফিগ একটি ট্যাবে দেখান।</string>
 
     <!-- AboutActivity -->
@@ -305,6 +307,8 @@
     <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
     <string name="title_ui_settings">ইউআই সেটিংস</string>
+    <string name="acc_toggle_on">চালু</string>
+    <string name="acc_toggle_off">বন্ধ</string>
     <string name="title_pref_ui_mode_night">ইউআই মোড সেটিংস</string>
     <string name="title_pref_dynamic_color">ডায়নামিক রঙ চালু করুন</string>
     <string name="summary_pref_dynamic_color">শুধুমাত্র Android 12+ ডিভাইসে কাজ করে</string>
