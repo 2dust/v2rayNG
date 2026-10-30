@@ -167,6 +167,12 @@
     <string name="menu_item_import_proxy_app">Импорт из буфера обмена</string>
     <string name="per_app_proxy_settings">Выбор приложений</string>
     <string name="per_app_proxy_settings_enable">Использовать выбор</string>
+    <string name="acc_app_checked">Отмечено</string>
+    <string name="acc_app_not_checked">Не отмечено</string>
+    <string name="acc_app_routing_state">%1$s. %2$s</string>
+    <string name="acc_app_routed_directly">маршрутизируется напрямую</string>
+    <string name="acc_app_routed_through">маршрутизируется через приложение</string>
+    <string name="acc_per_app_routing_disabled">маршрутизация по приложениям не включена</string>
     <string name="app_picker_unknown_app">Неизвестное приложение (неопознанный UID)</string>
 
     <!-- Preferences -->
@@ -305,6 +311,8 @@
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
+    <string name="acc_toggle_on">Включено</string>
+    <string name="acc_toggle_off">Выключено</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
     <string name="title_pref_dynamic_color">Динамические цвета</string>
     <string name="summary_pref_dynamic_color">Работает только на Android 12+</string>
