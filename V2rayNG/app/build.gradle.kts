@@ -7,6 +7,7 @@ plugins {
 
 android {
     namespace = "dev.relayx.core"
+    ndkVersion = "30.0.16248370"
     compileSdk = 37
 
     defaultConfig {
