@@ -19,3 +19,15 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# --- RelayX keep rules ---
+-keep class go.** { *; }
+-dontwarn go.**
+-keep class libv2ray.** { *; }
+-dontwarn libv2ray.**
+-keep class dev.relayx.core.service.** { *; }
+-keep class dev.relayx.core.dto.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
