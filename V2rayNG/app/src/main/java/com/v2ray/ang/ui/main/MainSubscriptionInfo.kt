@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -28,11 +28,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
-import com.v2ray.ang.extension.toTrafficString
-import com.v2ray.ang.handler.SubscriptionInfoParser
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.R
+import dev.relayx.core.dto.entities.SubscriptionUsageInfo
+import dev.relayx.core.extension.toTrafficString
+import dev.relayx.core.handler.SubscriptionInfoParser
+import dev.relayx.core.util.Utils
 
 private const val MILLIS_PER_SECOND = 1000L
 private const val EXPIRY_DATE_PATTERN = "yyyy-MM-dd"

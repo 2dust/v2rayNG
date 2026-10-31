@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.perappproxy
+package dev.relayx.core.ui.perappproxy
 
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -39,19 +39,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppDivider
-import com.v2ray.ang.ui.compose.AppDropdownMenuItems
-import com.v2ray.ang.ui.compose.AppListItem
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.ConfirmDialog
-import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.R
+import dev.relayx.core.dto.AppInfo
+import dev.relayx.core.extension.toastSuccess
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppDivider
+import dev.relayx.core.ui.compose.AppDropdownMenuItems
+import dev.relayx.core.ui.compose.AppListItem
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.ConfirmDialog
+import dev.relayx.core.ui.compose.ItemDivider
+import dev.relayx.core.ui.compose.NavigationBarsBottomPadding
+import dev.relayx.core.ui.compose.verticalScrollbar
+import dev.relayx.core.util.Utils
 
 private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
     SelectAll(R.string.menu_item_select_all),

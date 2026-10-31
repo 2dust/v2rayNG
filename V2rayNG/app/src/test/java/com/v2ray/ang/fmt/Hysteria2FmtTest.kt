@@ -1,6 +1,6 @@
-package com.v2ray.ang.fmt
+package dev.relayx.core.fmt
 
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.net.URI

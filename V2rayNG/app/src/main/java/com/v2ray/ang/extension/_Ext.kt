@@ -1,9 +1,9 @@
-package com.v2ray.ang.extension
+package dev.relayx.core.extension
 
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import com.v2ray.ang.enums.EConfigType
+import dev.relayx.core.enums.EConfigType
 import java.io.Serializable
 import java.net.URI
 import java.util.Locale

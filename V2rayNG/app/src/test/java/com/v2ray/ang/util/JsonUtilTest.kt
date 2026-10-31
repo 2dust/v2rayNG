@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import com.google.gson.JsonParser
 import org.junit.jupiter.api.Assertions.assertEquals

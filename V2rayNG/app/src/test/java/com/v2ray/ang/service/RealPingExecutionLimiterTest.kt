@@ -1,6 +1,6 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
-import com.v2ray.ang.enums.EConfigType
+import dev.relayx.core.enums.EConfigType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

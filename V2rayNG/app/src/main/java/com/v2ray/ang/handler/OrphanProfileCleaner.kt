@@ -1,6 +1,6 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
-import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
+import dev.relayx.core.AppConfig.DEFAULT_SUBSCRIPTION_ID
 
 internal data class StoredProfileReference(
     val guid: String,

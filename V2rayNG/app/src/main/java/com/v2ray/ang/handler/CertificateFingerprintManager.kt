@@ -1,14 +1,14 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.CertSha256Request
-import com.v2ray.ang.dto.CertSha256Result
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.CertSha256Request
+import dev.relayx.core.dto.CertSha256Result
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.util.HttpUtil
+import dev.relayx.core.util.JsonUtil
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import libv2ray.Libv2ray
 
 object CertificateFingerprintManager {

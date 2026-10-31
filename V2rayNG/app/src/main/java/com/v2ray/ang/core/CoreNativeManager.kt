@@ -1,9 +1,9 @@
-package com.v2ray.ang.core
+package dev.relayx.core.core
 
 import android.content.Context
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import go.Seq
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.compose
+package dev.relayx.core.ui.compose
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -39,7 +39,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
+import dev.relayx.core.R
 
 @Composable
 fun ConfirmDialog(

@@ -1,4 +1,4 @@
-package com.v2ray.ang.dto.entities
+package dev.relayx.core.dto.entities
 
 /**
  * Account information a subscription panel (3x-ui, Marzban, Remnawave, ...) publishes in the

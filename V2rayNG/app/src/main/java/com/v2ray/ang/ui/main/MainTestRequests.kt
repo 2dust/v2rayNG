@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import java.util.UUID
 

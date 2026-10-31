@@ -1,7 +1,7 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
-import com.v2ray.ang.dto.ConnectionTestResult
-import com.v2ray.ang.dto.RealPingResult
+import dev.relayx.core.dto.ConnectionTestResult
+import dev.relayx.core.dto.RealPingResult
 
 sealed class MainServiceEvent {
     data object StateRunning : MainServiceEvent()

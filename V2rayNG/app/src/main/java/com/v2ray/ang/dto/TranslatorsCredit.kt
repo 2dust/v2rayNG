@@ -1,9 +1,9 @@
-package com.v2ray.ang.dto
+package dev.relayx.core.dto
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.util.LogUtil
 
 data class Contributor(
     val name: String,

@@ -1,17 +1,17 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
 import android.content.Context
 import android.os.Process
 import android.util.AtomicFile
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.root.RootProxyManager.TABLE
-import com.v2ray.ang.root.RootProxyManager.TUN
-import com.v2ray.ang.root.RootProxyManager.teardown
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.PackageUidResolver
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.root.RootProxyManager.TABLE
+import dev.relayx.core.root.RootProxyManager.TUN
+import dev.relayx.core.root.RootProxyManager.teardown
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.PackageUidResolver
+import dev.relayx.core.util.Utils
 import java.io.File
 
 /**

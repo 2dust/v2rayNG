@@ -1,12 +1,12 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.contracts.Tun2SocksControl
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.contracts.Tun2SocksControl
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.util.LogUtil
 import java.io.File
 
 /**

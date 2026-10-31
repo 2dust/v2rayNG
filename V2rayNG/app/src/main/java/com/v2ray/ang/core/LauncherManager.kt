@@ -1,23 +1,23 @@
-package com.v2ray.ang.core
+package dev.relayx.core.core
 
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.helper.MessageHelper
-import com.v2ray.ang.root.RootManager
-import com.v2ray.ang.service.CoreProxyOnlyService
-import com.v2ray.ang.service.CoreRootService
-import com.v2ray.ang.service.CoreVpnService
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.extension.isComplexType
+import dev.relayx.core.extension.toast
+import dev.relayx.core.extension.toastError
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.helper.MessageHelper
+import dev.relayx.core.root.RootManager
+import dev.relayx.core.service.CoreProxyOnlyService
+import dev.relayx.core.service.CoreRootService
+import dev.relayx.core.service.CoreVpnService
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 
 object LauncherManager {
 

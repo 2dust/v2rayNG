@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.compose
+package dev.relayx.core.ui.compose
 
 import android.app.Activity
 import android.os.Build
@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
+import dev.relayx.core.AppConfig
+import dev.relayx.core.handler.MmkvManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

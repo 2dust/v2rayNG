@@ -1,16 +1,16 @@
-package com.v2ray.ang.ui.userasset
+package dev.relayx.core.ui.userasset
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.UrlContentRequest
-import com.v2ray.ang.dto.entities.AssetUrlCache
-import com.v2ray.ang.dto.entities.AssetUrlItem
-import com.v2ray.ang.extension.concatUrl
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.UrlContentRequest
+import dev.relayx.core.dto.entities.AssetUrlCache
+import dev.relayx.core.dto.entities.AssetUrlItem
+import dev.relayx.core.extension.concatUrl
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.ui.base.BaseViewModel
+import dev.relayx.core.util.HttpUtil
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive

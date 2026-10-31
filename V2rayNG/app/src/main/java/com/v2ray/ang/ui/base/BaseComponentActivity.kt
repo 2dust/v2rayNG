@@ -1,12 +1,12 @@
-package com.v2ray.ang.ui.base
+package dev.relayx.core.ui.base
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.ui.compose.AppTheme
+import dev.relayx.core.handler.AppLocaleManager
+import dev.relayx.core.ui.compose.AppTheme
 
 abstract class BaseComponentActivity : AppCompatActivity() {
 

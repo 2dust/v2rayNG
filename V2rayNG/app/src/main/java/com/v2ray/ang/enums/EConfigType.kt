@@ -1,6 +1,6 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 
 enum class EConfigType(val value: Int, val protocolScheme: String) {
     VMESS(1, AppConfig.VMESS),

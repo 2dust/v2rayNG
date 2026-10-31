@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,9 +23,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.verticalScrollbar
+import dev.relayx.core.R
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.verticalScrollbar
 
 @Composable
 fun MainTopBar(

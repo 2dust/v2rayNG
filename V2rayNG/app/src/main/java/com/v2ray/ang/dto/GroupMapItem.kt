@@ -1,6 +1,6 @@
-package com.v2ray.ang.dto
+package dev.relayx.core.dto
 
-import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
+import dev.relayx.core.dto.entities.SubscriptionUsageInfo
 
 data class GroupMapItem(
     var id: String,

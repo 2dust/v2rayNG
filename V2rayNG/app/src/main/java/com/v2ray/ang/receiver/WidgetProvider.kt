@@ -1,4 +1,4 @@
-package com.v2ray.ang.receiver
+package dev.relayx.core.receiver
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -7,10 +7,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.core.LauncherManager
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.core.CoreServiceManager
+import dev.relayx.core.core.LauncherManager
 
 class WidgetProvider : AppWidgetProvider() {
     /**

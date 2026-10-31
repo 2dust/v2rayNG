@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
 import android.app.LocaleManager
 import android.content.Context
@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.LocaleManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.ConfigurationCompat
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.enums.Language
+import dev.relayx.core.AppConfig
+import dev.relayx.core.enums.Language
 
 /**
  * Keeps the legacy in-app language preference synchronized with Android's per-app locale APIs.

@@ -1,15 +1,15 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.content.Context
-import com.v2ray.ang.core.CoreConfigManager
-import com.v2ray.ang.core.CoreNativeManager
-import com.v2ray.ang.dto.RealPingEvent
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.SpeedtestManager
+import dev.relayx.core.core.CoreConfigManager
+import dev.relayx.core.core.CoreNativeManager
+import dev.relayx.core.dto.RealPingEvent
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.isComplexType
+import dev.relayx.core.extension.isNotNullEmpty
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.handler.SpeedtestManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope

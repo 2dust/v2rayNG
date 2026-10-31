@@ -1,4 +1,4 @@
-package com.v2ray.ang.dto.entities
+package dev.relayx.core.dto.entities
 
 data class AssetUrlItem(
     var remarks: String = "",

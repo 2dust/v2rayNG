@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -9,7 +9,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.ToNumberPolicy
 import com.google.gson.reflect.TypeToken
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 import java.lang.reflect.Type
 
 object JsonUtil {

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.server
+package dev.relayx.core.ui.server
 
 /** Removes one draft member and its row key together, resolving its current position at confirmation. */
 internal fun withoutProxyChainMember(

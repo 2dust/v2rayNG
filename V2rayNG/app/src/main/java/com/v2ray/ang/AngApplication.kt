@@ -1,15 +1,15 @@
-package com.v2ray.ang
+package dev.relayx.core
 
 import android.app.Application
 import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
-import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.compose.ThemeManager
+import dev.relayx.core.AppConfig.ANG_PACKAGE
+import dev.relayx.core.handler.AppLocaleManager
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.ui.compose.ThemeManager
 
 class AngApplication : Application() {
     companion object {

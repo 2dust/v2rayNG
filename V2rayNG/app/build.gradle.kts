@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.v2ray.ang"
+    namespace = "dev.relayx.core"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.v2ray.ang"
+        applicationId = "dev.relayx.core"
         minSdk = 24
         targetSdk = 37
         versionCode = 754

@@ -1,9 +1,9 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import com.v2ray.ang.dto.AppInfo
+import dev.relayx.core.dto.AppInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

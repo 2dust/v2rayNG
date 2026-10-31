@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -34,11 +34,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.AppDivider
-import com.v2ray.ang.ui.compose.colorFabActive
-import com.v2ray.ang.ui.compose.colorFabInactiveDark
-import com.v2ray.ang.ui.compose.colorFabInactiveLight
+import dev.relayx.core.R
+import dev.relayx.core.ui.compose.AppDivider
+import dev.relayx.core.ui.compose.colorFabActive
+import dev.relayx.core.ui.compose.colorFabInactiveDark
+import dev.relayx.core.ui.compose.colorFabInactiveLight
 import kotlinx.coroutines.launch
 
 @Composable

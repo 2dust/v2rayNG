@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

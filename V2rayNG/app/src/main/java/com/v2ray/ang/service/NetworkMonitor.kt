@@ -1,12 +1,12 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.extension.delay
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.extension.delay
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

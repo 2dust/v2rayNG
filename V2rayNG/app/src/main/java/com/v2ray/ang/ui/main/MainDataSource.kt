@@ -1,11 +1,11 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
-import com.v2ray.ang.dto.SubscriptionUpdateResult
-import com.v2ray.ang.dto.TestServiceMessage
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.ServerAffiliationInfo
-import com.v2ray.ang.dto.entities.SubscriptionCache
-import com.v2ray.ang.dto.entities.SubscriptionItem
+import dev.relayx.core.dto.SubscriptionUpdateResult
+import dev.relayx.core.dto.TestServiceMessage
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.dto.entities.ServerAffiliationInfo
+import dev.relayx.core.dto.entities.SubscriptionCache
+import dev.relayx.core.dto.entities.SubscriptionItem
 import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 

@@ -1,4 +1,4 @@
-package com.v2ray.ang.contracts
+package dev.relayx.core.contracts
 
 /**
  * Interface that defines the control operations for tun2socks implementations.

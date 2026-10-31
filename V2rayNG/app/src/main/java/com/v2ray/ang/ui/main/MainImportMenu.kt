@@ -1,14 +1,14 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.ui.compose.AppDropdownMenuItems
-import com.v2ray.ang.ui.compose.SelectListDialog
+import dev.relayx.core.R
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.isComplexType
+import dev.relayx.core.ui.compose.AppDropdownMenuItems
+import dev.relayx.core.ui.compose.SelectListDialog
 
 private enum class ImportMenuAction(@StringRes val labelRes: Int, val action: MainAction) {
     QRCode(R.string.menu_item_import_config_qrcode, MainAction.ImportQRcode),

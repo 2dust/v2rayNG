@@ -1,12 +1,12 @@
-package com.v2ray.ang.fmt
+package dev.relayx.core.fmt
 
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.V2rayNShareItem
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.V2rayNShareItem
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.extension.isNotNullEmpty
+import dev.relayx.core.util.JsonUtil
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 
 object V2rayNFmt : FmtBase() {
     fun parse(list: List<String>, subId: String): List<ProfileItem> {

@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.content.Context
 import android.os.Handler

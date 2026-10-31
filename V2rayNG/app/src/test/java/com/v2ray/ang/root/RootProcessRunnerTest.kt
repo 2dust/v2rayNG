@@ -1,4 +1,4 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

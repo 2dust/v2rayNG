@@ -1,13 +1,13 @@
-package com.v2ray.ang.helper
+package dev.relayx.core.helper
 
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.v2ray.ang.R
-import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
+import dev.relayx.core.R
+import dev.relayx.core.enums.PermissionType
+import dev.relayx.core.extension.toast
 
 /**
  * Helper for requesting permissions.

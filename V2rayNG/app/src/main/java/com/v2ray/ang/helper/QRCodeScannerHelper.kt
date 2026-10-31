@@ -1,11 +1,11 @@
-package com.v2ray.ang.helper
+package dev.relayx.core.helper
 
 import android.app.Activity
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.v2ray.ang.ui.ScannerActivity
+import dev.relayx.core.ui.ScannerActivity
 
 /**
  * Helper for scanning QR codes.

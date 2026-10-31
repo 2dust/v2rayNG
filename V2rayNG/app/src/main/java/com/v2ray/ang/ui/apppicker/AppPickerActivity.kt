@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.apppicker
+package dev.relayx.core.ui.apppicker
 
 import android.content.Context
 import android.content.Intent
@@ -28,15 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppDropdownMenuItems
-import com.v2ray.ang.ui.compose.AppListItem
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.verticalScrollbar
+import dev.relayx.core.R
+import dev.relayx.core.dto.AppInfo
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppDropdownMenuItems
+import dev.relayx.core.ui.compose.AppListItem
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.ItemDivider
+import dev.relayx.core.ui.compose.NavigationBarsBottomPadding
+import dev.relayx.core.ui.compose.verticalScrollbar
 
 private enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
     SelectAll(R.string.menu_item_select_all),

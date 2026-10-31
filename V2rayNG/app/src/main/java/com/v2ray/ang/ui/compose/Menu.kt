@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.compose
+package dev.relayx.core.ui.compose
 
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text

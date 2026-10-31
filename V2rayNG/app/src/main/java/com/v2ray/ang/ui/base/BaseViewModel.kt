@@ -1,14 +1,14 @@
-package com.v2ray.ang.ui.base
+package dev.relayx.core.ui.base
 
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.AngApplication
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.AppLocaleManager
+import dev.relayx.core.AngApplication
+import dev.relayx.core.extension.toast
+import dev.relayx.core.extension.toastError
+import dev.relayx.core.extension.toastSuccess
+import dev.relayx.core.handler.AppLocaleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

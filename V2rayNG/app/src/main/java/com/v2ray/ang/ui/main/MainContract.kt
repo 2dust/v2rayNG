@@ -1,8 +1,8 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
-import com.v2ray.ang.dto.ConnectionTestResult
-import com.v2ray.ang.dto.GroupMapItem
-import com.v2ray.ang.dto.LocateTarget
+import dev.relayx.core.dto.ConnectionTestResult
+import dev.relayx.core.dto.GroupMapItem
+import dev.relayx.core.dto.LocateTarget
 
 /** Locale-neutral state formatted only when it reaches the main UI. */
 sealed interface MainStatus {
@@ -58,7 +58,7 @@ sealed interface MainAction {
     data class SelectGroup(val groupId: String) : MainAction
     data class SelectServer(val guid: String) : MainAction
     data class RemoveServer(val guid: String) : MainAction
-    data class EditServer(val guid: String, val profile: com.v2ray.ang.dto.entities.ProfileItem) : MainAction
+    data class EditServer(val guid: String, val profile: dev.relayx.core.dto.entities.ProfileItem) : MainAction
     data class Search(val query: String) : MainAction
     data class ShareQRCode(val guid: String) : MainAction
     data class ShareClipboard(val guid: String) : MainAction

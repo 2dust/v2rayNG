@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package dev.relayx.core.ui
 
 /**
  * Pure selection operations shared by application-list screens.

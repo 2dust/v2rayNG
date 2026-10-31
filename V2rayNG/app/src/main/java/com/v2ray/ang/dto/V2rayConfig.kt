@@ -1,8 +1,8 @@
-package com.v2ray.ang.dto
+package dev.relayx.core.dto
 
 import com.google.gson.annotations.SerializedName
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.enums.EConfigType
+import dev.relayx.core.AppConfig
+import dev.relayx.core.enums.EConfigType
 
 data class V2rayConfig(
     var remarks: String? = null,

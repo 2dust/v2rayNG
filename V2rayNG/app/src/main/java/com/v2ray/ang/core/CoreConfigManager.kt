@@ -1,26 +1,26 @@
-package com.v2ray.ang.core
+package dev.relayx.core.core
 
 import android.content.Context
 import android.text.TextUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.ConfigResult
-import com.v2ray.ang.dto.CoreConfigContext
-import com.v2ray.ang.dto.V2rayConfig
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.RulesetItem
-import com.v2ray.ang.enums.BalancerStrategyType
-import com.v2ray.ang.enums.CoreResolvedType
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.PackageUidResolver
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.ConfigResult
+import dev.relayx.core.dto.CoreConfigContext
+import dev.relayx.core.dto.V2rayConfig
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.dto.entities.RulesetItem
+import dev.relayx.core.enums.BalancerStrategyType
+import dev.relayx.core.enums.CoreResolvedType
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.isNotNullEmpty
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.util.HttpUtil
+import dev.relayx.core.util.JsonUtil
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.PackageUidResolver
+import dev.relayx.core.util.Utils
 
 object CoreConfigManager {
     private var initConfigCache: String? = null

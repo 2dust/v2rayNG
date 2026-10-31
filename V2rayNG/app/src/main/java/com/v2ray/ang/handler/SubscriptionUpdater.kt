@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,11 +10,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteWorkManager
 import androidx.work.workDataOf
-import com.v2ray.ang.AngApplication
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.SubscriptionUpdateMessage
-import com.v2ray.ang.helper.MessageHelper
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AngApplication
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.SubscriptionUpdateMessage
+import dev.relayx.core.helper.MessageHelper
+import dev.relayx.core.util.LogUtil
 import java.util.concurrent.TimeUnit
 
 object SubscriptionUpdater {

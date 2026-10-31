@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -29,10 +29,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.AppDivider
-import com.v2ray.ang.ui.compose.LocalDarkTheme
-import com.v2ray.ang.ui.compose.verticalScrollbar
+import dev.relayx.core.R
+import dev.relayx.core.ui.compose.AppDivider
+import dev.relayx.core.ui.compose.LocalDarkTheme
+import dev.relayx.core.ui.compose.verticalScrollbar
 
 enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRes: Int) {
     Subscriptions(R.drawable.ic_subscriptions_24dp, R.string.title_sub_setting),

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.logcat
+package dev.relayx.core.ui.logcat
 
 import android.content.ClipData
 import android.content.Intent
@@ -38,16 +38,16 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.extension.toastError
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.ItemDivider
+import dev.relayx.core.ui.compose.NavigationBarsBottomPadding
+import dev.relayx.core.ui.compose.verticalScrollbar
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

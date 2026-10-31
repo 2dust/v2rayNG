@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.compose
+package dev.relayx.core.ui.compose
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.v2ray.ang.R
-import com.v2ray.ang.util.AppIconFetcher
+import dev.relayx.core.R
+import dev.relayx.core.util.AppIconFetcher
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @OptIn(ExperimentalMaterial3Api::class)

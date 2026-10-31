@@ -1,4 +1,4 @@
-package com.v2ray.ang.contracts
+package dev.relayx.core.contracts
 
 import android.app.Service
 import android.net.Network

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.settings
+package dev.relayx.core.ui.settings
 
 import android.app.Application
 import android.content.ComponentName

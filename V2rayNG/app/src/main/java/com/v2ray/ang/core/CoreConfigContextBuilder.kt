@@ -1,18 +1,18 @@
-package com.v2ray.ang.core
+package dev.relayx.core.core
 
 import android.content.Context
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.dto.CoreConfigContext
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.BalancerStrategyType
-import com.v2ray.ang.enums.CoreResolvedType
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.dto.CoreConfigContext
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.BalancerStrategyType
+import dev.relayx.core.enums.CoreResolvedType
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.isComplexType
+import dev.relayx.core.extension.isNotNullEmpty
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 
 /**
  * Build runtime context from the selected profile.

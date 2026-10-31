@@ -1,6 +1,6 @@
-package com.v2ray.ang
+package dev.relayx.core
 
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.util.Utils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

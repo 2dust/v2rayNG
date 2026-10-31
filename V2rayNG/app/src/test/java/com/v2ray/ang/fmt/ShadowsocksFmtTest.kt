@@ -1,9 +1,9 @@
-package com.v2ray.ang.fmt
+package dev.relayx.core.fmt
 
 import android.util.Base64
 import android.util.Log
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.dto.entities.ProfileItem
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.dto.entities.ProfileItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

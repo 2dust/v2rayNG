@@ -1,4 +1,4 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -10,15 +10,15 @@ import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.extension.delay
-import com.v2ray.ang.extension.toSpeedString
-import com.v2ray.ang.helper.NotificationHelper
-import com.v2ray.ang.ui.main.MainActivity
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.core.CoreServiceManager
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.extension.delay
+import dev.relayx.core.extension.toSpeedString
+import dev.relayx.core.helper.NotificationHelper
+import dev.relayx.core.ui.main.MainActivity
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

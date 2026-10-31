@@ -1,4 +1,4 @@
-package com.v2ray.ang.extension
+package dev.relayx.core.extension
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -46,8 +46,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.dto.GroupMapItem
-import com.v2ray.ang.dto.entities.ServersCache
+import dev.relayx.core.dto.GroupMapItem
+import dev.relayx.core.dto.entities.ServersCache
 import kotlinx.coroutines.flow.StateFlow
 
 private val TAB_BAR_PADDING = 3.dp

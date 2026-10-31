@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.base
+package dev.relayx.core.ui.base
 
 /**
  * Base interface for ViewModel UI events.

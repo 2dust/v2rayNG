@@ -1,15 +1,15 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
 import android.os.Build
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.dto.CheckUpdateResult
-import com.v2ray.ang.dto.GitHubRelease
-import com.v2ray.ang.dto.UrlContentRequest
-import com.v2ray.ang.extension.concatUrl
-import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.BuildConfig
+import dev.relayx.core.dto.CheckUpdateResult
+import dev.relayx.core.dto.GitHubRelease
+import dev.relayx.core.dto.UrlContentRequest
+import dev.relayx.core.extension.concatUrl
+import dev.relayx.core.util.HttpUtil
+import dev.relayx.core.util.JsonUtil
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

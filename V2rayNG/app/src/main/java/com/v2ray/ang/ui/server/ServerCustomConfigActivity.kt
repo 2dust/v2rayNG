@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.server
+package dev.relayx.core.ui.server
 
 import android.os.Bundle
 import androidx.compose.foundation.Canvas
@@ -53,23 +53,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.fmt.CustomFmt
-import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.horizontalScrollbar
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.toast
+import dev.relayx.core.extension.toastSuccess
+import dev.relayx.core.fmt.CustomFmt
+import dev.relayx.core.handler.AngConfigManager
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.DeleteConfirmDialog
+import dev.relayx.core.ui.compose.FormTextField
+import dev.relayx.core.ui.compose.NavigationBarsSpacer
+import dev.relayx.core.ui.compose.horizontalScrollbar
+import dev.relayx.core.ui.compose.verticalScrollbar
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 
 class ServerCustomConfigActivity : BaseComponentActivity() {

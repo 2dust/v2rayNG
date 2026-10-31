@@ -1,9 +1,9 @@
-package com.v2ray.ang.dto
+package dev.relayx.core.dto
 
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.BalancerStrategyType
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.NetworkType
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.BalancerStrategyType
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.enums.NetworkType
 
 @Suppress("PropertyName")
 data class V2rayNShareItem(

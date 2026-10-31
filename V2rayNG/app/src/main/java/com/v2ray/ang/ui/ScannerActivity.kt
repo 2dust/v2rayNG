@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package dev.relayx.core.ui
 
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -61,14 +61,14 @@ import com.google.zxing.DecodeHintType
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.ui.base.HelperBaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.QRCodeDecoder
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.enums.PermissionType
+import dev.relayx.core.extension.toast
+import dev.relayx.core.ui.base.HelperBaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.QRCodeDecoder
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean

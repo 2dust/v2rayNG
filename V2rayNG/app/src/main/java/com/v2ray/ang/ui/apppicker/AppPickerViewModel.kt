@@ -1,14 +1,14 @@
-package com.v2ray.ang.ui.apppicker
+package dev.relayx.core.ui.apppicker
 
 import android.app.Application
 import android.content.Context
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.ui.AppSelection
-import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.AppManagerUtil
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.dto.AppInfo
+import dev.relayx.core.ui.AppSelection
+import dev.relayx.core.ui.base.BaseViewModel
+import dev.relayx.core.util.AppManagerUtil
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

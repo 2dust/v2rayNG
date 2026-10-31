@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.subscription
+package dev.relayx.core.ui.subscription
 
 import android.content.Intent
 import android.os.Bundle
@@ -37,22 +37,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.QRCodeDialog
-import com.v2ray.ang.ui.compose.ReorderableListItem
-import com.v2ray.ang.ui.compose.SelectListDialog
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.extension.toast
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.MmkvManager.rememberMmkvBool
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.DeleteConfirmDialog
+import dev.relayx.core.ui.compose.ItemDivider
+import dev.relayx.core.ui.compose.NavigationBarsBottomPadding
+import dev.relayx.core.ui.compose.QRCodeDialog
+import dev.relayx.core.ui.compose.ReorderableListItem
+import dev.relayx.core.ui.compose.SelectListDialog
+import dev.relayx.core.ui.compose.SettingsSwitchItem
+import dev.relayx.core.ui.compose.verticalScrollbar
+import dev.relayx.core.util.Utils
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 

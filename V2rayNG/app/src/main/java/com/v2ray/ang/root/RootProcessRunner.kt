@@ -1,4 +1,4 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit

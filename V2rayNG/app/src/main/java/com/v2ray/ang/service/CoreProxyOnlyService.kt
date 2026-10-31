@@ -1,15 +1,15 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.contracts.ServiceControl
-import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.handler.NotificationManager
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.contracts.ServiceControl
+import dev.relayx.core.core.CoreServiceManager
+import dev.relayx.core.handler.AppLocaleManager
+import dev.relayx.core.handler.NotificationManager
+import dev.relayx.core.util.LogUtil
 import java.lang.ref.SoftReference
 
 class CoreProxyOnlyService : Service(), ServiceControl {

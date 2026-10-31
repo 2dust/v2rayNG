@@ -1,6 +1,6 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream

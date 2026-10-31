@@ -1,7 +1,7 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
 import androidx.annotation.StringRes
-import com.v2ray.ang.R
+import dev.relayx.core.R
 
 /**
  * Enum defining different notification channels.

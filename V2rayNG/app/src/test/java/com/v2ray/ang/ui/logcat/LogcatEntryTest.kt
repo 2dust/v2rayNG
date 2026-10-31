@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.logcat
+package dev.relayx.core.ui.logcat
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

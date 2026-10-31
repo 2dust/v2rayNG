@@ -1,6 +1,6 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**

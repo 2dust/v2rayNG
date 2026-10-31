@@ -1,4 +1,4 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
 /**
  * VPN interface address configuration enum class

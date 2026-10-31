@@ -1,4 +1,4 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import android.content.Context
 import coil3.ImageLoader
@@ -8,7 +8,7 @@ import coil3.fetch.FetchResult
 import coil3.fetch.Fetcher
 import coil3.fetch.ImageFetchResult
 import coil3.request.Options
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 
 class AppIconFetcher(
     private val packageName: String,

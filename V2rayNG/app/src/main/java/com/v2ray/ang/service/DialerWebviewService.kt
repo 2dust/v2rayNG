@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,7 +7,7 @@ import android.os.Looper
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.v2ray.ang.contracts.IDialerService
+import dev.relayx.core.contracts.IDialerService
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 import java.util.concurrent.atomic.AtomicLong

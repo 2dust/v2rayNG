@@ -1,4 +1,4 @@
-package com.v2ray.ang.dto
+package dev.relayx.core.dto
 
 /**
  * Result of subscription update operation

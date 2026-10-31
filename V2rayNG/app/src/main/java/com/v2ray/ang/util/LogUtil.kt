@@ -1,8 +1,8 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import android.util.Log
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
+import dev.relayx.core.AppConfig
+import dev.relayx.core.handler.MmkvManager
 import java.util.Locale
 
 object LogUtil {

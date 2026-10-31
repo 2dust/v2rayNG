@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.settings
+package dev.relayx.core.ui.settings
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -31,28 +31,28 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.VPN
-import com.v2ray.ang.R
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.root.RootManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.CollapsiblePreferenceGroupHeader
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.SettingsEditItem
-import com.v2ray.ang.ui.compose.SettingsListItem
-import com.v2ray.ang.ui.compose.SettingsMenuItem
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.ThemeManager
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.AppConfig.VPN
+import dev.relayx.core.R
+import dev.relayx.core.extension.toastError
+import dev.relayx.core.handler.AppLocaleManager
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.MmkvManager.rememberMmkvBool
+import dev.relayx.core.handler.MmkvManager.rememberMmkvString
+import dev.relayx.core.handler.SettingsChangeManager
+import dev.relayx.core.root.RootManager
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.CollapsiblePreferenceGroupHeader
+import dev.relayx.core.ui.compose.NavigationBarsSpacer
+import dev.relayx.core.ui.compose.SettingsEditItem
+import dev.relayx.core.ui.compose.SettingsListItem
+import dev.relayx.core.ui.compose.SettingsMenuItem
+import dev.relayx.core.ui.compose.SettingsSwitchItem
+import dev.relayx.core.ui.compose.ThemeManager
+import dev.relayx.core.ui.compose.verticalScrollbar
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseComponentActivity() {

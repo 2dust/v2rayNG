@@ -1,11 +1,11 @@
-package com.v2ray.ang.ui.base
+package dev.relayx.core.ui.base
 
 import android.net.Uri
 import android.os.Bundle
-import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.helper.FileChooserHelper
-import com.v2ray.ang.helper.PermissionHelper
-import com.v2ray.ang.helper.QRCodeScannerHelper
+import dev.relayx.core.enums.PermissionType
+import dev.relayx.core.helper.FileChooserHelper
+import dev.relayx.core.helper.PermissionHelper
+import dev.relayx.core.helper.QRCodeScannerHelper
 
 /**
  * HelperBaseComponentActivity extends BaseComponentActivity and provides additional helpers for

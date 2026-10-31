@@ -1,4 +1,4 @@
-package com.v2ray.ang.service
+package dev.relayx.core.service
 
 import android.annotation.SuppressLint
 import android.app.Service
@@ -11,19 +11,19 @@ import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.StrictMode
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.LOOPBACK
-import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.contracts.ServiceControl
-import com.v2ray.ang.contracts.Tun2SocksControl
-import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.handler.AppLocaleManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.NotificationManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.root.RootLanSharing
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.AppConfig.LOOPBACK
+import dev.relayx.core.BuildConfig
+import dev.relayx.core.contracts.ServiceControl
+import dev.relayx.core.contracts.Tun2SocksControl
+import dev.relayx.core.core.CoreServiceManager
+import dev.relayx.core.handler.AppLocaleManager
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.NotificationManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.root.RootLanSharing
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import java.lang.ref.SoftReference
 import java.util.concurrent.atomic.AtomicBoolean
 

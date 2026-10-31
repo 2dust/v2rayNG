@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.server
+package dev.relayx.core.ui.server
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
@@ -23,24 +23,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
-import com.v2ray.ang.AppConfig.TAG_PROXY
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.BalancerStrategyType
-import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isNotNullEmpty
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.FormDropdownField
-import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import dev.relayx.core.AppConfig.BUILTIN_OUTBOUND_TAGS
+import dev.relayx.core.AppConfig.TAG_PROXY
+import dev.relayx.core.R
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.BalancerStrategyType
+import dev.relayx.core.enums.EConfigType
+import dev.relayx.core.extension.isNotNullEmpty
+import dev.relayx.core.extension.toast
+import dev.relayx.core.extension.toastSuccess
+import dev.relayx.core.handler.MmkvManager
+import dev.relayx.core.handler.SettingsManager
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.DeleteConfirmDialog
+import dev.relayx.core.ui.compose.FormDropdownField
+import dev.relayx.core.ui.compose.FormTextField
+import dev.relayx.core.ui.compose.NavigationBarsSpacer
+import dev.relayx.core.ui.compose.SettingsSwitchItem
 
 class ServerGroupActivity : BaseComponentActivity() {
 

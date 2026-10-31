@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.compose
+package dev.relayx.core.ui.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.currentStateAsState
-import com.v2ray.ang.extension.delay
+import dev.relayx.core.extension.delay
 import kotlinx.coroutines.flow.collectLatest
 
 data class ScrollbarConfig(

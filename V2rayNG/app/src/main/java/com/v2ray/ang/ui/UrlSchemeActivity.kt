@@ -1,18 +1,18 @@
-package com.v2ray.ang.ui
+package dev.relayx.core.ui
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.main.MainActivity
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.extension.toast
+import dev.relayx.core.extension.toastError
+import dev.relayx.core.handler.AngConfigManager
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.main.MainActivity
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

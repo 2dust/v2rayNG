@@ -1,10 +1,10 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.ServersCache
-import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.extension.nullIfBlank
-import com.v2ray.ang.handler.AngConfigManager
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.dto.entities.ServersCache
+import dev.relayx.core.extension.isComplexType
+import dev.relayx.core.extension.nullIfBlank
+import dev.relayx.core.handler.AngConfigManager
 
 internal data class ServerRowUiModel(
     val guid: String,

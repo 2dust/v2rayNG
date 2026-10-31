@@ -1,9 +1,9 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
 import android.util.Log
 import com.tencent.mmkv.MMKV
-import com.v2ray.ang.dto.entities.SubscriptionItem
-import com.v2ray.ang.util.JsonUtil
+import dev.relayx.core.dto.entities.SubscriptionItem
+import dev.relayx.core.util.JsonUtil
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

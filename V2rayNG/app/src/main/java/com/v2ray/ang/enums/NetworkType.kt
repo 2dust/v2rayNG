@@ -1,4 +1,4 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
 enum class NetworkType(val type: String) {
     TCP("tcp"),

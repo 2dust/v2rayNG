@@ -1,4 +1,4 @@
-package com.v2ray.ang.helper
+package dev.relayx.core.helper
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,9 +8,9 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
-import com.v2ray.ang.R
-import com.v2ray.ang.enums.NotificationChannelType
-import com.v2ray.ang.handler.AppLocaleManager
+import dev.relayx.core.R
+import dev.relayx.core.enums.NotificationChannelType
+import dev.relayx.core.handler.AppLocaleManager
 
 /**
  * Unified notification helper for different notification channels.

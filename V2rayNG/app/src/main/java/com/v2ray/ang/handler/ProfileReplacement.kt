@@ -1,6 +1,6 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
-import com.v2ray.ang.dto.entities.ProfileItem
+import dev.relayx.core.dto.entities.ProfileItem
 
 internal object ProfileReplacement {
 

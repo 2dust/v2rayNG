@@ -1,12 +1,12 @@
-package com.v2ray.ang.ui.logcat
+package dev.relayx.core.ui.logcat
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.base.BaseViewModel
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.ui.base.BaseViewModel
+import dev.relayx.core.util.LogUtil
+import dev.relayx.core.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

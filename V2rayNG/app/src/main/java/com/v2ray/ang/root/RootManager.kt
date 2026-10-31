@@ -1,9 +1,9 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.root.RootManager.isRootAvailable
-import com.v2ray.ang.root.RootManager.refresh
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.root.RootManager.isRootAvailable
+import dev.relayx.core.root.RootManager.refresh
+import dev.relayx.core.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

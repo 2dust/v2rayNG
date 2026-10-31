@@ -1,10 +1,10 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
 /**
  * Load-balancing strategy types supported by xray balancer.
  *
  * @param policyGroupType The string value written into the xray config JSON.
- * @param policyGroupTypeValue The numeric string stored in [com.v2ray.ang.dto.entities.ProfileItem.policyGroupType].
+ * @param policyGroupTypeValue The numeric string stored in [dev.relayx.core.dto.entities.ProfileItem.policyGroupType].
  * @param requiresBurstObservatory Whether this strategy needs a burstObservatory (leastLoad).
  * @param requiresObservatory Whether this strategy needs an observatory (leastPing).
  * @param supportsObservatory Whether an observatory can health-filter this strategy.

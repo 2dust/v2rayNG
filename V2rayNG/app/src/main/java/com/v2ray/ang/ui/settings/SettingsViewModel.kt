@@ -1,12 +1,12 @@
-package com.v2ray.ang.ui.settings
+package dev.relayx.core.ui.settings
 
 import android.app.Application
 import android.content.Intent
 import android.provider.Settings
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.R
-import com.v2ray.ang.root.RootManager
-import com.v2ray.ang.ui.base.BaseViewModel
+import dev.relayx.core.AppConfig
+import dev.relayx.core.R
+import dev.relayx.core.root.RootManager
+import dev.relayx.core.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

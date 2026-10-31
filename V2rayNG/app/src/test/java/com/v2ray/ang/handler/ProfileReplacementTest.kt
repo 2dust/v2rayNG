@@ -1,7 +1,7 @@
-package com.v2ray.ang.handler
+package dev.relayx.core.handler
 
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.enums.EConfigType
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.enums.EConfigType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

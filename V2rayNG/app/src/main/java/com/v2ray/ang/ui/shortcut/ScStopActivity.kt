@@ -1,11 +1,11 @@
-package com.v2ray.ang.ui.shortcut
+package dev.relayx.core.ui.shortcut
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.v2ray.ang.core.CoreServiceManager
-import com.v2ray.ang.core.LauncherManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
+import dev.relayx.core.core.CoreServiceManager
+import dev.relayx.core.core.LauncherManager
+import dev.relayx.core.ui.base.BaseComponentActivity
 
 class ScStopActivity : BaseComponentActivity() {
 

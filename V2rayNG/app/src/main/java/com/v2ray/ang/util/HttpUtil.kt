@@ -1,9 +1,9 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.LOOPBACK
-import com.v2ray.ang.BuildConfig
-import com.v2ray.ang.dto.UrlContentRequest
+import dev.relayx.core.AppConfig
+import dev.relayx.core.AppConfig.LOOPBACK
+import dev.relayx.core.BuildConfig
+import dev.relayx.core.dto.UrlContentRequest
 import okhttp3.Credentials
 import okhttp3.Headers
 import okhttp3.OkHttpClient

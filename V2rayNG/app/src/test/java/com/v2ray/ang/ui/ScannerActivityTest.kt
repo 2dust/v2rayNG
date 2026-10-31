@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package dev.relayx.core.ui
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap

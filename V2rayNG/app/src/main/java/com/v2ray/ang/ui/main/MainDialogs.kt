@@ -1,10 +1,10 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.res.stringResource
-import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import dev.relayx.core.R
+import dev.relayx.core.ui.compose.DeleteConfirmDialog
 
 data class ServerDeleteTarget(
     val guid: String,

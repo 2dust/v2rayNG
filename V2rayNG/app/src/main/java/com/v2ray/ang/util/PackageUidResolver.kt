@@ -1,8 +1,8 @@
-package com.v2ray.ang.util
+package dev.relayx.core.util
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.v2ray.ang.AppConfig
+import dev.relayx.core.AppConfig
 import java.util.concurrent.ConcurrentHashMap
 
 object PackageUidResolver {

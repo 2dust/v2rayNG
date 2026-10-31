@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.main
+package dev.relayx.core.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,17 +53,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.LocateTarget
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
-import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.ReorderableGridItem
-import com.v2ray.ang.ui.compose.ReorderableListItem
-import com.v2ray.ang.ui.compose.colorConfigType
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
-import com.v2ray.ang.ui.compose.verticalScrollbar
+import dev.relayx.core.R
+import dev.relayx.core.dto.LocateTarget
+import dev.relayx.core.dto.entities.ProfileItem
+import dev.relayx.core.dto.entities.SubscriptionUsageInfo
+import dev.relayx.core.ui.compose.ItemDivider
+import dev.relayx.core.ui.compose.ReorderableGridItem
+import dev.relayx.core.ui.compose.ReorderableListItem
+import dev.relayx.core.ui.compose.colorConfigType
+import dev.relayx.core.ui.compose.colorPing
+import dev.relayx.core.ui.compose.colorPingRed
+import dev.relayx.core.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState

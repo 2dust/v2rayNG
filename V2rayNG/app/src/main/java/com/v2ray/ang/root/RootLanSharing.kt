@@ -1,8 +1,8 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
 import android.content.Context
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.handler.MmkvManager
+import dev.relayx.core.AppConfig
+import dev.relayx.core.handler.MmkvManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

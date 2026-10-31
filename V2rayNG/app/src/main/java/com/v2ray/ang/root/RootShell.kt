@@ -1,8 +1,8 @@
-package com.v2ray.ang.root
+package dev.relayx.core.root
 
 import android.content.Context
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.util.LogUtil
+import dev.relayx.core.AppConfig
+import dev.relayx.core.util.LogUtil
 import java.io.File
 
 /**

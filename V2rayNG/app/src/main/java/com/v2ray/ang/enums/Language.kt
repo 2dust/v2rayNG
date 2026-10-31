@@ -1,4 +1,4 @@
-package com.v2ray.ang.enums
+package dev.relayx.core.enums
 
 import androidx.core.os.LocaleListCompat
 import java.util.Locale

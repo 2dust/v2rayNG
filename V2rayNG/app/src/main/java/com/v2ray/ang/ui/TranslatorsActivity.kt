@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui
+package dev.relayx.core.ui
 
 import android.os.Bundle
 import androidx.compose.foundation.clickable
@@ -29,13 +29,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.R
-import com.v2ray.ang.dto.TranslatorsCredit
-import com.v2ray.ang.dto.TranslatorsParser
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.util.Utils
+import dev.relayx.core.R
+import dev.relayx.core.dto.TranslatorsCredit
+import dev.relayx.core.dto.TranslatorsParser
+import dev.relayx.core.ui.base.BaseComponentActivity
+import dev.relayx.core.ui.compose.AppTopBar
+import dev.relayx.core.ui.compose.NavigationBarsSpacer
+import dev.relayx.core.util.Utils
 
 class TranslatorsActivity : BaseComponentActivity() {
 
