@@ -1,4 +1,4 @@
-## Mobix VPN v1.0.0
+## RX VPN v1.0.0
 
 Built automatically from `4e02ba9597055a30dd0156ece95470d497507640` with the **Xray core** engine and native
 **tun2socks** support. Works on every Iranian operator (MCI, Irancell, Rightel,
@@ -19,7 +19,7 @@ Wi-Fi) and on every Android 7.0+ device.
 
 ## فارسی
 
-نسخه‌ی `v1.0.0` موبیکس وی‌پی‌ان، ساخته‌شده با هسته‌ی **Xray** و پشتیبانی بومی از **tun2socks**.
+نسخه‌ی `v1.0.0` آر ایکس وی‌پی‌ان، ساخته‌شده با هسته‌ی **Xray** و پشتیبانی بومی از **tun2socks**.
 روی همه‌ی اپراتورها (همراه اول، ایرانسل، رایتل، وای‌فای) و همه‌ی گوشی‌های اندروید ۷ به بالا کار می‌کند.
 
 | فایل | مناسب برای |
