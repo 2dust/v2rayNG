@@ -49,6 +49,11 @@ jobs:
             echo "Source run $RUN_ID is not successful: $STATUS" >&2
             exit 1
           fi
+
+      - name: Surface publish errors
+        if: failure()
+        run: |
+          echo "Release publish failed. Check the previous step output." >&2
           SHA=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json headSha --jq .headSha)
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
@@ -68,7 +73,7 @@ jobs:
         run: |
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md"
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md" --draft=false --latest
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
@@ -77,3 +82,8 @@ jobs:
               --notes-file "$RUNNER_TEMP/notes.md" \
               --latest
           fi
+
+      - name: Surface publish errors
+        if: failure()
+        run: |
+          echo "Release publish failed. Check the previous step output." >&2
