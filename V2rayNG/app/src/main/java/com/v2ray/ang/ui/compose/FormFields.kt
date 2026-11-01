@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -88,6 +89,9 @@ fun FormDropdownField(
     val menuScrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val visibleOptions = remember(value, options, editable) {
+        if (editable) filterDropdownOptions(options, value) else options
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -139,7 +143,7 @@ fun FormDropdownField(
             scrollState = menuScrollState,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
-            options.forEach { option ->
+            visibleOptions.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option) },
                     onClick = {
@@ -150,5 +154,21 @@ fun FormDropdownField(
                 )
             }
         }
+    }
+}
+
+/**
+ * Options an editable dropdown offers for the text the user has typed.
+ *
+ * A blank query, or one that already equals an option, keeps every option so the menu still works
+ * as a plain picker. Any other query keeps the options containing it anywhere, ignoring case, so a
+ * partly remembered or mid-string fragment still finds its entry.
+ */
+internal fun filterDropdownOptions(options: List<String>, query: String): List<String> {
+    val trimmed = query.trim()
+    return if (trimmed.isEmpty() || trimmed in options) {
+        options
+    } else {
+        options.filter { it.contains(trimmed, ignoreCase = true) }
     }
 }
