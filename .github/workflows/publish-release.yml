@@ -1,6 +1,9 @@
 name: Publish RX VPN Release
 
 on:
+  push:
+    branches:
+      - arena/01066f02-test1
   workflow_dispatch:
     inputs:
       release_tag:
@@ -18,6 +21,7 @@ permissions:
 jobs:
   publish:
     name: Publish tested APKs
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-release]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,7 +32,7 @@ jobs:
         with:
           name: RXVPN-apk
           path: apk
-          run-id: ${{ inputs.artifact_run_id }}
+          run-id: ${{ inputs.artifact_run_id || '41347658618' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List APKs
@@ -38,7 +42,7 @@ jobs:
         id: source
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUN_ID: ${{ inputs.artifact_run_id }}
+          RUN_ID: ${{ inputs.artifact_run_id || '41347658618' }}
         run: |
           STATUS=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json conclusion --jq .conclusion)
           if [ "$STATUS" != "success" ]; then
@@ -50,7 +54,7 @@ jobs:
 
       - name: Write release notes
         env:
-          TAG: ${{ inputs.release_tag }}
+          TAG: ${{ inputs.release_tag || 'v1.0.0' }}
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
         run: |
           sed -e "s|@TAG@|${TAG}|g" -e "s|@SHA@|${SOURCE_SHA}|g" \
@@ -59,7 +63,7 @@ jobs:
       - name: Publish APKs to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ inputs.release_tag }}
+          TAG: ${{ inputs.release_tag || 'v1.0.0' }}
           SOURCE_SHA: ${{ steps.source.outputs.sha }}
         run: |
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
