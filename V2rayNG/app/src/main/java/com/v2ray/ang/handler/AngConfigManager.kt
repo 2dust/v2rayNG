@@ -492,7 +492,10 @@ object AngConfigManager {
 
             // Account info (traffic, expiry, support link) the panel sends in the response headers.
             var usageInfo: SubscriptionUsageInfo? = null
+            // Refresh interval the panel asks clients to use (minutes), if any.
+            var panelIntervalMinutes: Long? = null
             val captureUsageInfo: (Headers) -> Unit = { headers ->
+                panelIntervalMinutes = SubscriptionInfoParser.parseUpdateIntervalMinutes(headers["Profile-Update-Interval"])
                 usageInfo = SubscriptionInfoParser.parse(
                     userInfo = headers["Subscription-Userinfo"],
                     profileTitle = headers["Profile-Title"],
@@ -543,7 +546,20 @@ object AngConfigManager {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 // Replaced on every successful update so the box disappears if the panel stops sending the headers.
                 it.subscription.usageInfo = usageInfo
+                // Opt-in (Advanced Settings): when enabled and the panel publishes an interval, turn
+                // auto-update on with that interval. Otherwise the user's own settings stay untouched.
+                var scheduleChanged = false
+                panelIntervalMinutes?.takeIf {
+                    MmkvManager.decodeSettingsBool(AppConfig.PREF_SUB_PANEL_INTERVAL, false)
+                }?.let { minutes ->
+                    scheduleChanged = !it.subscription.autoUpdate || it.subscription.updateInterval != minutes
+                    it.subscription.autoUpdate = true
+                    it.subscription.updateInterval = minutes
+                }
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
+                if (scheduleChanged) {
+                    SubscriptionUpdater.syncOne(subId = it.guid)
+                }
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
                     configCount = count,

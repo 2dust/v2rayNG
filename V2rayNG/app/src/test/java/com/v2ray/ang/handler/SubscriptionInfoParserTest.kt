@@ -88,4 +88,27 @@ class SubscriptionInfoParserTest {
         assertEquals("https://p.example/info", SubscriptionInfoParser.withWebPageFallback(own, "https://p.example/sub/abc").webPageUrl)
         assertNull(SubscriptionInfoParser.withWebPageFallback(base, "not a url").webPageUrl)
     }
+
+    @Test
+    fun updateIntervalHoursAreConvertedToMinutes() {
+        assertEquals(720L, SubscriptionInfoParser.parseUpdateIntervalMinutes("12")!!)
+        assertEquals(90L, SubscriptionInfoParser.parseUpdateIntervalMinutes(" 1.5 ")!!)
+        assertEquals(1440L, SubscriptionInfoParser.parseUpdateIntervalMinutes("24")!!)
+    }
+
+    @Test
+    fun updateIntervalIsClampedToSchedulerLimits() {
+        assertEquals(15L, SubscriptionInfoParser.parseUpdateIntervalMinutes("0.05")!!)
+        assertEquals(365L * 24 * 60, SubscriptionInfoParser.parseUpdateIntervalMinutes("100000")!!)
+    }
+
+    @Test
+    fun invalidUpdateIntervalGivesNull() {
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes(null))
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes(""))
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes("0"))
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes("-3"))
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes("abc"))
+        assertNull(SubscriptionInfoParser.parseUpdateIntervalMinutes("NaN"))
+    }
 }
