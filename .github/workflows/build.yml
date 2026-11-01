@@ -218,6 +218,7 @@ jobs:
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
               --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
               --latest
