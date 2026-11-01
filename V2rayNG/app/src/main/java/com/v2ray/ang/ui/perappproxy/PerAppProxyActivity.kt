@@ -315,7 +315,7 @@ private fun RoutingAppRow(app: AppInfo, checked: Boolean, onClick: () -> Unit) {
         )
         Checkbox(
             checked = checked,
-            onClick = null,
+            onCheckedChange = null,
             modifier = Modifier.clearAndSetSemantics {},
         )
     }
