@@ -163,7 +163,7 @@ fun SettingsScreen(
             MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE, "auto") ?: "auto"
         )
     }
-    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, "0")
+    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, ThemeManager.DEFAULT_UI_MODE)
     var dynamicColor by rememberMmkvBool(AppConfig.PREF_DYNAMIC_COLOR, false)
 
     var ipv6Enabled by rememberMmkvBool(AppConfig.PREF_IPV6_ENABLED, false)

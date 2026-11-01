@@ -1,120 +1,79 @@
-# Mobix VPN — موبیکس وی‌پی‌ان
+# RX VPN
 
 <div align="center">
-  <img src="branding/mobix-logo.png" width="140" alt="Mobix VPN logo" />
+  <img src="branding/rx-vpn-logo.png" width="128" alt="RX VPN monogram" />
 
-  **اتصال امن، سریع و پایدار — روی همه‌ی اپراتورها و همه‌ی گوشی‌ها**
+  **کلاینت اندروید با رابط گرافیتی، دکمه‌های شیشه‌ای و مسیردهی به تفکیک برنامه**
 </div>
 
----
+RX VPN یک کلاینت اندرویدی مبتنی بر [v2rayNG](https://github.com/2dust/v2rayNG) و هستهٔ Xray است. این مخزن نسخهٔ اختصاصی برند RX را نگه می‌دارد؛ سرور VPN یا کانفیگ پولی داخل برنامه ارائه نمی‌شود.
 
-## فارسی
+## امکانات این نسخه
 
-### موبیکس چیست؟
+- نام و آیکون اختصاصی RX VPN، با مونوکرام هندسی قابل بازتولید
+- تم پیش‌فرض گرافیتی تیره با رنگ تأکیدی کهربایی؛ تم روشن و رنگ پویا همچنان قابل انتخاب‌اند
+- دکمه‌های شیشه‌ای با لایه‌های نیمه‌شفاف و حاشیهٔ کنترل‌شده، بدون وابستگی به بلور پس‌زمینه در نسخه‌های جدید اندروید
+- صفحهٔ اتصال با وضعیت واقعی سرویس، دکمهٔ اتصال/قطع، آزمایش اتصال و دسترسی مستقیم به مسیردهی برنامه‌ها
+- سه حالت مسیردهی در حالت VPN معمولی:
+  1. همهٔ برنامه‌ها به‌جز خود RX VPN
+  2. فقط برنامه‌های انتخاب‌شده
+  3. همهٔ برنامه‌ها به‌جز انتخاب‌شده‌ها
+- ورود کانفیگ از فایل، کلیپ‌بورد، QR یا لینک اشتراک
+- پشتیبانی از پروتکل‌های موجود در هسته، از جمله VLESS، VMess، Trojan، Shadowsocks و WireGuard
 
-**Mobix VPN** یک کلاینت VPN کامل برای اندروید است که موتور اتصال آن هسته‌ی
-[Xray](https://github.com/XTLS/Xray-core) است. یعنی همه‌ی پروتکل‌های پرکاربرد و
-ضد‌فیلتر را پشتیبانی می‌کند و با هر اپراتور و هر شبکه‌ای (همراه اول، ایرانسل،
-رایتل، وای‌فای خانگی و …) کار می‌کند.
+**تغییر مسیردهی با اتصال دوبارهٔ VPN اعمال می‌شود.** حالت‌های پروکسی و روت رفتار جداگانهٔ خود را دارند. کیفیت و امکان اتصال به سرور، شبکه و تنظیمات دستگاه بستگی دارد؛ هیچ تضمین «اتصال روی همهٔ اپراتورها» داده نمی‌شود.
 
-| ویژگی | توضیح |
+## دریافت APK
+
+۱. در تب **Actions**، گردش‌کار **Build RX VPN APK** را باز کنید.
+۲. آخرین ساخت موفق روی شاخهٔ موردنظر را انتخاب کنید.
+۳. فایل **RXVPN-apk** را دانلود و باز کنید.
+
+| فایل | دستگاه |
 | --- | --- |
-| پروتکل‌ها | VLESS، VMess، Trojan، Shadowsocks، SOCKS، HTTP، WireGuard، Hysteria2، و کانفیگ سفارشی |
-| هسته‌ی اتصال | Xray core (به‌همراه پشتیبانی از v2fly) |
-| حالت اتصال | VpnService (بدون روت، همه‌ی اپ‌ها) + حالت پروکسی + tun2socks (hev-socks5-tunnel) |
-| پینگ و تست | تست واقعی (Real ping)، تست سرعت همه‌ی سرورها به‌صورت گروهی |
-| اشتراک | لینک ساب، بروزرسانی خودکار، نمایش حجم مصرفی |
-| امنیت | پشتیبانی TLS/REALITY، پین گواهی، مسیریابی هوشمند (ایران/جهانی) |
-| طراحی | رابط Compose و Material 3، تم روشن/تاریک، رنگ اختصاصی برند |
-| سازگاری | اندروید ۷ به بالا (API 24+) و ABIهای `arm64-v8a`، `armeabi-v7a`، `x86_64`، `x86` + APK یونیورسال |
+| `RXVPN_*_arm64-v8a.apk` | بیشتر گوشی‌های اندرویدی جدید |
+| `RXVPN_*_armeabi-v7a.apk` | گوشی‌های قدیمی ۳۲ بیتی |
+| `RXVPN_*_x86_64.apk` / `x86` | شبیه‌سازها و دستگاه‌های اینتل |
+| `RXVPN_*_universal.apk` | شامل همهٔ معماری‌های اعلام‌شده |
 
-### نصب
+برای انتشار نسخه، گردش‌کار را دستی با `release_tag` اجرا کنید. کلید امضای پایدار باید از طریق secretهای مخزن تأمین شود؛ کلید موقتِ ساخت برای انتشار به‌روزرسانی‌های قابل اعتماد مناسب نیست.
 
-۱. از تب **Actions** در همین مخزن، آخرین بیلد موفق `Build Mobix VPN APK` را باز کنید.
-۲. فایل `MobixVPN-apk` را دانلود کنید.
-۳. APK مناسب گوشی‌تان را نصب کنید:
+## شروع استفاده
 
-| فایل | مناسب برای |
-| --- | --- |
-| `MobixVPN_*_arm64-v8a.apk` | تقریباً همه‌ی گوشی‌های امروزی (پیشنهادی) |
-| `MobixVPN_*_armeabi-v7a.apk` | گوشی‌های قدیمی ۳۲ بیتی |
-| `MobixVPN_*_x86_64.apk` / `x86` | شبیه‌سازها و تبلت‌های اینتل |
-| `MobixVPN_*_universal.apk` | یک فایل برای همه‌ی دستگاه‌ها |
+۱. کانفیگ معتبر سرور خود را وارد کنید.
+۲. یک سرور را از فهرست انتخاب کنید.
+۳. در «مسیردهی برنامه‌ها» مشخص کنید کدام برنامه‌ها از VPN عبور کنند.
+۴. «اتصال» را بزنید و مجوز VPN اندروید را تأیید کنید.
 
-> اگر مطمئن نیستید کدام نسخه را بگیرید، همان `universal` را نصب کنید.
+بدون کانفیگ، صفحهٔ اصلی ورود فایل و کلیپ‌بورد را نشان می‌دهد و اتصال موفقِ ساختگی نمایش داده نمی‌شود. برای حفظ داده‌ها و امکان به‌روزرسانی، شناسهٔ نصب فعلی `com.mobix.vpn` تغییر نکرده است؛ نام و فایل‌های خروجی RX VPN هستند.
 
-### ساخت نسخه‌ی ریلیز (نسخه‌ی قابل دانلود در Releases)
+## ساخت محلی
 
-از تب **Actions** → `Build Mobix VPN APK` → **Run workflow** و در فیلد
-`release_tag` عددی مثل `v1.0.0` وارد کنید. APKها به‌طور خودکار به بخش
-**Releases** اضافه می‌شوند تا لینک دانلود دائمی داشته باشند.
-
-### حریم خصوصی
-
-برنامه هیچ داده‌ای را به سرور شخص ثالث نمی‌فرستد؛ همه‌ی کانفیگ‌ها، ساب‌ها و
-تنظیمات فقط روی خود گوشی ذخیره می‌شوند.
-
-### لوگو و هویت بصری
-
-فایل‌های برند در پوشه‌ی [`branding/`](branding) قرار دارند:
-
-- `mobix-logo.png` — لوگوی اصلی (۱۰۲۴×۱۰۲۴)
-- `mobix-logo.svg` — نسخه‌ی وکتور برای چاپ و وب
-- `mobix-playstore-512.png` — آیکون ۵۱۲×۵۱۲ برای استور
-- `mobix-feature-graphic.png` — تصویر ۱۰۲۴×۵۰۰ برای استور
-- `render_brand.py` — اسکریپت بازسازی همه‌ی آیکون‌های اندروید از لوگو
-
-برای بازسازی آیکون‌ها:
-
-```bash
-pip install pillow
-python3 branding/render_brand.py
-```
-
----
-
-## English
-
-**Mobix VPN** is an Android VPN client powered by the [Xray](https://github.com/XTLS/Xray-core)
-core, with a custom Material 3 interface and a dedicated brand identity
-(shield + bolt mark, violet → cyan gradient).
-
-### Highlights
-
-- Protocols: VLESS, VMess, Trojan, Shadowsocks, SOCKS, HTTP, WireGuard, Hysteria2, custom configs
-- Connection modes: VpnService (no root), proxy-only, and tun2socks via hev-socks5-tunnel
-- Subscriptions with auto-update and usage info, real-ping and batch speed tests
-- Smart routing profiles (Iran / global / whitelist / blacklist), TLS pinning, REALITY support
-- Works on Android 7.0+ (API 24) across `arm64-v8a`, `armeabi-v7a`, `x86_64` and `x86`
-
-### Getting the APK
-
-1. Open the **Actions** tab and pick the latest successful `Build Mobix VPN APK` run.
-2. Download the `MobixVPN-apk` artifact.
-3. Install the APK that matches your device (see the table above; `universal` always works).
-
-To produce a permanent download link, run the workflow with a `release_tag`
-(e.g. `v1.0.0`) — the APKs are then attached to **Releases**.
-
-### Building locally
+نسخه‌های ابزار از `V2rayNG/gradle/libs.versions.toml` و `.github/workflows/build.yml` خوانده می‌شوند. کتابخانه‌های بومی ورودی ساخت هستند و در Git ذخیره نمی‌شوند.
 
 ```bash
 git submodule update --init --recursive
-# LLVM NDK 30.x is required for the hev-socks5-tunnel native libraries
+# NDK مطابق گردش‌کار ساخت را نصب و NDK_HOME را تنظیم کنید.
 bash compile-hevtun.sh
+mkdir -p V2rayNG/app/libs
 cp -r libs/* V2rayNG/app/libs/
-# put libv2ray.aar from 2dust/AndroidLibXrayLite into V2rayNG/app/libs/
-cd V2rayNG && ./gradlew assemblePlaystoreRelease
+# libv2ray.aar را مطابق revision زیرماژول AndroidLibXrayLite تهیه کنید.
+cd V2rayNG
+./gradlew :app:testPlaystoreDebugUnitTest :app:compilePlaystoreDebugKotlin
+./gradlew :app:assemblePlaystoreDebug :app:assembleFdroidDebug
 ```
 
-The same steps, fully automated, live in [`.github/workflows/build.yml`](.github/workflows/build.yml).
+جزئیات تهیهٔ AAR و امضای خروجی در [گردش‌کار ساخت](.github/workflows/build.yml) قرار دارد. ساخت موفق جای آزمایش اتصال روی دستگاه واقعی را نمی‌گیرد.
 
----
+## هویت بصری
 
-## Credits & License
+فایل‌های برند در [`branding/`](branding/) هستند. مونوکرام، آیکون‌های لانچر و آیکون اعلان با اسکریپت زیر بازتولید می‌شوند:
 
-Mobix VPN is based on the open-source work of
-[v2rayNG](https://github.com/2dust/v2rayNG) by 2dust and the Xray team, and is
-distributed under the **GNU General Public License v3.0** — see [LICENSE](LICENSE).
-All third-party libraries and their licenses are listed inside the app
-(*Settings → About → Open source licenses*).
+```bash
+python3 -m pip install pillow
+python3 branding/render_brand.py
+```
+
+## مجوز
+
+این پروژه بر پایهٔ کار متن‌باز v2rayNG و Xray است و تحت **GPL-3.0** توزیع می‌شود؛ [LICENSE](LICENSE) را ببینید. فهرست مجوز کتابخانه‌ها در بخش «دربارهٔ برنامه» حفظ شده است.

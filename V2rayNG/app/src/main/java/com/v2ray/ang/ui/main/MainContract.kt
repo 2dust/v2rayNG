@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.main
 import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
+import com.v2ray.ang.ui.perappproxy.PerAppRoutingMode
 
 /** Locale-neutral state formatted only when it reaches the main UI. */
 sealed interface MainStatus {
@@ -26,6 +27,8 @@ data class MainUiState(
     val locateTarget: LocateTarget? = null,
     val confirmRemove: Boolean = false,
     val doubleColumnDisplay: Boolean = false,
+    val routingMode: PerAppRoutingMode = PerAppRoutingMode.ALL,
+    val routedAppCount: Int = 0,
     val shareQRCodeBitmap: android.graphics.Bitmap? = null
 )
 

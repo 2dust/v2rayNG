@@ -1,4 +1,4 @@
-name: Build Mobix VPN APK
+name: Build RX VPN APK
 
 on:
   workflow_dispatch:
@@ -105,6 +105,16 @@ jobs:
             "https://github.com/2dust/AndroidLibXrayLite/releases/download/${CORE_TAG}/libv2ray.aar"
           ls -lh V2rayNG/app/libs/
 
+      - name: Validate UI, resources, and both distribution flavors
+        run: |
+          cd V2rayNG
+          chmod +x gradlew
+          ./gradlew --no-daemon \
+            :app:testPlaystoreDebugUnitTest \
+            :app:compilePlaystoreDebugKotlin \
+            :app:assemblePlaystoreDebug \
+            :app:assembleFdroidDebug
+
       - name: Create signing key
         run: |
           if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
@@ -142,7 +152,7 @@ jobs:
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: MobixVPN-apk
+          name: RXVPN-apk
           path: V2rayNG/app/build/outputs/apk/playstore/release/*.apk
           if-no-files-found: error
 
@@ -160,7 +170,7 @@ jobs:
       - name: Download APKs
         uses: actions/download-artifact@v4
         with:
-          name: MobixVPN-apk
+          name: RXVPN-apk
           path: apk
 
       - name: List downloaded APKs
@@ -174,7 +184,7 @@ jobs:
           VERSION_NAME=$(grep -oP 'versionName = "\K[^"]+' V2rayNG/app/build.gradle.kts | head -1)
           TAG="${INPUT_TAG:-v${VERSION_NAME}}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Publishing Mobix VPN $TAG"
+          echo "Publishing RX VPN $TAG"
 
       - name: Write release notes
         env:
@@ -195,7 +205,7 @@ jobs:
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
-              --title "Mobix VPN $TAG" \
+              --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
               --latest
           fi

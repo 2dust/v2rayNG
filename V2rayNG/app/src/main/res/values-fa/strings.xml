@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mobix VPN</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">تعویض</string>
     <string name="app_tile_name">تعویض</string>
     <string name="app_tile_first_use">برای اولین استفاده از این قابلیت، لطفاً ابتدا از داخل برنامه یک سرور اضافه کنید</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">سرویس Mobix VPN</string>
+    <string name="notification_channel_service">سرویس RX VPN</string>
     <string name="notification_channel_subscription_updates">به‌روزرسانی اشتراک‌ها</string>
     <string name="notification_channel_connection_checks">بررسی اتصال</string>
     <string name="notification_action_stop_v2ray">توقف</string>
@@ -28,7 +28,7 @@
 
     <!--ServerActivity-->
     <string name="empty_state_title">هنوز کانفیگی اضافه نشده</string>
-    <string name="empty_state_hint">برای شروع دکمه‌ی + را بزنید تا کانفیگ اضافه کنید، لینک اشتراک بچسبانید یا کد QR را اسکن کنید.</string>
+    <string name="empty_state_hint">فایل کانفیگ را وارد کن یا لینک کپی‌شده را بچسبان؛ بعد یک سرور انتخاب کن و متصل شو.</string>
     <string name="title_server">فایل کانفیگ</string>
     <string name="menu_item_add_config">افزودن کانفیگ</string>
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
@@ -407,7 +407,7 @@
     <string name="connection_test_error">آزمایش اتصال ناموفق بود: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
-    <string name="connection_connected">متصل است.\nبرای بررسی اتصال ضربه بزنید.</string>
+    <string name="connection_connected">متصل</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
 
@@ -566,4 +566,20 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">اتصال</string>
+    <string name="rx_disconnect">قطع اتصال</string>
+    <string name="rx_connect_hint">برای اتصال، یک کانفیگ اضافه و انتخاب کن.</string>
+    <string name="rx_app_routing">مسیردهی برنامه‌ها</string>
+    <string name="rx_routing_all">همهٔ برنامه‌ها</string>
+    <string name="rx_routing_all_hint">همهٔ برنامه‌ها به‌جز خود RX VPN از VPN عبور می‌کنند.</string>
+    <string name="rx_routing_only">فقط برنامه‌های انتخاب‌شده</string>
+    <string name="rx_routing_only_hint">فقط برنامه‌های تیک‌خورده از VPN استفاده می‌کنند؛ بقیه مستقیم متصل می‌شوند.</string>
+    <string name="rx_routing_except">همه به‌جز انتخاب‌شده‌ها</string>
+    <string name="rx_routing_except_hint">برنامه‌های تیک‌خورده مستقیم متصل می‌شوند؛ بقیه از VPN عبور می‌کنند.</string>
+    <string name="rx_routing_save_failed">ذخیرهٔ مسیردهی برنامه‌ها انجام نشد؛ دوباره تلاش کن.</string>
+    <string name="rx_search_apps">جست‌وجوی برنامه‌ها</string>
+    <string name="rx_no_apps">برنامه‌ای پیدا نشد</string>
+    <string name="rx_routing_change_hint">تغییرات با اتصال دوبارهٔ VPN اعمال می‌شوند.</string>
+    <string name="rx_select_apps_hint">پیش از اتصال دست‌کم یک برنامه انتخاب کن.</string>
 </resources>

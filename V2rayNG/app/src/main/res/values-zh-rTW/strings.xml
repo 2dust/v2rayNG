@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mobix VPN</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">開關</string>
     <string name="app_tile_name">開關</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Mobix VPN 服務</string>
+    <string name="notification_channel_service">RX VPN 服務</string>
     <string name="notification_channel_subscription_updates">訂閱更新</string>
     <string name="notification_channel_connection_checks">連線檢查</string>
     <string name="notification_action_stop_v2ray">停止</string>
@@ -403,7 +403,7 @@
     <string name="connection_test_error">連線測試失敗：%s</string>
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
-    <string name="connection_connected">"已連線。輕觸以檢查連線。"</string>
+    <string name="connection_connected">已連線</string>
     <string name="connection_not_connected">"未連線"</string>
     <string name="connection_running_task_left">正在執行的測試：%s</string>
 
@@ -562,4 +562,20 @@
     <string name="sub_info_open_page">開啟訂閱資訊頁面</string>
     <string name="sub_info_unlimited">無限制</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">連線</string>
+    <string name="rx_disconnect">中斷連線</string>
+    <string name="rx_connect_hint">新增並選擇設定後即可連線。</string>
+    <string name="rx_app_routing">應用程式分流</string>
+    <string name="rx_routing_all">所有應用程式</string>
+    <string name="rx_routing_all_hint">除了 RX VPN 本身，所有應用程式都透過 VPN。</string>
+    <string name="rx_routing_only">僅所選應用程式</string>
+    <string name="rx_routing_only_hint">僅勾選的應用程式使用 VPN，其他直接連線。</string>
+    <string name="rx_routing_except">除了所選應用程式之外全部</string>
+    <string name="rx_routing_except_hint">勾選的應用程式直接連線，其他使用 VPN。</string>
+    <string name="rx_routing_save_failed">無法儲存應用程式分流設定，請重試。</string>
+    <string name="rx_search_apps">搜尋應用程式</string>
+    <string name="rx_no_apps">沒有符合的應用程式</string>
+    <string name="rx_routing_change_hint">變更將在 VPN 重新連線後生效。</string>
+    <string name="rx_select_apps_hint">連線前請至少選擇一個應用程式。</string>
 </resources>

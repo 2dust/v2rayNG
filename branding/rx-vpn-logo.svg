@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RX VPN">
+  <defs><linearGradient id="tile" x2="0" y2="1"><stop stop-color="#303336"/><stop offset="1" stop-color="#17191b"/></linearGradient></defs>
+  <rect width="512" height="512" rx="120" fill="url(#tile)"/>
+  <g transform="translate(46.08 46.08) scale(0.82)">
+    <path fill="#f4f2ed" fill-rule="evenodd" d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
+    <path fill="#e8b778" d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
+  </g>
+</svg>

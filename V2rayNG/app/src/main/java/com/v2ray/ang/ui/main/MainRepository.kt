@@ -23,6 +23,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.ui.perappproxy.PerAppRoutingMode
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.channels.Channel
@@ -124,6 +125,14 @@ class MainRepository(
 
     override fun isGroupAllDisplayEnabled(): Boolean =
         MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)
+
+    override fun getPerAppRoutingMode(): PerAppRoutingMode = PerAppRoutingMode.fromSettings(
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false),
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false),
+    )
+
+    override fun getRoutedAppCount(): Int =
+        MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET)?.size ?: 0
 
     override fun getString(resId: Int): String = localizedContext.getString(resId)
 
