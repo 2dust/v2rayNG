@@ -98,10 +98,16 @@ class PerAppRoutingModeTest {
 
     @Test
     fun failedRollbackIsNeverReportedAsSuccess() {
+        var enabledWriteAttempts = 0
         assertThrows(IllegalStateException::class.java) {
             PerAppRoutingMode.persist(PerAppRoutingMode.ALL, PerAppRoutingMode.EXCEPT_SELECTED) { key, _ ->
-                key == AppConfig.PREF_PER_APP_PROXY
+                when (key) {
+                    // The initial enable succeeds, but restoring it during rollback fails.
+                    AppConfig.PREF_PER_APP_PROXY -> ++enabledWriteAttempts == 1
+                    else -> false
+                }
             }
         }
+        assertEquals(2, enabledWriteAttempts)
     }
 }
