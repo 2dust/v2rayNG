@@ -42,7 +42,7 @@ open class FmtBase {
      */
     fun getQueryParam(uri: URI): Map<String, String> {
         return uri.rawQuery.split("&")
-            .associate { it.split("=").let { (k, v) -> k to Utils.decodeURIComponent(v) } }
+            .associate { it.split("=", limit = 2).let { (k, v) -> k to Utils.decodeURIComponent(v) } }
     }
 
     /**
