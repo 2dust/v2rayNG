@@ -207,6 +207,8 @@ fun MainScreen(
                             groups = groups,
                             selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
                             mainViewModel = mainViewModel,
+                            onEditGroup = { id -> onAction(MainAction.EditSubscription(id)) },
+                            onDeleteGroup = { id -> onAction(MainAction.DeleteSubscription(id)) },
                             onTabClick = { targetIndex ->
                                 scope.launch {
                                     pagerState.navigateToPageOptimized(
