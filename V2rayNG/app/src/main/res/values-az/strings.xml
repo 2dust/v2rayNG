@@ -102,6 +102,7 @@
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (istəyə bağlı, vergüllə ayrılmış)</string>
     <string name="server_lab_local_address">Yerli ünvan (istəyə bağlı IPv4/IPv6, vergüllə ayrılmış)</string>
+    <string name="server_lab_local_address_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>
     <string name="server_lab_local_mtu">MTU (istəyə bağlı, standart 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (istəyə bağlı, vergüllə ayrılmış IPv4/IPv6)</string>
     <string name="server_lab_remote_dns_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>
