@@ -36,6 +36,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import libv2ray.CoreCallbackHandler
@@ -53,6 +55,8 @@ object CoreServiceManager {
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
     private val connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val mutableRunningState = MutableStateFlow(false)
+    internal val runningState = mutableRunningState.asStateFlow()
 
     @Volatile
     private var isReloading = false
@@ -177,8 +181,11 @@ object CoreServiceManager {
             else -> {}
         }
 
+        mutableRunningState.value = true
         if (!isReload) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+        } else {
+            MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_RUNNING, "")
         }
         NotificationManager.startSpeedNotification()
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core started successfully")
@@ -190,6 +197,7 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        mutableRunningState.value = false
         connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
 
@@ -261,6 +269,7 @@ object CoreServiceManager {
             val tunFd = currentVpnInterface
 
             isReloading = true
+            mutableRunningState.value = false
             connectionTestScope.coroutineContext.cancelChildren()
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
 
