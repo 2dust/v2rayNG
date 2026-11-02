@@ -23,7 +23,7 @@ object Hysteria2Fmt : FmtBase() {
         val uri = URI(Utils.fixIllegalUrl(str))
         config.remarks = Utils.decodeURIComponent(uri.fragment.orEmpty()).let { it.ifEmpty { "none" } }
         config.server = uri.idnHost
-        config.serverPort = uri.port.toString()
+        config.serverPort = (if (uri.port == -1) AppConfig.DEFAULT_PORT else uri.port).toString()
         config.password = uri.userInfo
         config.security = AppConfig.TLS
         config.network = NetworkType.HYSTERIA.type
