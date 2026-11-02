@@ -23,7 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -114,13 +114,13 @@ fun SubSettingScreen(
     val qrCodeBitmap by viewModel.qrCode.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val actionFeedback = rememberAccessibilityActionFeedback()
     val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(viewModel, lifecycleOwner, context, actionFeedback) {
+    LaunchedEffect(viewModel, lifecycleOwner, resources, actionFeedback) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.autoUpdateChanges.collect { enabled ->
-                actionFeedback(context.getString(
+                actionFeedback(resources.getString(
                     if (enabled) R.string.acc_subscription_auto_update_enabled
                     else R.string.acc_subscription_auto_update_disabled
                 ))
