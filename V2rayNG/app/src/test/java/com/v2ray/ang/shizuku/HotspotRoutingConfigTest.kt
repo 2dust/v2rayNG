@@ -32,6 +32,10 @@ class HotspotRoutingConfigTest {
                     {"tag": "tun", "protocol": "tun"}
                   ],
                   "outbounds": [{"tag": "proxy", "protocol": "freedom"}],
+                  "dns": {"servers": [
+                    {"address": "192.0.2.53", "domains": ["domain:example.com"], "finalQuery": true},
+                    "https://dns.example/dns-query"
+                  ]},
                   "routing": {"domainStrategy": "AsIs"}
                 }
             """.trimIndent(),
@@ -41,6 +45,11 @@ class HotspotRoutingConfigTest {
         val inbounds = root.getAsJsonArray("inbounds")
         assertEquals(1, inbounds.size())
         assertEquals("tun", inbounds[0].asJsonObject.get("protocol").asString)
+        val dnsServers = root.getAsJsonObject("dns").getAsJsonArray("servers")
+        assertEquals(2, dnsServers.size())
+        assertEquals("192.0.2.53", dnsServers[0].asJsonObject.get("address").asString)
+        assertTrue(dnsServers[0].asJsonObject.get("finalQuery").asBoolean)
+        assertEquals("https://dns.example/dns-query", dnsServers[1].asString)
         assertTrue(root.has("outbounds"))
         assertTrue(root.has("routing"))
     }
