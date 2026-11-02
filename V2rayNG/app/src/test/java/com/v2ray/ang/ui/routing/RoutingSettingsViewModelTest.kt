@@ -1,10 +1,13 @@
 package com.v2ray.ang.ui.routing
 
 import android.app.Application
+import android.content.Context
+import android.content.res.AssetManager
 import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.JsonUtil
@@ -21,6 +24,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.ByteArrayInputStream
+import java.io.IOException
 
 class RoutingSettingsViewModelTest {
     private lateinit var storage: MMKV
@@ -169,5 +174,65 @@ class RoutingSettingsViewModelTest {
 
         assertEquals(original, saved)
         assertEquals(emptyList<RulesetItem>(), viewModel.getAll())
+    }
+
+    @Test
+    fun presetResetPreservesLockedContentsAndDistinctSameNamedRules() {
+        val locked = RulesetItem(id = "locked", remarks = "Same", locked = true)
+        val other = RulesetItem(id = "other", remarks = "Same")
+        saved = JsonUtil.toJson(listOf(locked, RulesetItem(id = "old")))
+        val context = presetContext(JsonUtil.toJson(listOf(locked.copy(locked = false), other)))
+
+        assertTrue(SettingsManager.resetRoutingRulesetsFromPresets(context, RoutingType.WHITE))
+
+        assertEquals(listOf(locked, other), MmkvManager.decodeRoutingRulesets())
+    }
+
+    @Test
+    fun refusedPresetResetReturnsFalseWithoutPartialIdentityRepairs() {
+        val original = """[{"id":"same","locked":true},{"id":"same","locked":true}]"""
+        saved = original
+        whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
+        val context = presetContext(JsonUtil.toJson(listOf(RulesetItem(id = "new"))))
+
+        mockStatic(Log::class.java).use {
+            assertFalse(SettingsManager.resetRoutingRulesetsFromPresets(context, RoutingType.WHITE))
+        }
+
+        assertEquals(original, saved)
+    }
+
+    @Test
+    fun emptyOrInvalidPresetsReturnFalseWithoutReplacingSavedRules() {
+        val original = JsonUtil.toJson(listOf(RulesetItem(id = "keep")))
+        saved = original
+
+        mockStatic(Log::class.java).use {
+            for (content in listOf("", "[]", "null", "invalid JSON")) {
+                assertFalse(SettingsManager.resetRoutingRulesetsFromPresets(presetContext(content), RoutingType.WHITE))
+                assertEquals(original, saved)
+            }
+        }
+        verify(storage, never()).encode(any<String>(), any<String>())
+    }
+
+    @Test
+    fun unreadablePresetReturnsFalseWithoutWriting() {
+        val context = presetContext("")
+        whenever(context.assets.open(RoutingType.WHITE.fileName)).thenThrow(IOException("Asset unavailable"))
+
+        mockStatic(Log::class.java).use {
+            assertFalse(SettingsManager.resetRoutingRulesetsFromPresets(context, RoutingType.WHITE))
+        }
+
+        verify(storage, never()).encode(any<String>(), any<String>())
+    }
+
+    private fun presetContext(content: String): Context {
+        val context = mock<Context>()
+        val assets = mock<AssetManager>()
+        whenever(context.assets).thenReturn(assets)
+        whenever(assets.open(RoutingType.WHITE.fileName)).thenAnswer { ByteArrayInputStream(content.toByteArray()) }
+        return context
     }
 }

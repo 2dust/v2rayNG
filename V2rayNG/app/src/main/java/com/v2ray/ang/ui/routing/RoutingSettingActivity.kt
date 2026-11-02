@@ -169,11 +169,17 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
     private fun importPredefined(type: RoutingType) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, type)
-                launch(Dispatchers.Main) {
-                    reloadRules()
-                    toastSuccess(R.string.toast_success)
+                val result = SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, type)
+                withContext(Dispatchers.Main) {
+                    if (result) {
+                        reloadRules()
+                        toastSuccess(R.string.toast_success)
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
             }
