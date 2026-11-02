@@ -418,22 +418,24 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         return true
     }
 
-    protected fun saveServer(state: ServerUiState): Boolean {
-        if (!validateBasicConfig(state)) return false
+    protected fun saveServer(state: ServerUiState) {
+        if (!validateBasicConfig(state)) return
         val config = state.toProfileItem(initialConfig)
-        if (!validateCommonConfig(state, config)) return false
-        if (!validateProtocolConfig(config)) return false
+        if (!validateCommonConfig(state, config)) return
+        if (!validateProtocolConfig(config)) return
 
         config.description = AngConfigManager.generateDescription(config)
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
-        val savedGuid = MmkvManager.encodeServerConfig(editGuid, config)
+        val savedGuid = MmkvManager.encodeServerConfig(editGuid, config) ?: run {
+            toast(R.string.toast_failure)
+            return
+        }
         toastSuccess(R.string.toast_success)
         ProfileEditorResult.run {
             finishSaved(savedGuid, isRunning)
         }
-        return true
     }
 
     @Composable
@@ -502,7 +504,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             toast(R.string.toast_action_not_allowed)
             return
         }
-        MmkvManager.removeServer(guid)
+        if (!MmkvManager.removeServer(guid)) {
+            toast(R.string.toast_failure)
+            return
+        }
         ProfileEditorResult.run {
             finishDeleted(guid)
         }
