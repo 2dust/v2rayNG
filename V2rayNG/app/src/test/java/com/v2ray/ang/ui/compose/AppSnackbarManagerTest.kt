@@ -125,6 +125,39 @@ class AppSnackbarManagerTest {
     }
 
     @Test
+    fun returningToAnAlreadyRegisteredHostDoesNotReplayShownFeedback() {
+        manager.setForeground(true)
+        manager.register("main")
+        manager.register("updates")
+        manager.show(UserMessage("Checking for update"))
+        manager.onPresented("updates", manager.hostState.currentSnackbarData!!)
+        manager.show(UserMessage("Finished"))
+
+        manager.unregister("updates")
+
+        assertEquals("main", manager.activeHost.value)
+        assertEquals("Finished", manager.hostState.currentSnackbarData?.visuals?.message)
+        assertTrue(notifications.isEmpty())
+    }
+
+    @Test
+    fun returningToAnAlreadyRegisteredHostRetainsAnErrorRequiringDismissal() {
+        manager.setForeground(true)
+        manager.register("main")
+        manager.register("editor")
+        manager.show(UserMessage("Error\nDetails", type = UserMessage.Type.ERROR))
+        val error = manager.hostState.currentSnackbarData!!
+        manager.onPresented("editor", error)
+
+        manager.unregister("editor")
+
+        assertEquals("main", manager.activeHost.value)
+        assertSame(error, manager.hostState.currentSnackbarData)
+        assertEquals(SnackbarDuration.Indefinite, error.visuals.duration)
+        assertTrue(notifications.isEmpty())
+    }
+
+    @Test
     fun finishingBeforePresentationKeepsTheMessageForTheNextScreen() {
         manager.setForeground(true)
         manager.register("editor")

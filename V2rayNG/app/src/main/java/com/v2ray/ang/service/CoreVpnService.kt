@@ -90,7 +90,7 @@ class CoreVpnService : VpnService(), ServiceControl {
         LogUtil.i(AppConfig.TAG, "StartCore-VPN: Service command received, systemVpnStart=$isSystemVpnStart")
         if (!setupVpnService()) {
             unlockStart()
-            MessageHelper.sendServiceEvent(this, AppConfig.MSG_STATE_START_FAILURE, "VPN setup failed")
+            MessageHelper.sendServiceEvent(this, AppConfig.MSG_STATE_START_FAILURE)
             // Stop service if setup fails to avoid infinite restart loops (START_STICKY)
             stopSelf()
             return START_NOT_STICKY

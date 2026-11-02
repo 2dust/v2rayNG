@@ -85,21 +85,25 @@ class AppSnackbarManager(
         private set
 
     internal fun register(host: String) {
-        presentation?.let { (previousHost, snackbar) ->
-            // Do not replay already-shown transient feedback on a different screen.
-            // Unseen queued messages and errors requiring dismissal still follow navigation.
-            if (previousHost != host && snackbar.visuals.duration != SnackbarDuration.Indefinite) {
-                snackbar.dismiss()
-                presentation = null
-            }
-        }
         hosts.add(host)
-        _activeHost.value = host
+        activateHost(host)
     }
 
     internal fun unregister(host: String) {
         hosts.remove(host)
-        _activeHost.value = hosts.lastOrNull()
+        activateHost(hosts.lastOrNull())
+    }
+
+    private fun activateHost(host: String?) {
+        presentation?.let { (previousHost, snackbar) ->
+            // Do not replay already-shown transient feedback on a different screen.
+            // Unseen queued messages and errors requiring dismissal still follow navigation.
+            if (host != null && previousHost != host && snackbar.visuals.duration != SnackbarDuration.Indefinite) {
+                snackbar.dismiss()
+                presentation = null
+            }
+        }
+        _activeHost.value = host
     }
 
     internal fun onPresented(host: String, snackbar: SnackbarData) {
