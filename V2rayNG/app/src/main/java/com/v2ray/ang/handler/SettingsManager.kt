@@ -3,7 +3,6 @@ package com.v2ray.ang.handler
 import android.content.Context
 import android.content.res.AssetManager
 import android.os.Build
-import android.text.TextUtils
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
@@ -65,7 +64,7 @@ object SettingsManager {
      */
     private fun getPresetRoutingRulesets(context: Context, type: RoutingType = RoutingType.WHITE): MutableList<RulesetItem>? {
         val assets = Utils.readTextFromAssets(context, type.fileName)
-        if (TextUtils.isEmpty(assets)) {
+        if (assets.isEmpty()) {
             return null
         }
 
@@ -77,9 +76,10 @@ object SettingsManager {
      * @param context The application context.
      * @param type The routing preset type.
      */
-    fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType) {
-        val rulesetList = getPresetRoutingRulesets(context, type) ?: return
-        resetRoutingRulesetsCommon(rulesetList)
+    fun resetRoutingRulesetsFromPresets(context: Context, type: RoutingType): Boolean {
+        val rulesetList = getPresetRoutingRulesets(context, type)
+        if (rulesetList.isNullOrEmpty()) return false
+        return resetRoutingRulesetsCommon(rulesetList)
     }
 
     /**
@@ -98,8 +98,7 @@ object SettingsManager {
                 return false
             }
 
-            resetRoutingRulesetsCommon(rulesetList)
-            return true
+            return resetRoutingRulesetsCommon(rulesetList)
         } catch (e: Exception) {
             LogUtil.e(ANG_PACKAGE, "Failed to reset routing rulesets", e)
             return false
@@ -110,16 +109,14 @@ object SettingsManager {
      * Common method to reset routing rulesets.
      * @param rulesetList The list of rulesets.
      */
-    private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
-        val rulesetNew: MutableList<RulesetItem> = mutableListOf()
-        MmkvManager.decodeRoutingRulesets()?.forEach { key ->
-            if (key.locked == true) {
-                rulesetNew.add(key)
-            }
+    private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>): Boolean {
+        return try {
+            MmkvManager.resetRoutingRulesets(rulesetList)
+            true
+        } catch (e: Exception) {
+            LogUtil.e(ANG_PACKAGE, "Failed to persist routing ruleset reset", e)
+            false
         }
-
-        rulesetNew.addAll(rulesetList)
-        MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
     /**
