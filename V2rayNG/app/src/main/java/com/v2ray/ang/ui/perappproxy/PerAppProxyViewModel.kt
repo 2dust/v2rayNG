@@ -46,10 +46,23 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     )
     val bypassApps: StateFlow<Boolean> = _bypassApps.asStateFlow()
 
-    // Cached full list for filtering
-    private var appsAll: List<AppInfo>? = null
+    // Keep the full installed-app snapshot available when the visible list is filtered.
+    private val _appsAll = MutableStateFlow<List<AppInfo>?>(null)
+    val appsAll: StateFlow<List<AppInfo>?> = _appsAll.asStateFlow()
+    private val _routingMode = MutableStateFlow(readRoutingMode())
+    internal val routingMode: StateFlow<PerAppRoutingMode> = _routingMode.asStateFlow()
     private var currentQuery = ""
     private var isAppListLoading = false
+
+    fun refreshRoutingMode() {
+        _routingMode.value = readRoutingMode()
+    }
+
+    private fun readRoutingMode(): PerAppRoutingMode = when {
+        SettingsManager.isRootMode() -> PerAppRoutingMode.ROOT
+        SettingsManager.isVpnMode() -> PerAppRoutingMode.VPN
+        else -> PerAppRoutingMode.PROXY_ONLY
+    }
 
     // Blacklist operations
     fun toggle(packageName: String) {
@@ -91,7 +104,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
 
     // Load and filter apps
     fun loadApps(context: Context) {
-        if (appsAll != null || isAppListLoading) return
+        if (_appsAll.value != null || isAppListLoading) return
 
         val applicationContext = context.applicationContext
         isAppListLoading = true
@@ -101,7 +114,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
                     val list = AppManagerUtil.loadNetworkAppList(applicationContext)
                     sortApps(list)
                 }
-                appsAll = apps
+                _appsAll.value = apps
                 _displayedApps.value = applyFilter(currentQuery)
             } catch (e: CancellationException) {
                 throw e
@@ -119,7 +132,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     }
 
     private fun applyFilter(query: String): List<AppInfo> {
-        val apps = appsAll ?: return emptyList()
+        val apps = _appsAll.value ?: return emptyList()
         if (query.isEmpty()) return apps
 
         return apps.filter {
@@ -230,7 +243,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     }
 
     private suspend fun applyProxyAppList(content: String, context: Context, forceGoogleApps: Boolean): Boolean {
-        val installedApps = appsAll ?: return false
+        val installedApps = _appsAll.value ?: return false
 
         try {
             val proxyAppList = if (content.isEmpty()) {
