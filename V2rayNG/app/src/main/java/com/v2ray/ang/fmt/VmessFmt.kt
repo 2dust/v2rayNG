@@ -30,7 +30,7 @@ object VmessFmt : FmtBase() {
         var result = str.replace(EConfigType.VMESS.protocolScheme, "")
         result = Utils.decode(result)
         if (TextUtils.isEmpty(result)) {
-            LogUtil.w(AppConfig.TAG, "Toast decoding failed")
+            LogUtil.w(AppConfig.TAG, "VmessFmt: decoded configuration is empty")
             return null
         }
         val vmessQRCode = JsonUtil.fromJson(result, VmessQRCode::class.java) ?: return null
@@ -40,7 +40,7 @@ object VmessFmt : FmtBase() {
             || TextUtils.isEmpty(vmessQRCode.id)
             || TextUtils.isEmpty(vmessQRCode.net)
         ) {
-            LogUtil.w(AppConfig.TAG, "Toast incorrect protocol")
+            LogUtil.w(AppConfig.TAG, "VmessFmt: configuration is missing required fields")
             return null
         }
 
