@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -58,6 +59,7 @@ fun MainBottomBar(
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
+        val serviceActionLabel = stringResource(if (isRunning) R.string.acc_disconnect else R.string.acc_connect)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,7 +101,8 @@ fun MainBottomBar(
                 .align(Alignment.TopEnd)
                 .padding(end = 24.dp)
                 .offset(y = (-28).dp)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .semantics { onClick(label = serviceActionLabel, action = null) },
             containerColor = if (isRunning) colorFabActive
             else if (isDarkTheme) colorFabInactiveDark
             else colorFabInactiveLight
