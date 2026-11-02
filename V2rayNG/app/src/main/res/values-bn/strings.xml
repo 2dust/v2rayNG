@@ -347,6 +347,7 @@
     <string name="title_sub_update">সাবস্ক্রিপশন আপডেট</string>
     <string name="title_ping_all_server">TCP বিলম্ব পরীক্ষা করুন (TCPing)</string>
     <string name="title_real_ping_all_server">প্রকৃত বিলম্ব পরীক্ষা করুন</string>
+    <string name="title_test_real_ping_and_sort">প্রকৃত বিলম্ব পরীক্ষা করে সাজান</string>
     <string name="title_user_asset_setting">অ্যাসেট ফাইল</string>
     <string name="title_sort_by_test_results">টেস্ট ফলাফল দ্বারা সাজানো</string>
     <string name="title_filter_config">কনফিগারেশন ফাইল ফিল্টার করুন</string>
@@ -439,6 +440,12 @@
     <string name="title_policy_group_subscription_filter">মন্তব্যের রেগুলার এক্সপ্রেশন ফিল্টার</string>
     <string name="title_policy_group_test_outbounds">বহির্গামী সংযোগ পরীক্ষা করুন (outbounds)</string>
     <string name="title_policy_group_fallback">বিকল্প বহির্গামী সংযোগ (outbound, ঐচ্ছিক)</string>
+    <string name="title_policy_group_auto_sort">স্বয়ংক্রিয় পরীক্ষা ও সাজানো</string>
+    <string name="summary_policy_group_auto_sort">প্রক্সি চালু থাকা অবস্থায় পর্যায়ক্রমে প্রকৃত বিলম্ব পরীক্ষা করে এই সাবস্ক্রিপশন সাজায়। ছোট বিরতিতে ব্যাটারি, ডেটা ও CPU বেশি ব্যবহৃত হয়।</string>
+    <string name="title_policy_group_auto_sort_interval">রিফ্রেশের বিরতি</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d মিনিট</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">স্বয়ংক্রিয়ভাবে সাজানো চালু করার আগে একটি নির্দিষ্ট সাবস্ক্রিপশন বেছে নিন।</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">স্বয়ংক্রিয় সাজানোর জন্য প্রক্সি-ভিত্তিক ব্যাকআপ আউটবাউন্ড প্রয়োজন; সরাসরি সংযোগ বা ব্লক অনুমোদিত নয়।</string>
 
     <string name="server_proxy_chain_members">প্রক্সি চেইনের সদস্য</string>
     <string name="server_proxy_chain_pick_members">সদস্য বাছতে এখানে ট্যাপ করুন</string>

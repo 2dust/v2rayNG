@@ -16,10 +16,13 @@ import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.OutboundTrafficStat
+import com.v2ray.ang.dto.RealPingEvent
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.AutoSortPolicy
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -28,11 +31,13 @@ import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
+import com.v2ray.ang.service.RealPingWorkerService
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.ensureActive
@@ -43,6 +48,7 @@ import libv2ray.CoreController
 import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
 
 object CoreServiceManager {
 
@@ -53,6 +59,13 @@ object CoreServiceManager {
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
     private val connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val autoSortScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val autoSortCoordinator = AutoSortCoordinator(
+        scope = autoSortScope,
+        planProvider = ::buildAutoSortPlan,
+        batchRunner = ::runAutoSortBatch,
+        resultCommitter = ::commitAutoSortResults,
+    )
 
     @Volatile
     private var isReloading = false
@@ -104,6 +117,7 @@ object CoreServiceManager {
             doStartCoreLoop(service, vpnInterface)
             return true
         } catch (e: Exception) {
+            autoSortCoordinator.stop()
             val message = e.message?.takeUnless { it.isBlank() } ?: e.javaClass.simpleName
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: $message", e)
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, message)
@@ -123,6 +137,7 @@ object CoreServiceManager {
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
         startNetworkMonitor(service)
+        autoSortCoordinator.start()
     }
 
     @Throws(Exception::class)
@@ -190,6 +205,7 @@ object CoreServiceManager {
      * @return True if the core was stopped successfully, false otherwise.
      */
     fun stopCoreLoop(): Boolean {
+        autoSortCoordinator.stop()
         connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
 
@@ -261,11 +277,13 @@ object CoreServiceManager {
             val tunFd = currentVpnInterface
 
             isReloading = true
+            autoSortCoordinator.stop()
             connectionTestScope.coroutineContext.cancelChildren()
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload start...")
 
             coreController.stopLoop()
             launchCore(service, tunFd, isReload = true)
+            autoSortCoordinator.start()
 
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Core reload finished")
             true
@@ -277,6 +295,157 @@ object CoreServiceManager {
         } finally {
             isReloading = false
         }
+    }
+
+    private fun buildAutoSortPlan(): AutoSortPlan? {
+        if (isReloading || !isRunning()) return null
+
+        return try {
+            val policyGroupGuid = MmkvManager.getSelectServer() ?: return null
+            val policyGroup = MmkvManager.decodeServerConfig(policyGroupGuid) ?: return null
+            if (!AutoSortPolicy.shouldRun(policyGroupGuid, policyGroupGuid, policyGroup, isRunning())) {
+                return null
+            }
+
+            val subscriptionId = policyGroup.policyGroupSubscriptionId
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?: return null
+            val candidateGuids = MmkvManager.decodeServerList(subscriptionId)
+                .asSequence()
+                .filter { it != policyGroupGuid }
+                .filter { guid ->
+                    MmkvManager.decodeServerConfig(guid)?.let(AutoSortPolicy::isTestableNode) == true
+                }
+                .toList()
+
+            AutoSortPlan(
+                policyGroupGuid = policyGroupGuid,
+                subscriptionId = subscriptionId,
+                intervalMinutes = AutoSortPolicy.normalizedInterval(
+                    policyGroup.policyGroupSortIntervalMinutes
+                ),
+                candidateGuids = candidateGuids,
+            )
+        } catch (e: Exception) {
+            LogUtil.e(
+                AppConfig.TAG,
+                "AutoSort: run-mode=${autoSortRunMode()} operation=build-plan",
+                e,
+            )
+            null
+        }
+    }
+
+    private suspend fun runAutoSortBatch(plan: AutoSortPlan): Map<String, Long>? {
+        if (isReloading) return null
+        val service = getService() ?: return null
+        val results = ConcurrentHashMap<String, Long>()
+        val worker = RealPingWorkerService(
+            context = service,
+            guids = plan.candidateGuids,
+            onlyTcp = false,
+            onEvent = { event ->
+                if (event is RealPingEvent.Result) {
+                    results[event.guid] = event.delayMillis
+                }
+            },
+        )
+
+        return try {
+            worker.start()
+            worker.awaitCompletion()
+            results.toMap()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            LogUtil.e(
+                AppConfig.TAG,
+                "AutoSort: run-mode=${autoSortRunMode()} operation=measure " +
+                        "policyGroup=${plan.policyGroupGuid} subscription=${plan.subscriptionId}",
+                e,
+            )
+            null
+        } finally {
+            worker.cancel()
+            withContext(NonCancellable) {
+                worker.awaitCompletion()
+            }
+        }
+    }
+
+    private fun commitAutoSortResults(plan: AutoSortPlan, results: Map<String, Long>): Boolean {
+        if (isReloading || !isRunning()) return false
+        if (MmkvManager.getSelectServer() != plan.policyGroupGuid) return false
+
+        val currentPolicyGroup = MmkvManager.decodeServerConfig(plan.policyGroupGuid) ?: return false
+        if (
+            !AutoSortPolicy.shouldRun(
+                plan.policyGroupGuid,
+                plan.policyGroupGuid,
+                currentPolicyGroup,
+                isRunning(),
+            )
+        ) {
+            return false
+        }
+        if (currentPolicyGroup.policyGroupSubscriptionId?.trim() != plan.subscriptionId) return false
+
+        val previousDelays = plan.candidateGuids.associateWith { guid ->
+            MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
+        }
+        try {
+            plan.candidateGuids.forEach { guid ->
+                MmkvManager.encodeServerTestDelayMillis(guid, results.getValue(guid))
+            }
+            AngConfigManager.sortByTestResultsForSub(
+                subId = plan.subscriptionId,
+                pinnedGuid = plan.policyGroupGuid,
+            )
+        } catch (e: Exception) {
+            previousDelays.forEach { (guid, delayMillis) ->
+                runCatching {
+                    MmkvManager.encodeServerTestDelayMillis(guid, delayMillis)
+                }.onFailure { restoreError ->
+                    LogUtil.e(
+                        AppConfig.TAG,
+                        "AutoSort: run-mode=${autoSortRunMode()} operation=restore " +
+                                "policyGroup=${plan.policyGroupGuid} subscription=${plan.subscriptionId} " +
+                                "guid=$guid",
+                        restoreError,
+                    )
+                }
+            }
+            LogUtil.e(
+                AppConfig.TAG,
+                "AutoSort: run-mode=${autoSortRunMode()} operation=commit " +
+                        "policyGroup=${plan.policyGroupGuid} subscription=${plan.subscriptionId}",
+                e,
+            )
+            return false
+        }
+
+        getService()?.let { service ->
+            MessageHelper.sendMsg2UI(
+                service,
+                AppConfig.MSG_AUTO_SORT_COMPLETE,
+                plan.subscriptionId,
+                plan.policyGroupGuid,
+            )
+        }
+        LogUtil.i(
+            AppConfig.TAG,
+            "AutoSort: run-mode=${autoSortRunMode()} operation=complete " +
+                    "policyGroup=${plan.policyGroupGuid} subscription=${plan.subscriptionId} " +
+                    "nodes=${plan.candidateGuids.size}",
+        )
+        return true
+    }
+
+    private fun autoSortRunMode(): String = when {
+        SettingsManager.isRootMode() -> "root"
+        SettingsManager.isVpnMode() -> "vpn"
+        else -> "proxy"
     }
 
     /**

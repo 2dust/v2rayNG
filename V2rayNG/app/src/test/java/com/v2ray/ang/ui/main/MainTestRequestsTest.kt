@@ -59,4 +59,14 @@ class MainTestRequestsTest {
         assertEquals(bulk, requests.completeBulk(bulk.id))
         assertFalse(requests.isTesting)
     }
+
+    @Test
+    fun combinedTestRequestKeepsItsSortIntentAcrossReplacementChecks() {
+        val requests = MainTestRequests()
+        val request = requests.beginBulk("group", sortOnFinish = true)
+
+        assertTrue(request.sortOnFinish)
+        assertEquals(request, requests.bulk)
+        assertEquals(request, requests.completeBulk(request.id))
+    }
 }

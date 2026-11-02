@@ -347,6 +347,7 @@
     <string name="title_sub_update">Cập nhật gói đăng ký</string>
     <string name="title_ping_all_server">Kiểm tra độ trễ TCP (TCPing)</string>
     <string name="title_real_ping_all_server">Kiểm tra độ trễ thực</string>
+    <string name="title_test_real_ping_and_sort">Kiểm tra độ trễ thực và sắp xếp</string>
     <string name="title_user_asset_setting">Tệp tài nguyên</string>
     <string name="title_sort_by_test_results">Sắp xếp theo kết quả kiểm tra</string>
     <string name="title_filter_config">Lọc cấu hình</string>
@@ -437,6 +438,12 @@
     <string name="title_policy_group_subscription_filter">Bộ lọc biểu thức chính quy cho tên ghi chú</string>
     <string name="title_policy_group_test_outbounds">Kiểm tra các kết nối đi (outbounds)</string>
     <string name="title_policy_group_fallback">Kết nối dự phòng (outbound, tùy chọn)</string>
+    <string name="title_policy_group_auto_sort">Tự động kiểm tra và sắp xếp</string>
+    <string name="summary_policy_group_auto_sort">Định kỳ kiểm tra độ trễ thực và sắp xếp đăng ký này khi proxy đang chạy. Khoảng thời gian ngắn làm tăng mức tiêu thụ pin, dữ liệu và CPU.</string>
+    <string name="title_policy_group_auto_sort_interval">Khoảng thời gian làm mới</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d phút</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">Chọn một đăng ký cụ thể trước khi bật tự động sắp xếp.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">Tự động sắp xếp cần outbound dự phòng qua proxy; không cho phép kết nối trực tiếp hoặc chặn.</string>
 
     <string name="server_proxy_chain_members">Thành viên chuỗi proxy</string>
     <string name="server_proxy_chain_pick_members">Chạm vào đây để chọn thành viên</string>

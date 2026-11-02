@@ -577,22 +577,33 @@ object AngConfigManager {
      * Sorts servers by test results for a subscription.
      *
      * @param subId The subscription ID.
+     * @param pinnedGuid Optional GUID kept first, normally the selected policy group.
      */
-    fun sortByTestResultsForSub(subId: String) {
+    fun sortByTestResultsForSub(subId: String, pinnedGuid: String? = null) {
         val serverList = MmkvManager.decodeServerList(subId)
         if (serverList.isEmpty()) return
 
-        val sorted = serverList
-            .map { guid ->
-                val delay =
-                    MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
-                guid to if (delay <= 0L) Long.MAX_VALUE else delay
-            }
-            .sortedBy { it.second }
-            .map { it.first }
-            .toMutableList()
+        val sorted = sortGuidsByTestResults(serverList, pinnedGuid) { guid ->
+            MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
+        }.toMutableList()
         MmkvManager.encodeServerList(sorted, subId)
     }
+
+    internal fun sortGuidsByTestResults(
+        guids: List<String>,
+        pinnedGuid: String? = null,
+        delayForGuid: (String) -> Long,
+    ): List<String> = guids
+        .withIndex()
+        .sortedWith(
+            compareBy<IndexedValue<String>> {
+                if (it.value == pinnedGuid) 0 else 1
+            }.thenBy {
+                if (it.value == pinnedGuid) 0L
+                else delayForGuid(it.value).takeIf { delay -> delay > 0L } ?: Long.MAX_VALUE
+            }.thenBy { it.index }
+        )
+        .map { it.value }
 
     /**
      * Parses the configuration via a subscription.

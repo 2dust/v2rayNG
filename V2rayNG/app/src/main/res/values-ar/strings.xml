@@ -347,6 +347,7 @@
     <string name="title_sub_update">تحديث الاشتراك</string>
     <string name="title_ping_all_server">اختبار تأخير TCP (TCPing)</string>
     <string name="title_real_ping_all_server">اختبار زمن الاستجابة الفعلي</string>
+    <string name="title_test_real_ping_and_sort">اختبار زمن الاستجابة الفعلي والفرز</string>
     <string name="title_user_asset_setting">ملفات الأصول</string>
     <string name="title_sort_by_test_results">الفرز حسب نتائج الاختبار</string>
     <string name="title_filter_config">تصفية ملف التكوين</string>
@@ -447,6 +448,12 @@
     <string name="title_policy_group_subscription_filter">مرشح تعبير نمطي للملاحظات</string>
     <string name="title_policy_group_test_outbounds">اختبار الاتصالات الصادرة (outbounds)</string>
     <string name="title_policy_group_fallback">الاتصال الصادر الاحتياطي (outbound، اختياري)</string>
+    <string name="title_policy_group_auto_sort">اختبار تلقائي وفرز</string>
+    <string name="summary_policy_group_auto_sort">يختبر زمن الاستجابة الفعلي دوريًا ويفرز هذا الاشتراك أثناء تشغيل الوكيل. الفواصل الأقصر تزيد استهلاك البطارية والبيانات والمعالج.</string>
+    <string name="title_policy_group_auto_sort_interval">فاصل التحديث</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d دقيقة</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">اختر اشتراكًا محددًا قبل تمكين الفرز التلقائي.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">يتطلب الفرز التلقائي خروجًا احتياطيًا عبر الوكيل؛ لا يُسمح بالاتصال المباشر أو الحظر.</string>
 
     <string name="server_proxy_chain_members">أعضاء سلسلة الوكيل</string>
     <string name="server_proxy_chain_pick_members">اضغط هنا لاختيار عضو</string>

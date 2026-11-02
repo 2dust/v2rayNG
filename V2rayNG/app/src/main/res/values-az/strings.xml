@@ -347,6 +347,7 @@
     <string name="title_sub_update">Abunəliyi yenilə</string>
     <string name="title_ping_all_server">TCP gecikmələrini sınaqdan keçir (TCPing)</string>
     <string name="title_real_ping_all_server">Real gecikmələri sınaqdan keçir</string>
+    <string name="title_test_real_ping_and_sort">Real gecikməni sına və sırala</string>
     <string name="title_user_asset_setting">Resurs faylları</string>
     <string name="title_sort_by_test_results">Sınaq nəticələrinə görə çeşidlə</string>
     <string name="title_filter_config">Konfiqurasiyaları filtrdən keçir</string>
@@ -439,6 +440,12 @@
     <string name="title_policy_group_subscription_filter">Qeydlərin regex filtri</string>
     <string name="title_policy_group_test_outbounds">Çıxışları sınaqdan keçir</string>
     <string name="title_policy_group_fallback">Ehtiyat çıxışı (istəyə bağlı)</string>
+    <string name="title_policy_group_auto_sort">Avtomatik sına və sırala</string>
+    <string name="summary_policy_group_auto_sort">Proksinin işləməsi zamanı real gecikməni dövri sına və bu abunəliyi sırala. Qısa intervallar batareya, məlumat və CPU sərfiyyatını artırır.</string>
+    <string name="title_policy_group_auto_sort_interval">Yeniləmə intervalı</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d dəq</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">Avtomatik sıralamanı aktivləşdirməzdən əvvəl konkret abunəlik seçin.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">Avtomatik sıralama üçün proxy üzərindən ehtiyat çıxış tələb olunur; birbaşa və bloklamaya icazə verilmir.</string>
 
     <string name="server_proxy_chain_members">Proksi zənciri üzvləri</string>
     <string name="server_proxy_chain_pick_members">Üzv seçmək üçün bura toxunun</string>
