@@ -5,6 +5,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.ui.compose.FormTextField
@@ -77,8 +78,11 @@ class ServerWireguardActivity : BaseServerActivity() {
         FormTextField(
             stringResource(R.string.server_lab_remote_dns),
             state.remoteDNS,
-            { state.remoteDNS = it }
+            { state.remoteDNS = it },
+            supportingText = stringResource(
+                R.string.server_lab_remote_dns_hint,
+                AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
+            )
         )
     }
 }
-
