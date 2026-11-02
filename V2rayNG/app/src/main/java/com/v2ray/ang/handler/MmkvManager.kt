@@ -817,6 +817,15 @@ object MmkvManager {
         check(writeRoutingRulesets(rules)) { "Failed to delete routing rule $ruleId" }
     }
 
+    /** Retain locked identities once when replacing the remaining rules from an import or preset. */
+    fun resetRoutingRulesets(rulesetList: List<RulesetItem>) = withRoutingRulesetLock {
+        val retained = withUniqueRoutingRuleIds(decodeRoutingRulesets().orEmpty())
+            .filter { it.locked == true }
+        val retainedIds = retained.mapTo(mutableSetOf()) { it.id }
+        val replacement = retained + rulesetList.filterNot { it.id in retainedIds }
+        check(writeRoutingRulesets(withUniqueRoutingRuleIds(replacement))) { "Failed to reset routing rules" }
+    }
+
     /**
      * Encodes the routing rulesets.
      *

@@ -111,15 +111,7 @@ object SettingsManager {
      * @param rulesetList The list of rulesets.
      */
     private fun resetRoutingRulesetsCommon(rulesetList: MutableList<RulesetItem>) {
-        val rulesetNew: MutableList<RulesetItem> = mutableListOf()
-        MmkvManager.decodeRoutingRulesets()?.forEach { key ->
-            if (key.locked == true) {
-                rulesetNew.add(key)
-            }
-        }
-
-        rulesetNew.addAll(rulesetList)
-        MmkvManager.encodeRoutingRulesets(rulesetNew)
+        MmkvManager.resetRoutingRulesets(rulesetList)
     }
 
     /**

@@ -125,7 +125,7 @@ class RoutingSettingsViewModelTest {
     }
 
     @Test
-    fun reimportWithLockedDuplicatesKeepsEveryRowAddressable() = runBlocking<Unit> {
+    fun reimportWithLockedDuplicatesRetainsEachLockedRuleExactlyOnce() = runBlocking<Unit> {
         val exported = """[{"id":"same","remarks":"Locked","locked":true},{"id":"same","remarks":"Locked","locked":true},{"remarks":"Other"}]"""
         saved = exported
         viewModel.reload()
@@ -135,7 +135,36 @@ class RoutingSettingsViewModelTest {
             viewModel.reload()
             val loaded = viewModel.getAll()
             assertEquals(retainedIds, loaded.take(retainedIds.size).map { it.id })
+            assertEquals(3, loaded.size)
+            assertEquals(2, loaded.count { it.locked == true })
             assertEquals(loaded.size, loaded.map { it.id }.toSet().size)
         }
+    }
+
+    @Test
+    fun importingAnEditedLockedIdentityPreservesTheSavedRuleAndOtherSameNamedRules() = runBlocking<Unit> {
+        val locked = RulesetItem(id = "locked", remarks = "Same", domain = listOf("saved.example"), locked = true)
+        val replacement = RulesetItem(id = "other", remarks = "Same")
+        saved = JsonUtil.toJson(listOf(locked, RulesetItem(id = "old")))
+        viewModel.reload()
+
+        assertTrue(SettingsManager.resetRoutingRulesets(JsonUtil.toJson(listOf(locked.copy(locked = false), replacement))))
+        viewModel.reload()
+
+        assertEquals(listOf(locked, replacement), viewModel.getAll())
+        assertEquals(listOf(locked, replacement), MmkvManager.decodeRoutingRulesets())
+    }
+
+    @Test
+    fun refusedResetDoesNotPersistPartialIdentityRepairsOrReplaceVisibleRules() = runBlocking<Unit> {
+        val original = """[{"id":"same","locked":true},{"id":"same","locked":true}]"""
+        saved = original
+        whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
+
+        assertTrue(runCatching { MmkvManager.resetRoutingRulesets(listOf(RulesetItem(id = "new"))) }
+            .exceptionOrNull() is IllegalStateException)
+
+        assertEquals(original, saved)
+        assertEquals(emptyList<RulesetItem>(), viewModel.getAll())
     }
 }
