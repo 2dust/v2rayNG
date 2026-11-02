@@ -8,18 +8,23 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Bundle
 import android.os.ParcelFileDescriptor
+import android.os.ResultReceiver
 import android.system.OsConstants
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
-import com.v2ray.ang.dto.ConnectionTestResult
+import com.v2ray.ang.dto.CoreUrlDownloadRequest
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BrowserDialerMode
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isNotNullEmpty
+import com.v2ray.ang.extension.serializable
+import com.v2ray.ang.handler.CoreDownloadManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -35,6 +40,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +54,8 @@ object CoreServiceManager {
 
     private val coreController: CoreController = CoreNativeManager.newCoreController(CoreCallback())
     private val mMsgReceive = ReceiveMessageHandler()
+    private val screenStateReceiver = ScreenStateReceiver()
+    private var urlDownloadScope: CoroutineScope? = null
     private var currentConfig: ProfileItem? = null
     private var processFinder: XrayProcessFinder? = null
     private var browserDialer: IDialerService? = null
@@ -114,11 +122,23 @@ object CoreServiceManager {
 
     @Throws(Exception::class)
     private fun doStartCoreLoop(service: Service, vpnInterface: ParcelFileDescriptor?) {
-        val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-        mFilter.addAction(Intent.ACTION_SCREEN_ON)
-        mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-        mFilter.addAction(Intent.ACTION_USER_PRESENT)
-        ContextCompat.registerReceiver(service, mMsgReceive, mFilter, Utils.receiverFlags())
+        ContextCompat.registerReceiver(
+            service,
+            mMsgReceive,
+            IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        val screenStateFilter = IntentFilter(Intent.ACTION_SCREEN_ON).apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+        }
+        ContextCompat.registerReceiver(
+            service,
+            screenStateReceiver,
+            screenStateFilter,
+            Utils.receiverFlags(),
+        )
+        urlDownloadScope?.cancel()
+        urlDownloadScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
@@ -191,6 +211,8 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
+        urlDownloadScope?.cancel()
+        urlDownloadScope = null
         val service = getService() ?: return false
 
         networkMonitor?.unregister()
@@ -221,6 +243,11 @@ object CoreServiceManager {
             service.unregisterReceiver(mMsgReceive)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
+        }
+        try {
+            service.unregisterReceiver(screenStateReceiver)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister screen receiver", e)
         }
 
         return true
@@ -345,13 +372,16 @@ object CoreServiceManager {
             }
 
             ensureActive()
-            val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
-            val result = ConnectionTestResult(
-                delayMillis = time,
-                errorMessage = errorStr,
-                country = endpoint?.country,
-                ipAddress = endpoint?.ipAddress,
-            )
+            val result = SpeedtestManager.buildConnectionTestResult(time, errorStr) {
+                val fetchViaCore = if (SettingsManager.shouldUseCoreForAppRequests()) {
+                    { url: String ->
+                        coreController.getUrlContent(url, currentOutboundTag())
+                    }
+                } else {
+                    null
+                }
+                SpeedtestManager.getRemoteIPInfo(fetchViaCore)
+            }
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
@@ -363,6 +393,47 @@ object CoreServiceManager {
             if (cause is CancellationException) {
                 MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
             }
+        }
+    }
+
+    private fun currentOutboundTag(): String =
+        if (currentConfig?.configType == EConfigType.POLICYGROUP) {
+            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+        } else {
+            AppConfig.TAG_PROXY
+        }
+
+    private fun downloadUrlThroughCore(request: CoreUrlDownloadRequest): Pair<Int, Bundle?> {
+        if (
+            !isRunning() ||
+            !SettingsManager.shouldUseCoreForAppRequests()
+        ) {
+            return Activity.RESULT_CANCELED to null
+        }
+        val service = getService() ?: return Activity.RESULT_CANCELED to null
+        val targetFile = CoreDownloadManager.targetFile(service, request.requestId)
+            ?: return CoreDownloadManager.RESULT_FAILED to null
+        targetFile.delete()
+
+        return try {
+            val headers = coreController.downloadUrlToFileWithHeaders(
+                request.url,
+                currentOutboundTag(),
+                request.headersJson,
+                targetFile.absolutePath,
+                request.timeoutMillis,
+            )
+            if (targetFile.isFile) {
+                Activity.RESULT_OK to Bundle().apply {
+                    putString(CoreUrlDownloadRequest.RESULT_HEADERS, headers)
+                }
+            } else {
+                CoreDownloadManager.RESULT_FAILED to null
+            }
+        } catch (e: Exception) {
+            targetFile.delete()
+            LogUtil.e(AppConfig.TAG, "Failed to download URL through core", e)
+            CoreDownloadManager.RESULT_FAILED to null
         }
     }
 
@@ -448,12 +519,12 @@ object CoreServiceManager {
 
     /**
      * Broadcast receiver for handling messages sent to the service.
-     * Handles registration, service control, and screen events.
+     * Handles internal registration and service-control messages.
      */
     private class ReceiveMessageHandler : BroadcastReceiver() {
         /**
          * Handles received broadcast messages.
-         * Processes service control messages and screen state changes.
+         * Processes service-control messages from another process in this app.
          * @param ctx The context in which the receiver is running.
          * @param intent The intent being received.
          */
@@ -503,8 +574,33 @@ object CoreServiceManager {
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
                     measureV2rayDelay(intent.getStringExtra("content").orEmpty())
                 }
-            }
 
+                AppConfig.MSG_DOWNLOAD_URL -> {
+                    if (!isOrderedBroadcast) return
+                    val scope = urlDownloadScope ?: return
+                    val request = intent.serializable<CoreUrlDownloadRequest>("content") ?: return
+                    val resultReceiver = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(
+                            CoreUrlDownloadRequest.EXTRA_RESULT_RECEIVER,
+                            ResultReceiver::class.java,
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra(CoreUrlDownloadRequest.EXTRA_RESULT_RECEIVER)
+                    } ?: return
+                    resultCode = Activity.RESULT_OK
+                    scope.launch {
+                        val (code, data) = downloadUrlThroughCore(request)
+                        ensureActive()
+                        resultReceiver.send(code, data)
+                    }
+                }
+            }
+        }
+    }
+
+    private class ScreenStateReceiver : BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, intent: Intent?) {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")
