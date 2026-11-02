@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.routing
 
 import android.app.Application
+import android.util.Log
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -9,6 +10,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -161,8 +163,9 @@ class RoutingSettingsViewModelTest {
         saved = original
         whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
 
-        assertTrue(runCatching { MmkvManager.resetRoutingRulesets(listOf(RulesetItem(id = "new"))) }
-            .exceptionOrNull() is IllegalStateException)
+        mockStatic(Log::class.java).use {
+            assertFalse(SettingsManager.resetRoutingRulesets(JsonUtil.toJson(listOf(RulesetItem(id = "new")))))
+        }
 
         assertEquals(original, saved)
         assertEquals(emptyList<RulesetItem>(), viewModel.getAll())
