@@ -4,7 +4,11 @@ import java.util.UUID
 
 /** Main-thread request ownership; a late reply must not complete a newer test. */
 internal class MainTestRequests {
-    data class Bulk(val id: String, val groupId: String)
+    data class Bulk(
+        val id: String,
+        val groupId: String,
+        val sortOnFinish: Boolean = false,
+    )
 
     private var current: String? = null
     var bulk: Bulk? = null
@@ -23,7 +27,8 @@ internal class MainTestRequests {
         current = null
     }
 
-    fun beginBulk(groupId: String): Bulk = Bulk(UUID.randomUUID().toString(), groupId).also { bulk = it }
+    fun beginBulk(groupId: String, sortOnFinish: Boolean = false): Bulk =
+        Bulk(UUID.randomUUID().toString(), groupId, sortOnFinish).also { bulk = it }
 
     fun completeBulk(id: String): Bulk? {
         val request = bulk?.takeIf { it.id == id } ?: return null

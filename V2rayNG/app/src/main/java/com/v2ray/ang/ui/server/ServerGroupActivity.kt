@@ -32,6 +32,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.AutoSortPolicy
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -60,6 +61,8 @@ class ServerGroupActivity : BaseComponentActivity() {
     private var initialType: Int = 0
     private var initialSubIndex: Int = 0
     private var initialTestOutbounds: Boolean = false
+    private var initialAutoSortEnabled: Boolean = false
+    private var initialSortIntervalMinutes: Int = AutoSortPolicy.DEFAULT_INTERVAL_MINUTES
     private lateinit var initialFallbackTag: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,8 +79,11 @@ class ServerGroupActivity : BaseComponentActivity() {
         initialRemarks = config?.remarks ?: ""
         initialFilter = config?.policyGroupFilter ?: ""
         initialType = config?.policyGroupType?.toIntOrNull() ?: 0
-        initialTestOutbounds = config == null || config.policyGroupTestOutbounds != false ||
-                !BalancerStrategyType.from(config.policyGroupType).supportsObservatory
+        initialTestOutbounds = config == null || config.policyGroupTestOutbounds != false
+        initialAutoSortEnabled = config?.policyGroupAutoSortEnabled == true
+        initialSortIntervalMinutes = AutoSortPolicy.normalizedInterval(
+            config?.policyGroupSortIntervalMinutes
+        )
         initialFallbackTag = config?.policyGroupFallbackTag.orEmpty()
         initialSubIndex = if (config != null) {
             subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
@@ -97,11 +103,23 @@ class ServerGroupActivity : BaseComponentActivity() {
             initialType = initialType,
             initialSubIndex = initialSubIndex,
             initialTestOutbounds = initialTestOutbounds,
+            initialAutoSortEnabled = initialAutoSortEnabled,
+            initialSortIntervalMinutes = initialSortIntervalMinutes,
             initialFallbackTag = initialFallbackTag,
             fallbackSuggestions = fallbackSuggestions,
             onBackClick = { finish() },
-            onSave = { remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag ->
-                saveServer(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+            onSave = { remarks, filter, typeIdx, subIdx, testOutbounds, autoSortEnabled,
+                sortIntervalMinutes, fallbackTag ->
+                saveServer(
+                    remarks,
+                    filter,
+                    typeIdx,
+                    subIdx,
+                    testOutbounds,
+                    autoSortEnabled,
+                    sortIntervalMinutes,
+                    fallbackTag,
+                )
             },
             onDelete = { deleteServer() }
         )
@@ -113,9 +131,22 @@ class ServerGroupActivity : BaseComponentActivity() {
         typeIdx: Int,
         subIdx: Int,
         testOutbounds: Boolean,
+        autoSortEnabled: Boolean,
+        sortIntervalMinutes: Int,
         fallbackTag: String,
     ): Boolean {
         if (remarks.isBlank()) {
+            return false
+        }
+        val normalizedAutoSortEnabled = autoSortEnabled &&
+                BalancerStrategyType.from(typeIdx.toString()) == BalancerStrategyType.LEAST_PING &&
+                testOutbounds
+        if (normalizedAutoSortEnabled && subIds.getOrNull(subIdx).isNullOrBlank()) {
+            toast(R.string.toast_policy_group_auto_sort_subscription_required)
+            return false
+        }
+        if (normalizedAutoSortEnabled && !AutoSortPolicy.isSafeFallback(fallbackTag)) {
+            toast(R.string.toast_policy_group_auto_sort_unsafe_fallback)
             return false
         }
 
@@ -129,6 +160,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.policyGroupSubscriptionId =
             subIds.getOrNull(subIdx)
         config.policyGroupTestOutbounds = testOutbounds
+        config.policyGroupAutoSortEnabled = normalizedAutoSortEnabled
+        config.policyGroupSortIntervalMinutes = AutoSortPolicy.normalizedInterval(
+            sortIntervalMinutes
+        )
         config.policyGroupFallbackTag = fallbackTag.trim().takeIf { it.isNotEmpty() }
 
         if (
@@ -217,13 +252,19 @@ fun ServerGroupScreen(
     initialType: Int,
     initialSubIndex: Int,
     initialTestOutbounds: Boolean,
+    initialAutoSortEnabled: Boolean,
+    initialSortIntervalMinutes: Int,
     initialFallbackTag: String,
     fallbackSuggestions: List<String>,
     onBackClick: () -> Unit,
-    onSave: (String, String, Int, Int, Boolean, String) -> Boolean,
+    onSave: (String, String, Int, Int, Boolean, Boolean, Int, String) -> Boolean,
     onDelete: () -> Unit
 ) {
     val typeEntries = stringArrayResource(R.array.policy_group_type).toList()
+    val sortIntervalMinutes = AutoSortPolicy.SUPPORTED_INTERVAL_MINUTES
+    val sortIntervalEntries = sortIntervalMinutes.map {
+        stringResource(R.string.policy_group_auto_sort_interval_minutes, it)
+    }
 
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
@@ -231,11 +272,22 @@ fun ServerGroupScreen(
     var typeValue by rememberSaveable { mutableStateOf(typeEntries.getOrNull(initialType).orEmpty()) }
     var subValue by rememberSaveable { mutableStateOf(subDisplay.getOrNull(initialSubIndex).orEmpty()) }
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
+    var autoSortEnabled by rememberSaveable { mutableStateOf(initialAutoSortEnabled) }
+    var sortIntervalIndex by rememberSaveable {
+        mutableStateOf(
+            sortIntervalMinutes.indexOf(
+                AutoSortPolicy.normalizedInterval(initialSortIntervalMinutes)
+            ).coerceAtLeast(0)
+        )
+    }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val selectedType = typeEntries.indexOf(typeValue).coerceAtLeast(0).toString()
-    val supportsObservatory = BalancerStrategyType.from(selectedType).supportsObservatory
+    val strategyType = BalancerStrategyType.from(selectedType)
+    val supportsObservatory = strategyType.supportsObservatory
+    val showsObservatoryControls =
+        supportsObservatory || strategyType == BalancerStrategyType.LEAST_PING
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -257,7 +309,18 @@ fun ServerGroupScreen(
                         if (!hasError) {
                             val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
                             val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
-                            onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+                            onSave(
+                                remarks,
+                                filter,
+                                typeIdx,
+                                subIdx,
+                                testOutbounds,
+                                autoSortEnabled,
+                                sortIntervalMinutes.getOrElse(sortIntervalIndex) {
+                                    AutoSortPolicy.DEFAULT_INTERVAL_MINUTES
+                                },
+                                fallbackTag,
+                            )
                         }
                     }) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
@@ -294,13 +357,35 @@ fun ServerGroupScreen(
                 onValueChange = { subValue = it }
             )
             FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
-            if (supportsObservatory) {
+            if (showsObservatoryControls) {
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_policy_group_test_outbounds),
                     checked = testOutbounds,
                     onCheckedChange = { testOutbounds = it }
                 )
                 if (testOutbounds) {
+                    if (strategyType == BalancerStrategyType.LEAST_PING) {
+                        SettingsSwitchItem(
+                            title = stringResource(R.string.title_policy_group_auto_sort),
+                            summary = stringResource(R.string.summary_policy_group_auto_sort),
+                            checked = autoSortEnabled,
+                            onCheckedChange = { autoSortEnabled = it }
+                        )
+                        if (autoSortEnabled) {
+                            FormDropdownField(
+                                label = stringResource(
+                                    R.string.title_policy_group_auto_sort_interval
+                                ),
+                                value = sortIntervalEntries[sortIntervalIndex],
+                                options = sortIntervalEntries,
+                                onValueChange = { selected ->
+                                    sortIntervalEntries.indexOf(selected)
+                                        .takeIf { it >= 0 }
+                                        ?.let { sortIntervalIndex = it }
+                                }
+                            )
+                        }
+                    }
                     FormDropdownField(
                         label = stringResource(R.string.title_policy_group_fallback),
                         value = fallbackTag,

@@ -347,6 +347,7 @@
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تئخیر واقعی</string>
+    <string name="title_test_real_ping_and_sort">تست تاخیر واقعی و مرتب کردن</string>
     <string name="title_user_asset_setting">فایلا بونچک جوقرافیایی</string>
     <string name="title_sort_by_test_results">ترتیب و ری نتیجه یل پینگ</string>
     <string name="title_filter_config">فیلتر کردن کانفیگا</string>
@@ -439,6 +440,12 @@
     <string name="title_policy_group_subscription_filter">فیلتر نیشتنا وا regex</string>
     <string name="title_policy_group_test_outbounds">آزمایش بارتا (outbounds)</string>
     <string name="title_policy_group_fallback">بارت جایگۊزین (outbound، اختیاری)</string>
+    <string name="title_policy_group_auto_sort">تست و مرتب‌سازی خودکار</string>
+    <string name="summary_policy_group_auto_sort">در زمان روشن بودن پروکسی، تاخیر واقعی را دوره‌ای تست کرده و این اشتراک را مرتب می‌کند. فاصله‌های کوتاه مصرف باتری، داده و CPU را افزایش می‌دهند.</string>
+    <string name="title_policy_group_auto_sort_interval">فاصله به‌روزرسانی</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d دقیقه</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">قبل از فعال‌کردن مرتب‌سازی خودکار، یک اشتراک مشخص انتخاب کنید.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">مرتب‌سازی خودکار به خروج پشتیبان از طریق پروکسی نیاز دارد؛ اتصال مستقیم و مسدودسازی مجاز نیست.</string>
 
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
