@@ -108,7 +108,15 @@ fun FormDropdownField(
     ) {
         OutlinedTextField(
             value = value,
-            onValueChange = { if (editable) onValueChange(it) },
+            onValueChange = {
+                if (editable) {
+                    onValueChange(it)
+                    // Typing is the search: open the menu as soon as the text matches an option, so
+                    // a name that is already filled in can be replaced without tapping the field
+                    // again, and close it instead of showing an empty menu when nothing matches.
+                    expanded = filterDropdownOptions(options, it).isNotEmpty()
+                }
+            },
             readOnly = !editable,
             enabled = enabled,
             label = { Text(label) },
