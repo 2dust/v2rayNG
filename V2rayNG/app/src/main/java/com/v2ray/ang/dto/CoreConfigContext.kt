@@ -14,7 +14,7 @@ data class CoreConfigContext(
     data class ResolvedOutbound(
         val tag: String,
         val profile: ProfileItem,
-        val resolvedProfiles: List<ProfileItem>,
+        val resolvedProfiles: List<Pair<String, ProfileItem>>,
         val resolvedType: CoreResolvedType,
     )
 

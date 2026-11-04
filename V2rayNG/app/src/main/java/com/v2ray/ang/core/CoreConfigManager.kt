@@ -287,11 +287,11 @@ object CoreConfigManager {
         existingTags: MutableSet<String>,
         v2rayConfig: V2rayConfig,
     ) {
-        val profile = resolvedOutbound.resolvedProfiles.firstOrNull() ?: run {
+        val p = resolvedOutbound.resolvedProfiles.firstOrNull() ?: run {
             LogUtil.w(AppConfig.TAG, "NORMAL resolved outbound '${resolvedOutbound.tag}' has empty resolvedProfiles, skipping")
             return
         }
-        val outbound = convertProfile2Outbound(profile) ?: run {
+        val outbound = convertProfile2Outbound(p) ?: run {
             LogUtil.w(AppConfig.TAG, "Could not convert NORMAL resolved outbound '${resolvedOutbound.tag}' profile to outbound, skipping")
             return
         }
@@ -373,8 +373,8 @@ object CoreConfigManager {
         policyGroupBalancerTags: MutableMap<String, String>,
         balancerStrategies: MutableList<BalancerStrategy>,
     ) {
-        val memberPairs = resolvedOutbound.resolvedProfiles.mapNotNull { profile ->
-            convertProfile2Outbound(profile)?.let { ob -> ob to profile }
+        val memberPairs = resolvedOutbound.resolvedProfiles.mapNotNull {
+            convertProfile2Outbound(it)?.let { ob -> ob to it.second }
         }
         if (memberPairs.isEmpty()) {
             LogUtil.w(AppConfig.TAG, "POLICYGROUP resolved outbound '${resolvedOutbound.tag}' has no valid member outbounds, skipping")
@@ -1124,8 +1124,17 @@ object CoreConfigManager {
     /**
      * Convert one profile object into one outbound object.
      */
-    private fun convertProfile2Outbound(profileItem: ProfileItem): V2rayConfig.OutboundBean? {
-        return CoreOutboundBuilder.convert(profileItem)
+    private fun convertProfile2Outbound(
+        p: Pair<String, ProfileItem>,
+    ): V2rayConfig.OutboundBean? {
+        if (p.second.configType == EConfigType.CUSTOM_OUTBOUND) {
+            MmkvManager.decodeServerRaw(p.first)?.let {
+                return JsonUtil.fromJsonSafe(it, V2rayConfig.OutboundBean::class.java)
+            }
+            return null
+
+        }
+        return CoreOutboundBuilder.convert(p.second)
     }
 
     //endregion

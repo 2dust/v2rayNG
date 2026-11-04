@@ -118,8 +118,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         }
 
         val invalidMembers = chainMembers.filter { member ->
-            val profile = SettingsManager.getServerViaRemarks(member)
-            profile == null || profile.configType.isComplexType()
+            val p = SettingsManager.getServerViaRemarks(member)
+            p == null || p.second.configType.isComplexType()
         }
 
         if (invalidMembers.isNotEmpty()) {
