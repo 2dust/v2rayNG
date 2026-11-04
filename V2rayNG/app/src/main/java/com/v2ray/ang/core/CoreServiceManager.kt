@@ -33,6 +33,7 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.ensureActive
@@ -53,6 +54,12 @@ object CoreServiceManager {
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
     private val connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** Job of the in-flight restart, used to cancel a previous restart when the user taps again. */
+    private var restartJob: Job? = null
+
+    private const val RESTART_TIMEOUT_MS = 5000L
+    private const val RESTART_POLL_MS = 50L
 
     @Volatile
     private var isReloading = false
@@ -488,11 +495,26 @@ object CoreServiceManager {
                     if (isOrderedBroadcast) resultCode = Activity.RESULT_OK
 
                     val pendingResult = goAsync()
-                    CoroutineScope(Dispatchers.Default).launch {
+                    restartJob?.cancel()
+                    restartJob = CoroutineScope(Dispatchers.Default).launch {
                         try {
                             serviceControl.stopService()
-                            delay(500L)
-                            LauncherManager.startService(serviceControl.getService())
+                            // stopLoop() is asynchronous, so a fixed delay can still leave the
+                            // core running. startService() would then hit "Core already running"
+                            // and silently return, leaving the service stopped.
+                            // Poll until the core has really exited (bounded by 5s).
+                            val deadline = System.currentTimeMillis() + RESTART_TIMEOUT_MS
+                            while (isRunning() && System.currentTimeMillis() < deadline) {
+                                delay(RESTART_POLL_MS)
+                            }
+                            if (isRunning()) {
+                                LogUtil.w(
+                                    AppConfig.TAG,
+                                    "StartCore-Manager: Core still running after ${RESTART_TIMEOUT_MS}ms, restart aborted"
+                                )
+                            } else {
+                                LauncherManager.startService(serviceControl.getService())
+                            }
                         } finally {
                             pendingResult.finish()
                         }
