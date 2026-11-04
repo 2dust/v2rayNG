@@ -30,14 +30,12 @@ jobs:
       uses: android-actions/setup-android@v4
       with:
         log-accepted-android-sdk-licenses: false
-        cmdline-tools-version: '14742923'
+        cmdline-tools-version: '16111833'
         packages: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
 
     - name: Install NDK
       run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-          --channel=0 \
-          --install "ndk;$NDK_VERSION"
+        echo "y" | android sdk install "ndk/$NDK_VERSION"
         echo "NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> $GITHUB_ENV
 
     - name: Restore cached libhevtun
