@@ -209,6 +209,9 @@ fun SettingsScreen(
     val coreLogLevelValues = stringArrayResource(R.array.core_loglevel).toList()
     val outboundResolveEntries = stringArrayResource(R.array.outbound_domain_resolve_method).toList()
     val outboundResolveValues = stringArrayResource(R.array.outbound_domain_resolve_method_value).toList()
+    val browserDialerMode by viewModel.browserDialerMode.collectAsStateWithLifecycle()
+    val browserDialerEntries = stringArrayResource(R.array.browser_dialer_mode).toList()
+    val browserDialerValues = stringArrayResource(R.array.browser_dialer_mode_value).toList()
     val xudpQuicEntries = stringArrayResource(R.array.mux_xudp_quic_entries).toList()
     val xudpQuicValues = stringArrayResource(R.array.mux_xudp_quic_value).toList()
     val fragmentPacketsEntries = stringArrayResource(R.array.fragment_packets).toList()
@@ -501,6 +504,13 @@ fun SettingsScreen(
                     values = outboundResolveValues,
                     selectedValue = outboundResolveMethod,
                     onSelected = { outboundResolveMethod = it }
+                )
+                SettingsListItem(
+                    title = stringResource(R.string.server_lab_browser_dialer),
+                    entries = browserDialerEntries,
+                    values = browserDialerValues,
+                    selectedValue = browserDialerMode,
+                    onSelected = { viewModel.setBrowserDialerMode(it) }
                 )
             }
 

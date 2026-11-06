@@ -139,7 +139,11 @@ object CoreServiceManager {
 
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
-        val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
+        val dialerMode = BrowserDialerMode.resolve(
+            config.browserDialerMode,
+            MmkvManager.decodeSettingsString(AppConfig.PREF_BROWSER_DIALER_MODE),
+            config.network
+        )
         val dialerAddr = if (dialerMode != null) {
             "127.0.0.1:${Utils.findRandomFreePort()}"
         } else {
