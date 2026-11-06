@@ -206,14 +206,14 @@ object SettingsManager {
      * @param remarks The remarks of the server.
      * @return The ProfileItem.
      */
-    fun getServerViaRemarks(remarks: String?): ProfileItem? {
+    fun getServerViaRemarks(remarks: String?): Pair<String, ProfileItem>? {
         if (remarks.isNullOrEmpty()) {
             return null
         }
         val serverList = decodeAllServerList()
         return serverList
-            .mapNotNull { guid -> decodeServerConfig(guid) }
-            .firstOrNull { it.remarks == remarks }
+            .mapNotNull { guid -> decodeServerConfig(guid)?.let { Pair(guid, it) } }
+            .firstOrNull { it.second.remarks == remarks }
     }
 
     /**
