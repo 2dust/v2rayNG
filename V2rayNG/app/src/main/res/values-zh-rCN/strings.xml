@@ -125,6 +125,9 @@
     <string name="server_lab_request_host6">Host (SNI) (可选)</string>
     <string name="toast_action_not_allowed">禁止此项操作</string>
     <string name="server_obfs_password">混淆密码</string>
+    <string name="server_obfs_type">混淆类型</string>
+    <string name="server_lab_min_packet_size">最小数据包大小（可选，默认 512）</string>
+    <string name="server_lab_max_packet_size">最大数据包大小（可选，默认 1200）</string>
     <string name="server_lab_port_hop">跳跃端口 (会覆盖服务器端口)</string>
     <string name="server_lab_port_hop_interval">端口跳跃间隔 (秒)</string>
     <string name="server_lab_bandwidth_down">带宽下行 (支持的单位 k/m/g/t)</string>

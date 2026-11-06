@@ -125,6 +125,9 @@
     <string name="server_lab_request_host6">হোস্ট (SNI) (ঐচ্ছিক)</string>
     <string name="toast_action_not_allowed">অ্যাকশন অনুমোদিত নয়</string>
     <string name="server_obfs_password">Obfs পাসওয়ার্ড</string>
+    <string name="server_obfs_type">Obfs এর ধরন</string>
+    <string name="server_lab_min_packet_size">সর্বনিম্ন প্যাকেট আকার (ঐচ্ছিক, ডিফল্ট 512)</string>
+    <string name="server_lab_max_packet_size">সর্বোচ্চ প্যাকেট আকার (ঐচ্ছিক, ডিফল্ট 1200)</string>
     <string name="server_lab_port_hop">পোর্ট হপিং (পোর্টের মান প্রতিস্থাপন করবে)</string>
     <string name="server_lab_port_hop_interval">পোর্ট পরিবর্তনের বিরতি (সেকেন্ড)</string>
     <string name="server_lab_bandwidth_down">ডাউনলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>

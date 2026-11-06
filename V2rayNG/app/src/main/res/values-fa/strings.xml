@@ -125,6 +125,9 @@
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">رمز عبور obfs</string>
+    <string name="server_obfs_type">نوع مبهم‌سازی</string>
+    <string name="server_lab_min_packet_size">حداقل اندازه بسته (اختیاری، پیش‌فرض 512)</string>
+    <string name="server_lab_max_packet_size">حداکثر اندازه بسته (اختیاری، پیش‌فرض 1200)</string>
     <string name="server_lab_port_hop">پرش پورت (پورت سرور را بازنویسی می‌کند)</string>
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
     <string name="server_lab_bandwidth_down">پهنای باند دانلود (واحدهای پشتیبانی‌شده: k/m/g/t)</string>

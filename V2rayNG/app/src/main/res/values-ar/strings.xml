@@ -125,6 +125,9 @@
     <string name="server_lab_request_host6">مضيف (SNI) (اختياري)</string>
     <string name="toast_action_not_allowed">الإجراء غير مسموح به</string>
     <string name="server_obfs_password">كلمة مرور Obfs</string>
+    <string name="server_obfs_type">نوع التمويه</string>
+    <string name="server_lab_min_packet_size">الحد الأدنى لحجم الحزمة (اختياري، الافتراضي 512)</string>
+    <string name="server_lab_max_packet_size">الحد الأقصى لحجم الحزمة (اختياري، الافتراضي 1200)</string>
     <string name="server_lab_port_hop">التنقل بين المنافذ (يتجاوز قيمة المنفذ)</string>
     <string name="server_lab_port_hop_interval">فاصل تبديل المنفذ (بالثواني)</string>
     <string name="server_lab_bandwidth_down">عرض النطاق للتنزيل (الوحدات المدعومة: k/m/g/t)</string>
