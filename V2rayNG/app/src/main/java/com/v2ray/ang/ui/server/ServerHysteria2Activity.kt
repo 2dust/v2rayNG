@@ -53,27 +53,27 @@ class ServerHysteria2Activity : BaseServerActivity() {
             onValueChange = { state.password = it },
             isError = state.isPasswordError
         )
-        val obfsOptions = listOf("", "salamander", "gecko")
+        val obfsOptions = listOf("none", "salamander", "gecko")
         val selectedObfs = when {
             state.obfs.equals("gecko", ignoreCase = true) -> "gecko"
             state.obfs.equals("salamander", ignoreCase = true) -> "salamander"
-            state.obfsPassword.isNotBlank() -> "salamander"
-            else -> ""
+            state.obfsPassword.isNotBlank() && !state.obfs.equals("none", ignoreCase = true) -> "salamander"
+            else -> "none"
         }
         FormDropdownField(
             label = stringResource(R.string.server_obfs_type),
             value = selectedObfs,
             options = obfsOptions,
             onValueChange = {
-                state.obfs = it
-                if (it.isEmpty()) {
+                state.obfs = if (it == "none") "" else it
+                if (it == "none") {
                     state.obfsPassword = ""
                     state.minPacketSize = ""
                     state.maxPacketSize = ""
                 }
             }
         )
-        if (selectedObfs.isNotEmpty()) {
+        if (selectedObfs != "none") {
             FormTextField(
                 stringResource(R.string.server_obfs_password),
                 state.obfsPassword,

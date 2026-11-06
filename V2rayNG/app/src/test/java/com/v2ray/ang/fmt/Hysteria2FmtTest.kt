@@ -134,6 +134,13 @@ class Hysteria2FmtTest {
     }
 
     @Test
+    fun obfsNoneDoesNotSetObfs() {
+        val profile = Hysteria2Fmt.parse("hy2://test@example.com/?obfs=none&obfs-password=secret")
+
+        assertEquals(null, profile.obfs)
+    }
+
+    @Test
     fun noObfsSurvivesUriRoundTrip() {
         val profile = Hysteria2Fmt.parse("hy2://test@example.com/?sni=example.com")
         val exported = "hysteria2://${Hysteria2Fmt.toUri(profile)}"

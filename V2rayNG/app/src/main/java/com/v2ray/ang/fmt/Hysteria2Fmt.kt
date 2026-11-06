@@ -34,7 +34,7 @@ object Hysteria2Fmt : FmtBase() {
             getItemFormQuery(config, queryParam)
 
             config.security = queryParam["security"] ?: AppConfig.TLS
-            config.obfs = queryParam["obfs"]
+            config.obfs = queryParam["obfs"]?.takeIf { !it.equals("none", ignoreCase = true) }
             config.obfsPassword = queryParam["obfs-password"]
             config.minPacketSize = queryParam["minPacketSize"]
             config.maxPacketSize = queryParam["maxPacketSize"]
@@ -71,7 +71,7 @@ object Hysteria2Fmt : FmtBase() {
         val isGecko = config.obfs.equals("gecko", ignoreCase = true)
             || config.minPacketSize.isNotNullEmpty()
             || config.maxPacketSize.isNotNullEmpty()
-        if (config.obfsPassword.isNotNullEmpty()) {
+        if (config.obfsPassword.isNotNullEmpty() && !config.obfs.equals("none", ignoreCase = true)) {
             dicQuery["obfs"] = if (isGecko) "gecko" else "salamander"
             dicQuery["obfs-password"] = config.obfsPassword.orEmpty()
             if (isGecko) {
