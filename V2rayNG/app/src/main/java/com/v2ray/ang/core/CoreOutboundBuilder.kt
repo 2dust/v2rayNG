@@ -243,7 +243,7 @@ object CoreOutboundBuilder {
             ?.map { it.trim() }
             ?.filter { it.isNotEmpty() }
             ?.ifEmpty { null }
-            ?: listOf(AppConfig.WIREGUARD_LOCAL_ADDRESS_V4)
+            ?: listOf(AppConfig.WIREGUARD_LOCAL_ADDRESS_V4, AppConfig.WIREGUARD_LOCAL_ADDRESS_V6)
 
         val addresses = if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true) {
             rawAddresses
