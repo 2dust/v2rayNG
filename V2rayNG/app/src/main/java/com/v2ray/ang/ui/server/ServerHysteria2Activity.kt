@@ -53,30 +53,44 @@ class ServerHysteria2Activity : BaseServerActivity() {
             onValueChange = { state.password = it },
             isError = state.isPasswordError
         )
-        val obfsOptions = listOf("salamander", "gecko")
-        val selectedObfs = if (state.obfs.equals("gecko", ignoreCase = true)) "gecko" else "salamander"
+        val obfsOptions = listOf("", "salamander", "gecko")
+        val selectedObfs = when {
+            state.obfs.equals("gecko", ignoreCase = true) -> "gecko"
+            state.obfs.equals("salamander", ignoreCase = true) -> "salamander"
+            state.obfsPassword.isNotBlank() -> "salamander"
+            else -> ""
+        }
         FormDropdownField(
             label = stringResource(R.string.server_obfs_type),
             value = selectedObfs,
             options = obfsOptions,
-            onValueChange = { state.obfs = it }
+            onValueChange = {
+                state.obfs = it
+                if (it.isEmpty()) {
+                    state.obfsPassword = ""
+                    state.minPacketSize = ""
+                    state.maxPacketSize = ""
+                }
+            }
         )
-        FormTextField(
-            stringResource(R.string.server_obfs_password),
-            state.obfsPassword,
-            { state.obfsPassword = it }
-        )
-        if (selectedObfs == "gecko") {
+        if (selectedObfs.isNotEmpty()) {
             FormTextField(
-                stringResource(R.string.server_lab_min_packet_size),
-                state.minPacketSize,
-                { state.minPacketSize = it }
+                stringResource(R.string.server_obfs_password),
+                state.obfsPassword,
+                { state.obfsPassword = it }
             )
-            FormTextField(
-                stringResource(R.string.server_lab_max_packet_size),
-                state.maxPacketSize,
-                { state.maxPacketSize = it }
-            )
+            if (selectedObfs == "gecko") {
+                FormTextField(
+                    stringResource(R.string.server_lab_min_packet_size),
+                    state.minPacketSize,
+                    { state.minPacketSize = it }
+                )
+                FormTextField(
+                    stringResource(R.string.server_lab_max_packet_size),
+                    state.maxPacketSize,
+                    { state.maxPacketSize = it }
+                )
+            }
         }
         FormTextField(
             stringResource(R.string.server_lab_port_hop),

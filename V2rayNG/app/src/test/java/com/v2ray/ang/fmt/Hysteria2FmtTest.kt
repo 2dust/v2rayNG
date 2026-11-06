@@ -132,4 +132,16 @@ class Hysteria2FmtTest {
         assertEquals(null, profile.minPacketSize)
         assertEquals(null, profile.maxPacketSize)
     }
+
+    @Test
+    fun noObfsSurvivesUriRoundTrip() {
+        val profile = Hysteria2Fmt.parse("hy2://test@example.com/?sni=example.com")
+        val exported = "hysteria2://${Hysteria2Fmt.toUri(profile)}"
+        val reparsed = Hysteria2Fmt.parse(exported)
+
+        assertEquals(null, reparsed.obfs)
+        assertEquals(null, reparsed.obfsPassword)
+        assertEquals(null, reparsed.minPacketSize)
+        assertEquals(null, reparsed.maxPacketSize)
+    }
 }
