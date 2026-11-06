@@ -58,7 +58,10 @@ data class ProfileItem(
     var mtu: Int? = null,
     var remoteDNS: String? = null,
 
+    var obfs: String? = null,
     var obfsPassword: String? = null,
+    var minPacketSize: String? = null,
+    var maxPacketSize: String? = null,
     var portHopping: String? = null,
     var portHoppingInterval: String? = null,
     @Deprecated("Use pinnedCA256")

@@ -86,4 +86,50 @@ class Hysteria2FmtTest {
         assertEquals(profile.password, reparsed.password)
         assertEquals(profile.sni, reparsed.sni)
     }
+
+    @Test
+    fun geckoObfsDefaultsPacketSizeWhenOmitted() {
+        val profile = Hysteria2Fmt.parse("hy2://test@example.com/?obfs=gecko&obfs-password=secret")
+
+        assertEquals("gecko", profile.obfs)
+        assertEquals("secret", profile.obfsPassword)
+        assertEquals("512", profile.minPacketSize)
+        assertEquals("1200", profile.maxPacketSize)
+    }
+
+    @Test
+    fun geckoObfsCustomPacketSizePreserved() {
+        val profile = Hysteria2Fmt.parse(
+            "hy2://test@example.com/?obfs=gecko&obfs-password=secret&minPacketSize=600&maxPacketSize=1300"
+        )
+
+        assertEquals("gecko", profile.obfs)
+        assertEquals("secret", profile.obfsPassword)
+        assertEquals("600", profile.minPacketSize)
+        assertEquals("1300", profile.maxPacketSize)
+    }
+
+    @Test
+    fun geckoObfsSurvivesUriRoundTrip() {
+        val profile = Hysteria2Fmt.parse(
+            "hy2://test@example.com/?obfs=gecko&obfs-password=secret&minPacketSize=600&maxPacketSize=1300"
+        )
+        val exported = "hysteria2://${Hysteria2Fmt.toUri(profile)}"
+        val reparsed = Hysteria2Fmt.parse(exported)
+
+        assertEquals("gecko", reparsed.obfs)
+        assertEquals("secret", reparsed.obfsPassword)
+        assertEquals("600", reparsed.minPacketSize)
+        assertEquals("1300", reparsed.maxPacketSize)
+    }
+
+    @Test
+    fun salamanderObfsDoesNotSetPacketSize() {
+        val profile = Hysteria2Fmt.parse("hy2://test@example.com/?obfs=salamander&obfs-password=secret")
+
+        assertEquals("salamander", profile.obfs)
+        assertEquals("secret", profile.obfsPassword)
+        assertEquals(null, profile.minPacketSize)
+        assertEquals(null, profile.maxPacketSize)
+    }
 }
