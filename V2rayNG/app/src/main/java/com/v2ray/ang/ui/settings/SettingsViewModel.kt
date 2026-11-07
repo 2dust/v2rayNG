@@ -4,15 +4,38 @@ import android.app.Application
 import android.content.Intent
 import android.provider.Settings
 import com.v2ray.ang.AppConfig
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SettingsViewModel(application: Application) : BaseViewModel(application) {
+
+    private val _browserDialerMode = MutableStateFlow(BROWSER_DIALER_OFF)
+    val browserDialerMode = _browserDialerMode.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _browserDialerMode.value = withContext(Dispatchers.IO) {
+                MmkvManager.decodeSettingsString(AppConfig.PREF_BROWSER_DIALER_MODE, BROWSER_DIALER_OFF)
+                    ?: BROWSER_DIALER_OFF
+            }
+        }
+    }
+
+    /** Persists the global Browser Dialer mode used by nodes that have no mode of their own. */
+    fun setBrowserDialerMode(value: String) {
+        _browserDialerMode.value = value
+        viewModelScope.launch(Dispatchers.IO) {
+            MmkvManager.encodeSettings(AppConfig.PREF_BROWSER_DIALER_MODE, value)
+        }
+    }
 
     private val _systemVpnSettingsAvailable = MutableStateFlow(false)
     val systemVpnSettingsAvailable = _systemVpnSettingsAvailable.asStateFlow()
@@ -69,5 +92,10 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
             toastError(R.string.toast_invalid_observatory_sampling)
             null
         }
+    }
+
+    private companion object {
+        /** Matches the "Disable" item of R.array.browser_dialer_mode_value. */
+        const val BROWSER_DIALER_OFF = "Disable"
     }
 }
