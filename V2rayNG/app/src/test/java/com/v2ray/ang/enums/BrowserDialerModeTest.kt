@@ -25,7 +25,18 @@ class BrowserDialerModeTest {
     @Test
     fun globalIgnoredForUnsupportedNetworks() {
         assertNull(BrowserDialerMode.resolve(null, "OkHttp", "tcp"))
-        assertNull(BrowserDialerMode.resolve(null, "OkHttp", null))
+        assertNull(BrowserDialerMode.resolve("", "OkHttp", "grpc"))
+    }
+
+    @Test
+    fun unknownNetworkUsesGlobal() {
+        assertEquals(BrowserDialerMode.OKHTTP, BrowserDialerMode.resolve(null, "OkHttp", null))
+        assertEquals(BrowserDialerMode.WEBVIEW, BrowserDialerMode.resolve("", "WebView", null))
+    }
+
+    @Test
+    fun nodeDisableOverridesGlobalForUnknownNetwork() {
+        assertNull(BrowserDialerMode.resolve("Disable", "OkHttp", null))
     }
 
     @Test
