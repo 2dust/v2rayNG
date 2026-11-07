@@ -175,10 +175,19 @@ object RootTproxyManager {
         }
         val appUid = context.applicationInfo.uid
         val port = SettingsManager.getSocksPort()
-        val runDir = File(context.filesDir, AppConfig.ROOT_RUNTIME_DIR).apply { mkdirs() }
+        val runDir = File(context.filesDir, AppConfig.ROOT_RUNTIME_DIR)
+        if (!runDir.isDirectory && !runDir.mkdirs()) {
+            LogUtil.e(AppConfig.TAG, "RootTproxyManager: failed to create runtime directory at ${runDir.absolutePath}")
+            return null
+        }
         val pidFile = File(runDir, "tproxy.pid").absolutePath
         val logFile = File(runDir, "tproxy.log").absolutePath
-        val cfgFile = File(runDir, "tproxy.yml").absolutePath
+        val cfgFile = File(runDir, "tproxy.yml")
+        // Written by the app process, never via the root script, so credentials stay out of it.
+        if (!RootProxyManager.writeHevConfig(cfgFile, buildHevConfig(port))) {
+            return null
+        }
+        val cfgPath = cfgFile.absolutePath
         val oomGuardPid = File(runDir, "oomguard.pid").absolutePath
         // IPv6 through the tunnel needs its own TPROXY target and anti-spoof match. When the
         // kernel is missing either, fall back to blackholing v6 rather than aborting the
@@ -222,10 +231,7 @@ object RootTproxyManager {
             // SOCKS inbound on loopback. `mark` is applied to its UPSTREAM socket only (see
             // hev_socks5_session_tcp_bind) — the accepted transparent socket is NOT marked,
             // which is why the OUTPUT chain needs the anti-spoof RETURN below.
-            appendLine("cat > '$cfgFile' <<'HEVCFG'")
-            append(buildHevConfig(port))
-            appendLine("HEVCFG")
-            appendLine("nohup \"\$BIN\" '$cfgFile' >'$logFile' 2>&1 &")
+            appendLine("nohup \"\$BIN\" '$cfgPath' >'$logFile' 2>&1 &")
             appendLine("TP_PID=\$!")
             appendLine("echo \$TP_PID > '$pidFile'")
             appendLine("echo ${AppConfig.ROOT_OOM_SCORE} > /proc/\$TP_PID/oom_score_adj 2>/dev/null || true")
@@ -290,8 +296,8 @@ object RootTproxyManager {
             // 127.0.0.0/8 RETURN already exempts, so the mark buys nothing. The tun2socks
             // engine omits it for the same reason.
             if (user != null && pass != null) {
-                appendLine("  username: '$user'")
-                appendLine("  password: '$pass'")
+                appendLine("  username: ${user.toSingleQuotedYamlScalar()}")
+                appendLine("  password: ${pass.toSingleQuotedYamlScalar()}")
             }
             appendLine("tcp:")
             appendLine("  port: $PORT")

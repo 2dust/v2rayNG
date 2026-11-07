@@ -246,7 +246,8 @@ object RootProxyManager {
         }
     }
 
-    private fun writeHevConfig(file: File, config: String): Boolean {
+    // Shared with [RootTproxyManager], which writes its helper config the same way.
+    internal fun writeHevConfig(file: File, config: String): Boolean {
         val atomicFile = AtomicFile(file)
         val output = try {
             atomicFile.startWrite()
