@@ -342,12 +342,14 @@ object RootProxyManager {
         val dnsChain = AppConfig.ROOT_DNS_OUT_CHAIN
         val v6 = cmd == "ip6tables"
         // DNAT needs a target of the same family. There is no v6 fallback, so without a v6
-        // remote DNS the v6 chain is skipped (ip6tables nat is often missing anyway).
+        // remote DNS the v6 chain is skipped.
         val dns = SettingsManager.getRemoteDnsServers()
             .firstOrNull { Utils.isPureIpAddress(it) && it.contains(":") == v6 }
             ?: if (v6) return "" else AppConfig.ROOT_LAN_DNS
         val lanCidrs = if (v6) bypassCidrsV6 else bypassCidrs
         return buildString {
+            // Most stock kernels have no ip6tables nat table: skip cleanly instead of failing.
+            if (v6) appendLine("if $cmd -t nat -S OUTPUT >/dev/null 2>&1; then")
             appendLine("$cmd -t nat -N $dnsChain 2>/dev/null || true")
             appendLine("$cmd -t nat -F $dnsChain")
             // Only rewrite queries already marked into the tun. Unmarked ones (the core's own
@@ -358,6 +360,7 @@ object RootProxyManager {
             }
             appendLine("$cmd -t nat -D OUTPUT -j $dnsChain 2>/dev/null || true")
             appendLine("$cmd -t nat -A OUTPUT -j $dnsChain")
+            if (v6) appendLine("fi")
         }
     }
 
