@@ -267,6 +267,10 @@ data class V2rayConfig(
                         val password: String? = null,
                         val header: String? = null,
                         val value: String? = null,
+                        // udphot
+                        val mode: String? = null,
+                        val interval: String? = null,
+                        val remotePorts: String? = null,
                         // fragment
                         val packets: String? = null,
                         val length: String? = null,
@@ -290,14 +294,7 @@ data class V2rayConfig(
                     var congestion: String? = null,
                     var brutalUp: String? = null,
                     var brutalDown: String? = null,
-                    var udpHop: UdpHopBean? = null,
-                ) {
-                    // Nested data class for the udpHop JSON object
-                    data class UdpHopBean(
-                        var ports: String? = null,
-                        var interval: String? = null
-                    )
-                }
+                )
             }
         }
 
