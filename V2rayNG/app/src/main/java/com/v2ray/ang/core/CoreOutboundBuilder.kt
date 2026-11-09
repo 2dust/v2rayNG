@@ -523,9 +523,7 @@ object CoreOutboundBuilder {
                     quicParams = quicParams
                 )
                 if (profileItem.obfsPassword.isNotNullEmpty() && !profileItem.obfs.equals("none", ignoreCase = true)) {
-                    val isGecko = profileItem.obfs.equals("gecko", ignoreCase = true)
-                        || profileItem.minPacketSize.isNotNullEmpty()
-                        || profileItem.maxPacketSize.isNotNullEmpty()
+                    val isGecko = profileItem.isGeckoObfs()
                     val packetSize = if (isGecko) {
                         val min = profileItem.minPacketSize?.toIntOrNull() ?: 512
                         val max = profileItem.maxPacketSize?.toIntOrNull() ?: 1200

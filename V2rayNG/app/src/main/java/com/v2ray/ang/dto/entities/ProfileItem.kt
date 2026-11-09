@@ -2,6 +2,7 @@ package com.v2ray.ang.dto.entities
 
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.util.Utils
 
 data class ProfileItem(
@@ -90,6 +91,11 @@ data class ProfileItem(
         }
         return "${Utils.getIpv6Address(server)}:$serverPort"
     }
+
+    fun isGeckoObfs(): Boolean =
+        obfs.equals("gecko", ignoreCase = true)
+            || minPacketSize.isNotNullEmpty()
+            || maxPacketSize.isNotNullEmpty()
 
     /**
      * Dedicated identity for "remove duplicate configurations".
