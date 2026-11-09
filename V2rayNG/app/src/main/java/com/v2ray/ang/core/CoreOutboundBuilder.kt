@@ -379,6 +379,22 @@ object CoreOutboundBuilder {
                 streamSettings.kcpSettings = kcpSetting
                 val udpMaskList =
                     mutableListOf<OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean>()
+                if (seed.isNullOrEmpty()) {
+                    udpMaskList.add(
+                        OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "mkcp-legacy"
+                        )
+                    )
+                } else {
+                    udpMaskList.add(
+                        OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "mkcp-legacy",
+                            settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                value = seed
+                            )
+                        )
+                    )
+                }
                 if (!headerType.isNullOrEmpty() && headerType != "none") {
                     val kcpHeaderType = when {
                         headerType == "wechat-video" -> "wechat"
@@ -399,23 +415,6 @@ object CoreOutboundBuilder {
                         )
                     )
                 }
-                if (seed.isNullOrEmpty()) {
-                    udpMaskList.add(
-                        OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = "mkcp-legacy"
-                        )
-                    )
-                } else {
-                    udpMaskList.add(
-                        OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = "mkcp-legacy",
-                            settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                value = seed
-                            )
-                        )
-                    )
-                }
-                udpMaskList.reverse()
                 streamSettings.finalmask = OutboundBean.StreamSettingsBean.FinalMaskBean(
                     udp = udpMaskList.toList()
                 )
@@ -485,6 +484,26 @@ object CoreOutboundBuilder {
                     brutalDown = profileItem.bandwidthDown?.nullIfBlank(),
                 )
                 quicParams.congestion = if (quicParams.brutalUp != null || quicParams.brutalDown != null) "brutal" else null
+                val hyUdpFinalmasks = mutableListOf<OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean>()
+                if (profileItem.obfsPassword.isNotNullEmpty() && !profileItem.obfs.equals("none", ignoreCase = true)) {
+                    val isGecko = profileItem.isGeckoObfs()
+                    val packetSize = if (isGecko) {
+                        val min = profileItem.minPacketSize?.toIntOrNull() ?: 512
+                        val max = profileItem.maxPacketSize?.toIntOrNull() ?: 1200
+                        "$min-$max"
+                    } else {
+                        null
+                    }
+                    hyUdpFinalmasks.add(
+                        OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
+                            type = "salamander",
+                            settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
+                                password = profileItem.obfsPassword,
+                                packetSize = packetSize
+                            )
+                        )
+                    )
+                }
                 if (profileItem.portHopping.isNotNullEmpty()) {
                     val rawInterval = profileItem.portHoppingInterval?.trim().nullIfBlank()
                     val interval = if (rawInterval == null) {
@@ -514,33 +533,21 @@ object CoreOutboundBuilder {
                             }
                         }
                     }
-                    quicParams.udpHop = OutboundBean.StreamSettingsBean.FinalMaskBean.QuicParamsBean.UdpHopBean(
-                        ports = profileItem.portHopping,
-                        interval = interval
-                    )
-                }
-                val finalmask = OutboundBean.StreamSettingsBean.FinalMaskBean(
-                    quicParams = quicParams
-                )
-                if (profileItem.obfsPassword.isNotNullEmpty() && !profileItem.obfs.equals("none", ignoreCase = true)) {
-                    val isGecko = profileItem.isGeckoObfs()
-                    val packetSize = if (isGecko) {
-                        val min = profileItem.minPacketSize?.toIntOrNull() ?: 512
-                        val max = profileItem.maxPacketSize?.toIntOrNull() ?: 1200
-                        "$min-$max"
-                    } else {
-                        null
-                    }
-                    finalmask.udp = listOf(
+                    hyUdpFinalmasks.add(
                         OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
-                            type = "salamander",
+                            type = "udphop",
                             settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                password = profileItem.obfsPassword.orEmpty(),
-                                packetSize = packetSize
+                                mode = "intervallocal,intervalremote",
+                                interval = interval,
+                                remotePorts = profileItem.portHopping,
                             )
                         )
                     )
                 }
+                val finalmask = OutboundBean.StreamSettingsBean.FinalMaskBean(
+                    udp = hyUdpFinalmasks.toList(),
+                    quicParams = quicParams,
+                )
                 streamSettings.hysteriaSettings = hysteriaSetting
                 streamSettings.finalmask = finalmask
             }
