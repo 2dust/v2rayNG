@@ -156,10 +156,12 @@ class MainViewModel(
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
             is MainServiceEvent.MeasureDelayResult -> {
-                if (!uiState.value.isRunning || !testRequests.completeCurrent(event.requestId)) return
+                if (!uiState.value.isRunning ||
+                    !testRequests.acceptCurrentResult(event.requestId, event.result.isFinal)
+                ) return
                 val status = MainStatus.ConnectionTest(event.result)
                 _uiState.update { it.copy(isTesting = testRequests.isTesting, status = status) }
-                publishTestAnnouncement(status)
+                if (event.result.isFinal) publishTestAnnouncement(status)
             }
 
             is MainServiceEvent.MeasureConfigSuccess -> {

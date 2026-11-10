@@ -102,6 +102,7 @@
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (istəyə bağlı, vergüllə ayrılmış)</string>
     <string name="server_lab_local_address">Yerli ünvan (istəyə bağlı IPv4/IPv6, vergüllə ayrılmış)</string>
+    <string name="server_lab_local_address_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>
     <string name="server_lab_local_mtu">MTU (istəyə bağlı, standart 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (istəyə bağlı, vergüllə ayrılmış IPv4/IPv6)</string>
     <string name="server_lab_remote_dns_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>
@@ -125,6 +126,9 @@
     <string name="server_lab_request_host6">Host (SNI) (istəyə bağlı)</string>
     <string name="toast_action_not_allowed">Fəaliyyətə icazə verilmir</string>
     <string name="server_obfs_password">Obfs şifrəsi</string>
+    <string name="server_obfs_type">Obfs növü</string>
+    <string name="server_lab_min_packet_size">Paketin minimum ölçüsü (istəyə bağlı, standart 512)</string>
+    <string name="server_lab_max_packet_size">Paketin maksimum ölçüsü (istəyə bağlı, standart 1200)</string>
     <string name="server_lab_port_hop">Port dəyişməsi (portu əvəzləyir)</string>
     <string name="server_lab_port_hop_interval">Port dəyişmə tezliyi (saniyə)</string>
     <string name="server_lab_bandwidth_down">Yükləmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>

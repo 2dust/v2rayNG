@@ -9,6 +9,22 @@ import org.junit.jupiter.api.Test
 
 class MainTestRequestsTest {
     @Test
+    fun earlyDelayKeepsRequestOpenAndLateResultsCannotCompleteReplacement() {
+        val requests = MainTestRequests()
+        val first = requests.beginCurrent()
+        assertTrue(requests.acceptCurrentResult(first, isFinal = false))
+        assertTrue(requests.isTesting)
+
+        val second = requests.beginCurrent()
+        assertFalse(requests.acceptCurrentResult(first, isFinal = false))
+        assertFalse(requests.acceptCurrentResult(first, isFinal = true))
+        assertTrue(requests.acceptCurrentResult(second, isFinal = false))
+        assertTrue(requests.acceptCurrentResult(second, isFinal = true))
+        assertFalse(requests.isTesting)
+        assertFalse(requests.acceptCurrentResult(second, isFinal = true))
+    }
+
+    @Test
     fun onlyTheLatestCurrentRequestCanFinishOnce() {
         val requests = MainTestRequests()
         assertFalse(requests.isTesting)
