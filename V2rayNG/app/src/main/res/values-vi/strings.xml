@@ -102,6 +102,7 @@
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6 không bắt buộc, phân cách bằng dấu phẩy)</string>
+    <string name="server_lab_local_address_hint">Nếu để trống, mặc định là %1$s. Địa chỉ IPv6 chỉ được dùng khi IPv6 được bật.</string>
     <string name="server_lab_local_mtu">MTU (không bắt buộc, mặc định 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (tùy chọn, các địa chỉ IPv4/IPv6 cách nhau bằng dấu phẩy)</string>
     <string name="server_lab_remote_dns_hint">Nếu để trống, mặc định là %1$s. Địa chỉ IPv6 chỉ được dùng khi IPv6 được bật.</string>
@@ -125,6 +126,9 @@
     <string name="server_lab_request_host6">Host (SNI) (không bắt buộc)</string>
     <string name="toast_action_not_allowed">Hành động này bị cấm!</string>
     <string name="server_obfs_password">Mật khẩu Obfs</string>
+    <string name="server_obfs_type">Loại Obfs</string>
+    <string name="server_lab_min_packet_size">Kích thước gói tin tối thiểu (tùy chọn, mặc định 512)</string>
+    <string name="server_lab_max_packet_size">Kích thước gói tin tối đa (tùy chọn, mặc định 1200)</string>
     <string name="server_lab_port_hop">Nhảy cổng (sẽ ghi đè cổng)</string>
     <string name="server_lab_port_hop_interval">Khoảng thời gian đổi cổng (giây)</string>
     <string name="server_lab_bandwidth_down">Băng thông tải xuống (đơn vị hỗ trợ: k/m/g/t)</string>

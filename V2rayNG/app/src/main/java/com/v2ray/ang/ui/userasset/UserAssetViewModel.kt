@@ -132,7 +132,11 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
                 }
             }
             if (!downloaded || targetTemp.length() == 0L) return false
-            return targetTemp.renameTo(target)
+            if (!replaceAssetFile(targetTemp, target)) {
+                LogUtil.e(AppConfig.TAG, "Failed to replace geo file: ${item.remarks}")
+                return false
+            }
+            return true
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
             return false
@@ -143,6 +147,14 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
 
     private fun tryHttpDownload(request: UrlContentRequest, targetFile: File, httpPort: Int): Boolean =
         HttpUtil.downloadToFile(request.copy(httpPort = httpPort), targetFile)
+
+    internal fun replaceAssetFile(temp: File, target: File): Boolean {
+        if (!temp.renameTo(target)) {
+            temp.delete()
+            return false
+        }
+        return true
+    }
 
     data class GeoDownloadResult(
         val successCount: Int,

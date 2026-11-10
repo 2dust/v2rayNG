@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.CoreUrlDownloadRequest
 import com.v2ray.ang.dto.OutboundTrafficStat
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -372,21 +373,36 @@ object CoreServiceManager {
             }
 
             ensureActive()
-            val result = SpeedtestManager.buildConnectionTestResult(time, errorStr) {
-                val fetchViaCore = if (SettingsManager.shouldUseCoreForAppRequests()) {
-                    { url: String ->
-                        coreController.getUrlContent(url, currentOutboundTag())
-                    }
-                } else {
-                    null
-                }
-                SpeedtestManager.getRemoteIPInfo(fetchViaCore)
-            }
+            val initialResult = ConnectionTestResult(
+                delayMillis = time,
+                errorMessage = errorStr,
+                country = null,
+                ipAddress = null,
+            )
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {
-                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
+                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, initialResult, requestId)
                 } else {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
+                    return@withContext
+                }
+            }
+
+            if (time >= 0) {
+                val endpoint = getConnectionTestEndpoint()
+                if (endpoint != null && (endpoint.country != null || endpoint.ipAddress != null)) {
+                    ensureActive()
+                    val fullResult = ConnectionTestResult(
+                        delayMillis = time,
+                        errorMessage = errorStr,
+                        country = endpoint.country,
+                        ipAddress = endpoint.ipAddress,
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        if (isRunning()) {
+                            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, fullResult, requestId)
+                        }
+                    }
                 }
             }
         }.invokeOnCompletion { cause ->
@@ -394,6 +410,15 @@ object CoreServiceManager {
                 MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
             }
         }
+    }
+
+    private fun getConnectionTestEndpoint(): SpeedtestManager.RemoteEndpointInfo? {
+        val fetchViaCore: ((String) -> String?)? = if (SettingsManager.shouldUseCoreForAppRequests()) {
+            { url -> coreController.getUrlContent(url, currentOutboundTag()) }
+        } else {
+            null
+        }
+        return SpeedtestManager.getRemoteIPInfo(fetchViaCore)
     }
 
     private fun currentOutboundTag(): String =

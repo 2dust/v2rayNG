@@ -28,7 +28,7 @@ object WireguardFmt : FmtBase() {
         config.serverPort = uri.port.toString()
 
         config.secretKey = uri.userInfo.orEmpty()
-        config.localAddress = queryParam["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
+        config.localAddress = queryParam["address"] ?: ""
         config.publicKey = queryParam["publickey"].orEmpty()
         config.preSharedKey = queryParam["presharedkey"]?.nullIfBlank()
         config.mtu = Utils.parseInt(queryParam["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
@@ -81,20 +81,25 @@ object WireguardFmt : FmtBase() {
 
         config.secretKey = interfaceParams["privatekey"].orEmpty()
         config.remarks = System.currentTimeMillis().toString()
-        config.localAddress = interfaceParams["address"] ?: AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
+        config.localAddress = interfaceParams["address"] ?: ""
         config.mtu = Utils.parseInt(interfaceParams["mtu"] ?: AppConfig.WIREGUARD_LOCAL_MTU)
         config.remoteDNS = interfaceParams["dns"] ?: ""
         config.publicKey = peerParams["publickey"].orEmpty()
         config.preSharedKey = peerParams["presharedkey"]?.nullIfBlank()
         val endpoint = peerParams["endpoint"].orEmpty()
-        val endpointParts = endpoint.split(":", limit = 2)
-        if (endpointParts.size == 2) {
-            config.server = endpointParts[0]
-            config.serverPort = endpointParts[1]
-        } else {
-            config.server = endpoint
-            config.serverPort = ""
+        val (server, port) = when {
+            // IPv6
+            endpoint.startsWith("[") ->
+                endpoint.substringAfter("[").substringBefore("]") to
+                        endpoint.substringAfter("]").removePrefix(":")
+            // Domain/IPv4
+            endpoint.count { it == ':' } == 1 ->
+                endpoint.substringBefore(":") to endpoint.substringAfter(":")
+            // No port
+            else -> endpoint to ""
         }
+        config.server = server
+        config.serverPort = port
         config.reserved = peerParams["reserved"] ?: "0,0,0"
         config.finalMask = (peerParams["finalmask"] ?: peerParams["fm"] ?: interfaceParams["finalmask"] ?: interfaceParams["fm"])?.nullIfBlank()
 

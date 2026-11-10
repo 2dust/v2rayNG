@@ -102,6 +102,7 @@
     <string name="server_lab_secret_key">کلید خصوصی</string>
     <string name="server_lab_reserved">Reserved (اختیاری، جدا شده با کاما)</string>
     <string name="server_lab_local_address">آدرس محلی (IPv4/IPv6 اختیاری، جدا شده با کاما)</string>
+    <string name="server_lab_local_address_hint">اگر خالی باشد، به‌طور پیش‌فرض از %1$s استفاده می‌شود. آدرس‌های IPv6 فقط زمانی استفاده می‌شوند که IPv6 فعال باشد.</string>
     <string name="server_lab_local_mtu">MTU (اختیاری، پیش‌فرض 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (اختیاری، آدرس‌های IPv4/IPv6 جدا شده با کاما)</string>
     <string name="server_lab_remote_dns_hint">اگر خالی باشد، به‌طور پیش‌فرض از %1$s استفاده می‌شود. آدرس‌های IPv6 فقط زمانی استفاده می‌شوند که IPv6 فعال باشد.</string>
@@ -125,6 +126,9 @@
     <string name="server_lab_request_host6">هاست (SNI) (اختیاری)</string>
     <string name="toast_action_not_allowed">این عمل ممنوع است</string>
     <string name="server_obfs_password">رمز عبور obfs</string>
+    <string name="server_obfs_type">نوع مبهم‌سازی</string>
+    <string name="server_lab_min_packet_size">حداقل اندازه بسته (اختیاری، پیش‌فرض 512)</string>
+    <string name="server_lab_max_packet_size">حداکثر اندازه بسته (اختیاری، پیش‌فرض 1200)</string>
     <string name="server_lab_port_hop">پرش پورت (پورت سرور را بازنویسی می‌کند)</string>
     <string name="server_lab_port_hop_interval">فاصله پورت پرش (ثانیه)</string>
     <string name="server_lab_bandwidth_down">پهنای باند دانلود (واحدهای پشتیبانی‌شده: k/m/g/t)</string>
