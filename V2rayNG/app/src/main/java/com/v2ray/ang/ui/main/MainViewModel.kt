@@ -25,8 +25,11 @@ import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -392,8 +395,12 @@ class MainViewModel(
     }
 
     private fun updateGroupUi(groupId: String, servers: List<ServersCache>) {
+        mutableServerGroupState(groupId).value = buildGroupUiState(groupId, servers)
+    }
+
+    private fun buildGroupUiState(groupId: String, servers: List<ServersCache>): ServerGroupUiState {
         val filteredServers = applyKeywordFilter(servers)
-        mutableServerGroupState(groupId).value = ServerGroupUiState(
+        return ServerGroupUiState(
             servers = filteredServers,
             rows = buildServerRows(groupId, filteredServers)
         )
@@ -782,6 +789,17 @@ class MainViewModel(
         _uiState.update { it.copy(selectedGuid = guid) }
     }
 
+    internal fun moveServer(groupId: String, guid: String, command: ReorderCommand, onSaved: () -> Unit): Boolean {
+        val servers = mutableServerGroupState(groupId).value.servers
+        val fromPosition = servers.indexOfFirst { it.guid == guid }
+        val toPosition = command.targetIndex(fromPosition, servers.size) ?: return false
+        val write = moveServer(groupId, fromPosition, toPosition) ?: return false
+        viewModelScope.launch {
+            if (write.await()) onSaved()
+        }
+        return true
+    }
+
     fun refreshSelectedGuid() {
         _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
     }
@@ -798,29 +816,39 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Boolean {
+    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Deferred<Boolean>? {
         val groupState = mutableServerGroupState(groupId).value
         val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return false
+        if (!servers.moveItem(fromPosition, toPosition)) return null
         val rows = groupState.rows.toMutableList()
-        if (!rows.moveItem(fromPosition, toPosition)) return false
+        if (!rows.moveItem(fromPosition, toPosition)) return null
         val guids = servers.map { it.guid }
         mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
+        val write = viewModelScope.async(start = CoroutineStart.LAZY) {
             previousPersistenceJob?.join()
-            dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
+            val saved = withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }
+            if (!saved) {
+                toastError(R.string.toast_failure)
+            }
+            // Only the final queued write reconciles the UI, on both success and failure.
+            // Read persisted membership/order instead of replaying a captured drag snapshot.
+            val thisJob = currentCoroutineContext()[Job]
+            if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                val persisted = withContext(ioDispatcher) {
+                    buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
+                }
+                if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                    mutableServerGroupState(groupId).value = persisted
+                    serverOrderPersistenceJobs.remove(groupId)
+                }
+            }
+            saved
         }
-        return true
-    }
-
-    internal fun moveServer(groupId: String, guid: String, command: ReorderCommand): Boolean {
-        val servers = mutableServerGroupState(groupId).value.servers
-        val fromPosition = servers.indexOfFirst { it.guid == guid }
-        val toPosition = command.targetIndex(fromPosition, servers.size) ?: return false
-        return moveServer(groupId, fromPosition, toPosition)
+        serverOrderPersistenceJobs[groupId] = write
+        write.start()
+        return write
     }
 
     // ---------- Testing ----------

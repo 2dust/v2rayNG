@@ -68,7 +68,6 @@ import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
-import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
@@ -102,9 +101,11 @@ fun GroupPagerPage(
     val groupState by groupStateFlow.collectAsStateWithLifecycle()
     val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
     val actionFeedback = rememberAccessibilityActionFeedback()
+    val moved = stringResource(R.string.acc_moved)
     val actions = remember(
         onSelectServer,
         actionFeedback,
+        moved,
         onAction,
         onShareServer,
         onMoreServer,
@@ -118,8 +119,9 @@ fun GroupPagerPage(
             share = onShareServer,
             more = onMoreServer,
             remove = onRemoveServer,
-            move = { guid, command -> mainViewModel.moveServer(groupId, guid, command) },
-            feedback = actionFeedback,
+            move = { guid, command ->
+                mainViewModel.moveServer(groupId, guid, command) { actionFeedback(moved) }
+            },
         )
     }
     // The box floats over the list (the list scrolls underneath it), so the list is padded by the box height.
@@ -175,7 +177,6 @@ private class ServerRowActions(
     val more: (String, ProfileItem) -> Unit,
     val remove: (String, String) -> Unit,
     val move: (String, ReorderCommand) -> Boolean,
-    val feedback: (String) -> Unit,
 ) {
     fun perform(action: ServerMenuAction, row: ServerRowUiModel) {
         action.perform(row.guid, row.profile, onAction, remove)
@@ -395,8 +396,8 @@ private fun ServerListItem(
         }
     }
     val accessibilityActions = itemActions + if (reorderIndex != null) {
-        reorderAccessibilityActions(reorderIndex, itemCount, actions.feedback) { command ->
-            actions.move(row.guid, command)
+        ReorderCommand.availableAt(reorderIndex, itemCount).map { command ->
+            CustomAccessibilityAction(stringResource(command.labelRes)) { actions.move(row.guid, command) }
         }
     } else {
         emptyList()
