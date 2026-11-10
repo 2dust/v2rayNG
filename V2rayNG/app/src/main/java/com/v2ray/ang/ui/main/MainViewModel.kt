@@ -391,8 +391,12 @@ class MainViewModel(
     }
 
     private fun updateGroupUi(groupId: String, servers: List<ServersCache>) {
+        mutableServerGroupState(groupId).value = buildGroupUiState(groupId, servers)
+    }
+
+    private fun buildGroupUiState(groupId: String, servers: List<ServersCache>): ServerGroupUiState {
         val filteredServers = applyKeywordFilter(servers)
-        mutableServerGroupState(groupId).value = ServerGroupUiState(
+        return ServerGroupUiState(
             servers = filteredServers,
             rows = buildServerRows(groupId, filteredServers)
         )
@@ -797,21 +801,36 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
+    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Boolean {
         val groupState = mutableServerGroupState(groupId).value
         val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return
+        if (!servers.moveItem(fromPosition, toPosition)) return false
         val rows = groupState.rows.toMutableList()
-        rows.moveItem(fromPosition, toPosition)
+        if (!rows.moveItem(fromPosition, toPosition)) return false
         val guids = servers.map { it.guid }
         mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
+        serverOrderPersistenceJobs[groupId] = viewModelScope.launch {
             previousPersistenceJob?.join()
-            dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
+            val saved = withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }
+            if (!saved) {
+                toastError(R.string.toast_failure)
+            }
+            // Only the final queued write reconciles the UI, on both success and failure.
+            // Read persisted membership/order instead of replaying a captured drag snapshot.
+            val thisJob = currentCoroutineContext()[Job]
+            if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                val persisted = withContext(ioDispatcher) {
+                    buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
+                }
+                if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                    mutableServerGroupState(groupId).value = persisted
+                    serverOrderPersistenceJobs.remove(groupId)
+                }
+            }
         }
+        return true
     }
 
     // ---------- Testing ----------

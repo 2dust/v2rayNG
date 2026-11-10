@@ -201,6 +201,11 @@ object MmkvManager {
     }
 
 
+    fun reorderServerList(serverList: List<String>, subscriptionId: String): Boolean =
+        withProfileIndexLock {
+            persistServerList(serverList, subscriptionId)
+        }
+
     /**
      * Decodes the server list for a given subscription.
      * If subscriptionId is empty, returns ungrouped servers.
