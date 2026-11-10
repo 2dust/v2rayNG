@@ -350,30 +350,23 @@ object CoreServiceManager {
                 errorMessage = errorStr,
                 isFinal = time < 0,
             )
-            val sent = withContext(Dispatchers.Main.immediate) {
+            suspend fun publish(result: ConnectionTestResult): Boolean = withContext(Dispatchers.Main.immediate) {
                 if (!isRunning()) {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
                     false
                 } else {
-                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, initialResult, requestId)
+                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
                     true
                 }
             }
-            if (!sent) return@launch
+            if (!publish(initialResult)) return@launch
 
             if (time >= 0) {
                 val endpoint = SpeedtestManager.getRemoteIPInfo()
-                val fullResult = initialResult.copy(
-                    country = endpoint?.country,
-                    ipAddress = endpoint?.ipAddress,
-                    isFinal = true,
-                )
-                withContext(Dispatchers.Main.immediate) {
-                    if (isRunning()) {
-                        MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, fullResult, requestId)
-                    } else {
-                        MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
-                    }
+                if (endpoint != null && (endpoint.country != null || endpoint.ipAddress != null)) {
+                    publish(initialResult.copy(country = endpoint.country, ipAddress = endpoint.ipAddress, isFinal = true))
+                } else {
+                    publish(initialResult.copy(isFinal = true))
                 }
             }
         }.invokeOnCompletion { cause ->
