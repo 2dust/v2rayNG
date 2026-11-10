@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
+import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -29,7 +30,7 @@ class ServerUiState(
     publicKey: String = "",
     preSharedKey: String = "",
     reserved: String = "0,0,0",
-    localAddress: String = WIREGUARD_LOCAL_ADDRESS_V4,
+    localAddress: String = "$WIREGUARD_LOCAL_ADDRESS_V4,$WIREGUARD_LOCAL_ADDRESS_V6",
     mtu: String = WIREGUARD_LOCAL_MTU,
     remoteDNS: String = WIREGUARD_LOCAL_REMOTE_DNS,
     obfsPassword: String = "",
@@ -206,9 +207,9 @@ class ServerUiState(
                 publicKey = initialConfig.publicKey ?: "",
                 preSharedKey = initialConfig.preSharedKey ?: "",
                 reserved = initialConfig.reserved ?: "0,0,0",
-                localAddress = initialConfig.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4,
+                localAddress = initialConfig.localAddress ?: "",
                 mtu = initialConfig.mtu?.toString() ?: WIREGUARD_LOCAL_MTU,
-                remoteDNS = initialConfig.remoteDNS ?: WIREGUARD_LOCAL_REMOTE_DNS,
+                remoteDNS = initialConfig.remoteDNS ?: "",
                 obfsPassword = initialConfig.obfsPassword ?: "",
                 portHopping = initialConfig.portHopping ?: "",
                 portHoppingInterval = initialConfig.portHoppingInterval ?: "",
