@@ -345,18 +345,36 @@ object CoreServiceManager {
             }
 
             ensureActive()
-            val endpoint = if (time >= 0) SpeedtestManager.getRemoteIPInfo() else null
-            val result = ConnectionTestResult(
+            val initialResult = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
-                country = endpoint?.country,
-                ipAddress = endpoint?.ipAddress,
+                country = null,
+                ipAddress = null,
             )
             withContext(Dispatchers.Main.immediate) {
                 if (isRunning()) {
-                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
+                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, initialResult, requestId)
                 } else {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
+                    return@withContext
+                }
+            }
+
+            if (time >= 0) {
+                val endpoint = SpeedtestManager.getRemoteIPInfo()
+                if (endpoint != null && (endpoint.country != null || endpoint.ipAddress != null)) {
+                    ensureActive()
+                    val fullResult = ConnectionTestResult(
+                        delayMillis = time,
+                        errorMessage = errorStr,
+                        country = endpoint.country,
+                        ipAddress = endpoint.ipAddress,
+                    )
+                    withContext(Dispatchers.Main.immediate) {
+                        if (isRunning()) {
+                            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, fullResult, requestId)
+                        }
+                    }
                 }
             }
         }.invokeOnCompletion { cause ->
