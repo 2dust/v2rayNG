@@ -24,8 +24,11 @@ import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -809,19 +812,20 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
+    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Deferred<Boolean>? {
         val groupState = mutableServerGroupState(groupId).value
         val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return
+        if (!servers.moveItem(fromPosition, toPosition)) return null
         val rows = groupState.rows.toMutableList()
-        rows.moveItem(fromPosition, toPosition)
+        if (!rows.moveItem(fromPosition, toPosition)) return null
         val guids = servers.map { it.guid }
         mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch {
+        val write = viewModelScope.async(start = CoroutineStart.LAZY) {
             previousPersistenceJob?.join()
-            if (!withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }) {
+            val saved = withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }
+            if (!saved) {
                 toastError(R.string.toast_failure)
             }
             // Only the final queued write reconciles the UI, on both success and failure.
@@ -836,7 +840,11 @@ class MainViewModel(
                     serverOrderPersistenceJobs.remove(groupId)
                 }
             }
+            saved
         }
+        serverOrderPersistenceJobs[groupId] = write
+        write.start()
+        return write
     }
 
     // ---------- Testing ----------

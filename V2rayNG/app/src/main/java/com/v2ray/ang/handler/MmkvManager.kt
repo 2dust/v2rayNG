@@ -195,6 +195,9 @@ object MmkvManager {
         return "$KEY_SUB_SERVER_PREFIX${getSubscriptionId(subscriptionId)}"
     }
 
+    fun reorderServerList(serverList: List<String>, subscriptionId: String): Boolean =
+        reorderIndex(serverListKey(subscriptionId), serverList)
+
     /**
      * Returns every server referenced outside the target group, or null if the raw indexes
      * cannot provide a complete view.
@@ -351,9 +354,6 @@ object MmkvManager {
             false
         }
     }
-
-    fun reorderServerList(serverList: List<String>, subscriptionId: String): Boolean =
-        reorderIndex(serverListKey(subscriptionId), serverList)
 
     /** A stale UI snapshot may change order, but must never change current membership. */
     private fun reorderIndex(key: String, requestedOrder: List<String>): Boolean {
