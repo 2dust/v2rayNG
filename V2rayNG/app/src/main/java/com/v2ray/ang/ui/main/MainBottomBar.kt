@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
+import com.v2ray.ang.ui.compose.accessibilityClickLabel
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
 import kotlinx.coroutines.launch
 
@@ -163,7 +163,7 @@ fun MainBottomBar(
                         .align(Alignment.CenterEnd)
                         .padding(end = knobInset)
                         .size(KNOB_SIZE)
-                        .semantics { onClick(label = serviceActionLabel, action = null) },
+                        .accessibilityClickLabel(serviceActionLabel),
                     shape = CircleShape,
                     containerColor = if (isRunning) colorFabActive
                     else if (isDarkTheme) colorFabInactiveDark
