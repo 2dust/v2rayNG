@@ -278,7 +278,8 @@ data class V2rayConfig(
                         val maxSplit: String? = null,
                         // noise
                         val reset: Int? = null,
-                        val noise: List<NoiseMaskBean>? = null
+                        val noise: List<NoiseMaskBean>? = null,
+                        val packetSize: String? = null
                     ) {
                         data class NoiseMaskBean(
                             val rand: String? = null,

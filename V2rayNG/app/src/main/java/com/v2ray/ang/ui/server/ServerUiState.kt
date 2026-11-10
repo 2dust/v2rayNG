@@ -33,7 +33,10 @@ class ServerUiState(
     localAddress: String = "$WIREGUARD_LOCAL_ADDRESS_V4,$WIREGUARD_LOCAL_ADDRESS_V6",
     mtu: String = WIREGUARD_LOCAL_MTU,
     remoteDNS: String = WIREGUARD_LOCAL_REMOTE_DNS,
+    obfs: String = "",
     obfsPassword: String = "",
+    minPacketSize: String = "",
+    maxPacketSize: String = "",
     portHopping: String = "",
     portHoppingInterval: String = "",
     bandwidthDown: String = "",
@@ -82,7 +85,10 @@ class ServerUiState(
     var localAddress by mutableStateOf(localAddress)
     var mtu by mutableStateOf(mtu)
     var remoteDNS by mutableStateOf(remoteDNS)
+    var obfs by mutableStateOf(obfs)
     var obfsPassword by mutableStateOf(obfsPassword)
+    var minPacketSize by mutableStateOf(minPacketSize)
+    var maxPacketSize by mutableStateOf(maxPacketSize)
     var portHopping by mutableStateOf(portHopping)
     var portHoppingInterval by mutableStateOf(portHoppingInterval)
     var bandwidthDown by mutableStateOf(bandwidthDown)
@@ -152,7 +158,10 @@ class ServerUiState(
             localAddress = if (isWireguard) localAddress else null,
             mtu = if (isWireguard) mtu.toIntOrNull() else null,
             remoteDNS = if (isWireguard) remoteDNS else null,
+            obfs = if (isHysteria2) obfs.nullIfBlank() else null,
             obfsPassword = if (isHysteria2) obfsPassword else null,
+            minPacketSize = if (isHysteria2) minPacketSize.nullIfBlank() else null,
+            maxPacketSize = if (isHysteria2) maxPacketSize.nullIfBlank() else null,
             portHopping = if (isHysteria2) portHopping else null,
             portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
             bandwidthDown = if (isHysteria2) bandwidthDown else null,
@@ -210,7 +219,10 @@ class ServerUiState(
                 localAddress = initialConfig.localAddress ?: "",
                 mtu = initialConfig.mtu?.toString() ?: WIREGUARD_LOCAL_MTU,
                 remoteDNS = initialConfig.remoteDNS ?: "",
+                obfs = initialConfig.obfs ?: "",
                 obfsPassword = initialConfig.obfsPassword ?: "",
+                minPacketSize = initialConfig.minPacketSize ?: "",
+                maxPacketSize = initialConfig.maxPacketSize ?: "",
                 portHopping = initialConfig.portHopping ?: "",
                 portHoppingInterval = initialConfig.portHoppingInterval ?: "",
                 bandwidthDown = initialConfig.bandwidthDown ?: "",

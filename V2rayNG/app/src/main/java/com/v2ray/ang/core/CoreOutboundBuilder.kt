@@ -485,12 +485,21 @@ object CoreOutboundBuilder {
                 )
                 quicParams.congestion = if (quicParams.brutalUp != null || quicParams.brutalDown != null) "brutal" else null
                 val hyUdpFinalmasks = mutableListOf<OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean>()
-                if (profileItem.obfsPassword.isNotNullEmpty()) {
+                if (profileItem.obfsPassword.isNotNullEmpty() && !profileItem.obfs.equals("none", ignoreCase = true)) {
+                    val isGecko = profileItem.isGeckoObfs()
+                    val packetSize = if (isGecko) {
+                        val min = profileItem.minPacketSize?.toIntOrNull() ?: 512
+                        val max = profileItem.maxPacketSize?.toIntOrNull() ?: 1200
+                        "$min-$max"
+                    } else {
+                        null
+                    }
                     hyUdpFinalmasks.add(
                         OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
                             type = "salamander",
                             settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
-                                password = profileItem.obfsPassword
+                                password = profileItem.obfsPassword,
+                                packetSize = packetSize
                             )
                         )
                     )
