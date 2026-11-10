@@ -267,20 +267,25 @@ private fun ServerListPage(
                         reorderableState,
                         key = row.guid
                     ) { isDragging ->
-                        ReorderableListItem(
-                            scope = this,
-                            isDragging = isDragging
-                        ) {
-                            ServerListItem(
-                                row = row,
-                                isSelected = row.guid == selectedGuid,
-                                doubleColumnDisplay = false,
-                                reorderIndex = index,
-                                itemCount = rows.size,
-                                actions = actions
-                            )
+                        val itemScope = this
+                        // ReorderableItem is a Box, so a bare divider would be drawn over the top of the
+                        // row (including the first one); the Column puts it below the row instead.
+                        Column {
+                            ReorderableListItem(
+                                scope = itemScope,
+                                isDragging = isDragging
+                            ) {
+                                ServerListItem(
+                                    row = row,
+                                    isSelected = row.guid == selectedGuid,
+                                    doubleColumnDisplay = false,
+                                    reorderIndex = index,
+                                    itemCount = rows.size,
+                                    actions = actions
+                                )
+                            }
+                            ItemDivider()
                         }
-                        ItemDivider()
                     }
                 } else {
                     ServerListItem(
