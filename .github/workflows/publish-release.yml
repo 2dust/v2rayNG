@@ -1,9 +1,6 @@
 name: Publish RX VPN Release
 
 on:
-  push:
-    branches:
-      - arena/01066f02-test1
   workflow_dispatch:
     inputs:
       release_tag:
@@ -49,13 +46,9 @@ jobs:
             echo "Source run $RUN_ID is not successful: $STATUS" >&2
             exit 1
           fi
-
-      - name: Surface publish errors
-        if: failure()
-        run: |
-          echo "Release publish failed. Check the previous step output." >&2
           SHA=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json headSha --jq .headSha)
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Publishing assets from source run $RUN_ID ($SHA)"
 
       - name: Write release notes
         env:
@@ -73,14 +66,14 @@ jobs:
         run: |
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md" --draft=false --latest
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md"
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
               --target "$SOURCE_SHA" \
               --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
-              --latest
+              --prerelease
           fi
 
       - name: Surface publish errors
