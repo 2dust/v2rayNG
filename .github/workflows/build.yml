@@ -222,25 +222,26 @@ jobs:
       - name: Collect APK facts
         working-directory: V2rayNG/app/build/outputs/apk/playstore/release
         run: |
-          # Written into the release notes as well, so the exact packaging of the shipped file can
-          # be inspected later without downloading anything.
+          # These lines are copied into the release notes so the exact packaging of the shipped file
+          # can be inspected later without downloading anything.
+          set +e
           BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           APK=RXVPN_1.0.2_arm64-v8a.apk
           {
-            echo "| fact | value |"
-            echo "| --- | --- |"
-            "$BUILD_TOOLS/aapt2" dump badging "$APK" \
-              | grep -E "^package:|^sdkVersion:|^targetSdkVersion:|^native-code:" \
-              | sed -e 's/|/\\|/g' -e 's/^/| `/` ' -e 's/$/ |/'
-            echo "| extractNativeLibs | $( \
-              "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$APK" \
-                | grep -i extractNativeLibs | sed 's/.*extractNativeLibs[^=]*=//' || echo "unset") |"
-            "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" \
-              | grep -E "Verified using|SHA-256" \
-              | sed -e 's/|/\\|/g' -e 's/^/| `/` ' -e 's/$/ |/'
-            echo "| native libs | $(unzip -v "$APK" | grep -c 'lib/arm64-v8a/') entries, $( \
-              unzip -v "$APK" | grep 'lib/arm64-v8a/' | head -3 | awk '{print $2 "%"}' | paste -sd ' ') compression |"
-          } > APK-FACTS.txt
+            echo '```'
+            echo "== badging =="
+            "$BUILD_TOOLS/aapt2" dump badging "$APK" | grep -E "^package:|^sdkVersion:|^targetSdkVersion:|^native-code:"
+            echo "== manifest flags =="
+            "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$APK" | grep -iE "extractNativeLibs|isFeatureSplit|split="
+            echo "== signature schemes =="
+            "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" 2>&1 | head -25
+            echo "== zipalign -c -v 4 =="
+            "$BUILD_TOOLS/zipalign" -c -v 4 "$APK" | tail -3
+            echo "== archive entries =="
+            unzip -v "$APK" | grep -E "resources.arsc|classes.dex|lib/arm64-v8a/" | head -12
+            echo "== end =="
+            echo '```'
+          } > APK-FACTS.txt 2>&1
           cat APK-FACTS.txt
 
       - name: Stage a debug APK for device tests
