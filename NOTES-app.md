@@ -38,6 +38,17 @@ Working branch: `arena/d739235f-rx-client` (App repo: `kairomax1/RX_client`).
 - Store metadata in `fastlane/metadata/android/en-US/` (title, short/full description, icon).
 - Release notes template: `.github/release-notes.md` with `@TAG@` / `@SHA@` placeholders.
 
+## Signing (so updates install over the top)
+- Only one key signs RX VPN: `V2rayNG/signing/rxclient.p12` (alias `mobix`, password
+  `mobixvpn`, PKCS#12). Cert SHA-256:
+  `52:86:4C:67:AF:63:07:4A:B2:A6:13:64:3A:4B:09:43:4E:3D:32:0B:87:DC:9C:1D:6B:EF:51:4D:88:1A:5C:83`.
+- CI used to generate a throwaway key per run, so every APK had a new signature and Android
+  refused to update in place ("App not installed") until the old app was uninstalled.
+  `build.yml` now signs with the checked-in key (`APP_KEYSTORE_BASE64`, if ever set, must
+  hold that same key). Never regenerate the key — that would force every user to uninstall.
+- Playstore APKs all carry `1000000*4 + versionCode`, so any playstore APK updates any other;
+  fdroid builds use a different offset, so switching between the two needs an uninstall.
+
 ## Publishing notes
 - Live releases: `v1.0.0` (RX Client, has the old promotion build) and `v1.0.0-rxvpn`
   (pre-release). The next release should be a normal release, e.g. `v1.0.1`, so
