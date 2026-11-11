@@ -186,11 +186,30 @@ jobs:
           }
           echo "Signing certificate matches the RX VPN release key."
 
+      - name: Verify APK structure and write checksums
+        working-directory: V2rayNG/app/build/outputs/apk/playstore/release
+        run: |
+          # apksigner proves the signature; these prove the file is a readable, aligned APK and
+          # give the tester a hash to compare against what actually landed on the phone.
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          for apk in *.apk; do
+            echo "== $apk"
+            "$BUILD_TOOLS/aapt2" dump badging "$apk" 2>/dev/null \
+              | grep -E "^package:|^sdkVersion:|^targetSdkVersion:|^native-code:" \
+              || { echo "::error::$apk is not a readable APK"; exit 1; }
+            "$BUILD_TOOLS/zipalign" -c -v 4 "$apk" > /dev/null \
+              || { echo "::error::$apk is not zip-aligned"; exit 1; }
+          done
+          sha256sum *.apk > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
           name: RXVPN-apk
-          path: V2rayNG/app/build/outputs/apk/playstore/release/*.apk
+          path: |
+            V2rayNG/app/build/outputs/apk/playstore/release/*.apk
+            V2rayNG/app/build/outputs/apk/playstore/release/SHA256SUMS.txt
           if-no-files-found: error
 
   release:
@@ -246,10 +265,10 @@ jobs:
             LATEST_FLAG="--latest"
           fi
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
+            gh release upload "$TAG" apk/*.apk apk/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
             gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md" $DRAFT_FLAG
           else
-            gh release create "$TAG" apk/*.apk \
+            gh release create "$TAG" apk/*.apk apk/SHA256SUMS.txt \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --title "RX VPN $TAG" \
