@@ -161,11 +161,10 @@ jobs:
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           chmod +x gradlew
           ./gradlew --no-daemon assemblePlaystoreRelease \
-            -Pandroid.injected.signing.store.file="$KEYSTORE_PATH" \
-            -Pandroid.injected.signing.store.password="$STORE_PASSWORD" \
-            -Pandroid.injected.signing.store.type=PKCS12 \
-            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+            -Prx.storeFile="$KEYSTORE_PATH" \
+            -Prx.storePassword="$STORE_PASSWORD" \
+            -Prx.keyAlias="$KEY_ALIAS" \
+            -Prx.keyPassword="$KEY_PASSWORD"
 
       - name: Show outputs
         run: find V2rayNG/app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
@@ -185,6 +184,21 @@ jobs:
             exit 1
           }
           echo "Signing certificate matches the RX VPN release key."
+
+      - name: Report APK facts
+        working-directory: V2rayNG/app/build/outputs/apk/playstore/release
+        run: |
+          # Every fact that decides whether a phone accepts the package is printed as an
+          # annotation, so a failed install can be diagnosed without downloading the APK.
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          for apk in *.apk; do
+            "$BUILD_TOOLS/aapt2" dump badging "$apk" 2>/dev/null \
+              | grep -E "^package:|^sdkVersion:|^targetSdkVersion:|^native-code:" \
+              | while read -r line; do echo "::notice title=$apk::$line"; done
+            "$BUILD_TOOLS/apksigner" verify --print-certs "$apk" 2>&1 \
+              | grep -E "Verified using|Signer #1 certificate SHA-256" \
+              | while read -r line; do echo "::notice title=signature::$line"; done
+          done
 
       - name: Verify APK structure and write checksums
         working-directory: V2rayNG/app/build/outputs/apk/playstore/release
