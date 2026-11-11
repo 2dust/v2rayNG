@@ -165,6 +165,22 @@ jobs:
       - name: Show outputs
         run: find V2rayNG/app/build/outputs/apk -name "*.apk" -exec ls -lh {} \;
 
+      - name: Verify signing certificate
+        env:
+          EXPECTED_SHA256: "52864c67af63074ab2a613643a4b09434e3d320b87dc9c1d6bef514d881a5c83"
+        run: |
+          # Guards the in-place-update promise: a different certificate means every user would
+          # have to uninstall before installing this build.
+          APK=$(ls V2rayNG/app/build/outputs/apk/playstore/release/*arm64-v8a.apk | head -1)
+          echo "Checking $APK"
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | tee "$RUNNER_TEMP/certs.txt"
+          grep -qi "$EXPECTED_SHA256" "$RUNNER_TEMP/certs.txt" || {
+            echo "::error::APK is not signed with the RX VPN release key; in-place updates would fail"
+            exit 1
+          }
+          echo "Signing certificate matches the RX VPN release key."
+
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
