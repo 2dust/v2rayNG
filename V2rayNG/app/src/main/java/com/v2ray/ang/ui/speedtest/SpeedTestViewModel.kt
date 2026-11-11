@@ -138,7 +138,7 @@ class SpeedTestViewModel(application: Application) : BaseViewModel(application) 
             )
         )
 
-        val suggested = ConfigBenchmark.suggestions(measurements).mapNotNull { suggestion ->
+        val suggested = ConfigBenchmark.suggestions(measurements.values).mapNotNull { suggestion ->
             rows.firstOrNull { it.guid == suggestion.guid }
         }
 
