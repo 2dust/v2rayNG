@@ -7,16 +7,15 @@
 <meta name="referrer" content="no-referrer">
 <title>RX Client — Splash Animation</title>
 <style>
-  /* ============ palette (from branding/rx-client-logo.svg) ============ */
+  /* ============================================================
+     palette — taken from the real app:
+     res/values/ic_launcher_background.xml, ui/compose/Theme.kt
+     ============================================================ */
   :root{
-    --violet:#6D4AFF;
-    --lilac:#8B5CFF;
-    --cyan:#19D9EC;
-    --ink:#05050B;
-    --paper:#0B0B14;
-    --text:#F2F2FA;
-    --muted:#8E8EA8;
-    --sp:1;                /* global speed factor */
+    --brand:#6D4AFF;      /* ic_launcher_background / colorFabActive */
+    --brand-lilac:#8B5CFF;
+    --brand-cyan:#19D9EC; /* secondary */
+    --sp:1;               /* global speed factor */
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -25,286 +24,239 @@
       radial-gradient(900px 600px at 15% -10%, #1a1140 0%, transparent 60%),
       radial-gradient(800px 600px at 95% 110%, #06313a 0%, transparent 60%),
       #06060c;
-    color:var(--text);
+    color:#F2F2FA;
     font-family:"Segoe UI", system-ui, -apple-system, "Vazirmatn", Roboto, sans-serif;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:22px; padding:28px 18px; min-height:100vh; overflow-x:hidden;
+    gap:20px; padding:26px 16px; min-height:100vh; overflow-x:hidden;
   }
-  body::after{ /* subtle noise */
+  body::after{
     content:""; position:fixed; inset:0; pointer-events:none; opacity:.035; z-index:99;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
   }
+  .page-title{font-size:14px; letter-spacing:.16em; text-transform:uppercase; color:#8E8EA8; margin:0}
+  .page-title b{color:#fff}
 
-  /* ============ page chrome ============ */
-  .page-title{font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin:0}
-  .page-title b{color:#fff; font-weight:700}
-
-  .controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center}
+  .controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
   .btn{
     border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05);
-    color:#e9e9f5; padding:9px 16px; border-radius:999px; font:inherit; font-size:13px;
-    cursor:pointer; backdrop-filter:blur(8px); transition:.18s ease;
+    color:#e9e9f5; padding:9px 15px; border-radius:999px; font:inherit; font-size:13px;
+    cursor:pointer; transition:.18s ease;
   }
-  .btn:hover{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3); transform:translateY(-1px)}
-  .btn:active{transform:translateY(0) scale(.97)}
-  .btn.primary{background:linear-gradient(120deg,var(--violet),var(--cyan)); border-color:transparent; color:#fff; font-weight:600;
-    box-shadow:0 8px 26px -10px var(--violet)}
-  .btn[aria-pressed="true"]{background:rgba(139,92,255,.28); border-color:rgba(139,92,255,.65)}
+  .btn:hover{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3)}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:linear-gradient(120deg,var(--brand),var(--brand-cyan)); border-color:transparent; color:#fff; font-weight:600;
+    box-shadow:0 8px 26px -10px var(--brand)}
 
-  /* ============ phone ============ */
+  /* ============ phone chassis ============ */
   .phone{
-    position:relative; width:378px; height:790px; border-radius:52px; padding:11px;
+    position:relative; width:378px; height:788px; border-radius:52px; padding:11px;
     background:linear-gradient(160deg,#2c2c3c,#0b0b12 40%,#1b1b28);
     box-shadow:
       0 0 0 1px rgba(255,255,255,.10),
       0 40px 90px -30px rgba(0,0,0,.95),
       0 0 120px -30px rgba(109,74,255,.55),
-      0 0 200px -60px rgba(25,217,236,.35);
+      0 0 200px -60px rgba(25,217,236,.3);
     flex:0 0 auto;
   }
   .screen{
     position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden;
-    background:#05050B; isolation:isolate;
+    background:#1C1B1F; isolation:isolate;
+    --app-surface:#1C1B1F;
+    --app-low:#1A191D;
+    --app-container:#1E1D21;
+    --app-high:#282729;
+    --app-on:#E6E1E5;
+    --app-onvar:#CAC4D0;
+    --app-outline:#49454F;
+    --app-primary:#B6A2FF;
+    --app-fab-off:#646464;
   }
-  .island{
-    position:absolute; top:11px; left:50%; transform:translateX(-50%);
-    width:104px; height:26px; border-radius:999px; background:#000; z-index:60;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  .screen[data-theme="light"]{
+    --app-surface:#FFFFFF;
+    --app-low:#F7F7F7;
+    --app-container:#F1F1F1;
+    --app-high:#EBEBEB;
+    --app-on:#1C1B1F;
+    --app-onvar:#49454F;
+    --app-outline:#CAC4D0;
+    --app-primary:#6D4AFF;
+    --app-fab-off:#9C9C9C;
   }
-  .statusbar{
-    position:absolute; top:16px; left:0; right:0; z-index:55; display:flex;
-    justify-content:space-between; align-items:center; padding:0 26px;
-    font-size:12.5px; font-weight:600; color:#fff; letter-spacing:.02em; opacity:.92;
-  }
+  .island{position:absolute; top:11px; left:50%; transform:translateX(-50%); width:104px; height:26px;
+    border-radius:999px; background:#000; z-index:60; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .statusbar{position:absolute; top:16px; left:0; right:0; z-index:55; display:flex; justify-content:space-between;
+    align-items:center; padding:0 26px; font-size:12.5px; font-weight:600; color:#fff; letter-spacing:.02em}
   .sb-right{display:flex; gap:5px; align-items:center}
-  .sb-right svg{display:block}
 
-  /* ============ SPLASH LAYER ============ */
+  /* ============================================================
+     SPLASH — built around the REAL adaptive launcher icon
+     ============================================================ */
   .splash{position:absolute; inset:0; z-index:30; display:grid; place-items:center; overflow:hidden}
-  .splash::before{ /* base gradient */
+  .splash::before{
     content:""; position:absolute; inset:0;
     background:
-      radial-gradient(120% 80% at 50% 8%, #1b1140 0%, transparent 55%),
-      radial-gradient(100% 70% at 50% 105%, #072a33 0%, transparent 60%),
-      linear-gradient(180deg,#08080F,#05050B 60%,#07070E);
+      radial-gradient(120% 80% at 50% 6%, #1b1140 0%, transparent 55%),
+      radial-gradient(100% 70% at 50% 106%, #072a33 0%, transparent 60%),
+      linear-gradient(180deg,#08080F,#05050B 62%,#07070E);
   }
-  .orb{position:absolute; border-radius:50%; filter:blur(46px); opacity:0}
-  .orb.a{width:320px; height:320px; background:var(--violet); top:-70px; left:-60px}
-  .orb.b{width:300px; height:300px; background:var(--cyan); bottom:-80px; right:-70px}
-  .orb.c{width:200px; height:200px; background:var(--lilac); top:38%; left:52%; filter:blur(70px)}
+  .orb{position:absolute; border-radius:50%; filter:blur(48px); opacity:0}
+  .orb.a{width:320px; height:320px; background:var(--brand); top:-70px; left:-60px}
+  .orb.b{width:300px; height:300px; background:var(--brand-cyan); bottom:-80px; right:-70px}
+  .orb.c{width:200px; height:200px; background:var(--brand-lilac); top:40%; left:54%; filter:blur(74px)}
 
-  /* logo block */
-  .logo-wrap{position:relative; display:grid; place-items:center; transform:translateY(-26px)}
-  .logo-glow{
-    position:absolute; width:300px; height:300px; border-radius:50%;
-    background:radial-gradient(circle, rgba(139,92,255,.55), rgba(25,217,236,.18) 45%, transparent 70%);
-    filter:blur(18px); opacity:0;
-  }
-  .shield{width:150px; height:150px; overflow:visible; position:relative; z-index:3;
-          filter:drop-shadow(0 10px 30px rgba(109,74,255,.55))}
-  .shield .outline{fill:none; stroke:url(#strokeGrad); stroke-width:7; stroke-linejoin:round;
-                   stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
-  .shield .plate{fill:#fff; opacity:0}
-  .shield .bolt{fill:none; stroke:#fff; stroke-width:6; stroke-linejoin:round;
-                stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
-  .shield .bolt-fill{fill:url(#boltGrad); opacity:0}
+  .logo-wrap{position:relative; display:grid; place-items:center; transform:translateY(-30px)}
+  .logo-glow{position:absolute; width:300px; height:300px; border-radius:50%;
+    background:radial-gradient(circle, rgba(109,74,255,.6), rgba(25,217,236,.16) 46%, transparent 70%);
+    filter:blur(20px); opacity:0}
 
-  /* expanding rings + sparks + flash */
-  .ring{
-    position:absolute; width:150px; height:150px; border-radius:50%;
-    border:1.5px solid rgba(180,160,255,.55); opacity:0; z-index:2;
-  }
-  .flash{
-    position:absolute; inset:-40%; z-index:20; opacity:0; pointer-events:none;
-    background:radial-gradient(circle at 50% 45%, #fff 0%, rgba(200,190,255,.55) 18%, transparent 52%);
-  }
-  .spark{
-    position:absolute; left:50%; top:50%; margin:-2.5px 0 0 -2.5px; width:5px; height:5px; border-radius:50%; background:#fff;
-    box-shadow:0 0 10px 2px rgba(180,200,255,.9); opacity:0; z-index:4;
-  }
+  /* the icon: violet squircle + white shield + bolt knocked out,
+     exactly like mipmap-*/ic_launcher + ic_launcher_foreground */
+  .appicon{width:132px; height:132px; border-radius:31px; position:relative; z-index:3; overflow:hidden;
+    box-shadow:0 18px 50px -12px rgba(109,74,255,.85), 0 0 0 1px rgba(255,255,255,.08) inset}
+  .appicon svg{display:block; width:100%; height:100%; border-radius:inherit}
+  .icon-plate{opacity:0}
+  .icon-shield{fill:none; stroke:#fff; stroke-width:9; stroke-linejoin:round;
+    stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
+  .icon-shield-fill{fill:#fff; opacity:0}
+  .icon-bolt{fill:var(--brand); opacity:0}
 
-  /* wordmark */
-  .wordmark{position:absolute; bottom:214px; left:0; right:0; text-align:center; z-index:5}
-  .wordmark h1{
-    margin:0; font-size:31px; font-weight:800; letter-spacing:.02em; direction:ltr;
-    color:#fff; display:inline-flex; gap:0;
-  }
+  .ring{position:absolute; width:132px; height:132px; border-radius:34px; border:1.5px solid rgba(180,160,255,.5); opacity:0; z-index:2}
+  .flash{position:absolute; inset:-40%; z-index:20; opacity:0; pointer-events:none;
+    background:radial-gradient(circle at 50% 45%, #fff 0%, rgba(200,190,255,.5) 18%, transparent 52%)}
+  .spark{position:absolute; left:50%; top:50%; margin:-2.5px 0 0 -2.5px; width:5px; height:5px; border-radius:50%;
+    background:#fff; box-shadow:0 0 10px 2px rgba(180,200,255,.9); opacity:0; z-index:4}
+
+  .wordmark{position:absolute; bottom:210px; left:0; right:0; text-align:center; z-index:5}
+  .wordmark h1{margin:0; font-size:31px; font-weight:800; letter-spacing:.01em; direction:ltr;
+    color:#fff; display:inline-flex}
   .wordmark h1 span{display:inline-block; opacity:0; transform:translateY(18px) rotateX(50deg)}
-  .wordmark .tag{
-    margin:9px 0 0; font-size:13px; color:#b9b7d6; opacity:0; letter-spacing:.01em;
-  }
-  /* loading */
-  .loader{
-    position:absolute; bottom:150px; left:50%; transform:translateX(-50%);
-    width:132px; height:3px; border-radius:99px; background:rgba(255,255,255,.10);
-    overflow:hidden; opacity:0; z-index:5;
-  }
-  .loader i{
-    display:block; height:100%; width:100%; border-radius:99px; transform-origin:right center;
-    transform:scaleX(0);
-    background:linear-gradient(90deg,var(--cyan),var(--lilac),var(--violet));
-  }
-  .dots{position:absolute; bottom:112px; display:flex; gap:6px; z-index:5; opacity:0}
-  .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.28)}
-  .dots i:nth-child(2){background:rgba(255,255,255,.6)}
+  .wordmark .tag{margin:9px 0 0; font-size:12.5px; color:#b9b7d6; opacity:0}
 
-  /* iris wipe into app */
-  .wipe{
-    position:absolute; left:50%; top:46%; width:1400px; height:1400px; margin:-700px 0 0 -700px;
+  .loader{position:absolute; bottom:148px; left:50%; transform:translateX(-50%); width:132px; height:3px;
+    border-radius:99px; background:rgba(255,255,255,.10); overflow:hidden; opacity:0; z-index:5}
+  .loader i{display:block; height:100%; width:100%; border-radius:99px; transform-origin:right center; transform:scaleX(0);
+    background:linear-gradient(90deg,var(--brand-cyan),var(--brand-lilac),var(--brand))}
+
+  .wipe{position:absolute; left:50%; top:46%; width:1400px; height:1400px; margin:-700px 0 0 -700px;
     border-radius:50%; z-index:40; opacity:0; transform:scale(0);
-    background:radial-gradient(circle, #2a1a63 0%, var(--violet) 42%, #0a0a14 78%);
-  }
+    background:radial-gradient(circle, #2a1a63 0%, var(--brand) 42%, #12111a 78%)}
 
-  /* ============ HOME LAYER (mock app) ============ */
-  .home{
-    position:absolute; inset:0; z-index:25; opacity:0; padding:64px 22px 0;
-    display:flex; flex-direction:column;
-    background:
-      radial-gradient(90% 55% at 50% 0%, #17102e 0%, transparent 60%),
-      radial-gradient(80% 40% at 50% 100%, #06222a 0%, transparent 65%),
-      #07070E;
-  }
-  .home-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px}
-  .home-head .brand{display:flex; align-items:center; gap:9px}
-  .home-head .brand svg{width:26px; height:26px; border-radius:8px}
-  .home-head .brand b{font-size:14.5px; letter-spacing:.01em}
-  .home-head .dots-btn{display:flex; gap:3px}
-  .home-head .dots-btn i{width:4px;height:4px;border-radius:50%;background:#6b6b85}
+  /* ============================================================
+     HOME — real MainScreen structure
+     MainTopButtonBar + server pager + MainBottomBar + FAB
+     ============================================================ */
+  .home{position:absolute; inset:0; z-index:25; opacity:0; display:flex; flex-direction:column;
+    background:var(--app-surface); color:var(--app-on)}
+  .appbar{flex:0 0 auto; display:flex; align-items:center; gap:2px; height:64px; padding:0 4px;
+    margin-top:38px; color:var(--app-on)}
+  .appbar h2{margin:0; font-size:20px; font-weight:500; flex:1; padding-inline-start:6px}
+  .icon-btn{width:44px; height:44px; border:0; background:transparent; border-radius:50%; color:var(--app-on);
+    display:grid; place-items:center; cursor:pointer}
+  .icon-btn:active{background:rgba(128,128,128,.16)}
+  .appbar .actions{display:flex}
 
-  .hero{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; margin-top:-30px}
-  .connect{position:relative; width:206px; height:206px; display:grid; place-items:center}
-  .connect .halo{
-    position:absolute; inset:0; border-radius:50%;
-    background:radial-gradient(circle, rgba(139,92,255,.32), transparent 68%); filter:blur(6px);
-  }
-  .connect .pulse{
-    position:absolute; inset:14px; border-radius:50%;
-    border:1px solid rgba(158,132,255,.35);
-  }
-  .connect .core{
-    position:relative; width:150px; height:150px; border-radius:50%; display:grid; place-items:center;
-    background:linear-gradient(145deg,var(--lilac),var(--violet) 45%, #4a2bd8);
-    box-shadow:0 18px 46px -14px rgba(109,74,255,.95), inset 0 2px 0 rgba(255,255,255,.35),
-               inset 0 -10px 26px rgba(0,0,0,.35);
-    color:#fff;
-  }
-  .connect .core::after{
-    content:""; position:absolute; inset:9px; border-radius:50%;
-    border:1px solid rgba(255,255,255,.18);
-  }
-  .state{font-size:15px; font-weight:600; color:#EAE8FF; opacity:0; transform:translateY(8px)}
-  .state small{display:block; font-weight:400; font-size:12px; color:var(--muted); margin-top:4px}
+  .pager{flex:1; overflow:hidden; padding:4px 10px 0}
+  .card{background:var(--app-low); border-radius:12px; padding:10px 4px; margin-bottom:8px;
+    display:flex; align-items:stretch; position:relative; border:1px solid rgba(128,128,128,.10)}
+  .card .bar{width:4px; border-radius:4px; background:var(--app-primary); margin:8px 0 8px 6px; opacity:0}
+  .card.selected .bar{opacity:1}
+  .card .body{flex:1; padding:2px 10px 4px}
+  .card .row1{display:flex; align-items:center; gap:2px}
+  .card .remarks{flex:1; font-size:15px; line-height:1.5; color:var(--app-on);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .card .act{width:34px; height:34px; display:grid; place-items:center; color:var(--app-onvar); opacity:.95}
+  .card .row2{display:flex; align-items:center; gap:6px; margin-top:5px; font-size:12.5px; color:var(--app-onvar)}
+  .card .row3{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; font-size:11.5px}
+  .card .proto{color:var(--brand)}
+  .card .ping{color:#009966}
+  .card .ping.red{color:#FF0099}
+  .badge{width:20px; height:20px; border-radius:50%; background:rgba(109,74,255,.2); color:var(--app-primary);
+    font-size:9.5px; font-weight:700; display:grid; place-items:center; flex:0 0 auto}
 
-  .servers{display:flex; flex-direction:column; gap:8px; margin-bottom:86px}
-  .srv{
-    display:flex; align-items:center; gap:10px; padding:11px 13px; border-radius:15px;
-    background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.06);
-  }
-  .srv .flag{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
-    background:rgba(139,92,255,.16); font-size:12px}
-  .srv .name{font-size:12.5px; flex:1}
-  .srv .name em{display:block; font-style:normal; font-size:10.5px; color:var(--muted); margin-top:2px}
-  .srv.on{border-color:rgba(139,92,255,.5); background:rgba(139,92,255,.12)}
-  .srv .tick{width:16px;height:16px;border-radius:50%;background:var(--violet);display:grid;place-items:center}
+  .bottombar{position:relative; flex:0 0 auto; border-top:1px solid var(--app-outline);
+    background:var(--app-surface); padding-bottom:22px}
+  .bottombar .inner{height:64px; display:flex; align-items:center; padding:0 16px}
+  .status-text{font-size:14px; color:var(--app-on)}
+  .status-text.connected{color:#00875a}
+  .fab{position:absolute; inset-inline-end:24px; top:0; transform:translateY(-28px);
+    width:56px; height:56px; border-radius:16px; border:0; cursor:pointer;
+    background:var(--app-fab-off); display:grid; place-items:center; color:#fff;
+    box-shadow:0 6px 16px -6px rgba(0,0,0,.6); transition:background .25s ease}
+  .fab.on{background:var(--brand); box-shadow:0 8px 26px -8px var(--brand)}
+  .fab svg{width:24px; height:24px; transition:transform .2s ease}
+  .fab.spin svg{animation:spin 3s linear}
 
-  .tabbar{
-    position:absolute; left:14px; right:14px; bottom:14px; height:64px; border-radius:22px;
-    background:rgba(18,18,30,.82); border:1px solid rgba(255,255,255,.07);
-    backdrop-filter:blur(14px); display:flex; align-items:center; justify-content:space-around;
-  }
-  .tab{display:grid; place-items:center; gap:3px; color:#6f6f8a; font-size:9.5px}
-  .tab.active{color:#c9bdff}
-  .tab svg{width:20px;height:20px}
-
-  /* ============ animation engine ============ */
-  .anim{
-    animation-delay:calc(var(--d,0ms) * var(--sp));
-    animation-duration:calc(var(--dur,600ms) * var(--sp));
-    animation-fill-mode:both;
-    animation-timing-function:ease-out;
-  }
-
+  /* ============ engine ============ */
   @keyframes fadeIn{from{opacity:0} to{opacity:1}}
   @keyframes fadeOut{from{opacity:1} to{opacity:0}}
   @keyframes orbIn{from{opacity:0; transform:scale(.55)} to{opacity:.42; transform:scale(1)}}
   @keyframes draw{from{stroke-dashoffset:1} to{stroke-dashoffset:0}}
-  @keyframes plateIn{from{opacity:0; transform:scale(.86)} to{opacity:1; transform:scale(1)}}
+  @keyframes popIn{0%{opacity:0; transform:scale(.55)} 60%{opacity:1; transform:scale(1.06)} 100%{opacity:1; transform:scale(1)}}
+  @keyframes plateIn{from{opacity:0; transform:scale(.88)} to{opacity:1; transform:scale(1)}}
   @keyframes glowIn{from{opacity:0; transform:scale(.7)} to{opacity:1; transform:scale(1)}}
-  @keyframes ringPop{0%{opacity:.85; transform:scale(.55)} 70%{opacity:.12} 100%{opacity:0; transform:scale(2.15)}}
-  @keyframes flashPop{0%{opacity:0} 12%{opacity:.95} 100%{opacity:0}}
+  @keyframes ringPop{0%{opacity:.8; transform:scale(.6)} 70%{opacity:.1} 100%{opacity:0; transform:scale(2.2)}}
+  @keyframes flashPop{0%{opacity:0} 12%{opacity:.9} 100%{opacity:0}}
   @keyframes sparkOut{0%{opacity:0; transform:rotate(var(--a)) translateY(0) scale(1)}
-                      18%{opacity:1}
-                      100%{opacity:0; transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) scale(.2)}}
-  @keyframes shake{
-    0%,100%{transform:translate(0,-26px)}
-    12%{transform:translate(-4px,-23px)}
-    28%{transform:translate(5px,-29px)}
-    46%{transform:translate(-3px,-28px)}
-    66%{transform:translate(2px,-24px)}
-    84%{transform:translate(-1px,-25px)}
-  }
+    18%{opacity:1} 100%{opacity:0; transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) scale(.2)}}
+  @keyframes shake{0%,100%{transform:translate(0,-30px)}
+    12%{transform:translate(-4px,-27px)} 28%{transform:translate(5px,-33px)}
+    46%{transform:translate(-3px,-32px)} 66%{transform:translate(2px,-28px)} 84%{transform:translate(-1px,-29px)}}
   @keyframes letterUp{from{opacity:0; transform:translateY(20px) rotateX(55deg)} to{opacity:1; transform:none}}
-  @keyframes tagUp{from{opacity:0; transform:translateY(10px)} to{opacity:.95; transform:none}}
+  @keyframes tagUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
   @keyframes loadBar{from{transform:scaleX(0)} to{transform:scaleX(1)}}
   @keyframes wipeIn{0%{opacity:0; transform:scale(0)} 12%{opacity:1} 100%{opacity:1; transform:scale(1)}}
-  @keyframes wipeOut{from{opacity:1} to{opacity:0}}
-  @keyframes homeIn{from{opacity:0; transform:scale(1.05)} to{opacity:1; transform:none}}
+  @keyframes homeIn{from{opacity:0} to{opacity:1}}
   @keyframes breathe{0%,100%{opacity:.35; transform:scale(.96)} 50%{opacity:.8; transform:scale(1.04)}}
-  @keyframes ripple{0%{transform:scale(.9); opacity:.55} 100%{transform:scale(1.42); opacity:0}}
+  @keyframes spin{to{transform:rotate(720deg)}}
 
-  .screen.run .splash{animation:fadeIn 300ms ease-out both,
-                                       fadeOut calc(620ms*var(--sp)) ease-in calc(3340ms*var(--sp)) forwards;
-                        animation-duration:calc(300ms*var(--sp)), calc(620ms*var(--sp))}
-
+  .screen.run .splash{animation:fadeIn calc(300ms*var(--sp)) ease-out both,
+                               fadeOut calc(620ms*var(--sp)) ease-in calc(3340ms*var(--sp)) forwards}
   .screen.run .orb.a{animation:orbIn calc(1200ms*var(--sp)) ease-out both}
   .screen.run .orb.b{animation:orbIn calc(1300ms*var(--sp)) ease-out calc(150ms*var(--sp)) both}
   .screen.run .orb.c{animation:orbIn calc(1500ms*var(--sp)) ease-out calc(400ms*var(--sp)) both}
 
-  .screen.run .orb.a,.screen.run .orb.b{opacity:.5}
-  .screen.run .orb.c{opacity:.35}
-
-  .screen.run .outline{animation:draw calc(1000ms*var(--sp)) cubic-bezier(.55,.05,.25,1) calc(180ms*var(--sp)) both}
-  .screen.run .plate{animation:plateIn calc(420ms*var(--sp)) cubic-bezier(.2,1.5,.4,1) calc(940ms*var(--sp)) both}
-  .screen.run .bolt{animation:draw calc(300ms*var(--sp)) ease-out calc(1150ms*var(--sp)) both}
-  .screen.run .bolt-fill{animation:plateIn calc(260ms*var(--sp)) ease-out calc(1360ms*var(--sp)) both}
-  .screen.run .logo-glow{animation:glowIn calc(900ms*var(--sp)) ease-out calc(950ms*var(--sp)) both,
-                                     breathe calc(3400ms*var(--sp)) ease-in-out calc(1850ms*var(--sp)) infinite}
-  .screen.run .flash{animation:flashPop calc(420ms*var(--sp)) ease-out calc(1380ms*var(--sp)) both}
-  .screen.run .ring{animation:ringPop calc(900ms*var(--sp)) cubic-bezier(.15,.7,.3,1) calc(1400ms*var(--sp)) both}
-  .screen.run .ring:nth-of-type(2){animation-delay:calc(1560ms*var(--sp))}
-  .screen.run .ring:nth-of-type(3){animation-delay:calc(1720ms*var(--sp))}
-  .screen.run .spark{animation:sparkOut calc(760ms*var(--sp)) cubic-bezier(.2,.6,.3,1) calc(1400ms*var(--sp)) both}
-  .screen.run .logo-wrap{animation:shake calc(520ms*var(--sp)) ease-out calc(1380ms*var(--sp)) both}
+  /* icon build-up */
+  .screen.run .appicon{animation:popIn calc(600ms*var(--sp)) cubic-bezier(.2,1.5,.35,1) calc(120ms*var(--sp)) both}
+  .screen.run .icon-plate{animation:plateIn calc(420ms*var(--sp)) ease-out calc(120ms*var(--sp)) both}
+  .screen.run .icon-shield{animation:draw calc(900ms*var(--sp)) cubic-bezier(.55,.05,.25,1) calc(420ms*var(--sp)) both}
+  .screen.run .icon-shield-fill{animation:plateIn calc(420ms*var(--sp)) cubic-bezier(.2,1.4,.4,1) calc(1180ms*var(--sp)) both}
+  .screen.run .icon-bolt{animation:plateIn calc(240ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
+  .screen.run .logo-glow{animation:glowIn calc(900ms*var(--sp)) ease-out calc(1150ms*var(--sp)) both,
+                                   breathe calc(3400ms*var(--sp)) ease-in-out calc(2100ms*var(--sp)) infinite}
+  .screen.run .flash{animation:flashPop calc(420ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
+  .screen.run .ring{animation:ringPop calc(900ms*var(--sp)) cubic-bezier(.15,.7,.3,1) calc(1540ms*var(--sp)) both}
+  .screen.run .ring:nth-of-type(2){animation-delay:calc(1700ms*var(--sp))}
+  .screen.run .ring:nth-of-type(3){animation-delay:calc(1860ms*var(--sp))}
+  .screen.run .spark{animation:sparkOut calc(760ms*var(--sp)) cubic-bezier(.2,.6,.3,1) calc(1540ms*var(--sp)) both}
+  .screen.run .logo-wrap{animation:shake calc(520ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
 
   .screen.run .wordmark h1 span{animation:letterUp calc(620ms*var(--sp)) cubic-bezier(.2,1.3,.35,1) both;
-                                animation-delay:calc((1700ms + var(--i) * 45ms) * var(--sp))}
-  .screen.run .tag{animation:tagUp calc(560ms*var(--sp)) ease-out calc(2060ms*var(--sp)) both}
-  .screen.run .loader{animation:fadeIn calc(300ms*var(--sp)) both; animation-delay:calc(2180ms*var(--sp))}
-  .screen.run .loader i{animation:loadBar calc(1400ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(2260ms*var(--sp)) both}
-  .screen.run .dots{animation:fadeIn calc(300ms*var(--sp)) both; animation-delay:calc(2300ms*var(--sp))}
+    animation-delay:calc((1820ms + var(--i) * 45ms) * var(--sp))}
+  .screen.run .tag{animation:tagUp calc(560ms*var(--sp)) ease-out calc(2180ms*var(--sp)) both}
+  .screen.run .loader{animation:fadeIn calc(300ms*var(--sp)) calc(2280ms*var(--sp)) both}
+  .screen.run .loader i{animation:loadBar calc(1400ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(2340ms*var(--sp)) both}
 
-  .screen.run .wipe{animation:wipeIn calc(760ms*var(--sp)) cubic-bezier(.6,0,.25,1) calc(2820ms*var(--sp)) both}
-  .screen.run .home{animation:homeIn calc(700ms*var(--sp)) ease-out calc(3300ms*var(--sp)) both}
-  .screen.run .home .connect{animation:plateIn calc(620ms*var(--sp)) cubic-bezier(.2,1.4,.35,1) calc(3520ms*var(--sp)) both}
-  .screen.run .home .state{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3720ms*var(--sp)) both}
-  .screen.run .home .srv{animation:tagUp calc(520ms*var(--sp)) ease-out both}
-  .screen.run .home .srv:nth-child(1){animation-delay:calc(3820ms*var(--sp))}
-  .screen.run .home .srv:nth-child(2){animation-delay:calc(3900ms*var(--sp))}
-  .screen.run .home .tabbar{animation:tagUp calc(560ms*var(--sp)) ease-out calc(3960ms*var(--sp)) both}
-  .screen.run .home .pulse{animation:ripple calc(2600ms*var(--sp)) ease-out calc(3800ms*var(--sp)) infinite}
-  .screen.run .home .pulse:nth-of-type(3){animation-delay:calc(5200ms*var(--sp))}
+  .screen.run .wipe{animation:wipeIn calc(760ms*var(--sp)) cubic-bezier(.6,0,.25,1) calc(2860ms*var(--sp)) both}
+  .screen.run .home{animation:homeIn calc(700ms*var(--sp)) ease-out calc(3320ms*var(--sp)) both}
+  .screen.run .appbar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3420ms*var(--sp)) both}
+  .screen.run .card{animation:tagUp calc(520ms*var(--sp)) ease-out both}
+  .screen.run .card:nth-child(1){animation-delay:calc(3520ms*var(--sp))}
+  .screen.run .card:nth-child(2){animation-delay:calc(3620ms*var(--sp))}
+  .screen.run .card:nth-child(3){animation-delay:calc(3720ms*var(--sp))}
+  .screen.run .bottombar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3800ms*var(--sp)) both}
+  .screen.run .fab{animation:popIn calc(560ms*var(--sp)) cubic-bezier(.2,1.5,.35,1) calc(3880ms*var(--sp)) both}
 
-  /* instant end state (skip button) */
   .screen.ended .home{opacity:1 !important; animation:none !important}
+  .screen.ended .appbar,.screen.ended .card,.screen.ended .bottombar,.screen.ended .fab{
+    opacity:1 !important; transform:none !important; animation:none !important}
+  .screen.ended .fab{transform:translateY(-28px) !important}
   .screen.ended .splash,.screen.ended .wipe{opacity:0 !important; animation:none !important; pointer-events:none}
 
-  .hint{font-size:12px; color:#5f5f78; text-align:center; max-width:520px; line-height:1.9}
+  .hint{font-size:12px; color:#5f5f78; text-align:center; max-width:540px; line-height:1.9}
   .hint kbd{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.14); border-radius:5px;
-             padding:1px 6px; font-size:11px; font-family:inherit}
+    padding:1px 6px; font-size:11px; font-family:inherit}
 
-  @media (max-width:460px){
-    .phone{transform:scale(.86); transform-origin:top center; margin-bottom:-110px}
-  }
+  @media (max-width:460px){ .phone{transform:scale(.86); transform-origin:top center; margin-bottom:-105px} }
 </style>
 </head>
 <body>
@@ -313,81 +265,117 @@
 
 <div class="phone">
   <div class="island"></div>
-  <div class="screen run" id="screen">
+  <div class="screen run" id="screen" data-theme="dark">
     <div class="statusbar">
       <span>۹:۴۱</span>
       <span class="sb-right">
-        <svg width="15" height="11" viewBox="0 0 15 11" fill="#fff"><rect x="0" y="7" width="2.5" height="4" rx="1"/><rect x="4" y="5" width="2.5" height="6" rx="1"/><rect x="8" y="2.5" width="2.5" height="8.5" rx="1"/><rect x="12" y="0" width="2.5" height="11" rx="1"/></svg>
-        <svg width="14" height="11" viewBox="0 0 14 11" fill="#fff"><path d="M7 10.5 0.4 3.9a9.3 9.3 0 0 1 13.2 0L7 10.5Z"/></svg>
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="#fff"><rect y="7" width="2.5" height="4" rx="1"/><rect x="4" y="5" width="2.5" height="6" rx="1"/><rect x="8" y="2.5" width="2.5" height="8.5" rx="1"/><rect x="12" width="2.5" height="11" rx="1"/></svg>
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="#fff"><path d="M7 10.5 .4 3.9a9.3 9.3 0 0 1 13.2 0L7 10.5Z"/></svg>
         <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".6" y=".6" width="18" height="9.8" rx="2.6" stroke="#fff" stroke-opacity=".55"/><rect x="2.2" y="2.2" width="13" height="6.6" rx="1.4" fill="#fff"/><path d="M20.2 4v3a1.7 1.7 0 0 0 0-3Z" fill="#fff" fill-opacity=".6"/></svg>
       </span>
     </div>
 
-    <!-- ================= HOME (mock app) ================= -->
-    <div class="home">
-      <div class="home-head">
-        <div class="brand">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <defs>
-              <linearGradient id="hbg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#6D4AFF"/><stop offset="55%" stop-color="#8B5CFF"/><stop offset="100%" stop-color="#19D9EC"/>
-              </linearGradient>
-            </defs>
-            <rect width="512" height="512" rx="120" fill="url(#hbg)"/>
-            <path fill="#fff" fill-rule="evenodd" d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z M274 192 L182 296 H248 L232 372 L330 260 H262 Z"/>
-          </svg>
-          <b>RX Client</b>
+    <!-- =====================================================
+         HOME — mirrors MainScreen.kt / MainBottomBar.kt
+         ===================================================== -->
+    <div class="home" id="home">
+      <div class="appbar">
+        <button class="icon-btn" aria-label="منو">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <h2>RX Client</h2>
+        <div class="actions">
+          <button class="icon-btn" aria-label="جستجو">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+          </button>
+          <button class="icon-btn" aria-label="افزودن">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="icon-btn" aria-label="بیشتر">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+          </button>
         </div>
-        <div class="dots-btn"><i></i><i></i><i></i></div>
       </div>
 
-      <div class="hero">
-        <div class="connect">
-          <div class="halo"></div>
-          <div class="pulse"></div>
-          <div class="pulse"></div>
-          <div class="core">
-            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
-              <path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>
-            </svg>
+      <div class="pager">
+        <div class="card selected">
+          <div class="bar"></div>
+          <div class="body">
+            <div class="row1">
+              <div class="remarks">سرور آلمان ۱</div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+              </div>
+            </div>
+            <div class="row2">
+              <span class="badge">DE</span>
+              <span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span>
+            </div>
+            <div class="row3">
+              <span class="proto">VLESS · Reality</span>
+              <span class="ping">۱۴۲ ms</span>
+            </div>
           </div>
         </div>
-        <div class="state">اتصال برقرار نیست<small>برای شروع، دکمه را بزنید</small></div>
+
+        <div class="card">
+          <div class="bar"></div>
+          <div class="body">
+            <div class="row1">
+              <div class="remarks">سرور فنلاند ۲</div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+              </div>
+            </div>
+            <div class="row2"><span class="badge">FI</span><span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span></div>
+            <div class="row3"><span class="proto">VMess · WS</span><span class="ping">۲۱۰ ms</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="bar"></div>
+          <div class="body">
+            <div class="row1">
+              <div class="remarks">سرور اختصاصی — ایران‌سل</div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </div>
+              <div class="act">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+              </div>
+            </div>
+            <div class="row2"><span class="badge">IR</span><span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span></div>
+            <div class="row3"><span class="proto">Trojan · TLS</span><span class="ping red">ناموفق</span></div>
+          </div>
+        </div>
       </div>
 
-      <div class="servers">
-        <div class="srv on">
-          <div class="flag">🇩🇪</div>
-          <div class="name">Germany · Frankfurt<em>VLESS · Reality · 42ms</em></div>
-          <div class="tick"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 6.3 4.7 9 10 3.4"/></svg></div>
-        </div>
-        <div class="srv">
-          <div class="flag">🇫🇮</div>
-          <div class="name">Finland · Helsinki<em>VMess · WS · 88ms</em></div>
-        </div>
-      </div>
-
-      <div class="tabbar">
-        <div class="tab active">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>
-          خانه
-        </div>
-        <div class="tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="6.5" rx="2"/><rect x="3" y="13.5" width="18" height="6.5" rx="2"/></svg>
-          سرورها
-        </div>
-        <div class="tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19V7"/></svg>
-          آمار
-        </div>
-        <div class="tab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></svg>
-          تنظیمات
-        </div>
+      <div class="bottombar">
+        <div class="inner"><span class="status-text" id="statusText">متصل نیست</span></div>
+        <button class="fab" id="fab" aria-label="شروع">
+          <svg id="fabIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+        </button>
       </div>
     </div>
 
-    <!-- ================= SPLASH ================= -->
+    <!-- =====================================================
+         SPLASH — the real adaptive launcher icon
+         ===================================================== -->
     <div class="splash">
       <div class="orb a"></div>
       <div class="orb b"></div>
@@ -395,36 +383,41 @@
 
       <div class="logo-wrap">
         <div class="logo-glow"></div>
-
         <div class="ring"></div>
         <div class="ring"></div>
         <div class="ring"></div>
 
-        <svg class="shield" viewBox="0 0 512 512" aria-label="RX Client">
-          <defs>
-            <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#8B5CFF"/><stop offset="60%" stop-color="#B08CFF"/><stop offset="100%" stop-color="#19D9EC"/>
-            </linearGradient>
-            <linearGradient id="boltGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#6D4AFF"/><stop offset="100%" stop-color="#19D9EC"/>
-            </linearGradient>
-          </defs>
-          <path class="outline" pathLength="1"
-                d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
-          <path class="plate" d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
-          <path class="bolt-fill" d="M274 192 L182 296 H248 L232 372 L330 260 H262 Z"/>
-          <path class="bolt" pathLength="1" d="M274 192 L182 296 H248 L232 372 L330 260 H262 Z"/>
-        </svg>
+        <div class="appicon">
+          <svg viewBox="0 0 512 512" aria-label="RX Client">
+            <defs>
+              <linearGradient id="iconBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#6D4AFF"/>
+                <stop offset="55%" stop-color="#6D4AFF"/>
+                <stop offset="100%" stop-color="#7B5BFF"/>
+              </linearGradient>
+            </defs>
+            <!-- adaptive icon background: @color/ic_launcher_background -->
+            <rect class="icon-plate" width="512" height="512" fill="url(#iconBg)"/>
+            <g transform="translate(256 268) scale(0.72) translate(-256 -268)">
+              <!-- @mipmap/ic_launcher_foreground -->
+              <path class="icon-shield" pathLength="1"
+                    d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
+              <path class="icon-shield-fill"
+                    d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
+              <path class="icon-bolt" d="M274 192 L182 296 H248 L232 372 L330 260 H262 Z"/>
+            </g>
+          </svg>
+        </div>
 
         <div class="flash"></div>
-        <div class="spark" style="--a:0deg;--r:120px"></div>
-        <div class="spark" style="--a:48deg;--r:100px"></div>
-        <div class="spark" style="--a:96deg;--r:135px"></div>
-        <div class="spark" style="--a:140deg;--r:105px"></div>
-        <div class="spark" style="--a:188deg;--r:125px"></div>
-        <div class="spark" style="--a:236deg;--r:95px"></div>
-        <div class="spark" style="--a:282deg;--r:130px"></div>
-        <div class="spark" style="--a:326deg;--r:110px"></div>
+        <div class="spark" style="--a:0deg;--r:118px"></div>
+        <div class="spark" style="--a:48deg;--r:98px"></div>
+        <div class="spark" style="--a:96deg;--r:132px"></div>
+        <div class="spark" style="--a:140deg;--r:102px"></div>
+        <div class="spark" style="--a:188deg;--r:122px"></div>
+        <div class="spark" style="--a:236deg;--r:94px"></div>
+        <div class="spark" style="--a:282deg;--r:128px"></div>
+        <div class="spark" style="--a:326deg;--r:108px"></div>
       </div>
 
       <div class="wordmark">
@@ -433,27 +426,26 @@
       </div>
 
       <div class="loader"><i></i></div>
-      <div class="dots"><i></i><i></i><i></i></div>
-
       <div class="wipe"></div>
     </div>
-    <!-- ================= /SPLASH ================= -->
   </div>
 </div>
 
 <div class="controls">
   <button class="btn primary" id="replay">↻ پخش دوباره</button>
-  <button class="btn" id="slow" aria-pressed="false">۰٫۵× آهسته</button>
+  <button class="btn" id="slow">۰٫۵× آهسته</button>
+  <button class="btn" id="theme">☀️ تم روشن</button>
   <button class="btn" id="skip">⏭ پرش به اپ</button>
 </div>
 
 <p class="hint">
-  کلید <kbd>R</kbd> هم انیمیشن را از اول پخش می‌کند.
-  این یک پیش‌نمایش است — فقط بگو کدام بخش را حذف یا اضافه کنم.
+  ساختار صفحه‌ی اصلی از <code>MainScreen.kt</code> و <code>MainBottomBar.kt</code> گرفته شده؛
+  آیکون هم همان `ic_launcher` واقعی است. روی دکمه‌ی گرد (FAB) بعد از باز شدن بزن تا حالت اتصال را ببینی.
+  کلید <kbd>R</kbd> = پخش دوباره.
 </p>
 
 <script>
-  // split wordmark into per-letter spans
+  // wordmark letters
   (function(){
     const el = document.getElementById('wordmark');
     'RX Client'.split('').forEach((ch, i) => {
@@ -465,34 +457,52 @@
   })();
 
   const screen = document.getElementById('screen');
-  const btnSlow = document.getElementById('slow');
+  const slowBtn = document.getElementById('slow');
+  const themeBtn = document.getElementById('theme');
 
   function replay(){
     screen.classList.remove('run','ended');
-    // force reflow so animations restart
     void screen.offsetWidth;
     screen.classList.add('run');
   }
-
-  document.getElementById('replay').addEventListener('click', replay);
-  document.getElementById('skip').addEventListener('click', () => {
+  function skip(){
     screen.classList.remove('run');
     screen.classList.add('ended');
-  });
+  }
 
-  btnSlow.addEventListener('click', () => {
-    const slow = btnSlow.getAttribute('aria-pressed') === 'true';
-    btnSlow.setAttribute('aria-pressed', String(!slow));
-    screen.style.setProperty('--sp', slow ? '1' : '0.5');
-    btnSlow.textContent = slow ? '۰٫۵× آهسته' : '۱× سرعت';
+  document.getElementById('replay').addEventListener('click', replay);
+  document.getElementById('skip').addEventListener('click', skip);
+
+  slowBtn.addEventListener('click', () => {
+    const isSlow = screen.style.getPropertyValue('--sp') === '0.5';
+    screen.style.setProperty('--sp', isSlow ? '1' : '0.5');
+    slowBtn.textContent = isSlow ? '۰٫۵× آهسته' : '۱× سرعت';
     replay();
   });
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'r' || e.key === 'R') replay();
+  themeBtn.addEventListener('click', () => {
+    const light = screen.dataset.theme === 'light';
+    screen.dataset.theme = light ? 'dark' : 'light';
+    themeBtn.textContent = light ? '☀️ تم روشن' : '🌙 تم تاریک';
   });
 
-  // auto-replay on load is just the initial .run class
+  // real app behaviour: FAB toggles the service, icon rotates, status text changes
+  const fab = document.getElementById('fab');
+  const fabIcon = document.getElementById('fabIcon');
+  const statusText = document.getElementById('statusText');
+  let running = false;
+  fab.addEventListener('click', () => {
+    running = !running;
+    fab.classList.toggle('on', running);
+    statusText.textContent = running ? 'متصل است. برای بررسی اتصال ضربه بزنید.' : 'متصل نیست';
+    statusText.classList.toggle('connected', running);
+    fabIcon.innerHTML = running
+      ? '<rect x="7" y="7" width="10" height="10" rx="1.5"/>'
+      : '<path d="M8 5.5v13l11-6.5z"/>';
+    fab.classList.toggle('spin', running);
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'r' || e.key === 'R') replay(); });
 </script>
 </body>
 </html>
