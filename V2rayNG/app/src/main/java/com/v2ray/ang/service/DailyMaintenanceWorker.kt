@@ -20,7 +20,7 @@ import com.v2ray.ang.dto.SubscriptionUpdateMessage
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.handler.CloudflareAssistant
 import com.v2ray.ang.handler.DailyMaintenance
-import com.v2ray.ang.handler.MessageHelper
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.handler.UpdateCheckerManager

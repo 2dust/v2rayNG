@@ -134,16 +134,19 @@ object ConfigBenchmark {
     }
 
     private fun client(port: Int, timeoutSeconds: Long): OkHttpClient {
-        val username = SettingsManager.getSocksUsername()
-        val password = SettingsManager.getSocksPassword()
+        // The local inbound only asks for a password when the user set one; OkHttp rejects a null
+        // Credentials argument, so the header is built once and reused by the authenticator.
+        val username = SettingsManager.getSocksUsername().orEmpty()
+        val password = SettingsManager.getSocksPassword().orEmpty()
+        val authHeader = if (username.isEmpty()) null else Credentials.basic(username, password)
         return OkHttpClient.Builder()
             .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress(AppConfig.LOOPBACK, port)))
             .proxyAuthenticator { _, response ->
-                if (response.request.header("Proxy-Authorization") != null) {
+                if (authHeader == null || response.request.header("Proxy-Authorization") != null) {
                     null
                 } else {
                     response.request.newBuilder()
-                        .header("Proxy-Authorization", Credentials.basic(username, password))
+                        .header("Proxy-Authorization", authHeader)
                         .build()
                 }
             }
