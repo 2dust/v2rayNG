@@ -7,47 +7,27 @@
 <title>RX VPN — Splash Animation</title>
 <style>
   /* ==========================================================
-     RX VPN identity — source: branch arena/d739235f-rx-client
-       branding/rx-vpn-logo.svg  ·  ui/compose/Theme.kt
-       ui/main/MainScreen.kt · MainBottomBar.kt · MainEmptyState.kt
+     RX VPN — matched to the shipped build
+       branding/rx-vpn-logo.svg · ui/compose/Theme.kt
+       ui/main/MainScreen.kt · MainGroupTab.kt · MainBottomBar.kt
+       ui/main/MainEmptyState.kt · ui/compose/RxComponents.kt
      ========================================================== */
   .screen{
-    --bg:#17191B;
-    --bg-low:#1D2022;
-    --surface:#17191B;
-    --container:#232628;
-    --container-high:#2C3033;
-    --container-highest:#363A3D;
+    --bg:#17191B; --bg-low:#1D2022;
+    --container:#232628; --container-high:#2C3033; --container-highest:#363A3D;
     --variant:#303336;
-    --on:#F1F0EB;
-    --onvar:#BCBEBB;
-    --outline:#929590;
-    --outline-var:#424649;
-    --primary:#E8B778;
-    --on-primary:#2C1D0B;
-    --tertiary:#9DCEB7;
-    --ping:#356B57;
-    --divider:#424649;
+    --on:#F1F0EB; --onvar:#BCBEBB; --outline:#929590; --outline-var:#424649;
+    --primary:#E8B778; --on-primary:#2C1D0B;
+    --tertiary:#9DCEB7; --divider:#424649;
   }
   .screen[data-theme="light"]{
-    --bg:#F5F4F1;
-    --bg-low:#EFEFEB;
-    --surface:#F5F4F1;
-    --container:#EAEAE6;
-    --container-high:#E4E4DF;
-    --container-highest:#DEDED8;
+    --bg:#F5F4F1; --bg-low:#EFEFEB;
+    --container:#EAEAE6; --container-high:#E4E4DF; --container-highest:#DEDED8;
     --variant:#E9E7E2;
-    --on:#202120;
-    --onvar:#5C5D59;
-    --outline:#7A7B76;
-    --outline-var:#D4D3CD;
-    --primary:#805522;
-    --on-primary:#FFFFFF;
-    --tertiary:#356B57;
-    --ping:#356B57;
-    --divider:#D4D3CD;
+    --on:#202120; --onvar:#5C5D59; --outline:#7A7B76; --outline-var:#D4D3CD;
+    --primary:#805522; --on-primary:#FFFFFF;
+    --tertiary:#356B57; --divider:#D4D3CD;
   }
-
   :root{ --sp:1; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -57,9 +37,8 @@
     color:#F1F0EB; font-family:"Vazirmatn","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:26px 16px;
   }
-  .page-title{font-size:13.5px; letter-spacing:.18em; text-transform:uppercase; color:#8a8d90; margin:0}
+  .page-title{font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:#8a8d90; margin:0}
   .page-title b{color:#E8B778}
-
   .controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
   .btn{border:1px solid rgba(241,240,235,.14); background:rgba(241,240,235,.05); color:#F1F0EB;
     padding:9px 15px; border-radius:12px; font:inherit; font-size:13px; cursor:pointer; transition:.16s}
@@ -68,115 +47,122 @@
   .btn.primary{background:linear-gradient(180deg,#E8B778,#d9a463); color:#2C1D0B; border-color:transparent; font-weight:700}
 
   /* ---------------- phone ---------------- */
-  .phone{position:relative; width:378px; height:788px; border-radius:52px; padding:11px; flex:0 0 auto;
+  .phone{position:relative; width:378px; height:788px; border-radius:50px; padding:11px; flex:0 0 auto;
     background:linear-gradient(160deg,#2a2d30,#0c0d0e 42%,#1b1d1f);
-    box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 40px 90px -30px #000, 0 0 130px -40px rgba(232,183,120,.28)}
-  .screen{position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 40px 90px -30px #000, 0 0 130px -40px rgba(232,183,120,.25)}
+  .screen{position:relative; width:100%; height:100%; border-radius:40px; overflow:hidden;
     background:var(--bg); isolation:isolate; color:var(--on)}
-  .island{position:absolute; top:11px; left:50%; transform:translateX(-50%); width:104px; height:26px;
+  .island{position:absolute; top:10px; left:50%; transform:translateX(-50%); width:96px; height:24px;
     border-radius:999px; background:#000; z-index:60}
-  .statusbar{position:absolute; top:16px; left:0; right:0; z-index:55; display:flex; justify-content:space-between;
-    align-items:center; padding:0 26px; font-size:12.5px; font-weight:600; color:#fff}
+  .statusbar{position:absolute; top:13px; left:0; right:0; z-index:55; display:flex; justify-content:space-between;
+    align-items:center; padding:0 20px; font-size:11px; font-weight:600; color:#fff}
 
-  /* ---------------- shared glass ---------------- */
-  .glass{ /* RxGlassPanel: layered translucency + soft edge highlight */
-    border-radius:24px;
-    background:linear-gradient(180deg, color-mix(in srgb, var(--container-high) 88%, transparent),
-                                       color-mix(in srgb, var(--container) 72%, transparent));
-    border:1px solid color-mix(in srgb, var(--outline-var) 38%, transparent);
-    box-shadow:inset 0 1px 0 color-mix(in srgb, var(--on) 12%, transparent);
+  .glass{
+    background:linear-gradient(180deg, color-mix(in srgb, var(--container-high) 92%, transparent),
+                                       color-mix(in srgb, var(--container) 74%, transparent));
+    border:1px solid color-mix(in srgb, var(--outline-var) 62%, transparent);
+    box-shadow:inset 0 1px 0 color-mix(in srgb, var(--on) 9%, transparent);
   }
 
-  /* ---------------- HOME (real RX VPN main screen) ---------------- */
+  /* ---------------- HOME ---------------- */
   .home{position:absolute; inset:0; z-index:25; display:flex; flex-direction:column; opacity:0;
-    background:linear-gradient(180deg, var(--bg-low), var(--bg))}
-  .appbar{height:64px; margin-top:38px; display:flex; align-items:center; gap:2px;
-    background:var(--surface); color:var(--on)}
-  .appbar h2{margin:0; font-size:20px; font-weight:500; flex:1; padding-inline-start:4px}
-  .icon-btn{width:44px; height:44px; border:0; background:transparent; color:var(--on); border-radius:50%;
-    display:grid; place-items:center; cursor:pointer}
+    background:linear-gradient(180deg, var(--bg-low) 0%, var(--bg) 26%, var(--bg) 100%)}
+
+  .appbar{height:50px; margin-top:30px; display:flex; align-items:center; gap:0; padding:0 4px;
+    background:transparent; color:var(--on)}
+  .appbar h2{margin:0; font-size:16px; font-weight:500; flex:1; padding-inline-start:2px; letter-spacing:.01em}
+  .icon-btn{width:38px; height:38px; border:0; background:transparent; color:var(--on); border-radius:50%;
+    display:grid; place-items:center; cursor:pointer; flex:0 0 auto}
   .icon-btn:active{background:rgba(128,128,128,.16)}
 
-  .content{flex:1; padding:24px; display:flex; align-items:center; justify-content:center}
-  .empty{padding:24px; width:100%; display:flex; flex-direction:column; align-items:center; text-align:center}
-  .empty .mark{width:76px; height:76px; color:var(--primary)}
-  .empty h3{margin:16px 0 0; font-size:20px; font-weight:600; line-height:1.5}
-  .empty p{margin:10px 0 0; font-size:13.5px; line-height:1.9; color:var(--onvar)}
-  .cta{margin-top:24px; width:100%; min-height:56px; border-radius:18px; border:0; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; gap:10px; font:inherit; font-size:15px; font-weight:600;
-    background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 96%, transparent),
-                                       color-mix(in srgb, var(--primary) 82%, transparent));
-    color:var(--on-primary); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent)}
-  .cta:active{transform:scale(.99)}
-  .link-btn{margin-top:4px; width:100%; min-height:44px; border:0; background:transparent; color:var(--primary);
-    font:inherit; font-size:13.5px; cursor:pointer}
+  /* GroupTabBar — CircleShape, surfaceContainerHigh, 0.5dp outline */
+  .tabbar{margin:4px 8px 0; height:31px; border-radius:999px; display:flex; padding:2.5px; gap:2px;
+    background:var(--container-high); border:1px solid color-mix(in srgb, var(--outline-var) 60%, transparent);
+    box-shadow:0 1px 3px rgba(0,0,0,.45)}
+  .tab{flex:1; border-radius:999px; display:flex; align-items:center; justify-content:center; gap:3px;
+    font-size:11px; font-weight:500; color:var(--onvar); padding:0 8px; white-space:nowrap; overflow:hidden}
+  .tab.selected{background:color-mix(in srgb, var(--primary) 12%, transparent); color:var(--primary)}
+  .badge{min-width:15px; height:15px; border-radius:999px; background:color-mix(in srgb, var(--onvar) 55%, transparent);
+    color:var(--bg); font-size:9px; font-weight:600; display:grid; place-items:center; padding:0 4px}
 
-  /* ---------------- bottom bar (MainBottomBar.kt) ---------------- */
-  .bottombar{padding:8px 16px 18px}
-  .bottombar .glass{padding:16px}
-  .status-row{display:flex; align-items:center; gap:10px; padding:2px 0; cursor:pointer}
-  .dot{width:8px; height:8px; border-radius:50%; background:var(--outline); flex:0 0 auto; transition:.3s}
-  .dot.on{background:var(--tertiary); box-shadow:0 0 0 4px color-mix(in srgb, var(--tertiary) 22%, transparent)}
-  .status-text{flex:1; font-size:13.5px; color:var(--onvar); line-height:1.6}
-  .ping-chip{font-size:11.5px; font-weight:600; color:var(--tertiary); background:color-mix(in srgb, var(--tertiary) 12%, transparent);
-    border-radius:8px; padding:3px 8px; opacity:0; transition:.3s}
+  .content{flex:1; padding:12px 0 0; overflow:hidden}
+  .empty{margin:0 34px; border-radius:13px; padding:22px 18px 14px; display:flex; flex-direction:column;
+    align-items:center; text-align:center}
+  .empty .mark{width:62px; height:62px; color:var(--primary)}
+  .empty h3{margin:8px 0 0; font-size:15.5px; font-weight:600; line-height:1.6}
+  .empty p{margin:12px 0 0; font-size:11.5px; line-height:1.95; color:var(--onvar); max-width:250px}
+  .cta{margin-top:18px; width:100%; height:42px; border-radius:13px; border:0; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:9px; font:inherit; font-size:13px; font-weight:600;
+    background:linear-gradient(180deg,#EBC68F 0%, #D5A165 55%, #C08C51 100%);
+    color:var(--on-primary); box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+  .cta:active{transform:scale(.99)}
+  .link-btn{margin-top:8px; height:34px; width:100%; border:0; background:transparent; color:var(--primary);
+    font:inherit; font-size:12px; cursor:pointer}
+
+  /* MainBottomBar — RxGlassPanel + accent RxGlassButton */
+  .bottombar{padding:0 6px 10px}
+  .bottombar .glass{border-radius:17px; padding:12px 13px}
+  .status-row{display:flex; align-items:center; gap:8px; padding:1px 2px; cursor:pointer}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--outline); flex:0 0 auto; transition:.3s}
+  .dot.on{background:var(--tertiary); box-shadow:0 0 0 4px color-mix(in srgb, var(--tertiary) 20%, transparent)}
+  .status-text{flex:1; font-size:11.5px; color:var(--onvar); line-height:1.6}
+  .ping-chip{font-size:10px; font-weight:600; color:var(--tertiary);
+    background:color-mix(in srgb, var(--tertiary) 12%, transparent); border-radius:7px; padding:2px 7px;
+    opacity:0; transition:.3s}
   .ping-chip.show{opacity:1}
-  .spin-mini{width:16px; height:16px; border-radius:50%; border:2px solid color-mix(in srgb, var(--primary) 35%, transparent);
-    border-top-color:var(--primary); animation:spin 1s linear infinite; display:none}
+  .spin-mini{width:14px; height:14px; border-radius:50%; border:2px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    border-top-color:var(--primary); animation:spin 1s linear infinite; display:none; flex:0 0 auto}
   .spin-mini.show{display:block}
 
-  .bar-actions{display:flex; gap:10px; margin-top:10px}
-  .connect{flex:1; height:60px; border-radius:18px; border:0; font:inherit; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 96%, transparent),
-                                       color-mix(in srgb, var(--primary) 82%, transparent));
-    color:var(--on-primary); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent);
-    transition:background .35s, box-shadow .35s}
-  .connect.running{background:linear-gradient(180deg, #2C3033, #232628); color:var(--on);
-    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 65%, transparent)}
-  .connect .lbl{display:flex; flex-direction:column; align-items:center; line-height:1.25}
-  .connect .lbl b{font-size:15px; font-weight:600}
-  .connect .lbl small{font-size:10.5px; opacity:.78; margin-top:2px; display:none}
+  .bar-actions{display:flex; gap:8px; margin-top:9px}
+  .connect{flex:1; height:45px; border-radius:13px; border:0; font:inherit; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    background:linear-gradient(180deg,#EBC68F 0%, #D5A165 55%, #C08C51 100%);
+    color:var(--on-primary); box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+    transition:background .35s, color .35s, box-shadow .35s}
+  .connect.running{background:linear-gradient(180deg,var(--container-high),var(--container));
+    color:var(--on); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 70%, transparent)}
+  .connect .lbl{display:flex; flex-direction:column; align-items:center; line-height:1.2}
+  .connect .lbl b{font-size:13px; font-weight:600}
+  .connect .lbl small{font-size:9.5px; opacity:.8; margin-top:1px; display:none}
   .connect.running .lbl small{display:block}
-  .square{width:60px; height:60px; flex:0 0 auto; border-radius:18px; border:0; color:var(--on); cursor:pointer;
+  .square{width:45px; height:45px; flex:0 0 auto; border-radius:13px; border:0; color:var(--on); cursor:pointer;
     display:grid; place-items:center;
-    background:linear-gradient(180deg, color-mix(in srgb, var(--container-high) 88%, transparent),
-                                       color-mix(in srgb, var(--container) 72%, transparent));
-    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 65%, transparent)}
+    background:linear-gradient(180deg,color-mix(in srgb,var(--container-high) 92%, transparent),
+                                       color-mix(in srgb,var(--container) 74%, transparent));
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 70%, transparent)}
 
   /* ---------------- SPLASH ---------------- */
   .splash{position:absolute; inset:0; z-index:30; display:grid; place-items:center; overflow:hidden}
   .splash::before{content:""; position:absolute; inset:0;
-    background:radial-gradient(120% 75% at 50% 4%, #24262a 0%, transparent 58%),
+    background:radial-gradient(120% 75% at 50% 4%, #26282c 0%, transparent 58%),
                linear-gradient(180deg,#101214,#17191B 60%,#111314)}
-  .glow{position:absolute; width:340px; height:340px; border-radius:50%; filter:blur(58px); opacity:0;
-    background:radial-gradient(circle, rgba(232,183,120,.42), rgba(232,183,120,.10) 45%, transparent 70%)}
+  .glow{position:absolute; width:330px; height:330px; border-radius:50%; filter:blur(58px); opacity:0;
+    background:radial-gradient(circle, rgba(232,183,120,.4), rgba(232,183,120,.09) 45%, transparent 70%)}
   .grid{position:absolute; inset:0; opacity:0;
-    background-image:radial-gradient(rgba(241,240,235,.10) 1px, transparent 1px);
-    background-size:22px 22px;
+    background-image:radial-gradient(rgba(241,240,235,.09) 1px, transparent 1px); background-size:22px 22px;
     mask-image:radial-gradient(circle at 50% 44%, #000 0%, transparent 68%)}
 
   .mark-wrap{position:relative; display:grid; place-items:center; transform:translateY(-34px)}
-  .tile{position:relative; width:134px; height:134px; border-radius:31.5px; overflow:hidden; z-index:3;
-    box-shadow:0 22px 50px -18px rgba(0,0,0,.9), 0 0 60px -18px rgba(232,183,120,.45)}
+  .tile{position:relative; width:126px; height:126px; border-radius:29.5px; overflow:hidden; z-index:3;
+    box-shadow:0 22px 50px -18px rgba(0,0,0,.9), 0 0 60px -18px rgba(232,183,120,.4)}
   .tile svg{display:block; width:100%; height:100%}
-  .rx-r{fill:none; stroke:#f4f2ed; stroke-width:7; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
-  .rx-r-fill{fill:#f4f2ed; opacity:0}
-  .rx-x{fill:none; stroke:#e8b778; stroke-width:7; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
-  .rx-x-fill{fill:#e8b778; opacity:0}
+  .rx-r,.rx-x{stroke-linejoin:round; stroke-width:7; stroke-dasharray:1; stroke-dashoffset:1; pathLength:1; fill:none}
+  .rx-r{stroke:#f4f2ed} .rx-x{stroke:#e8b778}
+  .rx-r-fill{fill:#f4f2ed; opacity:0} .rx-x-fill{fill:#e8b778; opacity:0}
   .shimmer{position:absolute; inset:-40%; z-index:4; opacity:0;
-    background:linear-gradient(105deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%)}
-  .ring{position:absolute; width:134px; height:134px; border-radius:34px; border:1.5px solid rgba(232,183,120,.45);
+    background:linear-gradient(105deg, transparent 38%, rgba(255,255,255,.5) 50%, transparent 62%)}
+  .ring{position:absolute; width:126px; height:126px; border-radius:32px; border:1.5px solid rgba(232,183,120,.42);
     opacity:0; z-index:2}
   .spark{position:absolute; left:50%; top:50%; margin:-2.5px 0 0 -2.5px; width:5px; height:5px; border-radius:50%;
-    background:#E8B778; box-shadow:0 0 12px 3px rgba(232,183,120,.65); opacity:0; z-index:4}
+    background:#E8B778; box-shadow:0 0 12px 3px rgba(232,183,120,.6); opacity:0; z-index:4}
 
-  .wordmark{position:absolute; bottom:206px; left:0; right:0; text-align:center; z-index:5}
-  .wordmark h1{margin:0; font-size:30px; font-weight:800; letter-spacing:.14em; direction:ltr;
+  .wordmark{position:absolute; bottom:200px; left:0; right:0; text-align:center; z-index:5}
+  .wordmark h1{margin:0; font-size:29px; font-weight:800; letter-spacing:.14em; direction:ltr;
     display:inline-flex; color:#F4F2ED}
   .wordmark h1 span{display:inline-block; opacity:0; transform:translateY(16px)}
-  .wordmark .tag{margin:10px 0 0; font-size:12.5px; color:#9b9d99; opacity:0}
-  .loader{position:absolute; bottom:146px; left:50%; transform:translateX(-50%); width:120px; height:3px;
+  .wordmark .tag{margin:10px 0 0; font-size:12px; color:#9b9d99; opacity:0}
+  .loader{position:absolute; bottom:144px; left:50%; transform:translateX(-50%); width:116px; height:3px;
     border-radius:99px; background:rgba(241,240,235,.10); overflow:hidden; opacity:0; z-index:5}
   .loader i{display:block; height:100%; width:100%; transform-origin:right center; transform:scaleX(0); border-radius:99px;
     background:linear-gradient(90deg,#8a6a3f,#E8B778,#f6dfbf)}
@@ -191,7 +177,7 @@
   @keyframes popIn{0%{opacity:0;transform:scale(.7)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
   @keyframes plateIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
   @keyframes glowIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
-  @keyframes ringPop{0%{opacity:.75;transform:scale(.62)}70%{opacity:.08}100%{opacity:0;transform:scale(2.3)}}
+  @keyframes ringPop{0%{opacity:.72;transform:scale(.62)}70%{opacity:.07}100%{opacity:0;transform:scale(2.3)}}
   @keyframes sparkOut{0%{opacity:0;transform:rotate(var(--a)) translateY(0) scale(1)}
     20%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) scale(.2)}}
   @keyframes sweep{0%{opacity:0;transform:translateX(-70%)}25%{opacity:1}100%{opacity:0;transform:translateX(70%)}}
@@ -226,16 +212,17 @@
   .screen.run .loader{animation:fadeIn calc(280ms*var(--sp)) calc(2320ms*var(--sp)) both}
   .screen.run .loader i{animation:loadBar calc(1200ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(2380ms*var(--sp)) both}
   .screen.run .wipe{animation:wipeIn calc(740ms*var(--sp)) cubic-bezier(.6,0,.25,1) calc(2820ms*var(--sp)) both}
-  .screen.run .home{animation:homeIn calc(700ms*var(--sp)) ease-out calc(3260ms*var(--sp)) both}
-  .screen.run .appbar{animation:tagUp calc(480ms*var(--sp)) ease-out calc(3380ms*var(--sp)) both}
-  .screen.run .content{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3500ms*var(--sp)) both}
+  .screen.run .home{animation:homeIn calc(650ms*var(--sp)) ease-out calc(3260ms*var(--sp)) both}
+  .screen.run .appbar{animation:tagUp calc(460ms*var(--sp)) ease-out calc(3360ms*var(--sp)) both}
+  .screen.run .tabbar{animation:tagUp calc(480ms*var(--sp)) ease-out calc(3440ms*var(--sp)) both}
+  .screen.run .content{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3520ms*var(--sp)) both}
   .screen.run .bottombar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3620ms*var(--sp)) both}
 
-  .screen.ended .home,.screen.ended .appbar,.screen.ended .content,.screen.ended .bottombar{
+  .screen.ended .home,.screen.ended .appbar,.screen.ended .tabbar,.screen.ended .content,.screen.ended .bottombar{
     opacity:1 !important; transform:none !important; animation:none !important}
   .screen.ended .splash,.screen.ended .wipe{opacity:0 !important; animation:none !important; pointer-events:none}
 
-  .hint{font-size:12px; color:#6f7276; text-align:center; max-width:560px; line-height:1.9; margin:0}
+  .hint{font-size:12px; color:#6f7276; text-align:center; max-width:580px; line-height:1.9; margin:0}
   .hint kbd{background:rgba(241,240,235,.09); border:1px solid rgba(241,240,235,.14); border-radius:5px;
     padding:1px 6px; font-size:11px; font-family:inherit}
   @media (max-width:460px){ .phone{transform:scale(.86); transform-origin:top center; margin-bottom:-105px} }
@@ -249,30 +236,35 @@
   <div class="island"></div>
   <div class="screen run" id="screen" data-theme="dark">
     <div class="statusbar">
-      <span>۹:۴۱</span>
-      <span style="display:flex; gap:5px; align-items:center">
-        <svg width="15" height="11" viewBox="0 0 15 11" fill="#fff"><rect y="7" width="2.5" height="4" rx="1"/><rect x="4" y="5" width="2.5" height="6" rx="1"/><rect x="8" y="2.5" width="2.5" height="8.5" rx="1"/><rect x="12" width="2.5" height="11" rx="1"/></svg>
-        <svg width="14" height="11" viewBox="0 0 14 11" fill="#fff"><path d="M7 10.5 .4 3.9a9.3 9.3 0 0 1 13.2 0L7 10.5Z"/></svg>
-        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".6" y=".6" width="18" height="9.8" rx="2.6" stroke="#fff" stroke-opacity=".55"/><rect x="2.2" y="2.2" width="13" height="6.6" rx="1.4" fill="#fff"/><path d="M20.2 4v3a1.7 1.7 0 0 0 0-3Z" fill="#fff" fill-opacity=".6"/></svg>
+      <span>۱۴:۵۰</span>
+      <span style="display:flex; gap:4px; align-items:center">
+        <svg width="13" height="10" viewBox="0 0 15 11" fill="#fff"><rect y="7" width="2.5" height="4" rx="1"/><rect x="4" y="5" width="2.5" height="6" rx="1"/><rect x="8" y="2.5" width="2.5" height="8.5" rx="1"/><rect x="12" width="2.5" height="11" rx="1"/></svg>
+        <svg width="12" height="10" viewBox="0 0 14 11" fill="#fff"><path d="M7 10.5 .4 3.9a9.3 9.3 0 0 1 13.2 0L7 10.5Z"/></svg>
+        <svg width="19" height="10" viewBox="0 0 22 11" fill="none"><rect x=".6" y=".6" width="18" height="9.8" rx="2.6" stroke="#fff" stroke-opacity=".55"/><rect x="2.2" y="2.2" width="13" height="6.6" rx="1.4" fill="#fff"/><path d="M20.2 4v3a1.7 1.7 0 0 0 0-3Z" fill="#fff" fill-opacity=".6"/></svg>
       </span>
     </div>
 
-    <!-- =========== HOME — MainScreen.kt (empty state) + MainBottomBar.kt =========== -->
+    <!-- ============ HOME — MainScreen / GroupTabBar / MainEmptyState / MainBottomBar ============ -->
     <div class="home">
       <div class="appbar">
         <button class="icon-btn" aria-label="منو">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
         <h2>RX VPN</h2>
         <button class="icon-btn" aria-label="جستجو">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         </button>
         <button class="icon-btn" aria-label="افزودن">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <button class="icon-btn" aria-label="بیشتر">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
         </button>
+      </div>
+
+      <div class="tabbar">
+        <div class="tab selected">Default</div>
+        <div class="tab">import sub<span class="badge">۲۱</span></div>
       </div>
 
       <div class="content">
@@ -283,10 +275,10 @@
           <h3>هنوز کانفیگی اضافه نشده</h3>
           <p>فایل کانفیگ را وارد کن یا لینک کپی‌شده را بچسبان؛ بعد یک سرور انتخاب کن و متصل شو.</p>
           <button class="cta">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
             افزودن کانفیگ
           </button>
-          <button class="link-btn">کانفیگ را از کلیپ‌بورد وارد کنید</button>
+          <button class="link-btn">کانفیگ را از کلیپ بورد وارد کنید</button>
         </div>
       </div>
 
@@ -300,18 +292,18 @@
           </div>
           <div class="bar-actions">
             <button class="connect" id="connectBtn">
-              <svg id="connIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>
+              <svg id="connIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>
               <span class="lbl"><b id="connLabel">اتصال</b><small id="connSub">۴۸ ms</small></span>
             </button>
             <button class="square" aria-label="مسیردهی برنامه‌ها">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="1.6"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="5" cy="19" r="1.6"/><circle cx="12" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/></svg>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- =========== SPLASH — branding/rx-vpn-logo.svg =========== -->
+    <!-- ============ SPLASH — branding/rx-vpn-logo.svg ============ -->
     <div class="splash">
       <div class="grid"></div>
       <div class="glow"></div>
@@ -330,27 +322,23 @@
             </defs>
             <rect width="512" height="512" fill="url(#tileGrad)"/>
             <g transform="translate(46.08 46.08) scale(0.82)">
-              <path class="rx-r" pathLength="1"
-                    d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
-              <path class="rx-r-fill"
-                    d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
-              <path class="rx-x" pathLength="1"
-                    d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
-              <path class="rx-x-fill"
-                    d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
+              <path class="rx-r" pathLength="1" d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
+              <path class="rx-r-fill" d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
+              <path class="rx-x" pathLength="1" d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
+              <path class="rx-x-fill" d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
             </g>
           </svg>
           <div class="shimmer"></div>
         </div>
 
-        <div class="spark" style="--a:0deg;--r:112px"></div>
-        <div class="spark" style="--a:52deg;--r:96px"></div>
-        <div class="spark" style="--a:104deg;--r:124px"></div>
-        <div class="spark" style="--a:152deg;--r:100px"></div>
-        <div class="spark" style="--a:200deg;--r:120px"></div>
-        <div class="spark" style="--a:248deg;--r:94px"></div>
-        <div class="spark" style="--a:296deg;--r:126px"></div>
-        <div class="spark" style="--a:340deg;--r:104px"></div>
+        <div class="spark" style="--a:0deg;--r:106px"></div>
+        <div class="spark" style="--a:52deg;--r:92px"></div>
+        <div class="spark" style="--a:104deg;--r:118px"></div>
+        <div class="spark" style="--a:152deg;--r:96px"></div>
+        <div class="spark" style="--a:200deg;--r:114px"></div>
+        <div class="spark" style="--a:248deg;--r:90px"></div>
+        <div class="spark" style="--a:296deg;--r:120px"></div>
+        <div class="spark" style="--a:340deg;--r:100px"></div>
       </div>
 
       <div class="wordmark">
@@ -373,8 +361,8 @@
 
 <p class="hint">
   آیکون و پالت از <code>branding/rx-vpn-logo.svg</code> و <code>Theme.kt</code>؛
-  صفحه‌ی اصلی از <code>MainScreen.kt</code> و <code>MainBottomBar.kt</code> (برنچ d739235f).
-  دکمه‌ی «اتصال» را بزن تا حالت متصل را ببینی. <kbd>R</kbd> = پخش دوباره.
+  چیدمان از <code>MainScreen.kt</code> + <code>MainGroupTab.kt</code> + <code>MainBottomBar.kt</code>،
+  مطابق اسکرین‌شات خودت. دکمه‌ی «اتصال» را بزن تا حالت متصل را ببینی. <kbd>R</kbd> = پخش دوباره.
 </p>
 
 <script>
@@ -392,11 +380,7 @@
   const slowBtn = document.getElementById('slow');
   const themeBtn = document.getElementById('theme');
 
-  function replay(){
-    screen.classList.remove('run','ended');
-    void screen.offsetWidth;
-    screen.classList.add('run');
-  }
+  function replay(){ screen.classList.remove('run','ended'); void screen.offsetWidth; screen.classList.add('run'); }
   document.getElementById('replay').addEventListener('click', replay);
   document.getElementById('skip').addEventListener('click', () => {
     screen.classList.remove('run'); screen.classList.add('ended');
@@ -414,7 +398,7 @@
   });
   document.addEventListener('keydown', e => { if (e.key === 'r' || e.key === 'R') replay(); });
 
-  // MainBottomBar behaviour: dot + status text + ping chip, connect/disconnect button
+  // MainBottomBar behaviour
   const dot = document.getElementById('dot');
   const statusText = document.getElementById('statusText');
   const pingChip = document.getElementById('pingChip');
@@ -423,7 +407,6 @@
   const connIcon = document.getElementById('connIcon');
   const connLabel = document.getElementById('connLabel');
   let state = 'idle';
-
   const ICON_POWER = '<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>';
   const ICON_STOP = '<rect x="7" y="7" width="10" height="10" rx="2"/>';
 
