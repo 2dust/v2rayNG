@@ -35,7 +35,6 @@ object BackupCipher {
     private const val KEY_BITS = 256
     private const val HEADER_BYTES = 9 + 1 + 4 + SALT_BYTES + IV_BYTES
     private const val BUFFER = 8 * 1024
-    private const val CHUNK_OVERHEAD = 64
 
     /** True when [file] starts with our header, i.e. it needs a password. */
     fun isEncrypted(file: File): Boolean = try {
@@ -110,17 +109,19 @@ object BackupCipher {
             )
 
             target.outputStream().use { output ->
+                // GCM decryption is all-or-nothing in the JDK provider: update() buffers the
+                // ciphertext and doFinal() produces the plaintext, so the allocating overloads are
+                // used here. The in-place ones would need a buffer as large as the whole backup.
                 val buffer = ByteArray(BUFFER)
-                val plain = ByteArray(BUFFER + CHUNK_OVERHEAD)
                 while (true) {
                     val read = input.read(buffer)
                     if (read < 0) break
-                    val produced = cipher.update(buffer, 0, read, plain, 0)
-                    if (produced > 0) output.write(plain, 0, produced)
+                    val chunk = cipher.update(buffer, 0, read)
+                    if (chunk != null && chunk.isNotEmpty()) output.write(chunk)
                 }
                 // Throws when the GCM tag does not match, i.e. for a wrong password.
-                val produced = cipher.doFinal(plain, 0)
-                if (produced > 0) output.write(plain, 0, produced)
+                val tail = cipher.doFinal()
+                if (tail.isNotEmpty()) output.write(tail)
             }
         }
         true
