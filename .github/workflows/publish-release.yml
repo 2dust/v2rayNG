@@ -11,6 +11,11 @@ on:
         description: "Successful build run ID that contains RXVPN-apk"
         required: true
         type: string
+      prerelease:
+        description: "Publish as a pre-release (leave false for a normal release)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -68,12 +73,14 @@ jobs:
             gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
             gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md"
           else
+            FLAGS=""
+            if [ "${{ inputs.prerelease }}" = "true" ]; then FLAGS="--prerelease"; fi
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
               --target "$SOURCE_SHA" \
               --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
-              --prerelease
+              $FLAGS
           fi
 
       - name: Surface publish errors
