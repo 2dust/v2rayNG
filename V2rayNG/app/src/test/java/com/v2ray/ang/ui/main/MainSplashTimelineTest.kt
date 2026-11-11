@@ -45,25 +45,20 @@ class MainSplashTimelineTest {
     }
 
     @Test
-    fun ringsAreStaggeredAndEndBeforeTheFinish() {
-        val first = MainSplashTimeline.ringProgress(MainSplashTimeline.RING_START_MS, 0f)
-        val second = MainSplashTimeline.ringProgress(MainSplashTimeline.RING_START_MS, MainSplashTimeline.RING_STEP_MS)
-        assertEquals(0f, first, delta)
-        assertEquals(0f, second, delta)
-        assertTrue(
-            MainSplashTimeline.ringProgress(
-                MainSplashTimeline.RING_START_MS + MainSplashTimeline.RING_STEP_MS,
-                MainSplashTimeline.RING_STEP_MS,
-            ) < first + 1f
-        )
-        assertEquals(
-            1f,
-            MainSplashTimeline.ringProgress(
-                MainSplashTimeline.RING_START_MS + MainSplashTimeline.RING_STEP_MS + MainSplashTimeline.RING_LENGTH_MS,
-                MainSplashTimeline.RING_STEP_MS,
-            ),
-            delta,
-        )
+    fun ringsAreStaggeredAndReachTheEnd() {
+        val step = MainSplashTimeline.RING_STEP_MS
+        val start = MainSplashTimeline.RING_START_MS
+        val length = MainSplashTimeline.RING_LENGTH_MS
+
+        assertEquals(0f, MainSplashTimeline.ringProgress(start, 0f), delta)
+        assertEquals(0f, MainSplashTimeline.ringProgress(start, step), delta)
+
+        // Halfway through the second ring's lead-in the first ring is already expanding.
+        assertTrue(MainSplashTimeline.ringProgress(start + step, 0f) > 0f)
+        assertEquals(0f, MainSplashTimeline.ringProgress(start + step, step), delta)
+
+        assertEquals(1f, MainSplashTimeline.ringProgress(start + length, 0f), delta)
+        assertEquals(1f, MainSplashTimeline.ringProgress(start + step + length, step), delta)
     }
 
     @Test

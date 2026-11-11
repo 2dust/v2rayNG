@@ -110,33 +110,42 @@ class MainActivity : HelperBaseComponentActivity() {
         // Dismissed after the first cold start; rememberSaveable keeps it dismissed on recreation.
         var showSplash by rememberSaveable { mutableStateOf(true) }
         Box(modifier = Modifier.fillMaxSize()) {
-            BackHandler { moveTaskToBack(false) }
-            MainScreen(
-                mainViewModel = mainViewModel,
-                onAction = { action ->
-                    when (action) {
-                        MainAction.ToggleService -> handleFabAction()
-                        MainAction.TestCurrentServer -> handleLayoutTestClick()
-                        MainAction.ImportQRcode -> importQRcode()
-                        MainAction.ImportClipboard -> importClipboard()
-                        MainAction.ImportConfigLocal -> importConfigLocal()
-                        is MainAction.ImportManually -> importManually(action.type)
-                        MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
-                        MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
-                        is MainAction.SelectServer -> setSelectServer(action.guid)
-                        is MainAction.EditServer -> editServer(action.guid, action.profile)
-                        is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                        is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
-                        is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
-                        else -> mainViewModel.onAction(action)
-                    }
-                },
-                onNavigate = { route -> navigateTo(route) },
-            )
+            MainContent()
             if (showSplash) {
                 MainSplashOverlay(onFinished = { showSplash = false })
             }
         }
+    }
+
+    /**
+     * The main screen itself, kept in its own composable so its callbacks keep this activity as
+     * their receiver while they sit inside the splash overlay's [Box].
+     */
+    @Composable
+    private fun MainContent() {
+        BackHandler { moveTaskToBack(false) }
+        MainScreen(
+            mainViewModel = mainViewModel,
+            onAction = { action ->
+                when (action) {
+                    MainAction.ToggleService -> handleFabAction()
+                    MainAction.TestCurrentServer -> handleLayoutTestClick()
+                    MainAction.ImportQRcode -> importQRcode()
+                    MainAction.ImportClipboard -> importClipboard()
+                    MainAction.ImportConfigLocal -> importConfigLocal()
+                    is MainAction.ImportManually -> importManually(action.type)
+                    MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
+                    MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
+                    is MainAction.SelectServer -> setSelectServer(action.guid)
+                    is MainAction.EditServer -> editServer(action.guid, action.profile)
+                    is MainAction.ShareClipboard -> shareToClipboard(action.guid)
+                    is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+                    is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
+                    else -> mainViewModel.onAction(action)
+                }
+            },
+            onNavigate = { route -> navigateTo(route) },
+        )
     }
 
     private fun shareToClipboard(guid: String): Boolean =
