@@ -8,7 +8,14 @@ import android.view.KeyEvent
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
@@ -100,29 +107,36 @@ class MainActivity : HelperBaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        BackHandler { moveTaskToBack(false) }
-        MainScreen(
-            mainViewModel = mainViewModel,
-            onAction = { action ->
-                when (action) {
-                    MainAction.ToggleService -> handleFabAction()
-                    MainAction.TestCurrentServer -> handleLayoutTestClick()
-                    MainAction.ImportQRcode -> importQRcode()
-                    MainAction.ImportClipboard -> importClipboard()
-                    MainAction.ImportConfigLocal -> importConfigLocal()
-                    is MainAction.ImportManually -> importManually(action.type)
-                    MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
-                    MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
-                    is MainAction.SelectServer -> setSelectServer(action.guid)
-                    is MainAction.EditServer -> editServer(action.guid, action.profile)
-                    is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                    is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
-                    is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
-                    else -> mainViewModel.onAction(action)
-                }
-            },
-            onNavigate = { route -> navigateTo(route) },
-        )
+        // Dismissed after the first cold start; rememberSaveable keeps it dismissed on recreation.
+        var showSplash by rememberSaveable { mutableStateOf(true) }
+        Box(modifier = Modifier.fillMaxSize()) {
+            BackHandler { moveTaskToBack(false) }
+            MainScreen(
+                mainViewModel = mainViewModel,
+                onAction = { action ->
+                    when (action) {
+                        MainAction.ToggleService -> handleFabAction()
+                        MainAction.TestCurrentServer -> handleLayoutTestClick()
+                        MainAction.ImportQRcode -> importQRcode()
+                        MainAction.ImportClipboard -> importClipboard()
+                        MainAction.ImportConfigLocal -> importConfigLocal()
+                        is MainAction.ImportManually -> importManually(action.type)
+                        MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
+                        MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
+                        is MainAction.SelectServer -> setSelectServer(action.guid)
+                        is MainAction.EditServer -> editServer(action.guid, action.profile)
+                        is MainAction.ShareClipboard -> shareToClipboard(action.guid)
+                        is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+                        is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
+                        else -> mainViewModel.onAction(action)
+                    }
+                },
+                onNavigate = { route -> navigateTo(route) },
+            )
+            if (showSplash) {
+                MainSplashOverlay(onFinished = { showSplash = false })
+            }
+        }
     }
 
     private fun shareToClipboard(guid: String): Boolean =
