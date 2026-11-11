@@ -1,0 +1,48 @@
+# RX VPN — notes that must survive
+
+Working branch: `arena/d739235f-rx-client` (App repo: `kairomax1/RX_client`).
+
+## App identity
+- **Name:** RX VPN — not "RX Client". `app_name` = `RX VPN` in `values/strings.xml`,
+  `dev`/`fdroid` flavour strings, and all 10 locale files.
+- **Package:** `com.mobix.vpn` (must stay — installed app and signing key depend on it).
+- **Icon:** dark rounded square (#1E1E1E-ish) with "R" in white and "X" in amber (#F5B050-ish).
+  Source of truth: `branding/rx-vpn-app-icon.png` (the 1254 px file the user supplied).
+  Generated from it: `branding/rx-vpn-playstore-512.png`,
+  `fastlane/metadata/android/en-US/images/icon.png`, and every
+  `mipmap-*/ic_launcher.png`, `ic_launcher_round.png`, `ic_launcher_foreground.png`.
+- **Palette:** graphite dark theme with an **amber** accent (the RX VPN theme), not the
+  violet/cyan "RX Client" theme. `Theme.kt` holds it.
+- **UI:** graphite glass panels/buttons (`RxGlassPanel`, `RxGlassButton` in
+  `ui/compose/RxComponents.kt`), app routing (`ui/perappproxy/`), bottom bar in
+  `ui/main/MainBottomBar.kt`.
+
+## Structure of the bottom bar (as of this change)
+- Status line: dot + status text. When connected it is tappable and re-checks the ping;
+  a spinner replaces the ping chip while a check runs.
+- The ping chip (`48 ms`) appears on the status line **and** as a second line under the
+  "Disconnect" label. No separate lightning button any more.
+- Big accent button: Connect / Disconnect (`rx_connect` / `rx_disconnect`).
+- Square button next to it opens App routing (`MainDestination.PerAppProxy`).
+
+## Things to remove (the user's standing instruction)
+- Anything advertising-like: promotion rows, promo URLs, ad/analytics/crash SDKs,
+  upstream Telegram channel links, dead wiki/help entries, upstream branding.
+- These were already stripped once (`80fa4a92`) and stayed stripped after the RX VPN merge.
+  Verify after any upstream merge with:
+  `grep -rIn "APP_PROMOTION_URL\|APP_WIKI_MODE\|9\.234456\|github_2dust" --exclude-dir=.git .`
+
+## Things to add / keep in mind
+- Ping visible to the user without a separate button (done in the bottom bar).
+- Privacy policy lives in `CR.md` and is referenced by `AppConfig.APP_PRIVACY_POLICY`.
+- Store metadata in `fastlane/metadata/android/en-US/` (title, short/full description, icon).
+- Release notes template: `.github/release-notes.md` with `@TAG@` / `@SHA@` placeholders.
+
+## Publishing notes
+- Live releases: `v1.0.0` (RX Client, has the old promotion build) and `v1.0.0-rxvpn`
+  (pre-release). The next release should be a normal release, e.g. `v1.0.1`, so
+  `releases/latest` points at the new build.
+- Workflow `Build RX VPN APK` builds APKs and runs validation; `Publish RX VPN Release`
+  uploads the artifact of a successful run with
+  `-f release_tag=<tag> -f artifact_run_id=<run id>`.
+- No Android SDK/JDK in the sandbox — GitHub Actions is the only compile gate.
