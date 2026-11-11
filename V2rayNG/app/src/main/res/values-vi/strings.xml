@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">Thêm [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Thêm [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Thêm [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_masque">Thêm [MASQUE]</string>
     <string name="confirm_delete_visible_profiles">Bạn có chắc muốn xóa tất cả cấu hình đang hiển thị không?</string>
     <string name="confirm_delete_duplicate_profiles">Bạn có chắc muốn xóa tất cả cấu hình trùng lặp đang hiển thị không?</string>
     <string name="confirm_delete_invalid_profiles">Vui lòng kiểm tra các cấu hình trước. Bạn có chắc muốn xóa tất cả cấu hình không hợp lệ đang hiển thị không?</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">h2 host</string>
     <string name="server_lab_request_host_quic">QUIC security</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_request_host_masque">MASQUE host</string>
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">QUIC key</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_path_masque">MASQUE path</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -103,6 +106,9 @@
     <string name="server_lab_reserved">Reserved (không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_address">Địa chỉ cục bộ (IPv4/IPv6 không bắt buộc, phân cách bằng dấu phẩy)</string>
     <string name="server_lab_local_address_hint">Nếu để trống, mặc định là %1$s. Địa chỉ IPv6 chỉ được dùng khi IPv6 được bật.</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">WARP PrivateKey</string>
+    <string name="server_lab_masque_warp_public_key">WARP PublicKey</string>
     <string name="server_lab_local_mtu">MTU (không bắt buộc, mặc định 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (tùy chọn, các địa chỉ IPv4/IPv6 cách nhau bằng dấu phẩy)</string>
     <string name="server_lab_remote_dns_hint">Nếu để trống, mặc định là %1$s. Địa chỉ IPv6 chỉ được dùng khi IPv6 được bật.</string>
