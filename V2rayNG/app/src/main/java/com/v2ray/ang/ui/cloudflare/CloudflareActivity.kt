@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.cloudflare
 
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,18 +32,24 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.InputDialog
+import com.v2ray.ang.ui.compose.InputField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
 import com.v2ray.ang.ui.compose.RxGlassButton
 import com.v2ray.ang.ui.compose.RxGlassPanel
+import com.v2ray.ang.ui.compose.RxPill
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.rxPingColor
+import com.v2ray.ang.ui.compose.rxPingContainer
 
 /**
  * Cloudflare tools: makes a blocked or slow Cloudflare-fronted config usable again.
  *
- * The screen only drives [CloudflareViewModel]; every change lands in the existing settings
- * (fragment/mux) or in the selected profile, so nothing here is a parallel configuration system.
+ * The screen never rewrites the profile the user picked. Every fix becomes a new entry inside the
+ * Cloudflare tab, carrying a latency measured through the core, so what the list shows is the real
+ * round trip of that config. The anti-block bundle still lands in the existing settings.
  */
 class CloudflareActivity : BaseComponentActivity() {
 
@@ -69,7 +78,8 @@ class CloudflareActivity : BaseComponentActivity() {
             onScan = viewModel::scan,
             onChoose = viewModel::choose,
             onApply = viewModel::applyChosen,
-            onProbe = viewModel::probeSelected
+            onProbe = viewModel::probeSelected,
+            onAddOther = viewModel::addOtherConfig
         )
     }
 }
@@ -84,8 +94,12 @@ fun CloudflareScreen(
     onScan: () -> Unit,
     onChoose: (String) -> Unit,
     onApply: () -> Unit,
-    onProbe: () -> Unit
+    onProbe: () -> Unit,
+    onAddOther: (String) -> Unit
 ) {
+    var showOtherDialog by remember { mutableStateOf(false) }
+    var otherText by remember { mutableStateOf("") }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -138,6 +152,15 @@ fun CloudflareScreen(
                 }
             }
 
+            // The numbers below come from a TLS handshake against each edge, not from the config, so
+            // the screen says that instead of pretending they are a config ping.
+            Text(
+                text = stringResource(R.string.cloudflare_scan_note),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.5.sp,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
+            )
+
             state.results.forEach { result ->
                 SettingsMenuItem(
                     title = result.address,
@@ -157,6 +180,16 @@ fun CloudflareScreen(
                     }
                 }
             }
+
+            PreferenceGroupHeader(title = stringResource(R.string.cloudflare_group_result))
+            ResultCard(state)
+
+            // Anything outside the app's own subscriptions can be dropped straight into the tab.
+            SettingsMenuItem(
+                title = stringResource(R.string.cloudflare_other_config),
+                subtitle = stringResource(R.string.cloudflare_other_summary),
+                onClick = { showOtherDialog = true }
+            )
 
             PreferenceGroupHeader(title = stringResource(R.string.cloudflare_group_test))
             Row(
@@ -187,6 +220,32 @@ fun CloudflareScreen(
             NavigationBarsSpacer()
         }
     }
+
+    if (showOtherDialog) {
+        InputDialog(
+            title = stringResource(R.string.cloudflare_other_config),
+            fields = listOf(
+                InputField(
+                    label = stringResource(R.string.cloudflare_other_field),
+                    value = otherText,
+                    singleLine = false
+                )
+            ),
+            onFieldChange = { _, value -> otherText = value },
+            confirmText = stringResource(R.string.cloudflare_other_add),
+            dismissText = stringResource(R.string.action_cancel),
+            onConfirm = {
+                val text = otherText
+                showOtherDialog = false
+                otherText = ""
+                onAddOther(text)
+            },
+            onDismiss = {
+                showOtherDialog = false
+                otherText = ""
+            }
+        )
+    }
 }
 
 @Composable
@@ -197,6 +256,58 @@ private fun AutoOutcomeText(@StringRes textRes: Int) {
         fontSize = 12.sp,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
     )
+}
+
+/** The config the last fix produced: its name and the latency that was actually measured. */
+@Composable
+private fun ResultCard(state: CloudflareViewModel.UiState) {
+    RxGlassPanel(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            if (state.fixedName == null) {
+                Text(
+                    text = stringResource(R.string.cloudflare_result_empty),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.5.sp
+                )
+            } else {
+                Text(
+                    text = state.fixedName,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 14.5.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val ping = state.fixedPingMs
+                    if (ping != null && ping > 0) {
+                        RxPill(
+                            text = stringResource(R.string.cloudflare_real_ping, ping),
+                            contentColor = rxPingColor(ping),
+                            containerColor = rxPingContainer(ping),
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.cloudflare_real_ping_pending),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+            Text(
+                text = stringResource(R.string.cloudflare_group_count, state.groupCount),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.5.sp,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+        }
+    }
 }
 
 @Composable

@@ -83,6 +83,12 @@ object AppConfig {
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_DAILY_MAINTENANCE = "pref_daily_maintenance"
     const val PREF_CLOUDFLARE_AUTO = "pref_cloudflare_auto"
+
+    /** GUID of the local group that holds the configs the Cloudflare tools produce. */
+    const val PREF_CLOUDFLARE_GROUP = "pref_cloudflare_group"
+
+    /** Maps a source profile to the Cloudflare copy made from it, so a repair refreshes it. */
+    const val PREF_CLOUDFLARE_COPY_PREFIX = "pref_cloudflare_copy_"
     const val PREF_SERVICE_RUNNING = "pref_service_running"
     const val PREF_BENCHMARK_PREFIX = "pref_benchmark_"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"

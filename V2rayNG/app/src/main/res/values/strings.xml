@@ -621,7 +621,7 @@
     <string name="cloudflare_test">Test the config</string>
     <string name="cloudflare_test_ok">Answered in %1$d ms.</string>
     <string name="cloudflare_test_failed">No answer: the config is blocked, or the address is dead.</string>
-    <string name="toast_cloudflare_applied">Config updated; the service restarts on the new address.</string>
+    <string name="toast_cloudflare_applied">The Cloudflare config was created in its own tab.</string>
     <string name="toast_cloudflare_scan_failed">No Cloudflare edge answered.</string>
     <string name="toast_cloudflare_no_config">Select a config first.</string>
     <string name="cloudflare_auto_title">Automatic repair</string>
@@ -646,4 +646,18 @@
     <string name="speedtest_needs_connection">Connect first, then test the speed.</string>
     <string name="speedtest_done">Speed recorded.</string>
     <string name="splash_tagline">Got your back</string>
+    <string name="cloudflare_group_name">Cloudflare</string>
+    <string name="cloudflare_copy_suffix">· CF</string>
+    <string name="cloudflare_group_result">Cloudflare config</string>
+    <string name="cloudflare_result_empty">Nothing has been fixed yet. Pick an edge above and press "Use this IP": the result is saved as a new config in this tab, never over your own.</string>
+    <string name="cloudflare_real_ping">Real ping: %1$d ms</string>
+    <string name="cloudflare_real_ping_pending">Saved. The real ping is being measured…</string>
+    <string name="cloudflare_group_count">Configs in this tab: %1$d</string>
+    <string name="cloudflare_scan_note">These numbers are TLS handshake latency to the edge, not a config ping. The config ping is measured through the core after the config is built.</string>
+    <string name="cloudflare_other_config">Another config</string>
+    <string name="cloudflare_other_summary">Anything that is not in the app: paste a vless / vmess / trojan / ss link and it lands in this tab.</string>
+    <string name="cloudflare_other_field">Config link</string>
+    <string name="cloudflare_other_add">Add</string>
+    <string name="cloudflare_other_saved">Added to the Cloudflare tab.</string>
+    <string name="cloudflare_other_failed">Nothing was added: the link was not a valid config.</string>
 </resources>

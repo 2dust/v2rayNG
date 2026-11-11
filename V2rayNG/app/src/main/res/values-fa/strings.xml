@@ -618,7 +618,7 @@
     <string name="cloudflare_test">تست کانفیگ</string>
     <string name="cloudflare_test_ok">در %1$d میلی‌ثانیه پاسخ داد.</string>
     <string name="cloudflare_test_failed">پاسخی نداد: کانفیگ بلاک است یا آدرس مرده.</string>
-    <string name="toast_cloudflare_applied">کانفیگ به‌روزرسانی شد؛ سرویس با آدرس جدید ری‌استارت می‌شود.</string>
+    <string name="toast_cloudflare_applied">کانفیگ کلادفلر در تب خودش ساخته شد.</string>
     <string name="toast_cloudflare_scan_failed">هیچ لبه‌ی کلادفلری پاسخ نداد.</string>
     <string name="toast_cloudflare_no_config">اول یک کانفیگ انتخاب کن.</string>
     <string name="cloudflare_auto_title">تعمیر خودکار</string>
@@ -643,4 +643,18 @@
     <string name="speedtest_needs_connection">اول وصل شو، بعد سرعت را تست کن.</string>
     <string name="speedtest_done">سرعت ثبت شد.</string>
     <string name="splash_tagline">هواتو داره</string>
+    <string name="cloudflare_group_name">کلادفلر</string>
+    <string name="cloudflare_copy_suffix">· کلادفلر</string>
+    <string name="cloudflare_group_result">کانفیگ کلادفلر</string>
+    <string name="cloudflare_result_empty">هنوز چیزی درست نشده. از بالا یک لبه انتخاب کنید و «این آی‌پی را بگذار» را بزنید؛ نتیجه به‌صورت یک کانفیگ تازه در همین تب ذخیره می‌شود، نه روی کانفیگ خودتان.</string>
+    <string name="cloudflare_real_ping">پینگ واقعی: %1$d میلی‌ثانیه</string>
+    <string name="cloudflare_real_ping_pending">ذخیره شد؛ پینگ واقعی در حال اندازه‌گیری است…</string>
+    <string name="cloudflare_group_count">کانفیگ‌های این تب: %1$d</string>
+    <string name="cloudflare_scan_note">این اعداد تأخیرِ دست‌دادن TLS به لبه هستند، نه پینگ کانفیگ. پینگ هر کانفیگ بعد از ساخته‌شدن، از خودِ هسته اندازه‌گیری می‌شود.</string>
+    <string name="cloudflare_other_config">کانفیگ دیگر</string>
+    <string name="cloudflare_other_summary">هر کانفیگی که در برنامه نیست: لینک vless / vmess / trojan / ss را بچسبانید تا در همین تب بنشیند.</string>
+    <string name="cloudflare_other_field">لینک کانفیگ</string>
+    <string name="cloudflare_other_add">افزودن</string>
+    <string name="cloudflare_other_saved">به تب کلادفلر اضافه شد.</string>
+    <string name="cloudflare_other_failed">چیزی اضافه نشد: لینک، کانفیگ معتبری نبود.</string>
 </resources>

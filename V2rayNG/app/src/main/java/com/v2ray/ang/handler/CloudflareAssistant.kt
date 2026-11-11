@@ -1,8 +1,11 @@
 package com.v2ray.ang.handler
 
+import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -62,9 +65,12 @@ object CloudflareAssistant {
      */
     data class RepairReport(
         val isCloudflare: Boolean = false,
+        /** Real round trip of the config that came out of the repair, measured through the core. */
         val latencyMs: Long? = null,
         val unblocked: Boolean = false,
         val switchedAddress: String? = null,
+        val newConfigGuid: String? = null,
+        val newConfigName: String? = null,
     )
 
     fun isAutoEnabled(): Boolean =
@@ -181,34 +187,164 @@ object CloudflareAssistant {
     // -------------------------------------------------------------------------
 
     /**
-     * Points the selected config at [address] while keeping the Cloudflare hostname for SNI and for
-     * the WebSocket Host header — the edge routes by name, so both have to stay.
+     * The local group the tools write to. Created on first use and remembered, so the tab keeps its
+     * identity even after the app restarts; nothing here talks to a server.
      */
-    fun applyAddress(guid: String, address: String): Boolean {
-        val config = MmkvManager.decodeServerConfig(guid) ?: return false
-        val originalAddress = config.server?.trim().orEmpty()
-        if (originalAddress.isEmpty()) return false
+    fun ensureGroup(groupName: String): String {
+        MmkvManager.decodeSettingsString(AppConfig.PREF_CLOUDFLARE_GROUP)
+            ?.takeIf { it.isNotBlank() && MmkvManager.decodeSubscription(it) != null }
+            ?.let { return it }
+
+        // An older install may already have a group with this name: reuse it instead of a duplicate.
+        MmkvManager.decodeSubscriptions()
+            .firstOrNull { it.subscription.url.isBlank() && it.subscription.remarks == groupName }
+            ?.let { existing ->
+                MmkvManager.encodeSettings(AppConfig.PREF_CLOUDFLARE_GROUP, existing.guid)
+                return existing.guid
+            }
+
+        val guid = Utils.getUuid()
+        MmkvManager.encodeSubscription(
+            guid,
+            SubscriptionItem(remarks = groupName, url = "", enabled = true),
+        )
+        MmkvManager.encodeSettings(AppConfig.PREF_CLOUDFLARE_GROUP, guid)
+        LogUtil.i(AppConfig.TAG, "Cloudflare: created the local group $groupName ($guid)")
+        return guid
+    }
+
+    /**
+     * How many configs the Cloudflare group currently holds. Reads only: asking for the count must
+     * not create an empty tab on a phone that never used these tools.
+     */
+    fun groupSize(groupName: String): Int {
+        val guid = MmkvManager.decodeSettingsString(AppConfig.PREF_CLOUDFLARE_GROUP)
+            ?.takeIf { it.isNotBlank() && MmkvManager.decodeSubscription(it) != null }
+            ?: MmkvManager.decodeSubscriptions()
+                .firstOrNull { it.subscription.url.isBlank() && it.subscription.remarks == groupName }
+                ?.guid
+            ?: return 0
+        return MmkvManager.decodeServerList(guid).size
+    }
+
+    /**
+     * Creates (or refreshes) a copy of [sourceGuid] that points at [address] while keeping the
+     * Cloudflare hostname for SNI and for the WebSocket Host header — the edge routes by name, so
+     * both have to stay.
+     *
+     * The source profile is never modified: the result is a new entry inside the Cloudflare group.
+     * A second call for the same source updates the copy made the first time, so daily repairs do
+     * not pile up near-identical profiles.
+     *
+     * @return the GUID of the stored copy, or null when the source has no usable host.
+     */
+    fun saveCloudflareCopy(
+        sourceGuid: String,
+        address: String,
+        groupId: String,
+        remarksSuffix: String,
+    ): String? {
+        val source = MmkvManager.decodeServerConfig(sourceGuid) ?: return null
+        val originalAddress = source.server?.trim().orEmpty()
+        if (originalAddress.isEmpty()) return null
 
         val domain = when {
             !isIpv4Literal(originalAddress) -> originalAddress
-            !config.sni.isNullOrBlank() -> config.sni
-            !config.host.isNullOrBlank() -> config.host
-            else -> return false
+            !source.sni.isNullOrBlank() -> source.sni
+            !source.host.isNullOrBlank() -> source.host
+            else -> return null
         }
 
-        if (config.sni.isNullOrBlank()) config.sni = domain
-        if (config.host.isNullOrBlank()) config.host = domain
-        config.server = address
+        // The profile may already be one of ours (the auto pass selects what it builds), so it is
+        // refreshed in place instead of becoming a copy of a copy. Anything else gets a copy, and a
+        // second repair of the same source refreshes that copy rather than making another entry.
+        val isOwnCopy = source.subscriptionId == groupId
+        val previous = if (isOwnCopy) null else {
+            MmkvManager.decodeSettingsString(AppConfig.PREF_CLOUDFLARE_COPY_PREFIX + sourceGuid)
+                ?.takeIf { it.isNotBlank() && MmkvManager.decodeServerConfig(it) != null }
+        }
+        val targetGuid = if (isOwnCopy) sourceGuid else previous.orEmpty()
+
+        val baseRemarks = source.remarks.trim()
+        val remarks = when {
+            isOwnCopy -> baseRemarks
+            baseRemarks.endsWith(remarksSuffix) -> baseRemarks
+            else -> "$baseRemarks $remarksSuffix".trim()
+        }
+
+        val copy = source.copy(
+            server = address,
+            sni = source.sni?.takeIf { it.isNotBlank() } ?: domain,
+            host = source.host?.takeIf { it.isNotBlank() } ?: domain,
+            remarks = remarks,
+            subscriptionId = groupId,
+        )
 
         return try {
-            MmkvManager.encodeServerConfig(guid, config)
+            val saved = MmkvManager.encodeServerConfig(targetGuid, copy)
+            if (!isOwnCopy) {
+                MmkvManager.encodeSettings(AppConfig.PREF_CLOUDFLARE_COPY_PREFIX + sourceGuid, saved)
+            }
             SettingsChangeManager.makeRestartService()
-            LogUtil.i(AppConfig.TAG, "Cloudflare: ${config.remarks} now uses $address (sni=$domain)")
-            true
+            SettingsChangeManager.makeSetupGroupTab()
+            LogUtil.i(AppConfig.TAG, "Cloudflare: ${copy.remarks} -> $address (sni=$domain)")
+            saved
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Cloudflare: could not update the profile", e)
-            false
+            LogUtil.e(AppConfig.TAG, "Cloudflare: could not store the Cloudflare copy", e)
+            null
         }
+    }
+
+    /**
+     * Measures [guid] through the core exactly like the app's own ping test, and remembers the
+     * number so the config list shows it too. This is the real round trip of that config; the
+     * numbers on the edge list are only handshake latency and are not presented as a config ping.
+     */
+    suspend fun measureRealPing(context: Context, guid: String): Long? {
+        val latency = try {
+            ConfigBenchmark.pingConfigs(context, listOf(guid)).values.firstOrNull()
+        } catch (e: Exception) {
+            LogUtil.w(AppConfig.TAG, "Cloudflare: real ping failed for $guid", e)
+            null
+        }
+        if (latency != null && latency > 0L) {
+            MmkvManager.encodeServerTestDelayMillis(guid, latency)
+            return latency
+        }
+        return null
+    }
+
+    /**
+     * The whole fix in one call: copy the selected config into the Cloudflare group pointing at
+     * [address], make that copy the selected profile and measure its real latency.
+     */
+    suspend fun buildCloudflareConfig(
+        context: Context,
+        sourceGuid: String,
+        address: String,
+        groupName: String,
+        remarksSuffix: String,
+    ): RepairReport? {
+        // Validate before anything is created, so a profile without a usable host never leaves an
+        // empty Cloudflare tab behind.
+        val source = MmkvManager.decodeServerConfig(sourceGuid) ?: return null
+        val sourceAddress = source.server?.trim().orEmpty()
+        if (sourceAddress.isEmpty()) return null
+        if (isIpv4Literal(sourceAddress) && source.sni.isNullOrBlank() && source.host.isNullOrBlank()) {
+            return null
+        }
+
+        val groupId = ensureGroup(groupName)
+        val guid = saveCloudflareCopy(sourceGuid, address, groupId, remarksSuffix) ?: return null
+        MmkvManager.setSelectServer(guid)
+        val latency = measureRealPing(context, guid)
+        return RepairReport(
+            isCloudflare = true,
+            latencyMs = latency,
+            switchedAddress = address,
+            newConfigGuid = guid,
+            newConfigName = MmkvManager.decodeServerConfig(guid)?.remarks,
+        )
     }
 
     // -------------------------------------------------------------------------
@@ -220,10 +356,14 @@ object CloudflareAssistant {
      * job: measure the selected config, and only touch anything when it is actually broken.
      *
      * Rules that keep it from being disruptive: a healthy config is left alone, the anti-block bundle
-     * is only switched on when it is off, and the address is only moved when the current edge does not
-     * answer at all or crawls.
+     * is only switched on when it is off, and a copy is only produced when the current edge does not
+     * answer at all or crawls. The produced copy carries a real, measured latency.
      */
-    suspend fun autoRepair(): RepairReport {
+    suspend fun autoRepair(
+        context: Context,
+        groupName: String,
+        remarksSuffix: String,
+    ): RepairReport {
         val guid = selectedGuid() ?: return RepairReport()
         val config = selectedConfig() ?: return RepairReport()
         if (!isCloudflareConfig(config)) return RepairReport()
@@ -249,21 +389,34 @@ object CloudflareAssistant {
             val best = scan(sni).firstOrNull()
             val worthIt = best != null &&
                     (before == null || best.latencyMs + IP_SWITCH_MARGIN_MS < before)
-            if (worthIt && best != null && applyAddress(guid, best.address)) {
-                switched = best.address
+            if (worthIt) switched = best?.address
+        }
+
+        // A repair never rewrites the user's own profile. It produces a Cloudflare copy with a real,
+        // measured latency, and only when the edge changed or the old one did not answer at all.
+        if (switched != null || before == null) {
+            val copied = buildCloudflareConfig(
+                context = context,
+                sourceGuid = guid,
+                address = switched ?: host,
+                groupName = groupName,
+                remarksSuffix = remarksSuffix,
+            )
+            if (copied != null) {
+                val report = copied.copy(unblocked = unblocked, latencyMs = copied.latencyMs ?: before)
+                LogUtil.i(
+                    AppConfig.TAG,
+                    "Cloudflare auto repair: copy=${report.newConfigName} ping=${report.latencyMs}"
+                )
+                return report
             }
         }
 
         LogUtil.i(
             AppConfig.TAG,
-            "Cloudflare auto repair: latency=$before unblocked=$unblocked address=$switched"
+            "Cloudflare auto repair: latency=$before unblocked=$unblocked copy=none"
         )
-        return RepairReport(
-            isCloudflare = true,
-            latencyMs = before,
-            unblocked = unblocked,
-            switchedAddress = switched,
-        )
+        return RepairReport(isCloudflare = true, latencyMs = before, unblocked = unblocked)
     }
 
     // -------------------------------------------------------------------------

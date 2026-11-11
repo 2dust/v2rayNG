@@ -22,6 +22,7 @@ import com.v2ray.ang.handler.CloudflareAssistant
 import com.v2ray.ang.handler.DailyMaintenance
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.handler.UpdateCheckerManager
 import com.v2ray.ang.util.HttpUtil
@@ -190,12 +191,20 @@ class DailyMaintenanceWorker(
     /** Repairs the selected Cloudflare config when it stopped answering; no-op otherwise. */
     private suspend fun repairCloudflareConfig() {
         if (!CloudflareAssistant.isAutoEnabled()) return
-        val report = CloudflareAssistant.autoRepair()
+        val report = CloudflareAssistant.autoRepair(
+            context = applicationContext,
+            groupName = applicationContext.getString(R.string.cloudflare_group_name),
+            remarksSuffix = applicationContext.getString(R.string.cloudflare_copy_suffix),
+        )
         if (!report.isCloudflare) return
+        // A repair leaves the user's own profile alone and writes a Cloudflare copy, so the tab has
+        // to be rebuilt for the new entry to show up.
+        if (report.newConfigGuid != null) SettingsChangeManager.makeSetupGroupTab()
         LogUtil.i(
             AppConfig.TAG,
             "Daily maintenance: Cloudflare latency=${report.latencyMs} " +
-                    "unblocked=${report.unblocked} address=${report.switchedAddress}"
+                    "unblocked=${report.unblocked} address=${report.switchedAddress} " +
+                    "copy=${report.newConfigName}"
         )
     }
 
