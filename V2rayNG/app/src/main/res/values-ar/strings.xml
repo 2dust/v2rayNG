@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">خدمة RX Client</string>
+    <string name="notification_channel_service">خدمة RX VPN</string>
     <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
     <string name="notification_channel_connection_checks">فحوص الاتصال</string>
     <string name="notification_action_stop_v2ray">إيقاف</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_oss_license">تراخيص المصادر المفتوحة</string>
     <string name="title_translators">المترجمون</string>
-    <string name="title_tg_channel">قناة Telegram</string>
 
-    <string name="title_pref_promotion">ترويج</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
     <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">مستوى السجل</string>
     <string name="title_outbound_domain_resolve_method">حل أسماء نطاقات الاتصالات الصادرة (outbound)</string>
     <string name="title_mode">الوضع</string>
-    <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
     <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
     <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>
@@ -413,7 +410,7 @@
     <string name="connection_test_error">فشل اختبار الاتصال: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
-    <string name="connection_connected">متصل. اضغط للتحقق من الاتصال.</string>
+    <string name="connection_connected">متصل</string>
     <string name="connection_not_connected">غير متصل</string>
     <string name="connection_running_task_left">الاختبارات قيد التشغيل: %s</string>
 
@@ -572,4 +569,20 @@
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">اتصال</string>
+    <string name="rx_disconnect">قطع الاتصال</string>
+    <string name="rx_connect_hint">أضف إعدادًا وحدده للاتصال.</string>
+    <string name="rx_app_routing">توجيه التطبيقات</string>
+    <string name="rx_routing_all">كل التطبيقات</string>
+    <string name="rx_routing_all_hint">مرّر كل التطبيقات عبر VPN، باستثناء RX VPN نفسه.</string>
+    <string name="rx_routing_only">التطبيقات المحددة فقط</string>
+    <string name="rx_routing_only_hint">تستخدم التطبيقات المحددة VPN فقط، وتتصل الأخرى مباشرة.</string>
+    <string name="rx_routing_except">الكل باستثناء المحدد</string>
+    <string name="rx_routing_except_hint">تتصل التطبيقات المحددة مباشرة، وتستخدم الأخرى VPN.</string>
+    <string name="rx_routing_save_failed">تعذر حفظ توجيه التطبيقات. حاول مجددًا.</string>
+    <string name="rx_search_apps">البحث في التطبيقات</string>
+    <string name="rx_no_apps">لا توجد تطبيقات مطابقة</string>
+    <string name="rx_routing_change_hint">تُطبق التغييرات عند إعادة اتصال VPN.</string>
+    <string name="rx_select_apps_hint">حدد تطبيقًا واحدًا على الأقل قبل الاتصال.</string>
 </resources>

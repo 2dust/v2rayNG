@@ -157,7 +157,7 @@ object HttpUtil {
             if (currentUrl == null) continue
             val client = buildOkHttpClient(request.timeout, request.httpPort, request.proxyUsername, request.proxyPassword, followRedirects = false)
             val finalUserAgent = if (request.userAgent.isNullOrBlank()) {
-                "RXClient/${BuildConfig.VERSION_NAME}"
+                "RXVPN/${BuildConfig.VERSION_NAME}"
             } else {
                 request.userAgent
             }

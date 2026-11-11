@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">Keçid</string>
     <string name="app_tile_name">Keçid</string>
     <string name="app_tile_first_use">Bu funksiyanı istifadə etməzdən əvvəl tətbiqə profil əlavə edin.</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Yeniləmək üçün aşağı çəkin!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">RX Client xidməti</string>
+    <string name="notification_channel_service">RX VPN xidməti</string>
     <string name="notification_channel_subscription_updates">Abunəlik yenilənmələri</string>
     <string name="notification_channel_connection_checks">Bağlantı yoxlamaları</string>
     <string name="notification_action_stop_v2ray">Dayandır</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">Mənbə kodu</string>
     <string name="title_oss_license">Açıq mənbə lisenziyaları</string>
     <string name="title_translators">Tərcüməçilər</string>
-    <string name="title_tg_channel">Telegram kanalı</string>
 
-    <string name="title_pref_promotion">Təşviqat</string>
 
     <string name="title_pref_auto_update_subscription">Abunəlikləri avtomatik yenilə</string>
     <string name="summary_pref_auto_update_subscription">Abunəliklərinizi arxa fonda təyin olunmuş intervallarla avtomatik yeniləyin. Cihazdan asılı olaraq bu funksiya həmişə işləməyə bilər</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">Jurnal Səviyyəsi</string>
     <string name="title_outbound_domain_resolve_method">Çıxış domeninin həll edilməsi</string>
     <string name="title_mode">Rejim</string>
-    <string name="title_mode_help">Ətraflı kömək üçün toxunun</string>
     <string name="title_language">Dil</string>
     <string name="title_ui_settings">İstifadəçi interfeysi tənzimləmələri</string>
     <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejim tənzimləmələri</string>
@@ -405,7 +402,7 @@
     <string name="connection_test_error">Bağlantı sınağı uğursuz oldu: %s</string>
     <string name="connection_test_fail">İnternet əlçatmazdır</string>
     <string name="connection_test_error_status_code">Xəta kodu: #%d</string>
-    <string name="connection_connected">Qoşuldu. Bağlantını yoxlamaq üçün toxunun.</string>
+    <string name="connection_connected">Qoşuldu</string>
     <string name="connection_not_connected">Qoşulmayıb</string>
     <string name="connection_running_task_left">İcra olunan sınaqlar: %s</string>
 
@@ -565,4 +562,20 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">Qoşul</string>
+    <string name="rx_disconnect">Bağlantını kəs</string>
+    <string name="rx_connect_hint">Qoşulmaq üçün konfiqurasiya əlavə edib seçin.</string>
+    <string name="rx_app_routing">Tətbiq marşrutu</string>
+    <string name="rx_routing_all">Bütün tətbiqlər</string>
+    <string name="rx_routing_all_hint">RX VPN-in özü istisna olmaqla, bütün tətbiqlər VPN-dən keçir.</string>
+    <string name="rx_routing_only">Yalnız seçilmiş tətbiqlər</string>
+    <string name="rx_routing_only_hint">Yalnız işarələnmiş tətbiqlər VPN istifadə edir; digərləri birbaşa qoşulur.</string>
+    <string name="rx_routing_except">Seçilənlər istisna olmaqla</string>
+    <string name="rx_routing_except_hint">İşarələnmiş tətbiqlər birbaşa qoşulur; digərləri VPN istifadə edir.</string>
+    <string name="rx_routing_save_failed">Tətbiq marşrutu saxlanılmadı. Yenidən cəhd edin.</string>
+    <string name="rx_search_apps">Tətbiq axtar</string>
+    <string name="rx_no_apps">Uyğun tətbiq yoxdur</string>
+    <string name="rx_routing_change_hint">Dəyişikliklər VPN yenidən qoşulanda tətbiq olunur.</string>
+    <string name="rx_select_apps_hint">Qoşulmadan əvvəl ən azı bir tətbiq seçin.</string>
 </resources>

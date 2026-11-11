@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>
     <string name="app_tile_first_use">এই ফিচারটি প্রথম ব্যবহার করা হচ্ছে, সার্ভার যোগ করতে অ্যাপটি ব্যবহার করুন</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">RX Client সার্ভিস</string>
+    <string name="notification_channel_service">RX VPN সার্ভিস</string>
     <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
     <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">সোর্স কোড</string>
     <string name="title_oss_license">ওপেন সোর্স লাইসেন্স</string>
     <string name="title_translators">অনুবাদকগণ</string>
-    <string name="title_tg_channel">টেলিগ্রাম চ্যানেল</string>
 
-    <string name="title_pref_promotion">প্রচার</string>
 
     <string name="title_pref_auto_update_subscription">স্বয়ংক্রিয় আপডেট সাবস্ক্রিপশন</string>
     <string name="summary_pref_auto_update_subscription">পটভূমিতে একটি নির্দিষ্ট সময় পর পর আপনার সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে আপডেট করুন। ডিভাইসের উপর নির্ভর করে, এই বৈশিষ্ট্যটি সবসময় কাজ নাও করতে পারে</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">লগ স্তর</string>
     <string name="title_outbound_domain_resolve_method">বহির্গামী সংযোগের ডোমেইন রেজলভ পদ্ধতি (outbound)</string>
     <string name="title_mode">মোড</string>
-    <string name="title_mode_help">আরো সাহায্যের জন্য ক্লিক করুন</string>
     <string name="title_language">ভাষা</string>
     <string name="title_ui_settings">ইউআই সেটিংস</string>
     <string name="title_pref_ui_mode_night">ইউআই মোড সেটিংস</string>
@@ -405,7 +402,7 @@
     <string name="connection_test_error">সংযোগ পরীক্ষা ব্যর্থ: %s</string>
     <string name="connection_test_fail">ইন্টারনেট উপলব্ধ নয়</string>
     <string name="connection_test_error_status_code">ত্রুটি কোড: #%d</string>
-    <string name="connection_connected">সংযুক্ত।\nসংযোগ পরীক্ষা করতে ট্যাপ করুন।</string>
+    <string name="connection_connected">সংযুক্ত</string>
     <string name="connection_not_connected">সংযুক্ত নয়</string>
     <string name="connection_running_task_left">চলমান পরীক্ষা: %s</string>
 
@@ -564,4 +561,20 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">সংযোগ</string>
+    <string name="rx_disconnect">সংযোগ বিচ্ছিন্ন</string>
+    <string name="rx_connect_hint">সংযোগ করতে একটি কনফিগারেশন যোগ করে নির্বাচন করুন.</string>
+    <string name="rx_app_routing">অ্যাপ রাউটিং</string>
+    <string name="rx_routing_all">সব অ্যাপ</string>
+    <string name="rx_routing_all_hint">RX VPN নিজে ছাড়া সব অ্যাপ VPN-এর মাধ্যমে যাবে।</string>
+    <string name="rx_routing_only">শুধু নির্বাচিত অ্যাপ</string>
+    <string name="rx_routing_only_hint">শুধু চিহ্নিত অ্যাপ VPN ব্যবহার করবে; অন্যগুলো সরাসরি সংযুক্ত হবে।</string>
+    <string name="rx_routing_except">নির্বাচিতগুলো ছাড়া সব</string>
+    <string name="rx_routing_except_hint">চিহ্নিত অ্যাপ সরাসরি যাবে; অন্য সব অ্যাপ VPN ব্যবহার করবে।</string>
+    <string name="rx_routing_save_failed">অ্যাপ রাউটিং সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।</string>
+    <string name="rx_search_apps">অ্যাপ খুঁজুন</string>
+    <string name="rx_no_apps">মিলে যাওয়া অ্যাপ নেই</string>
+    <string name="rx_routing_change_hint">VPN পুনরায় সংযুক্ত হলে পরিবর্তনগুলো প্রযোজ্য হবে।</string>
+    <string name="rx_select_apps_hint">সংযোগের আগে অন্তত একটি অ্যাপ নির্বাচন করুন.</string>
 </resources>

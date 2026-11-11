@@ -1,27 +1,27 @@
-<p>A V2Ray client for Android, support <a href="https://github.com/XTLS/Xray-core">Xray core</a> and <a href="https://github.com/v2fly/v2ray-core">v2fly core</a></p>
+<p>RX VPN is an Android client for V2Ray/Xray cores, built on the open-source
+<a href="https://github.com/2dust/v2rayNG">v2rayNG</a> project. It does not ship or sell VPN service or
+server configurations: you bring your own server, subscription link, or config file.</p>
 
-<h3>Telegram Channel</h3>
-
-<p><a href="https://t.me/github_2dust">github_2dust</a></p>
-
-<h3>Usage</h3>
-
-<h4>Geoip and Geosite</h4>
-
+<h3>What it does</h3>
 <ul>
-<li>geoip.dat and geosite.dat files are in <code>Android/data/com.v2ray.ang/files/assets</code> (path may differ on some Android device)</li>
-<li>download feature will get enhanced version in this <a href="https://github.com/Loyalsoldier/v2ray-rules-dat">repo</a> (Note it need a working proxy)</li>
-<li>latest official <a href="https://github.com/v2fly/domain-list-community">domain list</a> and <a href="https://github.com/v2fly/geoip">ip list</a> can be imported manually</li>
-<li>possible to use third party dat file in the same folder, like <a href="https://guide.v2fly.org/routing/sitedata.html#%E5%A4%96%E7%BD%AE%E7%9A%84%E5%9F%9F%E5%90%8D%E6%96%87%E4%BB%B6">h2y</a></li>
+<li>Import configs by QR code, clipboard, file, or subscription link</li>
+<li>Protocols supported by the bundled Xray core, including VLESS, VMess, Trojan, Shadowsocks,
+SOCKS, WireGuard, TUIC, and Hysteria2</li>
+<li>VPN mode with native tun2socks, plus proxy-only and root modes</li>
+<li>App-based routing: all apps, selected apps only, or all apps except selected ones</li>
+<li>Subscription groups, delay and real-ping tests, backup and restore, per-app settings</li>
 </ul>
 
-<h3>More in our <a href="https://github.com/2dust/v2rayNG/wiki">wiki</a></h3>
+<h3>No ads, no tracking</h3>
+<p>RX VPN contains no advertising SDK, no analytics SDK, and no crash-reporting SDK. The app does
+not send usage data to the developer. Its only network connections are the ones you configure, plus
+the update check against this repository's own releases page, which you can ignore.</p>
+<p>Android 7.0 (API 24) and newer is supported.</p>
 
-<h3>Development guide</h3>
+<h3>Requirements</h3>
+<p>A working server configuration is required. Connection quality and availability depend on your
+server, your operator, and your device network, so no universal connectivity guarantee is made.</p>
 
-<p>Android project under V2rayNG folder can be compiled directly in Android Studio, or using Gradle wrapper. But the v2ray core inside the aar is (probably) outdated.
-The aar can be compiled from the Golang project <a href="https://github.com/2dust/AndroidLibV2rayLite">AndroidLibV2rayLite</a> or <a href="https://github.com/2dust/AndroidLibXrayLite">AndroidLibXrayLite</a>.
-For a quick start, read guide for <a href="https://github.com/golang/go/wiki/Mobile">Go Mobile</a> and <a href="https://tutorialedge.net/golang/makefiles-for-go-developers/">Makefiles for Go Developers</a></p>
-
-<p>v2rayNG can run on Android Emulators. For WSA, VPN permission need to be granted via
-<code>appops set [package name] ACTIVATE_VPN allow</code></p>
+<h3>Source code</h3>
+<p>The app is GPL-3.0 licensed. Source code, release APKs, and issue tracker:
+<a href="https://github.com/kairomax1/RX_client">kairomax1/RX_client</a>.</p>

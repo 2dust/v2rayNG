@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
-    <string name="app_widget_name">RX Client</string>
-    <string name="app_tile_name">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
+    <string name="app_widget_name">RX VPN</string>
+    <string name="app_tile_name">RX VPN</string>
     <string name="app_tile_first_use">Добавьте профиль в приложении перед использованием этой функции.</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Служба RX Client</string>
+    <string name="notification_channel_service">Служба RX VPN</string>
     <string name="notification_channel_subscription_updates">Обновления подписок</string>
     <string name="notification_channel_connection_checks">Проверки соединения</string>
     <string name="notification_action_stop_v2ray">Остановить</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">Исходный код</string>
     <string name="title_oss_license">Лицензии открытого исходного кода</string>
     <string name="title_translators">Переводчики</string>
-    <string name="title_tg_channel">Telegram-канал</string>
 
-    <string name="title_pref_promotion">Предложения</string>
 
     <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">Подробность ведения журнала</string>
     <string name="title_outbound_domain_resolve_method">Определение доменов исходящих подключений</string>
     <string name="title_mode">Режим</string>
-    <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
     <string name="title_pref_ui_mode_night">Тема интерфейса</string>
@@ -409,7 +406,7 @@
     <string name="connection_test_error">Ошибка проверки соединения: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
-    <string name="connection_connected">Подключено.\nНажмите, чтобы проверить соединение.</string>
+    <string name="connection_connected">Подключено</string>
     <string name="connection_not_connected">Нет соединения</string>
     <string name="connection_running_task_left">Выполняется проверок: %s</string>
 
@@ -568,4 +565,20 @@
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">Подключить</string>
+    <string name="rx_disconnect">Отключить</string>
+    <string name="rx_connect_hint">Добавьте и выберите конфигурацию для подключения.</string>
+    <string name="rx_app_routing">Маршруты приложений</string>
+    <string name="rx_routing_all">Все приложения</string>
+    <string name="rx_routing_all_hint">Через VPN идут все приложения, кроме самого RX VPN.</string>
+    <string name="rx_routing_only">Только выбранные</string>
+    <string name="rx_routing_only_hint">Только отмеченные приложения используют VPN; остальные подключаются напрямую.</string>
+    <string name="rx_routing_except">Все, кроме выбранных</string>
+    <string name="rx_routing_except_hint">Отмеченные приложения подключаются напрямую; остальные используют VPN.</string>
+    <string name="rx_routing_save_failed">Не удалось сохранить маршруты приложений. Повторите попытку.</string>
+    <string name="rx_search_apps">Поиск приложений</string>
+    <string name="rx_no_apps">Подходящих приложений нет</string>
+    <string name="rx_routing_change_hint">Изменения применятся при переподключении VPN.</string>
+    <string name="rx_select_apps_hint">Перед подключением выберите хотя бы одно приложение.</string>
 </resources>

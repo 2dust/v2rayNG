@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">开关</string>
     <string name="app_tile_name">开关</string>
     <string name="app_tile_first_use">初次使用此功能请先用 APP 添加配置</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">请下拉刷新!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">RX Client 服务</string>
+    <string name="notification_channel_service">RX VPN 服务</string>
     <string name="notification_channel_subscription_updates">订阅更新</string>
     <string name="notification_channel_connection_checks">连接检查</string>
     <string name="notification_action_stop_v2ray">停止</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">源代码</string>
     <string name="title_oss_license">开源许可证</string>
     <string name="title_translators">翻译贡献者</string>
-    <string name="title_tg_channel">Telegram 频道</string>
 
-    <string name="title_pref_promotion">推广</string>
 
     <string name="title_pref_auto_update_subscription">自动更新订阅</string>
     <string name="summary_pref_auto_update_subscription">在后台按一定时间间隔自动更新您的订阅。受设备影响，此功能不一定总是有效</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">日志级别</string>
     <string name="title_outbound_domain_resolve_method">出站域名预解析方式 (outbound)</string>
     <string name="title_mode">模式</string>
-    <string name="title_mode_help">点此查看更多帮助</string>
     <string name="title_language">语言</string>
     <string name="title_ui_settings">用户界面设置</string>
     <string name="title_pref_ui_mode_night">深色模式</string>
@@ -403,7 +400,7 @@
     <string name="connection_test_error">连接测试失败：%s</string>
     <string name="connection_test_fail">无法访问互联网</string>
     <string name="connection_test_error_status_code">错误码：#%d</string>
-    <string name="connection_connected">"已连接。点击检查连接。"</string>
+    <string name="connection_connected">已连接</string>
     <string name="connection_not_connected">"未连接"</string>
     <string name="connection_running_task_left">正在运行的测试：%s</string>
 
@@ -562,4 +559,20 @@
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">连接</string>
+    <string name="rx_disconnect">断开连接</string>
+    <string name="rx_connect_hint">添加并选择配置后即可连接。</string>
+    <string name="rx_app_routing">应用分流</string>
+    <string name="rx_routing_all">所有应用</string>
+    <string name="rx_routing_all_hint">除 RX VPN 自身外，所有应用都通过 VPN。</string>
+    <string name="rx_routing_only">仅所选应用</string>
+    <string name="rx_routing_only_hint">仅勾选的应用使用 VPN，其他应用直接连接。</string>
+    <string name="rx_routing_except">除所选应用外的所有应用</string>
+    <string name="rx_routing_except_hint">勾选的应用直接连接，其他应用使用 VPN。</string>
+    <string name="rx_routing_save_failed">无法保存应用分流设置，请重试。</string>
+    <string name="rx_search_apps">搜索应用</string>
+    <string name="rx_no_apps">没有匹配的应用</string>
+    <string name="rx_routing_change_hint">更改将在 VPN 重新连接后生效。</string>
+    <string name="rx_select_apps_hint">连接前请至少选择一个应用。</string>
 </resources>

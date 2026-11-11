@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">Kết nối ngay</string>
     <string name="app_tile_name">Kết nối ngay</string>
-    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào RX Client để sử dụng!</string>
+    <string name="app_tile_first_use">Vui lòng thêm một cấu hình vào RX VPN để sử dụng!</string>
     <string name="navigation_drawer_open">Mở Menu ứng dụng</string>
     <string name="navigation_drawer_close">Đóng Menu ứng dụng</string>
     <string name="migration_success">Đã chuyển dữ liệu!</string>
@@ -14,20 +14,20 @@
     <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">Dịch vụ RX Client</string>
+    <string name="notification_channel_service">Dịch vụ RX VPN</string>
     <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
     <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
-    <string name="notification_action_stop_v2ray">Ngắt kết nối RX Client</string>
-    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho RX Client. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
+    <string name="notification_action_stop_v2ray">Ngắt kết nối RX VPN</string>
+    <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho RX VPN. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
     <string name="notification_action_more">Nhấn để biết thêm…</string>
-    <string name="toast_services_start">Đang khởi động RX Client…</string>
-    <string name="toast_services_stop">Đã dừng RX Client!</string>
-    <string name="toast_services_success">Đã khởi động RX Client!</string>
-    <string name="toast_services_failure">Không thể khởi động RX Client, kiểm tra lại cấu hình!</string>
+    <string name="toast_services_start">Đang khởi động RX VPN…</string>
+    <string name="toast_services_stop">Đã dừng RX VPN!</string>
+    <string name="toast_services_success">Đã khởi động RX VPN!</string>
+    <string name="toast_services_failure">Không thể khởi động RX VPN, kiểm tra lại cấu hình!</string>
 
     <!--ServerActivity-->
-    <string name="title_server">RX Client</string>
+    <string name="title_server">RX VPN</string>
     <string name="menu_item_add_config">Thêm cấu hình</string>
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_edit_config">Chỉnh sửa cấu hình</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">Mã nguồn</string>
     <string name="title_oss_license">Giấy phép mã nguồn mở</string>
     <string name="title_translators">Người dịch</string>
-    <string name="title_tg_channel">Kênh Telegram</string>
 
-    <string name="title_pref_promotion">Ưu đãi</string>
 
     <string name="title_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký</string>
     <string name="summary_pref_auto_update_subscription">Tự động cập nhật các gói đăng ký của bạn ở trong nền với khoảng thời gian cố định. Tùy thiết bị, tính năng này có thể không luôn hoạt động đúng như mong đợi.</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">Cấp độ nhật ký</string>
     <string name="title_outbound_domain_resolve_method">Phân giải tên miền cho kết nối đi (outbound)</string>
     <string name="title_mode">Chế độ kết nối</string>
-    <string name="title_mode_help">Nhấn vào đây nếu bạn cần trợ giúp!</string>
     <string name="title_language">Ngôn ngữ</string>
     <string name="title_ui_settings">Cài đặt UI</string>
     <string name="title_pref_ui_mode_night">Cài đặt chế độ UI</string>
@@ -366,7 +363,7 @@
     <string name="toast_server_not_found_in_group">Không tìm thấy máy chủ đã chọn trong nhóm hiện tại</string>
     <string name="title_locate_selected_config">Tìm cấu hình đã chọn</string>
 
-    <string name="tasker_start_service">Khởi động RX Client</string>
+    <string name="tasker_start_service">Khởi động RX VPN</string>
     <string name="tasker_setting_confirm">Xác nhận</string>
 
     <!-- RoutingSettingActivity -->
@@ -403,7 +400,7 @@
     <string name="connection_test_error">Kiểm tra kết nối thất bại: %s</string>
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
-    <string name="connection_connected">Đã kết nối.\nNhấn để kiểm tra kết nối.</string>
+    <string name="connection_connected">Đã kết nối</string>
     <string name="connection_not_connected">Chưa kết nối</string>
     <string name="connection_running_task_left">Số lượt kiểm tra đang chạy: %s</string>
 
@@ -562,4 +559,20 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">Kết nối</string>
+    <string name="rx_disconnect">Ngắt kết nối</string>
+    <string name="rx_connect_hint">Thêm và chọn cấu hình để kết nối.</string>
+    <string name="rx_app_routing">Định tuyến ứng dụng</string>
+    <string name="rx_routing_all">Tất cả ứng dụng</string>
+    <string name="rx_routing_all_hint">Định tuyến mọi ứng dụng qua VPN, trừ chính RX VPN.</string>
+    <string name="rx_routing_only">Chỉ ứng dụng đã chọn</string>
+    <string name="rx_routing_only_hint">Chỉ ứng dụng được chọn dùng VPN; ứng dụng khác kết nối trực tiếp.</string>
+    <string name="rx_routing_except">Tất cả trừ ứng dụng đã chọn</string>
+    <string name="rx_routing_except_hint">Ứng dụng được chọn kết nối trực tiếp; ứng dụng khác dùng VPN.</string>
+    <string name="rx_routing_save_failed">Không thể lưu định tuyến ứng dụng. Hãy thử lại.</string>
+    <string name="rx_search_apps">Tìm ứng dụng</string>
+    <string name="rx_no_apps">Không có ứng dụng phù hợp</string>
+    <string name="rx_routing_change_hint">Thay đổi áp dụng khi VPN kết nối lại.</string>
+    <string name="rx_select_apps_hint">Chọn ít nhất một ứng dụng trước khi kết nối.</string>
 </resources>

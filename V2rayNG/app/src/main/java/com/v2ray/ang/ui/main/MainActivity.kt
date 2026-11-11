@@ -155,13 +155,6 @@ class MainActivity : HelperBaseComponentActivity() {
             MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
             MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
             MainDestination.About -> Intent(this, AboutActivity::class.java)
-            MainDestination.Promotion -> {
-                Utils.openUri(
-                    this,
-                    "${Utils.decode(AppConfig.APP_PROMOTION_URL)}?t=${System.currentTimeMillis()}"
-                )
-                return
-            }
         }
         settingsActivityLauncher.launch(intent)
     }
@@ -190,8 +183,15 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun startV2Ray() {
-        if (mainViewModel.uiState.value.selectedGuid.isNullOrEmpty()) {
-            toast(R.string.title_file_chooser)
+        val state = mainViewModel.uiState.value
+        if (!MainConnectionPolicy.canConnect(
+                state.isRunning, state.selectedGuid, state.routingMode, state.routedAppCount
+            )
+        ) {
+            toast(
+                if (state.selectedGuid.isNullOrEmpty()) R.string.title_file_chooser
+                else R.string.rx_select_apps_hint
+            )
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN

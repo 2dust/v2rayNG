@@ -1,0 +1,89 @@
+name: Publish RX VPN Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag, for example v1.0.0"
+        required: true
+        type: string
+      artifact_run_id:
+        description: "Successful build run ID that contains RXVPN-apk"
+        required: true
+        type: string
+      prerelease:
+        description: "Publish as a pre-release (leave false for a normal release)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish tested APKs
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-release]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download tested APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: RXVPN-apk
+          path: apk
+          run-id: ${{ inputs.artifact_run_id || '41347658618' }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List APKs
+        run: ls -lh apk
+
+      - name: Resolve source build
+        id: source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ inputs.artifact_run_id || '41347658618' }}
+        run: |
+          STATUS=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json conclusion --jq .conclusion)
+          if [ "$STATUS" != "success" ]; then
+            echo "Source run $RUN_ID is not successful: $STATUS" >&2
+            exit 1
+          fi
+          SHA=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json headSha --jq .headSha)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Publishing assets from source run $RUN_ID ($SHA)"
+
+      - name: Write release notes
+        env:
+          TAG: ${{ inputs.release_tag || 'v1.0.0' }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          sed -e "s|@TAG@|${TAG}|g" -e "s|@SHA@|${SOURCE_SHA}|g" \
+            .github/release-notes.md > "$RUNNER_TEMP/notes.md"
+
+      - name: Publish APKs to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.release_tag || 'v1.0.0' }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            FLAGS=""
+            if [ "${{ inputs.prerelease }}" = "true" ]; then FLAGS="--prerelease"; fi
+            gh release create "$TAG" apk/*.apk \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$SOURCE_SHA" \
+              --title "RX VPN $TAG" \
+              --notes-file "$RUNNER_TEMP/notes.md" \
+              $FLAGS
+          fi
+
+      - name: Surface publish errors
+        if: failure()
+        run: |
+          echo "Release publish failed. Check the previous step output." >&2

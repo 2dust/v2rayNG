@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
     <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">سرویس RX Client</string>
+    <string name="notification_channel_service">سرویس RX VPN</string>
     <string name="notification_channel_subscription_updates">ورۊ کردن اشتراکا</string>
     <string name="notification_channel_connection_checks">واجۊری منپیز</string>
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
@@ -291,9 +291,7 @@
     <string name="title_source_code">کود بونچک</string>
     <string name="title_oss_license">موجوزا کود بونچک</string>
     <string name="title_translators">ولرنی کارووݩ</string>
-    <string name="title_tg_channel">تورگه تلگرام</string>
 
-    <string name="title_pref_promotion">تبلیقات</string>
 
     <string name="title_pref_auto_update_subscription">ورۊ کردن خوتکار اشتراکا</string>
     <string name="summary_pref_auto_update_subscription">اشتراکا خوتووݩ ن و تۉر خوتکار وا فاسله زمۊوی من پس زمینه ورۊ کۊنین. ای ویژیی من پوی دسگایل گاشڌ هی کار نکونه</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">سئت گوزارشا</string>
     <string name="title_outbound_domain_resolve_method">بارت پؽش هل دامنه دری (outbound)</string>
     <string name="title_mode">هالت</string>
-    <string name="title_mode_help">سی دووسمندیا وو هیاری قلوه، ری ای هؽل بزݩ</string>
     <string name="title_language">زووݩ</string>
     <string name="title_ui_settings">سامووا رابت منتوری</string>
     <string name="title_pref_ui_mode_night">سامووا هالت رابت منتوری</string>
@@ -405,7 +402,7 @@
     <string name="connection_test_error">منپیز و اینترنتن نجوست: %s</string>
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
-    <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
+    <string name="connection_connected">متصل</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
 
@@ -564,4 +561,20 @@
     <string name="sub_info_open_page">واز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">بی‌حد</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">اتصال</string>
+    <string name="rx_disconnect">قطع اتصال</string>
+    <string name="rx_connect_hint">برای اتصال، یک کانفیگ اضافه و انتخاب کنید.</string>
+    <string name="rx_app_routing">مسیردهی برنامه‌ها</string>
+    <string name="rx_routing_all">همهٔ برنامه‌ها</string>
+    <string name="rx_routing_all_hint">همهٔ برنامه‌ها به‌جز خود RX VPN از VPN عبور می‌کنند.</string>
+    <string name="rx_routing_only">فقط برنامه‌های انتخاب‌شده</string>
+    <string name="rx_routing_only_hint">فقط برنامه‌های تیک‌خورده از VPN استفاده می‌کنند؛ بقیه مستقیم متصل می‌شوند.</string>
+    <string name="rx_routing_except">همه به‌جز انتخاب‌شده‌ها</string>
+    <string name="rx_routing_except_hint">برنامه‌های تیک‌خورده مستقیم متصل می‌شوند؛ بقیه از VPN عبور می‌کنند.</string>
+    <string name="rx_routing_save_failed">ذخیرهٔ مسیردهی برنامه‌ها انجام نشد؛ دوباره تلاش کنید.</string>
+    <string name="rx_search_apps">جست‌وجوی برنامه‌ها</string>
+    <string name="rx_no_apps">برنامه‌ای پیدا نشد</string>
+    <string name="rx_routing_change_hint">تغییرات با اتصال دوبارهٔ VPN اعمال می‌شوند.</string>
+    <string name="rx_select_apps_hint">پیش از اتصال دست‌کم یک برنامه انتخاب کنید.</string>
 </resources>

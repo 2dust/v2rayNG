@@ -52,7 +52,6 @@ import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseComponentActivity() {
@@ -88,7 +87,6 @@ class SettingsActivity : BaseComponentActivity() {
         SettingsScreen(
             viewModel = viewModel,
             onBackClick = { finish() },
-            onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) },
             onSystemVpnSettingsClicked = ::openSystemVpnSettings
         )
     }
@@ -99,7 +97,6 @@ class SettingsActivity : BaseComponentActivity() {
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBackClick: () -> Unit,
-    onModeHelpClicked: () -> Unit,
     onSystemVpnSettingsClicked: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -163,7 +160,7 @@ fun SettingsScreen(
             MmkvManager.decodeSettingsString(AppConfig.PREF_LANGUAGE, "auto") ?: "auto"
         )
     }
-    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, "0")
+    var uiModeNight by rememberMmkvString(AppConfig.PREF_UI_MODE_NIGHT, ThemeManager.DEFAULT_UI_MODE)
     var dynamicColor by rememberMmkvBool(AppConfig.PREF_DYNAMIC_COLOR, false)
 
     var ipv6Enabled by rememberMmkvBool(AppConfig.PREF_IPV6_ENABLED, false)
@@ -681,10 +678,6 @@ fun SettingsScreen(
                     values = modeValues,
                     selectedValue = mode,
                     onSelected = { mode = it }
-                )
-                SettingsMenuItem(
-                    title = stringResource(R.string.title_mode_help),
-                    onClick = onModeHelpClicked
                 )
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_root_mode_enabled),

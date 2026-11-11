@@ -1,40 +1,173 @@
-**v2rayNG 隐私权政策**
+# RX VPN — Privacy Policy / سیاست حریم خصوصی
 
-本政策自2023年11月17日起施行
+Last updated: 2026-11-11 · آخرین به‌روزرسانی: ۲۰ آبان ۱۴۰۵ (2026-11-11)
 
-2dust 将 v2rayNG 应用程序构建为开源应用程序。 本服务由 2dust 免费提供，并且旨在按原样使用。
+RX VPN is an open-source client for the V2Ray/Xray cores, derived from
+[v2rayNG](https://github.com/2dust/v2rayNG). It does not provide a VPN service, a server, or a
+subscription. You add your own server configuration.
 
-v2rayNG 尊重并保护所有用户的个人隐私权，为此我们向大众公开这份隐私权政策。**您使用 v2rayNG 即代表您以阅读并同意了这份条款，如果您不同意这份条款请立即停止使用并卸载 v2rayNG。**
+RX VPN یک کلاینت متن‌باز برای هسته‌های V2Ray/Xray است که از پروژهٔ
+[v2rayNG](https://github.com/2dust/v2rayNG) گرفته شده. این برنامه سرویس VPN، سرور یا اشتراک ارائه
+نمی‌دهد؛ کانفیگ سرور خودتان را اضافه می‌کنید.
 
-**信息收集**
+---
 
-v2rayNG 软件自身不会发送任何信息到开发者，但是您下载软件的应用市场（如 Google Play）可能会收集关于应用运行状态的相关信息并提供给 v2rayNG 开发者。有关这些信息，请阅读您使用的应用市场所提供的隐私权政策。
+## English
 
-v2rayNG 软件中可能包含需要通过 IAP 支付解锁的功能，您的支付信息将由相关的 IAP 渠道进行处理，而我们对支付信息没有访问权。
+### 1. What we collect
 
-当您向 v2rayNG 开发者反馈软件运行中的错误时，开发者可能会要求您提供软件以及系统的日志以帮助确认问题的原因。因日志中可能包括敏感信息，此类信息只能由您自己操作发送。**我们不对任何传输服务的安全性和隐私性做任何明示或暗示的担保，请您在传送相关信息时选择可以您自身可以接受的方式。**
+**Nothing is sent to the developer.** RX VPN contains no advertising SDK, no analytics SDK, and no
+crash-reporting SDK. There is no account, no sign-in, and no telemetry endpoint.
 
-**信息共享**
+### 2. Data that stays on your device
 
-我们不会向任何第三方出售收集到的用户数据。我们可能向外部开发者提供信息以协助软件的开发，但是在提供信息之前我们会传达相关保密义务并确定其可以遵守。
+The app stores the following locally, inside its own private storage:
 
-**信息存留**
+- the server profiles or subscription links you add, including their credentials
+- app settings (routing mode, per-app selections, DNS, ports, theme, language)
+- logs you choose to view in the in-app log screen
+- an optional backup file if you create one
 
-除非有相关法律规定，我们会在 30 天内清除不需要继续使用的用户数据，或将统计数据整合为无法识别单个用户的综合报告。
+This data is not uploaded anywhere by the app. Removing the app or clearing its data deletes it.
+Backups are written only where you choose, and WebDAV backups go only to the server address you enter.
 
-**信息泄露**
+### 3. Network connections the app makes
 
-我们会使用合理的技术和安全手段尽力保护用户的数据，但是无法保证数据的绝对安全。如果我们确认数据发生了泄露，我们会在 7 天内通过可用的渠道通知用户。**您同意不向我们追责任何因不可抗力而造成的损失。**
+The app connects only to the destinations below. Everything else is traffic you generated yourself
+through your own server.
 
-**儿童隐私**
+| Destination | When | Purpose | Can it be disabled? |
+| --- | --- | --- | --- |
+| Your server / subscription URL | when you connect or refresh | deliver your VPN traffic and fetch your subscription | it is your own configuration |
+| `api.github.com` (this repository's releases) | when the update check runs | compare your installed version with the latest release | the check is user-initiated and can be ignored |
+| `raw.githubusercontent.com` (this repository) | when you open the privacy policy or geo files | display this document, download geo data | it only opens when you tap |
+| `gstatic.com` / `google.com` (`generate_204`) | when a delay test runs | measure latency to a server | URL is configurable in settings |
+| `api.ip.sb` or the IP API you set | when you check your IP | show your current IP and location | URL is configurable in settings |
+| DNS resolvers you configured | while connected | resolve domain names | it is your own configuration |
 
-这些服务不针对 13 岁以下的任何人。我不会故意收集 13 岁以下儿童的个人身份信息。 如果我发现 13 岁以下的儿童向我提供了个人信息，我会立即从我们的服务器中删除该信息。 如果您是父母或监护人，并且您知道您的孩子向我们提供了个人信息，请与我联系，以便我能够采取必要的行动。
+### 4. Permissions and why they are needed
 
-**条款修改**
+- **INTERNET / ACCESS_NETWORK_STATE / CHANGE_NETWORK_STATE** — establish and monitor the tunnel.
+- **FOREGROUND_SERVICE (+ SPECIAL_USE)** — keep the VPN service running with a notification.
+- **POST_NOTIFICATIONS** — show the ongoing connection notification.
+- **CAMERA** — read QR codes, only while you are on the scanner screen.
+- **RECEIVE_BOOT_COMPLETED** — reconnect after a reboot, only if you enabled start-on-boot and a
+  server is selected.
+- **QUERY_ALL_PACKAGES** — list installed apps so you can choose which apps use the tunnel. Only app
+  names and icons for that picker are read; the list never leaves the device.
+- **VPN service permission (system dialog)** — create the tunnel.
 
-我们保留修改这份隐私权政策的权利，但是会确保在更新条款前至少 30 天通过我们的可用渠道和应用内提示来通知用户。**在新条款生效后继续使用软件即表示您同意修改后的隐私权政策。**
+Camera, notifications, and the app list are never read in the background.
 
-**联系我们**
+### 5. Sharing
 
-如果您对我的隐私政策有任何疑问或建议，请随时通过 CaptainIronng@protonmail.com 与我联系。
+We do not sell, share, or transfer any data. There is no third party to share it with: the app has no
+third-party advertising or analytics component.
 
+### 6. Your control
+
+You can revoke permissions in Android settings, delete profiles inside the app, clear app data, or
+uninstall. Because nothing is stored remotely, deletion is immediate and complete.
+
+### 7. Children
+
+The app is not directed at children under 13 and collects no personal information from anyone.
+
+### 8. Changes
+
+Changes to this policy are published in this repository, so the version shown inside the app is always
+the current one.
+
+### 9. Contact
+
+Open an issue at <https://github.com/kairomax1/RX_client/issues>. Do not include credentials, private
+keys, or full configuration links in an issue.
+
+---
+
+## فارسی
+
+### ۱. چه اطلاعاتی جمع می‌کنیم
+
+**هیچ اطلاعاتی برای توسعه‌دهنده ارسال نمی‌شود.** در RX VPN هیچ SDK تبلیغات، آنالیتیکس یا گزارش
+خطا وجود ندارد. حساب کاربری، ورود، و سرور تلمتری هم ندارد.
+
+### ۲. داده‌ای که روی دستگاه خودتان می‌ماند
+
+برنامه این موارد را فقط در حافظهٔ خصوصی خودش ذخیره می‌کند:
+
+- پروفایل‌های سرور یا لینک‌های اشتراکی که اضافه می‌کنید، همراه با اطلاعات ورودشان
+- تنظیمات برنامه (حالت مسیردهی، انتخاب برنامه‌ها، DNS، پورت‌ها، پوسته، زبان)
+- لاگ‌هایی که در صفحهٔ لاگ برنامه می‌بینید
+- فایل پشتیبان، اگر خودتان بسازید
+
+این داده‌ها توسط برنامه به جایی آپلود نمی‌شوند. با حذف برنامه یا پاک‌کردن داده‌های آن، پاک می‌شوند.
+پشتیبان فقط جایی نوشته می‌شود که خودتان انتخاب کنید و پشتیبان WebDAV فقط به آدرسی می‌رود که خودتان
+وارد کرده‌اید.
+
+### ۳. اتصال‌های شبکه‌ای برنامه
+
+برنامه فقط به مقصدهای زیر وصل می‌شود. هر چیز دیگری ترافیک خود شماست که از سرور خودتان می‌گذرد.
+
+| مقصد | چه زمانی | برای چه | قابل غیرفعال‌سازی است؟ |
+| --- | --- | --- | --- |
+| سرور / لینک اشتراک شما | هنگام اتصال یا به‌روزرسانی اشتراک | عبور ترافیک VPN و دریافت اشتراک | همان کانفیگ خودتان است |
+| `api.github.com` (ریلیزهای همین مخزن) | هنگام بررسی به‌روزرسانی | مقایسهٔ نسخهٔ نصب‌شده با آخرین انتشار | با انتخاب شما اجرا می‌شود و می‌توانید نادیده بگیرید |
+| `raw.githubusercontent.com` (همین مخزن) | هنگام باز کردن این سند یا فایل‌های geo | نمایش این سند و دریافت داده‌های geo | فقط با لمس شما باز می‌شود |
+| `gstatic.com` / `google.com` (`generate_204`) | هنگام تست تأخیر | اندازه‌گیری پینگ سرور | آدرس در تنظیمات قابل تغییر است |
+| `api.ip.sb` یا IP API انتخابی شما | هنگام بررسی IP | نمایش IP و موقعیت فعلی | آدرس در تنظیمات قابل تغییر است |
+| DNS انتخابی شما | در حال اتصال | تبدیل نام دامنه | همان کانفیگ خودتان است |
+
+### ۴. دسترسی‌ها و دلیل‌شان
+
+- **INTERNET / ACCESS_NETWORK_STATE / CHANGE_NETWORK_STATE** — ایجاد و پایش تونل.
+- **FOREGROUND_SERVICE (+ SPECIAL_USE)** — زنده نگه‌داشتن سرویس VPN همراه با اعلان.
+- **POST_NOTIFICATIONS** — نمایش اعلان وضعیت اتصال.
+- **CAMERA** — خواندن QR، فقط وقتی در صفحهٔ اسکنر هستید.
+- **RECEIVE_BOOT_COMPLETED** — اتصال خودکار پس از روشن‌شدن گوشی، فقط اگر «شروع خودکار» را روشن
+  کرده باشید و سروری انتخاب شده باشد.
+- **QUERY_ALL_PACKAGES** — فهرست برنامه‌های نصب‌شده برای انتخاب برنامه‌هایی که از تونل عبور کنند.
+  فقط نام و آیکون برنامه‌ها برای همین انتخابگر خوانده می‌شود و این فهرست هرگز از دستگاه خارج نمی‌شود.
+- **مجوز VPN (دیالوگ سیستم)** — ساخت تونل.
+
+دوربین، اعلان‌ها و فهرست برنامه‌ها هرگز در پس‌زمینه خوانده نمی‌شوند.
+
+### ۵. اشتراک‌گذاری
+
+هیچ داده‌ای فروخته، به اشتراک گذاشته یا منتقل نمی‌شود. طرف سومی هم وجود ندارد؛ برنامه هیچ مؤلفهٔ
+تبلیغاتی یا آنالیتیکسِ شخص ثالث ندارد.
+
+### ۶. کنترل شما
+
+می‌توانید دسترسی‌ها را از تنظیمات اندروید پس بگیرید، پروفایل‌ها را در برنامه حذف کنید، داده‌های
+برنامه را پاک کنید یا برنامه را حذف کنید. چون چیزی روی سرور ما ذخیره نمی‌شود، حذف فوری و کامل است.
+
+### ۷. کودکان
+
+این برنامه برای کودکان زیر ۱۳ سال ساخته نشده و از هیچ‌کس اطلاعات شخصی جمع نمی‌کند.
+
+### ۸. تغییرات
+
+هر تغییر در این سیاست در همین مخزن منتشر می‌شود؛ پس نسخه‌ای که داخل برنامه نمایش داده می‌شود همیشه
+به‌روز است.
+
+### ۹. تماس
+
+در <https://github.com/kairomax1/RX_client/issues> یک issue باز کنید. اطلاعات ورود، کلید خصوصی یا لینک
+کامل کانفیگ را در issue قرار ندهید.
+
+---
+
+## Credits / اعتبارها
+
+This policy text was written for RX VPN. RX VPN is derived from
+[v2rayNG](https://github.com/2dust/v2rayNG) (GPL-3.0) and bundles the
+[Xray-core](https://github.com/XTLS/Xray-core) and
+[hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) projects. Portions of the app's UI
+and routing behaviour follow the upstream project. See [LICENSE](LICENSE).
+
+این متن برای RX VPN نوشته شده است. RX VPN بر پایهٔ پروژهٔ
+[v2rayNG](https://github.com/2dust/v2rayNG) (مجوز GPL-3.0) است و پروژه‌های
+[Xray-core](https://github.com/XTLS/Xray-core) و
+[hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) را همراه دارد. بخشی از رابط کاربری و
+رفتار مسیردهی از پروژهٔ بالادست گرفته شده است. [LICENSE](LICENSE) را ببینید.
