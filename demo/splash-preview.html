@@ -4,424 +4,357 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="referrer" content="no-referrer">
-<title>RX Client — Splash Animation</title>
+<title>RX VPN — Splash Animation</title>
 <style>
-  /* ============================================================
-     palette — taken from the real app:
-     res/values/ic_launcher_background.xml, ui/compose/Theme.kt
-     ============================================================ */
-  :root{
-    --brand:#6D4AFF;      /* ic_launcher_background / colorFabActive */
-    --brand-lilac:#8B5CFF;
-    --brand-cyan:#19D9EC; /* secondary */
-    --sp:1;               /* global speed factor */
+  /* ==========================================================
+     RX VPN identity — source: branch arena/d739235f-rx-client
+       branding/rx-vpn-logo.svg  ·  ui/compose/Theme.kt
+       ui/main/MainScreen.kt · MainBottomBar.kt · MainEmptyState.kt
+     ========================================================== */
+  .screen{
+    --bg:#17191B;
+    --bg-low:#1D2022;
+    --surface:#17191B;
+    --container:#232628;
+    --container-high:#2C3033;
+    --container-highest:#363A3D;
+    --variant:#303336;
+    --on:#F1F0EB;
+    --onvar:#BCBEBB;
+    --outline:#929590;
+    --outline-var:#424649;
+    --primary:#E8B778;
+    --on-primary:#2C1D0B;
+    --tertiary:#9DCEB7;
+    --ping:#356B57;
+    --divider:#424649;
   }
+  .screen[data-theme="light"]{
+    --bg:#F5F4F1;
+    --bg-low:#EFEFEB;
+    --surface:#F5F4F1;
+    --container:#EAEAE6;
+    --container-high:#E4E4DF;
+    --container-highest:#DEDED8;
+    --variant:#E9E7E2;
+    --on:#202120;
+    --onvar:#5C5D59;
+    --outline:#7A7B76;
+    --outline-var:#D4D3CD;
+    --primary:#805522;
+    --on-primary:#FFFFFF;
+    --tertiary:#356B57;
+    --ping:#356B57;
+    --divider:#D4D3CD;
+  }
+
+  :root{ --sp:1; }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{height:100%}
   body{
-    margin:0; background:
-      radial-gradient(900px 600px at 15% -10%, #1a1140 0%, transparent 60%),
-      radial-gradient(800px 600px at 95% 110%, #06313a 0%, transparent 60%),
-      #06060c;
-    color:#F2F2FA;
-    font-family:"Segoe UI", system-ui, -apple-system, "Vazirmatn", Roboto, sans-serif;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:20px; padding:26px 16px; min-height:100vh; overflow-x:hidden;
+    margin:0; min-height:100vh; overflow-x:hidden;
+    background:radial-gradient(900px 600px at 20% -10%, #26282b 0%, transparent 60%), #0b0c0d;
+    color:#F1F0EB; font-family:"Vazirmatn","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:26px 16px;
   }
-  body::after{
-    content:""; position:fixed; inset:0; pointer-events:none; opacity:.035; z-index:99;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
-  }
-  .page-title{font-size:14px; letter-spacing:.16em; text-transform:uppercase; color:#8E8EA8; margin:0}
-  .page-title b{color:#fff}
+  .page-title{font-size:13.5px; letter-spacing:.18em; text-transform:uppercase; color:#8a8d90; margin:0}
+  .page-title b{color:#E8B778}
 
   .controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
-  .btn{
-    border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05);
-    color:#e9e9f5; padding:9px 15px; border-radius:999px; font:inherit; font-size:13px;
-    cursor:pointer; transition:.18s ease;
-  }
-  .btn:hover{background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.3)}
+  .btn{border:1px solid rgba(241,240,235,.14); background:rgba(241,240,235,.05); color:#F1F0EB;
+    padding:9px 15px; border-radius:12px; font:inherit; font-size:13px; cursor:pointer; transition:.16s}
+  .btn:hover{background:rgba(241,240,235,.1)}
   .btn:active{transform:scale(.97)}
-  .btn.primary{background:linear-gradient(120deg,var(--brand),var(--brand-cyan)); border-color:transparent; color:#fff; font-weight:600;
-    box-shadow:0 8px 26px -10px var(--brand)}
+  .btn.primary{background:linear-gradient(180deg,#E8B778,#d9a463); color:#2C1D0B; border-color:transparent; font-weight:700}
 
-  /* ============ phone chassis ============ */
-  .phone{
-    position:relative; width:378px; height:788px; border-radius:52px; padding:11px;
-    background:linear-gradient(160deg,#2c2c3c,#0b0b12 40%,#1b1b28);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.10),
-      0 40px 90px -30px rgba(0,0,0,.95),
-      0 0 120px -30px rgba(109,74,255,.55),
-      0 0 200px -60px rgba(25,217,236,.3);
-    flex:0 0 auto;
-  }
-  .screen{
-    position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden;
-    background:#1C1B1F; isolation:isolate;
-    --app-surface:#1C1B1F;
-    --app-low:#1A191D;
-    --app-container:#1E1D21;
-    --app-high:#282729;
-    --app-on:#E6E1E5;
-    --app-onvar:#CAC4D0;
-    --app-outline:#49454F;
-    --app-primary:#B6A2FF;
-    --app-fab-off:#646464;
-  }
-  .screen[data-theme="light"]{
-    --app-surface:#FFFFFF;
-    --app-low:#F7F7F7;
-    --app-container:#F1F1F1;
-    --app-high:#EBEBEB;
-    --app-on:#1C1B1F;
-    --app-onvar:#49454F;
-    --app-outline:#CAC4D0;
-    --app-primary:#6D4AFF;
-    --app-fab-off:#9C9C9C;
-  }
+  /* ---------------- phone ---------------- */
+  .phone{position:relative; width:378px; height:788px; border-radius:52px; padding:11px; flex:0 0 auto;
+    background:linear-gradient(160deg,#2a2d30,#0c0d0e 42%,#1b1d1f);
+    box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 40px 90px -30px #000, 0 0 130px -40px rgba(232,183,120,.28)}
+  .screen{position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden;
+    background:var(--bg); isolation:isolate; color:var(--on)}
   .island{position:absolute; top:11px; left:50%; transform:translateX(-50%); width:104px; height:26px;
-    border-radius:999px; background:#000; z-index:60; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+    border-radius:999px; background:#000; z-index:60}
   .statusbar{position:absolute; top:16px; left:0; right:0; z-index:55; display:flex; justify-content:space-between;
-    align-items:center; padding:0 26px; font-size:12.5px; font-weight:600; color:#fff; letter-spacing:.02em}
-  .sb-right{display:flex; gap:5px; align-items:center}
+    align-items:center; padding:0 26px; font-size:12.5px; font-weight:600; color:#fff}
 
-  /* ============================================================
-     SPLASH — built around the REAL adaptive launcher icon
-     ============================================================ */
-  .splash{position:absolute; inset:0; z-index:30; display:grid; place-items:center; overflow:hidden}
-  .splash::before{
-    content:""; position:absolute; inset:0;
-    background:
-      radial-gradient(120% 80% at 50% 6%, #1b1140 0%, transparent 55%),
-      radial-gradient(100% 70% at 50% 106%, #072a33 0%, transparent 60%),
-      linear-gradient(180deg,#08080F,#05050B 62%,#07070E);
+  /* ---------------- shared glass ---------------- */
+  .glass{ /* RxGlassPanel: layered translucency + soft edge highlight */
+    border-radius:24px;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--container-high) 88%, transparent),
+                                       color-mix(in srgb, var(--container) 72%, transparent));
+    border:1px solid color-mix(in srgb, var(--outline-var) 38%, transparent);
+    box-shadow:inset 0 1px 0 color-mix(in srgb, var(--on) 12%, transparent);
   }
-  .orb{position:absolute; border-radius:50%; filter:blur(48px); opacity:0}
-  .orb.a{width:320px; height:320px; background:var(--brand); top:-70px; left:-60px}
-  .orb.b{width:300px; height:300px; background:var(--brand-cyan); bottom:-80px; right:-70px}
-  .orb.c{width:200px; height:200px; background:var(--brand-lilac); top:40%; left:54%; filter:blur(74px)}
 
-  .logo-wrap{position:relative; display:grid; place-items:center; transform:translateY(-30px)}
-  .logo-glow{position:absolute; width:300px; height:300px; border-radius:50%;
-    background:radial-gradient(circle, rgba(109,74,255,.6), rgba(25,217,236,.16) 46%, transparent 70%);
-    filter:blur(20px); opacity:0}
-
-  /* the icon: violet squircle + white shield + bolt knocked out,
-     exactly like mipmap-*/ic_launcher + ic_launcher_foreground */
-  .appicon{width:132px; height:132px; border-radius:31px; position:relative; z-index:3; overflow:hidden;
-    box-shadow:0 18px 50px -12px rgba(109,74,255,.85), 0 0 0 1px rgba(255,255,255,.08) inset}
-  .appicon svg{display:block; width:100%; height:100%; border-radius:inherit}
-  .icon-plate{opacity:0}
-  .icon-shield{fill:none; stroke:#fff; stroke-width:9; stroke-linejoin:round;
-    stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
-  .icon-shield-fill{fill:#fff; opacity:0}
-  .icon-bolt{fill:var(--brand); opacity:0}
-
-  .ring{position:absolute; width:132px; height:132px; border-radius:34px; border:1.5px solid rgba(180,160,255,.5); opacity:0; z-index:2}
-  .flash{position:absolute; inset:-40%; z-index:20; opacity:0; pointer-events:none;
-    background:radial-gradient(circle at 50% 45%, #fff 0%, rgba(200,190,255,.5) 18%, transparent 52%)}
-  .spark{position:absolute; left:50%; top:50%; margin:-2.5px 0 0 -2.5px; width:5px; height:5px; border-radius:50%;
-    background:#fff; box-shadow:0 0 10px 2px rgba(180,200,255,.9); opacity:0; z-index:4}
-
-  .wordmark{position:absolute; bottom:210px; left:0; right:0; text-align:center; z-index:5}
-  .wordmark h1{margin:0; font-size:31px; font-weight:800; letter-spacing:.01em; direction:ltr;
-    color:#fff; display:inline-flex}
-  .wordmark h1 span{display:inline-block; opacity:0; transform:translateY(18px) rotateX(50deg)}
-  .wordmark .tag{margin:9px 0 0; font-size:12.5px; color:#b9b7d6; opacity:0}
-
-  .loader{position:absolute; bottom:148px; left:50%; transform:translateX(-50%); width:132px; height:3px;
-    border-radius:99px; background:rgba(255,255,255,.10); overflow:hidden; opacity:0; z-index:5}
-  .loader i{display:block; height:100%; width:100%; border-radius:99px; transform-origin:right center; transform:scaleX(0);
-    background:linear-gradient(90deg,var(--brand-cyan),var(--brand-lilac),var(--brand))}
-
-  .wipe{position:absolute; left:50%; top:46%; width:1400px; height:1400px; margin:-700px 0 0 -700px;
-    border-radius:50%; z-index:40; opacity:0; transform:scale(0);
-    background:radial-gradient(circle, #2a1a63 0%, var(--brand) 42%, #12111a 78%)}
-
-  /* ============================================================
-     HOME — real MainScreen structure
-     MainTopButtonBar + server pager + MainBottomBar + FAB
-     ============================================================ */
-  .home{position:absolute; inset:0; z-index:25; opacity:0; display:flex; flex-direction:column;
-    background:var(--app-surface); color:var(--app-on)}
-  .appbar{flex:0 0 auto; display:flex; align-items:center; gap:2px; height:64px; padding:0 4px;
-    margin-top:38px; color:var(--app-on)}
-  .appbar h2{margin:0; font-size:20px; font-weight:500; flex:1; padding-inline-start:6px}
-  .icon-btn{width:44px; height:44px; border:0; background:transparent; border-radius:50%; color:var(--app-on);
+  /* ---------------- HOME (real RX VPN main screen) ---------------- */
+  .home{position:absolute; inset:0; z-index:25; display:flex; flex-direction:column; opacity:0;
+    background:linear-gradient(180deg, var(--bg-low), var(--bg))}
+  .appbar{height:64px; margin-top:38px; display:flex; align-items:center; gap:2px;
+    background:var(--surface); color:var(--on)}
+  .appbar h2{margin:0; font-size:20px; font-weight:500; flex:1; padding-inline-start:4px}
+  .icon-btn{width:44px; height:44px; border:0; background:transparent; color:var(--on); border-radius:50%;
     display:grid; place-items:center; cursor:pointer}
   .icon-btn:active{background:rgba(128,128,128,.16)}
-  .appbar .actions{display:flex}
 
-  .pager{flex:1; overflow:hidden; padding:4px 10px 0}
-  .card{background:var(--app-low); border-radius:12px; padding:10px 4px; margin-bottom:8px;
-    display:flex; align-items:stretch; position:relative; border:1px solid rgba(128,128,128,.10)}
-  .card .bar{width:4px; border-radius:4px; background:var(--app-primary); margin:8px 0 8px 6px; opacity:0}
-  .card.selected .bar{opacity:1}
-  .card .body{flex:1; padding:2px 10px 4px}
-  .card .row1{display:flex; align-items:center; gap:2px}
-  .card .remarks{flex:1; font-size:15px; line-height:1.5; color:var(--app-on);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .card .act{width:34px; height:34px; display:grid; place-items:center; color:var(--app-onvar); opacity:.95}
-  .card .row2{display:flex; align-items:center; gap:6px; margin-top:5px; font-size:12.5px; color:var(--app-onvar)}
-  .card .row3{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; font-size:11.5px}
-  .card .proto{color:var(--brand)}
-  .card .ping{color:#009966}
-  .card .ping.red{color:#FF0099}
-  .badge{width:20px; height:20px; border-radius:50%; background:rgba(109,74,255,.2); color:var(--app-primary);
-    font-size:9.5px; font-weight:700; display:grid; place-items:center; flex:0 0 auto}
+  .content{flex:1; padding:24px; display:flex; align-items:center; justify-content:center}
+  .empty{padding:24px; width:100%; display:flex; flex-direction:column; align-items:center; text-align:center}
+  .empty .mark{width:76px; height:76px; color:var(--primary)}
+  .empty h3{margin:16px 0 0; font-size:20px; font-weight:600; line-height:1.5}
+  .empty p{margin:10px 0 0; font-size:13.5px; line-height:1.9; color:var(--onvar)}
+  .cta{margin-top:24px; width:100%; min-height:56px; border-radius:18px; border:0; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px; font:inherit; font-size:15px; font-weight:600;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 96%, transparent),
+                                       color-mix(in srgb, var(--primary) 82%, transparent));
+    color:var(--on-primary); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent)}
+  .cta:active{transform:scale(.99)}
+  .link-btn{margin-top:4px; width:100%; min-height:44px; border:0; background:transparent; color:var(--primary);
+    font:inherit; font-size:13.5px; cursor:pointer}
 
-  .bottombar{position:relative; flex:0 0 auto; border-top:1px solid var(--app-outline);
-    background:var(--app-surface); padding-bottom:22px}
-  .bottombar .inner{height:64px; display:flex; align-items:center; padding:0 16px}
-  .status-text{font-size:14px; color:var(--app-on)}
-  .status-text.connected{color:#00875a}
-  .fab{position:absolute; inset-inline-end:24px; top:0; transform:translateY(-28px);
-    width:56px; height:56px; border-radius:16px; border:0; cursor:pointer;
-    background:var(--app-fab-off); display:grid; place-items:center; color:#fff;
-    box-shadow:0 6px 16px -6px rgba(0,0,0,.6); transition:background .25s ease}
-  .fab.on{background:var(--brand); box-shadow:0 8px 26px -8px var(--brand)}
-  .fab svg{width:24px; height:24px; transition:transform .2s ease}
-  .fab.spin svg{animation:spin 3s linear}
+  /* ---------------- bottom bar (MainBottomBar.kt) ---------------- */
+  .bottombar{padding:8px 16px 18px}
+  .bottombar .glass{padding:16px}
+  .status-row{display:flex; align-items:center; gap:10px; padding:2px 0; cursor:pointer}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--outline); flex:0 0 auto; transition:.3s}
+  .dot.on{background:var(--tertiary); box-shadow:0 0 0 4px color-mix(in srgb, var(--tertiary) 22%, transparent)}
+  .status-text{flex:1; font-size:13.5px; color:var(--onvar); line-height:1.6}
+  .ping-chip{font-size:11.5px; font-weight:600; color:var(--tertiary); background:color-mix(in srgb, var(--tertiary) 12%, transparent);
+    border-radius:8px; padding:3px 8px; opacity:0; transition:.3s}
+  .ping-chip.show{opacity:1}
+  .spin-mini{width:16px; height:16px; border-radius:50%; border:2px solid color-mix(in srgb, var(--primary) 35%, transparent);
+    border-top-color:var(--primary); animation:spin 1s linear infinite; display:none}
+  .spin-mini.show{display:block}
 
-  /* ============ engine ============ */
-  @keyframes fadeIn{from{opacity:0} to{opacity:1}}
-  @keyframes fadeOut{from{opacity:1} to{opacity:0}}
-  @keyframes orbIn{from{opacity:0; transform:scale(.55)} to{opacity:.42; transform:scale(1)}}
-  @keyframes draw{from{stroke-dashoffset:1} to{stroke-dashoffset:0}}
-  @keyframes popIn{0%{opacity:0; transform:scale(.55)} 60%{opacity:1; transform:scale(1.06)} 100%{opacity:1; transform:scale(1)}}
-  @keyframes plateIn{from{opacity:0; transform:scale(.88)} to{opacity:1; transform:scale(1)}}
-  @keyframes glowIn{from{opacity:0; transform:scale(.7)} to{opacity:1; transform:scale(1)}}
-  @keyframes ringPop{0%{opacity:.8; transform:scale(.6)} 70%{opacity:.1} 100%{opacity:0; transform:scale(2.2)}}
-  @keyframes flashPop{0%{opacity:0} 12%{opacity:.9} 100%{opacity:0}}
-  @keyframes sparkOut{0%{opacity:0; transform:rotate(var(--a)) translateY(0) scale(1)}
-    18%{opacity:1} 100%{opacity:0; transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) scale(.2)}}
-  @keyframes shake{0%,100%{transform:translate(0,-30px)}
-    12%{transform:translate(-4px,-27px)} 28%{transform:translate(5px,-33px)}
-    46%{transform:translate(-3px,-32px)} 66%{transform:translate(2px,-28px)} 84%{transform:translate(-1px,-29px)}}
-  @keyframes letterUp{from{opacity:0; transform:translateY(20px) rotateX(55deg)} to{opacity:1; transform:none}}
-  @keyframes tagUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
-  @keyframes loadBar{from{transform:scaleX(0)} to{transform:scaleX(1)}}
-  @keyframes wipeIn{0%{opacity:0; transform:scale(0)} 12%{opacity:1} 100%{opacity:1; transform:scale(1)}}
-  @keyframes homeIn{from{opacity:0} to{opacity:1}}
-  @keyframes breathe{0%,100%{opacity:.35; transform:scale(.96)} 50%{opacity:.8; transform:scale(1.04)}}
-  @keyframes spin{to{transform:rotate(720deg)}}
+  .bar-actions{display:flex; gap:10px; margin-top:10px}
+  .connect{flex:1; height:60px; border-radius:18px; border:0; font:inherit; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 96%, transparent),
+                                       color-mix(in srgb, var(--primary) 82%, transparent));
+    color:var(--on-primary); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent);
+    transition:background .35s, box-shadow .35s}
+  .connect.running{background:linear-gradient(180deg, #2C3033, #232628); color:var(--on);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 65%, transparent)}
+  .connect .lbl{display:flex; flex-direction:column; align-items:center; line-height:1.25}
+  .connect .lbl b{font-size:15px; font-weight:600}
+  .connect .lbl small{font-size:10.5px; opacity:.78; margin-top:2px; display:none}
+  .connect.running .lbl small{display:block}
+  .square{width:60px; height:60px; flex:0 0 auto; border-radius:18px; border:0; color:var(--on); cursor:pointer;
+    display:grid; place-items:center;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--container-high) 88%, transparent),
+                                       color-mix(in srgb, var(--container) 72%, transparent));
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--outline-var) 65%, transparent)}
 
-  .screen.run .splash{animation:fadeIn calc(300ms*var(--sp)) ease-out both,
-                               fadeOut calc(620ms*var(--sp)) ease-in calc(3340ms*var(--sp)) forwards}
-  .screen.run .orb.a{animation:orbIn calc(1200ms*var(--sp)) ease-out both}
-  .screen.run .orb.b{animation:orbIn calc(1300ms*var(--sp)) ease-out calc(150ms*var(--sp)) both}
-  .screen.run .orb.c{animation:orbIn calc(1500ms*var(--sp)) ease-out calc(400ms*var(--sp)) both}
+  /* ---------------- SPLASH ---------------- */
+  .splash{position:absolute; inset:0; z-index:30; display:grid; place-items:center; overflow:hidden}
+  .splash::before{content:""; position:absolute; inset:0;
+    background:radial-gradient(120% 75% at 50% 4%, #24262a 0%, transparent 58%),
+               linear-gradient(180deg,#101214,#17191B 60%,#111314)}
+  .glow{position:absolute; width:340px; height:340px; border-radius:50%; filter:blur(58px); opacity:0;
+    background:radial-gradient(circle, rgba(232,183,120,.42), rgba(232,183,120,.10) 45%, transparent 70%)}
+  .grid{position:absolute; inset:0; opacity:0;
+    background-image:radial-gradient(rgba(241,240,235,.10) 1px, transparent 1px);
+    background-size:22px 22px;
+    mask-image:radial-gradient(circle at 50% 44%, #000 0%, transparent 68%)}
 
-  /* icon build-up */
-  .screen.run .appicon{animation:popIn calc(600ms*var(--sp)) cubic-bezier(.2,1.5,.35,1) calc(120ms*var(--sp)) both}
-  .screen.run .icon-plate{animation:plateIn calc(420ms*var(--sp)) ease-out calc(120ms*var(--sp)) both}
-  .screen.run .icon-shield{animation:draw calc(900ms*var(--sp)) cubic-bezier(.55,.05,.25,1) calc(420ms*var(--sp)) both}
-  .screen.run .icon-shield-fill{animation:plateIn calc(420ms*var(--sp)) cubic-bezier(.2,1.4,.4,1) calc(1180ms*var(--sp)) both}
-  .screen.run .icon-bolt{animation:plateIn calc(240ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
-  .screen.run .logo-glow{animation:glowIn calc(900ms*var(--sp)) ease-out calc(1150ms*var(--sp)) both,
-                                   breathe calc(3400ms*var(--sp)) ease-in-out calc(2100ms*var(--sp)) infinite}
-  .screen.run .flash{animation:flashPop calc(420ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
-  .screen.run .ring{animation:ringPop calc(900ms*var(--sp)) cubic-bezier(.15,.7,.3,1) calc(1540ms*var(--sp)) both}
-  .screen.run .ring:nth-of-type(2){animation-delay:calc(1700ms*var(--sp))}
-  .screen.run .ring:nth-of-type(3){animation-delay:calc(1860ms*var(--sp))}
-  .screen.run .spark{animation:sparkOut calc(760ms*var(--sp)) cubic-bezier(.2,.6,.3,1) calc(1540ms*var(--sp)) both}
-  .screen.run .logo-wrap{animation:shake calc(520ms*var(--sp)) ease-out calc(1520ms*var(--sp)) both}
+  .mark-wrap{position:relative; display:grid; place-items:center; transform:translateY(-34px)}
+  .tile{position:relative; width:134px; height:134px; border-radius:31.5px; overflow:hidden; z-index:3;
+    box-shadow:0 22px 50px -18px rgba(0,0,0,.9), 0 0 60px -18px rgba(232,183,120,.45)}
+  .tile svg{display:block; width:100%; height:100%}
+  .rx-r{fill:none; stroke:#f4f2ed; stroke-width:7; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
+  .rx-r-fill{fill:#f4f2ed; opacity:0}
+  .rx-x{fill:none; stroke:#e8b778; stroke-width:7; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; pathLength:1}
+  .rx-x-fill{fill:#e8b778; opacity:0}
+  .shimmer{position:absolute; inset:-40%; z-index:4; opacity:0;
+    background:linear-gradient(105deg, transparent 38%, rgba(255,255,255,.55) 50%, transparent 62%)}
+  .ring{position:absolute; width:134px; height:134px; border-radius:34px; border:1.5px solid rgba(232,183,120,.45);
+    opacity:0; z-index:2}
+  .spark{position:absolute; left:50%; top:50%; margin:-2.5px 0 0 -2.5px; width:5px; height:5px; border-radius:50%;
+    background:#E8B778; box-shadow:0 0 12px 3px rgba(232,183,120,.65); opacity:0; z-index:4}
 
-  .screen.run .wordmark h1 span{animation:letterUp calc(620ms*var(--sp)) cubic-bezier(.2,1.3,.35,1) both;
-    animation-delay:calc((1820ms + var(--i) * 45ms) * var(--sp))}
-  .screen.run .tag{animation:tagUp calc(560ms*var(--sp)) ease-out calc(2180ms*var(--sp)) both}
-  .screen.run .loader{animation:fadeIn calc(300ms*var(--sp)) calc(2280ms*var(--sp)) both}
-  .screen.run .loader i{animation:loadBar calc(1400ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(2340ms*var(--sp)) both}
+  .wordmark{position:absolute; bottom:206px; left:0; right:0; text-align:center; z-index:5}
+  .wordmark h1{margin:0; font-size:30px; font-weight:800; letter-spacing:.14em; direction:ltr;
+    display:inline-flex; color:#F4F2ED}
+  .wordmark h1 span{display:inline-block; opacity:0; transform:translateY(16px)}
+  .wordmark .tag{margin:10px 0 0; font-size:12.5px; color:#9b9d99; opacity:0}
+  .loader{position:absolute; bottom:146px; left:50%; transform:translateX(-50%); width:120px; height:3px;
+    border-radius:99px; background:rgba(241,240,235,.10); overflow:hidden; opacity:0; z-index:5}
+  .loader i{display:block; height:100%; width:100%; transform-origin:right center; transform:scaleX(0); border-radius:99px;
+    background:linear-gradient(90deg,#8a6a3f,#E8B778,#f6dfbf)}
+  .wipe{position:absolute; left:50%; top:44%; width:1400px; height:1400px; margin:-700px 0 0 -700px;
+    border-radius:50%; z-index:40; opacity:0; transform:scale(0);
+    background:radial-gradient(circle, #3a2c19 0%, #17191B 62%)}
 
-  .screen.run .wipe{animation:wipeIn calc(760ms*var(--sp)) cubic-bezier(.6,0,.25,1) calc(2860ms*var(--sp)) both}
-  .screen.run .home{animation:homeIn calc(700ms*var(--sp)) ease-out calc(3320ms*var(--sp)) both}
-  .screen.run .appbar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3420ms*var(--sp)) both}
-  .screen.run .card{animation:tagUp calc(520ms*var(--sp)) ease-out both}
-  .screen.run .card:nth-child(1){animation-delay:calc(3520ms*var(--sp))}
-  .screen.run .card:nth-child(2){animation-delay:calc(3620ms*var(--sp))}
-  .screen.run .card:nth-child(3){animation-delay:calc(3720ms*var(--sp))}
-  .screen.run .bottombar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3800ms*var(--sp)) both}
-  .screen.run .fab{animation:popIn calc(560ms*var(--sp)) cubic-bezier(.2,1.5,.35,1) calc(3880ms*var(--sp)) both}
+  /* ---------------- keyframes ---------------- */
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeOut{from{opacity:1}to{opacity:0}}
+  @keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  @keyframes popIn{0%{opacity:0;transform:scale(.7)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+  @keyframes plateIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  @keyframes glowIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+  @keyframes ringPop{0%{opacity:.75;transform:scale(.62)}70%{opacity:.08}100%{opacity:0;transform:scale(2.3)}}
+  @keyframes sparkOut{0%{opacity:0;transform:rotate(var(--a)) translateY(0) scale(1)}
+    20%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--r) * -1)) scale(.2)}}
+  @keyframes sweep{0%{opacity:0;transform:translateX(-70%)}25%{opacity:1}100%{opacity:0;transform:translateX(70%)}}
+  @keyframes shake{0%,100%{transform:translate(0,-34px)}25%{transform:translate(-2px,-36px)}
+    50%{transform:translate(2px,-32px)}75%{transform:translate(-1px,-35px)}}
+  @keyframes letterUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes tagUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes loadBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes wipeIn{0%{opacity:0;transform:scale(0)}12%{opacity:1}100%{opacity:1;transform:scale(1)}}
+  @keyframes homeIn{from{opacity:0}to{opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  .screen.ended .home{opacity:1 !important; animation:none !important}
-  .screen.ended .appbar,.screen.ended .card,.screen.ended .bottombar,.screen.ended .fab{
+  /* ---------------- timeline ---------------- */
+  .screen.run .splash{animation:fadeIn calc(280ms*var(--sp)) ease-out both,
+                               fadeOut calc(600ms*var(--sp)) ease-in calc(3260ms*var(--sp)) forwards}
+  .screen.run .grid{animation:fadeIn calc(900ms*var(--sp)) ease-out calc(120ms*var(--sp)) both}
+  .screen.run .glow{animation:glowIn calc(1100ms*var(--sp)) ease-out calc(60ms*var(--sp)) both}
+  .screen.run .tile{animation:popIn calc(620ms*var(--sp)) cubic-bezier(.2,1.4,.35,1) calc(180ms*var(--sp)) both}
+  .screen.run .rx-r{animation:draw calc(700ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(620ms*var(--sp)) both}
+  .screen.run .rx-r-fill{animation:plateIn calc(320ms*var(--sp)) ease-out calc(1180ms*var(--sp)) both}
+  .screen.run .rx-x{animation:draw calc(560ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(1180ms*var(--sp)) both}
+  .screen.run .rx-x-fill{animation:plateIn calc(300ms*var(--sp)) ease-out calc(1620ms*var(--sp)) both}
+  .screen.run .shimmer{animation:sweep calc(900ms*var(--sp)) ease-in-out calc(1700ms*var(--sp)) both}
+  .screen.run .ring{animation:ringPop calc(900ms*var(--sp)) cubic-bezier(.15,.7,.3,1) calc(1660ms*var(--sp)) both}
+  .screen.run .ring:nth-of-type(2){animation-delay:calc(1820ms*var(--sp))}
+  .screen.run .ring:nth-of-type(3){animation-delay:calc(1980ms*var(--sp))}
+  .screen.run .spark{animation:sparkOut calc(780ms*var(--sp)) cubic-bezier(.2,.6,.3,1) calc(1680ms*var(--sp)) both}
+  .screen.run .mark-wrap{animation:shake calc(520ms*var(--sp)) ease-out calc(1660ms*var(--sp)) both}
+  .screen.run .wordmark h1 span{animation:letterUp calc(560ms*var(--sp)) cubic-bezier(.2,1.2,.35,1) both;
+    animation-delay:calc((1900ms + var(--i) * 40ms) * var(--sp))}
+  .screen.run .tag{animation:tagUp calc(520ms*var(--sp)) ease-out calc(2240ms*var(--sp)) both}
+  .screen.run .loader{animation:fadeIn calc(280ms*var(--sp)) calc(2320ms*var(--sp)) both}
+  .screen.run .loader i{animation:loadBar calc(1200ms*var(--sp)) cubic-bezier(.5,0,.3,1) calc(2380ms*var(--sp)) both}
+  .screen.run .wipe{animation:wipeIn calc(740ms*var(--sp)) cubic-bezier(.6,0,.25,1) calc(2820ms*var(--sp)) both}
+  .screen.run .home{animation:homeIn calc(700ms*var(--sp)) ease-out calc(3260ms*var(--sp)) both}
+  .screen.run .appbar{animation:tagUp calc(480ms*var(--sp)) ease-out calc(3380ms*var(--sp)) both}
+  .screen.run .content{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3500ms*var(--sp)) both}
+  .screen.run .bottombar{animation:tagUp calc(520ms*var(--sp)) ease-out calc(3620ms*var(--sp)) both}
+
+  .screen.ended .home,.screen.ended .appbar,.screen.ended .content,.screen.ended .bottombar{
     opacity:1 !important; transform:none !important; animation:none !important}
-  .screen.ended .fab{transform:translateY(-28px) !important}
   .screen.ended .splash,.screen.ended .wipe{opacity:0 !important; animation:none !important; pointer-events:none}
 
-  .hint{font-size:12px; color:#5f5f78; text-align:center; max-width:540px; line-height:1.9}
-  .hint kbd{background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.14); border-radius:5px;
+  .hint{font-size:12px; color:#6f7276; text-align:center; max-width:560px; line-height:1.9; margin:0}
+  .hint kbd{background:rgba(241,240,235,.09); border:1px solid rgba(241,240,235,.14); border-radius:5px;
     padding:1px 6px; font-size:11px; font-family:inherit}
-
   @media (max-width:460px){ .phone{transform:scale(.86); transform-origin:top center; margin-bottom:-105px} }
 </style>
 </head>
 <body>
 
-<p class="page-title">RX&nbsp;Client · <b>انیمیشن ورود</b></p>
+<p class="page-title">RX&nbsp;VPN · <b>انیمیشن ورود</b></p>
 
 <div class="phone">
   <div class="island"></div>
   <div class="screen run" id="screen" data-theme="dark">
     <div class="statusbar">
       <span>۹:۴۱</span>
-      <span class="sb-right">
+      <span style="display:flex; gap:5px; align-items:center">
         <svg width="15" height="11" viewBox="0 0 15 11" fill="#fff"><rect y="7" width="2.5" height="4" rx="1"/><rect x="4" y="5" width="2.5" height="6" rx="1"/><rect x="8" y="2.5" width="2.5" height="8.5" rx="1"/><rect x="12" width="2.5" height="11" rx="1"/></svg>
         <svg width="14" height="11" viewBox="0 0 14 11" fill="#fff"><path d="M7 10.5 .4 3.9a9.3 9.3 0 0 1 13.2 0L7 10.5Z"/></svg>
         <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".6" y=".6" width="18" height="9.8" rx="2.6" stroke="#fff" stroke-opacity=".55"/><rect x="2.2" y="2.2" width="13" height="6.6" rx="1.4" fill="#fff"/><path d="M20.2 4v3a1.7 1.7 0 0 0 0-3Z" fill="#fff" fill-opacity=".6"/></svg>
       </span>
     </div>
 
-    <!-- =====================================================
-         HOME — mirrors MainScreen.kt / MainBottomBar.kt
-         ===================================================== -->
-    <div class="home" id="home">
+    <!-- =========== HOME — MainScreen.kt (empty state) + MainBottomBar.kt =========== -->
+    <div class="home">
       <div class="appbar">
         <button class="icon-btn" aria-label="منو">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
-        <h2>RX Client</h2>
-        <div class="actions">
-          <button class="icon-btn" aria-label="جستجو">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-          </button>
-          <button class="icon-btn" aria-label="افزودن">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          </button>
-          <button class="icon-btn" aria-label="بیشتر">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
-          </button>
-        </div>
+        <h2>RX VPN</h2>
+        <button class="icon-btn" aria-label="جستجو">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="افزودن">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="بیشتر">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+        </button>
       </div>
 
-      <div class="pager">
-        <div class="card selected">
-          <div class="bar"></div>
-          <div class="body">
-            <div class="row1">
-              <div class="remarks">سرور آلمان ۱</div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-              </div>
-            </div>
-            <div class="row2">
-              <span class="badge">DE</span>
-              <span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span>
-            </div>
-            <div class="row3">
-              <span class="proto">VLESS · Reality</span>
-              <span class="ping">۱۴۲ ms</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="bar"></div>
-          <div class="body">
-            <div class="row1">
-              <div class="remarks">سرور فنلاند ۲</div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-              </div>
-            </div>
-            <div class="row2"><span class="badge">FI</span><span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span></div>
-            <div class="row3"><span class="proto">VMess · WS</span><span class="ping">۲۱۰ ms</span></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="bar"></div>
-          <div class="body">
-            <div class="row1">
-              <div class="remarks">سرور اختصاصی — ایران‌سل</div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              </div>
-              <div class="act">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
-              </div>
-            </div>
-            <div class="row2"><span class="badge">IR</span><span>↑ ۰ KB/s &nbsp; ↓ ۰ KB/s</span></div>
-            <div class="row3"><span class="proto">Trojan · TLS</span><span class="ping red">ناموفق</span></div>
-          </div>
+      <div class="content">
+        <div class="glass empty">
+          <svg class="mark" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M100,156 L192,156 L220,162 L238,178 L244,202 L238,228 L216,248 L254,356 L204,356 L168,260 L146,260 L146,356 L100,356 Z M146,196 L188,196 L198,200 L202,208 L198,218 L188,222 L146,222 Z M266,156 L316,156 L342,210 L370,156 L420,156 L368,252 L424,356 L372,356 L342,296 L312,356 L260,356 L316,252 Z"/>
+          </svg>
+          <h3>هنوز کانفیگی اضافه نشده</h3>
+          <p>فایل کانفیگ را وارد کن یا لینک کپی‌شده را بچسبان؛ بعد یک سرور انتخاب کن و متصل شو.</p>
+          <button class="cta">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            افزودن کانفیگ
+          </button>
+          <button class="link-btn">کانفیگ را از کلیپ‌بورد وارد کنید</button>
         </div>
       </div>
 
       <div class="bottombar">
-        <div class="inner"><span class="status-text" id="statusText">متصل نیست</span></div>
-        <button class="fab" id="fab" aria-label="شروع">
-          <svg id="fabIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
-        </button>
+        <div class="glass">
+          <div class="status-row" id="statusRow">
+            <span class="dot" id="dot"></span>
+            <span class="status-text" id="statusText">متصل نیست</span>
+            <span class="spin-mini" id="spinMini"></span>
+            <span class="ping-chip" id="pingChip">۴۸ ms</span>
+          </div>
+          <div class="bar-actions">
+            <button class="connect" id="connectBtn">
+              <svg id="connIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>
+              <span class="lbl"><b id="connLabel">اتصال</b><small id="connSub">۴۸ ms</small></span>
+            </button>
+            <button class="square" aria-label="مسیردهی برنامه‌ها">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- =====================================================
-         SPLASH — the real adaptive launcher icon
-         ===================================================== -->
+    <!-- =========== SPLASH — branding/rx-vpn-logo.svg =========== -->
     <div class="splash">
-      <div class="orb a"></div>
-      <div class="orb b"></div>
-      <div class="orb c"></div>
+      <div class="grid"></div>
+      <div class="glow"></div>
 
-      <div class="logo-wrap">
-        <div class="logo-glow"></div>
+      <div class="mark-wrap">
         <div class="ring"></div>
         <div class="ring"></div>
         <div class="ring"></div>
 
-        <div class="appicon">
-          <svg viewBox="0 0 512 512" aria-label="RX Client">
+        <div class="tile">
+          <svg viewBox="0 0 512 512" aria-label="RX VPN">
             <defs>
-              <linearGradient id="iconBg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#6D4AFF"/>
-                <stop offset="55%" stop-color="#6D4AFF"/>
-                <stop offset="100%" stop-color="#7B5BFF"/>
+              <linearGradient id="tileGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#303336"/><stop offset="1" stop-color="#17191b"/>
               </linearGradient>
             </defs>
-            <!-- adaptive icon background: @color/ic_launcher_background -->
-            <rect class="icon-plate" width="512" height="512" fill="url(#iconBg)"/>
-            <g transform="translate(256 268) scale(0.72) translate(-256 -268)">
-              <!-- @mipmap/ic_launcher_foreground -->
-              <path class="icon-shield" pathLength="1"
-                    d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
-              <path class="icon-shield-fill"
-                    d="M256 104 L392 154 V268 C392 348 332 404 256 432 C180 404 120 348 120 268 V154 Z"/>
-              <path class="icon-bolt" d="M274 192 L182 296 H248 L232 372 L330 260 H262 Z"/>
+            <rect width="512" height="512" fill="url(#tileGrad)"/>
+            <g transform="translate(46.08 46.08) scale(0.82)">
+              <path class="rx-r" pathLength="1"
+                    d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
+              <path class="rx-r-fill"
+                    d="M100 156h92l28 6 18 16 6 24-6 26-22 20 38 108h-50l-36-96h-22v96h-46zm46 40h42l10 4 4 8-4 10-10 4h-42z"/>
+              <path class="rx-x" pathLength="1"
+                    d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
+              <path class="rx-x-fill"
+                    d="M266 156h50l26 54 28-54h50l-52 96 56 104h-52l-30-60-30 60h-52l56-104z"/>
             </g>
           </svg>
+          <div class="shimmer"></div>
         </div>
 
-        <div class="flash"></div>
-        <div class="spark" style="--a:0deg;--r:118px"></div>
-        <div class="spark" style="--a:48deg;--r:98px"></div>
-        <div class="spark" style="--a:96deg;--r:132px"></div>
-        <div class="spark" style="--a:140deg;--r:102px"></div>
-        <div class="spark" style="--a:188deg;--r:122px"></div>
-        <div class="spark" style="--a:236deg;--r:94px"></div>
-        <div class="spark" style="--a:282deg;--r:128px"></div>
-        <div class="spark" style="--a:326deg;--r:108px"></div>
+        <div class="spark" style="--a:0deg;--r:112px"></div>
+        <div class="spark" style="--a:52deg;--r:96px"></div>
+        <div class="spark" style="--a:104deg;--r:124px"></div>
+        <div class="spark" style="--a:152deg;--r:100px"></div>
+        <div class="spark" style="--a:200deg;--r:120px"></div>
+        <div class="spark" style="--a:248deg;--r:94px"></div>
+        <div class="spark" style="--a:296deg;--r:126px"></div>
+        <div class="spark" style="--a:340deg;--r:104px"></div>
       </div>
 
       <div class="wordmark">
-        <h1 id="wordmark" aria-label="RX Client"></h1>
+        <h1 id="wordmark" aria-label="RX VPN"></h1>
         <p class="tag">اتصال امن، پرسرعت و بی‌وقفه</p>
       </div>
 
@@ -439,16 +372,15 @@
 </div>
 
 <p class="hint">
-  ساختار صفحه‌ی اصلی از <code>MainScreen.kt</code> و <code>MainBottomBar.kt</code> گرفته شده؛
-  آیکون هم همان `ic_launcher` واقعی است. روی دکمه‌ی گرد (FAB) بعد از باز شدن بزن تا حالت اتصال را ببینی.
-  کلید <kbd>R</kbd> = پخش دوباره.
+  آیکون و پالت از <code>branding/rx-vpn-logo.svg</code> و <code>Theme.kt</code>؛
+  صفحه‌ی اصلی از <code>MainScreen.kt</code> و <code>MainBottomBar.kt</code> (برنچ d739235f).
+  دکمه‌ی «اتصال» را بزن تا حالت متصل را ببینی. <kbd>R</kbd> = پخش دوباره.
 </p>
 
 <script>
-  // wordmark letters
   (function(){
     const el = document.getElementById('wordmark');
-    'RX Client'.split('').forEach((ch, i) => {
+    'RX VPN'.split('').forEach((ch, i) => {
       const s = document.createElement('span');
       s.textContent = ch === ' ' ? '\u00A0' : ch;
       s.style.setProperty('--i', i);
@@ -465,44 +397,62 @@
     void screen.offsetWidth;
     screen.classList.add('run');
   }
-  function skip(){
-    screen.classList.remove('run');
-    screen.classList.add('ended');
-  }
-
   document.getElementById('replay').addEventListener('click', replay);
-  document.getElementById('skip').addEventListener('click', skip);
-
+  document.getElementById('skip').addEventListener('click', () => {
+    screen.classList.remove('run'); screen.classList.add('ended');
+  });
   slowBtn.addEventListener('click', () => {
     const isSlow = screen.style.getPropertyValue('--sp') === '0.5';
     screen.style.setProperty('--sp', isSlow ? '1' : '0.5');
     slowBtn.textContent = isSlow ? '۰٫۵× آهسته' : '۱× سرعت';
     replay();
   });
-
   themeBtn.addEventListener('click', () => {
     const light = screen.dataset.theme === 'light';
     screen.dataset.theme = light ? 'dark' : 'light';
     themeBtn.textContent = light ? '☀️ تم روشن' : '🌙 تم تاریک';
   });
-
-  // real app behaviour: FAB toggles the service, icon rotates, status text changes
-  const fab = document.getElementById('fab');
-  const fabIcon = document.getElementById('fabIcon');
-  const statusText = document.getElementById('statusText');
-  let running = false;
-  fab.addEventListener('click', () => {
-    running = !running;
-    fab.classList.toggle('on', running);
-    statusText.textContent = running ? 'متصل است. برای بررسی اتصال ضربه بزنید.' : 'متصل نیست';
-    statusText.classList.toggle('connected', running);
-    fabIcon.innerHTML = running
-      ? '<rect x="7" y="7" width="10" height="10" rx="1.5"/>'
-      : '<path d="M8 5.5v13l11-6.5z"/>';
-    fab.classList.toggle('spin', running);
-  });
-
   document.addEventListener('keydown', e => { if (e.key === 'r' || e.key === 'R') replay(); });
+
+  // MainBottomBar behaviour: dot + status text + ping chip, connect/disconnect button
+  const dot = document.getElementById('dot');
+  const statusText = document.getElementById('statusText');
+  const pingChip = document.getElementById('pingChip');
+  const spinMini = document.getElementById('spinMini');
+  const connectBtn = document.getElementById('connectBtn');
+  const connIcon = document.getElementById('connIcon');
+  const connLabel = document.getElementById('connLabel');
+  let state = 'idle';
+
+  const ICON_POWER = '<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>';
+  const ICON_STOP = '<rect x="7" y="7" width="10" height="10" rx="2"/>';
+
+  connectBtn.addEventListener('click', () => {
+    if (state === 'connected') {
+      state = 'idle';
+      dot.classList.remove('on');
+      statusText.textContent = 'متصل نیست';
+      pingChip.classList.remove('show');
+      connectBtn.classList.remove('running');
+      connIcon.innerHTML = ICON_POWER;
+      connLabel.textContent = 'اتصال';
+      return;
+    }
+    if (state === 'connecting') return;
+    state = 'connecting';
+    spinMini.classList.add('show');
+    statusText.textContent = 'در حال اتصال…';
+    setTimeout(() => {
+      spinMini.classList.remove('show');
+      state = 'connected';
+      dot.classList.add('on');
+      statusText.textContent = 'متصل است. برای بررسی اتصال ضربه بزنید.';
+      pingChip.classList.add('show');
+      connectBtn.classList.add('running');
+      connIcon.innerHTML = ICON_STOP;
+      connLabel.textContent = 'قطع اتصال';
+    }, 1200);
+  });
 </script>
 </body>
 </html>
