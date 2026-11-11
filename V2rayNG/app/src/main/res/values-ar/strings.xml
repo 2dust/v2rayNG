@@ -291,9 +291,7 @@
     <string name="title_source_code">الكود المصدري</string>
     <string name="title_oss_license">تراخيص المصادر المفتوحة</string>
     <string name="title_translators">المترجمون</string>
-    <string name="title_tg_channel">قناة Telegram</string>
 
-    <string name="title_pref_promotion">ترويج</string>
 
     <string name="title_pref_auto_update_subscription">اشتراكات التحديث التلقائي</string>
     <string name="summary_pref_auto_update_subscription">قم بتحديث اشتراكاتك تلقائيًا بفترة زمنية في الخلفية. اعتمادًا على الجهاز، قد لا تعمل هذه الميزة دائمًا</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">مستوى السجل</string>
     <string name="title_outbound_domain_resolve_method">حل أسماء نطاقات الاتصالات الصادرة (outbound)</string>
     <string name="title_mode">الوضع</string>
-    <string name="title_mode_help">انقر هنا للحصول على مزيد من المساعدة</string>
     <string name="title_language">اللغة</string>
     <string name="title_ui_settings">إعدادات واجهة المستخدم</string>
     <string name="title_pref_ui_mode_night">إعدادات وضع واجهة المستخدم ليلاً</string>

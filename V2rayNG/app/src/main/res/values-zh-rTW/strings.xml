@@ -291,9 +291,7 @@
     <string name="title_source_code">原始碼</string>
     <string name="title_oss_license">開放原始碼授權</string>
     <string name="title_translators">翻譯貢獻者</string>
-    <string name="title_tg_channel">Telegram 頻道</string>
 
-    <string name="title_pref_promotion">推廣</string>
 
     <string name="title_pref_auto_update_subscription">自動更新訂閱</string>
     <string name="summary_pref_auto_update_subscription">在背景依指定間隔自動更新訂閱。此功能可能因裝置而無法穩定運作。</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">記錄層級</string>
     <string name="title_outbound_domain_resolve_method">出站網域預解析方式 (outbound)</string>
     <string name="title_mode">模式</string>
-    <string name="title_mode_help">輕觸以檢視說明</string>
     <string name="title_language">語言</string>
     <string name="title_ui_settings">介面顯示設定</string>
     <string name="title_pref_ui_mode_night">深色模式</string>

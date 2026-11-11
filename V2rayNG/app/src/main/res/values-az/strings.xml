@@ -291,9 +291,7 @@
     <string name="title_source_code">Mənbə kodu</string>
     <string name="title_oss_license">Açıq mənbə lisenziyaları</string>
     <string name="title_translators">Tərcüməçilər</string>
-    <string name="title_tg_channel">Telegram kanalı</string>
 
-    <string name="title_pref_promotion">Təşviqat</string>
 
     <string name="title_pref_auto_update_subscription">Abunəlikləri avtomatik yenilə</string>
     <string name="summary_pref_auto_update_subscription">Abunəliklərinizi arxa fonda təyin olunmuş intervallarla avtomatik yeniləyin. Cihazdan asılı olaraq bu funksiya həmişə işləməyə bilər</string>
@@ -302,7 +300,6 @@
     <string name="title_core_loglevel">Jurnal Səviyyəsi</string>
     <string name="title_outbound_domain_resolve_method">Çıxış domeninin həll edilməsi</string>
     <string name="title_mode">Rejim</string>
-    <string name="title_mode_help">Ətraflı kömək üçün toxunun</string>
     <string name="title_language">Dil</string>
     <string name="title_ui_settings">İstifadəçi interfeysi tənzimləmələri</string>
     <string name="title_pref_ui_mode_night">İstifadəçi interfeysi rejim tənzimləmələri</string>
