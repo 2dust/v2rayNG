@@ -139,7 +139,7 @@ jobs:
               -alias mobix \
               -keyalg RSA -keysize 2048 -validity 10950 \
               -storepass mobixvpn -keypass mobixvpn \
-              -dname "CN=RX Client, OU=Mobile, O=RX Client, L=Tehran, C=IR"
+              -dname "CN=RX VPN, OU=Mobile, O=RX VPN, L=Tehran, C=IR"
             echo "Generated a development signing key (set APP_KEYSTORE_BASE64 to reuse a stable key)"
           fi
           echo "KEYSTORE_PATH=$RUNNER_TEMP/rxclient.jks" >> "$GITHUB_ENV"

@@ -580,4 +580,5 @@
     <string name="rx_no_apps">No matching apps</string>
     <string name="rx_routing_change_hint">Changes apply when the VPN reconnects.</string>
     <string name="rx_select_apps_hint">Select at least one app before connecting.</string>
+    <string name="rx_ping_tap_hint">Tap to check ping</string>
 </resources>

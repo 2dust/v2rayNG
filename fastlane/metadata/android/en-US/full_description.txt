@@ -1,4 +1,4 @@
-<p>RX Client is an Android client for V2Ray/Xray cores, built on the open-source
+<p>RX VPN is an Android client for V2Ray/Xray cores, built on the open-source
 <a href="https://github.com/2dust/v2rayNG">v2rayNG</a> project. It does not ship or sell VPN service or
 server configurations: you bring your own server, subscription link, or config file.</p>
 
@@ -13,7 +13,7 @@ SOCKS, WireGuard, TUIC, and Hysteria2</li>
 </ul>
 
 <h3>No ads, no tracking</h3>
-<p>RX Client contains no advertising SDK, no analytics SDK, and no crash-reporting SDK. The app does
+<p>RX VPN contains no advertising SDK, no analytics SDK, and no crash-reporting SDK. The app does
 not send usage data to the developer. Its only network connections are the ones you configure, plus
 the update check against this repository's own releases page, which you can ignore.</p>
 <p>Android 7.0 (API 24) and newer is supported.</p>

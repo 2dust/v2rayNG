@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -32,12 +36,15 @@ import com.v2ray.ang.ui.compose.RxGlassPanel
 fun MainBottomBar(
     displayText: String,
     isRunning: Boolean,
+    isTesting: Boolean,
+    pingText: String?,
     canConnect: Boolean,
     needsAppSelection: Boolean,
     onAction: (MainAction) -> Unit,
     onNavigate: (MainDestination) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
+    val pingCheckDescription = stringResource(R.string.connection_test_pending)
     RxGlassPanel(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,7 +52,21 @@ fun MainBottomBar(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Tapping the status line re-checks the ping while connected; there is no
+            // separate lightning button, so the user cannot hit it by accident.
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(enabled = isRunning && !isTesting) {
+                        onAction(MainAction.TestCurrentServer)
+                    }
+                    .semantics {
+                        if (isRunning) contentDescription = pingCheckDescription
+                    }
+                    .padding(vertical = 2.dp)
+            ) {
                 Box(
                     Modifier
                         .size(8.dp)
@@ -60,14 +81,21 @@ fun MainBottomBar(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f).padding(start = 10.dp)
                 )
-                IconButton(
-                    onClick = { onAction(MainAction.TestCurrentServer) },
-                    enabled = isRunning,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_flash_on_24dp),
-                        contentDescription = stringResource(R.string.connection_test_pending),
-                        modifier = Modifier.size(20.dp),
+                if (isTesting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = colors.primary,
+                    )
+                } else if (pingText != null) {
+                    Text(
+                        text = pingText,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.tertiary,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(colors.tertiary.copy(alpha = 0.12f))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
                     )
                 }
             }
@@ -86,12 +114,22 @@ fun MainBottomBar(
                         contentDescription = null,
                         modifier = Modifier.size(22.dp),
                     )
-                    Text(
-                        text = stringResource(
-                            if (isRunning) R.string.rx_disconnect else R.string.rx_connect
-                        ),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(
+                                if (isRunning) R.string.rx_disconnect else R.string.rx_connect
+                            ),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        if (isRunning) {
+                            Text(
+                                text = pingText
+                                    ?: stringResource(R.string.rx_ping_tap_hint),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = LocalContentColor.current.copy(alpha = 0.78f),
+                            )
+                        }
+                    }
                 }
                 RxGlassButton(
                     onClick = { onNavigate(MainDestination.PerAppProxy) },

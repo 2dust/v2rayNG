@@ -579,4 +579,5 @@
     <string name="rx_no_apps">برنامه‌ای پیدا نشد</string>
     <string name="rx_routing_change_hint">تغییرات با اتصال دوبارهٔ VPN اعمال می‌شوند.</string>
     <string name="rx_select_apps_hint">پیش از اتصال دست‌کم یک برنامه انتخاب کن.</string>
+    <string name="rx_ping_tap_hint">برای بررسی پینگ بزن</string>
 </resources>

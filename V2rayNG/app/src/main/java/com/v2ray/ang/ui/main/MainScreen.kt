@@ -50,6 +50,12 @@ fun MainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
     val displayText = mainViewModel.formatStatus(uiState.status)
+    // While connected the bottom bar shows the measured latency instead of a separate test button.
+    val pingText = when (val status = uiState.status) {
+        is MainStatus.ConnectionTest ->
+            if (status.result.delayMillis >= 0) "${status.result.delayMillis} ms" else null
+        else -> null
+    }
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -203,6 +209,8 @@ fun MainScreen(
                     MainBottomBar(
                         displayText = displayText,
                         isRunning = isRunning,
+                        isTesting = uiState.isTesting,
+                        pingText = pingText,
                         canConnect = MainConnectionPolicy.canConnect(
                         isRunning = isRunning,
                         selectedGuid = selectedGuid,

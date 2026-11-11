@@ -1,12 +1,12 @@
-# RX Client — Privacy Policy / سیاست حریم خصوصی
+# RX VPN — Privacy Policy / سیاست حریم خصوصی
 
 Last updated: 2026-11-11 · آخرین به‌روزرسانی: ۲۰ آبان ۱۴۰۵ (2026-11-11)
 
-RX Client is an open-source client for the V2Ray/Xray cores, derived from
+RX VPN is an open-source client for the V2Ray/Xray cores, derived from
 [v2rayNG](https://github.com/2dust/v2rayNG). It does not provide a VPN service, a server, or a
 subscription. You add your own server configuration.
 
-RX Client یک کلاینت متن‌باز برای هسته‌های V2Ray/Xray است که از پروژهٔ
+RX VPN یک کلاینت متن‌باز برای هسته‌های V2Ray/Xray است که از پروژهٔ
 [v2rayNG](https://github.com/2dust/v2rayNG) گرفته شده. این برنامه سرویس VPN، سرور یا اشتراک ارائه
 نمی‌دهد؛ کانفیگ سرور خودتان را اضافه می‌کنید.
 
@@ -16,7 +16,7 @@ RX Client یک کلاینت متن‌باز برای هسته‌های V2Ray/Xra
 
 ### 1. What we collect
 
-**Nothing is sent to the developer.** RX Client contains no advertising SDK, no analytics SDK, and no
+**Nothing is sent to the developer.** RX VPN contains no advertising SDK, no analytics SDK, and no
 crash-reporting SDK. There is no account, no sign-in, and no telemetry endpoint.
 
 ### 2. Data that stays on your device
@@ -89,7 +89,7 @@ keys, or full configuration links in an issue.
 
 ### ۱. چه اطلاعاتی جمع می‌کنیم
 
-**هیچ اطلاعاتی برای توسعه‌دهنده ارسال نمی‌شود.** در RX Client هیچ SDK تبلیغات، آنالیتیکس یا گزارش
+**هیچ اطلاعاتی برای توسعه‌دهنده ارسال نمی‌شود.** در RX VPN هیچ SDK تبلیغات، آنالیتیکس یا گزارش
 خطا وجود ندارد. حساب کاربری، ورود، و سرور تلمتری هم ندارد.
 
 ### ۲. داده‌ای که روی دستگاه خودتان می‌ماند
@@ -160,13 +160,13 @@ keys, or full configuration links in an issue.
 
 ## Credits / اعتبارها
 
-This policy text was written for RX Client. RX Client is derived from
+This policy text was written for RX VPN. RX VPN is derived from
 [v2rayNG](https://github.com/2dust/v2rayNG) (GPL-3.0) and bundles the
 [Xray-core](https://github.com/XTLS/Xray-core) and
 [hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) projects. Portions of the app's UI
 and routing behaviour follow the upstream project. See [LICENSE](LICENSE).
 
-این متن برای RX Client نوشته شده است. RX Client بر پایهٔ پروژهٔ
+این متن برای RX VPN نوشته شده است. RX VPN بر پایهٔ پروژهٔ
 [v2rayNG](https://github.com/2dust/v2rayNG) (مجوز GPL-3.0) است و پروژه‌های
 [Xray-core](https://github.com/XTLS/Xray-core) و
 [hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) را همراه دارد. بخشی از رابط کاربری و
