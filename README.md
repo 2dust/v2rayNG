@@ -1,97 +1,79 @@
-## RX Client v1.0.0
+# RX VPN
 
-An Android client for the **Xray core** with native **tun2socks** support, built on the open-source
-[v2rayNG](https://github.com/2dust/v2rayNG) project (GPL-3.0). RX Client ships **no** VPN service and
-**no** ready-made server: you add your own config or subscription. It contains no advertising,
-analytics, or crash-reporting SDK.
+<div align="center">
+  <img src="branding/rx-vpn-logo.png" width="128" alt="RX VPN monogram" />
 
-| APK | Devices |
+  **کلاینت اندروید با رابط گرافیتی، دکمه‌های شیشه‌ای و مسیردهی به تفکیک برنامه**
+</div>
+
+RX VPN یک کلاینت اندرویدی مبتنی بر [v2rayNG](https://github.com/2dust/v2rayNG) و هستهٔ Xray است. این مخزن نسخهٔ اختصاصی برند RX را نگه می‌دارد؛ سرور VPN یا کانفیگ پولی داخل برنامه ارائه نمی‌شود.
+
+## امکانات این نسخه
+
+- نام و آیکون اختصاصی RX VPN، با مونوکرام هندسی قابل بازتولید
+- تم پیش‌فرض گرافیتی تیره با رنگ تأکیدی کهربایی؛ تم روشن و رنگ پویا همچنان قابل انتخاب‌اند
+- دکمه‌های شیشه‌ای با لایه‌های نیمه‌شفاف و حاشیهٔ کنترل‌شده، بدون وابستگی به بلور پس‌زمینه در نسخه‌های جدید اندروید
+- صفحهٔ اتصال با وضعیت واقعی سرویس، دکمهٔ اتصال/قطع، آزمایش اتصال و دسترسی مستقیم به مسیردهی برنامه‌ها
+- سه حالت مسیردهی در حالت VPN معمولی:
+  1. همهٔ برنامه‌ها به‌جز خود RX VPN
+  2. فقط برنامه‌های انتخاب‌شده
+  3. همهٔ برنامه‌ها به‌جز انتخاب‌شده‌ها
+- ورود کانفیگ از فایل، کلیپ‌بورد، QR یا لینک اشتراک
+- پشتیبانی از پروتکل‌های موجود در هسته، از جمله VLESS، VMess، Trojan، Shadowsocks و WireGuard
+
+**تغییر مسیردهی با اتصال دوبارهٔ VPN اعمال می‌شود.** حالت‌های پروکسی و روت رفتار جداگانهٔ خود را دارند. کیفیت و امکان اتصال به سرور، شبکه و تنظیمات دستگاه بستگی دارد؛ هیچ تضمین «اتصال روی همهٔ اپراتورها» داده نمی‌شود.
+
+## دریافت APK
+
+۱. در تب **Actions**، گردش‌کار **Build RX VPN APK** را باز کنید.
+۲. آخرین ساخت موفق روی شاخهٔ موردنظر را انتخاب کنید.
+۳. فایل **RXVPN-apk** را دانلود و باز کنید.
+
+| فایل | دستگاه |
 | --- | --- |
-| `*_arm64-v8a.apk` | Almost all modern phones (recommended) |
-| `*_armeabi-v7a.apk` | Older 32-bit phones |
-| `*_x86_64.apk`, `*_x86.apk` | Emulators and Intel tablets |
-| `*_universal.apk` | One APK for every device |
+| `RXVPN_*_arm64-v8a.apk` | بیشتر گوشی‌های اندرویدی جدید |
+| `RXVPN_*_armeabi-v7a.apk` | گوشی‌های قدیمی ۳۲ بیتی |
+| `RXVPN_*_x86_64.apk` / `x86` | شبیه‌سازها و دستگاه‌های اینتل |
+| `RXVPN_*_universal.apk` | شامل همهٔ معماری‌های اعلام‌شده |
 
-Requires Android 7.0 (API 24) or newer.
+برای انتشار نسخه، گردش‌کار را دستی با `release_tag` اجرا کنید. کلید امضای پایدار باید از طریق secretهای مخزن تأمین شود؛ کلید موقتِ ساخت برای انتشار به‌روزرسانی‌های قابل اعتماد مناسب نیست.
 
-### Install
+## شروع استفاده
 
-1. Download the APK that matches your phone (or the `universal` one) from the
-   [Releases page](https://github.com/kairomax1/RX_client/releases).
-2. Allow "install unknown apps" if Android asks.
-3. Open **RX Client**, add your config with `+` (scan QR, paste link, import file or subscription),
-   select it, then press the round button to connect.
+۱. کانفیگ معتبر سرور خود را وارد کنید.
+۲. یک سرور را از فهرست انتخاب کنید.
+۳. در «مسیردهی برنامه‌ها» مشخص کنید کدام برنامه‌ها از VPN عبور کنند.
+۴. «اتصال» را بزنید و مجوز VPN اندروید را تأیید کنید.
 
-### Features
+بدون کانفیگ، صفحهٔ اصلی ورود فایل و کلیپ‌بورد را نشان می‌دهد و اتصال موفقِ ساختگی نمایش داده نمی‌شود. برای حفظ داده‌ها و امکان به‌روزرسانی، شناسهٔ نصب فعلی `com.mobix.vpn` تغییر نکرده است؛ نام و فایل‌های خروجی RX VPN هستند.
 
-- Import by QR code, clipboard, file, or subscription link
-- Protocols supported by the bundled Xray core: VLESS, VMess, Trojan, Shadowsocks, SOCKS, WireGuard,
-  TUIC, Hysteria2
-- VPN mode with native tun2socks, plus proxy-only and root modes
-- App-based routing: all apps, selected apps only, or all apps except selected ones; a routing change
-  is applied on the next VPN connection
-- Subscription groups, delay/real-ping tests, backup and restore
+## ساخت محلی
 
-Connection quality and availability depend on your server, your operator, and your network. No
-"works on every operator" guarantee is made, and a successful build is not a substitute for a test
-on a real device.
-
-## فارسی
-
-نسخه‌ی `v1.0.0` آر ایکس کلاینت: کلاینت اندرویدی هسته‌ی **Xray** با پشتیبانی بومی از **tun2socks**،
-بر پایه‌ی پروژهٔ متن‌باز [v2rayNG](https://github.com/2dust/v2rayNG) (مجوز GPL-3.0). این برنامه
-**سرویس VPN یا سرور آماده ارائه نمی‌دهد**؛ کانفیگ یا لینک اشتراک خودتان را اضافه می‌کنید. هیچ SDK
-تبلیغات، آنالیتیکس یا گزارش خطا در آن نیست.
-
-| فایل | مناسب برای |
-| --- | --- |
-| `*_arm64-v8a.apk` | تقریباً همه‌ی گوشی‌های امروزی (پیشنهادی) |
-| `*_armeabi-v7a.apk` | گوشی‌های قدیمی ۳۲ بیتی |
-| `*_x86_64.apk` / `*_x86.apk` | شبیه‌سازها و تبلت‌های اینتل |
-| `*_universal.apk` | یک فایل برای همه‌ی دستگاه‌ها |
-
-اندروید ۷.۰ (API 24) به بالا.
-
-### نصب
-
-۱. فایل APK مناسب گوشی‌تان (یا نسخه‌ی `universal`) را از صفحه‌ی
-   [Releases](https://github.com/kairomax1/RX_client/releases) دانلود کنید.
-۲. اگر اندروید اجازه خواست، «نصب برنامه‌های ناشناس» را فعال کنید.
-۳. برنامه‌ی **RX Client** را باز کنید، با دکمه‌ی `+` کانفیگ خود را اضافه کنید (اسکن QR، لینک، فایل
-   یا لینک اشتراک)، سرور را انتخاب کنید و دکمه‌ی گرد را بزنید تا وصل شوید.
-
-کیفیت و امکان اتصال به سرور و شبکه‌ی شما بستگی دارد؛ هیچ تضمین «اتصال روی همه‌ی اپراتورها» داده
-نمی‌شود.
-
-## Development
-
-The Android project lives under `V2rayNG/` and uses Kotlin, Gradle Kotlin DSL, Compose and Material 3.
-Tool versions are read from `V2rayNG/gradle/libs.versions.toml` and
-[`.github/workflows/build.yml`](.github/workflows/build.yml).
+نسخه‌های ابزار از `V2rayNG/gradle/libs.versions.toml` و `.github/workflows/build.yml` خوانده می‌شوند. کتابخانه‌های بومی ورودی ساخت هستند و در Git ذخیره نمی‌شوند.
 
 ```bash
 git submodule update --init --recursive
-# install the NDK used by the build workflow and set NDK_HOME
+# NDK مطابق گردش‌کار ساخت را نصب و NDK_HOME را تنظیم کنید.
 bash compile-hevtun.sh
 mkdir -p V2rayNG/app/libs
 cp -r libs/* V2rayNG/app/libs/
-# provide libv2ray.aar matching the AndroidLibXrayLite revision
+# libv2ray.aar را مطابق revision زیرماژول AndroidLibXrayLite تهیه کنید.
 cd V2rayNG
 ./gradlew :app:testPlaystoreDebugUnitTest :app:compilePlaystoreDebugKotlin
-./gradlew :app:assemblePlaystoreRelease
+./gradlew :app:assemblePlaystoreDebug :app:assembleFdroidDebug
 ```
 
-The build workflow publishes APKs to GitHub Releases on pushes to `master`, or when it is dispatched
-manually with a `release_tag`. Release builds are signed with the repository keystore when the
-`APP_KEYSTORE_BASE64` secret is set; otherwise a throwaway CI key is used, which is not suitable for
-trusted updates.
+جزئیات تهیهٔ AAR و امضای خروجی در [گردش‌کار ساخت](.github/workflows/build.yml) قرار دارد. ساخت موفق جای آزمایش اتصال روی دستگاه واقعی را نمی‌گیرد.
 
-## Credits and license
+## هویت بصری
 
-RX Client is derived from [v2rayNG](https://github.com/2dust/v2rayNG) by 2dust and friends, and from
-the [Xray-core](https://github.com/XTLS/Xray-core) and
-[hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) projects. Translation credits are
-listed inside the app.
+فایل‌های برند در [`branding/`](branding/) هستند. مونوکرام، آیکون‌های لانچر و آیکون اعلان با اسکریپت زیر بازتولید می‌شوند:
 
-This project is distributed under **GPL-3.0**; see [LICENSE](LICENSE). The privacy policy is in
-[CR.md](CR.md).
+```bash
+python3 -m pip install pillow
+python3 branding/render_brand.py
+```
+
+## مجوز
+
+این پروژه بر پایهٔ کار متن‌باز v2rayNG و Xray است و تحت **GPL-3.0** توزیع می‌شود؛ [LICENSE](LICENSE) را ببینید. فهرست مجوز کتابخانه‌ها در بخش «دربارهٔ برنامه» حفظ شده است.

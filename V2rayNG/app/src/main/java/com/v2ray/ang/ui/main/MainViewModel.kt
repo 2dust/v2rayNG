@@ -116,6 +116,7 @@ class MainViewModel(
     init {
         collectServiceEvents()
         setupGroupTab()
+        refreshUiSettings()
     }
 
     private fun collectServiceEvents() {
@@ -336,11 +337,19 @@ class MainViewModel(
     }
 
     fun refreshUiSettings() {
-        _uiState.update {
-            it.copy(
-                confirmRemove = dataSource.getConfirmRemove(),
-                doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
-            )
+        viewModelScope.launch(ioDispatcher) {
+            val confirmRemove = dataSource.getConfirmRemove()
+            val doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+            val routingMode = dataSource.getPerAppRoutingMode()
+            val routedAppCount = dataSource.getRoutedAppCount()
+            _uiState.update {
+                it.copy(
+                    confirmRemove = confirmRemove,
+                    doubleColumnDisplay = doubleColumnDisplay,
+                    routingMode = routingMode,
+                    routedAppCount = routedAppCount,
+                )
+            }
         }
     }
 

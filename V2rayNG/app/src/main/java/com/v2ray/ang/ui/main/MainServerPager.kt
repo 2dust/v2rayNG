@@ -87,6 +87,8 @@ fun GroupPagerPage(
     usageInfo: SubscriptionUsageInfo?,
     groupTitle: String,
     onOpenLink: (String) -> Unit,
+    onImportConfig: () -> Unit,
+    onImportClipboard: () -> Unit,
     contentPadding: PaddingValues
 ) {
     val groupStateFlow = remember(groupId) {
@@ -140,7 +142,9 @@ fun GroupPagerPage(
                 mainViewModel.moveServer(groupId, fromIndex, toIndex)
             },
             contentPadding = listPadding,
-            showEmptyState = searchQuery.isEmpty()
+            showEmptyState = searchQuery.isEmpty(),
+            onImportConfig = onImportConfig,
+            onImportClipboard = onImportClipboard,
         )
         if (usageInfo != null) {
             SubscriptionInfoCard(
@@ -178,10 +182,16 @@ private fun ServerListPage(
     onLocateHandled: () -> Unit,
     onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues,
-    showEmptyState: Boolean = false
+    showEmptyState: Boolean = false,
+    onImportConfig: () -> Unit,
+    onImportClipboard: () -> Unit,
 ) {
     if (rows.isEmpty() && showEmptyState) {
-        MainEmptyState(modifier = Modifier.padding(contentPadding))
+        MainEmptyState(
+            onImportConfig = onImportConfig,
+            onImportClipboard = onImportClipboard,
+            modifier = Modifier.fillMaxSize().padding(contentPadding),
+        )
         return
     }
 

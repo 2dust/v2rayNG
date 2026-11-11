@@ -1,4 +1,4 @@
-name: Build RX Client APK
+name: Build RX VPN APK
 
 on:
   workflow_dispatch:
@@ -105,8 +105,29 @@ jobs:
             "https://github.com/2dust/AndroidLibXrayLite/releases/download/${CORE_TAG}/libv2ray.aar"
           ls -lh V2rayNG/app/libs/
 
-      # NOTE: the keystore alias/passwords keep their legacy "mobix" names so that
-      # updates are still signed with the same key as previous releases of the app.
+      - name: Validate UI, resources, and both distribution flavors
+        run: |
+          cd V2rayNG
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew --no-daemon \
+            :app:testPlaystoreDebugUnitTest \
+            :app:compilePlaystoreDebugKotlin \
+            :app:assemblePlaystoreDebug \
+            :app:assembleFdroidDebug 2>&1 | tee "$RUNNER_TEMP/rx-validation.log"
+
+      - name: Surface validation errors
+        if: failure()
+        run: |
+          python3 - <<'PYEOF'
+          import os, re
+          path = os.path.join(os.environ["RUNNER_TEMP"], "rx-validation.log")
+          if os.path.exists(path):
+              for line in open(path, encoding="utf-8", errors="replace"):
+                  if line.startswith("e:") or "FAILED" in line or line.startswith("Caused by:"):
+                      print("::error::" + line.strip().replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"))
+          PYEOF
+
       - name: Create signing key
         run: |
           if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
@@ -144,7 +165,7 @@ jobs:
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: RXClient-apk
+          name: RXVPN-apk
           path: V2rayNG/app/build/outputs/apk/playstore/release/*.apk
           if-no-files-found: error
 
@@ -162,7 +183,7 @@ jobs:
       - name: Download APKs
         uses: actions/download-artifact@v4
         with:
-          name: RXClient-apk
+          name: RXVPN-apk
           path: apk
 
       - name: List downloaded APKs
@@ -176,7 +197,7 @@ jobs:
           VERSION_NAME=$(grep -oP 'versionName = "\K[^"]+' V2rayNG/app/build.gradle.kts | head -1)
           TAG="${INPUT_TAG:-v${VERSION_NAME}}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Publishing RX Client $TAG"
+          echo "Publishing RX VPN $TAG"
 
       - name: Write release notes
         env:
@@ -197,7 +218,8 @@ jobs:
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
-              --title "RX Client $TAG" \
+              --target "$GITHUB_SHA" \
+              --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
               --latest
           fi

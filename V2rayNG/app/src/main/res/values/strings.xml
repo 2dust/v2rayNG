@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RX Client</string>
+    <string name="app_name" translatable="false">RX VPN</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">Add a profile in the app before using this feature.</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">RX Client service</string>
+    <string name="notification_channel_service">RX VPN service</string>
     <string name="notification_channel_subscription_updates">Subscription updates</string>
     <string name="notification_channel_connection_checks">Connection checks</string>
     <string name="notification_action_stop_v2ray">Stop</string>
@@ -28,7 +28,7 @@
 
     <!--ServerActivity-->
     <string name="empty_state_title">No configuration yet</string>
-    <string name="empty_state_hint">Tap + to add a config, paste a subscription link or scan a QR code to get started.</string>
+    <string name="empty_state_hint">Import a configuration file or paste a copied link. Then select a server and connect.</string>
     <string name="title_server">Config</string>
     <string name="menu_item_add_config">Add config</string>
     <string name="menu_item_save_config">Save config</string>
@@ -404,7 +404,7 @@
     <string name="connection_test_error">Connection test failed: %s</string>
     <string name="connection_test_fail">Internet unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
-    <string name="connection_connected">Connected. Tap to check connection.</string>
+    <string name="connection_connected">Connected</string>
     <string name="connection_not_connected">Not connected</string>
     <string name="connection_running_task_left">Tests running: %s</string>
 
@@ -564,4 +564,20 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
 
+    <!-- RX VPN connection and per-app routing UI -->
+    <string name="rx_connect">Connect</string>
+    <string name="rx_disconnect">Disconnect</string>
+    <string name="rx_connect_hint">Add and select a configuration to connect.</string>
+    <string name="rx_app_routing">App routing</string>
+    <string name="rx_routing_all">All apps</string>
+    <string name="rx_routing_all_hint">Route all apps through VPN, except RX VPN itself.</string>
+    <string name="rx_routing_only">Selected apps only</string>
+    <string name="rx_routing_only_hint">Only checked apps use VPN. Other apps connect directly.</string>
+    <string name="rx_routing_except">All except selected</string>
+    <string name="rx_routing_except_hint">Checked apps connect directly. All other apps use VPN.</string>
+    <string name="rx_routing_save_failed">Could not save app routing. Try again.</string>
+    <string name="rx_search_apps">Search apps</string>
+    <string name="rx_no_apps">No matching apps</string>
+    <string name="rx_routing_change_hint">Changes apply when the VPN reconnects.</string>
+    <string name="rx_select_apps_hint">Select at least one app before connecting.</string>
 </resources>

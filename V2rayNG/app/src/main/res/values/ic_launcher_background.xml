@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- RX Client brand violet: background of the adaptive launcher icon. -->
-    <color name="ic_launcher_background">#6D4AFF</color>
+    <color name="ic_launcher_background">#17191B</color>
 </resources>

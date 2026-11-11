@@ -36,15 +36,13 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
 
-    private val _perAppProxyEnabled = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false)
+    private val _routingMode = MutableStateFlow(
+        PerAppRoutingMode.fromSettings(
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY, false),
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false),
+        )
     )
-    val perAppProxyEnabled: StateFlow<Boolean> = _perAppProxyEnabled.asStateFlow()
-
-    private val _bypassApps = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS, false)
-    )
-    val bypassApps: StateFlow<Boolean> = _bypassApps.asStateFlow()
+    val routingMode: StateFlow<PerAppRoutingMode> = _routingMode.asStateFlow()
 
     // Cached full list for filtering
     private var appsAll: List<AppInfo>? = null
@@ -74,19 +72,24 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY_SET, newBlacklist.toMutableSet())
     }
 
-    // Per‑app proxy switch
-    fun setPerAppProxyEnabled(enabled: Boolean) {
-        if (_perAppProxyEnabled.value != enabled) {
-            _perAppProxyEnabled.value = enabled
-            MmkvManager.encodeSettings(AppConfig.PREF_PER_APP_PROXY, enabled)
+    fun setRoutingMode(mode: PerAppRoutingMode): Boolean {
+        val previous = _routingMode.value
+        val saved = try {
+            PerAppRoutingMode.persist(previous, mode) { key, value ->
+                MmkvManager.encodeSettings(key, value)
+            }
+        } catch (error: Exception) {
+            LogUtil.e(AppConfig.TAG, "Per-app routing mode rollback failed", error)
+            false
         }
-    }
-
-    fun setBypassAppsEnabled(enabled: Boolean) {
-        if (_bypassApps.value != enabled) {
-            _bypassApps.value = enabled
-            MmkvManager.encodeSettings(AppConfig.PREF_BYPASS_APPS, enabled)
+        if (!saved) {
+            LogUtil.e(AppConfig.TAG, "Per-app routing mode save failed")
         }
+        if (saved && previous != mode) {
+            _routingMode.value = mode
+            SettingsChangeManager.makeRestartService()
+        }
+        return saved
     }
 
     // Load and filter apps
@@ -147,6 +150,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     // Bulk actions
     fun selectAll() {
         val displayedApps = _displayedApps.value
+        if (displayedApps.isEmpty()) return
         val currentSelection = _blacklist.value
         val allSelected = displayedApps.all { it.packageName in currentSelection }
         val newSelection = currentSelection.toMutableSet().apply {
@@ -221,7 +225,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
 
     fun exportProxyApp(): String {
         return buildString {
-            append(_bypassApps.value)
+            append(_routingMode.value.bypassSelected)
             _blacklist.value.forEach { packageName ->
                 append(System.lineSeparator())
                 append(packageName)
@@ -240,7 +244,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
             } else content
             if (proxyAppList.isNullOrEmpty()) return false
 
-            val bypassApps = _bypassApps.value
+            val bypassApps = _routingMode.value.bypassSelected
             val newBlacklist = withContext(Dispatchers.Default) {
                 AppSelection.fromProxyList(
                     packageNames = installedApps.map { it.packageName },
@@ -260,7 +264,8 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     }
 
     private fun enablePerAppProxyAndRestart() {
-        setPerAppProxyEnabled(true)
-        SettingsChangeManager.makeRestartService()
+        if (setRoutingMode(PerAppRoutingMode.afterBulkSelection(_routingMode.value))) {
+            SettingsChangeManager.makeRestartService()
+        }
     }
 }
