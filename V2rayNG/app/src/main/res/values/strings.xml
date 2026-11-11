@@ -581,4 +581,9 @@
     <string name="rx_routing_change_hint">Changes apply when the VPN reconnects.</string>
     <string name="rx_select_apps_hint">Select at least one app before connecting.</string>
     <string name="rx_ping_tap_hint">Tap to check ping</string>
+    <string name="onboarding_language_title">Choose the app language</string>
+    <string name="onboarding_language_hint">You can change it later in Settings.</string>
+    <string name="onboarding_language_persian" translatable="false">فارسی</string>
+    <string name="onboarding_language_english" translatable="false">English</string>
+    <string name="onboarding_language_system">Use the device language</string>
 </resources>

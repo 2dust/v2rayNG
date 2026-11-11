@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
@@ -28,6 +29,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
@@ -37,6 +39,8 @@ import com.v2ray.ang.ui.backup.BackupActivity
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.checkupdate.CheckUpdateActivity
 import com.v2ray.ang.ui.logcat.LogcatActivity
+import com.v2ray.ang.ui.onboarding.LanguageOnboarding
+import com.v2ray.ang.ui.onboarding.LanguageOnboardingScreen
 import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
 import com.v2ray.ang.ui.routing.RoutingSettingActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
@@ -109,8 +113,24 @@ class MainActivity : HelperBaseComponentActivity() {
     override fun ScreenContent() {
         // Dismissed after the first cold start; rememberSaveable keeps it dismissed on recreation.
         var showSplash by rememberSaveable { mutableStateOf(true) }
+        val context = LocalContext.current
+        // A fresh install answers one question before the home screen. The answer is applied by the
+        // same per-app locale machinery the settings screen uses.
+        var askLanguage by rememberSaveable {
+            mutableStateOf(LanguageOnboarding.shouldAsk(context))
+        }
         Box(modifier = Modifier.fillMaxSize()) {
-            MainContent()
+            if (askLanguage) {
+                LanguageOnboardingScreen(
+                    onSelect = { code ->
+                        askLanguage = false
+                        LanguageOnboarding.markChosen()
+                        AppLocaleManager.setApplicationLanguage(code)
+                    }
+                )
+            } else {
+                MainContent()
+            }
             if (showSplash) {
                 MainSplashOverlay(onFinished = { showSplash = false })
             }

@@ -31,7 +31,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -47,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.rxLetterR
+import com.v2ray.ang.ui.compose.rxLetterX
 import com.v2ray.ang.util.LogUtil
 import kotlin.math.min
 
@@ -290,48 +291,4 @@ private fun DrawScope.drawSheen(progress: Float, highlight: Color) {
             end = Offset(current + band, size.height + band),
         )
     )
-}
-
-/** "R" of the RX monogram, in the 512-unit viewport used by `ic_brand_mark`. */
-private fun rxLetterR(): Path = Path().apply {
-    fillType = PathFillType.EvenOdd
-    moveTo(100f, 156f)
-    lineTo(192f, 156f)
-    lineTo(220f, 162f)
-    lineTo(238f, 178f)
-    lineTo(244f, 202f)
-    lineTo(238f, 228f)
-    lineTo(216f, 248f)
-    lineTo(254f, 356f)
-    lineTo(204f, 356f)
-    lineTo(168f, 260f)
-    lineTo(146f, 260f)
-    lineTo(146f, 356f)
-    lineTo(100f, 356f)
-    close()
-    moveTo(146f, 196f)
-    lineTo(188f, 196f)
-    lineTo(198f, 200f)
-    lineTo(202f, 208f)
-    lineTo(198f, 218f)
-    lineTo(188f, 222f)
-    lineTo(146f, 222f)
-    close()
-}
-
-/** "X" of the RX monogram, in the 512-unit viewport used by `ic_brand_mark`. */
-private fun rxLetterX(): Path = Path().apply {
-    moveTo(266f, 156f)
-    lineTo(316f, 156f)
-    lineTo(342f, 210f)
-    lineTo(370f, 156f)
-    lineTo(420f, 156f)
-    lineTo(368f, 252f)
-    lineTo(424f, 356f)
-    lineTo(372f, 356f)
-    lineTo(342f, 296f)
-    lineTo(312f, 356f)
-    lineTo(260f, 356f)
-    lineTo(316f, 252f)
-    close()
 }

@@ -580,4 +580,7 @@
     <string name="rx_routing_change_hint">تغییرات با اتصال دوبارهٔ VPN اعمال می‌شوند.</string>
     <string name="rx_select_apps_hint">پیش از اتصال دست‌کم یک برنامه انتخاب کن.</string>
     <string name="rx_ping_tap_hint">برای بررسی پینگ بزن</string>
+    <string name="onboarding_language_title">زبان برنامه را انتخاب کنید</string>
+    <string name="onboarding_language_hint">بعداً هم می‌توانید از تنظیمات تغییرش دهید.</string>
+    <string name="onboarding_language_system">زبان گوشی</string>
 </resources>

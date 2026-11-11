@@ -7,6 +7,11 @@ on:
         description: "If set (e.g. v1.0.0), the APKs are published as a GitHub Release"
         required: false
         type: string
+      draft:
+        description: "Create the release as a draft, visible only to you (test builds)"
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - master
@@ -230,15 +235,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.release.outputs.tag }}
+          DRAFT: ${{ inputs.draft }}
         run: |
+          # A draft stays private to the repository owner, so a test build never becomes public.
+          if [ "$DRAFT" = "true" ]; then
+            DRAFT_FLAG="--draft"
+            LATEST_FLAG=""
+          else
+            DRAFT_FLAG=""
+            LATEST_FLAG="--latest"
+          fi
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" apk/*.apk --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md"
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$RUNNER_TEMP/notes.md" $DRAFT_FLAG
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --title "RX VPN $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
-              --latest
+              $DRAFT_FLAG $LATEST_FLAG
           fi
