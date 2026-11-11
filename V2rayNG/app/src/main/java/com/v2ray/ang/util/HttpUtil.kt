@@ -157,7 +157,7 @@ object HttpUtil {
             if (currentUrl == null) continue
             val client = buildOkHttpClient(request.timeout, request.httpPort, request.proxyUsername, request.proxyPassword, followRedirects = false)
             val finalUserAgent = if (request.userAgent.isNullOrBlank()) {
-                "MobixVPN/${BuildConfig.VERSION_NAME}"
+                "RXClient/${BuildConfig.VERSION_NAME}"
             } else {
                 request.userAgent
             }

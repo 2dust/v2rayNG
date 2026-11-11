@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Mobix VPN brand violet: background of the Android TV / leanback banner. -->
+    <!-- RX Client brand violet: background of the Android TV / leanback banner. -->
     <color name="ic_banner_background">#6D4AFF</color>
 </resources>
