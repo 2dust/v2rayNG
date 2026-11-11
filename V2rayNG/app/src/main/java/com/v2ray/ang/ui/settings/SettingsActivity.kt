@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.DailyMaintenance
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -110,7 +112,10 @@ fun SettingsScreen(
     var observatorySettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var advancedSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var modeSettingsExpanded by rememberSaveable { mutableStateOf(true) }
+    var dailyMaintenanceExpanded by rememberSaveable { mutableStateOf(true) }
 
+    val context = LocalContext.current
+    var dailyMaintenance by rememberMmkvBool(AppConfig.PREF_DAILY_MAINTENANCE, true)
     var localDns by rememberMmkvBool(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
     var fakeDns by rememberMmkvBool(AppConfig.PREF_FAKE_DNS_ENABLED, false)
     var appendHttpProxy by rememberMmkvBool(AppConfig.PREF_APPEND_HTTP_PROXY, false)
@@ -706,6 +711,32 @@ fun SettingsScreen(
                             lanSharing = newValue
                         }
                     }
+                )
+            }
+
+            CollapsiblePreferenceGroupHeader(
+                title = stringResource(R.string.title_pref_daily_maintenance),
+                expanded = dailyMaintenanceExpanded,
+                onExpandedChange = { dailyMaintenanceExpanded = it }
+            )
+            if (dailyMaintenanceExpanded) {
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_pref_daily_maintenance),
+                    summary = stringResource(R.string.summary_pref_daily_maintenance),
+                    checked = dailyMaintenance,
+                    onCheckedChange = { enabled ->
+                        dailyMaintenance = enabled
+                        if (enabled) {
+                            DailyMaintenance.schedule(context)
+                        } else {
+                            DailyMaintenance.cancel(context)
+                        }
+                    }
+                )
+                SettingsMenuItem(
+                    title = stringResource(R.string.title_daily_maintenance_run_now),
+                    subtitle = stringResource(R.string.summary_daily_maintenance_run_now),
+                    onClick = { DailyMaintenance.runNow(context) }
                 )
             }
 

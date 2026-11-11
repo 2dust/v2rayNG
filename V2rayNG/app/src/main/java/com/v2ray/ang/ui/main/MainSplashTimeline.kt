@@ -10,7 +10,7 @@ package com.v2ray.ang.ui.main
 internal object MainSplashTimeline {
 
     /** Whole animation, including the closing fade. Nothing follows it. */
-    const val TOTAL_MS = 2350f
+    const val TOTAL_MS = 2680f
 
     const val TILE_START_MS = 0f
     const val TILE_END_MS = 420f
@@ -27,10 +27,12 @@ internal object MainSplashTimeline {
     const val SWEEP_END_MS = 1820f
     const val WORD_START_MS = 1420f
     const val WORD_END_MS = 1880f
+    const val TAGLINE_START_MS = 1660f
+    const val TAGLINE_END_MS = 2060f
     const val BAR_START_MS = 1500f
     const val BAR_END_MS = 2050f
-    const val FADE_START_MS = 1880f
-    const val FADE_END_MS = 2350f
+    const val FADE_START_MS = 2180f
+    const val FADE_END_MS = 2680f
 
     /** Linear 0..1 progress of the window [startMs]..[endMs], clamped at both ends. */
     fun progress(elapsedMs: Float, startMs: Float, endMs: Float): Float {
@@ -49,6 +51,20 @@ internal object MainSplashTimeline {
     /** Scale of the icon tile: starts smaller than 1, overshoots slightly, settles at 1. */
     fun tileScale(elapsedMs: Float): Float =
         0.72f + 0.28f * overshoot(progress(elapsedMs, TILE_START_MS, TILE_END_MS))
+
+    /**
+     * Hauling of the app name's letter spacing while it lands: wide and airy as it fades in, then
+     * it settles to its final tracking.
+     */
+    fun nameLetterSpacingSp(wordProgress: Float): Float =
+        9f - 5f * wordProgress.coerceIn(0f, 1f)
+
+    /**
+     * Opacity of the tagline. It rides in on the name's landing, so the two read as one line of
+     * copy rather than two separate events.
+     */
+    fun taglineAlpha(elapsedMs: Float): Float =
+        progress(elapsedMs, TAGLINE_START_MS, TAGLINE_END_MS)
 
     /** Opacity of the whole overlay; stays 1 until the closing fade. */
     fun overlayAlpha(elapsedMs: Float): Float =

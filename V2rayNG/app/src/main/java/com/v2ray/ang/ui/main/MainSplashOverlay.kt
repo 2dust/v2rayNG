@@ -121,6 +121,7 @@ fun MainSplashOverlay(
     val barProgress = MainSplashTimeline.progress(
         elapsed, MainSplashTimeline.BAR_START_MS, MainSplashTimeline.BAR_END_MS
     )
+    val taglineProgress = MainSplashTimeline.taglineAlpha(elapsed)
     val overlayAlpha = MainSplashTimeline.overlayAlpha(elapsed)
     val ringOne = MainSplashTimeline.ringProgress(elapsed, 0f)
     val ringTwo = MainSplashTimeline.ringProgress(elapsed, MainSplashTimeline.RING_STEP_MS)
@@ -195,7 +196,7 @@ fun MainSplashOverlay(
                 color = colors.onSurface,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 4.sp,
+                letterSpacing = MainSplashTimeline.nameLetterSpacingSp(wordProgress).sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.graphicsLayer {
                     alpha = wordProgress
@@ -203,7 +204,23 @@ fun MainSplashOverlay(
                 },
             )
 
-            Spacer(Modifier.height(26.dp))
+            Spacer(Modifier.height(8.dp))
+
+            // The line the app greets a returning user with, riding in right as the name lands.
+            Text(
+                text = stringResource(R.string.splash_tagline),
+                color = colors.onSurfaceVariant,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 1.5.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.graphicsLayer {
+                    alpha = taglineProgress
+                    translationY = (1f - taglineProgress) * 18f
+                },
+            )
+
+            Spacer(Modifier.height(24.dp))
 
             Box(
                 modifier = Modifier

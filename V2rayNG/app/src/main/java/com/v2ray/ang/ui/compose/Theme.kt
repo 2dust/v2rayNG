@@ -5,7 +5,9 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.MmkvManager
@@ -106,6 +109,34 @@ private val DarkColor = darkColorScheme(
 val colorPing = Color(0xFF356B57)
 val colorPingRed = Color(0xFFBA1A1A)
 val colorConfigType = Color(0xFF805522)
+/**
+ * One corner language for the whole app: chips, cards, dialogs and menus all draw from here, so
+ * screens written at different times still look like the same product.
+ */
+private val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(30.dp),
+)
+
+/**
+ * Tone for a measured delay: calm while it is fast, warm when it drags, hard red when it failed.
+ * Reading it from the scheme keeps the same meaning in light, dark and dynamic color.
+ */
+@Composable
+fun rxPingColor(delayMs: Long): Color = when {
+    delayMs < 0L -> MaterialTheme.colorScheme.error
+    delayMs <= 400L -> MaterialTheme.colorScheme.tertiary
+    delayMs <= 900L -> MaterialTheme.colorScheme.primary
+    else -> MaterialTheme.colorScheme.error
+}
+
+/** Backing tint for [rxPingColor]; same hue, low enough to keep the label readable on top. */
+@Composable
+fun rxPingContainer(delayMs: Long): Color = rxPingColor(delayMs).copy(alpha = 0.14f)
+
 val colorFabActive = Color(0xFF805522)
 val colorFabInactiveLight = Color(0xFF62625E)
 val colorFabInactiveDark = Color(0xFF424649)
@@ -202,7 +233,8 @@ fun AppTheme(
         LocalAppSnackbar provides snackbarController
     ) {
         MaterialTheme(
-            colorScheme = colorScheme
+            colorScheme = colorScheme,
+            shapes = AppShapes,
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 AppSnackbarBridge(controller = snackbarController)

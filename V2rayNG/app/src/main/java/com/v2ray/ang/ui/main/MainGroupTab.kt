@@ -52,7 +52,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 private val TAB_BAR_PADDING = 3.dp
 private val TAB_SPACING = 2.dp
-private val TAB_HEIGHT = 30.dp
+private val TAB_HEIGHT = 34.dp
 private val SELECTED_TAB_MARGIN = 12.dp
 
 /**

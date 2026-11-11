@@ -50,6 +50,7 @@ object AppConfig {
     const val PREF_OBSERVATORY_LEAST_LOAD_SAMPLING = "pref_observatory_least_load_sampling"
     const val PREF_OBSERVATORY_LEAST_LOAD_TIMEOUT = "pref_observatory_least_load_timeout"
     const val SUBSCRIPTION_UPDATE_TASK_NAME = "subscription_updater"
+    const val DAILY_MAINTENANCE_WORK_NAME = "rx_daily_maintenance"
     const val SUBSCRIPTION_MIN_INTERVAL_MINUTES = 15L
     const val PREF_SPEED_ENABLED = "pref_speed_enabled"
     const val PREF_CONFIRM_REMOVE = "pref_confirm_remove"
@@ -80,6 +81,10 @@ object AppConfig {
     const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
+    const val PREF_DAILY_MAINTENANCE = "pref_daily_maintenance"
+    const val PREF_CLOUDFLARE_AUTO = "pref_cloudflare_auto"
+    const val PREF_SERVICE_RUNNING = "pref_service_running"
+    const val PREF_BENCHMARK_PREFIX = "pref_benchmark_"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
     const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel_v2"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"

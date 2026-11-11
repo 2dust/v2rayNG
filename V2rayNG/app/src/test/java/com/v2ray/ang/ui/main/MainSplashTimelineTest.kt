@@ -70,6 +70,7 @@ class MainSplashTimelineTest {
             MainSplashTimeline.GLOW_END_MS,
             MainSplashTimeline.SWEEP_END_MS,
             MainSplashTimeline.WORD_END_MS,
+            MainSplashTimeline.TAGLINE_END_MS,
             MainSplashTimeline.BAR_END_MS,
             MainSplashTimeline.FADE_END_MS,
             MainSplashTimeline.RING_START_MS + MainSplashTimeline.RING_STEP_MS + MainSplashTimeline.RING_LENGTH_MS,
@@ -79,7 +80,32 @@ class MainSplashTimelineTest {
             MainSplashTimeline.TILE_START_MS to MainSplashTimeline.TILE_END_MS,
             MainSplashTimeline.R_START_MS to MainSplashTimeline.R_END_MS,
             MainSplashTimeline.X_START_MS to MainSplashTimeline.X_END_MS,
+            MainSplashTimeline.TAGLINE_START_MS to MainSplashTimeline.TAGLINE_END_MS,
         ).forEach { (start, end) -> assertTrue(start < end, "window $start..$end") }
+    }
+
+    @Test
+    fun taglineRidesInOnTheNameAndSettlesBeforeTheFade() {
+        // Hidden while the tile and letters are still being drawn.
+        assertEquals(0f, MainSplashTimeline.taglineAlpha(0f), delta)
+        assertEquals(0f, MainSplashTimeline.taglineAlpha(MainSplashTimeline.TAGLINE_START_MS), delta)
+        // Starts after the name's own window opened, so the two read as one line of copy.
+        assertTrue(MainSplashTimeline.TAGLINE_START_MS > MainSplashTimeline.WORD_START_MS)
+        assertEquals(1f, MainSplashTimeline.taglineAlpha(MainSplashTimeline.TAGLINE_END_MS), delta)
+        // Fully readable before the overlay starts fading away.
+        assertTrue(MainSplashTimeline.TAGLINE_END_MS < MainSplashTimeline.FADE_START_MS)
+    }
+
+    @Test
+    fun nameTrackingTightensAsItLands() {
+        val wide = MainSplashTimeline.nameLetterSpacingSp(0f)
+        val settled = MainSplashTimeline.nameLetterSpacingSp(1f)
+        assertEquals(9f, wide, delta)
+        assertEquals(4f, settled, delta)
+        assertTrue(
+            MainSplashTimeline.nameLetterSpacingSp(0.5f) in settled..wide,
+            "tracking must tighten monotonically",
+        )
     }
 
     @Test

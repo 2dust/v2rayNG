@@ -5,15 +5,23 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
@@ -42,8 +51,10 @@ import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.InputDialog
 import com.v2ray.ang.ui.compose.InputField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.PreferenceGroupHeader
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsMenuItem
+import com.v2ray.ang.util.BackupCipher
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -59,6 +70,20 @@ enum class BackupLocation(@StringRes val labelRes: Int) {
 class BackupActivity : HelperBaseComponentActivity() {
 
     private val viewModel: BackupViewModel by viewModels()
+
+    /** What the open password dialog is collecting a password for. */
+    private sealed interface PendingPassword {
+        /** Create a backup; the password is optional. */
+        data class Backup(val location: BackupLocation) : PendingPassword
+
+        /** Share a backup file; the password is optional. */
+        object Share : PendingPassword
+
+        /** Open an existing backup; [mismatch] marks a wrong password so the dialog can say so. */
+        data class Restore(val file: File, val mismatch: Boolean = false) : PendingPassword
+    }
+
+    private var pendingPassword by mutableStateOf<PendingPassword?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +103,18 @@ class BackupActivity : HelperBaseComponentActivity() {
                             handleExportLocal(event.cachePath, event.targetUri)
                         }
 
+                        is BackupViewModel.BackupViewModelEvent.RestorePasswordRequired -> {
+                            pendingPassword =
+                                PendingPassword.Restore(event.cachedFile, mismatch = false)
+                        }
+
+                        is BackupViewModel.BackupViewModelEvent.RestorePasswordMismatch -> {
+                            pendingPassword =
+                                PendingPassword.Restore(event.cachedFile, mismatch = true)
+                        }
+
                         is BackupViewModel.BackupViewModelEvent.RestoreSuccess -> {
+                            pendingPassword = null
                             SettingsManager.initApp(this@BackupActivity)
                         }
 
@@ -94,17 +130,20 @@ class BackupActivity : HelperBaseComponentActivity() {
         BackupScreen(
             isLoadingState = viewModel.isLoading,
             webDavConfigState = viewModel.webDavConfig,
-            onBackupOptionSelected = { location ->
-                when (location) {
-                    BackupLocation.Local -> backupViaLocal()
-                    BackupLocation.WebDav -> viewModel.backupViaWebDav(cacheDir, getString(R.string.app_name))
-                }
+            passwordRequest = passwordRequest(),
+            onPasswordSubmit = { password -> submitPassword(password) },
+            onPasswordDismiss = {
+                pendingPassword = null
+                viewModel.cancelPendingRestore()
             },
-            onShareClick = { viewModel.shareBackup(cacheDir, getString(R.string.app_name)) },
+            onBackupOptionSelected = { location ->
+                pendingPassword = PendingPassword.Backup(location)
+            },
+            onShareClick = { pendingPassword = PendingPassword.Share },
             onRestoreOptionSelected = { location ->
                 when (location) {
                     BackupLocation.Local -> restoreViaLocal()
-                    BackupLocation.WebDav -> viewModel.restoreViaWebDav(cacheDir)
+                    BackupLocation.WebDav -> viewModel.restoreViaWebDav(cacheDir, null)
                 }
             },
             onCleanupProfiles = viewModel::cleanupProfileStorage,
@@ -113,23 +152,78 @@ class BackupActivity : HelperBaseComponentActivity() {
         )
     }
 
+    /** Describes the open password prompt for the screen, or null when none is needed. */
+    private fun passwordRequest(): BackupPasswordRequest? = when (val pending = pendingPassword) {
+        null -> null
+        is PendingPassword.Backup -> BackupPasswordRequest(
+            key = "backup-${pending.location}",
+            titleRes = R.string.backup_password_backup_title,
+            hintRes = R.string.backup_password_backup_hint,
+            optional = true,
+            mismatch = false,
+        )
+
+        PendingPassword.Share -> BackupPasswordRequest(
+            key = "share",
+            titleRes = R.string.backup_password_backup_title,
+            hintRes = R.string.backup_password_backup_hint,
+            optional = true,
+            mismatch = false,
+        )
+
+        is PendingPassword.Restore -> BackupPasswordRequest(
+            key = "restore-${pending.file.path}-${pending.mismatch}",
+            titleRes = R.string.backup_password_restore_title,
+            hintRes = R.string.backup_password_restore_hint,
+            optional = false,
+            mismatch = pending.mismatch,
+        )
+    }
+
+    private fun submitPassword(password: String) {
+        val pending = pendingPassword ?: return
+        pendingPassword = null
+        val secret = password.takeIf { it.isNotEmpty() }
+        val appName = getString(R.string.app_name)
+
+        when (pending) {
+            is PendingPassword.Backup -> when (pending.location) {
+                BackupLocation.Local -> backupViaLocal(secret)
+                BackupLocation.WebDav -> viewModel.backupViaWebDav(cacheDir, appName, secret)
+            }
+
+            PendingPassword.Share -> viewModel.shareBackup(cacheDir, appName, secret)
+
+            is PendingPassword.Restore ->
+                viewModel.restoreConfiguration(cacheDir, pending.file, secret)
+        }
+    }
+
     private fun handleShareFile(filePath: String) {
+        val file = File(filePath)
         startActivity(
             Intent.createChooser(
-                Intent(Intent.ACTION_SEND).setType("application/zip")
+                Intent(Intent.ACTION_SEND).setType(mimeTypeOf(file))
                     .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     .putExtra(
                         Intent.EXTRA_STREAM,
                         FileProvider.getUriForFile(
                             this,
                             BuildConfig.APPLICATION_ID + ".cache",
-                            File(filePath)
+                            file
                         )
                     ),
                 getString(R.string.title_configuration_share)
             )
         )
     }
+
+    private fun mimeTypeOf(file: File): String =
+        if (file.extension.equals(BackupCipher.EXTENSION, ignoreCase = true)) {
+            "application/octet-stream"
+        } else {
+            "application/zip"
+        }
 
     private fun handleExportLocal(cachePath: String, targetUri: Uri) {
         try {
@@ -146,34 +240,34 @@ class BackupActivity : HelperBaseComponentActivity() {
         }
     }
 
-    private fun backupViaLocal() {
+    private fun backupViaLocal(password: String?) {
         val dateFormatted = SimpleDateFormat(
             "yyyy-MM-dd-HH-mm-ss",
             Locale.getDefault()
         ).format(System.currentTimeMillis())
-        val defaultFileName = "${getString(R.string.app_name)}_${dateFormatted}.zip"
+        val extension = if (password == null) "zip" else BackupCipher.EXTENSION
+        val defaultFileName = "${getString(R.string.app_name)}_${dateFormatted}.$extension"
 
         launchCreateDocument(defaultFileName) { uri ->
             if (uri != null) {
-                viewModel.prepareBackupForUri(cacheDir, getString(R.string.app_name), uri)
+                viewModel.prepareBackupForUri(cacheDir, getString(R.string.app_name), uri, password)
             }
         }
     }
 
     private fun restoreViaLocal() {
-        launchFileChooser { uri ->
+        launchFileChooser(mimeType = "*/*") { uri ->
             if (uri == null) {
                 return@launchFileChooser
             }
             try {
-                val targetFile =
-                    File(cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
+                val targetFile = File(cacheDir, "restore_${System.currentTimeMillis()}.zip")
                 contentResolver.openInputStream(uri).use { input ->
                     targetFile.outputStream().use { fileOut ->
                         input?.copyTo(fileOut)
                     }
                 }
-                viewModel.restoreConfiguration(cacheDir, targetFile)
+                viewModel.restoreConfiguration(cacheDir, targetFile, null)
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Error during file restore", e)
                 toastError(R.string.toast_failure)
@@ -182,10 +276,22 @@ class BackupActivity : HelperBaseComponentActivity() {
     }
 }
 
+/** Everything the screen needs to draw the password prompt. */
+data class BackupPasswordRequest(
+    val key: String,
+    @StringRes val titleRes: Int,
+    @StringRes val hintRes: Int,
+    val optional: Boolean,
+    val mismatch: Boolean,
+)
+
 @Composable
 fun BackupScreen(
     isLoadingState: StateFlow<Boolean>,
     webDavConfigState: StateFlow<WebDavConfig?>,
+    passwordRequest: BackupPasswordRequest?,
+    onPasswordSubmit: (String) -> Unit,
+    onPasswordDismiss: () -> Unit,
     onBackupOptionSelected: (BackupLocation) -> Unit,
     onShareClick: () -> Unit,
     onRestoreOptionSelected: (BackupLocation) -> Unit,
@@ -218,9 +324,11 @@ fun BackupScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
+            PreferenceGroupHeader(title = stringResource(R.string.backup_group_backup))
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_backup_24dp),
                 title = stringResource(R.string.title_configuration_backup),
+                subtitle = stringResource(R.string.summary_backup_contents),
                 onClick = { showBackupDialog = true }
             )
             SettingsMenuItem(
@@ -228,18 +336,21 @@ fun BackupScreen(
                 title = stringResource(R.string.title_configuration_share),
                 onClick = onShareClick
             )
+
+            PreferenceGroupHeader(title = stringResource(R.string.backup_group_restore))
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_restore_24dp),
                 title = stringResource(R.string.title_configuration_restore),
                 onClick = { showRestoreDialog = true }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_delete_24dp),
                 title = stringResource(R.string.title_profile_storage_cleanup),
                 subtitle = stringResource(R.string.summary_profile_storage_cleanup),
                 onClick = { showCleanupDialog = true }
             )
-            Spacer(modifier = Modifier.height(16.dp))
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_settings_24dp),
                 title = stringResource(R.string.title_webdav_config_setting),
@@ -291,6 +402,78 @@ fun BackupScreen(
             onDismiss = { showWebDavDialog = false }
         )
     }
+
+    if (passwordRequest != null) {
+        BackupPasswordDialog(
+            request = passwordRequest,
+            onSubmit = onPasswordSubmit,
+            onDismiss = onPasswordDismiss
+        )
+    }
+}
+
+@Composable
+private fun BackupPasswordDialog(
+    request: BackupPasswordRequest,
+    onSubmit: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // Keyed by the request, so a wrong password reopens with an empty field.
+    var password by remember(request.key) { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(request.titleRes)) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(request.hintRes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.backup_password_label)) },
+                    isError = request.mismatch,
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (request.mismatch) {
+                    Text(
+                        text = stringResource(R.string.toast_backup_wrong_password),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onSubmit(password.trim()) },
+                enabled = request.optional || password.isNotBlank()
+            ) {
+                Text(stringResource(R.string.backup_password_continue))
+            }
+        },
+        dismissButton = {
+            Row {
+                if (request.optional) {
+                    TextButton(onClick = { onSubmit("") }) {
+                        Text(stringResource(R.string.backup_password_none))
+                    }
+                }
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
+    )
 }
 
 @Composable

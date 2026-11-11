@@ -39,6 +39,10 @@
         android:minSdkVersion="34" />
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Scheduling: the daily job checks connectivity before it does network work. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Lets the daily job hand a downloaded update to the installer. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
@@ -206,6 +210,12 @@
             android:exported="false" />
         <activity
             android:name=".ui.backup.BackupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.cloudflare.CloudflareActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.speedtest.SpeedTestActivity"
             android:exported="false" />
         <activity
             android:name=".ui.AboutActivity"

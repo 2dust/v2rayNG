@@ -26,7 +26,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -60,9 +60,9 @@ import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
-import com.v2ray.ang.ui.compose.colorConfigType
-import com.v2ray.ang.ui.compose.colorPing
-import com.v2ray.ang.ui.compose.colorPingRed
+import com.v2ray.ang.ui.compose.RxPill
+import com.v2ray.ang.ui.compose.rxPingColor
+import com.v2ray.ang.ui.compose.rxPingContainer
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -360,7 +360,8 @@ private fun ServerListItem(
     doubleColumnDisplay: Boolean,
     actions: ServerRowActions
 ) {
-    val testResult = if (row.testDelayMillis == 0L) {
+    val colors = MaterialTheme.colorScheme
+    val delayText = if (row.testDelayMillis == 0L) {
         ""
     } else {
         stringResource(R.string.server_test_delay_value, row.testDelayMillis)
@@ -370,10 +371,15 @@ private fun ServerListItem(
     } else {
         null
     }
+    val verticalPadding = if (doubleColumnDisplay) 8.dp else 11.dp
+
+    // Selected rows are tinted rather than outlined: it reads instantly in a list of twenty and
+    // still leaves the text at full contrast on every wallpaper and theme.
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
+            .background(if (isSelected) colors.primary.copy(alpha = 0.09f) else Color.Transparent)
             .semantics {
                 if (selectedStateDescription != null) {
                     stateDescription = selectedStateDescription
@@ -383,101 +389,98 @@ private fun ServerListItem(
     ) {
         Box(
             Modifier
-                .width(10.dp)
+                .width(4.dp)
                 .fillMaxHeight()
-        ) {
-            if (isSelected) {
-                Row {
-                    Spacer(Modifier.width(6.dp))
-                    Box(
-                        Modifier
-                            .width(4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 10.dp)
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                }
-            }
-        }
+                .background(if (isSelected) colors.primary else Color.Transparent)
+        )
 
         Column(
             Modifier
                 .weight(1f)
-                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 12.dp, end = 2.dp, top = verticalPadding, bottom = verticalPadding)
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(row.remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (doubleColumnDisplay) {
-                    IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_more_vert_24dp),
-                            stringResource(R.string.acc_more),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                } else {
-                    IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_share_24dp),
-                            stringResource(R.string.title_configuration_share),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_edit_24dp),
-                            stringResource(R.string.acc_edit),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                    IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_delete_24dp),
-                            stringResource(R.string.acc_delete),
-                            Modifier.size(24.dp)
-                        )
-                    }
+                Text(
+                    text = row.remarks,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleSmall.copy(lineBreak = LineBreak.Paragraph),
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                // In the two column layout the header only has room for the name, so the latency
+                // moves down to the last line there and the title keeps its full width.
+                if (!doubleColumnDisplay && delayText.isNotEmpty()) {
+                    RxPill(
+                        text = delayText,
+                        contentColor = rxPingColor(row.testDelayMillis),
+                        containerColor = rxPingContainer(row.testDelayMillis),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+                // One entry point for share, edit and delete: the row stays calm and the target
+                // the user has to aim at is a single 40dp button instead of three 36dp ones.
+                IconButton(
+                    onClick = { actions.more(row.guid, row.profile) },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_more_vert_24dp),
+                        stringResource(R.string.acc_more),
+                        Modifier.size(22.dp)
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp))
+
+            Spacer(modifier = Modifier.height(5.dp))
+
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (row.subscriptionBadge.isNotBlank()) {
-                    Box(
-                        Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
-                    ) {
-                        Text(row.subscriptionBadge.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                    }
+                    RxPill(
+                        text = row.subscriptionBadge.uppercase(),
+                        contentColor = colors.primary,
+                        containerColor = colors.primary.copy(alpha = 0.14f),
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
                 }
                 Text(
-                    row.statistics,
-                    Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = row.statistics,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                if (isSelected) {
+                    Icon(
+                        painterResource(R.drawable.ic_action_done),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = colors.primary
+                    )
+                }
             }
+
             Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    row.typeDescription,
-                    modifier = Modifier.weight(1f, fill = false),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorConfigType,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RxPill(
+                    text = row.typeDescription,
+                    contentColor = colors.onSurfaceVariant,
+                    containerColor = colors.surfaceContainerHigh.copy(alpha = 0.85f),
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    testResult,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (doubleColumnDisplay && delayText.isNotEmpty()) {
+                    RxPill(
+                        text = delayText,
+                        contentColor = rxPingColor(row.testDelayMillis),
+                        containerColor = rxPingContainer(row.testDelayMillis),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
             }
         }
     }

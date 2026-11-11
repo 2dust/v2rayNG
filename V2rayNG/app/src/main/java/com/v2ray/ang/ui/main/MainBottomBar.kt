@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.RxGlassButton
+import com.v2ray.ang.ui.compose.RxPill
 import com.v2ray.ang.ui.compose.RxGlassPanel
 
 @Composable
@@ -50,9 +51,9 @@ fun MainBottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 14.dp, vertical = 6.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(horizontal = 14.dp, vertical = 14.dp)) {
             // Tapping the status line re-checks the ping while connected; there is no
             // separate lightning button, so the user cannot hit it by accident.
             Row(
@@ -68,12 +69,24 @@ fun MainBottomBar(
                     }
                     .padding(vertical = 2.dp)
             ) {
-                Box(
-                    Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(if (isRunning) colors.tertiary else colors.outline)
-                )
+                // A soft halo behind the dot: the state is readable at a glance without reading
+                // the text, and it costs one extra 16dp box.
+                Box(contentAlignment = Alignment.Center) {
+                    if (isRunning) {
+                        Box(
+                            Modifier
+                                .size(16.dp)
+                                .clip(CircleShape)
+                                .background(colors.tertiary.copy(alpha = 0.18f))
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (isRunning) colors.tertiary else colors.outline)
+                    )
+                }
                 Text(
                     text = displayText,
                     style = MaterialTheme.typography.bodyMedium,
@@ -89,24 +102,20 @@ fun MainBottomBar(
                         color = colors.primary,
                     )
                 } else if (pingText != null) {
-                    Text(
+                    RxPill(
                         text = pingText,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = colors.tertiary,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(colors.tertiary.copy(alpha = 0.12f))
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                        contentColor = colors.tertiary,
+                        containerColor = colors.tertiary.copy(alpha = 0.14f),
                     )
                 }
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RxGlassButton(
                     onClick = { onAction(MainAction.ToggleService) },
                     enabled = canConnect,
                     accent = true,
-                    modifier = Modifier.weight(1f).height(60.dp),
+                    modifier = Modifier.weight(1f).height(62.dp),
                 ) {
                     Icon(
                         painter = painterResource(
@@ -134,7 +143,7 @@ fun MainBottomBar(
                 }
                 RxGlassButton(
                     onClick = { onNavigate(MainDestination.PerAppProxy) },
-                    modifier = Modifier.padding(start = 10.dp).size(60.dp),
+                    modifier = Modifier.padding(start = 12.dp).size(62.dp),
                     contentPadding = PaddingValues(0.dp),
                 ) {
                     Icon(

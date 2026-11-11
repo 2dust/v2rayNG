@@ -57,3 +57,20 @@ Working branch: `arena/d739235f-rx-client` (App repo: `kairomax1/RX_client`).
   uploads the artifact of a successful run with
   `-f release_tag=<tag> -f artifact_run_id=<run id>`.
 - No Android SDK/JDK in the sandbox — GitHub Actions is the only compile gate.
+
+## Design system (1.0.2 pass)
+- `ui/compose/Theme.kt` owns `AppShapes` (8/12/18/24/30 dp) and is passed to `MaterialTheme`,
+  so chips, cards, dialogs and menus share one corner language.
+- Semantic latency tone: `rxPingColor(ms)` / `rxPingContainer(ms)` — tertiary <= 400 ms,
+  primary <= 900 ms, error otherwise or for -1. Do not hardcode `colorPing`/`colorPingRed`
+  in new screens (they stay for the older routing screen).
+- `RxPill(text, contentColor, containerColor)` in `ui/compose/RxComponents.kt` is the one
+  small label used for protocol, latency and subscription badge.
+- Server rows: tinted selected background + 4 dp accent rail, name row, meta row with badge /
+  statistics / done tick, third row with type pill (plus latency pill in the two column grid).
+  Share, edit and delete live behind a single 40 dp overflow button that opens
+  `ShareMethodDialog(more = true)`.
+- Splash: brand mark, name, then `splash_tagline` («هواتو داره» / "Got your back"); the whole
+  overlay is skipped when `ServiceRuntimeState.isRunning()` is true, i.e. the tunnel is up.
+- `ServiceRuntimeState` mirrors the core state into MMKV (`pref_service_running`) from the
+  `:daemon` process and verifies the daemon process is alive before trusting it.
