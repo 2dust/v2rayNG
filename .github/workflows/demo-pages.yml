@@ -3,12 +3,9 @@ name: Demo preview page
 # Publishes the static splash-animation demo in /demo to GitHub Pages.
 # It is intentionally isolated from the Android build workflows.
 on:
-  push:
-    branches:
-      - arena/86ebebd3-rx-client
-    paths:
-      - 'demo/**'
-      - '.github/workflows/demo-pages.yml'
+  # Manual only: GitHub Pages must be enabled once in repo Settings first
+  # (Settings -> Pages -> Deploy from a branch -> arena/86ebebd3-rx-client -> /demo),
+  # or run this workflow after granting the integration Pages admin access.
   workflow_dispatch:
 
 permissions:
