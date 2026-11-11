@@ -357,6 +357,7 @@
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
     <string name="title_real_ping_all_server">測試真連接延遲</string>
+    <string name="title_test_real_ping_and_sort">測試真連接延遲並排序</string>
     <string name="title_user_asset_setting">資源檔案</string>
     <string name="title_sort_by_test_results">依測試結果排序</string>
     <string name="title_filter_config">篩選設定</string>
@@ -447,6 +448,12 @@
     <string name="title_policy_group_subscription_filter">備註正規表示式篩選</string>
     <string name="title_policy_group_test_outbounds">測試出站 (outbounds)</string>
     <string name="title_policy_group_fallback">備用出站 (outbound，選填)</string>
+    <string name="title_policy_group_auto_sort">自動測試並排序</string>
+    <string name="summary_policy_group_auto_sort">代理執行期間會定期測試真連接延遲並排序此訂閱。較短間隔會增加耗電、流量與 CPU 使用量。</string>
+    <string name="title_policy_group_auto_sort_interval">重新整理間隔</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d 分鐘</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">啟用自動排序前，請選擇一個具體訂閱。</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">自動排序需要經由代理的備用出站，不允許使用直連或封鎖。</string>
 
     <string name="server_proxy_chain_members">代理鏈成員</string>
     <string name="server_proxy_chain_pick_members">點此選擇成員</string>

@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
@@ -104,6 +105,7 @@ class MainViewModel(
     private var preloadJob: Job? = null
     private var selectedGroupLoadJob: Job? = null
     private var reloadJob: Job? = null
+    private var autoSortReloadJob: Job? = null
     private var testResultFlushJob: Job? = null
     private val pendingTestResults = linkedMapOf<String, Long>()
 
@@ -171,6 +173,8 @@ class MainViewModel(
                     onTestsFinished(request.id)
                 }
             }
+
+            is MainServiceEvent.AutoSortCompleted -> reloadAutoSortGroup(event.subscriptionId)
 
             is MainServiceEvent.MeasureDelayCancelled -> {
                 //if (testRequests.completeCurrent(event.requestId)) resetTestStatus()
@@ -279,6 +283,7 @@ class MainViewModel(
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)
             MainAction.TestRealAllServers -> testAllRealPing()
+            MainAction.TestRealAllServersAndSort -> testAllRealPing(sortOnFinish = true)
             MainAction.CancelTesting -> cancelAllPing()
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
@@ -835,7 +840,7 @@ class MainViewModel(
         }
     }
 
-    fun testAllRealPing(onlyTcp: Boolean = false) {
+    fun testAllRealPing(onlyTcp: Boolean = false, sortOnFinish: Boolean = false) {
         cancelAllPing()
         val groupId = uiState.value.selectedGroupId
         val servers = currentServers()
@@ -855,11 +860,15 @@ class MainViewModel(
                 }
             )
         }
-        val request = testRequests.beginBulk(groupId)
+        val request = testRequests.beginBulk(groupId, sortOnFinish)
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
-            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            serverGuids = if (keywordFilter.isNotEmpty() && !sortOnFinish) {
+                serverGuids
+            } else {
+                emptyList()
+            },
             onlyTcp = onlyTcp
         )
         _uiState.update {
@@ -898,11 +907,48 @@ class MainViewModel(
     }
 
     private fun onTestsFinished(requestId: String) {
-        if (testRequests.completeBulk(requestId) == null) return
+        val request = testRequests.completeBulk(requestId) ?: return
         resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
+            if (request.sortOnFinish) {
+                sortCompletedTestResults(request.groupId)
+            }
             cacheMutex.withLock { groupDataCache.clear() }
             reloadAllGroups(_uiState.value.groups.map { it.id })
+        }
+    }
+
+    private fun sortCompletedTestResults(groupId: String) {
+        val pinned = pinnedPolicyGroupTarget()
+        val groupIds = if (groupId.isEmpty()) {
+            dataSource.getSubsList()
+        } else {
+            listOf(groupId)
+        }
+        groupIds.forEach { id ->
+            val pinnedGuid = pinned?.takeIf { it.first == id }?.second
+            dataSource.sortByTestResultsForSub(id, pinnedGuid)
+        }
+    }
+
+    private fun pinnedPolicyGroupTarget(): Pair<String, String>? {
+        val guid = dataSource.getSelectServer() ?: return null
+        val profile = dataSource.decodeServerConfig(guid) ?: return null
+        if (profile.configType != EConfigType.POLICYGROUP) return null
+        return profile.subscriptionId to guid
+    }
+
+    private fun reloadAutoSortGroup(subscriptionId: String) {
+        if (subscriptionId.isBlank()) return
+        if (_uiState.value.groups.none { it.id == subscriptionId }) return
+
+        autoSortReloadJob?.cancel()
+        autoSortReloadJob = viewModelScope.launch(ioDispatcher) {
+            cacheMutex.withLock { groupDataCache.remove(subscriptionId) }
+            updateGroupUi(
+                subscriptionId,
+                loadGroup(subscriptionId, forceRefresh = true),
+            )
         }
     }
 

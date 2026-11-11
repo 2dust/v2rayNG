@@ -357,6 +357,7 @@
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تأخیر واقعی</string>
+    <string name="title_test_real_ping_and_sort">آزمایش تأخیر واقعی و مرتب‌سازی</string>
     <string name="title_user_asset_setting">فایل های منبع جغرافیایی</string>
     <string name="title_sort_by_test_results">مرتب‌سازی بر اساس نتایج آزمایش</string>
     <string name="title_filter_config">فیلتر کردن کانفیگ‌ها</string>
@@ -449,6 +450,12 @@
     <string name="title_policy_group_subscription_filter">فیلتر توضیحات با عبارت منظم</string>
     <string name="title_policy_group_test_outbounds">آزمایش خروجی‌ها (outbounds)</string>
     <string name="title_policy_group_fallback">خروجی پشتیبان (outbound، اختیاری)</string>
+    <string name="title_policy_group_auto_sort">آزمایش و مرتب‌سازی خودکار</string>
+    <string name="summary_policy_group_auto_sort">هنگام اجرای پروکسی، تأخیر واقعی را دوره‌ای آزمایش کرده و این اشتراک را مرتب می‌کند. بازه‌های کوتاه مصرف باتری، داده و CPU را افزایش می‌دهند.</string>
+    <string name="title_policy_group_auto_sort_interval">بازه به‌روزرسانی</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d دقیقه</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">پیش از فعال‌کردن مرتب‌سازی خودکار، یک اشتراک مشخص انتخاب کنید.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">مرتب‌سازی خودکار به خروجی پشتیبان از طریق پروکسی نیاز دارد؛ اتصال مستقیم و مسدودسازی مجاز نیست.</string>
 
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>

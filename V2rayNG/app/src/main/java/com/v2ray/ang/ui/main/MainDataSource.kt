@@ -40,7 +40,7 @@ interface MainDataSource : Closeable {
     fun removeInvalidServersInGroup(groupId: String): Int
 
     fun clearAllTestDelayResults(guids: List<String>)
-    fun sortByTestResultsForSub(subId: String)
+    fun sortByTestResultsForSub(subId: String, pinnedGuid: String? = null)
     fun getSubsList(): List<String>
 
     suspend fun importBatchConfig(

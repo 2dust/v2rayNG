@@ -357,6 +357,7 @@
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверить TCP-задержку</string>
     <string name="title_real_ping_all_server">Проверить реальную задержку</string>
+    <string name="title_test_real_ping_and_sort">Проверить реальную задержку и отсортировать</string>
     <string name="title_user_asset_setting">Файлы ресурсов</string>
     <string name="title_sort_by_test_results">Сортировать по результатам теста</string>
     <string name="title_filter_config">Фильтр профилей</string>
@@ -453,6 +454,12 @@
     <string name="title_policy_group_subscription_filter">Фильтр примечаний (регулярное выражение)</string>
     <string name="title_policy_group_test_outbounds">Тестировать исходящие подключения</string>
     <string name="title_policy_group_fallback">Резервное исходящее подключение (необязательно)</string>
+    <string name="title_policy_group_auto_sort">Автопроверка и сортировка</string>
+    <string name="summary_policy_group_auto_sort">Периодически проверяет реальную задержку и сортирует эту подписку во время работы прокси. Короткие интервалы увеличивают расход батареи, трафика и ЦП.</string>
+    <string name="title_policy_group_auto_sort_interval">Интервал обновления</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d мин</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">Перед включением автоматической сортировки выберите конкретную подписку.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">Для автоматической сортировки нужен резервный исходящий через прокси; прямое подключение и блокировка запрещены.</string>
 
     <string name="server_proxy_chain_members">Участники цепочки прокси</string>
     <string name="server_proxy_chain_pick_members">Нажмите здесь, чтобы выбрать участника</string>

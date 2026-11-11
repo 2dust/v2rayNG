@@ -357,6 +357,7 @@
     <string name="title_sub_update">Update subscription</string>
     <string name="title_ping_all_server">Test TCP delays (TCPing)</string>
     <string name="title_real_ping_all_server">Test real delays</string>
+    <string name="title_test_real_ping_and_sort">Test real delays and sort</string>
     <string name="title_user_asset_setting">Asset files</string>
     <string name="title_sort_by_test_results">Sort by test results</string>
     <string name="title_filter_config">Filter configs</string>
@@ -449,6 +450,12 @@
     <string name="title_policy_group_subscription_filter">Remarks regex filter</string>
     <string name="title_policy_group_test_outbounds">Test outbounds</string>
     <string name="title_policy_group_fallback">Fallback outbound (optional)</string>
+    <string name="title_policy_group_auto_sort">Auto test and sort</string>
+    <string name="summary_policy_group_auto_sort">Periodically tests real latency and sorts this subscription while the proxy is running. Short intervals use more battery, data, and CPU.</string>
+    <string name="title_policy_group_auto_sort_interval">Refresh interval</string>
+    <string name="policy_group_auto_sort_interval_minutes">%1$d min</string>
+    <string name="toast_policy_group_auto_sort_subscription_required">Choose a specific subscription before enabling automatic sorting.</string>
+    <string name="toast_policy_group_auto_sort_unsafe_fallback">Automatic sorting requires a proxy fallback; direct and block are not allowed.</string>
 
     <string name="server_proxy_chain_members">Proxy chain members</string>
     <string name="server_proxy_chain_pick_members">Tap here to pick a member</string>

@@ -11,6 +11,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 internal object RealPingExecutionLimiter {
@@ -55,8 +57,13 @@ class RealPingWorkerService(
 
     private val runningCount = AtomicInteger(0)
     private val totalCount = AtomicInteger(0)
+    private val started = AtomicBoolean(false)
+    private val closed = AtomicBoolean(false)
+    private val completion = CompletableDeferred<Unit>()
 
     fun start() {
+        if (!started.compareAndSet(false, true)) return
+
         val jobs = guids.map { guid ->
             totalCount.incrementAndGet()
             scope.launch {
@@ -66,8 +73,12 @@ class RealPingWorkerService(
                     if (scope.isActive) {
                         onEvent(RealPingEvent.Result(guid, result))
                     }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
                 } catch (_: Throwable) {
-                    // ignore
+                    if (scope.isActive) {
+                        onEvent(RealPingEvent.Result(guid, -1L))
+                    }
                 } finally {
                     val count = totalCount.decrementAndGet()
                     val left = runningCount.decrementAndGet()
@@ -89,6 +100,8 @@ class RealPingWorkerService(
             } finally {
                 close()
             }
+        }.also { job ->
+            job.invokeOnCompletion { close() }
         }
     }
 
@@ -96,11 +109,18 @@ class RealPingWorkerService(
         job.cancel()
     }
 
+    suspend fun awaitCompletion() {
+        completion.await()
+    }
+
     private fun close() {
+        if (!closed.compareAndSet(false, true)) return
         try {
             dispatcher.close()
         } catch (_: Throwable) {
             // ignore
+        } finally {
+            completion.complete(Unit)
         }
     }
 

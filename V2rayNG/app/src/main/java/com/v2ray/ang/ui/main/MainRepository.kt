@@ -73,6 +73,9 @@ class MainRepository(
                     requestId
                 )
                 AppConfig.MSG_MEASURE_CONFIG_CANCEL -> MainServiceEvent.MeasureConfigCancelled(requestId)
+                AppConfig.MSG_AUTO_SORT_COMPLETE -> MainServiceEvent.AutoSortCompleted(
+                    safeIntent.getStringExtra("content").orEmpty()
+                )
 
                 else -> null
             }
@@ -180,8 +183,8 @@ class MainRepository(
     override fun clearAllTestDelayResults(guids: List<String>) =
         MmkvManager.clearAllTestDelayResults(guids)
 
-    override fun sortByTestResultsForSub(subId: String) {
-        AngConfigManager.sortByTestResultsForSub(subId)
+    override fun sortByTestResultsForSub(subId: String, pinnedGuid: String?) {
+        AngConfigManager.sortByTestResultsForSub(subId, pinnedGuid)
     }
 
     override fun getSubsList(): List<String> = MmkvManager.decodeSubsList()
