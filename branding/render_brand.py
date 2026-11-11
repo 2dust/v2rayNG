@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the Mobix VPN brand assets (launcher icons, notification icon, banner).
+"""Render the RX Client brand assets (launcher icons, notification icon, banner).
 
 The mark is a shield with a lightning bolt knocked out of it, on a violet -> cyan
 gradient tile.  Everything is drawn from code so the assets can be regenerated:
@@ -162,11 +162,11 @@ DENSITIES = {
 
 if __name__ == "__main__":
     # Marketing / preview assets
-    save(draw_mark(1024), ROOT, "mobix-logo.png")
-    save(shield_only(1024, WHITE), ROOT, "mobix-mark-mono.png")
+    save(draw_mark(1024), ROOT, "rx-client-logo.png")
+    save(shield_only(1024, WHITE), ROOT, "rx-client-mark-mono.png")
 
     # Play Store icon
-    save(draw_mark(512), ROOT, "mobix-playstore-512.png")
+    save(draw_mark(512), ROOT, "rx-client-playstore-512.png")
 
     # Feature graphic / banner (Play Store 1024x500)
     banner = Image.new("RGB", (1024, 500), INK)
@@ -183,9 +183,9 @@ if __name__ == "__main__":
         light = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 31)
     except OSError:
         bold = light = ImageFont.load_default()
-    d.text((446, 188), "MOBIX VPN", font=bold, fill=WHITE)
+    d.text((446, 188), "RX CLIENT", font=bold, fill=WHITE)
     d.text((450, 288), "Fast  •  Stable  •  Every network", font=light, fill=(228, 224, 255))
-    save(banner.convert("RGB"), ROOT, "mobix-feature-graphic.png")
+    save(banner.convert("RGB"), ROOT, "rx-client-feature-graphic.png")
 
     for density, size in DENSITIES.items():
         out = os.path.join(RES, f"mipmap-{density}")

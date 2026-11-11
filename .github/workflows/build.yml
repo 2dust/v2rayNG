@@ -1,4 +1,4 @@
-name: Build Mobix VPN APK
+name: Build RX Client APK
 
 on:
   workflow_dispatch:
@@ -105,21 +105,23 @@ jobs:
             "https://github.com/2dust/AndroidLibXrayLite/releases/download/${CORE_TAG}/libv2ray.aar"
           ls -lh V2rayNG/app/libs/
 
+      # NOTE: the keystore alias/passwords keep their legacy "mobix" names so that
+      # updates are still signed with the same key as previous releases of the app.
       - name: Create signing key
         run: |
           if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
-            printf '%s' "${{ secrets.APP_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/mobix.jks"
+            printf '%s' "${{ secrets.APP_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/rxclient.jks"
             echo "Using repository signing key"
           else
             keytool -genkeypair -v \
-              -keystore "$RUNNER_TEMP/mobix.jks" \
+              -keystore "$RUNNER_TEMP/rxclient.jks" \
               -alias mobix \
               -keyalg RSA -keysize 2048 -validity 10950 \
               -storepass mobixvpn -keypass mobixvpn \
-              -dname "CN=Mobix VPN, OU=Mobile, O=Mobix, L=Tehran, C=IR"
+              -dname "CN=RX Client, OU=Mobile, O=RX Client, L=Tehran, C=IR"
             echo "Generated a development signing key (set APP_KEYSTORE_BASE64 to reuse a stable key)"
           fi
-          echo "KEYSTORE_PATH=$RUNNER_TEMP/mobix.jks" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PATH=$RUNNER_TEMP/rxclient.jks" >> "$GITHUB_ENV"
 
       - name: Build release APKs
         env:
@@ -142,7 +144,7 @@ jobs:
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: MobixVPN-apk
+          name: RXClient-apk
           path: V2rayNG/app/build/outputs/apk/playstore/release/*.apk
           if-no-files-found: error
 
@@ -160,7 +162,7 @@ jobs:
       - name: Download APKs
         uses: actions/download-artifact@v4
         with:
-          name: MobixVPN-apk
+          name: RXClient-apk
           path: apk
 
       - name: List downloaded APKs
@@ -174,7 +176,7 @@ jobs:
           VERSION_NAME=$(grep -oP 'versionName = "\K[^"]+' V2rayNG/app/build.gradle.kts | head -1)
           TAG="${INPUT_TAG:-v${VERSION_NAME}}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Publishing Mobix VPN $TAG"
+          echo "Publishing RX Client $TAG"
 
       - name: Write release notes
         env:
@@ -195,7 +197,7 @@ jobs:
           else
             gh release create "$TAG" apk/*.apk \
               --repo "$GITHUB_REPOSITORY" \
-              --title "Mobix VPN $TAG" \
+              --title "RX Client $TAG" \
               --notes-file "$RUNNER_TEMP/notes.md" \
               --latest
           fi

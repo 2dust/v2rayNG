@@ -28,11 +28,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 private val LightColor = lightColorScheme(
-    primary = Color(0xFF6D4AFF), // Mobix violet
+    primary = Color(0xFF6D4AFF), // RX Client violet
     onPrimary = Color(0xFFFFFFFF), // White
     primaryContainer = Color(0xFFE6DEFF), // Pale violet
     onPrimaryContainer = Color(0xFF24005E), // Deep violet
-    secondary = Color(0xFF19D9EC), // Mobix cyan
+    secondary = Color(0xFF19D9EC), // RX Client cyan
     onSecondary = Color(0xFF00363D), // Deep teal
     secondaryContainer = Color(0xFFC7F7FC), // Pale cyan
     onSecondaryContainer = Color(0xFF00363D), // Deep teal
@@ -104,8 +104,8 @@ private val DarkColor = darkColorScheme(
 // Semantic Colors
 val colorPing = Color(0xFF009966) // Green
 val colorPingRed = Color(0xFFFF0099) // Pink Red
-val colorConfigType = Color(0xFF6D4AFF) // Mobix violet
-val colorFabActive = Color(0xFF6D4AFF) // Mobix violet
+val colorConfigType = Color(0xFF6D4AFF) // RX Client violet
+val colorFabActive = Color(0xFF6D4AFF) // RX Client violet
 val colorFabInactiveLight = Color(0xFF9C9C9C) // Gray
 val colorFabInactiveDark = Color(0xFF646464) // Dark Gray
 val dividerColorLight = Color(0xFFE0E0E0) // Light Gray
