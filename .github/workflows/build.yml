@@ -160,7 +160,9 @@ jobs:
           cd V2rayNG
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           chmod +x gradlew
-          ./gradlew --no-daemon assemblePlaystoreRelease \
+          # The debug variant is built too: it carries the same code but a well-known debug key,
+          # which makes it a useful A/B test when a device refuses to install the release file.
+          ./gradlew --no-daemon assemblePlaystoreRelease :app:assemblePlaystoreDebug \
             -Prx.storeFile="$KEYSTORE_PATH" \
             -Prx.storePassword="$STORE_PASSWORD" \
             -Prx.keyAlias="$KEY_ALIAS" \
@@ -217,6 +219,37 @@ jobs:
           sha256sum *.apk > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
+      - name: Collect APK facts
+        working-directory: V2rayNG/app/build/outputs/apk/playstore/release
+        run: |
+          # Written into the release notes as well, so the exact packaging of the shipped file can
+          # be inspected later without downloading anything.
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          APK=RXVPN_1.0.2_arm64-v8a.apk
+          {
+            echo "| fact | value |"
+            echo "| --- | --- |"
+            "$BUILD_TOOLS/aapt2" dump badging "$APK" \
+              | grep -E "^package:|^sdkVersion:|^targetSdkVersion:|^native-code:" \
+              | sed -e 's/|/\\|/g' -e 's/^/| `/` ' -e 's/$/ |/'
+            echo "| extractNativeLibs | $( \
+              "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$APK" \
+                | grep -i extractNativeLibs | sed 's/.*extractNativeLibs[^=]*=//' || echo "unset") |"
+            "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" \
+              | grep -E "Verified using|SHA-256" \
+              | sed -e 's/|/\\|/g' -e 's/^/| `/` ' -e 's/$/ |/'
+            echo "| native libs | $(unzip -v "$APK" | grep -c 'lib/arm64-v8a/') entries, $( \
+              unzip -v "$APK" | grep 'lib/arm64-v8a/' | head -3 | awk '{print $2 "%"}' | paste -sd ' ') compression |"
+          } > APK-FACTS.txt
+          cat APK-FACTS.txt
+
+      - name: Stage a debug APK for device tests
+        run: |
+          # Same code, different signing key: if this installs where the release build does not,
+          # the refusal is about the signature, not about the app itself.
+          cp V2rayNG/app/build/outputs/apk/playstore/debug/*arm64-v8a.apk \
+             V2rayNG/app/build/outputs/apk/playstore/release/RXVPN_1.0.2_test-debug_arm64-v8a.apk
+
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
@@ -224,6 +257,7 @@ jobs:
           path: |
             V2rayNG/app/build/outputs/apk/playstore/release/*.apk
             V2rayNG/app/build/outputs/apk/playstore/release/SHA256SUMS.txt
+            V2rayNG/app/build/outputs/apk/playstore/release/APK-FACTS.txt
           if-no-files-found: error
 
   release:
@@ -262,6 +296,9 @@ jobs:
         run: |
           sed -e "s|@TAG@|${TAG}|g" -e "s|@SHA@|${GITHUB_SHA}|g" \
             .github/release-notes.md > "$RUNNER_TEMP/notes.md"
+          if [ -f apk/APK-FACTS.txt ]; then
+            { echo ""; echo "### APK packaging"; echo ""; cat apk/APK-FACTS.txt; } >> "$RUNNER_TEMP/notes.md"
+          fi
           head -5 "$RUNNER_TEMP/notes.md"
 
       - name: Publish APKs to GitHub Releases
