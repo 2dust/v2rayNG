@@ -50,6 +50,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
@@ -269,12 +270,7 @@ fun ProxyChainScreen(
                 .consumeWindowInsets(innerPadding)
                 .imePadding()
                 .verticalScrollbar(lazyListState),
-            contentPadding = PaddingValues(
-                top = 8.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 36.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-            )
+            contentPadding = NavigationBarsBottomPadding()
         ) {
             item(key = "remarks_field") {
                 FormTextField(
@@ -305,12 +301,6 @@ fun ProxyChainScreen(
                                 .padding(horizontal = 4.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "${index + 1}",
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .width(10.dp)
-                            )
                             FormDropdownField(
                                 label = stringResource(R.string.server_lab_remarks),
                                 placeholder = stringResource(R.string.server_proxy_chain_member_unselected),
