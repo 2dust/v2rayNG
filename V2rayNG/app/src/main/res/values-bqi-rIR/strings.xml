@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ٱووردن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_masque">ٱووردن [MASQUE]</string>
     <plurals name="acc_group_tab">
         <item quantity="one">%1$s. %2$d سرور منس هڌ</item>
         <item quantity="other">%1$s. %2$d سرور منس هڌ</item>
@@ -86,6 +87,7 @@
     <string name="server_lab_request_host_h2">هاست h2</string>
     <string name="server_lab_request_host_quic">ٱمنیت QUIC</string>
     <string name="server_lab_request_host_grpc">Authority gRPC</string>
+    <string name="server_lab_request_host_masque">هاست MASQUE</string>
     <string name="server_lab_path">تور</string>
     <string name="server_lab_path_ws">تور WS</string>
     <string name="server_lab_path_httpupgrade">تور HTTPUpgrade</string>
@@ -94,6 +96,7 @@
     <string name="server_lab_path_quic">کیلیت QUIC</string>
     <string name="server_lab_path_kcp">KCP seed</string>
     <string name="server_lab_path_grpc">نوم سرویس gRPC</string>
+    <string name="server_lab_path_masque">تور MASQUE</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">جا کلک</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -116,6 +119,9 @@
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address_hint">اگه خالی بی، پؽش فرز %1$s سی و کار گرؽڌه وابی. نشۊویا IPv6 فقظ وختؽ کار گرؽڌه وابیڌه که IPv6 رۊشن بی.</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">کیلیت سیخومی WARP</string>
+    <string name="server_lab_masque_warp_public_key">کیلیت پوی وولاتی WARP</string>
     <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرز 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (اختياری، نشۊویا IPv4/IPv6 جوڌا وابیڌه وا کاما، یا «local» سی و کار گرؽڌن DNS دسگا)</string>
     <string name="server_lab_remote_dns_hint">اگه خالی بی، پؽش فرز %1$s سی و کار گرؽڌه وابی. نشۊویا IPv6 فقظ وختؽ کار گرؽڌه وابیڌه که IPv6 رۊشن بی.</string>

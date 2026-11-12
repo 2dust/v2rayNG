@@ -31,6 +31,7 @@ object CoreOutboundBuilder {
             EConfigType.TROJAN -> toOutboundTrojan(profileItem)
             EConfigType.WIREGUARD -> toOutboundWireguard(profileItem)
             EConfigType.HYSTERIA2 -> toOutboundHysteria2(profileItem)
+            EConfigType.MASQUE -> toOutboundMasque(profileItem)
             EConfigType.HTTP -> toOutboundHttp(profileItem)
             else -> null
         }
@@ -53,6 +54,7 @@ object CoreOutboundBuilder {
                 || protocol.equals(EConfigType.WIREGUARD.name, true)
                 || protocol.equals(EConfigType.HYSTERIA2.name, true)
                 || protocol.equals(EConfigType.HYSTERIA.name, true)
+                || protocol.equals(EConfigType.MASQUE.name, true)
             ) {
                 muxEnabled = false
             } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
@@ -87,6 +89,7 @@ object CoreOutboundBuilder {
             EConfigType.SHADOWSOCKS,
             EConfigType.SOCKS,
             EConfigType.HTTP,
+            EConfigType.MASQUE,
             EConfigType.TROJAN -> OutboundBean(
                 protocol = configType.name.lowercase(),
                 settings = OutboundBean.OutSettingsBean(),
@@ -310,6 +313,88 @@ object CoreOutboundBuilder {
 
         outboundBean.streamSettings?.let {
             populateTlsSettings(it, profileItem, sni)
+        }
+
+        return outboundBean
+    }
+
+    private fun toOutboundMasque(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = createInitOutbound(EConfigType.MASQUE) ?: return null
+        profileItem.network = NetworkType.MASQUE.type
+        profileItem.security = AppConfig.TLS
+        profileItem.insecure = false
+        profileItem.alpn = profileItem.alpn?.trim()?.nullIfBlank() ?: "h3"
+
+        val rawAddresses = profileItem.localAddress
+            ?.split(",")
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }
+            ?.ifEmpty { null }
+            ?: listOf(AppConfig.MASQUE_LOCAL_ADDRESS_V4, AppConfig.MASQUE_LOCAL_ADDRESS_V6)
+
+        val addresses = if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true) {
+            rawAddresses
+        } else {
+            val ipv4Addresses = rawAddresses.filter { !it.contains(":") }
+            ipv4Addresses.ifEmpty { listOf(AppConfig.MASQUE_LOCAL_ADDRESS_V4) }
+        }
+
+        val defaultDns = AppConfig.MASQUE_LOCAL_REMOTE_DNS.split(",").map { it.trim() }
+
+        val rawDNS = profileItem.remoteDNS
+            ?.split(",")
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }
+            ?.ifEmpty { null }
+            ?: defaultDns
+
+        val remotes = if (MmkvManager.decodeSettingsBool(AppConfig.PREF_IPV6_ENABLED) == true) {
+            rawDNS
+        } else {
+            rawDNS.filter { !it.contains(":") }
+                .ifEmpty { defaultDns.filter { !it.contains(":") } }
+        }
+
+        outboundBean.settings?.let { masque ->
+            masque.address = getServerAddress(profileItem)
+            masque.port = profileItem.serverPort.orEmpty().toInt()
+            masque.remoteDNS = remotes
+        }
+
+        val warp = if (!profileItem.secretKey.isNullOrBlank() || !profileItem.publicKey.isNullOrBlank()) {
+            OutboundBean.StreamSettingsBean.MasqueSettingsBean.WarpBean(
+                privateKey = profileItem.secretKey.orEmpty(),
+                publicKey = profileItem.publicKey.orEmpty(),
+                address = addresses
+            )
+        } else {
+            null
+        }
+        val sni = outboundBean.streamSettings?.let {
+            it.masqueSettings = OutboundBean.StreamSettingsBean.MasqueSettingsBean(
+                host = profileItem.host.nullIfBlank(),
+                path = profileItem.path.nullIfBlank(),
+                warp = warp
+            )
+            if (!profileItem.headers.isNullOrBlank()) {
+                try {
+                    val headers = JsonUtil.fromJson(profileItem.headers.orEmpty(), JsonObject::class.java)
+                    if (headers == null || headers.entrySet().any { !it.value.isJsonPrimitive || !it.value.asJsonPrimitive.isString }) {
+                        LogUtil.e(AppConfig.TAG, "Failed to build MASQUE outbound headers: expected a JSON object with string values")
+                        return null
+                    }
+                    it.masqueSettings?.headers = headers.entrySet().associate { entry -> entry.key to entry.value.asString }
+                } catch (_: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to build MASQUE outbound headers: invalid JSON")
+                    return null
+                }
+            }
+            populateTransportSettings(it, profileItem)
+        }
+
+        outboundBean.streamSettings?.let {
+            val tlsProfile = profileItem.copy(publicKey = null, fingerPrint = if (profileItem.alpn == "h2") profileItem.fingerPrint else null, echConfigList = null)
+            populateTlsSettings(it, tlsProfile, sni)
         }
 
         return outboundBean

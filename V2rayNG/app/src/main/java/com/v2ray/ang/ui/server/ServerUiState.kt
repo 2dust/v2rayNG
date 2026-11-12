@@ -5,6 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
+import com.v2ray.ang.AppConfig.MASQUE_LOCAL_ADDRESS_V4
+import com.v2ray.ang.AppConfig.MASQUE_LOCAL_ADDRESS_V6
+import com.v2ray.ang.AppConfig.MASQUE_LOCAL_REMOTE_DNS
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
@@ -30,10 +33,10 @@ class ServerUiState(
     publicKey: String = "",
     preSharedKey: String = "",
     reserved: String = "0,0,0",
-    localAddress: String = "$WIREGUARD_LOCAL_ADDRESS_V4,$WIREGUARD_LOCAL_ADDRESS_V6",
+    localAddress: String = if (configType == EConfigType.MASQUE) "$MASQUE_LOCAL_ADDRESS_V4,$MASQUE_LOCAL_ADDRESS_V6" else "$WIREGUARD_LOCAL_ADDRESS_V4,$WIREGUARD_LOCAL_ADDRESS_V6",
     mtu: String = WIREGUARD_LOCAL_MTU,
-    remoteDNS: String = WIREGUARD_LOCAL_REMOTE_DNS,
     obfs: String = "",
+    remoteDNS: String = if (configType == EConfigType.MASQUE) MASQUE_LOCAL_REMOTE_DNS else WIREGUARD_LOCAL_REMOTE_DNS,
     obfsPassword: String = "",
     minPacketSize: String = "",
     maxPacketSize: String = "",
@@ -49,6 +52,7 @@ class ServerUiState(
     authority: String = "",
     host: String = "",
     path: String = "",
+    headers: String = "",
     xhttpExtra: String = "",
     finalMask: String = "",
     seed: String = "",
@@ -101,6 +105,7 @@ class ServerUiState(
     var authority by mutableStateOf(authority)
     var host by mutableStateOf(host)
     var path by mutableStateOf(path)
+    var headers by mutableStateOf(headers)
     var xhttpExtra by mutableStateOf(xhttpExtra)
     var finalMask by mutableStateOf(finalMask)
     var seed by mutableStateOf(seed)
@@ -132,6 +137,7 @@ class ServerUiState(
         val isShadowsocks = configType == EConfigType.SHADOWSOCKS
         val isSocksOrHttp = configType == EConfigType.SOCKS || configType == EConfigType.HTTP
         val isWireguard = configType == EConfigType.WIREGUARD
+        val isMasque = configType == EConfigType.MASQUE
         val isHysteria2 = configType == EConfigType.HYSTERIA2
 
         return initialConfig.copy(
@@ -147,17 +153,17 @@ class ServerUiState(
             },
             flow = if (isVless) flow else null,
             username = if (isSocksOrHttp) username else null,
-            secretKey = if (isWireguard) secretKey else null,
+            secretKey = if (isWireguard || isMasque) secretKey else null,
             publicKey = when {
-                isWireguard -> publicKey
+                isWireguard || isMasque -> publicKey
                 streamSecurity == REALITY -> publicKeyReality
                 else -> null
             },
             preSharedKey = if (isWireguard) preSharedKey else null,
             reserved = if (isWireguard) reserved else null,
-            localAddress = if (isWireguard) localAddress else null,
+            localAddress = if (isWireguard || isMasque) localAddress else null,
             mtu = if (isWireguard) mtu.toIntOrNull() else null,
-            remoteDNS = if (isWireguard) remoteDNS else null,
+            remoteDNS = if (isWireguard || isMasque) remoteDNS else null,
             obfs = if (isHysteria2) obfs.nullIfBlank() else null,
             obfsPassword = if (isHysteria2) obfsPassword else null,
             minPacketSize = if (isHysteria2) minPacketSize.nullIfBlank() else null,
@@ -174,6 +180,7 @@ class ServerUiState(
             authority = authority.nullIfBlank(),
             host = host,
             path = path,
+            headers = if (isMasque) headers.nullIfBlank() else null,
             xhttpExtra = xhttpExtra.nullIfBlank(),
             finalMask = finalMask.nullIfBlank(),
             seed = seed.nullIfBlank(),
@@ -235,6 +242,7 @@ class ServerUiState(
                 authority = initialConfig.authority ?: "",
                 host = initialConfig.host ?: "",
                 path = initialConfig.path ?: "",
+                headers = initialConfig.headers ?: "",
                 xhttpExtra = initialConfig.xhttpExtra ?: "",
                 finalMask = initialConfig.finalMask ?: "",
                 seed = initialConfig.seed ?: "",
