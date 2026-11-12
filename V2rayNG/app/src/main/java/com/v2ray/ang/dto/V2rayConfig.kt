@@ -122,6 +122,7 @@ data class V2rayConfig(
             var realitySettings: TlsSettingsBean? = null,
             var grpcSettings: GrpcSettingsBean? = null,
             var hysteriaSettings: HysteriaSettingsBean? = null,
+            var masqueSettings: MasqueSettingsBean? = null,
             var finalmask: Any? = null,
             val dsSettings: Any? = null,
             var sockopt: SockoptBean? = null
@@ -252,6 +253,21 @@ data class V2rayConfig(
                 var version: Int,
                 var auth: String? = null
             )
+
+            data class MasqueSettingsBean(
+                var host: String? = null,
+                var path: String? = null,
+                var user: String? = null,
+                var pass: String? = null,
+                var headers: Map<String, String>? = null,
+                var warp: WarpBean? = null
+            ) {
+                data class WarpBean(
+                    var privateKey: String,
+                    var publicKey: String,
+                    var address: List<String>
+                )
+            }
 
             //https://xtls.github.io/config/transport.html#finalmaskobject
             data class FinalMaskBean(
