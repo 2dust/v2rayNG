@@ -135,7 +135,7 @@ fun GroupPagerPage(
             lazyListStates = lazyListStates,
             lazyGridStates = lazyGridStates,
             actions = actions,
-            onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
+            onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled(it)) },
             onMoveServer = { fromIndex, toIndex ->
                 mainViewModel.moveServer(groupId, fromIndex, toIndex)
             },
@@ -174,7 +174,7 @@ private fun ServerListPage(
     lazyListStates: MutableMap<String, LazyListState>,
     lazyGridStates: MutableMap<String, LazyGridState>,
     actions: ServerRowActions,
-    onLocateHandled: () -> Unit,
+    onLocateHandled: (LocateTarget) -> Unit,
     onMoveServer: (Int, Int) -> Unit,
     contentPadding: PaddingValues
 ) {
@@ -282,14 +282,14 @@ private fun LocateTargetEffect(
     target: LocateTarget?,
     rows: List<ServerRowUiModel>,
     state: LazyListState,
-    onHandled: () -> Unit,
+    onHandled: (LocateTarget) -> Unit,
 ) {
     if (target == null) return
     LaunchedEffect(target, rows) {
         val index = rows.indexOfFirst { it.guid == target.serverGuid }
         if (index < 0) return@LaunchedEffect
         state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
-        onHandled()
+        onHandled(target)
     }
 }
 
@@ -298,14 +298,14 @@ private fun LocateTargetEffect(
     target: LocateTarget?,
     rows: List<ServerRowUiModel>,
     state: LazyGridState,
-    onHandled: () -> Unit,
+    onHandled: (LocateTarget) -> Unit,
 ) {
     if (target == null) return
     LaunchedEffect(target, rows) {
         val index = rows.indexOfFirst { it.guid == target.serverGuid }
         if (index < 0) return@LaunchedEffect
         state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
-        onHandled()
+        onHandled(target)
     }
 }
 

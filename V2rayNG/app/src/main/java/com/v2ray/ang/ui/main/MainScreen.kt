@@ -7,27 +7,20 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
@@ -38,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,7 +43,7 @@ fun MainScreen(
     val groups = uiState.groups
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val isRunning = uiState.isRunning
-    val displayText = mainViewModel.formatStatus(uiState.status)
+    val displayText = mainViewModel.formatStatus(uiState.testStatus ?: uiState.status)
     val selectedGuid = uiState.selectedGuid
     val doubleColumnDisplay = uiState.doubleColumnDisplay
     val confirmRemove = uiState.confirmRemove
@@ -60,8 +52,7 @@ fun MainScreen(
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var showSearch by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var showSearch by rememberSaveable { mutableStateOf(uiState.searchQuery.isNotEmpty()) }
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
@@ -78,43 +69,11 @@ fun MainScreen(
         }
     }
 
-    val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { groups.size.coerceAtLeast(1) }
-    )
-
-    val lazyListStates = remember { mutableStateMapOf<String, LazyListState>() }
-    val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
-
-    LaunchedEffect(groups) {
-        val validGroupIds = groups.map { it.id }.toSet()
-        lazyListStates.keys.retainAll(validGroupIds)
-        lazyGridStates.keys.retainAll(validGroupIds)
-    }
-
-    LaunchedEffect(groups, uiState.selectedGroupId) {
-        if (groups.isEmpty()) return@LaunchedEffect
-        val selectedIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }
-            .takeIf { it >= 0 } ?: 0
-        if (!pagerState.isScrollInProgress && pagerState.settledPage != selectedIndex) {
-            pagerState.scrollToPage(selectedIndex)
-        }
-    }
-
-    val latestGroups by rememberUpdatedState(groups)
+    val selectGroup: (String) -> Unit = { onAction(MainAction.SelectGroup(it)) }
+    val pagerState = rememberMainPhonePagerState(groups, uiState.selectedGroupId, selectGroup)
+    val scrollStates = rememberMainGroupScrollStates(groups.map { it.id })
     // Height of the floating connection bar, so the server lists can scroll clear of it.
     var bottomBarHeightPx by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }
-            .distinctUntilChanged()
-            .collect { page ->
-                val currentGroups = latestGroups
-                if (page in currentGroups.indices) {
-                    onAction(MainAction.SelectGroup(currentGroups[page].id))
-                }
-            }
-    }
 
     MainDialogs(
         showDelAllConfirm = showDelAllConfirm,
@@ -164,13 +123,9 @@ fun MainScreen(
                 MainTopBar(
                     isLoading = isLoading,
                     showSearch = showSearch,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { query: String ->
-                        searchQuery = query
-                        onAction(MainAction.Search(query))
-                    },
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = { onAction(MainAction.Search(it)) },
                     onSearchClose = {
-                        searchQuery = ""
                         onAction(MainAction.Search(""))
                         showSearch = false
                     },
@@ -213,16 +168,8 @@ fun MainScreen(
                     if (groups.size > 1) {
                         GroupTabBar(
                             groups = groups,
-                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
-                            mainViewModel = mainViewModel,
-                            onTabClick = { targetIndex ->
-                                scope.launch {
-                                    pagerState.navigateToPageOptimized(
-                                        targetPage = targetIndex,
-                                        animateAdjacentPage = true
-                                    )
-                                }
-                            }
+                            selectedTabIndex = mainSelectedGroupIndex(groups, uiState.selectedGroupId),
+                            onSelectGroup = selectGroup
                         )
                     }
 
@@ -241,9 +188,9 @@ fun MainScreen(
                             selectedGuid = selectedGuid,
                             locateTarget = uiState.locateTarget,
                             doubleColumnDisplay = doubleColumnDisplay,
-                            searchQuery = searchQuery,
-                            lazyListStates = lazyListStates,
-                            lazyGridStates = lazyGridStates,
+                            searchQuery = uiState.searchQuery,
+                            lazyListStates = scrollStates.lists,
+                            lazyGridStates = scrollStates.grids,
                             onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
                             onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
                             onShareServer = { guid, profile ->

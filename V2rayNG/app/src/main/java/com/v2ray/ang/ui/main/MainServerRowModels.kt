@@ -5,6 +5,8 @@ import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
+import java.text.BreakIterator
+import java.util.Locale
 
 internal data class ServerRowUiModel(
     val guid: String,
@@ -23,7 +25,7 @@ internal data class ServerGroupUiState(
 
 internal fun buildServerRowUiModel(
     server: ServersCache,
-    subscriptionRemarks: String,
+    subscriptionBadge: String,
 ): ServerRowUiModel {
     val profile = server.profile
     return ServerRowUiModel(
@@ -34,7 +36,7 @@ internal fun buildServerRowUiModel(
             ?: AngConfigManager.generateDescription(profile),
         typeDescription = serverProtocolDescription(profile),
         testDelayMillis = server.testDelayMillis,
-        subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),
+        subscriptionBadge = subscriptionBadge
     )
 }
 
@@ -58,4 +60,12 @@ private fun serverProtocolDescription(profile: ProfileItem): String {
         }
     }
     return parts.joinToString(" / ")
+}
+
+internal fun firstGrapheme(text: String): String {
+    if (text.isEmpty()) return ""
+    val iterator = BreakIterator.getCharacterInstance(Locale.getDefault())
+    iterator.setText(text)
+    val end = iterator.following(0).takeIf { it != BreakIterator.DONE } ?: text.length
+    return text.substring(0, end)
 }

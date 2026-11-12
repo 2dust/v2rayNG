@@ -45,10 +45,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.GroupMapItem
-import com.v2ray.ang.dto.entities.ServersCache
-import kotlinx.coroutines.flow.StateFlow
 
 private val TAB_BAR_PADDING = 3.dp
 private val TAB_SPACING = 2.dp
@@ -64,11 +61,10 @@ private val SELECTED_TAB_MARGIN = 12.dp
  * selected tab in view.
  */
 @Composable
-fun GroupTabBar(
+internal fun GroupTabBar(
     groups: List<GroupMapItem>,
     selectedTabIndex: Int,
-    mainViewModel: MainViewModel,
-    onTabClick: (Int) -> Unit,
+    onSelectGroup: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val selectedIndex = selectedTabIndex.coerceIn(0, groups.lastIndex)
@@ -96,14 +92,10 @@ fun GroupTabBar(
                 EqualOrNaturalTabsLayout(availablePx = availablePx) {
                     groups.forEachIndexed { index, group ->
                         key(group.id) {
-                            val serverFlow = remember(group.id, mainViewModel) {
-                                mainViewModel.serversForGroup(group.id)
-                            }
                             GroupTabItem(
                                 group = group,
                                 selected = index == selectedIndex,
-                                serverFlow = serverFlow,
-                                onClick = { onTabClick(index) }
+                                onClick = { onSelectGroup(group.id) }
                             )
                         }
                     }
@@ -161,12 +153,10 @@ private fun EqualOrNaturalTabsLayout(
 private fun GroupTabItem(
     group: GroupMapItem,
     selected: Boolean,
-    serverFlow: StateFlow<List<ServersCache>>,
     onClick: () -> Unit
 ) {
-    val servers by serverFlow.collectAsStateWithLifecycle()
     // The default group (empty id) never showed a count.
-    val count = if (group.id.isEmpty()) 0 else servers.size
+    val count = if (group.id.isEmpty()) 0 else group.serverCount
     val colors = MaterialTheme.colorScheme
     val bringIntoView = remember { BringIntoViewRequester() }
     var size by remember { mutableStateOf(IntSize.Zero) }

@@ -30,11 +30,8 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -89,17 +86,16 @@ class MainViewModel(
 
     // ---------- Keyword filtering ----------
     @Volatile
-    private var keywordFilter: String = ""
     private var filterJob: Job? = null
 
     // ---------- Groups & cache ----------
     private val cacheMutex = Mutex()
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
     private val groupUiFlows = ConcurrentHashMap<String, MutableStateFlow<ServerGroupUiState>>()
-    private val groupServerFlows = ConcurrentHashMap<String, StateFlow<List<ServersCache>>>()
     private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
     private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
+    private var initializeJob: Job? = null
     private var setupGroupJob: Job? = null
     private var preloadJob: Job? = null
     private var selectedGroupLoadJob: Job? = null
@@ -145,9 +141,10 @@ class MainViewModel(
             }
 
             MainServiceEvent.StateStopSuccess -> updateRunningState(false)
+
             is MainServiceEvent.MeasureDelayResult -> {
                 if (!uiState.value.isRunning) return
-                _uiState.update { it.copy(isTesting = false, status = MainStatus.ConnectionTest(event.result)) }
+                _uiState.update { it.copy(isTesting = false, testStatus = MainStatus.ConnectionTest(event.result)) }
             }
 
             is MainServiceEvent.MeasureConfigSuccess -> {
@@ -157,7 +154,7 @@ class MainViewModel(
 
             is MainServiceEvent.MeasureConfigNotify -> {
                 if (event.requestId == testRequests.bulk?.id) {
-                    _uiState.update { it.copy(status = MainStatus.TestProgress(event.progress)) }
+                    _uiState.update { it.copy(testStatus = MainStatus.TestProgress(event.progress)) }
                 }
             }
 
@@ -172,9 +169,7 @@ class MainViewModel(
                 }
             }
 
-            is MainServiceEvent.MeasureDelayCancelled -> {
-                //if (testRequests.completeCurrent(event.requestId)) resetTestStatus()
-            }
+            is MainServiceEvent.MeasureDelayCancelled -> Unit
 
             is MainServiceEvent.MeasureConfigCancelled -> {
                 if (testRequests.completeBulk(event.requestId) != null) {
@@ -251,18 +246,6 @@ class MainViewModel(
     }
 
     // ---------- Public state accessors ----------
-    fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
-        groupServerFlows.computeIfAbsent(groupId) {
-            val groupState = mutableServerGroupState(groupId)
-            groupState
-                .map { it.servers }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-                    initialValue = groupState.value.servers,
-                )
-        }
-
     internal fun serverGroupState(groupId: String): StateFlow<ServerGroupUiState> =
         mutableServerGroupState(groupId).asStateFlow()
 
@@ -273,7 +256,7 @@ class MainViewModel(
         mutableServerGroupState(uiState.value.selectedGroupId).value.servers
 
     // ---------- Action handler ----------
-    fun onAction(action: MainAction) {
+    fun onAction(action: MainAction.ViewModelIntent) {
         when (action) {
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
@@ -287,12 +270,12 @@ class MainViewModel(
             MainAction.UpdateSubscriptions -> importConfigViaSub(uiState.value.selectedGroupId)
             is MainAction.UpdateGroupSubscription -> importConfigViaSub(action.groupId)
             MainAction.ExportAll -> exportAllAsync()
+            MainAction.LocateSelectedServer -> triggerLocateSelectedServer()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
-            is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
-            MainAction.LocateHandled -> consumeLocateTarget()
+            is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -301,27 +284,13 @@ class MainViewModel(
             MainAction.DismissQRCodeDialog -> {
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
-
-            MainAction.ToggleService,
-            MainAction.TestCurrentServer,
-            MainAction.ImportQRcode,
-            MainAction.ImportClipboard,
-            MainAction.ImportConfigLocal,
-            is MainAction.ImportManually,
-            MainAction.RestartService,
-            MainAction.LocateSelectedServer,
-            is MainAction.EditServer,
-            is MainAction.ShareClipboard,
-            is MainAction.ShareFullContent,
-            is MainAction.OpenSubscriptionLink -> {
-                // Handled by Activity via its onAction lambda
-            }
         }
     }
 
     // ---------- Initialization ----------
     fun initialize() {
-        viewModelScope.launch(preloadDispatcher) {
+        if (initializeJob != null) return
+        initializeJob = viewModelScope.launch(preloadDispatcher) {
             try {
                 initialPageReady.await()
                 delay(32)
@@ -374,7 +343,7 @@ class MainViewModel(
     }
 
     private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
-        val keyword = keywordFilter.trim()
+        val keyword = uiState.value.searchQuery.trim()
         if (keyword.isEmpty()) return servers
         val regex = try {
             Regex(keyword, RegexOption.IGNORE_CASE)
@@ -396,16 +365,26 @@ class MainViewModel(
             servers = filteredServers,
             rows = buildServerRows(groupId, filteredServers)
         )
+        _uiState.update { state ->
+            val index = state.groups.indexOfFirst { it.id == groupId }
+            if (index < 0 || state.groups[index].serverCount == filteredServers.size) {
+                state
+            } else {
+                val groups = state.groups.toMutableList()
+                groups[index] = groups[index].copy(serverCount = filteredServers.size)
+                state.copy(groups = groups)
+            }
+        }
     }
 
     private fun buildServerRows(groupId: String, servers: List<ServersCache>): List<ServerRowUiModel> {
-        val subscriptionRemarks = if (groupId.isEmpty()) {
+        val subscriptionBadges = if (groupId.isEmpty()) {
             servers.asSequence()
                 .map { it.profile.subscriptionId }
                 .filter { it.isNotEmpty() }
                 .distinct()
                 .associateWith { subscriptionId ->
-                    dataSource.getSubscriptionItem(subscriptionId)?.remarks.orEmpty()
+                    firstGrapheme(dataSource.getSubscriptionItem(subscriptionId)?.remarks.orEmpty())
                 }
         } else {
             emptyMap()
@@ -413,12 +392,10 @@ class MainViewModel(
         return servers.map { server ->
             buildServerRowUiModel(
                 server = server,
-                subscriptionRemarks = subscriptionRemarks[server.profile.subscriptionId].orEmpty()
+                subscriptionBadge = subscriptionBadges[server.profile.subscriptionId].orEmpty()
             )
         }
     }
-
-    fun getSubscriptions(): List<SubscriptionCache> = dataSource.getSubscriptions()
 
     private fun resolveSelectedGroup(groups: List<GroupMapItem>): String {
         val current = uiState.value.selectedGroupId
@@ -467,12 +444,11 @@ class MainViewModel(
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
                 groupUiFlows.keys.removeAll { it !in validIds }
-                groupServerFlows.keys.removeAll { it !in validIds }
                 groupLoadMutexes.keys.removeAll { it !in validIds }
 
                 _uiState.update {
                     it.copy(
-                        groups = groups,
+                        groups = groups.withServerCountsFrom(it.groups),
                         selectedGroupId = selectedGroup,
                         selectedGuid = dataSource.getSelectServer(),
                     )
@@ -586,7 +562,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val groupId = uiState.value.selectedGroupId
-                    val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
+                    val list = if (groupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                         dataSource.getServerGuidList("")
                     } else {
                         currentServers().map { it.guid }
@@ -612,7 +588,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val count =
-                        if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
+                        if (uiState.value.selectedGroupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                             dataSource.removeAllServer()
                         } else {
                             val guids = currentServers().map { it.guid }
@@ -682,7 +658,7 @@ class MainViewModel(
 
     private fun removeInvalidServerInternal(): Int {
         val visibleServersOnly =
-            uiState.value.selectedGroupId.isNotEmpty() || keywordFilter.isNotBlank()
+            uiState.value.selectedGroupId.isNotEmpty() || uiState.value.searchQuery.isNotBlank()
         return if (visibleServersOnly) {
             currentServers().sumOf { server ->
                 dataSource.removeInvalidServerByGuid(server.guid)
@@ -737,14 +713,6 @@ class MainViewModel(
         }
     }
 
-    fun reloadServerList() {
-        val groupId = uiState.value.selectedGroupId
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
-            updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
-        }
-    }
-
     fun reloadAllGroups(groupIds: List<String>) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch(preloadDispatcher) {
@@ -762,8 +730,8 @@ class MainViewModel(
     }
 
     fun filterConfig(keyword: String) {
-        if (keyword == keywordFilter) return
-        keywordFilter = keyword
+        if (keyword == uiState.value.searchQuery) return
+        _uiState.update { it.copy(searchQuery = keyword) }
         filterJob?.cancel()
         filterJob = viewModelScope.launch(defaultDispatcher) {
             delay(300)
@@ -798,13 +766,15 @@ class MainViewModel(
     }
 
     fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
-        val groupState = mutableServerGroupState(groupId).value
+        if (groupId.isEmpty()) return
+        val groupFlow = mutableServerGroupState(groupId)
+        val groupState = groupFlow.value
         val servers = groupState.servers.toMutableList()
         if (!servers.moveItem(fromPosition, toPosition)) return
         val rows = groupState.rows.toMutableList()
         rows.moveItem(fromPosition, toPosition)
         val guids = servers.map { it.guid }
-        mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
+        groupFlow.value = ServerGroupUiState(servers, rows)
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
         serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
@@ -829,8 +799,7 @@ class MainViewModel(
         _uiState.update {
             it.copy(
                 isTesting = testRequests.isTesting,
-                status = if (testRequests.isTesting) MainStatus.Testing
-                else if (it.isRunning) MainStatus.Connected else MainStatus.Disconnected
+                testStatus = if (testRequests.isTesting) MainStatus.Testing else null
             )
         }
     }
@@ -859,13 +828,13 @@ class MainViewModel(
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
-            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            serverGuids = if (uiState.value.searchQuery.isNotEmpty()) serverGuids else emptyList(),
             onlyTcp = onlyTcp
         )
         _uiState.update {
             it.copy(
                 isTesting = true,
-                status = MainStatus.Testing
+                testStatus = MainStatus.Testing
             )
         }
         bulkTestJob = viewModelScope.launch {
@@ -893,7 +862,7 @@ class MainViewModel(
 
     fun testCurrentServerRealPing() {
         if (!uiState.value.isRunning) return
-        _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
+        _uiState.update { it.copy(isTesting = true, testStatus = MainStatus.Testing) }
         dataSource.testCurrentServerRealPing("")
     }
 
@@ -923,8 +892,10 @@ class MainViewModel(
         }
     }
 
-    private fun consumeLocateTarget() {
-        _uiState.update { it.copy(locateTarget = null) }
+    private fun consumeLocateTarget(target: LocateTarget) {
+        _uiState.update { state ->
+            if (state.locateTarget == target) state.copy(locateTarget = null) else state
+        }
     }
 
     // ---------- Running state ----------
@@ -934,8 +905,9 @@ class MainViewModel(
             state.copy(
                 isRunning = running,
                 isTesting = testRequests.isTesting,
-                status = if (!clearTestingText && state.isRunning == running) state.status
-                else if (running) MainStatus.Connected else MainStatus.Disconnected
+                status = if (running) MainStatus.Connected else MainStatus.Disconnected,
+                testStatus = if (!clearTestingText && state.isRunning == running) state.testStatus
+                else if (testRequests.isTesting) MainStatus.Testing else null
             )
         }
     }
@@ -948,7 +920,6 @@ class MainViewModel(
         filterJob?.cancel()
         cancelAllPing()
         dataSource.close()
-        super.onCleared()
     }
 
     // ---------- Factory ----------
