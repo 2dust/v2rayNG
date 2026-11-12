@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">[Trojan] əlavə et</string>
     <string name="menu_item_import_config_manually_wireguard">[WireGuard] əlavə et</string>
     <string name="menu_item_import_config_manually_hysteria2">[Hysteria2] əlavə et</string>
+    <string name="menu_item_import_config_manually_masque">[MASQUE] əlavə et</string>
     <string name="confirm_delete_visible_profiles">Hazırda göstərilən bütün profilləri silmək istədiyinizə əminsiniz?</string>
     <string name="confirm_delete_duplicate_profiles">Hazırda göstərilən bütün təkrar profilləri silmək istədiyinizə əminsiniz?</string>
     <string name="confirm_delete_invalid_profiles">Zəhmət olmasa əvvəlcə profilləri sınaqdan keçirin. Hazırda göstərilən bütün yararsız profilləri silmək istədiyinizə əminsiniz?</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">h2 host</string>
     <string name="server_lab_request_host_quic">QUIC təhlükəsizliyi</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_request_host_masque">MASQUE host</string>
     <string name="server_lab_path">yol</string>
     <string name="server_lab_path_ws">ws yolu</string>
     <string name="server_lab_path_httpupgrade">httpupgrade yolu</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">QUIC açarı</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_path_masque">MASQUE yolu</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Barmaq izi</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -103,6 +106,9 @@
     <string name="server_lab_reserved">Reserved (istəyə bağlı, vergüllə ayrılmış)</string>
     <string name="server_lab_local_address">Yerli ünvan (istəyə bağlı IPv4/IPv6, vergüllə ayrılmış)</string>
     <string name="server_lab_local_address_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">WARP PrivateKey</string>
+    <string name="server_lab_masque_warp_public_key">WARP PublicKey</string>
     <string name="server_lab_local_mtu">MTU (istəyə bağlı, standart 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (istəyə bağlı, vergüllə ayrılmış IPv4/IPv6)</string>
     <string name="server_lab_remote_dns_hint">Boşdursa, standart olaraq %1$s istifadə olunur. IPv6 ünvanları yalnız IPv6 aktiv olduqda istifadə edilir.</string>

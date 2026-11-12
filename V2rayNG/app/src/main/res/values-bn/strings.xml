@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">[Trojan] যোগ করুন</string>
     <string name="menu_item_import_config_manually_wireguard">[WireGuard] যোগ করুন</string>
     <string name="menu_item_import_config_manually_hysteria2">[Hysteria2] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_masque">[MASQUE] যোগ করুন</string>
     <string name="confirm_delete_visible_profiles">আপনি কি বর্তমানে প্রদর্শিত সব প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_duplicate_profiles">আপনি কি বর্তমানে প্রদর্শিত সব সদৃশ প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_invalid_profiles">প্রথমে প্রোফাইলগুলো পরীক্ষা করুন। আপনি কি বর্তমানে প্রদর্শিত সব অবৈধ প্রোফাইল মুছে ফেলতে চান?</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">h2 হোস্ট</string>
     <string name="server_lab_request_host_quic">QUIC নিরাপত্তা</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_request_host_masque">MASQUE হোস্ট</string>
     <string name="server_lab_path">পথ</string>
     <string name="server_lab_path_ws">ws পথ</string>
     <string name="server_lab_path_httpupgrade">httpupgrade পথ</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">QUIC কী</string>
     <string name="server_lab_path_kcp">kcp বীজ</string>
     <string name="server_lab_path_grpc">gRPC সেবার নাম</string>
+    <string name="server_lab_path_masque">MASQUE পথ</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">ফিঙ্গারপ্রিন্ট</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -103,6 +106,9 @@
     <string name="server_lab_reserved">Reserved (ঐচ্ছিক, কমা দিয়ে পৃথক)</string>
     <string name="server_lab_local_address">স্থানীয় ঠিকানা (ঐচ্ছিক IPv4/IPv6, কমা দ্বারা পৃথক করা)</string>
     <string name="server_lab_local_address_hint">খালি থাকলে ডিফল্টভাবে %1$s ব্যবহৃত হয়। IPv6 চালু থাকলেই কেবল IPv6 ঠিকানা ব্যবহৃত হয়।</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">WARP প্রাইভেট কী</string>
+    <string name="server_lab_masque_warp_public_key">WARP পাবলিক কী</string>
     <string name="server_lab_local_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (ঐচ্ছিক, কমা দ্বারা পৃথক করা IPv4/IPv6 ঠিকানা)</string>
     <string name="server_lab_remote_dns_hint">খালি থাকলে ডিফল্টভাবে %1$s ব্যবহৃত হয়। IPv6 চালু থাকলেই কেবল IPv6 ঠিকানা ব্যবহৃত হয়।</string>
