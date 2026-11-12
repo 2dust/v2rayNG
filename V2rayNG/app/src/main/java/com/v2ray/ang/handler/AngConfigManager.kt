@@ -14,7 +14,9 @@ import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.fmt.CustomOutboundFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.MasqueFmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
 import com.v2ray.ang.fmt.TrojanFmt
@@ -49,6 +51,7 @@ object AngConfigManager {
             EConfigType.VLESS.protocolScheme to VlessFmt::parse,
             EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
             EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
+            EConfigType.MASQUE.protocolScheme to MasqueFmt::parse,
             AppConfig.HY2 to Hysteria2Fmt::parse,
         )
     }
@@ -165,6 +168,7 @@ object AngConfigManager {
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
+                EConfigType.MASQUE -> MasqueFmt.toUri(config)
                 else -> {}
             }
         } catch (e: Exception) {
@@ -369,6 +373,23 @@ object AngConfigManager {
                 throw e
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.TAG, "Failed to parse custom config server as single config", e)
+            }
+            return 0
+        } else if (!server.contains("outbounds") && server.contains("protocol")) {
+            try {
+                val (config, rawOutbound) = CustomOutboundFmt.parse(server)
+                config.subscriptionId = subid
+                config.description = generateDescription(config)
+                commitProfiles(
+                    configs = listOf(ParsedProfile(config, rawOutbound)),
+                    subid = subid,
+                    append = append,
+                )
+                return 1
+            } catch (e: ProfileStorageException) {
+                throw e
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to parse custom outbound", e)
             }
             return 0
         } else if (server.startsWith("[Interface]") && server.contains("[Peer]")) {
