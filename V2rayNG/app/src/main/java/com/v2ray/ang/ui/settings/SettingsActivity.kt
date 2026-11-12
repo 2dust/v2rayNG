@@ -36,6 +36,8 @@ import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.ui.compose.dpadMovePreviousNavigation
+import com.v2ray.ang.ui.compose.rememberDpadFocusRequester
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvString
@@ -50,6 +52,8 @@ import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
+import com.v2ray.ang.ui.compose.isTelevisionDevice
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -103,7 +107,9 @@ fun SettingsScreen(
     onSystemVpnSettingsClicked: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val backFocusRequester = rememberDpadFocusRequester()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isTelevision = isTelevisionDevice()
     val systemVpnSettingsAvailable by viewModel.systemVpnSettingsAvailable.collectAsStateWithLifecycle()
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -224,7 +230,8 @@ fun SettingsScreen(
             AppTopBar(
                 title = stringResource(R.string.title_settings),
                 onBackClick = onBackClick,
-                isLoading = isLoading
+                isLoading = isLoading,
+                navigationFocusRequester = backFocusRequester
             )
         }
     ) { innerPadding ->
@@ -232,6 +239,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .tvSafeAreaPadding()
+                .dpadMovePreviousNavigation { backFocusRequester.requestFocus() }
                 .verticalScrollbar(scrollState)
                 .verticalScroll(scrollState)
         ) {
@@ -241,18 +250,20 @@ fun SettingsScreen(
                 onExpandedChange = { uiSettingsExpanded = it }
             )
             if (uiSettingsExpanded) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_pref_speed_enabled),
-                    summary = stringResource(R.string.summary_pref_speed_enabled),
-                    checked = speedEnabled,
-                    onCheckedChange = { speedEnabled = it }
-                )
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_pref_confirm_remove),
-                    summary = stringResource(R.string.summary_pref_confirm_remove),
-                    checked = confirmRemove,
-                    onCheckedChange = { confirmRemove = it }
-                )
+                if (!isTelevision) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_pref_speed_enabled),
+                        summary = stringResource(R.string.summary_pref_speed_enabled),
+                        checked = speedEnabled,
+                        onCheckedChange = { speedEnabled = it }
+                    )
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_pref_confirm_remove),
+                        summary = stringResource(R.string.summary_pref_confirm_remove),
+                        checked = confirmRemove,
+                        onCheckedChange = { confirmRemove = it }
+                    )
+                }
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_pref_double_column_display),
                     summary = stringResource(R.string.summary_pref_double_column_display),
@@ -700,20 +711,22 @@ fun SettingsScreen(
                         }
                     }
                 )
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_root_lan_sharing),
-                    summary = stringResource(R.string.summary_root_lan_sharing),
-                    checked = lanSharing,
-                    onCheckedChange = { newValue ->
-                        if (newValue && !RootManager.cachedRoot()) {
-                            viewModel.checkAndRequestRoot {
-                                lanSharing = true
+                if (!isTelevision) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_root_lan_sharing),
+                        summary = stringResource(R.string.summary_root_lan_sharing),
+                        checked = lanSharing,
+                        onCheckedChange = { newValue ->
+                            if (newValue && !RootManager.cachedRoot()) {
+                                viewModel.checkAndRequestRoot {
+                                    lanSharing = true
+                                }
+                            } else {
+                                lanSharing = newValue
                             }
-                        } else {
-                            lanSharing = newValue
                         }
-                    }
-                )
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
