@@ -14,9 +14,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.tv.material3.DrawerState as TvDrawerState
+import androidx.tv.material3.DrawerValue as TvDrawerValue
+import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.dto.GroupMapItem
+import com.v2ray.ang.dto.entities.ProfileItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+
+@Stable
+internal class MainTvDrawerCoordinator(val state: TvDrawerState) {
+    private var focusToRestore: (() -> Boolean)? = null
+
+    val isOpen: Boolean
+        get() = state.currentValue == TvDrawerValue.Open
+
+    fun openFrom(restoreFocus: (() -> Boolean)?) {
+        focusToRestore = restoreFocus
+        state.setValue(TvDrawerValue.Open)
+    }
+
+    fun close() {
+        state.setValue(TvDrawerValue.Closed)
+    }
+
+    fun takeFocusToRestore(): (() -> Boolean)? = focusToRestore.also { focusToRestore = null }
+}
+
+@Composable
+internal fun rememberMainTvDrawerCoordinator(): MainTvDrawerCoordinator {
+    val drawerState = rememberTvDrawerState(TvDrawerValue.Closed)
+    return remember(drawerState) { MainTvDrawerCoordinator(drawerState) }
+}
+
+internal data class MainShareTarget(
+    val guid: String,
+    val profile: ProfileItem,
+    val more: Boolean
+)
+
+internal sealed interface MainDialog {
+    data class BulkDelete(val target: BulkDeleteTarget) : MainDialog
+    data class Share(val target: MainShareTarget) : MainDialog
+}
 
 internal class MainGroupScrollStates {
     val lists = mutableStateMapOf<String, LazyListState>()
