@@ -423,7 +423,7 @@ object CoreServiceManager {
 
     private fun currentOutboundTag(): String =
         if (currentConfig?.configType == EConfigType.POLICYGROUP) {
-            coreController.getBalancerPrincipleTarget(AppConfig.TAG_BALANCER)
+            coreController.getBalancerOutbound(AppConfig.TAG_BALANCER)
         } else {
             AppConfig.TAG_PROXY
         }
