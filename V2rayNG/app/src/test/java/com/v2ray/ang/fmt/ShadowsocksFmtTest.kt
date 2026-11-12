@@ -154,6 +154,18 @@ class ShadowsocksFmtTest {
     }
 
     @Test
+    fun test_parseSip002_withUnencodedObfsPlugin() {
+        val ssUrl = "ss://aes-256-gcm:mypassword@example.com:8388/" +
+            "?plugin=obfs-local;obfs=http;obfs-host=cdn.example.com#Obfs"
+
+        val result = ShadowsocksFmt.parseSip002(ssUrl)
+
+        assertNotNull(result)
+        assertEquals("http", result?.headerType)
+        assertEquals("cdn.example.com", result?.host)
+    }
+
+    @Test
     fun test_parseSip002_withChacha20Encryption() {
         val ssUrl = createSip002Url(
             method = "chacha20-ietf-poly1305",
