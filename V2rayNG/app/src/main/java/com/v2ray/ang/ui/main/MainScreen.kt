@@ -90,6 +90,12 @@ fun MainScreen(
     var deleteTarget by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
         mutableStateOf<ServerDeleteTarget?>(null)
     }
+    var dialogFocusToRestore by remember { mutableStateOf<(() -> Boolean)?>(null) }
+    LaunchedEffect(dialogFocusToRestore, isTelevision) {
+        val restore = dialogFocusToRestore ?: return@LaunchedEffect
+        if (isTelevision) restore()
+        dialogFocusToRestore = null
+    }
     val requestRemoveServer: (String, String) -> Unit = { guid, name ->
         if (confirmRemove) {
             deleteTarget = ServerDeleteTarget(guid, name)
@@ -160,7 +166,10 @@ fun MainScreen(
             guid = target.guid,
             profile = target.profile,
             more = target.more,
-            onDismiss = { dialog = null },
+            onDismiss = {
+                dialog = null
+                dialogFocusToRestore = target.restoreFocus
+            },
             onActionSelected = { dialog = null },
             onAction = onAction,
             onRemove = requestRemoveServer
@@ -222,23 +231,25 @@ fun MainScreen(
                                 selectedGuid = selectedGuid,
                                 locateTarget = uiState.locateTarget,
                                 doubleColumnDisplay = doubleColumnDisplay,
+                                revealSelectedGeneration = resumeFocusGeneration,
                                 searchQuery = uiState.searchQuery,
-                                lazyListStates = scrollStates.lists,
-                                lazyGridStates = scrollStates.grids,
+                                scrollStates = scrollStates,
                                 onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
                                 onEditServer = { guid, profile ->
                                     onAction(MainAction.EditServer(guid, profile))
                                 },
-                                onShareServer = { guid, profile ->
-                                    dialog = MainDialog.Share(MainShareTarget(guid, profile, false))
-                                },
-                                onMoreServer = { guid, profile ->
-                                    dialog = MainDialog.Share(MainShareTarget(guid, profile, true))
+                                onShareServer = { guid, profile, more, restore ->
+                                    dialog = MainDialog.Share(MainShareTarget(guid, profile, more, restore))
                                 },
                                 onRemoveServer = requestRemoveServer,
                                 usageInfo = group.usageInfo,
                                 groupTitle = group.remarks,
                                 onOpenLink = { url -> onAction(MainAction.OpenSubscriptionLink(url)) },
+                                onOpenDrawer = { restore -> tvDrawerCoordinator?.openFrom(restore) },
+                                onBackFromList = { topBarFocus.start.requestFocus() },
+                                onMoveUpFromFirstRow = if (tvTabState != null) {
+                                    { focusGroupTab(group.id) }
+                                } else null,
                                 contentPadding = PaddingValues(
                                     start = if (isTelevision) 48.dp else 0.dp,
                                     top = if (isTelevision) 16.dp else 0.dp,

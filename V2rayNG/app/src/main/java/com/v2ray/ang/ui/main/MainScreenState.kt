@@ -50,7 +50,8 @@ internal fun rememberMainTvDrawerCoordinator(): MainTvDrawerCoordinator {
 internal data class MainShareTarget(
     val guid: String,
     val profile: ProfileItem,
-    val more: Boolean
+    val more: Boolean,
+    val restoreFocus: () -> Boolean
 )
 
 internal sealed interface MainDialog {
@@ -61,6 +62,7 @@ internal sealed interface MainDialog {
 internal class MainGroupScrollStates {
     val lists = mutableStateMapOf<String, LazyListState>()
     val grids = mutableStateMapOf<String, LazyGridState>()
+    val lastReveal = mutableMapOf<String, Triple<Int, String, Boolean>>()
 }
 
 @Composable
@@ -70,6 +72,7 @@ internal fun rememberMainGroupScrollStates(groupIds: List<String>): MainGroupScr
         val validIds = groupIds.toSet()
         states.lists.keys.retainAll(validIds)
         states.grids.keys.retainAll(validIds)
+        states.lastReveal.keys.retainAll(validIds)
     }
     return states
 }
