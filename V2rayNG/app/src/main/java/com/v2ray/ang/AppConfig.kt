@@ -168,6 +168,10 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
     const val WIREGUARD_LOCAL_REMOTE_DNS = "1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+    const val MASQUE_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
+    const val MASQUE_LOCAL_ADDRESS_V6 = "2606:4700:110:8a36::2/128"
+    const val MASQUE_LOCAL_REMOTE_DNS = "1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001"
+
     const val LOOPBACK = "127.0.0.1"
 
     /** Shared defaults for settings shown in the UI and consumed by config generation. */
@@ -196,9 +200,9 @@ object AppConfig {
     const val MSG_MEASURE_CONFIG_SUCCESS = 72
     const val MSG_MEASURE_CONFIG_NOTIFY = 73
     const val MSG_MEASURE_CONFIG_FINISH = 74
-    const val MSG_QUERY_HOTSPOT_CONFIG = 81
-    const val MSG_HOTSPOT_CONFIG_RESPONSE = 82
-    const val MSG_SHIZUKU_APP_FOREGROUND = 83
+    const val MSG_QUERY_HOTSPOT_CONFIG = 91
+    const val MSG_HOTSPOT_CONFIG_RESPONSE = 92
+    const val MSG_SHIZUKU_APP_FOREGROUND = 93
 
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
@@ -221,6 +225,7 @@ object AppConfig {
     const val TUIC = "tuic://"
     const val HYSTERIA = "hysteria://"
     const val HYSTERIA2 = "hysteria2://"
+    const val MASQUE = "masque://"
     const val HY2 = "hy2://"
     const val V2RAYNFMTS = "v2rayn://"
 

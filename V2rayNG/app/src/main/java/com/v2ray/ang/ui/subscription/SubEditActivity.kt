@@ -2,25 +2,33 @@ package com.v2ray.ang.ui.subscription
 
 import android.os.Bundle
 import android.text.TextUtils
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -37,9 +45,9 @@ import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
@@ -57,6 +65,7 @@ class SubEditActivity : BaseComponentActivity() {
         suggestions = SettingsManager.getProfileRemarks(
             excludeConfigTypes = setOf(
                 EConfigType.CUSTOM,
+                EConfigType.CUSTOM_OUTBOUND,
                 EConfigType.POLICYGROUP,
                 EConfigType.PROXYCHAIN,
             )
@@ -139,6 +148,8 @@ fun SubEditScreen(
     var nextProfile by rememberSaveable { mutableStateOf(initial.nextProfile ?: "") }
 
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+    var showPrevProfileDialog by rememberSaveable { mutableStateOf(false) }
+    var showNextProfileDialog by rememberSaveable { mutableStateOf(false) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
 
@@ -247,22 +258,20 @@ fun SubEditScreen(
                 checked = allowInsecureUrl,
                 onCheckedChange = { allowInsecureUrl = it }
             )
-            FormDropdownField(
+            ProfileSelectDialogField(
                 label = stringResource(R.string.sub_setting_pre_profile),
                 placeholder = stringResource(R.string.sub_setting_pre_profile_tip),
                 value = prevProfile,
-                options = profileSuggestions,
-                onValueChange = { prevProfile = it },
-                editable = true,
+                onClick = { showPrevProfileDialog = true },
+                onClear = { prevProfile = "" },
                 supportingText = stringResource(R.string.sub_setting_entry_proxy_tip)
             )
-            FormDropdownField(
+            ProfileSelectDialogField(
                 label = stringResource(R.string.sub_setting_next_profile),
                 placeholder = stringResource(R.string.sub_setting_pre_profile_tip),
                 value = nextProfile,
-                options = profileSuggestions,
-                onValueChange = { nextProfile = it },
-                editable = true,
+                onClick = { showNextProfileDialog = true },
+                onClear = { nextProfile = "" },
                 supportingText = stringResource(R.string.sub_setting_exit_proxy_tip)
             )
             NavigationBarsSpacer()
@@ -276,5 +285,71 @@ fun SubEditScreen(
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )
+    }
+    if (showPrevProfileDialog) {
+        ServerSelectListDialog(
+            title = stringResource(R.string.sub_setting_pre_profile),
+            options = profileSuggestions,
+            selectedOption = prevProfile,
+            onSelected = {
+                prevProfile = it
+                showPrevProfileDialog = false
+            },
+            onDismiss = { showPrevProfileDialog = false }
+        )
+    }
+    if (showNextProfileDialog) {
+        ServerSelectListDialog(
+            title = stringResource(R.string.sub_setting_next_profile),
+            options = profileSuggestions,
+            selectedOption = nextProfile,
+            onSelected = {
+                nextProfile = it
+                showNextProfileDialog = false
+            },
+            onDismiss = { showNextProfileDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun ProfileSelectDialogField(
+    label: String,
+    placeholder: String,
+    value: String,
+    onClick: () -> Unit,
+    onClear: () -> Unit,
+    supportingText: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(role = Role.Button, onClick = onClick),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(label, style = MaterialTheme.typography.labelMedium)
+            Text(
+                text = value.ifEmpty { placeholder },
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = supportingText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        IconButton(onClick = onClear) {
+            Icon(
+                painterResource(R.drawable.ic_delete_24dp),
+                contentDescription = "${stringResource(R.string.logcat_clear)}, $label"
+            )
+        }
     }
 }
