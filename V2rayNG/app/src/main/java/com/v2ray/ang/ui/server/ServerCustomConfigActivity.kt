@@ -61,6 +61,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.fmt.CustomOutboundFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -84,11 +85,15 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
     private var initialRemarks: String = ""
     private var initialContent: String = ""
+    private var configType = EConfigType.CUSTOM
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = MmkvManager.decodeServerConfig(editGuid)
-        initialRemarks = config?.remarks ?: ""
+        config?.let {
+            configType = it.configType
+            initialRemarks = it.remarks
+        }
         initialContent = MmkvManager.decodeServerRaw(editGuid).orEmpty()
     }
 
@@ -112,9 +117,12 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
         if (remarks.isBlank()) {
             return false
         }
-
-        val parsedProfile = try {
-            CustomFmt.parse(content)
+        val (parsedProfile, contentToSave) = try {
+            if (configType == EConfigType.CUSTOM_OUTBOUND) {
+                CustomOutboundFmt.parse(content)
+            } else {
+                Pair(CustomFmt.parse(content), content)
+            }
         } catch (e: Exception) {
             LogUtil.e(
                 AppConfig.TAG,
@@ -135,7 +143,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         val config =
             MmkvManager.decodeServerConfig(editGuid)
-                ?: ProfileItem.create(EConfigType.CUSTOM)
+                ?: ProfileItem.create(configType)
 
         config.remarks =
             remarks.ifEmpty { parsedProfile?.remarks.orEmpty() }
@@ -152,7 +160,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         MmkvManager.encodeServerRaw(
             savedGuid,
-            content
+            contentToSave
         )
 
         toastSuccess(R.string.toast_success)
