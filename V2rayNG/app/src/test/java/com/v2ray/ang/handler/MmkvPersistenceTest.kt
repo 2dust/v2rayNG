@@ -117,6 +117,30 @@ class MmkvPersistenceTest {
         }
     }
 
+    @Test fun `custom outbound refresh commits metadata and rejects a stale response`() {
+        val original = SubscriptionItem(remarks = "Subscription", lastUpdated = 100)
+        val updated = original.copy(lastUpdated = 200, usageInfo = SubscriptionUsageInfo(download = 42))
+        MmkvManager.encodeSubscription("s", original)
+
+        val outbound = """{"protocol":"freedom","tag":"custom"}"""
+        assertEquals(1, AngConfigManager.parseAndCommitProfiles(
+            outbound, "s", append = false, SubscriptionUpdateCommit(original, updated),
+        ))
+
+        val guid = MmkvManager.decodeServerList("s").single()
+        assertEquals(updated, MmkvManager.decodeSubscription("s"))
+        assertEquals(EConfigType.CUSTOM_OUTBOUND, MmkvManager.decodeServerConfig(guid)?.configType)
+        assertNotNull(MmkvManager.decodeServerRaw(guid))
+
+        assertThrows(SubscriptionUpdateAbortedException::class.java) {
+            AngConfigManager.parseAndCommitProfiles(
+                outbound, "s", append = false, SubscriptionUpdateCommit(original, updated),
+            )
+        }
+        assertEquals(listOf(guid), MmkvManager.decodeServerList("s"))
+        assertEquals(updated, MmkvManager.decodeSubscription("s"))
+    }
+
     @Test fun `failed refresh restores usage metadata profiles raw payloads indexes and selection`() {
         val affectedStores = listOf(stores.main, stores.profiles, stores.raw, stores.affiliations, stores.subscriptions)
         val oldUsage = SubscriptionUsageInfo(download = 42, total = 100)

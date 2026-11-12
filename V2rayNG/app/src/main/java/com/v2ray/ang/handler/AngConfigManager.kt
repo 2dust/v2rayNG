@@ -392,6 +392,7 @@ object AngConfigManager {
                     configs = listOf(ParsedProfile(config, rawOutbound)),
                     subid = subid,
                     append = append,
+                    subscriptionUpdate = subscriptionUpdate,
                 )
                 return 1
             } catch (e: ProfileStorageException) {
@@ -645,7 +646,7 @@ object AngConfigManager {
      * @param append Whether to append the configurations.
      * @return The number of configurations parsed.
      */
-    private fun parseAndCommitProfiles(
+    internal fun parseAndCommitProfiles(
         server: String?,
         subid: String,
         append: Boolean,
