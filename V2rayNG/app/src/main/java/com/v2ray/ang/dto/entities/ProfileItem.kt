@@ -25,6 +25,7 @@ data class ProfileItem(
     var headerType: String? = null,
     var host: String? = null,
     var path: String? = null,
+    var headers: String? = null,
     var seed: String? = null,
     var kcpMtu: Int? = null,
     var kcpTti: Int? = null,

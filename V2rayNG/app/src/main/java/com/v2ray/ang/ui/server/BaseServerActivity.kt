@@ -252,16 +252,22 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         state: ServerUiState,
         options: FieldOptions,
         scope: CoroutineScope,
-        buildProfileItem: () -> ProfileItem
+        buildProfileItem: () -> ProfileItem,
+        showSecuritySelector: Boolean = true,
+        showFingerprint: Boolean = true,
+        showAllowInsecure: Boolean = true,
+        showEchConfigList: Boolean = true
     ) {
         val context = LocalContext.current
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FormDropdownField(
-                stringResource(R.string.server_lab_stream_security),
-                state.streamSecurity,
-                options.streamSecurityOptions,
-                { state.streamSecurity = it }
-            )
+            if (showSecuritySelector) {
+                FormDropdownField(
+                    stringResource(R.string.server_lab_stream_security),
+                    state.streamSecurity,
+                    options.streamSecurityOptions,
+                    { state.streamSecurity = it }
+                )
+            }
 
             if (state.streamSecurity.isBlank()) {
                 return@Column
@@ -272,30 +278,36 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 state.sni,
                 { state.sni = it }
             )
-            FormDropdownField(
-                stringResource(R.string.server_lab_stream_fingerprint),
-                state.fingerPrint,
-                options.uTlsOptions,
-                { state.fingerPrint = it }
-            )
+            if (showFingerprint) {
+                FormDropdownField(
+                    stringResource(R.string.server_lab_stream_fingerprint),
+                    state.fingerPrint,
+                    options.uTlsOptions,
+                    { state.fingerPrint = it }
+                )
+            }
 
             if (state.streamSecurity == TLS) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.server_lab_allow_insecure),
-                    checked = state.allowInsecure,
-                    onCheckedChange = { state.allowInsecure = it }
-                )
+                if (showAllowInsecure) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.server_lab_allow_insecure),
+                        checked = state.allowInsecure,
+                        onCheckedChange = { state.allowInsecure = it }
+                    )
+                }
                 FormDropdownField(
                     stringResource(R.string.server_lab_stream_alpn),
                     state.alpn,
                     options.alpnOptions,
                     { state.alpn = it }
                 )
-                FormTextField(
-                    stringResource(R.string.server_lab_ech_config_list),
-                    state.echConfigList,
-                    { state.echConfigList = it }
-                )
+                if (showEchConfigList) {
+                    FormTextField(
+                        stringResource(R.string.server_lab_ech_config_list),
+                        state.echConfigList,
+                        { state.echConfigList = it }
+                    )
+                }
                 FormTextField(
                     stringResource(R.string.server_lab_verify_peer_cert_by_name),
                     state.verifyPeerCertByName,
