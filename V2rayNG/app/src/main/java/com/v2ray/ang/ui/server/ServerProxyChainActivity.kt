@@ -317,7 +317,7 @@ fun ProxyChainScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .then(with(this@ReorderableItem) { reorderableDragHandle() })
+                                    .reorderableDragHandle(this@ReorderableItem)
                                     .padding(4.dp)
                             ) {
                                 Icon(
