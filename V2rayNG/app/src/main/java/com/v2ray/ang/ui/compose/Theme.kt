@@ -2,6 +2,9 @@ package com.v2ray.ang.ui.compose
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.gestures.BringIntoViewSpec
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +19,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -26,6 +30,7 @@ import com.v2ray.ang.handler.MmkvManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.roundToInt
 
 private val LightColor = lightColorScheme(
     primary = Color(0xFF000000), // Black
@@ -161,7 +166,29 @@ fun resolveDarkTheme(): Boolean {
 
 val LocalDarkTheme = compositionLocalOf { false }
 
+internal fun pixelAlignedScrollDistance(distance: Float): Float = distance.roundToInt().toFloat()
+
+/**
+ * Isolates [ExperimentalFoundationApi] while retaining the platform focus policy and rounding its
+ * movement to lazy-list pixels, preventing one-pixel oscillation on Android TV. Reevaluate when
+ * BringIntoViewSpec becomes stable; remove this adapter when the stable platform policy returns
+ * pixel-aligned distances on the supported Compose and TV versions.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+private class PixelAlignedBringIntoViewSpec(
+    private val delegate: BringIntoViewSpec
+) : BringIntoViewSpec {
+    override fun calculateScrollDistance(
+        offset: Float,
+        size: Float,
+        containerSize: Float
+    ): Float = pixelAlignedScrollDistance(
+        delegate.calculateScrollDistance(offset = offset, size = size, containerSize = containerSize)
+    )
+}
+
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun AppTheme(
     darkTheme: Boolean = resolveDarkTheme(),
     content: @Composable () -> Unit
@@ -177,8 +204,17 @@ fun AppTheme(
         else -> LightColor
     }
     val snackbarController = rememberAppSnackbarController()
-
+    val platformBringIntoViewSpec = LocalBringIntoViewSpec.current
+    val isTelevision = isTelevisionDevice()
     val view = LocalView.current
+    val bringIntoViewSpec = if (isTelevision) {
+        remember(platformBringIntoViewSpec) {
+            PixelAlignedBringIntoViewSpec(delegate = platformBringIntoViewSpec)
+        }
+    } else {
+        platformBringIntoViewSpec
+    }
+
     if (!view.isInEditMode) {
         SideEffect {
             val activity = view.context as? Activity ?: return@SideEffect
@@ -192,7 +228,8 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
-        LocalAppSnackbar provides snackbarController
+        LocalAppSnackbar provides snackbarController,
+        LocalBringIntoViewSpec provides bringIntoViewSpec
     ) {
         MaterialTheme(
             colorScheme = colorScheme
