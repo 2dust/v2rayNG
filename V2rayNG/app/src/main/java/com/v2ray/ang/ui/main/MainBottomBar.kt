@@ -1,10 +1,13 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,9 +40,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +58,8 @@ private val KNOB_SIZE = 56.dp
 private val BAR_MAX_WIDTH = 480.dp
 private const val TEXT_MAX_SP = 14f
 private const val TEXT_MIN_SP = 10f
+private const val TEXT_SIZE_STEP_SP = 0.5f
+private const val TEXT_SIZE_ANIMATION_MS = 180
 private const val TEXT_LINE_HEIGHT_FACTOR = 1.3f
 
 /**
@@ -118,7 +123,7 @@ fun MainBottomBar(
                         .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
                 )
                 CompositionLocalProvider(LocalLayoutDirection provides textLayoutDirection) {
-                    Box(
+                    BoxWithConstraints(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .fillMaxWidth()
@@ -126,28 +131,58 @@ fun MainBottomBar(
                             .absolutePadding(left = 20.dp, right = KNOB_SIZE + knobInset + 8.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
+                        val textMeasurer = rememberTextMeasurer()
+                        val baseTextStyle = MaterialTheme.typography.bodyMedium.copy(
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                        val targetFontSizeSp = remember(
+                            displayText,
+                            constraints.maxWidth,
+                            baseTextStyle,
+                            textMeasurer
+                        ) {
+                            var candidateSp = TEXT_MAX_SP
+                            while (candidateSp > TEXT_MIN_SP) {
+                                val layout = textMeasurer.measure(
+                                    text = displayText,
+                                    style = baseTextStyle.copy(
+                                        fontSize = candidateSp.sp,
+                                        lineHeight = (candidateSp * TEXT_LINE_HEIGHT_FACTOR).sp
+                                    ),
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 2,
+                                    constraints = Constraints(maxWidth = constraints.maxWidth)
+                                )
+                                if (!layout.hasVisualOverflow) break
+                                candidateSp -= TEXT_SIZE_STEP_SP
+                            }
+                            candidateSp.coerceAtLeast(TEXT_MIN_SP)
+                        }
+                        val fontSizeSp by animateFloatAsState(
+                            targetValue = targetFontSizeSp,
+                            animationSpec = tween(durationMillis = TEXT_SIZE_ANIMATION_MS),
+                            label = "connectionStatusFontSize"
+                        )
+
                         // At most two lines of a fixed line height, shrinking the font if needed, so a longer
                         // message (for example a ping result in Persian) never makes the bar taller.
-                        var fontSizeSp by remember(displayText) { mutableFloatStateOf(TEXT_MAX_SP) }
                         Text(
                             text = displayText,
-                            style = MaterialTheme.typography.bodyMedium.copy(
+                            style = baseTextStyle.copy(
                                 fontSize = fontSizeSp.sp,
-                                lineHeight = (fontSizeSp * TEXT_LINE_HEIGHT_FACTOR).sp,
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.None
-                                )
+                                lineHeight = (fontSizeSp * TEXT_LINE_HEIGHT_FACTOR).sp
                             ),
                             textAlign = TextAlign.Start,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            onTextLayout = { layout ->
-                                if (layout.hasVisualOverflow && fontSizeSp > TEXT_MIN_SP) {
-                                    fontSizeSp = (fontSizeSp - 1f).coerceAtLeast(TEXT_MIN_SP)
-                                }
-                            },
-                            modifier = Modifier.semantics { contentDescription = displayText }
+                            modifier = Modifier
+                                .animateContentSize(
+                                    animationSpec = tween(durationMillis = TEXT_SIZE_ANIMATION_MS)
+                                )
+                                .semantics { contentDescription = displayText }
                         )
                     }
                 }
