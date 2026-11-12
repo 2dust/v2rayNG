@@ -1,43 +1,48 @@
 package com.v2ray.ang.ui.server
 
 import android.os.Bundle
+import android.view.View
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.core.text.BidiFormatter
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -48,16 +53,42 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppIconButton
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.AppTopBarAction
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.ReorderableListItem
+import com.v2ray.ang.ui.compose.ServerSelectButton
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
+import com.v2ray.ang.ui.compose.TvTextFieldNavigation
+import com.v2ray.ang.ui.compose.dpadLongPressToMove
+import com.v2ray.ang.ui.compose.dpadMovePreviousNavigation
+import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
+import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.compose.isTelevisionDevice
+import com.v2ray.ang.ui.compose.keepDpadReorderItemVisible
+import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
+import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
+import com.v2ray.ang.ui.compose.rememberDpadFocusRequester
+import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
+import com.v2ray.ang.ui.compose.reorderIndicesForKeys
 import com.v2ray.ang.ui.compose.reorderableDragHandle
+import com.v2ray.ang.ui.compose.requestFocusWhenReady
+import com.v2ray.ang.ui.compose.tvAwareImePadding
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
+import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.util.UUID
+
+private data class ProxyChainMemberFocusTargets(
+    val field: FocusRequester = FocusRequester(),
+    val remove: FocusRequester = FocusRequester()
+)
 
 class ServerProxyChainActivity : BaseComponentActivity() {
 
@@ -145,11 +176,11 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 ?: ProfileItem.create(EConfigType.PROXYCHAIN)
 
         config.remarks = remarks.trim()
-        config.proxyChainProfiles =
-            chainMembers.joinToString(",")
-
-        config.description =
-            chainMembers.joinToString(" -> ")
+        config.proxyChainProfiles = chainMembers.joinToString(",")
+        val isRtl = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+        val bidiFormatter = BidiFormatter.getInstance(isRtl)
+        val chainSeparator = if (isRtl) " ← " else " → "
+        config.description = chainMembers.joinToString(chainSeparator) { bidiFormatter.unicodeWrap(it) }
 
         if (
             config.subscriptionId.isEmpty() &&
@@ -206,27 +237,80 @@ fun ProxyChainScreen(
     onSave: (String, List<String>) -> Boolean,
     onDelete: () -> Unit
 ) {
+    val isTelevision = isTelevisionDevice()
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
-    var members by rememberSaveable { mutableStateOf(initialMembers) }
-    var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
+    var savedMembers by rememberSaveable { mutableStateOf(initialMembers) }
+    var savedMemberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
+    val members = savedMembers
+    val memberKeys = savedMemberKeys
     var showProfileDeleteConfirm by remember { mutableStateOf(false) }
     var memberToDeleteKey by rememberSaveable { mutableStateOf<String?>(null) }
     var editingMemberKey by rememberSaveable { mutableStateOf<String?>(null) }
+    var pendingMemberFocusKey by remember { mutableStateOf<String?>(null) }
+    var pendingAddFocus by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
+    val backFocusRequester = rememberDpadFocusRequester()
+    val remarksFocusRequester = remember { FocusRequester() }
+    val saveFocusRequester = remember { FocusRequester() }
+    val addFocusRequester = remember { FocusRequester() }
+    val memberFocusTargets = rememberDpadFocusTargets(memberKeys) { ProxyChainMemberFocusTargets() }
     val lazyListState = rememberLazyListState()
+    val itemKeys = listOf("remarks_field", "members_header") + memberKeys
+    val requestRowFocus = rememberLazyDpadFocus(
+        listOf(listOf(remarksFocusRequester), emptyList()) + memberKeys.map {
+            with(memberFocusTargets.getValue(it)) { listOf(field, remove) }
+        }
+    ) { lazyListState.scrollToItem(it) }
+    val dpadReorderState = rememberSyncedDpadReorderState(memberKeys, isTelevision) { key, index ->
+        val memberKey = key as? String ?: return@rememberSyncedDpadReorderState
+        val focusTargets = memberFocusTargets[memberKey]
+        if (index >= 0 && focusTargets != null) {
+            lazyListState.keepDpadReorderItemVisible(memberKey, itemKeys.indexOf(memberKey))
+            requestFocusWhenReady(focusTargets.field)
+        }
+    }
+
+    fun moveMember(fromIdx: Int, toIdx: Int) {
+        val reordered = savedMembers.toMutableList()
+        if (reordered.moveItem(fromIdx, toIdx)) {
+            savedMembers = reordered
+            savedMemberKeys = savedMemberKeys.toMutableList().also { it.moveItem(fromIdx, toIdx) }
+        }
+    }
+
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val fromIndex = memberKeys.indexOf(from.key)
-        val toIndex = memberKeys.indexOf(to.key)
-        if (fromIndex != -1 && toIndex != -1) {
-            val reordered = members.toMutableList()
-            val reorderedKeys = memberKeys.toMutableList()
-            if (reordered.moveItem(fromIndex, toIndex)) {
-                reorderedKeys.moveItem(fromIndex, toIndex)
-                members = reordered
-                memberKeys = reorderedKeys
-            }
+        reorderIndicesForKeys(memberKeys, from.key, to.key)?.let { (fromIndex, toIndex) ->
+            moveMember(fromIndex, toIndex)
+        }
+    }
+
+    LaunchedEffect(pendingMemberFocusKey, pendingAddFocus, memberKeys) {
+        val target = pendingMemberFocusKey?.let { memberFocusTargets[it]?.field }
+            ?: addFocusRequester.takeIf { pendingAddFocus }
+        if (target != null) requestRowFocus(target)
+        pendingMemberFocusKey = null
+        pendingAddFocus = false
+    }
+
+    fun addMember() {
+        val memberKey = UUID.randomUUID().toString()
+        savedMembers = savedMembers + ""
+        savedMemberKeys = savedMemberKeys + memberKey
+        if (isTelevision) pendingMemberFocusKey = memberKey
+    }
+
+    fun removeMember(memberKey: String) {
+        val index = savedMemberKeys.indexOf(memberKey)
+        if (index < 0) return
+        val nextFocusKey = savedMemberKeys.getOrNull(index + 1) ?: savedMemberKeys.getOrNull(index - 1)
+        val (remainingMembers, remainingKeys) = withoutProxyChainMember(savedMembers, savedMemberKeys, memberKey)
+        savedMembers = remainingMembers
+        savedMemberKeys = remainingKeys
+        if (isTelevision) {
+            pendingMemberFocusKey = nextFocusKey
+            pendingAddFocus = nextFocusKey == null
         }
     }
 
@@ -236,37 +320,49 @@ fun ProxyChainScreen(
             AppTopBar(
                 title = EConfigType.PROXYCHAIN.toString(),
                 onBackClick = onBackClick,
-                actions = {
-                    if (showDelete) {
-                        IconButton(onClick = { showProfileDeleteConfirm = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
-                        }
-                    }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
-
-                        val hasError = remarksErr
-                        if (!hasError) {
-                            onSave(remarks, members)
-                        }
-                    }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
-                    }
+                navigationFocusRequester = backFocusRequester,
+                onMoveDown = { requestRowFocus(remarksFocusRequester) },
+                actionItems = buildList {
+                    if (showDelete) add(AppTopBarAction(
+                        painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.menu_item_del_config),
+                        onClick = { showProfileDeleteConfirm = true }
+                    ))
+                    add(AppTopBarAction(
+                        painterResource(R.drawable.ic_fab_check), stringResource(R.string.menu_item_save_config),
+                        onClick = {
+                            isRemarksError = remarks.isBlank()
+                            if (!isRemarksError) onSave(remarks, savedMembers)
+                        },
+                        focusRequester = saveFocusRequester
+                    ))
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    members = members + ""
-                    memberKeys = memberKeys + UUID.randomUUID().toString()
-                },
-                modifier = Modifier
-                    .offset(y = -20.dp)
-                    .navigationBarsPadding()
-            ) {
-                Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_member))
+            if (isTelevision) {
+                AppIconButton(
+                    icon = painterResource(R.drawable.ic_add_24dp),
+                    label = stringResource(R.string.action_add_member),
+                    focusRequester = addFocusRequester,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = Modifier
+                        .offset(y = -20.dp)
+                        .navigationBarsPadding()
+                        .dpadOrderedFocusNavigation(addFocusRequester, listOf(addFocusRequester))
+                        .dpadVerticalFocusNavigation(
+                            onMoveUp = {
+                                memberKeys.lastOrNull()
+                                    ?.let { memberFocusTargets[it]?.field?.let(requestRowFocus) }
+                                    ?: requestRowFocus(remarksFocusRequester)
+                            },
+                            onMoveDown = { true }
+                        ),
+                    onClick = ::addMember
+                )
+            } else {
+                FloatingActionButton(onClick = ::addMember, modifier = Modifier.offset(y = -20.dp).navigationBarsPadding()) {
+                    Icon(painterResource(R.drawable.ic_add_24dp), stringResource(R.string.action_add_member))
+                }
             }
         }
     ) { innerPadding ->
@@ -276,20 +372,35 @@ fun ProxyChainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imePadding()
-                .verticalScrollbar(lazyListState),
-            contentPadding = NavigationBarsBottomPadding()
+                .tvAwareImePadding()
+                .verticalScrollbar(lazyListState)
+                .tvSafeAreaPadding(),
+            contentPadding = if (isTelevision) PaddingValues(
+                top = 8.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 36.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            ) else NavigationBarsBottomPadding()
         ) {
             item(key = "remarks_field") {
                 FormTextField(
                     label = stringResource(R.string.server_lab_remarks),
                     value = remarks,
                     onValueChange = { remarks = it },
-                    isError = isRemarksError
+                    isError = isRemarksError,
+                    tvNavigation = TvTextFieldNavigation(
+                        focusRequester = remarksFocusRequester,
+                        onMoveUp = { backFocusRequester.requestFocus() },
+                        onMoveDown = {
+                            memberKeys.firstOrNull()
+                                ?.let { memberFocusTargets[it]?.field?.let(requestRowFocus) }
+                                ?: addFocusRequester.requestFocus()
+                        }
+                    )
                 )
             }
 
-            item {
+            item(key = "members_header") {
                 Text(
                     text = stringResource(R.string.server_proxy_chain_members),
                     style = MaterialTheme.typography.bodyLarge,
@@ -299,72 +410,117 @@ fun ProxyChainScreen(
 
             itemsIndexed(items = members, key = { index, _ -> memberKeys[index] }) { index, member ->
                 val memberKey = memberKeys[index]
-                ReorderableItem(reorderableState, key = memberKey) { isDragging ->
-                    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                    Surface(
+                val focusTargets = memberFocusTargets.getValue(memberKey)
+                val previousTargets = memberKeys.getOrNull(index - 1)
+                    ?.let(memberFocusTargets::get)
+                val nextTargets = memberKeys.getOrNull(index + 1)
+                    ?.let(memberFocusTargets::get)
+                val dpadReorderItem = DpadReorderItem(
+                    state = dpadReorderState,
+                    key = memberKey,
+                    index = index,
+                    itemCount = memberKeys.size,
+                    targetIndex = ::verticalDpadReorderTarget,
+                    onMove = ::moveMember
+                )
+                val isMoving = dpadReorderState.isMoving(memberKey)
+                val openMemberPicker: () -> Unit = { editingMemberKey = memberKey }
+                val actionFocusOrder = remember(focusTargets) {
+                    listOf(focusTargets.field, focusTargets.remove)
+                }
+
+                ReorderableItem(reorderableState, key = memberKey, modifier = Modifier.zIndex(if (isMoving) 1f else 0f)) { isDragging ->
+                    val itemScope = this
+                    val rowContent: @Composable RowScope.() -> Unit = {
+                        if (isTelevision) {
+                            Text("${index + 1}", modifier = Modifier.width(44.dp), textAlign = TextAlign.Center)
+                        } else {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_menu_24dp),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.reorderableDragHandle(itemScope).padding(4.dp)
+                            )
+                        }
+                    ServerSelectButton(
+                        label = stringResource(R.string.server_proxy_chain_member),
+                        value = member,
+                        placeholder = stringResource(R.string.server_proxy_chain_member_unselected),
+                        focusRequester = focusTargets.field,
+                        showFocus = !isMoving,
+                        onClick = openMemberPicker,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        shadowElevation = elevation
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 8.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .reorderableDragHandle(this@ReorderableItem)
-                                    .padding(4.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_menu_24dp),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Surface(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable { editingMemberKey = memberKey },
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            ) {
-                                Text(
-                                    text = member.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) },
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = if (member.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                    else MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = if (member.isBlank()) FontWeight.Normal else FontWeight.Medium,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    if (member.isBlank()) {
-                                        val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                                        members = remainingMembers
-                                        memberKeys = remainingKeys
-                                    } else {
-                                        memberToDeleteKey = memberKey
-                                    }
+                            .weight(1f)
+                            .dpadLongPressToMove(
+                                enabled = isTelevision,
+                                item = dpadReorderItem,
+                                onClick = openMemberPicker,
+                                addFocusTarget = false
+                            )
+                            .dpadOrderedFocusNavigation(
+                                current = focusTargets.field,
+                                order = actionFocusOrder,
+                                onBeforeFirst = { backFocusRequester.requestFocus() }
+                            )
+                            .dpadVerticalFocusNavigation(
+                                onMoveUp = {
+                                    previousTargets?.field?.let(requestRowFocus)
+                                        ?: requestRowFocus(remarksFocusRequester)
                                 },
+                                onMoveDown = {
+                                    nextTargets?.field?.let(requestRowFocus)
+                                        ?: addFocusRequester.requestFocus()
+                                }
+                            )
+                    )
+                    AppIconButton(
+                        icon = painterResource(R.drawable.ic_delete_24dp),
+                        label = stringResource(R.string.action_remove),
+                        focusRequester = focusTargets.remove,
+                        modifier = Modifier
+                            .dpadOrderedFocusNavigation(focusTargets.remove, actionFocusOrder)
+                            .dpadVerticalFocusNavigation(
+                                onMoveUp = {
+                                    previousTargets?.remove?.let(requestRowFocus)
+                                        ?: saveFocusRequester.requestFocus()
+                                },
+                                onMoveDown = {
+                                    nextTargets?.remove?.let(requestRowFocus)
+                                        ?: addFocusRequester.requestFocus()
+                                }
+                            ),
+                        onClick = {
+                            if (member.isBlank()) removeMember(memberKey)
+                            else memberToDeleteKey = memberKey
+                        }
+                    )
+                    }
+                    if (isTelevision) {
+                        ReorderableListItem(itemScope, isDragging, isMoving) {
+                            Row(
                                 modifier = Modifier
-                                    .padding(start = 4.dp)
-                                    .size(36.dp)
-                            ) {
-                                Icon(
-                                    painterResource(R.drawable.ic_delete_24dp),
-                                    contentDescription = stringResource(R.string.acc_remove),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                                    .fillMaxWidth()
+                                    .dpadMovePreviousNavigation(enabled = !dpadReorderState.isMoving) {
+                                        backFocusRequester.requestFocus()
+                                    }
+                                    .padding(horizontal = 4.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                content = rowContent
+                            )
+                        }
+                    } else {
+                        val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            shadowElevation = elevation
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                content = rowContent
+                            )
                         }
                     }
                 }
@@ -385,27 +541,30 @@ fun ProxyChainScreen(
             message = stringResource(R.string.confirm_delete_proxy_chain_member),
             itemName = members.getOrNull(memberKeys.indexOf(memberKey)).orEmpty(),
             onConfirm = {
-                val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                members = remainingMembers
-                memberKeys = remainingKeys
+                removeMember(memberKey)
                 memberToDeleteKey = null
             },
             onDismiss = { memberToDeleteKey = null }
         )
     }
-    editingMemberKey?.let { memberKey ->
-        val currentIndex = memberKeys.indexOf(memberKey)
-        if (currentIndex != -1) {
-            ServerSelectListDialog(
-                title = stringResource(R.string.server_proxy_chain_pick_members),
-                options = allRemarks,
-                selectedOption = members.getOrNull(currentIndex),
-                onSelected = { selectedRemark ->
-                    members = members.toMutableList().also { it[currentIndex] = selectedRemark }
-                    editingMemberKey = null
-                },
-                onDismiss = { editingMemberKey = null }
-            )
+    editingMemberKey?.takeIf { it in memberKeys }?.let { memberKey ->
+        fun closePicker() {
+            editingMemberKey = null
+            if (isTelevision) pendingMemberFocusKey = memberKey
         }
+
+        ServerSelectListDialog(
+            title = stringResource(
+                if (isTelevision) R.string.server_proxy_chain_member_unselected else R.string.server_proxy_chain_pick_members
+            ),
+            options = allRemarks,
+            selectedOption = members.getOrNull(memberKeys.indexOf(memberKey)),
+            onSelected = { selectedRemark ->
+                val index = savedMemberKeys.indexOf(memberKey)
+                if (index >= 0) savedMembers = savedMembers.toMutableList().also { it[index] = selectedRemark }
+                closePicker()
+            },
+            onDismiss = ::closePicker
+        )
     }
 }
