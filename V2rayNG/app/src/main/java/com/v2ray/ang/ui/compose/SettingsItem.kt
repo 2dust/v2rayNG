@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.compose
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +8,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -49,11 +59,17 @@ fun CollapsiblePreferenceGroupHeader(
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isTelevision = isTelevisionDevice()
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onExpandedChange(!expanded) }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .dpadFocusOutline()
+            .dpadClickable { onExpandedChange(!expanded) }
+            .padding(
+                horizontal = if (isTelevision) 24.dp else 16.dp,
+                vertical = 12.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -81,18 +97,38 @@ private fun SettingsItemRow(
     enabled: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    showFocus: Boolean = true,
+    focusRequester: FocusRequester? = null,
+    role: Role? = null,
+    toggleState: Boolean? = null,
     trailing: @Composable (() -> Unit)? = null
 ) {
-    val titleColor = if (enabled) MaterialTheme.colorScheme.onSurface
-    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    val descriptionColor = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
-    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-
+    val isTelevision = isTelevisionDevice()
+    val titleColor = when {
+        enabled -> MaterialTheme.colorScheme.onSurface
+        isTelevision -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }
+    val descriptionColor = if (enabled) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick) else Modifier)
-            .padding(16.dp),
+            .dpadFocusOutline(focusRequester = focusRequester, showFocus = showFocus)
+            .semantics(mergeDescendants = true) {
+                role?.let { this.role = it }
+                toggleState?.let { toggleableState = ToggleableState(it) }
+            }
+            .then(
+                onClick?.let { Modifier.dpadClickable(enabled, role = role, onClick = it) } ?: Modifier
+            )
+            .padding(
+                horizontal = if (isTelevision) 24.dp else 16.dp,
+                vertical = 16.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
@@ -123,6 +159,41 @@ private fun SettingsItemRow(
     }
 }
 
+private class SettingsDialogState(val originFocusRequester: FocusRequester) {
+    var visible by mutableStateOf(false)
+        private set
+    var restoreOriginFocus by mutableStateOf(false)
+        private set
+
+    fun open() {
+        visible = true
+    }
+
+    fun close() {
+        visible = false
+        restoreOriginFocus = true
+    }
+
+    fun focusRestored() {
+        restoreOriginFocus = false
+    }
+}
+
+@Composable
+private fun rememberSettingsDialogState(originFocusRequester: FocusRequester? = null): SettingsDialogState {
+    val state = remember(originFocusRequester) {
+        SettingsDialogState(originFocusRequester ?: FocusRequester())
+    }
+    val isTelevision = isTelevisionDevice()
+    LaunchedEffect(state.visible, state.restoreOriginFocus, isTelevision) {
+        if (!state.visible && state.restoreOriginFocus) {
+            if (isTelevision) requestFocusWhenReady(state.originFocusRequester)
+            state.focusRestored()
+        }
+    }
+    return state
+}
+
 @Composable
 fun SettingsEditItem(
     icon: Painter? = null,
@@ -132,9 +203,10 @@ fun SettingsEditItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isPassword: Boolean = false,
-    keyboardNumber: Boolean = false
+    keyboardNumber: Boolean = false,
+    focusRequester: FocusRequester? = null
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    val dialogState = rememberSettingsDialogState(focusRequester)
     val description = if (isPassword) {
         if (value.isEmpty()) null else "******"
     } else {
@@ -147,12 +219,14 @@ fun SettingsEditItem(
         description = description,
         enabled = enabled,
         onClick = if (enabled) {
-            { showDialog = true }
+            dialogState::open
         } else null,
-        modifier = modifier
+        modifier = modifier,
+        showFocus = !dialogState.visible,
+        focusRequester = dialogState.originFocusRequester
     )
 
-    if (showDialog) {
+    if (dialogState.visible) {
         var text by remember { mutableStateOf(value) }
         InputDialog(
             title = title,
@@ -160,14 +234,22 @@ fun SettingsEditItem(
                 InputField(
                     label = title,
                     value = text,
-                    visualTransformation = VisualTransformation.None
+                    keyboardOptions = if (keyboardNumber) {
+                        KeyboardOptions(keyboardType = KeyboardType.Number)
+                    } else {
+                        KeyboardOptions.Default
+                    },
+                    visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
                 )
             ),
             onFieldChange = { _, v -> text = v },
             confirmText = stringResource(R.string.action_ok),
             dismissText = stringResource(R.string.action_cancel),
-            onConfirm = { showDialog = false; onValueChanged(text) },
-            onDismiss = { showDialog = false }
+            onConfirm = {
+                dialogState.close()
+                onValueChanged(text)
+            },
+            onDismiss = dialogState::close
         )
     }
 }
@@ -181,9 +263,10 @@ fun SettingsListItem(
     selectedValue: String,
     onSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    focusRequester: FocusRequester? = null
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    val dialogState = rememberSettingsDialogState(focusRequester)
     val options = entries.zip(values)
     val selectedOption = options.find { it.second == selectedValue } ?: options.firstOrNull()
     val summary = selectedOption?.first.orEmpty()
@@ -194,22 +277,24 @@ fun SettingsListItem(
         description = summary.ifEmpty { null },
         enabled = enabled,
         onClick = if (enabled) {
-            { showDialog = true }
+            dialogState::open
         } else null,
-        modifier = modifier
+        modifier = modifier,
+        showFocus = !dialogState.visible,
+        focusRequester = dialogState.originFocusRequester
     )
 
-    if (showDialog) {
+    if (dialogState.visible) {
         SelectListDialog(
             title = title,
             options = options,
             optionText = { it.first },
             selectedOption = selectedOption,
             onSelected = { option ->
-                showDialog = false
+                dialogState.close()
                 onSelected(option.second)
             },
-            onDismiss = { showDialog = false },
+            onDismiss = dialogState::close,
             showRadio = true
         )
     }
@@ -243,6 +328,7 @@ fun SettingsSwitchItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val isTelevision = isTelevisionDevice()
     SettingsItemRow(
         icon = icon,
         title = title,
@@ -252,11 +338,13 @@ fun SettingsSwitchItem(
             { onCheckedChange(!checked) }
         } else null,
         modifier = modifier,
+        role = Role.Switch,
+        toggleState = checked,
         trailing = {
             Switch(
                 checked = checked,
-                onCheckedChange = if (enabled) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                onCheckedChange = null,
+                modifier = Modifier.scale(if (isTelevision) 0.75f else 0.8f).clearAndSetSemantics {},
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
