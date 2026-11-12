@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,10 +24,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,17 +39,25 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AppTopBarAction
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
+import com.v2ray.ang.ui.compose.tvAwareImePadding
+import com.v2ray.ang.ui.compose.TvTextFieldNavigation
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.apppicker.AppPickerActivity
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppIconButton
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ServerSelectButton
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
@@ -76,7 +85,6 @@ class RoutingEditActivity : BaseComponentActivity() {
     @Composable
     override fun ScreenContent() {
         RoutingEditScreen(
-            position = position,
             initial = initial,
             outboundSuggestions = outboundSuggestions,
             canUseProcess = canUseProcess,
@@ -87,7 +95,7 @@ class RoutingEditActivity : BaseComponentActivity() {
     }
 
     private fun saveServer(rulesetItem: RulesetItem): Boolean {
-        if (rulesetItem.remarks.isNullOrEmpty()) {
+        if (rulesetItem.remarks.isNullOrEmpty() || (position >= 0 && initial == null)) {
             return false
         }
         if (position < 0 && rulesetItem.id.isEmpty()) {
@@ -112,7 +120,6 @@ class RoutingEditActivity : BaseComponentActivity() {
 
 @Composable
 fun RoutingEditScreen(
-    position: Int,
     initial: RulesetItem?,
     outboundSuggestions: List<String>,
     canUseProcess: Boolean,
@@ -123,6 +130,10 @@ fun RoutingEditScreen(
     val context = LocalContext.current
     val processSelectTitle = stringResource(R.string.routing_settings_process_select)
     val scrollState = rememberScrollState()
+    val isTelevision = isTelevisionDevice()
+    val processFieldFocusRequester = if (isTelevision) remember { FocusRequester() } else null
+    val processPickerFocusRequester = if (isTelevision) remember { FocusRequester() } else null
+    val portFocusRequester = if (isTelevision) remember { FocusRequester() } else null
 
     var remarks by rememberSaveable { mutableStateOf(initial?.remarks ?: "") }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
@@ -131,14 +142,13 @@ fun RoutingEditScreen(
     var ip by rememberSaveable { mutableStateOf(initial?.ip?.joinToString(",") ?: "") }
     var processText by rememberSaveable { mutableStateOf(initial?.process?.joinToString(",") ?: "") }
     var protocol by rememberSaveable { mutableStateOf(initial?.protocol?.joinToString(",") ?: "") }
-    var network by rememberSaveable { mutableStateOf(initial?.network ?: "") }
+    var network by rememberSaveable { mutableStateOf(initial?.network.orEmpty()) }
     var port by rememberSaveable { mutableStateOf(initial?.port ?: "") }
     var outboundTag by rememberSaveable {
         mutableStateOf(initial?.outboundTag ?: BUILTIN_OUTBOUND_TAGS.first())
     }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     var showOutboundDialog by rememberSaveable { mutableStateOf(false) }
-    val selectedNetwork = network.ifBlank { "tcp,udp" }
 
     val processPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -150,7 +160,7 @@ fun RoutingEditScreen(
     }
 
     fun buildRuleset(): RulesetItem {
-        val rulesetItem = SettingsManager.getRoutingRuleset(position) ?: RulesetItem()
+        val rulesetItem = initial?.copy() ?: RulesetItem()
         rulesetItem.apply {
             this.remarks = remarks
             this.locked = locked
@@ -187,29 +197,24 @@ fun RoutingEditScreen(
             AppTopBar(
                 title = stringResource(R.string.routing_settings_rule_title),
                 onBackClick = onBackClick,
-                actions = {
-                    if (position >= 0) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(
-                                painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = stringResource(R.string.acc_delete)
-                            )
-                        }
-                    }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
-
-                        val hasError = remarksErr
-                        if (!hasError) {
-                            onSave(buildRuleset())
-                        }
-                    }) {
-                        Icon(
-                            painterResource(R.drawable.ic_fab_check),
-                            contentDescription = stringResource(R.string.acc_save)
+                actionItems = buildList {
+                    if (initial != null) add(
+                        AppTopBarAction(
+                            icon = painterResource(R.drawable.ic_delete_24dp),
+                            label = stringResource(R.string.action_delete),
+                            contentDescription = stringResource(R.string.acc_delete),
+                            onClick = { showDeleteConfirm = true }
                         )
-                    }
+                    )
+                    add(AppTopBarAction(
+                        icon = painterResource(R.drawable.ic_fab_check),
+                        label = stringResource(R.string.routing_settings_save),
+                        contentDescription = stringResource(R.string.acc_save),
+                        onClick = {
+                            isRemarksError = remarks.isBlank()
+                            if (!isRemarksError) onSave(buildRuleset())
+                        }
+                    ))
                 }
             )
         }
@@ -219,7 +224,8 @@ fun RoutingEditScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imePadding()
+                .tvAwareImePadding()
+                .tvSafeAreaPadding()
                 .verticalScroll(scrollState)
                 .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
@@ -258,7 +264,13 @@ fun RoutingEditScreen(
                 placeholder = stringResource(R.string.routing_settings_comma_tip),
                 value = processText,
                 onValueChange = { processText = it },
-                enabled = canUseProcess
+                enabled = canUseProcess,
+                modifier = Modifier.focusProperties {
+                    processPickerFocusRequester?.let { down = it }
+                },
+                tvNavigation = TvTextFieldNavigation(
+                    focusRequester = processFieldFocusRequester
+                )
             )
             if (canUseProcess) {
                 TextButton(
@@ -276,7 +288,13 @@ fun RoutingEditScreen(
                             )
                         )
                     },
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .dpadFocusOutline(focusRequester = processPickerFocusRequester, cornerRadius = 20.dp)
+                        .focusProperties {
+                            processFieldFocusRequester?.let { up = it }
+                            portFocusRequester?.let { down = it }
+                        }
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_per_apps_24dp),
@@ -289,7 +307,13 @@ fun RoutingEditScreen(
             FormTextField(
                 label = stringResource(R.string.routing_settings_port),
                 value = port,
-                onValueChange = { port = it }
+                onValueChange = { port = it },
+                modifier = Modifier.focusProperties {
+                    processPickerFocusRequester?.let { up = it }
+                },
+                tvNavigation = TvTextFieldNavigation(
+                    focusRequester = portFocusRequester
+                )
             )
             FormTextField(
                 label = stringResource(R.string.routing_settings_protocol),
@@ -299,31 +323,46 @@ fun RoutingEditScreen(
             )
             FormDropdownField(
                 label = stringResource(R.string.routing_settings_network),
-                value = selectedNetwork,
+                value = network.ifBlank { ROUTING_NETWORK_OPTIONS.last() },
                 options = ROUTING_NETWORK_OPTIONS,
                 onValueChange = { network = it }
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FormDropdownField(
-                    label = stringResource(R.string.routing_settings_outbound_tag),
-                    placeholder = stringResource(
-                        R.string.routing_settings_outbound_tag_hint,
-                        stringResource(R.string.server_lab_remarks)
-                    ),
-                    value = outboundTag,
-                    options = BUILTIN_OUTBOUND_TAGS.toList(),
-                    onValueChange = { outboundTag = it },
-                    modifier = Modifier.weight(1f)
+            if (isTelevision) {
+                val outboundLabel = stringResource(R.string.routing_settings_outbound_tag)
+                Text(
+                    text = outboundLabel,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp)
                 )
-                IconButton(onClick = { showOutboundDialog = true }) {
-                    Icon(
-                        painterResource(R.drawable.ic_search_24dp),
-                        contentDescription = stringResource(R.string.title_file_chooser)
+                ServerSelectButton(
+                    label = outboundLabel,
+                    value = outboundTag,
+                    onClick = { showOutboundDialog = true },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FormDropdownField(
+                        label = stringResource(R.string.routing_settings_outbound_tag),
+                        placeholder = stringResource(
+                            R.string.routing_settings_outbound_tag_hint,
+                            stringResource(R.string.server_lab_remarks)
+                        ),
+                        value = outboundTag,
+                        options = BUILTIN_OUTBOUND_TAGS.toList(),
+                        onValueChange = { outboundTag = it },
+                        modifier = Modifier.weight(1f)
+                    )
+                    AppIconButton(
+                        icon = painterResource(R.drawable.ic_search_24dp),
+                        label = stringResource(R.string.menu_item_search),
+                        contentDescription = stringResource(R.string.acc_search),
+                        onClick = { showOutboundDialog = true }
                     )
                 }
             }
@@ -342,7 +381,7 @@ fun RoutingEditScreen(
         if (showOutboundDialog) {
             ServerSelectListDialog(
                 title = stringResource(R.string.routing_settings_outbound_tag),
-                options = outboundSuggestions,
+                options = if (isTelevision) BUILTIN_OUTBOUND_TAGS.toList() + outboundSuggestions else outboundSuggestions,
                 selectedOption = outboundTag,
                 onSelected = {
                     outboundTag = it

@@ -133,7 +133,7 @@ object SettingsManager {
         val rulesetList = MmkvManager.decodeRoutingRulesets()
         if (rulesetList.isNullOrEmpty()) return null
 
-        return rulesetList[index]
+        return rulesetList.getOrNull(index)
     }
 
     /**
@@ -165,7 +165,7 @@ object SettingsManager {
         if (index < 0) return
 
         val rulesetList = MmkvManager.decodeRoutingRulesets()
-        if (rulesetList.isNullOrEmpty()) return
+        if (rulesetList == null || index !in rulesetList.indices) return
 
         rulesetList.removeAt(index)
         MmkvManager.encodeRoutingRulesets(rulesetList)
