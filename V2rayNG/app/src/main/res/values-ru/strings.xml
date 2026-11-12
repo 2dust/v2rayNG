@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">Добавить Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Добавить WireGuard</string>
     <string name="menu_item_import_config_manually_hysteria2">Добавить Hysteria2</string>
+    <string name="menu_item_import_config_manually_masque">Добавить MASQUE</string>
     <string name="confirm_delete_visible_profiles">Удалить все отображаемые профили?</string>
     <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
     <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">Узел H2</string>
     <string name="server_lab_request_host_quic">Шифрование QUIC</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_request_host_masque">Узел MASQUE</string>
     <string name="server_lab_path">Путь</string>
     <string name="server_lab_path_ws">Путь WS</string>
     <string name="server_lab_path_httpupgrade">Путь HTTPUpgrade</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">Ключ QUIC</string>
     <string name="server_lab_path_kcp">Сид KCP</string>
     <string name="server_lab_path_grpc">Служба gRPC</string>
+    <string name="server_lab_path_masque">Путь MASQUE</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Отпечаток</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -103,6 +106,9 @@
     <string name="server_lab_reserved">Reserved (необязательно, через запятую)</string>
     <string name="server_lab_local_address">Локальный адрес (необязательно, IPv4/IPv6 через запятую)</string>
     <string name="server_lab_local_address_hint">Если пусто, используется %1$s. IPv6-адреса применяются только при включённом IPv6.</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">Закрытый ключ WARP</string>
+    <string name="server_lab_masque_warp_public_key">Открытый ключ WARP</string>
     <string name="server_lab_local_mtu">MTU (необязательно, по умолчанию 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (необязательно, IPv4/IPv6-адреса через запятую)</string>
     <string name="server_lab_remote_dns_hint">Если пусто, используется %1$s. IPv6-адреса применяются только при включённом IPv6.</string>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
@@ -51,6 +52,7 @@ import com.v2ray.ang.ui.compose.colorFabInactiveLight
 import kotlinx.coroutines.launch
 
 private val KNOB_SIZE = 56.dp
+private val BAR_MAX_WIDTH = 480.dp
 private const val TEXT_MAX_SP = 14f
 private const val TEXT_MIN_SP = 10f
 private const val TEXT_LINE_HEIGHT_FACTOR = 1.3f
@@ -60,7 +62,8 @@ private const val TEXT_LINE_HEIGHT_FACTOR = 1.3f
  *
  * The button always sits on the physical right edge, in left-to-right and right-to-left languages
  * alike, and never moves, so the bar can be used with one hand. The message is start-aligned (left
- * in LTR, right in RTL, next to the button). Tapping the track tests the current server.
+ * in LTR, right in RTL, next to the button). Tapping the track tests the current server. On wide
+ * screens the bar is capped at [BAR_MAX_WIDTH] and centered.
  */
 @Composable
 fun MainBottomBar(
@@ -90,6 +93,9 @@ fun MainBottomBar(
 
     Box(
         modifier = modifier
+            // On wide screens (tablets, landscape) the bar keeps a phone-like width and stays centered
+            // instead of stretching across the whole screen.
+            .widthIn(max = BAR_MAX_WIDTH)
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 14.dp)
