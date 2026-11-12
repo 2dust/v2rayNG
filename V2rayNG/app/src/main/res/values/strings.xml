@@ -11,7 +11,6 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="migration_fail">Data migration failed!</string>
-    <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">v2rayNG service</string>
@@ -576,4 +575,25 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
 
+    <string name="action_exit">Exit</string>
+    <string name="action_save">Save</string>
+    <string name="action_add_subscription">Add subscription</string>
+    <string name="action_back">Back</string>
+    <string name="action_more">More</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_share">Share</string>
+    <string name="action_info">Info</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_add_member">Add member</string>
+    <string name="action_start_scan">Start scan</string>
+    <string name="action_stop_scan">Stop scan</string>
+    <string name="action_torch">Torch</string>
+    <string name="action_select_image">Select image</string>
+    <string name="menu_item_edit_asset">Edit asset</string>
+    <string name="menu_item_del_asset">Delete asset</string>
+    <string name="logcat_update">Update</string>
+    <string name="sub_setting_no_proxy">None</string>
+    <string name="routing_settings_enable_rule">Enable rule</string>
+    <string name="connection_connected_tv">Connected</string>
+    <string name="server_proxy_chain_member">Member</string>
 </resources>

@@ -11,7 +11,6 @@
     <string name="action_ok">تأیید</string>
     <string name="action_cancel">لغو</string>
     <string name="migration_fail">انتقال داده‌ها با شکست مواجه شد!</string>
-    <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">سرویس v2rayNG</string>
@@ -32,6 +31,20 @@
     <string name="menu_item_save_config">ذخیره کانفیگ</string>
     <string name="menu_item_edit_config">ویرایش کردن کانفیگ</string>
     <string name="menu_item_del_config">حذف کانفیگ</string>
+    <string name="action_exit">خروج</string>
+    <string name="action_save">ذخیره</string>
+    <string name="action_add_subscription">افزودن اشتراک</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">بیشتر</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="action_share">اشتراک‌گذاری</string>
+    <string name="action_info">اطلاعات</string>
+    <string name="action_remove">برداشتن</string>
+    <string name="action_add_member">افزودن عضو</string>
+    <string name="action_start_scan">شروع اسکن</string>
+    <string name="action_stop_scan">توقف اسکن</string>
+    <string name="action_torch">چراغ‌قوه</string>
+    <string name="action_select_image">انتخاب تصویر</string>
     <string name="menu_item_import_config_qrcode">کانفیگ را از کد QR وارد کنید</string>
     <string name="menu_item_import_config_clipboard">کانفیگ را از کلیپ ‌بورد وارد کنید</string>
     <string name="menu_item_import_config_local">کانفیگ را از محلی وارد کنید</string>
@@ -160,6 +173,8 @@
     <string name="menu_item_scan_qrcode">اسکن کد QR</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">دانلود فایل‌ ها</string>
+    <string name="menu_item_edit_asset">ویرایش منبع</string>
+    <string name="menu_item_del_asset">حذف منبع</string>
     <string name="title_user_asset_add_url">افزودن URL منبع</string>
     <string name="msg_file_not_found">فایل پیدا نشد</string>
     <string name="msg_remark_is_duplicate">این نام از قبل وجود دارد</string>
@@ -331,6 +346,7 @@
     <string name="summary_root_lan_sharing">ترافیک دستگاه‌های متصل به نقطهٔ اتصال Wi-Fi و USB را از VPN عبور می‌دهد.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_update">به‌روزرسانی</string>
     <string name="logcat_copy">کپی</string>
     <string name="logcat_clear">پاک کردن</string>
     <string name="logcat_share">اشتراک‌گذاری گزارش</string>
@@ -353,6 +369,7 @@
     <string name="sub_setting_pre_profile_tip">لطفاً مطمئن شوید که نام مستعار وجود دارد و منحصر به فرد است</string>
     <string name="sub_setting_entry_proxy_tip">پروکسی انتخاب‌شده پیش از هر پروفایل این اشتراک، به‌عنوان حلقهٔ ورودی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
     <string name="sub_setting_exit_proxy_tip">پروکسی انتخاب‌شده پس از هر پروفایل این اشتراک، به‌عنوان حلقهٔ خروجی زنجیرهٔ پروکسی آن پروفایل اضافه می‌شود.</string>
+    <string name="sub_setting_no_proxy">هیچ‌کدام</string>
     <string name="toast_invalid_update_interval">بازه بروزرسانی نامعتبر است. حداقل مقدار 15 دقیقه است.</string>
     <string name="title_sub_update">به‌روزرسانی گروه فعلی اشتراک</string>
     <string name="title_ping_all_server">آزمایش تأخیر TCP (TCPing)</string>
@@ -389,6 +406,7 @@
     <string name="routing_settings_comma_tip">چند ورودی را با کاما (,) جدا کنید.</string>
     <string name="routing_settings_save">ذخیره</string>
     <string name="routing_settings_delete">حذف</string>
+    <string name="routing_settings_enable_rule">فعال کردن قانون</string>
     <string name="routing_settings_rule_title">تنظیمات قانون مسیریابی</string>
     <string name="routing_settings_add_rule">اضافه کردن قانون</string>
     <string name="routing_settings_import_predefined_rulesets">وارد کردن مجموعه قوانین از پیش تعریف شده</string>
@@ -417,6 +435,7 @@
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
     <string name="connection_connected">متصل است.\nبرای بررسی اتصال ضربه بزنید.</string>
+    <string name="connection_connected_tv">متصل است</string>
     <string name="connection_not_connected">متصل نیست</string>
     <string name="connection_running_task_left">آزمایش‌های در حال اجرا: %s</string>
 
@@ -451,6 +470,7 @@
     <string name="title_policy_group_fallback">خروجی پشتیبان (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">اعضای زنجیره پروکسی</string>
+    <string name="server_proxy_chain_member">عضو</string>
     <string name="server_proxy_chain_pick_members">برای انتخاب عضو اینجا بزنید</string>
     <string name="server_proxy_chain_member_unselected">یک عضو را انتخاب کنید</string>
     <string name="server_proxy_chain_members_unselected">لطفاً برای هر ردیف زنجیره یک عضو انتخاب کنید</string>
