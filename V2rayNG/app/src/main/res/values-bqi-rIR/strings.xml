@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ٱووردن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_masque">ٱووردن [MASQUE]</string>
     <string name="confirm_delete_visible_profiles">پوی کانفیگا ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_duplicate_profiles">پوی کانفیگا تکراری ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_invalid_profiles">ٱول کانفیگا ن آزمایش کۊنین. پوی کانفیگا نا موئتبر ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">هاست h2</string>
     <string name="server_lab_request_host_quic">ٱمنیت QUIC</string>
     <string name="server_lab_request_host_grpc">Authority gRPC</string>
+    <string name="server_lab_request_host_masque">هاست MASQUE</string>
     <string name="server_lab_path">تور</string>
     <string name="server_lab_path_ws">تور WS</string>
     <string name="server_lab_path_httpupgrade">تور HTTPUpgrade</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">کیلیت QUIC</string>
     <string name="server_lab_path_kcp">KCP seed</string>
     <string name="server_lab_path_grpc">نوم سرویس gRPC</string>
+    <string name="server_lab_path_masque">تور MASQUE</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">جا کلک</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -102,6 +105,10 @@
     <string name="server_lab_secret_key">کیلیت سیخومی</string>
     <string name="server_lab_reserved">Reserved(اختیاری، وا کاما (,) ز یک جوڌا ابۊن)</string>
     <string name="server_lab_local_address">نشۊوی مهلی (اختیاری IPv4/IPv6، وا کاما (,) ز یک جوڌا ابۊن)</string>
+    <string name="server_lab_local_address_hint">اگه خالی بی، پؽش فرز %1$s سی و کار گرؽڌه وابی. نشۊویا IPv6 فقظ وختؽ کار گرؽڌه وابیڌه که IPv6 رۊشن بی.</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">کیلیت سیخومی WARP</string>
+    <string name="server_lab_masque_warp_public_key">کیلیت پوی وولاتی WARP</string>
     <string name="server_lab_local_mtu">MTU(اختیاری، پؽش فرز 1420)</string>
     <string name="server_lab_remote_dns">remoteDNS (اختياری، نشۊویا IPv4/IPv6 جوڌا وابیڌه وا کاما، یا «local» سی و کار گرؽڌن DNS دسگا)</string>
     <string name="server_lab_remote_dns_hint">اگه خالی بی، پؽش فرز %1$s سی و کار گرؽڌه وابی. نشۊویا IPv6 فقظ وختؽ کار گرؽڌه وابیڌه که IPv6 رۊشن بی.</string>
@@ -125,6 +132,9 @@
     <string name="server_lab_request_host6">هاست(SNI)(اختیاری)</string>
     <string name="toast_action_not_allowed">ای کار ممنۊع هڌ</string>
     <string name="server_obfs_password">رزم obfs</string>
+    <string name="server_obfs_type">نوع مبهم‌سازی</string>
+    <string name="server_lab_min_packet_size">حداقل اندازه بسته (اختیاری، پیش‌فرض 512)</string>
+    <string name="server_lab_max_packet_size">حداکثر اندازه بسته (اختیاری، پیش‌فرض 1200)</string>
     <string name="server_lab_port_hop">گوم پورت (پورت سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله گوم پورت (سانیه)</string>
     <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
