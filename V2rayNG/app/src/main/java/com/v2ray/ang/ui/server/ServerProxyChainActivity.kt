@@ -2,22 +2,22 @@ package com.v2ray.ang.ui.server
 
 import android.os.Bundle
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -48,8 +50,9 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
@@ -74,7 +77,12 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         super.onCreate(savedInstanceState)
 
         allRemarks = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN)
+            excludeConfigTypes = setOf(
+                EConfigType.CUSTOM,
+                EConfigType.CUSTOM_OUTBOUND,
+                EConfigType.POLICYGROUP,
+                EConfigType.PROXYCHAIN,
+            )
         )
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
@@ -118,8 +126,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         }
 
         val invalidMembers = chainMembers.filter { member ->
-            val profile = SettingsManager.getServerViaRemarks(member)
-            profile == null || profile.configType.isComplexType()
+            val entry = SettingsManager.getProfileEntryViaRemarks(member)
+            entry == null || entry.profile.configType.isComplexType()
         }
 
         if (invalidMembers.isNotEmpty()) {
@@ -204,6 +212,7 @@ fun ProxyChainScreen(
     var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
     var showProfileDeleteConfirm by remember { mutableStateOf(false) }
     var memberToDeleteKey by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingMemberKey by rememberSaveable { mutableStateOf<String?>(null) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val lazyListState = rememberLazyListState()
@@ -269,12 +278,7 @@ fun ProxyChainScreen(
                 .consumeWindowInsets(innerPadding)
                 .imePadding()
                 .verticalScrollbar(lazyListState),
-            contentPadding = PaddingValues(
-                top = 8.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 36.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-            )
+            contentPadding = NavigationBarsBottomPadding()
         ) {
             item(key = "remarks_field") {
                 FormTextField(
@@ -297,43 +301,68 @@ fun ProxyChainScreen(
                 val memberKey = memberKeys[index]
                 ReorderableItem(reorderableState, key = memberKey) { isDragging ->
                     val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                    Surface(shadowElevation = elevation) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        shadowElevation = elevation
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .then(with(this) { reorderableDragHandle() })
-                                .padding(horizontal = 4.dp, vertical = 4.dp),
+                                .padding(start = 8.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "${index + 1}",
+                            Box(
                                 modifier = Modifier
-                                    .padding(start = 16.dp)
-                                    .width(10.dp)
-                            )
-                            FormDropdownField(
-                                label = stringResource(R.string.server_lab_remarks),
-                                placeholder = stringResource(R.string.server_proxy_chain_member_unselected),
-                                value = member,
-                                options = allRemarks,
-                                onValueChange = { newVal ->
-                                    members = members.toMutableList().also { it[index] = newVal }
+                                    .then(with(this@ReorderableItem) { reorderableDragHandle() })
+                                    .padding(4.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_menu_24dp),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Surface(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { editingMemberKey = memberKey },
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            ) {
+                                Text(
+                                    text = member.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (member.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    else MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = if (member.isBlank()) FontWeight.Normal else FontWeight.Medium,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (member.isBlank()) {
+                                        val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
+                                        members = remainingMembers
+                                        memberKeys = remainingKeys
+                                    } else {
+                                        memberToDeleteKey = memberKey
+                                    }
                                 },
-                                editable = true,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = {
-                                if (member.isBlank()) {
-                                    val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                                    members = remainingMembers
-                                    memberKeys = remainingKeys
-                                } else {
-                                    memberToDeleteKey = memberKey
-                                }
-                            }) {
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .size(36.dp)
+                            ) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
-                                    contentDescription = stringResource(R.string.acc_remove)
+                                    contentDescription = stringResource(R.string.acc_remove),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
                         }
@@ -363,5 +392,20 @@ fun ProxyChainScreen(
             },
             onDismiss = { memberToDeleteKey = null }
         )
+    }
+    editingMemberKey?.let { memberKey ->
+        val currentIndex = memberKeys.indexOf(memberKey)
+        if (currentIndex != -1) {
+            ServerSelectListDialog(
+                title = stringResource(R.string.server_proxy_chain_pick_members),
+                options = allRemarks,
+                selectedOption = members.getOrNull(currentIndex),
+                onSelected = { selectedRemark ->
+                    members = members.toMutableList().also { it[currentIndex] = selectedRemark }
+                    editingMemberKey = null
+                },
+                onDismiss = { editingMemberKey = null }
+            )
+        }
     }
 }

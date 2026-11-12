@@ -16,7 +16,11 @@ object CertificateFingerprintManager {
 
     fun fetchForManualFill(profile: ProfileItem): String? {
         val request = buildRequest(profile) ?: return null
-        val result = if (profile.configType == EConfigType.HYSTERIA2) {
+        // alpn can be "h2,http/1.1" so need to split by parts
+        val alpn = profile.alpn.orEmpty().split(",").map { it.trim() }
+        val useQuic = profile.configType == EConfigType.HYSTERIA2 ||
+            (profile.configType == EConfigType.MASQUE && ("h2" !in alpn || "h3" in alpn))
+        val result = if (useQuic) {
             fetch("quic", request) { Libv2ray.fetchQuicCertSha256(it) }
         } else {
             fetch("tls", request) { Libv2ray.fetchTlsCertSha256(it) }
