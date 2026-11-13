@@ -36,6 +36,33 @@ class TvMainInteractionTest {
     }
 
     @Test
+    fun centerDropIgnoresTranslatedRepeatsUntilAnotherQuietPeriod() {
+        val state = DpadReorderState()
+        val guard = dpadRepeatReleaseGuardMillis(50)
+        state.onActivationKeyDown("profile", 0, true, 0, guard)
+        state.onActivationKeyUp("profile", 20, guard)
+        val drop = 20 + guard + 1
+        assertEquals(DpadReorderActivation.Dropped, state.onActivationKeyDown("profile", 0, false, drop, guard))
+        assertNull(state.movingKey)
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyUp("profile", drop + 20, guard))
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyDown("profile", 0, true, drop + 25, guard))
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyDown("profile", 0, false, drop + 100, guard))
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyUp("profile", drop + 120, guard))
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyDown("profile", 0, false, drop + guard + 121, guard))
+        assertEquals(DpadReorderActivation.Click, state.onActivationKeyUp("profile", drop + guard + 140, guard))
+    }
+
+    @Test
+    fun backDropDoesNotSwallowTheNextCenterPress() {
+        val state = DpadReorderState()
+        val guard = dpadRepeatReleaseGuardMillis(50)
+        state.onActivationKeyDown("profile", 0, true, 0, guard)
+        assertEquals(DpadReorderActivation.Dropped, state.onDropRequest("profile"))
+        assertEquals(DpadReorderActivation.None, state.onActivationKeyDown("profile", 0, false, 100, guard))
+        assertEquals(DpadReorderActivation.Click, state.onActivationKeyUp("profile", 120, guard))
+    }
+
+    @Test
     fun gridMovementFollowsMirroredColumns() {
         assertEquals(1, twoColumnDpadReorderTarget(0, DpadReorderDirection.Right, isRtl = false))
         assertEquals(0, twoColumnDpadReorderTarget(0, DpadReorderDirection.Right, isRtl = true))

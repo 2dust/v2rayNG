@@ -28,7 +28,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -147,9 +146,9 @@ internal fun Modifier.dpadFocusOutline(
 }
 
 @Composable
-internal fun Modifier.dpadClickable(enabled: Boolean = true, role: Role? = null, onClick: () -> Unit): Modifier {
+internal fun Modifier.dpadClickable(onClick: () -> Unit): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
-    return clickable(interactionSource = interactionSource, indication = null, enabled = enabled, role = role, onClick = onClick)
+    return clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
 }
 
 internal fun Key.isDpadActivationKey(): Boolean =

@@ -114,6 +114,8 @@ class MainViewModel(
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
+    internal suspend fun awaitInitialProfilePage() = initialPageReady.await()
+
     // ---------- Service events ----------
     init {
         collectServiceEvents()

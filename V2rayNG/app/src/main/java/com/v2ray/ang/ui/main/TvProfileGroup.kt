@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
@@ -42,6 +43,7 @@ import com.v2ray.ang.ui.compose.keepDpadReorderItemVisible
 import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
 import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
+import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.compose.twoColumnDpadReorderTarget
 import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 import kotlinx.coroutines.flow.first
@@ -69,7 +71,10 @@ internal fun TvProfileGroup(
     scroll: TvProfileScrollState,
     dialogs: TvMainDialogActions,
     onAction: (MainAction) -> Unit,
-    resumeGeneration: Int,
+    onEdit: (MainAction.EditServer) -> Unit,
+    editorFocusGuid: String?,
+    onEditorFocusHandled: (Boolean) -> Unit,
+    revealGeneration: Int,
     lastReveals: MutableMap<String, ProfileReveal>,
     onOpenDrawer: (() -> Boolean) -> Unit,
     onBackToToolbar: () -> Unit,
@@ -99,9 +104,31 @@ internal fun TvProfileGroup(
         return if (removed) neighbor?.let { restore(it) } ?: false else restore(guid, action)
     }
 
-    RevealSelectedProfile(group.id, scroll, resumeGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
+    if (editorFocusGuid == null) {
+        RevealSelectedProfile(group.id, scroll, revealGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
+    } else {
+        val window = LocalWindowInfo.current
+        val onHandled by rememberUpdatedState(onEditorFocusHandled)
+        LaunchedEffect(editorFocusGuid, keys, doubleColumn) {
+            snapshotFlow { window.isWindowFocused }.first { it }
+            mainViewModel.awaitInitialProfilePage()
+            val index = keys.indexOf(editorFocusGuid)
+            // After process recreation the group flow can be populated before its rows are composed.
+            if (index < 0 && groupStateFlow.value.rows.any { it.guid == editorFocusGuid }) return@LaunchedEffect
+            val focus = targets[editorFocusGuid]
+            val button = focus?.buttons?.get(if (doubleColumn) ProfileRowAction.More else ProfileRowAction.Edit)
+            val restored = button != null && (button.requestFocus() || run {
+                scroll.reveal(index, doubleColumn)
+                requestFocusWhenReady(button)
+            })
+            if (restored) {
+                uiState.selectedGuid?.let { lastReveals[group.id] = ProfileReveal(revealGeneration, it, doubleColumn) }
+            }
+            onHandled(restored)
+        }
+    }
     val canReorder = groupState.canReorder(group.id, uiState.searchQuery)
-    val reorder = if (canReorder) rememberSyncedDpadReorderState(keys, enabled = true, stateKey = group.id) { key, index ->
+    val reorder = if (canReorder) rememberSyncedDpadReorderState(keys) { key, index ->
         val guid = key as? String ?: return@rememberSyncedDpadReorderState
         if (index >= 0) {
             if (doubleColumn) scroll.grid.keepDpadReorderItemVisible(guid, index)
@@ -163,7 +190,7 @@ internal fun TvProfileGroup(
                     onSelect = { onAction(MainAction.SelectServer(row.guid)) },
                     onAction = { action ->
                         val neighbor = focusAfterProfileRemoval(latestKeys, row.guid)
-                        runProfileRowAction(action, row, onAction, dialogs) { removed ->
+                        runProfileRowAction(action, row, onEdit, dialogs) { removed ->
                             if (removed) restoreAfterRemoval(row.guid, neighbor, action)
                             else restore(row.guid, action)
                         }
@@ -180,16 +207,16 @@ internal fun TvProfileGroup(
 private fun RevealSelectedProfile(
     groupId: String,
     scroll: TvProfileScrollState,
-    resumeGeneration: Int,
+    revealGeneration: Int,
     selectedGuid: String?,
     rows: List<ServerRowUiModel>,
     doubleColumn: Boolean,
     lastReveals: MutableMap<String, ProfileReveal>
 ) {
     val latestRows by rememberUpdatedState(rows)
-    LaunchedEffect(scroll, resumeGeneration, selectedGuid, doubleColumn) {
+    LaunchedEffect(scroll, revealGeneration, selectedGuid, doubleColumn) {
         if (selectedGuid == null) return@LaunchedEffect
-        val reveal = ProfileReveal(resumeGeneration, selectedGuid, doubleColumn)
+        val reveal = ProfileReveal(revealGeneration, selectedGuid, doubleColumn)
         // Returning to an already revealed group must not reset its scroll position.
         if (lastReveals[groupId] == reveal) return@LaunchedEffect
         val index = snapshotFlow { latestRows.indexOfFirst { it.guid == selectedGuid } }.first { it >= 0 }
@@ -225,7 +252,7 @@ private fun TvProfileRow(
         )
         .then(
             if (reorderItem == null) Modifier.dpadClickable(onClick = onSelect)
-            else Modifier.dpadLongPressToMove(enabled = true, item = reorderItem, onClick = onSelect)
+            else Modifier.dpadLongPressToMove(item = reorderItem, onClick = onSelect)
         )
     Column {
         TvProfileRowLayout(

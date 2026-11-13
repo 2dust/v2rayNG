@@ -13,11 +13,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
@@ -51,11 +51,14 @@ internal fun TvMainScreen(
     val groupIds = groups.map { it.id }
     val selectedGroupIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }.coerceAtLeast(0)
     val selectedGroup = groups.getOrNull(selectedGroupIndex)
-    val scrollStates = remember { mutableMapOf<String, TvProfileScrollState>() }
+    val groupScrollStates = rememberSaveableStateHolder()
+    val knownGroupIds = remember { mutableSetOf<String>() }
     val lastReveals = remember { mutableMapOf<String, ProfileReveal>() }
     LaunchedEffect(groupIds) {
         val ids = groupIds.toSet()
-        scrollStates.keys.retainAll(ids)
+        (knownGroupIds - ids).forEach(groupScrollStates::removeState)
+        knownGroupIds.clear()
+        knownGroupIds.addAll(ids)
         lastReveals.keys.retainAll(ids)
     }
     val drawer = rememberMainTvDrawerCoordinator()
@@ -68,9 +71,23 @@ internal fun TvMainScreen(
     val topBarFocus = remember { TvMainTopBarFocus() }
     val lifecycleOwner = LocalLifecycleOwner.current
     var resumeFocusGeneration by remember { mutableIntStateOf(0) }
+    var profileRevealGeneration by remember { mutableIntStateOf(0) }
+    var editorGuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var returningFromEditor by remember { mutableStateOf(editorGuid != null) }
+    var focusToRestore by remember { mutableStateOf<(suspend () -> Boolean)?>(null) }
+    fun openEditor(action: MainAction.EditServer) {
+        returningFromEditor = false
+        editorGuid = action.guid
+        onAction(action)
+    }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) resumeFocusGeneration++
+            if (event == Lifecycle.Event.ON_RESUME) {
+                resumeFocusGeneration++
+                // Restore the editor's row instead of scrolling it away to the active profile.
+                if (editorGuid == null) profileRevealGeneration++
+                else returningFromEditor = true
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -80,19 +97,17 @@ internal fun TvMainScreen(
     LaunchedEffect(isDrawerOpen, showSearch) {
         val justClosed = drawerWasOpen && !isDrawerOpen
         drawerWasOpen = isDrawerOpen
-        if (!isDrawerOpen && (justClosed || !showSearch)) {
+        if (!isDrawerOpen && (justClosed || (!showSearch && editorGuid == null))) {
             if (drawer.takeFocusToRestore()?.invoke() != true) requestFocusWhenReady(topBarFocus.start)
         }
-        drawerWasOpen = isDrawerOpen
     }
     val windowInfo = LocalWindowInfo.current
-    var dialogFocusToRestore by remember { mutableStateOf<(suspend () -> Boolean)?>(null) }
-    LaunchedEffect(dialogFocusToRestore) {
-        val restore = dialogFocusToRestore ?: return@LaunchedEffect
+    LaunchedEffect(focusToRestore) {
+        val restore = focusToRestore ?: return@LaunchedEffect
         snapshotFlow { windowInfo.isWindowFocused }.first { it }
         withFrameNanos { }
         if (!restore()) requestFocusWhenReady(topBarFocus.start)
-        dialogFocusToRestore = null
+        focusToRestore = null
     }
 
     BackHandler(enabled = showSearch, onBack = ::closeSearch)
@@ -110,7 +125,8 @@ internal fun TvMainScreen(
         shareQRCodeBitmap = uiState.shareQRCodeBitmap,
         selectedGuid = uiState.selectedGuid,
         onAction = onAction,
-        onRestoreFocus = { dialogFocusToRestore = it }
+        onEdit = ::openEditor,
+        onRestoreFocus = { focusToRestore = it }
     ) { dialogs ->
         TvMainNavigationDrawer(
             drawerState = drawer.state,
@@ -155,15 +171,21 @@ internal fun TvMainScreen(
                                 onSelectGroup = { onAction(MainAction.SelectGroup(it)) }
                             )
                         }
-                        key(selectedGroup.id) {
+                        groupScrollStates.SaveableStateProvider(selectedGroup.id) {
                             TvProfileGroup(
                                 group = selectedGroup,
                                 mainViewModel = mainViewModel,
                                 uiState = uiState,
-                                scroll = remember { scrollStates.getOrPut(selectedGroup.id) { TvProfileScrollState() } },
+                                scroll = rememberTvProfileScrollState(),
                                 onAction = onAction,
+                                onEdit = ::openEditor,
+                                editorFocusGuid = editorGuid.takeIf { returningFromEditor },
+                                onEditorFocusHandled = { restored ->
+                                    editorGuid = null
+                                    if (!restored) focusToRestore = { requestFocusWhenReady(topBarFocus.start) }
+                                },
                                 dialogs = dialogs,
-                                resumeGeneration = resumeFocusGeneration,
+                                revealGeneration = profileRevealGeneration,
                                 lastReveals = lastReveals,
                                 onOpenDrawer = drawer::openFrom,
                                 onBackToToolbar = { topBarFocus.start.requestFocus() },

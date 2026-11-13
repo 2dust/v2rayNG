@@ -36,6 +36,7 @@ internal fun TvMainDialogs(
     shareQRCodeBitmap: Bitmap?,
     selectedGuid: String?,
     onAction: (MainAction) -> Unit,
+    onEdit: (MainAction.EditServer) -> Unit,
     onRestoreFocus: (suspend () -> Boolean) -> Unit,
     content: @Composable (TvMainDialogActions) -> Unit
 ) {
@@ -53,7 +54,7 @@ internal fun TvMainDialogs(
     bulkDelete?.let { target ->
         TvDeleteConfirmDialog(
             message = stringResource(target.messageRes),
-            onConfirm = { onAction(target.action) },
+            onConfirm = { bulkDelete = null; onAction(target.action) },
             onDismiss = { bulkDelete = null }
         )
     }
@@ -63,7 +64,10 @@ internal fun TvMainDialogs(
             { stringResource(it.labelRes) },
             { action ->
                 shareTarget = null
-                action.dispatch(target.guid, target.profile, onAction) { guid, name -> requestRemove(guid, name, target.restoreFocus) }
+                action.dispatch(target.guid, target.profile, { selectedAction ->
+                    if (selectedAction is MainAction.EditServer) onEdit(selectedAction)
+                    else onAction(selectedAction)
+                }) { guid, name -> requestRemove(guid, name, target.restoreFocus) }
             },
             {
                 shareTarget = null
@@ -83,7 +87,7 @@ internal fun TvMainDialogs(
             message = stringResource(R.string.confirm_delete_profile),
             itemName = target.profileName,
             onConfirm = { close(true) },
-            onDismiss = { if (deleteTarget != null) close(false) }
+            onDismiss = { close(false) }
         )
     }
     if (shareQRCodeBitmap != null) {

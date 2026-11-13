@@ -20,7 +20,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -61,14 +63,18 @@ import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-internal class TvProfileScrollState {
-    val list = LazyListState()
-    val grid = LazyGridState()
-
+internal class TvProfileScrollState(val list: LazyListState, val grid: LazyGridState) {
     suspend fun reveal(index: Int, doubleColumn: Boolean) {
         if (doubleColumn) grid.scrollToItem(index, -grid.layoutInfo.viewportSize.height / 3)
         else list.scrollToItem(index, -list.layoutInfo.viewportSize.height / 3)
     }
+}
+
+@Composable
+internal fun rememberTvProfileScrollState(): TvProfileScrollState {
+    val list = rememberLazyListState()
+    val grid = rememberLazyGridState()
+    return remember(list, grid) { TvProfileScrollState(list, grid) }
 }
 
 @Composable
@@ -198,13 +204,13 @@ internal val gridProfileActions = listOf(ProfileRowAction.More)
 internal fun runProfileRowAction(
     action: ProfileRowAction,
     row: ServerRowUiModel,
-    onAction: (MainAction) -> Unit,
+    onEdit: (MainAction.EditServer) -> Unit,
     dialogs: TvMainDialogActions,
     restoreFocus: RestoreProfileFocus
 ) {
     when (action) {
         ProfileRowAction.More, ProfileRowAction.Share -> dialogs.share(row.guid, row.profile, action == ProfileRowAction.More, restoreFocus)
-        ProfileRowAction.Edit -> onAction(MainAction.EditServer(row.guid, row.profile))
+        ProfileRowAction.Edit -> onEdit(MainAction.EditServer(row.guid, row.profile))
         ProfileRowAction.Delete -> dialogs.remove(row.guid, row.remarks, restoreFocus)
     }
 }

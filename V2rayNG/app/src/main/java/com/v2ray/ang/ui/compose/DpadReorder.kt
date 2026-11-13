@@ -41,8 +41,9 @@ import kotlinx.coroutines.launch
  * Enter/DPAD_CENTER as discrete ACTION_UP/ACTION_DOWN pairs whose repeatCount is zero.
  * Without a quiet period, one hold can start movement, drop the item, and then click it.
  * Keep a conservative 500 ms floor, while allowing slower configured key-repeat
- * delays to extend it. This only delays the Center press that drops a moving item;
- * directional movement remains immediate. Remove the quiet period only when every supported
+ * delays to extend it. Apply it before a Center drop and again before accepting a
+ * new activation after that drop. Directional movement and Back remain immediate.
+ * Remove the quiet period only when every supported
  * Android TV remote and USB/Bluetooth keyboard path reports a held activation as one down/up
  * sequence with non-zero repeatCount or isLongPress on every repeated event.
  */
@@ -50,7 +51,7 @@ private const val MIN_KEY_REPEAT_QUIET_PERIOD_MS = 500L
 
 internal enum class DpadReorderDirection { Up, Down, Left, Right }
 
-internal enum class DpadReorderPhase { Idle, Pressed, MovingAwaitRelease, MovingReady }
+internal enum class DpadReorderPhase { Idle, Pressed, MovingAwaitRelease, MovingReady, DropGuard }
 
 internal enum class DpadReorderActivation { None, Click, StartedMoving, Dropped }
 
@@ -60,7 +61,7 @@ internal class DpadReorderState {
         private set
 
     private var activeKey by mutableStateOf<Any?>(null)
-    private var dropAllowedAfterMillis = Long.MIN_VALUE
+    private var repeatQuietUntilMillis = Long.MIN_VALUE
     var movingIndex by mutableIntStateOf(-1)
         private set
 
@@ -73,10 +74,10 @@ internal class DpadReorderState {
 
     fun isMoving(key: Any): Boolean = isMoving && activeKey == key
 
-    fun syncItems(keys: Collection<*>, enabled: Boolean = true) {
+    fun syncItems(keys: List<*>) {
         val key = activeKey ?: return
-        val index = keys.indexOfFirst { it == key }
-        if (!enabled || index < 0) {
+        val index = keys.indexOf(key)
+        if (index < 0) {
             reset()
         } else {
             movingIndex = index
@@ -90,6 +91,7 @@ internal class DpadReorderState {
         eventTimeMillis: Long,
         repeatReleaseGuardMillis: Long
     ): DpadReorderActivation {
+        if (phase == DpadReorderPhase.DropGuard && !isLongPress && eventTimeMillis > repeatQuietUntilMillis) reset()
         return when (phase) {
             DpadReorderPhase.Idle -> {
                 activeKey = key
@@ -119,16 +121,23 @@ internal class DpadReorderState {
 
             DpadReorderPhase.MovingReady -> {
                 if (activeKey == key) {
-                    if (isLongPress || eventTimeMillis <= dropAllowedAfterMillis) {
-                        dropAllowedAfterMillis = eventTimeMillis + repeatReleaseGuardMillis
+                    if (isLongPress || eventTimeMillis <= repeatQuietUntilMillis) {
+                        repeatQuietUntilMillis = eventTimeMillis + repeatReleaseGuardMillis
                         DpadReorderActivation.None
                     } else {
                         reset()
+                        phase = DpadReorderPhase.DropGuard
+                        repeatQuietUntilMillis = eventTimeMillis + repeatReleaseGuardMillis
                         DpadReorderActivation.Dropped
                     }
                 } else {
                     DpadReorderActivation.None
                 }
+            }
+
+            DpadReorderPhase.DropGuard -> {
+                repeatQuietUntilMillis = eventTimeMillis + repeatReleaseGuardMillis
+                DpadReorderActivation.None
             }
         }
     }
@@ -139,7 +148,7 @@ internal class DpadReorderState {
         repeatReleaseGuardMillis: Long,
         canceled: Boolean = false
     ): DpadReorderActivation {
-        if (activeKey != key) return DpadReorderActivation.None
+        if (phase != DpadReorderPhase.DropGuard && activeKey != key) return DpadReorderActivation.None
         if (canceled && phase == DpadReorderPhase.Pressed) {
             reset()
             return DpadReorderActivation.None
@@ -154,12 +163,12 @@ internal class DpadReorderState {
 
             DpadReorderPhase.MovingAwaitRelease -> {
                 phase = DpadReorderPhase.MovingReady
-                dropAllowedAfterMillis = eventTimeMillis + repeatReleaseGuardMillis
+                repeatQuietUntilMillis = eventTimeMillis + repeatReleaseGuardMillis
                 DpadReorderActivation.None
             }
 
-            DpadReorderPhase.MovingReady -> {
-                dropAllowedAfterMillis = eventTimeMillis + repeatReleaseGuardMillis
+            DpadReorderPhase.MovingReady, DpadReorderPhase.DropGuard -> {
+                repeatQuietUntilMillis = eventTimeMillis + repeatReleaseGuardMillis
                 DpadReorderActivation.None
             }
         }
@@ -177,8 +186,7 @@ internal class DpadReorderState {
         return if (isMoving && activeKey == key) {
             reset()
             DpadReorderActivation.Dropped
-        } else if (phase == DpadReorderPhase.Idle) {
-            reset()
+        } else if (phase == DpadReorderPhase.Idle || phase == DpadReorderPhase.DropGuard) {
             DpadReorderActivation.Click
         } else {
             DpadReorderActivation.None
@@ -187,6 +195,7 @@ internal class DpadReorderState {
 
     internal fun onPointerLongPress(key: Any, index: Int): DpadReorderActivation {
         if (isMoving && activeKey != key) return DpadReorderActivation.None
+        if (phase == DpadReorderPhase.DropGuard) reset()
         activeKey = key
         movingIndex = index
         phase = DpadReorderPhase.MovingReady
@@ -225,7 +234,7 @@ internal class DpadReorderState {
     private fun reset() {
         phase = DpadReorderPhase.Idle
         activeKey = null
-        dropAllowedAfterMillis = Long.MIN_VALUE
+        repeatQuietUntilMillis = Long.MIN_VALUE
         movingIndex = -1
     }
 }
@@ -240,17 +249,11 @@ internal class DpadReorderItem(
 )
 
 @Composable
-private fun rememberDpadReorderState(key: Any? = Unit): DpadReorderState =
-    remember(key) { DpadReorderState() }
-
-@Composable
 internal fun rememberSyncedDpadReorderState(
     keys: List<*>,
-    enabled: Boolean,
-    stateKey: Any? = Unit,
     onMovingItem: suspend (key: Any, index: Int) -> Unit
 ): DpadReorderState {
-    val state = rememberDpadReorderState(stateKey)
+    val state = remember { DpadReorderState() }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(state, lifecycleOwner) {
         // Row focus can move transiently while an item is reordered. End the interaction only
@@ -264,8 +267,8 @@ internal fun rememberSyncedDpadReorderState(
             state.cancelInteraction()
         }
     }
-    LaunchedEffect(state, enabled, keys) {
-        state.syncItems(keys, enabled)
+    LaunchedEffect(state, keys) {
+        state.syncItems(keys)
     }
     LaunchedEffect(state.movingKey, state.movingIndex) {
         val movingKey = state.movingKey ?: return@LaunchedEffect
@@ -361,13 +364,9 @@ private class LongPressTimer(var job: Job? = null)
 
 @Composable
 internal fun Modifier.dpadLongPressToMove(
-    enabled: Boolean,
     item: DpadReorderItem,
-    onClick: () -> Unit,
-    addFocusTarget: Boolean = true
+    onClick: () -> Unit
 ): Modifier {
-    if (!enabled) return this
-
     val coroutineScope = rememberCoroutineScope()
     val repeatReleaseGuardMillis = remember {
         dpadRepeatReleaseGuardMillis(ViewConfiguration.getKeyRepeatDelay())
@@ -488,7 +487,6 @@ internal fun Modifier.dpadLongPressToMove(
                         } else {
                             cancelLongPressTimer()
                         }
-                        if (action == DpadReorderActivation.Dropped) suppressedKeyUp = event.key
                         handleActivation(action)
                         true
                     }
@@ -511,5 +509,5 @@ internal fun Modifier.dpadLongPressToMove(
             }
         }
 
-    return if (addFocusTarget) movementModifier.focusable() else movementModifier
+    return movementModifier.focusable()
 }

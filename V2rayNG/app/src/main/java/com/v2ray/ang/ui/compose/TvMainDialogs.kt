@@ -34,55 +34,36 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
 @Composable
-private fun TvConfirmDialog(
-    title: String? = null,
-    message: String,
-    confirmText: String = stringResource(R.string.action_ok),
-    dismissText: String? = stringResource(R.string.action_cancel),
-    confirmIcon: @Composable (() -> Unit)? = null,
-    messageTextAlign: TextAlign = TextAlign.Start,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val confirmFocusRequester = remember { FocusRequester() }
-    val dismissFocusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(dismissText) {
-        requestFocusWhenReady(if (dismissText != null) dismissFocusRequester else confirmFocusRequester)
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = title?.let { { Text(it) } },
-        text = {
-            Text(message, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium,
-                textAlign = messageTextAlign)
-        },
-        confirmButton = {
-            TvDialogButton(confirmText, { onConfirm(); onDismiss() }, icon = confirmIcon,
-                focusRequester = confirmFocusRequester)
-        },
-        dismissButton = dismissText?.let { text ->
-            { TvDialogButton(text, onDismiss, focusRequester = dismissFocusRequester) }
-        },
-        containerColor = MaterialTheme.colorScheme.surface
-    )
-}
-
-@Composable
 internal fun TvDeleteConfirmDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     itemName: String? = null
 ) {
-    TvConfirmDialog(
-        message = if (itemName.isNullOrBlank()) message else "$message\n\n$itemName",
-        messageTextAlign = TextAlign.Center,
-        confirmText = stringResource(R.string.action_delete),
-        confirmIcon = { Icon(painterResource(R.drawable.ic_delete_24dp), null, Modifier.size(24.dp)) },
-        onConfirm = onConfirm,
-        onDismiss = onDismiss
+    val dismissFocusRequester = remember { FocusRequester() }
+    LaunchedEffect(dismissFocusRequester) { requestFocusWhenReady(dismissFocusRequester) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Text(
+                text = if (itemName.isNullOrBlank()) message else "$message\n\n$itemName",
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+        },
+        confirmButton = {
+            TvDialogButton(
+                text = stringResource(R.string.action_delete),
+                onClick = onConfirm,
+                icon = { Icon(painterResource(R.drawable.ic_delete_24dp), null, Modifier.size(24.dp)) }
+            )
+        },
+        dismissButton = {
+            TvDialogButton(stringResource(R.string.action_cancel), onDismiss, focusRequester = dismissFocusRequester)
+        },
+        containerColor = MaterialTheme.colorScheme.surface
     )
 }
 
@@ -117,11 +98,7 @@ private fun TvDialogButton(
 }
 
 @Composable
-internal fun TvQRCodeDialog(
-    bitmap: Bitmap?,
-    onDismiss: () -> Unit
-) {
-    if (bitmap == null) return
+internal fun TvQRCodeDialog(bitmap: Bitmap, onDismiss: () -> Unit) {
     val closeFocusRequester = remember { FocusRequester() }
     LaunchedEffect(closeFocusRequester) { requestFocusWhenReady(closeFocusRequester) }
     val closeText = stringResource(R.string.action_close)
