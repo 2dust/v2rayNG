@@ -6,6 +6,12 @@ import org.junit.jupiter.api.Test
 class MainImportMenuTest {
 
     @Test
+    fun tvMoreMenuLeavesRestartToTheToolbarAndOmitsDeleteAll() {
+        assertEquals(listOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll),
+            MainMoreMenuAction.entries - tvMoreMenuActions.toSet())
+    }
+
+    @Test
     fun regularShareMenuContainsOnlyShareActions() {
         val expected = listOf(
             ServerMenuAction.ShareQRCode,

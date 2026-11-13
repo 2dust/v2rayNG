@@ -93,7 +93,8 @@ fun GroupPagerPage(
         mainViewModel.serverGroupState(groupId)
     }
     val groupState by groupStateFlow.collectAsStateWithLifecycle()
-    val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
+    val canReorder = groupState.canReorder(groupId, searchQuery)
+    val groupLocateTarget = locateTarget?.takeIf { it.groupId == groupId }
     val actions = remember(
         onSelectServer,
         onEditServer,
@@ -128,16 +129,16 @@ fun GroupPagerPage(
         ServerListPage(
             rows = groupState.rows,
             selectedGuid = selectedGuid,
-            locateTarget = locateTarget?.takeIf { it.groupId == groupId },
+            locateTarget = groupLocateTarget,
             canReorder = canReorder,
             doubleColumnDisplay = doubleColumnDisplay,
             groupId = groupId,
             lazyListStates = lazyListStates,
             lazyGridStates = lazyGridStates,
             actions = actions,
-            onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
-            onMoveServer = { fromIndex, toIndex ->
-                mainViewModel.moveServer(groupId, fromIndex, toIndex)
+            onLocateHandled = { groupLocateTarget?.let { mainViewModel.onAction(MainAction.LocateHandled(it)) } },
+            onMoveServer = { from, to ->
+                mainViewModel.onAction(MainAction.MoveServer(groupId, from, to))
             },
             contentPadding = listPadding
         )
@@ -175,16 +176,20 @@ private fun ServerListPage(
     lazyGridStates: MutableMap<String, LazyGridState>,
     actions: ServerRowActions,
     onLocateHandled: () -> Unit,
-    onMoveServer: (Int, Int) -> Unit,
+    onMoveServer: (String, String) -> Unit,
     contentPadding: PaddingValues
 ) {
+    fun move(from: Any?, to: Any?) {
+        if (from is String && to is String) onMoveServer(from, to)
+    }
+
     if (doubleColumnDisplay) {
         val gridState = remember(groupId) {
             lazyGridStates.getOrPut(groupId) { LazyGridState() }
         }
         val reorderableGridState = if (canReorder) {
             rememberReorderableLazyGridState(gridState) { from, to ->
-                onMoveServer(from.index, to.index)
+                move(from.key, to.key)
             }
         } else null
 
@@ -228,7 +233,7 @@ private fun ServerListPage(
         }
         val reorderableState = if (canReorder) {
             rememberReorderableLazyListState(listState) { from, to ->
-                onMoveServer(from.index, to.index)
+                move(from.key, to.key)
             }
         } else null
 

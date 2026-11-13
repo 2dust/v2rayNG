@@ -8,3 +8,6 @@ internal fun <T> MutableList<T>.moveItem(fromIndex: Int, toIndex: Int): Boolean 
     add(toIndex, removeAt(fromIndex))
     return true
 }
+
+internal fun MutableList<String>.moveGuid(fromGuid: String, toGuid: String): Boolean =
+    moveItem(indexOf(fromGuid), indexOf(toGuid))

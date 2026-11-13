@@ -573,4 +573,9 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+    <string name="action_exit">Thoát</string>
+    <string name="action_back">Quay lại</string>
+    <string name="action_more">Thêm</string>
+    <string name="action_clear">Xoá</string>
+    <string name="connection_connected_tv">Đã kết nối</string>
 </resources>
