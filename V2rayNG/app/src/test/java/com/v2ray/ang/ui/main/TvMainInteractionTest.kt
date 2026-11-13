@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.runtime.saveable.SaverScope
 import com.v2ray.ang.ui.compose.DpadReorderActivation
 import com.v2ray.ang.ui.compose.DpadReorderDirection
 import com.v2ray.ang.ui.compose.DpadReorderState
@@ -12,6 +13,24 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class TvMainInteractionTest {
+    @Test
+    fun drawerOriginRestoresById() {
+        val saver = TvMainFocusTarget.DrawerOrigin.Saver
+        val scope = SaverScope { true }
+        val targets = listOf(
+            TvMainFocusTarget.Toolbar,
+            TvMainFocusTarget.GroupTab("subscription-id"),
+            TvMainFocusTarget.GroupTab(""),
+            TvMainFocusTarget.Profile("profile-guid"),
+            TvMainFocusTarget.Profile("profile-guid", ProfileRowAction.More)
+        )
+        for (target in targets) {
+            val saved = with(saver) { scope.save(target) }
+            assertEquals(target, saver.restore(checkNotNull(saved)))
+        }
+        assertNull(with(saver) { scope.save(null) })
+    }
+
     @Test
     fun toolbarKeepsRestartAndOnlyShowsConnectivityTestWhenRunning() {
         assertEquals(

@@ -40,9 +40,32 @@ import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import kotlinx.coroutines.flow.first
 
 internal sealed interface TvMainFocusTarget {
-    data object Toolbar : TvMainFocusTarget
-    data class GroupTab(val id: String) : TvMainFocusTarget
-    data class Profile(val guid: String, val action: ProfileRowAction? = null) : TvMainFocusTarget {
+    sealed interface DrawerOrigin : TvMainFocusTarget {
+        companion object {
+            val Saver = listSaver<DrawerOrigin?, String>(
+                save = { target ->
+                    when (target) {
+                        null -> emptyList()
+                        Toolbar -> listOf("toolbar")
+                        is GroupTab -> listOf("tab", target.id)
+                        is Profile -> listOf("profile", target.guid, target.action?.name.orEmpty())
+                    }
+                },
+                restore = {
+                    when (it[0]) {
+                        "toolbar" -> Toolbar
+                        "tab" -> GroupTab(it[1])
+                        "profile" -> Profile(it[1], it[2].takeIf(String::isNotEmpty)?.let(ProfileRowAction::valueOf))
+                        else -> null
+                    }
+                }
+            )
+        }
+    }
+
+    data object Toolbar : DrawerOrigin
+    data class GroupTab(val id: String) : DrawerOrigin
+    data class Profile(val guid: String, val action: ProfileRowAction? = null) : DrawerOrigin {
         companion object {
             val Saver = listSaver<Profile?, String>(
                 save = { target -> target?.let { listOf(it.guid, it.action?.name.orEmpty()) }.orEmpty() },
@@ -77,9 +100,11 @@ internal fun TvMainScreen(
     }
     val drawerState = rememberTvDrawerState(TvDrawerValue.Closed)
     val isDrawerOpen = drawerState.currentValue == TvDrawerValue.Open
-    var drawerOrigin by remember { mutableStateOf<TvMainFocusTarget?>(null) }
+    var drawerOrigin by rememberSaveable(stateSaver = TvMainFocusTarget.DrawerOrigin.Saver) {
+        mutableStateOf<TvMainFocusTarget.DrawerOrigin?>(null)
+    }
     var focusToRestore by remember { mutableStateOf<TvMainFocusTarget?>(null) }
-    fun openDrawer(origin: TvMainFocusTarget) {
+    fun openDrawer(origin: TvMainFocusTarget.DrawerOrigin) {
         drawerOrigin = origin
         drawerState.setValue(TvDrawerValue.Open)
     }
@@ -213,7 +238,7 @@ internal fun TvMainScreen(
                                         focusToRestore = if (restored) null else TvMainFocusTarget.Toolbar
                                     }
                                 },
-                                revealActiveProfile = editorOrigin == null,
+                                revealActiveProfile = editorOrigin == null && drawerOrigin !is TvMainFocusTarget.Profile,
                                 dialogs = dialogs,
                                 revealGeneration = profileRevealGeneration,
                                 lastReveals = lastReveals,

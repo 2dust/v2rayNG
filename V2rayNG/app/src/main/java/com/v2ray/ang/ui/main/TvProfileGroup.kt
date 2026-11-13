@@ -107,6 +107,7 @@ internal fun TvProfileGroup(
                     val removed = withTimeoutOrNull(2_000) { snapshotFlow { origin.guid !in latestKeys }.first { it } } == true
                     if (removed) focusToRestore.neighbor?.let { TvMainFocusTarget.Profile(it) } else origin
                 }
+                else -> return@LaunchedEffect
             }
             val index = profile?.let { keys.indexOf(it.guid) } ?: -1
             // Group data may be ready before the corresponding rows have been composed.
