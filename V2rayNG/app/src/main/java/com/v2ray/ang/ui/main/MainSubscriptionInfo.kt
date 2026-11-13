@@ -90,7 +90,9 @@ internal fun SubscriptionInfoCard(
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
-    actionButton: @Composable (icon: Int, label: String, isRefresh: Boolean, onClick: () -> Unit) -> Unit,
+    actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit = { icon, label, _, click ->
+        CardIconButton(icon, label, click)
+    },
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
 
@@ -121,7 +123,7 @@ internal fun SubscriptionInfoCard(
                             R.drawable.ic_feedback_24dp
                         },
                         stringResource(R.string.sub_info_open_support),
-                        false
+                        false,
                     ) { onOpenLink(url) }
                 }
                 model.webPageUrl?.let { url ->
@@ -157,11 +159,7 @@ internal fun SubscriptionInfoCard(
 }
 
 @Composable
-internal fun SubscriptionCardIconButton(
-    iconRes: Int,
-    contentDescription: String,
-    onClick: () -> Unit,
-) {
+private fun CardIconButton(iconRes: Int, contentDescription: String, onClick: () -> Unit) {
     IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
         Icon(painterResource(iconRes), contentDescription, Modifier.size(20.dp))
     }

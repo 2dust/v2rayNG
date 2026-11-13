@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test
 class MainImportMenuTest {
 
     @Test
-    fun tvMovesRestartToTheToolbarAndAddsExitWithoutExposingBulkDelete() {
-        val tvOnly = tvMoreMenuActions - phoneMoreMenuActions.toSet()
-        val phoneOnly = phoneMoreMenuActions - tvMoreMenuActions.toSet()
-        assertEquals(listOf(MainMoreMenuAction.Exit), tvOnly)
-        assertEquals(listOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll), phoneOnly)
+    fun tvMoreMenuLeavesRestartToTheToolbarAndOmitsDeleteAll() {
+        assertEquals(listOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll),
+            MainMoreMenuAction.entries - tvMoreMenuActions.toSet())
     }
 
     @Test

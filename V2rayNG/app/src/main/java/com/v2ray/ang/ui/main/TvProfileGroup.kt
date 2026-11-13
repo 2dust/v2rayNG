@@ -18,7 +18,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,7 +31,6 @@ import com.v2ray.ang.ui.compose.DpadReorderDirection
 import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.TvReorderableItem
-import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.dpadBackNavigation
 import com.v2ray.ang.ui.compose.dpadClickable
 import com.v2ray.ang.ui.compose.dpadFocusOutline
@@ -61,8 +59,8 @@ internal fun TvProfileGroup(
     group: GroupMapItem,
     mainViewModel: MainViewModel,
     uiState: MainUiState,
-    scrollStates: MutableMap<String, ProfileScrollState>,
-    dialogs: MainDialogActions,
+    scroll: TvProfileScrollState,
+    dialogs: TvMainDialogActions,
     onAction: (MainAction) -> Unit,
     resumeGeneration: Int,
     lastReveals: MutableMap<String, ProfileReveal>,
@@ -73,7 +71,6 @@ internal fun TvProfileGroup(
     val groupStateFlow = remember(mainViewModel, group.id) { mainViewModel.serverGroupState(group.id) }
     val groupState by groupStateFlow.collectAsStateWithLifecycle()
     val rows = groupState.rows
-    val scroll = rememberProfileScrollState(scrollStates, group.id)
     val doubleColumn = uiState.doubleColumnDisplay
     val rowActions = if (doubleColumn) gridProfileActions else singleColumnProfileActions
     val keys = remember(rows) { rows.map { it.guid } }
@@ -108,7 +105,7 @@ internal fun TvProfileGroup(
     val headerModifier = Modifier
         .dpadVerticalFocusNavigation(onMoveUp = { onUpFromFirstRow?.invoke() ?: false }, onMoveDown = { false })
         .dpadBackNavigation(onBack = onBackToToolbar)
-    ProfileGroupLayout(
+    TvProfileGroupLayout(
         group = group,
         contentPadding = PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
         onAction = onAction,
@@ -117,7 +114,7 @@ internal fun TvProfileGroup(
             TvIconButton(painterResource(icon), label, click, focusRequester = refreshFocus.takeIf { isRefresh })
         }
     ) { padding ->
-        ProfileCollection(
+        TvProfileCollection(
             group, groupState, uiState, scroll, padding, onAction,
             itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
         ) { index, row, dragScope, dragging ->
@@ -163,7 +160,7 @@ internal fun TvProfileGroup(
 @Composable
 private fun RevealSelectedProfile(
     groupId: String,
-    scroll: ProfileScrollState,
+    scroll: TvProfileScrollState,
     resumeGeneration: Int,
     selectedGuid: String?,
     rows: List<ServerRowUiModel>,
@@ -212,10 +209,10 @@ private fun TvProfileRow(
             else Modifier.dpadLongPressToMove(enabled = true, item = reorderItem, onClick = onSelect)
         )
     Column {
-        ProfileRow(
+        TvProfileRowLayout(
             model = row,
             selected = selected,
-            markerColor = if (selected && !moving) colorFabActive else Color.Unspecified,
+            showSelectionMarker = selected && !moving,
             decoration = decoration,
             interaction = interaction,
             actions = {
@@ -239,11 +236,11 @@ private fun TvProfileRow(
         ) {
             Spacer(Modifier.height(4.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                ProfileAddress(row, badgeSpacing = 8.dp)
+                TvProfileAddress(row)
                 Spacer(Modifier.width(16.dp))
-                ProfileType(row.typeDescription)
+                TvProfileType(row.typeDescription)
                 Spacer(Modifier.width(16.dp))
-                TestResult(row.testDelayMillis)
+                TvProfileTestResult(row.testDelayMillis)
             }
         }
         AppDivider(Modifier.padding(horizontal = 12.dp, vertical = 2.dp))

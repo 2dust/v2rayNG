@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -62,6 +61,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.util.AppIconFetcher
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     title: String,
@@ -75,56 +75,38 @@ fun AppTopBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    AppTopBarLayout(
-        isLoading = isLoading,
-        title = {
-            if (isSearchActive) {
-                TopBarSearchField(
-                    query = searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    placeholder = searchPlaceholder
-                )
-            } else {
-                Text(text = title)
-            }
-        },
-        navigationIcon = {
-            if (navigationIcon != null) {
-                navigationIcon()
-            } else {
-                IconButton(onClick = if (isSearchActive) onSearchClose else onBackClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24dp),
-                        contentDescription = stringResource(R.string.acc_back)
-                    )
-                }
-            }
-        },
-        actions = actions
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun AppTopBarLayout(
-    isLoading: Boolean,
-    title: @Composable () -> Unit,
-    navigationIcon: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    actions: @Composable RowScope.() -> Unit
-) {
     Column {
         TopAppBar(
-            title = title,
-            navigationIcon = navigationIcon,
+            title = {
+                if (isSearchActive) {
+                    SearchInputField(
+                        query = searchQuery,
+                        onQueryChange = onSearchQueryChange,
+                        placeholder = searchPlaceholder
+                    )
+                } else {
+                    Text(text = title)
+                }
+            },
+            navigationIcon = {
+                if (navigationIcon != null) {
+                    navigationIcon()
+                } else {
+                    IconButton(onClick = if (isSearchActive) onSearchClose else onBackClick) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_back_24dp),
+                            contentDescription = stringResource(R.string.acc_back)
+                        )
+                    }
+                }
+            },
             actions = actions,
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 titleContentColor = MaterialTheme.colorScheme.onSurface,
                 navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                 actionIconContentColor = MaterialTheme.colorScheme.onSurface
-            ),
-            modifier = modifier
+            )
         )
         AnimatedVisibility(
             visible = isLoading,
@@ -137,50 +119,42 @@ internal fun AppTopBarLayout(
 }
 
 @Composable
-internal fun TopBarSearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String?) {
+private fun SearchInputField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    placeholder: String?
+) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        TopBarSearchTextField(query, onQueryChange, placeholder, Modifier.weight(1f).focusRequester(focusRequester))
+        OutlinedTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp),
+            placeholder = { if (placeholder != null) Text(placeholder, style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                selectionColors = TextSelectionColors(
+                    handleColor = MaterialTheme.colorScheme.secondary,
+                    backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+                )
+            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+        )
         if (query.isNotEmpty()) {
             IconButton(onClick = { onQueryChange("") }) {
-                Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), stringResource(R.string.action_clear))
+                Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), "Clear")
             }
         }
     }
-}
-
-@Composable
-internal fun TopBarSearchTextField(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    placeholder: String?,
-    modifier: Modifier,
-    readOnly: Boolean = false,
-    interactionSource: MutableInteractionSource? = null
-) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        readOnly = readOnly,
-        singleLine = true,
-        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp),
-        placeholder = { if (placeholder != null) Text(placeholder, style = TextStyle(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp)) },
-        interactionSource = interactionSource,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            cursorColor = MaterialTheme.colorScheme.secondary,
-            selectionColors = TextSelectionColors(
-                handleColor = MaterialTheme.colorScheme.secondary,
-                backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
-            )
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        modifier = modifier
-    )
 }
 
 @Composable

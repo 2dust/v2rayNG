@@ -29,8 +29,11 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -84,13 +87,13 @@ class MainViewModel(
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     // ---------- Keyword filtering ----------
-    @Volatile
     private var filterJob: Job? = null
 
     // ---------- Groups & cache ----------
     private val cacheMutex = Mutex()
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
     private val groupUiFlows = ConcurrentHashMap<String, MutableStateFlow<ServerGroupUiState>>()
+    private val groupServerFlows = ConcurrentHashMap<String, StateFlow<List<ServersCache>>>()
     private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
     private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
@@ -245,6 +248,18 @@ class MainViewModel(
     }
 
     // ---------- Public state accessors ----------
+    fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
+        groupServerFlows.computeIfAbsent(groupId) {
+            val groupState = mutableServerGroupState(groupId)
+            groupState
+                .map { it.servers }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+                    initialValue = groupState.value.servers,
+                )
+        }
+
     internal fun serverGroupState(groupId: String): StateFlow<ServerGroupUiState> =
         mutableServerGroupState(groupId).asStateFlow()
 
@@ -381,16 +396,6 @@ class MainViewModel(
             rows = buildServerRows(groupId, filteredServers),
             isFiltered = keyword.isNotEmpty()
         )
-        _uiState.update { state ->
-            val index = state.groups.indexOfFirst { it.id == groupId }
-            if (index < 0 || state.groups[index].serverCount == filteredServers.size) {
-                state
-            } else {
-                val groups = state.groups.toMutableList()
-                groups[index] = groups[index].copy(serverCount = filteredServers.size)
-                state.copy(groups = groups)
-            }
-        }
     }
 
     private fun buildServerRows(groupId: String, servers: List<ServersCache>): List<ServerRowUiModel> {
@@ -460,12 +465,12 @@ class MainViewModel(
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
                 groupUiFlows.keys.removeAll { it !in validIds }
+                groupServerFlows.keys.removeAll { it !in validIds }
                 groupLoadMutexes.keys.removeAll { it !in validIds }
 
-                _uiState.update { state ->
-                    val counts = state.groups.associate { it.id to it.serverCount }
-                    state.copy(
-                        groups = groups.map { group -> group.copy(serverCount = counts[group.id] ?: 0) },
+                _uiState.update {
+                    it.copy(
+                        groups = groups,
                         selectedGroupId = selectedGroup,
                         selectedGuid = dataSource.getSelectServer(),
                     )

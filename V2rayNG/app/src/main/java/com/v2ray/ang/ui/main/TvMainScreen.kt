@@ -31,9 +31,6 @@ import androidx.tv.material3.DrawerState as TvDrawerState
 import androidx.tv.material3.DrawerValue as TvDrawerValue
 import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.TvActionDialog
-import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
-import com.v2ray.ang.ui.compose.TvQRCodeDialog
 import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
@@ -48,11 +45,15 @@ internal fun TvMainScreen(
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
     val groups = uiState.groups
     val groupIds = groups.map { it.id }
-    val selectedGroupIndex = mainSelectedGroupIndex(groups, uiState.selectedGroupId)
+    val selectedGroupIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }.coerceAtLeast(0)
     val selectedGroup = groups.getOrNull(selectedGroupIndex)
-    val scrollStates = rememberMainGroupScrollStates(groupIds)
+    val scrollStates = remember { mutableMapOf<String, TvProfileScrollState>() }
     val lastReveals = remember { mutableMapOf<String, ProfileReveal>() }
-    LaunchedEffect(groupIds) { lastReveals.keys.retainAll(groupIds.toSet()) }
+    LaunchedEffect(groupIds) {
+        val ids = groupIds.toSet()
+        scrollStates.keys.retainAll(ids)
+        lastReveals.keys.retainAll(ids)
+    }
     val drawer = rememberMainTvDrawerCoordinator()
     var showSearch by rememberSaveable { mutableStateOf(uiState.searchQuery.isNotEmpty()) }
     fun closeSearch() {
@@ -94,13 +95,9 @@ internal fun TvMainScreen(
     } else null
     fun focusGroupTab(groupId: String): Boolean = tabTargets[groupId]?.let { requestTabFocus?.invoke(it) } ?: false
 
-    MainDialogs(
-        confirmRemove = true,
+    TvMainDialogs(
         shareQRCodeBitmap = uiState.shareQRCodeBitmap,
         onAction = onAction,
-        deleteDialog = { message, name, confirm, dismiss -> TvDeleteConfirmDialog(message, confirm, dismiss, name) },
-        shareDialog = { options, select, dismiss -> TvActionDialog(options, { stringResource(it.labelRes) }, select, dismiss) },
-        qrCodeDialog = { bitmap, dismiss -> TvQRCodeDialog(bitmap, dismiss) },
         onRestoreFocus = { dialogFocusToRestore = it }
     ) { dialogs ->
         TvMainNavigationDrawer(
@@ -140,7 +137,7 @@ internal fun TvMainScreen(
                     Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                         if (tabState != null && requestTabFocus != null) {
                             TvGroupTabBar(
-                                groups, selectedGroupIndex, tabState, tabOrder, requestTabFocus,
+                                groups, mainViewModel, selectedGroupIndex, tabState, tabOrder, requestTabFocus,
                                 onOpenDrawer = { target -> drawer.openFrom { requestTabFocus(target) } },
                                 onMoveUp = { topBarFocus.start.requestFocus() },
                                 onSelectGroup = { onAction(MainAction.SelectGroup(it)) }
@@ -151,7 +148,7 @@ internal fun TvMainScreen(
                                 group = selectedGroup,
                                 mainViewModel = mainViewModel,
                                 uiState = uiState,
-                                scrollStates = scrollStates,
+                                scroll = remember { scrollStates.getOrPut(selectedGroup.id) { TvProfileScrollState() } },
                                 onAction = onAction,
                                 dialogs = dialogs,
                                 resumeGeneration = resumeFocusGeneration,
