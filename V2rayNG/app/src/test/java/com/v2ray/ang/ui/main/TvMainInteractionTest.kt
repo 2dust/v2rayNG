@@ -8,9 +8,21 @@ import com.v2ray.ang.ui.compose.dpadRepeatReleaseGuardMillis
 import com.v2ray.ang.ui.compose.tvTextFieldRecoveryAction
 import com.v2ray.ang.ui.compose.twoColumnDpadReorderTarget
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class TvMainInteractionTest {
+    @Test
+    fun removalFocusPrefersNextProfileThenPrevious() {
+        val keys = listOf("first", "middle", "last")
+        assertEquals("middle", focusAfterProfileRemoval(keys, "first"))
+        assertEquals("last", focusAfterProfileRemoval(keys, "middle"))
+        assertEquals("middle", focusAfterProfileRemoval(keys, "last"))
+        assertNull(focusAfterProfileRemoval(listOf("only"), "only"))
+        assertNull(focusAfterProfileRemoval(emptyList(), "missing"))
+        assertNull(focusAfterProfileRemoval(keys, "missing"))
+    }
+
     @Test
     fun heldCenterCannotDropOrSelectUntilKeyRepeatsHaveStopped() {
         val state = DpadReorderState()

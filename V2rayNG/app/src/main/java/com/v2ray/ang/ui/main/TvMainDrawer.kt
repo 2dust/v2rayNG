@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -205,6 +206,7 @@ private fun NavigationDrawerScope.TvMainDrawerContent(
                     },
                     scale = TvListItemScale.None,
                     modifier = Modifier
+                        .focusProperties { canFocus = drawerValue == TvDrawerValue.Open }
                         .focusRequester(focusRequesters[index])
                         .onFocusChanged { if (it.isFocused) focusedIndex = index }
                         .dpadLogicalHorizontalNavigation(onMovePrevious = {}, onMoveNext = onClose)

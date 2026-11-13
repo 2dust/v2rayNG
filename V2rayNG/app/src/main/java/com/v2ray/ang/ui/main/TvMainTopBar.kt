@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +51,6 @@ import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.dpadPopupHorizontalNavigation
 import com.v2ray.ang.ui.compose.dpadTopBarFocusNavigation
 import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
-import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 internal val tvMoreMenuActions = MainMoreMenuAction.entries - setOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll)
@@ -64,15 +62,6 @@ internal class TvMainTopBarFocus {
     val add = FocusRequester()
     val restart = FocusRequester()
     val more = FocusRequester()
-}
-
-@Composable
-internal fun rememberTvMainTopBarFocus(showSearch: Boolean): TvMainTopBarFocus {
-    val focus = remember { TvMainTopBarFocus() }
-    if (!showSearch) {
-        LaunchedEffect(focus) { requestFocusWhenReady(focus.start) }
-    }
-    return focus
 }
 
 @Composable

@@ -45,6 +45,7 @@ import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
 import com.v2ray.ang.ui.compose.twoColumnDpadReorderTarget
 import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 
 private class ProfileRowFocus(actions: List<ProfileRowAction>) {
     val row = FocusRequester()
@@ -53,6 +54,12 @@ private class ProfileRowFocus(actions: List<ProfileRowAction>) {
 }
 
 internal data class ProfileReveal(val generation: Int, val guid: String, val doubleColumn: Boolean)
+
+internal fun focusAfterProfileRemoval(keys: List<String>, guid: String): String? {
+    val index = keys.indexOf(guid)
+    if (index < 0) return null
+    return keys.getOrNull(index + 1) ?: keys.getOrNull(index - 1)
+}
 
 @Composable
 internal fun TvProfileGroup(
@@ -80,10 +87,16 @@ internal fun TvProfileGroup(
     }
     // A drawer or dialog may outlive a lazy item. Resolve the current row by GUID when restoring.
     val latestTargets by rememberUpdatedState(targets)
+    val latestKeys by rememberUpdatedState(keys)
     fun restore(guid: String, action: ProfileRowAction? = null): Boolean {
         val focus = latestTargets[guid] ?: return false
         val target = if (action == null) focus.row else focus.buttons[action] ?: return false
         return requestFocus(target)
+    }
+    suspend fun restoreAfterRemoval(guid: String, neighbor: String?, action: ProfileRowAction): Boolean {
+        // Refresh runs off the UI thread; focus the replacement only after the row has gone.
+        val removed = withTimeoutOrNull(2_000) { snapshotFlow { guid !in latestKeys }.first { it } } == true
+        return if (removed) neighbor?.let { restore(it) } ?: false else restore(guid, action)
     }
 
     RevealSelectedProfile(group.id, scroll, resumeGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
@@ -148,7 +161,13 @@ internal fun TvProfileGroup(
                     onBackToToolbar = onBackToToolbar,
                     reorderItem = reorderItem,
                     onSelect = { onAction(MainAction.SelectServer(row.guid)) },
-                    onAction = { action -> runProfileRowAction(action, row, onAction, dialogs) { restore(row.guid, action) } }
+                    onAction = { action ->
+                        val neighbor = focusAfterProfileRemoval(latestKeys, row.guid)
+                        runProfileRowAction(action, row, onAction, dialogs) { removed ->
+                            if (removed) restoreAfterRemoval(row.guid, neighbor, action)
+                            else restore(row.guid, action)
+                        }
+                    }
                 )
             }
             if (dragScope == null) renderRow()

@@ -21,19 +21,22 @@ internal enum class TvBulkDeleteTarget(@StringRes val messageRes: Int, val actio
     Invalid(R.string.confirm_delete_invalid_profiles, MainAction.RemoveInvalidServers)
 }
 
-private data class TvShareTarget(val guid: String, val profile: ProfileItem, val more: Boolean, val restoreFocus: () -> Boolean)
+internal typealias RestoreProfileFocus = suspend (afterRemoval: Boolean) -> Boolean
+
+private data class TvShareTarget(val guid: String, val profile: ProfileItem, val more: Boolean, val restoreFocus: RestoreProfileFocus)
 
 internal class TvMainDialogActions(
     val bulkDelete: (TvBulkDeleteTarget) -> Unit,
-    val share: (String, ProfileItem, Boolean, () -> Boolean) -> Unit,
-    val remove: (String, String) -> Unit
+    val share: (String, ProfileItem, Boolean, RestoreProfileFocus) -> Unit,
+    val remove: (String, String, RestoreProfileFocus) -> Unit
 )
 
 @Composable
 internal fun TvMainDialogs(
     shareQRCodeBitmap: Bitmap?,
+    selectedGuid: String?,
     onAction: (MainAction) -> Unit,
-    onRestoreFocus: (() -> Boolean) -> Unit,
+    onRestoreFocus: (suspend () -> Boolean) -> Unit,
     content: @Composable (TvMainDialogActions) -> Unit
 ) {
     var bulkDelete by remember { mutableStateOf<TvBulkDeleteTarget?>(null) }
@@ -41,7 +44,11 @@ internal fun TvMainDialogs(
     var deleteTarget by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
         mutableStateOf<ServerDeleteTarget?>(null)
     }
-    val requestRemove: (String, String) -> Unit = { guid, name -> deleteTarget = ServerDeleteTarget(guid, name) }
+    var deleteFocus by remember { mutableStateOf<RestoreProfileFocus?>(null) }
+    fun requestRemove(guid: String, name: String, restoreFocus: RestoreProfileFocus) {
+        deleteFocus = restoreFocus
+        deleteTarget = ServerDeleteTarget(guid, name)
+    }
 
     bulkDelete?.let { target ->
         TvDeleteConfirmDialog(
@@ -56,20 +63,27 @@ internal fun TvMainDialogs(
             { stringResource(it.labelRes) },
             { action ->
                 shareTarget = null
-                action.dispatch(target.guid, target.profile, onAction, requestRemove)
+                action.dispatch(target.guid, target.profile, onAction) { guid, name -> requestRemove(guid, name, target.restoreFocus) }
             },
             {
                 shareTarget = null
-                onRestoreFocus(target.restoreFocus)
+                onRestoreFocus { target.restoreFocus(false) }
             }
         )
     }
     deleteTarget?.let { target ->
+        fun close(confirmed: Boolean) {
+            val restoreFocus = deleteFocus
+            deleteTarget = null
+            deleteFocus = null
+            if (confirmed) onAction(MainAction.RemoveServer(target.guid))
+            onRestoreFocus { restoreFocus?.invoke(confirmed && target.guid != selectedGuid) == true }
+        }
         TvDeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_profile),
             itemName = target.profileName,
-            onConfirm = { onAction(MainAction.RemoveServer(target.guid)) },
-            onDismiss = { deleteTarget = null }
+            onConfirm = { close(true) },
+            onDismiss = { if (deleteTarget != null) close(false) }
         )
     }
     if (shareQRCodeBitmap != null) {
@@ -79,6 +93,6 @@ internal fun TvMainDialogs(
     content(TvMainDialogActions(
         bulkDelete = { bulkDelete = it },
         share = { guid, profile, more, restore -> shareTarget = TvShareTarget(guid, profile, more, restore) },
-        remove = requestRemove
+        remove = ::requestRemove
     ))
 }

@@ -19,8 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -34,6 +37,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
+import kotlinx.coroutines.flow.first
 
 @Composable
 internal fun TvMainScreen(
@@ -61,7 +65,7 @@ internal fun TvMainScreen(
         showSearch = false
     }
 
-    val topBarFocus = rememberTvMainTopBarFocus(showSearch)
+    val topBarFocus = remember { TvMainTopBarFocus() }
     val lifecycleOwner = LocalLifecycleOwner.current
     var resumeFocusGeneration by remember { mutableIntStateOf(0) }
     DisposableEffect(lifecycleOwner) {
@@ -72,15 +76,22 @@ internal fun TvMainScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val isDrawerOpen = drawer.isOpen
-    LaunchedEffect(drawer, isDrawerOpen) {
-        if (isDrawerOpen) return@LaunchedEffect
-        val restore = drawer.takeFocusToRestore() ?: return@LaunchedEffect
-        if (!restore()) requestFocusWhenReady(topBarFocus.start)
+    var drawerWasOpen by remember { mutableStateOf(isDrawerOpen) }
+    LaunchedEffect(isDrawerOpen, showSearch) {
+        val justClosed = drawerWasOpen && !isDrawerOpen
+        drawerWasOpen = isDrawerOpen
+        if (!isDrawerOpen && (justClosed || !showSearch)) {
+            if (drawer.takeFocusToRestore()?.invoke() != true) requestFocusWhenReady(topBarFocus.start)
+        }
+        drawerWasOpen = isDrawerOpen
     }
-    var dialogFocusToRestore by remember { mutableStateOf<(() -> Boolean)?>(null) }
+    val windowInfo = LocalWindowInfo.current
+    var dialogFocusToRestore by remember { mutableStateOf<(suspend () -> Boolean)?>(null) }
     LaunchedEffect(dialogFocusToRestore) {
         val restore = dialogFocusToRestore ?: return@LaunchedEffect
-        restore()
+        snapshotFlow { windowInfo.isWindowFocused }.first { it }
+        withFrameNanos { }
+        if (!restore()) requestFocusWhenReady(topBarFocus.start)
         dialogFocusToRestore = null
     }
 
@@ -97,6 +108,7 @@ internal fun TvMainScreen(
 
     TvMainDialogs(
         shareQRCodeBitmap = uiState.shareQRCodeBitmap,
+        selectedGuid = uiState.selectedGuid,
         onAction = onAction,
         onRestoreFocus = { dialogFocusToRestore = it }
     ) { dialogs ->

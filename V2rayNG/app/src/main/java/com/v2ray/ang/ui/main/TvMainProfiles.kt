@@ -200,12 +200,12 @@ internal fun runProfileRowAction(
     row: ServerRowUiModel,
     onAction: (MainAction) -> Unit,
     dialogs: TvMainDialogActions,
-    restoreFocus: () -> Boolean
+    restoreFocus: RestoreProfileFocus
 ) {
     when (action) {
         ProfileRowAction.More, ProfileRowAction.Share -> dialogs.share(row.guid, row.profile, action == ProfileRowAction.More, restoreFocus)
         ProfileRowAction.Edit -> onAction(MainAction.EditServer(row.guid, row.profile))
-        ProfileRowAction.Delete -> dialogs.remove(row.guid, row.remarks)
+        ProfileRowAction.Delete -> dialogs.remove(row.guid, row.remarks, restoreFocus)
     }
 }
 
