@@ -142,7 +142,7 @@ internal fun TvMainTopBar(
             modifier = Modifier.padding(horizontal = 48.dp, vertical = 12.dp),
             title = {
                 if (showSearch) {
-                    TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder)
+                    TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder, onMoveDown)
                 } else {
                     Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.CenterStart) {
                         AppBrandTitle(
@@ -159,7 +159,7 @@ internal fun TvMainTopBar(
                         contentDescription = stringResource(R.string.acc_back),
                         onClick = onSearchClose,
                         focusRequester = focusRequesters.start,
-                        modifier = Modifier.dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder) { false }
+                        modifier = Modifier.dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder, onMoveDown)
                     )
                 }
             },

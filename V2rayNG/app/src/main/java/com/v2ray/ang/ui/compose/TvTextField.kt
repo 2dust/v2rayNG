@@ -150,7 +150,8 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester): Tv
 @Composable
 internal fun Modifier.tvSearchFieldFocus(
     state: TvTextFieldState,
-    focusOrder: List<FocusRequester>
+    focusOrder: List<FocusRequester>,
+    onMoveDown: () -> Boolean
 ): Modifier {
     return bringIntoViewRequester(state.bringIntoViewRequester)
         .onSizeChanged { state.measuredSize = it }
@@ -163,7 +164,7 @@ internal fun Modifier.tvSearchFieldFocus(
                 }
                 event.key == Key.DirectionUp || event.key == Key.DirectionDown -> {
                     state.finishEditing()
-                    event.key == Key.DirectionUp
+                    event.key == Key.DirectionUp || onMoveDown()
                 }
                 else -> false
             }
