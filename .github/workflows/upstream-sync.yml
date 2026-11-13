@@ -20,7 +20,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The core submodule is fetched from this fork's mirror of upstream's
+  # AndroidLibXrayLite, which carries no commits of its own. Bring its main
+  # branch and its tags up to upstream's here, before a release that updates
+  # the core is proposed, so that the proposal's checks can fetch the new
+  # commit and the build manifest can name its tag. GitHub's "Sync fork"
+  # button copies the branch but never the tags.
+  #
+  # Neither push is forced: if upstream rewrites main or moves a tag, the push
+  # is refused and the job fails, so commits this fork has already pinned are
+  # never lost from the mirror. MIRROR_GITHUB_ANDROIDLIBXRAYLITE_TOKEN is a
+  # fine-grained personal access token for the mirror repository only
+  # (Contents: read and write). Without it the job is skipped with a notice.
+  core-mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bring the core mirror up to upstream
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_GITHUB_ANDROIDLIBXRAYLITE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${MIRROR_TOKEN}" ]]; then
+            echo '::notice::MIRROR_GITHUB_ANDROIDLIBXRAYLITE_TOKEN is not set; the core mirror was not updated.'
+            exit 0
+          fi
+          upstream=https://github.com/2dust/AndroidLibXrayLite.git
+          mirror=https://github.com/AcideFluorhydrique/AndroidLibXrayLite.git
+          git init --quiet --bare core.git
+          git -C core.git fetch --quiet --tags "$upstream" '+refs/heads/main:refs/heads/main'
+          # The first, empty helper drops any helper the runner has configured.
+          GIT_TERMINAL_PROMPT=0 git -C core.git \
+              -c credential.helper= \
+              -c credential.helper='!f() { test "$1" = get && printf "username=x-access-token\npassword=%s\n" "$MIRROR_TOKEN"; }; f' \
+              push "$mirror" refs/heads/main:refs/heads/main 'refs/tags/*:refs/tags/*'
+
   sync:
+    needs: core-mirror
+    # Propose the release even when the mirror could not be updated; its
+    # checks then fail at checkout, which says what is missing.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       # SYNC_TOKEN is a fine-grained personal access token for this repository

@@ -87,6 +87,13 @@ All of this is under the repository's **Settings**.
    secret `SYNC_TOKEN`. Note its expiry date: when it expires, sync falls back
    to opening issues until it is replaced.
 
+   The same workflow keeps the core mirror,
+   `AcideFluorhydrique/AndroidLibXrayLite`, up to upstream: its `main` branch
+   and every tag. Create a second token, *Only select repositories* → that
+   mirror, permission *Contents*: **Read and write**, and save it as the
+   secret `MIRROR_GITHUB_ANDROIDLIBXRAYLITE_TOKEN`. Without it the mirror has
+   to be updated by hand as described under the routine below.
+
 6. **GitHub Pages**, after the first release has created the `gh-pages`
    branch: Pages → *Deploy from a branch* → `gh-pages`, `/ (root)`. The
    repository is then at <https://acidefluorhydrique.github.io/v2rayNG/repo>.
@@ -166,12 +173,16 @@ All of this is under the repository's **Settings**.
 
    The core submodule is fetched from this fork's own mirror,
    `AcideFluorhydrique/AndroidLibXrayLite`, so that a pinned commit survives
-   upstream rewriting or removing its repository. A PR that updates the core
-   therefore fails at checkout until the mirror has the new commit: press
-   *Sync fork* on the mirror's `main`, which must never carry commits of its
-   own, then re-run the checks. *Sync fork* does not copy tags, and the build
-   manifest names the core's version from its tag, so push those too from a
-   clone that has both remotes:
+   upstream rewriting or removing its repository. The mirror carries no
+   commits of its own: `upstream-sync.yml` pushes upstream's `main` and tags
+   to it before proposing a release, so the PR's checks can fetch the new
+   commit and the build manifest can name its tag. It never forces a push, so
+   if upstream rewrites `main` or moves a tag the job fails instead of
+   dropping a commit this fork has pinned; look at what upstream did before
+   doing anything about it. Without the token, or to fix things by hand,
+   press *Sync fork* on the mirror's `main` and push the tags, which *Sync
+   fork* does not copy, from a clone that has both remotes, then re-run the
+   PR's checks:
 
    ```bash
    git fetch https://github.com/2dust/AndroidLibXrayLite.git --tags
@@ -226,6 +237,7 @@ can be batched; ones that update the core should not be.
 | Reproducibility baseline | after upstream upgrades AGP, Gradle or dependencies | The APK bytes change legitimately; compare two runs again as in docs/reproducible-build.md. |
 | A fork-only fix between upstream releases | as needed | Version codes come from upstream's `versionCode`, and a release tag must match `versionName`. Releasing the same upstream version twice therefore needs both raised first (for example `versionName = "2.3.9-1"`), and those lines will conflict with the next upstream sync. Prefer waiting for the next upstream release when you can. |
 | Renewing `SYNC_TOKEN` | at its expiry | Sync keeps working in issue-only mode meanwhile. |
+| Renewing `MIRROR_GITHUB_ANDROIDLIBXRAYLITE_TOKEN` | at its expiry | Until then the core mirror is not updated, and a release that updates the core fails its checks at checkout. |
 
 ## Where Forkray differs from upstream, and why it merges cleanly
 
