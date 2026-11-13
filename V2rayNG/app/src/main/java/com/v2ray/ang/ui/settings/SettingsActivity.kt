@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.settings
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,24 +43,29 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.CollapsiblePreferenceGroupHeader
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.SettingsEditItem
-import com.v2ray.ang.ui.compose.SettingsListItem
-import com.v2ray.ang.ui.compose.SettingsMenuItem
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.launch
 
-class SettingsActivity : BaseComponentActivity() {
+abstract class BaseSettingsActivity : BaseComponentActivity() {
 
     private val viewModel: SettingsViewModel by viewModels()
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.refreshSystemVpnSettingsAvailability()
@@ -84,26 +89,53 @@ class SettingsActivity : BaseComponentActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
-        SettingsScreen(
-            viewModel = viewModel,
-            onBackClick = { finish() },
-            onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) },
-            onSystemVpnSettingsClicked = ::openSystemVpnSettings
-        )
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+        SettingsLayout(isLoading) { modifier, rows ->
+            SettingsForm(
+                modifier = modifier,
+                rows = rows,
+                viewModel = viewModel,
+                onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) },
+                onSystemVpnSettingsClicked = ::openSystemVpnSettings
+            )
+        }
+    }
+
+    @Composable
+    internal abstract fun SettingsLayout(isLoading: Boolean, form: @Composable (Modifier, SettingsRows) -> Unit)
+}
+
+class SettingsActivity : BaseSettingsActivity() {
+
+    override fun televisionDestination(): Intent? {
+        val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+        return if (uiMode == Configuration.UI_MODE_TYPE_TELEVISION) Intent(this, TvSettingsActivity::class.java) else null
+    }
+
+    @Composable
+    override fun SettingsLayout(isLoading: Boolean, form: @Composable (Modifier, SettingsRows) -> Unit) {
+        val scrollState = rememberScrollState()
+        Scaffold(
+            contentWindowInsets = WindowInsets(0),
+            topBar = {
+                AppTopBar(title = stringResource(R.string.title_settings), onBackClick = { finish() }, isLoading = isLoading)
+            }
+        ) { innerPadding ->
+            form(Modifier.fillMaxSize().padding(innerPadding).verticalScrollbar(scrollState).verticalScroll(scrollState), PhoneSettingsRows)
+        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+private fun SettingsForm(
+    modifier: Modifier,
+    rows: SettingsRows,
     viewModel: SettingsViewModel,
-    onBackClick: () -> Unit,
     onModeHelpClicked: () -> Unit,
     onSystemVpnSettingsClicked: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val systemVpnSettingsAvailable by viewModel.systemVpnSettingsAvailable.collectAsStateWithLifecycle()
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -218,23 +250,8 @@ fun SettingsScreen(
     val modeEntries = stringArrayResource(R.array.mode_entries).toList()
     val modeValues = stringArrayResource(R.array.mode_value).toList()
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0),
-        topBar = {
-            AppTopBar(
-                title = stringResource(R.string.title_settings),
-                onBackClick = onBackClick,
-                isLoading = isLoading
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScrollbar(scrollState)
-                .verticalScroll(scrollState)
-        ) {
+    with(rows) {
+        Column(modifier = modifier) {
             CollapsiblePreferenceGroupHeader(
                 title = stringResource(R.string.title_ui_settings),
                 expanded = uiSettingsExpanded,
@@ -286,6 +303,7 @@ fun SettingsScreen(
                     entries = languageEntries,
                     values = languageValues,
                     selectedValue = language,
+                    focusKey = AppConfig.PREF_LANGUAGE,
                     onSelected = {
                         language = it
                         AppLocaleManager.setApplicationLanguage(it)
