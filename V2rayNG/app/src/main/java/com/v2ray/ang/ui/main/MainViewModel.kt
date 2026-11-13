@@ -43,6 +43,12 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
+internal fun locateProfileGroupId(subscriptionId: String, groups: List<GroupMapItem>): String? {
+    // A blank ID in an imported profile means Default; a blank UI group ID means All.
+    val groupId = subscriptionId.ifEmpty { AppConfig.DEFAULT_SUBSCRIPTION_ID }
+    return groupId.takeIf { id -> groups.any { it.id == id } }
+}
+
 private fun applyTestDelayResults(
     servers: List<ServersCache>,
     updates: Map<String, Long>,
@@ -907,11 +913,10 @@ class MainViewModel(
     }
 
     fun triggerLocateSelectedServer() {
-        val selected = dataSource.getSelectServer() ?: return
-        val profile = dataSource.decodeServerConfig(selected) ?: return
-        val groupId = profile.subscriptionId
-        if (_uiState.value.groups.none { it.id == groupId }) return
         viewModelScope.launch(ioDispatcher) {
+            val selected = dataSource.getSelectServer() ?: return@launch
+            val profile = dataSource.decodeServerConfig(selected) ?: return@launch
+            val groupId = locateProfileGroupId(profile.subscriptionId, uiState.value.groups) ?: return@launch
             updateGroupUi(groupId, loadGroup(groupId))
             if (_uiState.value.selectedGroupId != groupId) {
                 dataSource.setSelectedSubscriptionId(groupId)
