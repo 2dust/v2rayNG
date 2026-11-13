@@ -4,44 +4,38 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AppSelectionMenuAction
+import com.v2ray.ang.ui.compose.AppSelectionTopBar
+import com.v2ray.ang.ui.compose.dpadMovePreviousNavigation
+import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
+import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
+import com.v2ray.ang.ui.compose.rememberDpadFocusRequester
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
-import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
-
-private enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
-    SelectAll(R.string.menu_item_select_all),
-    InvertSelection(R.string.menu_item_invert_selection)
-}
 
 class AppPickerActivity : BaseComponentActivity() {
 
@@ -120,63 +114,42 @@ fun AppPickerScreen(
 ) {
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
-    var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
+    val backFocusRequester = rememberDpadFocusRequester(requestFocus = !showSearch, requestKey = showSearch)
+    val packageNames = apps.map { it.packageName }
+    val rowFocusRequesters = rememberDpadFocusTargets(packageNames) { FocusRequester() }
+    val requestRowFocus = rememberLazyDpadFocus(packageNames.map { listOf(rowFocusRequesters.getValue(it)) }) {
+        listState.scrollToItem(it)
+    }
+    val focusFirstApp = {
+        apps.firstOrNull()?.let { rowFocusRequesters[it.packageName]?.let(requestRowFocus) } ?: false
+    }
+    LaunchedEffect(searchQuery) {
         onSearch(searchQuery)
     }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
-            AppTopBar(
+            AppSelectionTopBar(
                 title = title,
-                onBackClick = onBackClick,
                 isLoading = isLoading,
                 isSearchActive = showSearch,
                 searchQuery = searchQuery,
-                onSearchQueryChange = { query ->
-                    searchQuery = query
-                    onSearch(query)
-                },
+                onSearchQueryChange = { searchQuery = it },
                 onSearchClose = {
                     searchQuery = ""
                     onSearch("")
                     showSearch = false
                 },
-                searchPlaceholder = stringResource(R.string.menu_item_search),
-                actions = {
-                    if (!showSearch) {
-                        IconButton(onClick = { showSearch = true }) {
-                            Icon(
-                                painterResource(R.drawable.ic_search_24dp),
-                                contentDescription = stringResource(R.string.acc_search)
-                            )
-                        }
-                    }
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(
-                                painterResource(R.drawable.ic_more_vert_24dp),
-                                contentDescription = null
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
-                            containerColor = MaterialTheme.colorScheme.surface
-                        ) {
-                            AppDropdownMenuItems(AppPickerMenuAction.entries, { it.labelRes }) { action ->
-                                showMenu = false
-                                when (action) {
-                                    AppPickerMenuAction.SelectAll -> onSelectAll()
-                                    AppPickerMenuAction.InvertSelection -> onInvertSelection()
-                                }
-                            }
-                        }
-                    }
-                }
+                onSearchOpen = { showSearch = true },
+                onBackClick = onBackClick,
+                backFocusRequester = backFocusRequester,
+                onMoveDown = focusFirstApp,
+                menuActions = listOf(
+                    AppSelectionMenuAction(stringResource(R.string.menu_item_select_all), onSelectAll),
+                    AppSelectionMenuAction(stringResource(R.string.menu_item_invert_selection), onInvertSelection)
+                )
             )
         }
     ) { innerPadding ->
@@ -185,17 +158,33 @@ fun AppPickerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .tvSafeAreaPadding()
+                .dpadMovePreviousNavigation { backFocusRequester.requestFocus() }
                 .verticalScrollbar(listState),
             contentPadding = NavigationBarsBottomPadding()
         ) {
-            items(items = apps, key = { it.packageName }) { app ->
+            itemsIndexed(items = apps, key = { _, app -> app.packageName }) { index, app ->
                 val checked = selectedPackages.contains(app.packageName)
+                val focusRequester = rowFocusRequesters.getValue(app.packageName)
                 AppListItem(
                     appName = app.appName,
                     packageName = app.packageName,
                     icon = null,
                     checked = checked,
-                    onCheckedChange = { onToggleApp(app.packageName) }
+                    onCheckedChange = { onToggleApp(app.packageName) },
+                    focusRequester = focusRequester,
+                    modifier = Modifier.dpadVerticalFocusNavigation(
+                        onMoveUp = {
+                            apps.getOrNull(index - 1)?.let {
+                                rowFocusRequesters[it.packageName]?.let(requestRowFocus)
+                            } ?: false
+                        },
+                        onMoveDown = {
+                            apps.getOrNull(index + 1)?.let {
+                                rowFocusRequesters[it.packageName]?.let(requestRowFocus)
+                            } ?: true
+                        }
+                    )
                 )
                 ItemDivider()
             }

@@ -4,7 +4,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -37,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -46,6 +50,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
@@ -115,40 +120,45 @@ fun MainBottomBar(
                         .shadow(elevation = 3.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
-                )
-                CompositionLocalProvider(LocalLayoutDirection provides textLayoutDirection) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .fillMaxWidth()
-                            // Room for the button on the right; absolute so it does not flip with the language.
-                            .absolutePadding(left = 20.dp, right = KNOB_SIZE + knobInset + 8.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        // At most two lines of a fixed line height, shrinking the font if needed, so a longer
-                        // message (for example a ping result in Persian) never makes the bar taller.
-                        var fontSizeSp by remember(displayText) { mutableFloatStateOf(TEXT_MAX_SP) }
-                        Text(
-                            text = displayText,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = fontSizeSp.sp,
-                                lineHeight = (fontSizeSp * TEXT_LINE_HEIGHT_FACTOR).sp,
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.None
-                                )
-                            ),
-                            textAlign = TextAlign.Start,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            onTextLayout = { layout ->
-                                if (layout.hasVisualOverflow && fontSizeSp > TEXT_MIN_SP) {
-                                    fontSizeSp = (fontSizeSp - 1f).coerceAtLeast(TEXT_MIN_SP)
-                                }
-                            },
-                            modifier = Modifier.semantics { contentDescription = displayText }
+                        .clickable(
+                            enabled = isRunning,
+                            onClickLabel = stringResource(R.string.connection_test_pending),
+                            role = Role.Button,
+                            onClick = { onAction(MainAction.TestCurrentServer) }
                         )
+                ) {
+                    CompositionLocalProvider(LocalLayoutDirection provides textLayoutDirection) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .fillMaxWidth()
+                                // Room for the button on the right; absolute so it does not flip with the language.
+                                .absolutePadding(left = 20.dp, right = KNOB_SIZE + knobInset + 8.dp),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            // At most two lines of a fixed line height, shrinking the font if needed, so a longer
+                            // message (for example a ping result in Persian) never makes the bar taller.
+                            var fontSizeSp by remember(displayText) { mutableFloatStateOf(TEXT_MAX_SP) }
+                            Text(
+                                text = displayText,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = fontSizeSp.sp,
+                                    lineHeight = (fontSizeSp * TEXT_LINE_HEIGHT_FACTOR).sp,
+                                    lineHeightStyle = LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Center,
+                                        trim = LineHeightStyle.Trim.None
+                                    )
+                                ),
+                                textAlign = TextAlign.Start,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                onTextLayout = { layout ->
+                                    if (layout.hasVisualOverflow && fontSizeSp > TEXT_MIN_SP) {
+                                        fontSizeSp = (fontSizeSp - 1f).coerceAtLeast(TEXT_MIN_SP)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
                 FloatingActionButton(
@@ -182,6 +192,48 @@ fun MainBottomBar(
                         modifier = Modifier
                             .size(24.dp)
                             .graphicsLayer { rotationZ = rotationAnim.value }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun MainTvStatusBar(displayText: String, testDisplayText: String) {
+    val statusDescription = listOf(displayText, testDisplayText)
+        .filter { it.isNotBlank() }
+        .joinToString(". ")
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        AppDivider()
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .height(64.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 48.dp)
+                    .semantics { contentDescription = statusDescription },
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = displayText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (testDisplayText.isNotBlank()) {
+                    Text(
+                        text = testDisplayText,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }

@@ -7,13 +7,10 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,11 +38,15 @@ import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.AppTopBarAction
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
+import com.v2ray.ang.ui.compose.tvAwareImePadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -350,7 +351,9 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         }
                     },
                     enabled = !state.isFetchingCert,
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .dpadFocusOutline(cornerRadius = 20.dp)
                 ) {
                     Text(stringResource(R.string.pinned_ca256_action_fetch))
                 }
@@ -462,21 +465,21 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 AppTopBar(
                     title = title,
                     onBackClick = { finish() },
-                    actions = {
-                        if (editGuid.isNotEmpty() && !isRunning) {
-                            IconButton(onClick = { showDeleteDialog = true }) {
-                                Icon(
-                                    painterResource(R.drawable.ic_delete_24dp),
-                                    stringResource(R.string.acc_delete)
-                                )
-                            }
-                        }
-                        IconButton(onClick = onSaveClick) {
-                            Icon(
-                                painterResource(R.drawable.ic_fab_check),
-                                stringResource(R.string.acc_save)
+                    actionItems = buildList {
+                        if (editGuid.isNotEmpty() && !isRunning) add(
+                            AppTopBarAction(
+                                painterResource(R.drawable.ic_delete_24dp),
+                                stringResource(R.string.menu_item_del_config),
+                                onClick = { showDeleteDialog = true }
                             )
-                        }
+                        )
+                        add(
+                            AppTopBarAction(
+                                painterResource(R.drawable.ic_fab_check),
+                                stringResource(R.string.menu_item_save_config),
+                                onClick = onSaveClick
+                            )
+                        )
                     }
                 )
             }
@@ -486,7 +489,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     .fillMaxSize()
                     .padding(innerPadding)
                     .consumeWindowInsets(innerPadding)
-                    .imePadding()
+                    .tvAwareImePadding()
+                    .tvSafeAreaPadding()
                     .verticalScroll(scrollState)
                     .verticalScrollbar(scrollState)
                     .padding(bottom = 36.dp),

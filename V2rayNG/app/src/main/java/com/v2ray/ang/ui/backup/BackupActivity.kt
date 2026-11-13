@@ -32,6 +32,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -44,6 +45,8 @@ import com.v2ray.ang.ui.compose.InputField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsMenuItem
+import com.v2ray.ang.ui.compose.dpadMovePreviousNavigation
+import com.v2ray.ang.ui.compose.rememberDpadFocusRequester
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -201,6 +204,7 @@ fun BackupScreen(
     var showWebDavDialog by remember { mutableStateOf(false) }
 
     val webDavSummary = currentWebDavConfig?.baseUrl
+    val backFocusRequester = rememberDpadFocusRequester()
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -208,7 +212,8 @@ fun BackupScreen(
             AppTopBar(
                 title = stringResource(R.string.title_configuration_backup_restore),
                 onBackClick = onBackClick,
-                isLoading = isLoading
+                isLoading = isLoading,
+                navigationFocusRequester = backFocusRequester
             )
         }
     ) { innerPadding ->
@@ -216,6 +221,8 @@ fun BackupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .tvSafeAreaPadding()
+                .dpadMovePreviousNavigation { backFocusRequester.requestFocus() }
                 .verticalScroll(rememberScrollState())
         ) {
             SettingsMenuItem(

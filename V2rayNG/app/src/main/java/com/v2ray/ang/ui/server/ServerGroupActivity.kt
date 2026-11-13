@@ -1,23 +1,17 @@
 package com.v2ray.ang.ui.server
 
 import android.os.Bundle
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,17 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AppTopBarAction
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
+import com.v2ray.ang.ui.compose.tvAwareImePadding
+import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
@@ -50,11 +41,14 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppIconButton
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ServerSelectButton
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
@@ -245,6 +239,7 @@ fun ServerGroupScreen(
     onDelete: () -> Unit
 ) {
     val typeEntries = stringArrayResource(R.array.policy_group_type).toList()
+    val scrollState = rememberScrollState()
 
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
@@ -265,25 +260,26 @@ fun ServerGroupScreen(
             AppTopBar(
                 title = EConfigType.POLICYGROUP.toString(),
                 onBackClick = onBackClick,
-                actions = {
-                    if (showDelete) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
-                        }
-                    }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
-
-                        val hasError = remarksErr
-                        if (!hasError) {
+                actionItems = buildList {
+                    if (showDelete) add(
+                        AppTopBarAction(
+                            icon = painterResource(R.drawable.ic_delete_24dp),
+                            label = stringResource(R.string.action_delete),
+                            contentDescription = stringResource(R.string.acc_delete),
+                            onClick = { showDeleteConfirm = true }
+                        )
+                    )
+                    add(AppTopBarAction(
+                        icon = painterResource(R.drawable.ic_fab_check),
+                        label = stringResource(R.string.action_save),
+                        contentDescription = stringResource(R.string.acc_save),
+                        onClick = {
                             val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
                             val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
-                            onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+                            isRemarksError = remarks.isBlank()
+                            if (!isRemarksError) onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
                         }
-                    }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
-                    }
+                    ))
                 }
             )
         }
@@ -293,9 +289,11 @@ fun ServerGroupScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imePadding()
+                .tvAwareImePadding()
+                .tvSafeAreaPadding()
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
-                .verticalScroll(rememberScrollState())
         ) {
             FormTextField(
                 label = stringResource(R.string.server_lab_remarks),
@@ -334,36 +332,19 @@ fun ServerGroupScreen(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Surface(
-                            modifier = Modifier
-                                .weight(1f)
-                                .semantics {
-                                    contentDescription = fallbackLabel
-                                    stateDescription = fallbackDisplay
-                                }
-                                .clickable(role = Role.Button) { showFallbackDialog = true },
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                text = fallbackDisplay,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (fallbackTag.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                else MaterialTheme.colorScheme.onSurface,
-                                fontWeight = if (fallbackTag.isBlank()) FontWeight.Normal else FontWeight.Medium,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier
-                                    .clearAndSetSemantics {}
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                            )
-                        }
-                        IconButton(onClick = { fallbackTag = "" }) {
-                            Icon(
-                                painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = "${stringResource(R.string.logcat_clear)}, $fallbackLabel"
-                            )
-                        }
+                        ServerSelectButton(
+                            label = fallbackLabel,
+                            value = fallbackTag,
+                            placeholder = fallbackDisplay,
+                            modifier = Modifier.weight(1f),
+                            onClick = { showFallbackDialog = true }
+                        )
+                        AppIconButton(
+                            icon = painterResource(R.drawable.ic_delete_24dp),
+                            label = stringResource(R.string.logcat_clear),
+                            onClick = { fallbackTag = "" },
+                            contentDescription = "${stringResource(R.string.logcat_clear)}, $fallbackLabel"
+                        )
                     }
                 }
                 NavigationBarsSpacer()

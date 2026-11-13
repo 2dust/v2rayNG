@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -33,6 +34,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.SubscriptionInfoParser
+import com.v2ray.ang.ui.compose.AppIconButton
+import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.util.Utils
 
 private const val MILLIS_PER_SECOND = 1000L
@@ -90,6 +93,7 @@ internal fun SubscriptionInfoCard(
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    refreshFocusRequester: FocusRequester? = null,
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
 
@@ -134,6 +138,7 @@ internal fun SubscriptionInfoCard(
                     iconRes = R.drawable.ic_refresh_24dp,
                     contentDescription = stringResource(R.string.title_sub_update),
                     onClick = onRefresh,
+                    focusRequester = refreshFocusRequester,
                 )
             }
 
@@ -164,7 +169,21 @@ internal fun SubscriptionInfoCard(
 }
 
 @Composable
-private fun CardIconButton(iconRes: Int, contentDescription: String, onClick: () -> Unit) {
+private fun CardIconButton(
+    iconRes: Int,
+    contentDescription: String,
+    onClick: () -> Unit,
+    focusRequester: FocusRequester? = null,
+) {
+    if (isTelevisionDevice()) {
+        AppIconButton(
+            icon = painterResource(iconRes),
+            label = contentDescription,
+            onClick = onClick,
+            focusRequester = focusRequester,
+        )
+        return
+    }
     IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
         Icon(painterResource(iconRes), contentDescription, Modifier.size(20.dp))
     }

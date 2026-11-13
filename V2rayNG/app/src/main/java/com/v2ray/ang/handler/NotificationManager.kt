@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -95,6 +96,7 @@ object NotificationManager {
             .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(currentConfig?.remarks ?: service.getString(R.string.app_name))
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
@@ -109,6 +111,15 @@ object NotificationManager {
                 service.getString(R.string.title_service_restart),
                 restartV2RayPendingIntent
             )
+
+        if (service.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION) {
+            mBuilder?.extend(
+                NotificationCompat.TvExtender()
+                    .setChannelId(channelId)
+                    .setContentIntent(contentPendingIntent)
+                    .setSuppressShowOverApps(true)
+            )
+        }
 
         //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)
 

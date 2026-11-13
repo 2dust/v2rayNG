@@ -11,7 +11,6 @@
     <string name="action_ok">قوۊل</string>
     <string name="action_cancel">لقو</string>
     <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
-    <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">سرویس v2rayNG</string>
@@ -32,6 +31,20 @@
     <string name="menu_item_save_config">زفت کردن کانفیگ</string>
     <string name="menu_item_edit_config">آلشتکاری کانفیگ</string>
     <string name="menu_item_del_config">پاک کردن کانفیگ</string>
+    <string name="action_exit">خروج</string>
+    <string name="action_save">زفت کردن</string>
+    <string name="action_add_subscription">ٱووردن اشتراک</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">بیشتر</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="action_share">همرسانی</string>
+    <string name="action_info">دونستنی</string>
+    <string name="action_remove">برداشتن</string>
+    <string name="action_add_member">ٱووردن هموند</string>
+    <string name="action_start_scan">شروع اسکن</string>
+    <string name="action_stop_scan">توقف اسکن</string>
+    <string name="action_torch">چراغ‌قوه</string>
+    <string name="action_select_image">انتخاب عکس</string>
     <string name="menu_item_import_config_qrcode">و من ٱووردن کانفیگ ز کود QR</string>
     <string name="menu_item_import_config_clipboard">و من ٱووردن کانفیگ ز کلیپ بورد</string>
     <string name="menu_item_import_config_local">و من ٱووردن کانفیگ ز ویرگه مهلی</string>
@@ -160,6 +173,8 @@
     <string name="menu_item_scan_qrcode">اسکن کود QR</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">دانلود فایلا</string>
+    <string name="menu_item_edit_asset">آلشتکاری دارایی</string>
+    <string name="menu_item_del_asset">پاک کردن دارایی</string>
     <string name="title_user_asset_add_url">نشۊوی اینترنتی بونچک ن ازاف کۊنین</string>
     <string name="msg_file_not_found">فایلن نجوست</string>
     <string name="msg_remark_is_duplicate">ای نوم ز زیتر بیڌس</string>
@@ -331,6 +346,7 @@
     <string name="summary_root_lan_sharing">ترافیک هات‌اسپات وای‌فای وو دسگا یل منپیز وابیڌه وا USB (تترینگ) ن ز تور VPN بفشنین.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_update">ورۊ کردن</string>
     <string name="logcat_copy">لف گیری</string>
     <string name="logcat_clear">روفتن</string>
     <string name="logcat_share">یک رسۊوی گوزارش</string>
@@ -354,6 +370,7 @@
     <string name="sub_setting_entry_proxy_tip">پروکسی پسند وابیڌه پؽش ز هر کانفیگ من ای اشتراک، و عونوان عوزو نیایی زنجیره پروکسی ازاف ابۊ.</string>
     <string name="sub_setting_exit_proxy_tip">پروکسی پسند وابیڌه بئڌ ز هر کانفیگ من ای اشتراک، و عونوان عوزو دیندایی زنجیره پروکسی ازاف ابۊ.</string>
     <string name="toast_invalid_update_interval">فاسله ورۊ کردن نا موئتبر هڌ. حداقل مقدار 15 دؽقه هڌ.</string>
+    <string name="sub_setting_no_proxy">هیچ‌کدام</string>
     <string name="title_sub_update">ورۊ کردن اشتراک بونکۊ سکویی</string>
     <string name="title_ping_all_server">آزمایش تئخیر TCP (TCPing)</string>
     <string name="title_real_ping_all_server">آزمایش تئخیر واقعی</string>
@@ -389,6 +406,7 @@
     <string name="routing_settings_comma_tip">چنتا مقدار ن وا کاما (,) ز یک جوڌا کۊنین.</string>
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
+    <string name="routing_settings_enable_rule">فعال کردن قاعده</string>
     <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
     <string name="routing_settings_add_rule">ٱووردن قانووݩ</string>
     <string name="routing_settings_import_predefined_rulesets">و من ٱووردن قانووا</string>
@@ -417,6 +435,7 @@
     <string name="connection_test_fail">اینترنت من دسرس نؽ</string>
     <string name="connection_test_error_status_code">کود ختا: #%d</string>
     <string name="connection_connected">منپیز هڌ. سی واجۊری کیلیک کوݩ.</string>
+    <string name="connection_connected_tv">منپیز هڌ</string>
     <string name="connection_not_connected">منپیز نؽڌ</string>
     <string name="connection_running_task_left">آزمایشا هونی ٱنجوم ابۊن: %s</string>
 
@@ -451,6 +470,7 @@
     <string name="title_policy_group_fallback">بارت جایگۊزین (outbound، اختیاری)</string>
 
     <string name="server_proxy_chain_members">ٱئزا زنجیره پروکسی</string>
+    <string name="server_proxy_chain_member">عوزو</string>
     <string name="server_proxy_chain_pick_members">سی پسند عوزو ایچو بزنین</string>
     <string name="server_proxy_chain_member_unselected">ی عوزو پسند کۊنین</string>
     <string name="server_proxy_chain_members_unselected">سی هر ردیف زنجیره، ی عوزو پسند کۊنین</string>

@@ -11,7 +11,6 @@
     <string name="action_ok">ОК</string>
     <string name="action_cancel">Отмена</string>
     <string name="migration_fail">Перенос данных не выполнен!</string>
-    <string name="pull_down_to_refresh">Потяните вниз для обновления!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">Служба v2rayNG</string>
@@ -32,6 +31,20 @@
     <string name="menu_item_save_config">Сохранить профиль</string>
     <string name="menu_item_edit_config">Изменить профиль</string>
     <string name="menu_item_del_config">Удалить профиль</string>
+    <string name="action_exit">Выход</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_add_subscription">Добавить подписку</string>
+    <string name="action_back">Назад</string>
+    <string name="action_more">Ещё</string>
+    <string name="action_clear">Очистить</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_info">Информация</string>
+    <string name="action_remove">Убрать</string>
+    <string name="action_add_member">Добавить участника</string>
+    <string name="action_start_scan">Начать сканирование</string>
+    <string name="action_stop_scan">Остановить сканирование</string>
+    <string name="action_torch">Фонарик</string>
+    <string name="action_select_image">Выбрать изображение</string>
     <string name="menu_item_import_config_qrcode">Импорт из QR-кода</string>
     <string name="menu_item_import_config_clipboard">Импорт из буфера обмена</string>
     <string name="menu_item_import_config_local">Импорт из файла</string>
@@ -160,6 +173,8 @@
     <string name="menu_item_scan_qrcode">Сканировать QR-код</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Загрузить файлы</string>
+    <string name="menu_item_edit_asset">Изменить ресурс</string>
+    <string name="menu_item_del_asset">Удалить ресурс</string>
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Название уже существует</string>
@@ -331,6 +346,7 @@
     <string name="summary_root_lan_sharing">Направлять через VPN трафик устройств, подключённых к точке доступа Wi-Fi или по USB</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_update">Обновить</string>
     <string name="logcat_copy">Копировать</string>
     <string name="logcat_clear">Очистить</string>
     <string name="logcat_share">Поделиться журналом</string>
@@ -353,6 +369,7 @@
     <string name="sub_setting_pre_profile_tip">Убедитесь, что профиль с таким названием существует и его название уникально.</string>
     <string name="sub_setting_entry_proxy_tip">Выбранный прокси добавляется перед каждым профилем подписки и становится входным участником цепочки прокси для этого профиля.</string>
     <string name="sub_setting_exit_proxy_tip">Выбранный прокси добавляется после каждого профиля подписки и становится выходным участником цепочки прокси для этого профиля.</string>
+    <string name="sub_setting_no_proxy">Нет</string>
     <string name="toast_invalid_update_interval">Неправильный интервал обновления. Минимум 15 минут.</string>
     <string name="title_sub_update">Обновить подписку</string>
     <string name="title_ping_all_server">Проверить TCP-задержку</string>
@@ -393,6 +410,7 @@
     <string name="routing_settings_comma_tip">Разделяйте несколько значений запятыми (,).</string>
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
+    <string name="routing_settings_enable_rule">Включить правило</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
     <string name="routing_settings_add_rule">Добавить правило</string>
     <string name="routing_settings_import_predefined_rulesets">Импорт набора правил</string>
@@ -421,6 +439,7 @@
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
     <string name="connection_connected">Подключено.\nНажмите, чтобы проверить соединение.</string>
+    <string name="connection_connected_tv">Соединено</string>
     <string name="connection_not_connected">Нет соединения</string>
     <string name="connection_running_task_left">Выполняется проверок: %s</string>
 
@@ -455,6 +474,7 @@
     <string name="title_policy_group_fallback">Резервное исходящее подключение (необязательно)</string>
 
     <string name="server_proxy_chain_members">Участники цепочки прокси</string>
+    <string name="server_proxy_chain_member">Участник</string>
     <string name="server_proxy_chain_pick_members">Нажмите здесь, чтобы выбрать участника</string>
     <string name="server_proxy_chain_member_unselected">Выбор участника</string>
     <string name="server_proxy_chain_members_unselected">Выберите участника для каждого звена цепочки</string>

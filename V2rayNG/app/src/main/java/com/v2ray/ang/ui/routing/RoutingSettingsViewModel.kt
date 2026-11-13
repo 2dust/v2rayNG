@@ -17,16 +17,15 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     private val _rulesetsFlow = MutableStateFlow<List<RulesetItem>>(emptyList())
     val rulesetsFlow: StateFlow<List<RulesetItem>> = _rulesetsFlow.asStateFlow()
 
-    fun getAll(): List<RulesetItem> = rulesets.toList()
+    // Row focus follows IDs, but the editor and storage use upstream's position contract.
+    internal fun positionOf(ruleId: String): Int = rulesets.indexOfFirst { it.id == ruleId }
 
     fun reload() {
         val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        var needsSave = false
         loaded.forEachIndexed { index, item ->
             if (item.id.isEmpty()) {
                 item.id = UUID.randomUUID().toString()
                 SettingsManager.saveRoutingRuleset(index, item)
-                needsSave = true
             }
         }
         rulesets.clear()
@@ -40,6 +39,13 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
             SettingsManager.saveRoutingRuleset(position, item)
             _rulesetsFlow.value = rulesets.toList()
         }
+    }
+
+    fun remove(position: Int) {
+        if (position !in rulesets.indices) return
+        SettingsManager.removeRoutingRuleset(position)
+        rulesets.removeAt(position)
+        _rulesetsFlow.value = rulesets.toList()
     }
 
     fun move(fromPosition: Int, toPosition: Int) {

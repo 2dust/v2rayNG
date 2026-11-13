@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.compose
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
 @Composable
@@ -14,6 +15,7 @@ fun <T> AppDropdownMenuItems(
     items.forEach { item ->
         DropdownMenuItem(
             text = { Text(stringResource(labelRes(item))) },
+            modifier = Modifier.tvMenuItemFocus(),
             onClick = { onSelected(item) }
         )
     }

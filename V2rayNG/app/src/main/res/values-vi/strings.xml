@@ -11,7 +11,6 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Hủy</string>
     <string name="migration_fail">Không thể chuyển dữ liệu!</string>
-    <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">Dịch vụ v2rayNG</string>
@@ -32,6 +31,20 @@
     <string name="menu_item_save_config">Lưu cấu hình</string>
     <string name="menu_item_edit_config">Chỉnh sửa cấu hình</string>
     <string name="menu_item_del_config">Xoá cấu hình</string>
+    <string name="action_exit">Thoát</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_add_subscription">Thêm gói đăng ký</string>
+    <string name="action_back">Quay lại</string>
+    <string name="action_more">Thêm</string>
+    <string name="action_clear">Xoá</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_info">Thông tin</string>
+    <string name="action_remove">Gỡ bỏ</string>
+    <string name="action_add_member">Thêm thành viên</string>
+    <string name="action_start_scan">Bắt đầu quét</string>
+    <string name="action_stop_scan">Dừng quét</string>
+    <string name="action_torch">Đèn pin</string>
+    <string name="action_select_image">Chọn hình ảnh</string>
     <string name="menu_item_import_config_qrcode">Nhập cấu hình từ mã QR</string>
     <string name="menu_item_import_config_clipboard">Nhập cấu hình từ bảng tạm</string>
     <string name="menu_item_import_config_local">Nhập cấu hình từ thiết bị</string>
@@ -160,6 +173,8 @@
     <string name="menu_item_scan_qrcode">Quét mã QR</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">Tải xuống tệp tin</string>
+    <string name="menu_item_edit_asset">Sửa tài nguyên</string>
+    <string name="menu_item_del_asset">Xóa tài nguyên</string>
     <string name="title_user_asset_add_url">Thêm URL tài nguyên</string>
     <string name="msg_file_not_found">Không tìm thấy tập tin!</string>
     <string name="msg_remark_is_duplicate">Tên này đã tồn tại!</string>
@@ -331,6 +346,7 @@
     <string name="summary_root_lan_sharing">Định tuyến lưu lượng từ thiết bị dùng điểm phát Wi-Fi và chia sẻ kết nối USB qua VPN.</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_update">Cập nhật</string>
     <string name="logcat_copy">Sao chép</string>
     <string name="logcat_clear">Xoá</string>
     <string name="logcat_share">Chia sẻ nhật ký</string>
@@ -353,6 +369,7 @@
     <string name="sub_setting_pre_profile_tip">Tên ghi chú của cấu hình phải tồn tại và là duy nhất</string>
     <string name="sub_setting_entry_proxy_tip">Proxy đã chọn được thêm trước mỗi cấu hình trong gói đăng ký, làm mắt xích đầu vào của chuỗi proxy cho cấu hình đó.</string>
     <string name="sub_setting_exit_proxy_tip">Proxy đã chọn được thêm sau mỗi cấu hình trong gói đăng ký, làm mắt xích đầu ra của chuỗi proxy cho cấu hình đó.</string>
+    <string name="sub_setting_no_proxy">Không có</string>
     <string name="toast_invalid_update_interval">Khoảng thời gian cập nhật không hợp lệ. Giá trị tối thiểu là 15 phút.</string>
     <string name="title_sub_update">Cập nhật gói đăng ký</string>
     <string name="title_ping_all_server">Kiểm tra độ trễ TCP (TCPing)</string>
@@ -387,6 +404,7 @@
     <string name="routing_settings_comma_tip">Phân cách nhiều mục bằng dấu phẩy (,).</string>
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
+    <string name="routing_settings_enable_rule">Bật quy tắc</string>
     <string name="routing_settings_rule_title">Cài đặt quy tắc định tuyến</string>
     <string name="routing_settings_add_rule">Thêm quy tắc</string>
     <string name="routing_settings_import_predefined_rulesets">Nhập các bộ quy tắc được xác định trước</string>
@@ -415,6 +433,7 @@
     <string name="connection_test_fail">Không thể truy cập Internet</string>
     <string name="connection_test_error_status_code">Mã lỗi: #%d</string>
     <string name="connection_connected">Đã kết nối.\nNhấn để kiểm tra kết nối.</string>
+    <string name="connection_connected_tv">Đã kết nối</string>
     <string name="connection_not_connected">Chưa kết nối</string>
     <string name="connection_running_task_left">Số lượt kiểm tra đang chạy: %s</string>
 
@@ -449,6 +468,7 @@
     <string name="title_policy_group_fallback">Kết nối dự phòng (outbound, tùy chọn)</string>
 
     <string name="server_proxy_chain_members">Thành viên chuỗi proxy</string>
+    <string name="server_proxy_chain_member">Thành viên</string>
     <string name="server_proxy_chain_pick_members">Chạm vào đây để chọn thành viên</string>
     <string name="server_proxy_chain_member_unselected">Chọn một thành viên</string>
     <string name="server_proxy_chain_members_unselected">Vui lòng chọn thành viên cho từng hàng trong chuỗi</string>

@@ -2,7 +2,6 @@ package com.v2ray.ang.ui.subscription
 
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,12 +9,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AppTopBarAction
+import com.v2ray.ang.ui.compose.tvSafeAreaPadding
+import com.v2ray.ang.ui.compose.tvAwareImePadding
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toLongEx
@@ -43,12 +42,16 @@ import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.compose.AppIconButton
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.dpadClickable
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
@@ -131,7 +134,6 @@ fun SubEditScreen(
     onSave: (SubscriptionItem) -> Boolean,
     onDelete: () -> Unit
 ) {
-    //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }
@@ -150,8 +152,11 @@ fun SubEditScreen(
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     var showPrevProfileDialog by rememberSaveable { mutableStateOf(false) }
     var showNextProfileDialog by rememberSaveable { mutableStateOf(false) }
-    val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
+    val isTelevision = isTelevisionDevice()
+    val proxyPlaceholder = stringResource(if (isTelevision) R.string.sub_setting_no_proxy else R.string.sub_setting_pre_profile_tip)
+    val confirmRemove = isTelevision ||
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
     fun buildSubItem(): SubscriptionItem {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
@@ -169,38 +174,45 @@ fun SubEditScreen(
         return subItem
     }
 
+    fun save() {
+        isRemarksError = remarks.isBlank()
+        isUrlError = url.isNotEmpty() && (!Utils.isValidUrl(url) || (!Utils.isValidSubUrl(url) && !allowInsecureUrl))
+        isUpdateIntervalError = autoUpdate && updateInterval.toLongEx() < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES
+        if (!isRemarksError && !isUrlError && !isUpdateIntervalError) onSave(buildSubItem())
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_sub_setting),
                 onBackClick = onBackClick,
-                actions = {
-                    if (editSubId.isNotEmpty()) {
-                        IconButton(onClick = {
-                            if (confirmRemove) showDeleteConfirm = true else onDelete()
-                        }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
-                        }
-                    }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        val urlErr = url.isNotEmpty() && (
-                            !Utils.isValidUrl(url) || (!Utils.isValidSubUrl(url) && !allowInsecureUrl)
+                actionItems = buildList {
+                    if (isTelevision) add(
+                        AppTopBarAction(
+                            icon = painterResource(R.drawable.ic_fab_check),
+                            label = stringResource(R.string.menu_item_save_config),
+                            onClick = ::save
                         )
-                        val intervalErr = autoUpdate && updateInterval.toLongEx() < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES
-
-                        isRemarksError = remarksErr
-                        isUrlError = urlErr
-                        isUpdateIntervalError = intervalErr
-
-                        val hasError = remarksErr || urlErr || intervalErr
-                        if (!hasError) {
-                            onSave(buildSubItem())
-                        }
-                    }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
-                    }
+                    )
+                    if (editSubId.isNotEmpty()) add(
+                        AppTopBarAction(
+                            icon = painterResource(R.drawable.ic_delete_24dp),
+                            label = stringResource(R.string.action_delete),
+                            contentDescription = stringResource(R.string.acc_delete),
+                            onClick = {
+                                if (confirmRemove) showDeleteConfirm = true else onDelete()
+                            }
+                        )
+                    )
+                    if (!isTelevision) add(
+                        AppTopBarAction(
+                            icon = painterResource(R.drawable.ic_fab_check),
+                            label = stringResource(R.string.action_save),
+                            contentDescription = stringResource(R.string.acc_save),
+                            onClick = ::save
+                        )
+                    )
                 }
             )
         }
@@ -210,7 +222,8 @@ fun SubEditScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imePadding()
+                .tvAwareImePadding()
+                .tvSafeAreaPadding()
                 .verticalScroll(scrollState)
                 .verticalScrollbar(scrollState)
                 .padding(vertical = 8.dp)
@@ -260,7 +273,7 @@ fun SubEditScreen(
             )
             ProfileSelectDialogField(
                 label = stringResource(R.string.sub_setting_pre_profile),
-                placeholder = stringResource(R.string.sub_setting_pre_profile_tip),
+                placeholder = proxyPlaceholder,
                 value = prevProfile,
                 onClick = { showPrevProfileDialog = true },
                 onClear = { prevProfile = "" },
@@ -268,7 +281,7 @@ fun SubEditScreen(
             )
             ProfileSelectDialogField(
                 label = stringResource(R.string.sub_setting_next_profile),
-                placeholder = stringResource(R.string.sub_setting_pre_profile_tip),
+                placeholder = proxyPlaceholder,
                 value = nextProfile,
                 onClick = { showNextProfileDialog = true },
                 onClear = { nextProfile = "" },
@@ -330,7 +343,9 @@ private fun ProfileSelectDialogField(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickable(role = Role.Button, onClick = onClick),
+                .dpadFocusOutline()
+                .dpadClickable(role = Role.Button, onClick = onClick)
+                .padding(if (isTelevisionDevice()) 8.dp else 0.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(label, style = MaterialTheme.typography.labelMedium)
@@ -345,11 +360,11 @@ private fun ProfileSelectDialogField(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        IconButton(onClick = onClear) {
-            Icon(
-                painterResource(R.drawable.ic_delete_24dp),
-                contentDescription = "${stringResource(R.string.logcat_clear)}, $label"
-            )
-        }
+        AppIconButton(
+            icon = painterResource(R.drawable.ic_delete_24dp),
+            label = stringResource(R.string.logcat_clear),
+            onClick = onClear,
+            contentDescription = "${stringResource(R.string.logcat_clear)}, $label"
+        )
     }
 }

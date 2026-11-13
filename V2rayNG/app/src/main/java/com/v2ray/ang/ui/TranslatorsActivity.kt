@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import android.os.Bundle
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,6 +36,10 @@ import com.v2ray.ang.dto.TranslatorsParser
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.dpadMovePreviousNavigation
+import com.v2ray.ang.ui.compose.isTelevisionDevice
+import com.v2ray.ang.ui.compose.rememberDpadFocusRequester
 import com.v2ray.ang.util.Utils
 
 class TranslatorsActivity : BaseComponentActivity() {
@@ -55,20 +60,23 @@ fun TranslatorsScreen(onBackClick: () -> Unit) {
     val credits = remember {
         TranslatorsParser.parse(Utils.readTextFromAssets(context, "translators.json"))
     }
+    val backFocusRequester = rememberDpadFocusRequester()
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.title_translators),
-                onBackClick = onBackClick
+                onBackClick = onBackClick,
+                navigationFocusRequester = backFocusRequester
             )
         }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .dpadMovePreviousNavigation { backFocusRequester.requestFocus() },
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -117,17 +125,19 @@ private fun TranslationCreditCard(credit: TranslatorsCredit) {
 private fun ContributorRow(displayName: String, linkUrl: String?) {
     val context = LocalContext.current
     val isLink = linkUrl != null
+    val isTelevision = isTelevisionDevice()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .dpadFocusOutline()
             .then(
                 if (isLink) {
                     Modifier.clickable(role = Role.Button) {
                         Utils.openUri(context, linkUrl)
                     }
                 } else {
-                    Modifier
+                    Modifier.focusable(enabled = isTelevision)
                 }
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),

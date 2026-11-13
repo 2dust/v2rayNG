@@ -11,7 +11,6 @@
     <string name="action_ok">確定</string>
     <string name="action_cancel">取消</string>
     <string name="migration_fail">資料遷移失敗！</string>
-    <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">v2rayNG 服務</string>
@@ -32,6 +31,20 @@
     <string name="menu_item_save_config">儲存設定</string>
     <string name="menu_item_edit_config">編輯設定檔</string>
     <string name="menu_item_del_config">刪除設定</string>
+    <string name="action_exit">退出</string>
+    <string name="action_save">儲存</string>
+    <string name="action_add_subscription">新增訂閱</string>
+    <string name="action_back">返回</string>
+    <string name="action_more">更多</string>
+    <string name="action_clear">清除</string>
+    <string name="action_share">分享</string>
+    <string name="action_info">資訊</string>
+    <string name="action_remove">移除</string>
+    <string name="action_add_member">新增成員</string>
+    <string name="action_start_scan">開始掃描</string>
+    <string name="action_stop_scan">停止掃描</string>
+    <string name="action_torch">手電筒</string>
+    <string name="action_select_image">選擇圖片</string>
     <string name="menu_item_import_config_qrcode">從 QR Code 匯入設定</string>
     <string name="menu_item_import_config_clipboard">從剪貼簿匯入設定</string>
     <string name="menu_item_import_config_local">從本機匯入</string>
@@ -160,6 +173,8 @@
     <string name="menu_item_scan_qrcode">掃描 QR Code</string>
     <string name="title_url" translatable="false">URL</string>
     <string name="menu_item_download_file">下載檔案</string>
+    <string name="menu_item_edit_asset">編輯資源</string>
+    <string name="menu_item_del_asset">刪除資源</string>
     <string name="title_user_asset_add_url">新增資源 URL</string>
     <string name="msg_file_not_found">找不到檔案</string>
     <string name="msg_remark_is_duplicate">名稱已存在</string>
@@ -331,6 +346,7 @@
     <string name="summary_root_lan_sharing">將 Wi-Fi 熱點和 USB 網路共享裝置的流量透過 VPN 轉送。</string>
 
     <string name="title_logcat" translatable="false">Logcat</string>
+    <string name="logcat_update">更新</string>
     <string name="logcat_copy">複製</string>
     <string name="logcat_clear">清除</string>
     <string name="logcat_share">分享日誌</string>
@@ -353,6 +369,7 @@
     <string name="sub_setting_pre_profile_tip">請確保設定檔別名存在且唯一</string>
     <string name="sub_setting_entry_proxy_tip">所選代理會加在此訂閱中每個設定檔之前，作為該設定檔代理鏈的入口節點。</string>
     <string name="sub_setting_exit_proxy_tip">所選代理會加在此訂閱中每個設定檔之後，作為該設定檔代理鏈的出口節點。</string>
+    <string name="sub_setting_no_proxy">無</string>
     <string name="toast_invalid_update_interval">更新間隔無效，最小值為 15 分鐘。</string>
     <string name="title_sub_update">更新訂閱</string>
     <string name="title_ping_all_server">測試 TCP 延遲（TCPing）</string>
@@ -387,6 +404,7 @@
     <string name="routing_settings_comma_tip">多個項目請用逗號（,）分隔。</string>
     <string name="routing_settings_save">儲存</string>
     <string name="routing_settings_delete">清除</string>
+    <string name="routing_settings_enable_rule">啟用規則</string>
     <string name="routing_settings_rule_title">路由規則設定</string>
     <string name="routing_settings_add_rule">新增規則</string>
     <string name="routing_settings_import_predefined_rulesets">匯入預先定義的規則集</string>
@@ -415,6 +433,7 @@
     <string name="connection_test_fail">"無法使用網際網路"</string>
     <string name="connection_test_error_status_code">錯誤碼：#%d</string>
     <string name="connection_connected">"已連線。輕觸以檢查連線。"</string>
+    <string name="connection_connected_tv">已連線</string>
     <string name="connection_not_connected">"未連線"</string>
     <string name="connection_running_task_left">正在執行的測試：%s</string>
 
@@ -449,6 +468,7 @@
     <string name="title_policy_group_fallback">備用出站 (outbound，選填)</string>
 
     <string name="server_proxy_chain_members">代理鏈成員</string>
+    <string name="server_proxy_chain_member">成員</string>
     <string name="server_proxy_chain_pick_members">點此選擇成員</string>
     <string name="server_proxy_chain_member_unselected">請選擇成員</string>
     <string name="server_proxy_chain_members_unselected">請為代理鏈中的每一列選擇成員</string>

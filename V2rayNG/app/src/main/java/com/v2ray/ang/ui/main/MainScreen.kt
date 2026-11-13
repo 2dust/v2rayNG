@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,40 +8,49 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.R
+import com.v2ray.ang.dto.GroupMapItem
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
-import kotlinx.coroutines.flow.distinctUntilChanged
+import com.v2ray.ang.ui.compose.isTelevisionDevice
+import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
+import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
+import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
@@ -50,232 +60,256 @@ fun MainScreen(
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
     val isLoading by mainViewModel.isLoading.collectAsStateWithLifecycle()
+    val isTelevision = isTelevisionDevice()
     val isRunning = uiState.isRunning
-    val displayText = mainViewModel.formatStatus(uiState.status)
+    val displayText = if (isTelevision && uiState.status == MainStatus.Connected) {
+        stringResource(R.string.connection_connected_tv)
+    } else {
+        mainViewModel.formatStatus(uiState.status)
+    }
     val selectedGuid = uiState.selectedGuid
+    val testDisplayText = uiState.testStatus
+        ?.let(mainViewModel::formatStatus)
+        .orEmpty()
     val doubleColumnDisplay = uiState.doubleColumnDisplay
-    val confirmRemove = uiState.confirmRemove
+    val confirmRemove = isTelevision || uiState.confirmRemove
     val shareQRCodeBitmap = uiState.shareQRCodeBitmap
 
     val isDarkTheme = LocalDarkTheme.current
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    var showSearch by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-    var showDelAllConfirm by remember { mutableStateOf(false) }
-    var showDelDuplicateConfirm by remember { mutableStateOf(false) }
-    var showDelInvalidConfirm by remember { mutableStateOf(false) }
-    var showRemoveConfirm by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
+    var bottomBarHeightPx by remember { mutableIntStateOf(0) }
+    val bottomBarHeight = with(LocalDensity.current) { bottomBarHeightPx.toDp() }
+    val drawerState = if (!isTelevision) rememberDrawerState(DrawerValue.Closed) else null
+    val drawerScope = rememberCoroutineScope()
+    val tvDrawerCoordinator = if (isTelevision) rememberMainTvDrawerCoordinator() else null
+    val isDrawerOpen = tvDrawerCoordinator?.isOpen == true
+    val openDrawer: (FocusRequester?) -> Unit = { requester ->
+        if (tvDrawerCoordinator != null) tvDrawerCoordinator.openFrom { requester?.requestFocus() ?: false }
+        else drawerScope.launch { drawerState?.open() }
+    }
+    var dialog by remember { mutableStateOf<MainDialog?>(null) }
+    var deleteTarget by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
         mutableStateOf<ServerDeleteTarget?>(null)
     }
-
-    var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
-    val removeServer: (String, String) -> Unit = { guid, profileName ->
+    var dialogFocusToRestore by remember { mutableStateOf<(() -> Boolean)?>(null) }
+    LaunchedEffect(dialogFocusToRestore, isTelevision) {
+        val restore = dialogFocusToRestore ?: return@LaunchedEffect
+        if (isTelevision) restore()
+        dialogFocusToRestore = null
+    }
+    val requestRemoveServer: (String, String) -> Unit = { guid, name ->
         if (confirmRemove) {
-            showRemoveConfirm = ServerDeleteTarget(guid, profileName)
+            deleteTarget = ServerDeleteTarget(guid, name)
         } else {
             onAction(MainAction.RemoveServer(guid))
         }
     }
-
-    val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { groups.size.coerceAtLeast(1) }
-    )
-
-    val lazyListStates = remember { mutableStateMapOf<String, LazyListState>() }
-    val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
-
-    LaunchedEffect(groups) {
-        val validGroupIds = groups.map { it.id }.toSet()
-        lazyListStates.keys.retainAll(validGroupIds)
-        lazyGridStates.keys.retainAll(validGroupIds)
+    var showSearch by rememberSaveable { mutableStateOf(uiState.searchQuery.isNotEmpty()) }
+    fun closeSearch() {
+        onAction(MainAction.Search(""))
+        showSearch = false
     }
+    val topBarFocus = rememberMainTopBarFocusRequesters(showSearch)
 
-    LaunchedEffect(groups, uiState.selectedGroupId) {
-        if (groups.isEmpty()) return@LaunchedEffect
-        val selectedIndex = groups.indexOfFirst { it.id == uiState.selectedGroupId }
-            .takeIf { it >= 0 } ?: 0
-        if (!pagerState.isScrollInProgress && pagerState.settledPage != selectedIndex) {
-            pagerState.scrollToPage(selectedIndex)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var resumeFocusGeneration by remember { mutableIntStateOf(0) }
+    DisposableEffect(lifecycleOwner, isTelevision) {
+        if (!isTelevision) return@DisposableEffect onDispose { }
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) resumeFocusGeneration++
         }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(tvDrawerCoordinator, isDrawerOpen) {
+        if (isDrawerOpen) return@LaunchedEffect
+        val restore = tvDrawerCoordinator?.takeFocusToRestore() ?: return@LaunchedEffect
+        if (!restore()) requestFocusWhenReady(topBarFocus.start)
     }
 
-    val latestGroups by rememberUpdatedState(groups)
-    // Height of the floating connection bar, so the server lists can scroll clear of it.
-    var bottomBarHeightPx by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }
-            .distinctUntilChanged()
-            .collect { page ->
-                val currentGroups = latestGroups
-                if (page in currentGroups.indices) {
-                    onAction(MainAction.SelectGroup(currentGroups[page].id))
-                }
-            }
+    BackHandler(enabled = isTelevision && showSearch, onBack = ::closeSearch)
+    BackHandler(enabled = isDrawerOpen) {
+        tvDrawerCoordinator?.close()
     }
 
-    MainDialogs(
-        showDelAllConfirm = showDelAllConfirm,
-        onDismissDelAll = { showDelAllConfirm = false },
-        onConfirmDelAll = { showDelAllConfirm = false; onAction(MainAction.RemoveAllServers) },
-        showDelDuplicateConfirm = showDelDuplicateConfirm,
-        onDismissDelDuplicate = { showDelDuplicateConfirm = false },
-        onConfirmDelDuplicate = { showDelDuplicateConfirm = false; onAction(MainAction.RemoveDuplicateServers) },
-        showDelInvalidConfirm = showDelInvalidConfirm,
-        onDismissDelInvalid = { showDelInvalidConfirm = false },
-        onConfirmDelInvalid = { showDelInvalidConfirm = false; onAction(MainAction.RemoveInvalidServers) },
-        showRemoveConfirm = showRemoveConfirm,
-        onDismissRemove = { showRemoveConfirm = null },
-        onConfirmRemove = { guid -> showRemoveConfirm = null; onAction(MainAction.RemoveServer(guid)) }
-    )
+    val groupIds = groups.map { it.id }
+    val selectedGroupIndex = mainSelectedGroupIndex(groups, uiState.selectedGroupId)
+    val scrollStates = rememberMainGroupScrollStates(groupIds)
+    val selectGroup: (String) -> Unit = { onAction(MainAction.SelectGroup(it)) }
+    val phonePager = if (!isTelevision) rememberMainPhonePagerState(groups, uiState.selectedGroupId, selectGroup) else null
+    val tvTabState = if (isTelevision && groups.size > 1) rememberLazyListState(selectedGroupIndex) else null
+    val tvTabTargets = if (tvTabState != null) rememberDpadFocusTargets(groupIds) { FocusRequester() } else emptyMap()
+    val tvTabOrder = if (tvTabState != null) groupIds.map(tvTabTargets::getValue) else emptyList()
+    val requestTabFocus = if (tvTabState != null) {
+        rememberLazyDpadFocus(tvTabOrder.map { listOf(it) }) { tvTabState.scrollToItem(it) }
+    } else null
+    fun focusGroupTab(groupId: String): Boolean = tvTabTargets[groupId]?.let { requestTabFocus?.invoke(it) } ?: false
 
-    if (shareTarget != null) {
-        val (guid, profile, more) = shareTarget!!
+    (dialog as? MainDialog.BulkDelete)?.target?.let { target ->
+        DeleteConfirmDialog(
+            message = stringResource(target.messageRes),
+            onConfirm = { onAction(target.action) },
+            onDismiss = { dialog = null }
+        )
+    }
+
+    deleteTarget?.let { target ->
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_profile),
+            itemName = target.profileName,
+            onConfirm = { onAction(MainAction.RemoveServer(target.guid)) },
+            onDismiss = { deleteTarget = null }
+        )
+    }
+
+    (dialog as? MainDialog.Share)?.target?.let { target ->
         ShareMethodDialog(
-            guid = guid,
-            profile = profile,
-            more = more,
-            onDismiss = { shareTarget = null },
+            guid = target.guid,
+            profile = target.profile,
+            more = target.more,
+            onDismiss = {
+                dialog = null
+                dialogFocusToRestore = target.restoreFocus
+            },
+            onActionSelected = { dialog = null },
             onAction = onAction,
-            onRemove = removeServer,
+            onRemove = requestRemoveServer
         )
     }
     if (shareQRCodeBitmap != null) {
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MainDrawerContent(
-                drawerState = drawerState,
-                onNavigate = { route ->
-                    scope.launch { drawerState.close() }
-                    onNavigate(route)
+    val mainContent: @Composable () -> Unit = {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+                topBar = {
+                    MainTopBar(
+                        isLoading = isLoading,
+                        isRunning = isRunning,
+                        showSearch = showSearch,
+                        searchQuery = uiState.searchQuery,
+                        focusRequesters = topBarFocus,
+                        onSearchQueryChange = { query ->
+                            onAction(MainAction.Search(query))
+                        },
+                        onSearchClose = ::closeSearch,
+                        onSearchToggle = { showSearch = it },
+                        onOpenDrawer = openDrawer,
+                        onMoveDown = { groups.getOrNull(selectedGroupIndex)?.let { focusGroupTab(it.id) } ?: false },
+                        onAction = onAction,
+                        onBulkDelete = { dialog = MainDialog.BulkDelete(it) }
+                    )
+                },
+                bottomBar = {
+                    if (isTelevision) {
+                        MainTvStatusBar(displayText, testDisplayText.replace('\n', ' '))
+                    }
                 }
-            )
-        }
-    ) {
-        Scaffold(
-            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
-            topBar = {
-                MainTopBar(
-                    isLoading = isLoading,
-                    showSearch = showSearch,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { query: String ->
-                        searchQuery = query
-                        onAction(MainAction.Search(query))
-                    },
-                    onSearchClose = {
-                        searchQuery = ""
-                        onAction(MainAction.Search(""))
-                        showSearch = false
-                    },
-                    onSearchToggle = { show: Boolean -> showSearch = show },
-                    onMenuClick = { scope.launch { drawerState.open() } },
-                    onAction = onAction,
-                    onMoreMenuAction = { action ->
-                        when (action) {
-                            MainMoreMenuAction.RestartService -> onAction(MainAction.RestartService)
-                            MainMoreMenuAction.DeleteAll -> showDelAllConfirm = true
-                            MainMoreMenuAction.DeleteDuplicate -> showDelDuplicateConfirm = true
-                            MainMoreMenuAction.DeleteInvalid -> showDelInvalidConfirm = true
-                            MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
-                            MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
-                            MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
-                            MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
-                            MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
-                            MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
+            ) { innerPadding ->
+                if (groups.isNotEmpty()) {
+                    val layoutDirection = LocalLayoutDirection.current
+                    val contentInsets = if (isTelevision) innerPadding else PaddingValues(
+                        start = innerPadding.calculateStartPadding(layoutDirection),
+                        top = innerPadding.calculateTopPadding(),
+                        end = innerPadding.calculateEndPadding(layoutDirection)
+                    )
+                    Column(modifier = Modifier.fillMaxSize().padding(contentInsets)) {
+                        if (tvTabState != null && requestTabFocus != null) {
+                            TvGroupTabBar(groups, selectedGroupIndex, tvTabState, tvTabOrder, requestTabFocus,
+                                onOpenDrawer = { target -> tvDrawerCoordinator?.openFrom { requestTabFocus(target) } },
+                                onMoveUp = { topBarFocus.start.requestFocus() },
+                                onSelectGroup = selectGroup)
+                        } else if (phonePager != null && groups.size > 1) {
+                            GroupTabBar(groups, selectedGroupIndex, selectGroup)
                         }
+
+                        val groupPage: @Composable (GroupMapItem) -> Unit = { group ->
+                            GroupPagerPage(
+                                groupId = group.id,
+                                mainViewModel = mainViewModel,
+                                selectedGuid = selectedGuid,
+                                locateTarget = uiState.locateTarget,
+                                doubleColumnDisplay = doubleColumnDisplay,
+                                revealSelectedGeneration = resumeFocusGeneration,
+                                searchQuery = uiState.searchQuery,
+                                scrollStates = scrollStates,
+                                onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
+                                onEditServer = { guid, profile ->
+                                    onAction(MainAction.EditServer(guid, profile))
+                                },
+                                onShareServer = { guid, profile, more, restore ->
+                                    dialog = MainDialog.Share(MainShareTarget(guid, profile, more, restore))
+                                },
+                                onRemoveServer = requestRemoveServer,
+                                usageInfo = group.usageInfo,
+                                groupTitle = group.remarks,
+                                onOpenLink = { url -> onAction(MainAction.OpenSubscriptionLink(url)) },
+                                onOpenDrawer = { restore -> tvDrawerCoordinator?.openFrom(restore) },
+                                onBackFromList = { topBarFocus.start.requestFocus() },
+                                onMoveUpFromFirstRow = if (tvTabState != null) {
+                                    { focusGroupTab(group.id) }
+                                } else null,
+                                contentPadding = PaddingValues(
+                                    start = if (isTelevision) 48.dp else 0.dp,
+                                    top = if (isTelevision) 16.dp else 0.dp,
+                                    end = if (isTelevision) 48.dp else 0.dp,
+                                    bottom = if (isTelevision) 80.dp else bottomBarHeight + 8.dp
+                                )
+                            )
+                        }
+                        if (phonePager != null) {
+                            HorizontalPager(
+                                state = phonePager,
+                                modifier = Modifier.fillMaxSize(),
+                                beyondViewportPageCount = 1,
+                                key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
+                            ) { page ->
+                                groups.getOrNull(page)?.let { groupPage(it) }
+                            }
+                        } else {
+                            val group = groups[selectedGroupIndex]
+                            key(group.id) { groupPage(group) }
+                        }
+                    }
+                }
+            }
+            if (!isTelevision) {
+                MainBottomBar(
+                    displayText = testDisplayText.ifBlank { displayText },
+                    isRunning = isRunning,
+                    isDarkTheme = isDarkTheme,
+                    onAction = onAction,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged { bottomBarHeightPx = it.height }
+                )
+            }
+        }
+    }
+
+    if (tvDrawerCoordinator != null) {
+        TvMainNavigationDrawer(
+            drawerState = tvDrawerCoordinator.state,
+            focusGeneration = resumeFocusGeneration,
+            onClose = tvDrawerCoordinator::close,
+            onNavigate = onNavigate,
+            content = mainContent
+        )
+    } else {
+        val phoneDrawerState = requireNotNull(drawerState)
+        ModalNavigationDrawer(
+            drawerState = phoneDrawerState,
+            drawerContent = {
+                MainDrawerContent(
+                    drawerState = phoneDrawerState,
+                    onNavigate = { destination ->
+                        drawerScope.launch { phoneDrawerState.close() }
+                        onNavigate(destination)
                     }
                 )
             },
-            floatingActionButton = {},
-        ) { innerPadding ->
-            val layoutDirection = LocalLayoutDirection.current
-            val bottomBarHeight = with(LocalDensity.current) { bottomBarHeightPx.toDp() }
-
-            Box(Modifier.fillMaxSize()) {
-            if (groups.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        // No bottom padding: the lists run behind the floating connection bar.
-                        .padding(
-                            start = innerPadding.calculateStartPadding(layoutDirection),
-                            top = innerPadding.calculateTopPadding(),
-                            end = innerPadding.calculateEndPadding(layoutDirection)
-                        )
-                ) {
-                    if (groups.size > 1) {
-                        GroupTabBar(
-                            groups = groups,
-                            selectedTabIndex = pagerState.currentPage.coerceIn(0, groups.lastIndex),
-                            mainViewModel = mainViewModel,
-                            onTabClick = { targetIndex ->
-                                scope.launch {
-                                    pagerState.navigateToPageOptimized(
-                                        targetPage = targetIndex,
-                                        animateAdjacentPage = true
-                                    )
-                                }
-                            }
-                        )
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        userScrollEnabled = true,
-                        beyondViewportPageCount = 1,
-                        key = { page -> groups.getOrNull(page)?.id ?: "group-page-$page" }
-                    ) { page ->
-                        val group = groups.getOrNull(page) ?: return@HorizontalPager
-
-                        GroupPagerPage(
-                            groupId = group.id,
-                            mainViewModel = mainViewModel,
-                            selectedGuid = selectedGuid,
-                            locateTarget = uiState.locateTarget,
-                            doubleColumnDisplay = doubleColumnDisplay,
-                            searchQuery = searchQuery,
-                            lazyListStates = lazyListStates,
-                            lazyGridStates = lazyGridStates,
-                            onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
-                            onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
-                            onShareServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, false)
-                            },
-                            onMoreServer = { guid, profile ->
-                                shareTarget = Triple(guid, profile, true)
-                            },
-                            onRemoveServer = removeServer,
-                            usageInfo = group.usageInfo,
-                            groupTitle = group.remarks,
-                            onOpenLink = { url -> onAction(MainAction.OpenSubscriptionLink(url)) },
-                            contentPadding = PaddingValues(
-                                start = 0.dp,
-                                top = 0.dp,
-                                end = 0.dp,
-                                bottom = bottomBarHeight + 8.dp
-                            )
-                        )
-                    }
-                }
-            }
-            MainBottomBar(
-                displayText = displayText,
-                isRunning = isRunning,
-                isDarkTheme = isDarkTheme,
-                onAction = onAction,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .onSizeChanged { bottomBarHeightPx = it.height }
-            )
-            }
-        }
+            content = mainContent
+        )
     }
 }
