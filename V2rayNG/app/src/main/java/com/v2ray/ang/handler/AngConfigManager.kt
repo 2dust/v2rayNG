@@ -169,6 +169,7 @@ object AngConfigManager {
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
                 EConfigType.MASQUE -> MasqueFmt.toUri(config)
+                EConfigType.CUSTOM_OUTBOUND -> MmkvManager.decodeServerRaw(guid)?.let {CustomOutboundFmt.toUri(config, it)} ?: ""
                 else -> {}
             }
         } catch (e: Exception) {
@@ -255,12 +256,24 @@ object AngConfigManager {
             // Parse all configs first (no I/O during parsing)
             val configs = mutableListOf<ProfileItem>()
             val v2raynLines = mutableListOf<String>()
+            val customOutbounds = mutableListOf<ParsedProfile>()
 
             servers.lines()
                 .distinct()
                 .reversed()
                 .forEach {
-                    if (it.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)) {
+                    if (it.startsWith("${AppConfig.V2RAYNFMTS}outbound/", ignoreCase = true)) {
+                        CustomOutboundFmt.parseUri(it)?.let { parsed ->
+                            parsed.first.subscriptionId = subid
+                            parsed.first.description = generateDescription(parsed.first)
+                            customOutbounds.add(
+                                ParsedProfile(
+                                    parsed.first,
+                                    parsed.second
+                                )
+                            )
+                        }
+                    } else if (it.startsWith(AppConfig.V2RAYNFMTS, ignoreCase = true)) {
                         v2raynLines.add(it)
                     } else {
                         val config = parseConfig(it, subid, subItem)
@@ -271,11 +284,11 @@ object AngConfigManager {
                 }
 
             val v2raynConfigs = V2rayNFmt.parse(v2raynLines, subid)
-            val allConfigs = v2raynConfigs + configs
+            val allConfigs = (v2raynConfigs + configs).map(::ParsedProfile) + customOutbounds
 
             if (allConfigs.isNotEmpty()) {
                 commitProfiles(
-                    configs = allConfigs.map(::ParsedProfile),
+                    configs = allConfigs,
                     subid = subid,
                     append = append,
                 )
