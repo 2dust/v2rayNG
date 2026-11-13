@@ -120,10 +120,7 @@ internal fun TvMainTopBar(
         modifier = Modifier.padding(horizontal = 48.dp, vertical = 12.dp),
         title = {
             if (showSearch) {
-                TvTopBarSearchField(
-                    searchQuery, onSearchQueryChange, stringResource(R.string.menu_item_search),
-                    searchInputFocus, searchClearFocus, searchFocusOrder, onMoveDown = { false }
-                )
+                TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder)
             } else {
                 Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.CenterStart) {
                     AppBrandTitle(
@@ -135,7 +132,7 @@ internal fun TvMainTopBar(
         navigationIcon = {
             if (showSearch) {
                 TvIconButton(
-                    icon = painterResource(R.drawable.ic_arrow_back_24dp),
+                    icon = painterResource(R.drawable.ic_tv_arrow_back_24dp),
                     label = stringResource(R.string.action_back),
                     contentDescription = stringResource(R.string.acc_back),
                     onClick = onSearchClose,

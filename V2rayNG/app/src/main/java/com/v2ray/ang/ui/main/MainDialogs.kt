@@ -11,10 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.QRCodeDialog
-import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
-import com.v2ray.ang.ui.compose.TvQRCodeDialog
+import com.v2ray.ang.extension.isComplexType
 
 data class ServerDeleteTarget(
     val guid: String,
@@ -44,6 +41,9 @@ internal fun MainDialogs(
     confirmRemove: Boolean,
     shareQRCodeBitmap: Bitmap?,
     onAction: (MainAction) -> Unit,
+    deleteDialog: @Composable (message: String, itemName: String?, confirm: () -> Unit, dismiss: () -> Unit) -> Unit,
+    shareDialog: @Composable (List<ServerMenuAction>, (ServerMenuAction) -> Unit, () -> Unit) -> Unit,
+    qrCodeDialog: @Composable (Bitmap, () -> Unit) -> Unit,
     onRestoreFocus: ((() -> Boolean) -> Unit)? = null,
     content: @Composable (MainDialogActions) -> Unit
 ) {
@@ -56,37 +56,40 @@ internal fun MainDialogs(
         else onAction(MainAction.RemoveServer(guid))
     }
 
-    val television = onRestoreFocus != null
     when (val current = dialog) {
-        is MainDialog.BulkDelete -> MainDeleteDialog(
-            television, stringResource(current.target.messageRes), null,
-            onConfirm = { onAction(current.target.action) }, onDismiss = { dialog = null }
+        is MainDialog.BulkDelete -> deleteDialog(
+            stringResource(current.target.messageRes), null, { onAction(current.target.action) }, { dialog = null }
         )
-        is MainDialog.Share -> ShareMethodDialog(
-            guid = current.guid,
-            profile = current.profile,
-            more = current.more,
-            television = television,
-            onDismiss = {
-                dialog = null
-                onRestoreFocus?.invoke(current.restoreFocus)
-            },
-            onActionSelected = { dialog = null },
-            onAction = onAction,
-            onRemove = requestRemove
-        )
+        is MainDialog.Share -> {
+            val options = serverMenuActions(current.profile.configType.isComplexType(), current.more)
+            shareDialog(
+                options,
+                { action ->
+                    dialog = null
+                    when (action) {
+                        ServerMenuAction.ShareQRCode -> onAction(MainAction.ShareQRCode(current.guid))
+                        ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(current.guid))
+                        ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(current.guid))
+                        ServerMenuAction.Edit -> onAction(MainAction.EditServer(current.guid, current.profile))
+                        ServerMenuAction.Delete -> requestRemove(current.guid, current.profile.remarks)
+                    }
+                },
+                {
+                    dialog = null
+                    onRestoreFocus?.invoke(current.restoreFocus)
+                }
+            )
+        }
         null -> Unit
     }
     deleteTarget?.let { target ->
-        MainDeleteDialog(
-            television, stringResource(R.string.confirm_delete_profile), target.profileName,
-            onConfirm = { onAction(MainAction.RemoveServer(target.guid)) },
-            onDismiss = { deleteTarget = null }
+        deleteDialog(
+            stringResource(R.string.confirm_delete_profile), target.profileName,
+            { onAction(MainAction.RemoveServer(target.guid)) }, { deleteTarget = null }
         )
     }
     if (shareQRCodeBitmap != null) {
-        val dismiss = { onAction(MainAction.DismissQRCodeDialog) }
-        if (television) TvQRCodeDialog(shareQRCodeBitmap, dismiss) else QRCodeDialog(shareQRCodeBitmap, dismiss)
+        qrCodeDialog(shareQRCodeBitmap) { onAction(MainAction.DismissQRCodeDialog) }
     }
 
     content(MainDialogActions(
@@ -94,10 +97,4 @@ internal fun MainDialogs(
         share = { guid, profile, more, restore -> dialog = MainDialog.Share(guid, profile, more, restore) },
         remove = requestRemove
     ))
-}
-
-@Composable
-private fun MainDeleteDialog(television: Boolean, message: String, item: String?, onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    if (television) TvDeleteConfirmDialog(message, onConfirm, onDismiss, item)
-    else DeleteConfirmDialog(message, onConfirm, onDismiss, item)
 }

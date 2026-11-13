@@ -357,8 +357,7 @@ class MainViewModel(
         }
     }
 
-    private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
-        val keyword = uiState.value.searchQuery.trim()
+    private fun applyKeywordFilter(servers: List<ServersCache>, keyword: String): List<ServersCache> {
         if (keyword.isEmpty()) return servers
         val regex = try {
             Regex(keyword, RegexOption.IGNORE_CASE)
@@ -375,10 +374,12 @@ class MainViewModel(
     }
 
     private fun updateGroupUi(groupId: String, servers: List<ServersCache>) {
-        val filteredServers = applyKeywordFilter(servers)
+        val keyword = uiState.value.searchQuery.trim()
+        val filteredServers = applyKeywordFilter(servers, keyword)
         mutableServerGroupState(groupId).value = ServerGroupUiState(
             servers = filteredServers,
-            rows = buildServerRows(groupId, filteredServers)
+            rows = buildServerRows(groupId, filteredServers),
+            isFiltered = keyword.isNotEmpty()
         )
         _uiState.update { state ->
             val index = state.groups.indexOfFirst { it.id == groupId }
@@ -783,17 +784,35 @@ class MainViewModel(
 
     private fun moveServer(action: MainAction.MoveServer) {
         val groupId = action.groupId
-        if (groupId.isEmpty() || uiState.value.searchQuery.isNotEmpty()) return
-        val groupFlow = mutableServerGroupState(groupId)
-        val reordered = groupFlow.value.moveServer(action.fromGuid, action.toGuid) ?: return
-        val guids = reordered.servers.map { it.guid }
-        groupFlow.value = reordered
-        // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
+        val groupFlow = groupUiFlows[groupId] ?: return
+        val current = groupFlow.value
+        if (!current.canReorder(groupId, uiState.value.searchQuery)) return
+        groupFlow.value = current.moveServer(action.fromGuid, action.toGuid) ?: return
+        // Keep immediate D-pad feedback, but apply queued moves by GUID to the stored index.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
-        serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
+        serverOrderPersistenceJobs[groupId] = viewModelScope.launch {
             previousPersistenceJob?.join()
-            dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = reordered.servers }
+            val saved = withContext(ioDispatcher) {
+                try {
+                    val order = dataSource.moveServerInGroup(groupId, action.fromGuid, action.toGuid)
+                    cacheMutex.withLock {
+                        val cached = groupDataCache.remove(groupId)?.associateBy { it.guid }
+                        if (order != null && cached != null && order.size == cached.size && order.all(cached::containsKey)) {
+                            groupDataCache[groupId] = order.map(cached::getValue)
+                        }
+                    }
+                    order != null
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to save profile order for group: $groupId", error)
+                    false
+                }
+            }
+            if (serverOrderPersistenceJobs[groupId] == coroutineContext[Job]) {
+                serverOrderPersistenceJobs.remove(groupId)
+                if (!saved) setupGroupTab(forceRefresh = true)
+            }
         }
     }
 

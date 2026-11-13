@@ -3,20 +3,16 @@ package com.v2ray.ang.ui.compose
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
@@ -31,7 +27,7 @@ private fun reorderableElevation(isDragging: Boolean, isMoving: Boolean) = anima
 )
 
 @Composable
-internal fun Modifier.tvReorderableDragHandle(scope: ReorderableCollectionItemScope): Modifier {
+private fun Modifier.tvReorderableDragHandle(scope: ReorderableCollectionItemScope): Modifier {
     val hapticFeedback = LocalHapticFeedback.current
     return with(scope) {
         longPressDraggableHandle(onDragStarted = {
@@ -42,15 +38,14 @@ internal fun Modifier.tvReorderableDragHandle(scope: ReorderableCollectionItemSc
 }
 
 @Composable
-private fun ReorderableSurface(
+internal fun TvReorderableItem(
     scope: ReorderableCollectionItemScope,
     isDragging: Boolean,
     isMoving: Boolean,
-    moveModeCornerRadius: Dp,
     content: @Composable () -> Unit
 ) {
     val elevation by reorderableElevation(isDragging, isMoving)
-    val shape = if (isMoving) RoundedCornerShape(moveModeCornerRadius) else RectangleShape
+    val shape = if (isMoving) RoundedCornerShape(12.dp) else RectangleShape
     Box(Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier.fillMaxWidth().tvReorderableDragHandle(scope),
@@ -62,25 +57,3 @@ private fun ReorderableSurface(
         if (isMoving) Box(Modifier.matchParentSize().border(4.dp, MaterialTheme.colorScheme.secondary, shape))
     }
 }
-
-@Composable
-internal fun TvReorderableListItem(
-    scope: ReorderableCollectionItemScope,
-    isDragging: Boolean,
-    isMoving: Boolean = false,
-    moveModeCornerRadius: Dp = 16.dp,
-    content: @Composable RowScope.() -> Unit
-) {
-    ReorderableSurface(scope, isDragging, isMoving, moveModeCornerRadius) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, content = content)
-    }
-}
-
-@Composable
-internal fun TvReorderableGridItem(
-    scope: ReorderableCollectionItemScope,
-    isDragging: Boolean,
-    isMoving: Boolean = false,
-    moveModeCornerRadius: Dp = 16.dp,
-    content: @Composable () -> Unit
-) = ReorderableSurface(scope, isDragging, isMoving, moveModeCornerRadius, content)

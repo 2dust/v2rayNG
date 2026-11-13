@@ -16,18 +16,17 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.IntSize
@@ -50,17 +49,8 @@ internal fun tvTextFieldRecoveryAction(
     else -> TvTextFieldRecoveryAction.None
 }
 
-data class TvTextFieldNavigation(
-    val focusRequester: FocusRequester? = null,
-    val onMoveUp: (() -> Boolean)? = null,
-    val onMoveDown: (() -> Boolean)? = null,
-    val onMovePrevious: (() -> Boolean)? = null,
-    val onMoveNext: (() -> Boolean)? = null
-)
-
 /**
- * Owns the passive-row/editor handoff and IME positioning for one TV text field. Keeping that
- * behavior here prevents every form and dialog from implementing subtly different state machines.
+ * Owns the handoff between the passive TV search focus target and the IME editor.
  */
 internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, private val hideKeyboard: () -> Unit) {
     val editorFocusRequester = FocusRequester()
@@ -110,34 +100,28 @@ internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, priva
 }
 
 /**
- * Isolates [ExperimentalLayoutApi] for WindowInsets.isImeVisible. Android TV overlay IMEs and
- * resizing multi-line editors can otherwise leave the field under the keyboard or oscillating by
- * one pixel. Reevaluate the opt-in when isImeVisible becomes stable; remove the frame settling
- * workaround when supported TV keyboards report final editor bounds in the visibility frame.
+ * Isolates [ExperimentalLayoutApi] for WindowInsets.isImeVisible so Back from the TV IME returns
+ * focus to the passive field. Reevaluate the opt-in when isImeVisible becomes stable.
  */
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
-internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester? = null): TvTextFieldState {
-    val defaultPassiveFocusRequester = remember { FocusRequester() }
-    val resolvedPassiveFocusRequester = passiveFocusRequester ?: defaultPassiveFocusRequester
+internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester): TvTextFieldState {
     val keyboardController = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current
     val imeBottomClearancePx = with(density) { TvImeBottomClearance.toPx() }
     val currentKeyboardController = rememberUpdatedState(keyboardController)
-    val state = remember(resolvedPassiveFocusRequester) {
+    val state = remember(passiveFocusRequester) {
         TvTextFieldState(
-            passiveFocusRequester = resolvedPassiveFocusRequester,
+            passiveFocusRequester = passiveFocusRequester,
             hideKeyboard = { currentKeyboardController.value?.hide() }
         )
     }
     val isImeVisible = WindowInsets.isImeVisible
 
     /*
-     * Keep this recovery sequence centralized. On Android TV, both the overlay IME and a
-     * multi-line field can change size for several frames after visibility is reported. Calling
-     * BringIntoViewRequester immediately uses stale bounds, causing the rapid one-pixel jitter or
-     * leaving the last line under the keyboard. Three frames is the shortest value verified on the
-     * AOSP TV keyboard; it is a compatibility delay, not animation timing.
+     * AOSP TV's overlay IME can report visibility before the layout settles. Wait before using
+     * the editor bounds so bring-into-view does not oscillate. Remove this delay when supported
+     * TV IMEs report final bounds in the visibility frame.
     */
     LaunchedEffect(state.isEditing, state.editorHasFocus, isImeVisible, state.measuredSize) {
         when (tvTextFieldRecoveryAction(state.isEditing, state.editorHasFocus, state.imeWasVisible, isImeVisible)) {
@@ -164,72 +148,29 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester? = n
 }
 
 @Composable
-internal fun Modifier.tvAwareTextFieldFocus(
-    state: TvTextFieldState?,
-    enabled: Boolean,
-    navigation: TvTextFieldNavigation,
-    onActivate: () -> Unit
+internal fun Modifier.tvSearchFieldFocus(
+    state: TvTextFieldState,
+    focusOrder: List<FocusRequester>
 ): Modifier {
-    if (state == null) return this
-    val focusManager = LocalFocusManager.current
     return bringIntoViewRequester(state.bringIntoViewRequester)
         .onSizeChanged { state.measuredSize = it }
-        .tvPassiveTextFieldFocus(
-            focusRequester = state.passiveFocusRequester,
-            interactionSource = state.interactionSource,
-            enabled = enabled,
-            onActivate = onActivate,
-            canActivate = { !state.isEditing },
-            onMoveUp = {
-                state.finishEditing()
-                navigation.onMoveUp?.invoke()
-                    ?: focusManager.moveFocus(FocusDirection.Up)
-            },
-            onMoveDown = {
-                state.finishEditing()
-                navigation.onMoveDown?.invoke()
-                    ?: focusManager.moveFocus(FocusDirection.Down)
+        .onPreviewKeyEvent { event ->
+            if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+            when {
+                event.key.isDpadActivationKey() && !state.isEditing -> {
+                    state.beginEditing()
+                    true
+                }
+                event.key == Key.DirectionUp || event.key == Key.DirectionDown -> {
+                    state.finishEditing()
+                    event.key == Key.DirectionUp
+                }
+                else -> false
             }
-        )
-        .then(
-            if (navigation.onMovePrevious != null || navigation.onMoveNext != null) {
-                Modifier.dpadLogicalHorizontalNavigation(
-                    onMovePrevious = {
-                        navigation.onMovePrevious?.invoke()
-                            ?: state.passiveFocusRequester.requestFocus()
-                    },
-                    onMoveNext = {
-                        navigation.onMoveNext?.invoke()
-                            ?: state.passiveFocusRequester.requestFocus()
-                    }
-                )
-            } else {
-                Modifier
-            }
-        )
-}
-
-@Composable
-internal fun Modifier.tvPassiveTextFieldFocus(
-    focusRequester: FocusRequester,
-    interactionSource: MutableInteractionSource,
-    enabled: Boolean,
-    onActivate: () -> Unit,
-    canActivate: () -> Boolean = { true },
-    onMoveUp: (() -> Boolean)? = null,
-    onMoveDown: (() -> Boolean)? = null
-): Modifier {
-    return onPreviewKeyEvent { event ->
-        if (event.type == KeyEventType.KeyDown && event.key.isDpadActivationKey() && canActivate()) {
-            onActivate()
-            true
-        } else {
-            false
         }
-    }
-        .dpadTextFieldNavigation(onMoveUp = onMoveUp, onMoveDown = onMoveDown)
-        .focusRequester(focusRequester)
-        .focusable(enabled = enabled, interactionSource = interactionSource)
+        .dpadOrderedFocusNavigation(state.passiveFocusRequester, focusOrder)
+        .focusRequester(state.passiveFocusRequester)
+        .focusable(interactionSource = state.interactionSource)
 }
 
 internal fun Modifier.tvTextFieldEditorFocus(state: TvTextFieldState): Modifier {

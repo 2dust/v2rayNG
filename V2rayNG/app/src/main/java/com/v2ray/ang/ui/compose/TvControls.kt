@@ -119,34 +119,16 @@ private fun FocusedActionLabel(visible: Boolean, label: String, color: Color, ga
 internal fun TvTopBarSearchField(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String?,
     focusRequester: FocusRequester,
     clearFocusRequester: FocusRequester,
-    focusOrder: List<FocusRequester>,
-    onMoveDown: () -> Boolean
+    focusOrder: List<FocusRequester>
 ) {
     val state = rememberTvTextFieldState(focusRequester)
-    fun moveFocus(direction: DpadHorizontalDirection): Boolean =
-        (adjacentDpadFocusTarget(focusRequester, focusOrder, direction) ?: focusRequester).requestFocus()
-
     LaunchedEffect(state) { state.beginEditing() }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier.weight(1f).tvAwareTextFieldFocus(
-                state = state,
-                enabled = true,
-                navigation = TvTextFieldNavigation(
-                    focusRequester = focusRequester,
-                    onMoveUp = { true },
-                    onMoveDown = onMoveDown,
-                    onMovePrevious = { moveFocus(DpadHorizontalDirection.Previous) },
-                    onMoveNext = { moveFocus(DpadHorizontalDirection.Next) }
-                ),
-                onActivate = state::beginEditing
-            )
-        ) {
+        Box(Modifier.weight(1f).tvSearchFieldFocus(state, focusOrder)) {
             TopBarSearchTextField(
-                query, onQueryChange, placeholder, Modifier.tvTextFieldEditorFocus(state),
+                query, onQueryChange, stringResource(R.string.menu_item_search), Modifier.fillMaxWidth().tvTextFieldEditorFocus(state),
                 readOnly = !state.isEditing, interactionSource = state.interactionSource
             )
         }
@@ -155,7 +137,7 @@ internal fun TvTopBarSearchField(
                 icon = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
                 label = stringResource(R.string.action_clear),
                 focusRequester = clearFocusRequester,
-                modifier = Modifier.dpadTopBarFocusNavigation(clearFocusRequester, focusOrder, onMoveDown),
+                modifier = Modifier.dpadTopBarFocusNavigation(clearFocusRequester, focusOrder) { false },
                 onClick = {
                     onQueryChange("")
                     focusRequester.requestFocus()

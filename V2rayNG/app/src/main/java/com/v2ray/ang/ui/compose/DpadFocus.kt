@@ -18,7 +18,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -28,7 +27,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -330,26 +328,4 @@ internal fun Modifier.dpadRowActionNavigation(
         onMoveUp = { previousRow?.let(requestFocus) ?: false },
         onMoveDown = { nextRow?.let(requestFocus) ?: true }
     )
-}
-
-/**
- * Lets a remote leave a focused text field after the on-screen keyboard is dismissed.
- * Compose text fields otherwise consume D-pad Up/Down as cursor movement, trapping TV focus.
- */
-@Composable
-internal fun Modifier.dpadTextFieldNavigation(
-    onMoveUp: (() -> Boolean)? = null,
-    onMoveDown: (() -> Boolean)? = null
-): Modifier {
-
-    val focusManager = LocalFocusManager.current
-    return onPreviewKeyEvent { event ->
-        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-
-        when (event.key) {
-            Key.DirectionUp -> onMoveUp?.invoke() ?: focusManager.moveFocus(FocusDirection.Up)
-            Key.DirectionDown -> onMoveDown?.invoke() ?: focusManager.moveFocus(FocusDirection.Down)
-            else -> false
-        }
-    }
 }

@@ -18,17 +18,21 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.DpadReorderDirection
 import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.TvIconButton
+import com.v2ray.ang.ui.compose.TvReorderableItem
+import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.dpadBackNavigation
 import com.v2ray.ang.ui.compose.dpadClickable
 import com.v2ray.ang.ui.compose.dpadFocusOutline
@@ -86,7 +90,7 @@ internal fun TvProfileGroup(
     }
 
     RevealSelectedProfile(group.id, scroll, resumeGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
-    val canReorder = group.id.isNotEmpty() && uiState.searchQuery.isEmpty()
+    val canReorder = groupState.canReorder(group.id, uiState.searchQuery)
     val reorder = if (canReorder) rememberSyncedDpadReorderState(keys, enabled = true, stateKey = group.id) { key, index ->
         val guid = key as? String ?: return@rememberSyncedDpadReorderState
         if (index >= 0) {
@@ -113,7 +117,10 @@ internal fun TvProfileGroup(
             TvIconButton(painterResource(icon), label, click, focusRequester = refreshFocus.takeIf { isRefresh })
         }
     ) { padding ->
-        ProfileCollection(group, rows, uiState, scroll, padding, onAction, isMoving = { reorder?.isMoving(it) == true }) { index, row ->
+        ProfileCollection(
+            group, groupState, uiState, scroll, padding, onAction,
+            itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
+        ) { index, row, dragScope, dragging ->
             val stride = if (doubleColumn) 2 else 1
             fun targetAt(position: Int) = keys.getOrNull(position)?.let(targets::get)
             val leadingColumn = !doubleColumn || index % 2 == 0
@@ -125,29 +132,30 @@ internal fun TvProfileGroup(
                     }
                 }
             }
-            TvProfileRow(
-                row = row,
-                selected = row.guid == uiState.selectedGuid,
-                current = targets.getValue(row.guid),
-                above = targetAt(index - stride),
-                below = targetAt(index + stride),
-                nextColumn = if (doubleColumn && leadingColumn) targetAt(index + 1)?.row else null,
-                requestFocus = requestFocus,
-                onPrevious = {
-                    val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
-                    if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer { restore(row.guid) }
-                },
-                onUpFromFirstRow = {
-                    if (refreshFocus != null) {
-                        refreshFocus.requestFocus()
-                        true
-                    } else onUpFromFirstRow?.let { it(); true } ?: false
-                },
-                onBackToToolbar = onBackToToolbar,
-                reorderItem = reorderItem,
-                onSelect = { onAction(MainAction.SelectServer(row.guid)) },
-                onAction = { action -> runProfileRowAction(action, row, onAction, dialogs) { restore(row.guid, action) } }
-            )
+            val renderRow = @Composable {
+                TvProfileRow(
+                    row = row,
+                    selected = row.guid == uiState.selectedGuid,
+                    current = targets.getValue(row.guid),
+                    above = targetAt(index - stride),
+                    below = targetAt(index + stride),
+                    nextColumn = if (doubleColumn && leadingColumn) targetAt(index + 1)?.row else null,
+                    requestFocus = requestFocus,
+                    onPrevious = {
+                        val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
+                        if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer { restore(row.guid) }
+                    },
+                    onUpFromFirstRow = {
+                        if (refreshFocus != null) refreshFocus.requestFocus() else onUpFromFirstRow?.invoke() ?: false
+                    },
+                    onBackToToolbar = onBackToToolbar,
+                    reorderItem = reorderItem,
+                    onSelect = { onAction(MainAction.SelectServer(row.guid)) },
+                    onAction = { action -> runProfileRowAction(action, row, onAction, dialogs) { restore(row.guid, action) } }
+                )
+            }
+            if (dragScope == null) renderRow()
+            else TvReorderableItem(dragScope, dragging, reorder?.isMoving(row.guid) == true, renderRow)
         }
     }
 }
@@ -207,7 +215,7 @@ private fun TvProfileRow(
         ProfileRow(
             model = row,
             selected = selected,
-            showSelectionMarker = selected && !moving,
+            markerColor = if (selected && !moving) colorFabActive else Color.Unspecified,
             decoration = decoration,
             interaction = interaction,
             actions = {
@@ -224,14 +232,14 @@ private fun TvProfileRow(
                     } else Modifier.dpadRowActionNavigation(target, current.order, previous, next, requestFocus)
                     TvIconButton(
                         painterResource(action.icon), stringResource(action.label), { onAction(action) },
-                        modifier = navigation, focusRequester = target
+                        modifier = navigation, focusRequester = target, contentDescription = stringResource(action.description)
                     )
                 }
             }
         ) {
             Spacer(Modifier.height(4.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                ProfileAddress(row)
+                ProfileAddress(row, badgeSpacing = 8.dp)
                 Spacer(Modifier.width(16.dp))
                 ProfileType(row.typeDescription)
                 Spacer(Modifier.width(16.dp))

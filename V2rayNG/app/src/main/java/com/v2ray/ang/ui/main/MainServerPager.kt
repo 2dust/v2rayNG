@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -50,9 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
@@ -60,14 +61,12 @@ import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
-import com.v2ray.ang.ui.compose.TvReorderableGridItem
-import com.v2ray.ang.ui.compose.TvReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
-import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -86,8 +85,17 @@ internal fun GroupPagerPage(
     ProfileGroupLayout(group, contentPadding, onAction, actionButton = { icon, label, _, click ->
         SubscriptionCardIconButton(icon, label, click)
     }) { padding ->
-        ProfileCollection(group, groupState.rows, uiState, scroll, padding, onAction) { _, row ->
-            PhoneProfileRow(row, row.guid == uiState.selectedGuid, uiState.doubleColumnDisplay, onAction, dialogs)
+        ProfileCollection(group, groupState, uiState, scroll, padding, onAction) { _, row, dragScope, dragging ->
+            val doubleColumn = uiState.doubleColumnDisplay
+            val renderRow = @Composable { PhoneProfileRow(row, row.guid == uiState.selectedGuid, doubleColumn, onAction, dialogs) }
+            Column {
+                when {
+                    dragScope == null -> renderRow()
+                    doubleColumn -> ReorderableGridItem(dragScope, dragging) { renderRow(); ProfileDivider() }
+                    else -> ReorderableListItem(dragScope, dragging) { renderRow() }
+                }
+                if (dragScope == null || !doubleColumn) ProfileDivider()
+            }
         }
     }
 }
@@ -137,15 +145,16 @@ internal fun ProfileGroupLayout(
 @Composable
 internal fun ProfileCollection(
     group: GroupMapItem,
-    rows: List<ServerRowUiModel>,
+    groupState: ServerGroupUiState,
     uiState: MainUiState,
     scroll: ProfileScrollState,
     contentPadding: PaddingValues,
     onAction: (MainAction) -> Unit,
-    isMoving: ((String) -> Boolean)? = null,
-    item: @Composable (Int, ServerRowUiModel) -> Unit
+    itemModifier: (String) -> Modifier = { Modifier },
+    item: @Composable (Int, ServerRowUiModel, ReorderableCollectionItemScope?, Boolean) -> Unit
 ) {
-    val canReorder = group.id.isNotEmpty() && uiState.searchQuery.isEmpty()
+    val rows = groupState.rows
+    val canReorder = groupState.canReorder(group.id, uiState.searchQuery)
     val doubleColumn = uiState.doubleColumnDisplay
     LocateTargetEffect(uiState.locateTarget?.takeIf { it.groupId == group.id }, rows, doubleColumn, onAction) {
         scroll.reveal(it, doubleColumn)
@@ -164,12 +173,10 @@ internal fun ProfileCollection(
         ) {
             itemsIndexed(rows, key = { _, row -> row.guid }) { index, row ->
                 if (state == null) {
-                    item(index, row)
+                    item(index, row, null, false)
                 } else {
-                    val moving = isMoving?.invoke(row.guid) == true
-                    ReorderableItem(state, key = row.guid, modifier = Modifier.zIndex(if (moving) 1f else 0f)) { dragging ->
-                        if (isMoving == null) ReorderableGridItem(this, dragging) { item(index, row) }
-                        else TvReorderableGridItem(this, dragging, moving, moveModeCornerRadius = 12.dp) { item(index, row) }
+                    ReorderableItem(state, key = row.guid, modifier = itemModifier(row.guid)) { dragging ->
+                        item(index, row, this, dragging)
                     }
                 }
             }
@@ -183,12 +190,10 @@ internal fun ProfileCollection(
         ) {
             itemsIndexed(rows, key = { _, row -> row.guid }) { index, row ->
                 if (state == null) {
-                    item(index, row)
+                    item(index, row, null, false)
                 } else {
-                    val moving = isMoving?.invoke(row.guid) == true
-                    ReorderableItem(state, key = row.guid, modifier = Modifier.zIndex(if (moving) 1f else 0f)) { dragging ->
-                        if (isMoving == null) ReorderableListItem(this, dragging) { item(index, row) }
-                        else TvReorderableListItem(this, dragging, moving, moveModeCornerRadius = 12.dp) { item(index, row) }
+                    ReorderableItem(state, key = row.guid, modifier = itemModifier(row.guid)) { dragging ->
+                        item(index, row, this, dragging)
                     }
                 }
             }
@@ -210,11 +215,11 @@ private fun LocateTargetEffect(
     }
 }
 
-internal enum class ProfileRowAction(val icon: Int, val label: Int) {
-    More(R.drawable.ic_more_vert_24dp, R.string.action_more),
+internal enum class ProfileRowAction(val icon: Int, val label: Int, val description: Int = label) {
+    More(R.drawable.ic_more_vert_24dp, R.string.action_more, R.string.acc_more),
     Share(R.drawable.ic_share_24dp, R.string.title_configuration_share),
-    Edit(R.drawable.ic_edit_24dp, R.string.menu_item_edit_config),
-    Delete(R.drawable.ic_delete_24dp, R.string.menu_item_del_config)
+    Edit(R.drawable.ic_edit_24dp, R.string.menu_item_edit_config, R.string.acc_edit),
+    Delete(R.drawable.ic_delete_24dp, R.string.menu_item_del_config, R.string.acc_delete)
 }
 
 internal val singleColumnProfileActions = listOf(ProfileRowAction.Share, ProfileRowAction.Edit, ProfileRowAction.Delete)
@@ -242,34 +247,34 @@ private fun PhoneProfileRow(
     onAction: (MainAction) -> Unit,
     dialogs: MainDialogActions
 ) {
-    Column {
-        ProfileRow(
-            model = row,
-            selected = selected,
-            interaction = Modifier.clickable { onAction(MainAction.SelectServer(row.guid)) },
-            actions = {
-                (if (doubleColumn) gridProfileActions else singleColumnProfileActions).forEach { action ->
-                    IconButton(
-                        onClick = { runProfileRowAction(action, row, onAction, dialogs) },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(painterResource(action.icon), stringResource(action.label))
-                    }
+    ProfileRow(
+        model = row,
+        selected = selected,
+        interaction = Modifier.clickable { onAction(MainAction.SelectServer(row.guid)) },
+        actions = {
+            (if (doubleColumn) gridProfileActions else singleColumnProfileActions).forEach { action ->
+                IconButton(
+                    onClick = { runProfileRowAction(action, row, onAction, dialogs) },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(painterResource(action.icon), stringResource(action.description), Modifier.size(24.dp))
                 }
             }
-        ) {
-            Spacer(Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { ProfileAddress(row) }
-            Spacer(Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                ProfileType(row.typeDescription, Modifier.weight(1f, fill = false))
-                Spacer(Modifier.width(8.dp))
-                TestResult(row.testDelayMillis)
-            }
         }
-        AppDivider(Modifier.padding(horizontal = 12.dp))
+    ) {
+        Spacer(Modifier.height(6.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { ProfileAddress(row) }
+        Spacer(Modifier.height(6.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            ProfileType(row.typeDescription, Modifier.weight(1f, fill = false))
+            Spacer(Modifier.width(8.dp))
+            TestResult(row.testDelayMillis)
+        }
     }
 }
+
+@Composable
+private fun ProfileDivider() = AppDivider(Modifier.padding(horizontal = 12.dp))
 
 @Composable
 internal fun ProfileRow(
@@ -277,7 +282,7 @@ internal fun ProfileRow(
     selected: Boolean,
     interaction: Modifier,
     decoration: Modifier = Modifier,
-    showSelectionMarker: Boolean = selected,
+    markerColor: Color = if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified,
     actions: @Composable RowScope.() -> Unit,
     details: @Composable () -> Unit
 ) {
@@ -288,13 +293,13 @@ internal fun ProfileRow(
             .semantics { if (selectedDescription != null) stateDescription = selectedDescription }
             .then(decoration)
             .drawBehind {
-                if (showSelectionMarker) {
+                if (markerColor != Color.Unspecified) {
                     val width = 4.dp.toPx()
                     val verticalInset = 10.dp.toPx()
                     val startInset = 6.dp.toPx()
                     val x = if (direction == LayoutDirection.Rtl) size.width - startInset - width else startInset
                     drawRect(
-                        color = colorFabActive, topLeft = Offset(x, verticalInset),
+                        color = markerColor, topLeft = Offset(x, verticalInset),
                         size = Size(width, (size.height - verticalInset * 2).coerceAtLeast(0f))
                     )
                 }
@@ -317,8 +322,9 @@ internal fun ProfileRow(
 }
 
 @Composable
-internal fun RowScope.ProfileAddress(model: ServerRowUiModel) {
+internal fun RowScope.ProfileAddress(model: ServerRowUiModel, badgeSpacing: Dp = 0.dp) {
     SubscriptionBadge(model.subscriptionBadge)
+    if (model.subscriptionBadge.isNotBlank() && badgeSpacing > 0.dp) Spacer(Modifier.width(badgeSpacing))
     Text(
         model.statistics, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis
@@ -342,7 +348,6 @@ private fun SubscriptionBadge(text: String) {
     ) {
         Text(text.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
-    Spacer(Modifier.width(8.dp))
 }
 
 @Composable

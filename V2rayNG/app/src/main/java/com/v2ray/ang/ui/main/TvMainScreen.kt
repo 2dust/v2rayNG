@@ -31,6 +31,9 @@ import androidx.tv.material3.DrawerState as TvDrawerState
 import androidx.tv.material3.DrawerValue as TvDrawerValue
 import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.TvActionDialog
+import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
+import com.v2ray.ang.ui.compose.TvQRCodeDialog
 import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
@@ -95,6 +98,9 @@ internal fun TvMainScreen(
         confirmRemove = true,
         shareQRCodeBitmap = uiState.shareQRCodeBitmap,
         onAction = onAction,
+        deleteDialog = { message, name, confirm, dismiss -> TvDeleteConfirmDialog(message, confirm, dismiss, name) },
+        shareDialog = { options, select, dismiss -> TvActionDialog(options, { stringResource(it.labelRes) }, select, dismiss) },
+        qrCodeDialog = { bitmap, dismiss -> TvQRCodeDialog(bitmap, dismiss) },
         onRestoreFocus = { dialogFocusToRestore = it }
     ) { dialogs ->
         TvMainNavigationDrawer(

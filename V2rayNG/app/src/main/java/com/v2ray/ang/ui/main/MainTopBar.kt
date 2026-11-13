@@ -65,17 +65,17 @@ internal fun MainTopBar(
         actions = {
             if (!showSearch) {
                 IconButton(onClick = onSearchOpen) {
-                    Icon(painterResource(R.drawable.ic_search_24dp), stringResource(R.string.menu_item_search))
+                    Icon(painterResource(R.drawable.ic_search_24dp), stringResource(R.string.acc_search))
                 }
             }
             MainTopBarMenu(maxMenuHeight, button = { open ->
                 IconButton(onClick = open) {
-                    Icon(painterResource(R.drawable.ic_add_24dp), stringResource(R.string.menu_item_add_config))
+                    Icon(painterResource(R.drawable.ic_add_24dp), stringResource(R.string.acc_add))
                 }
             }) { close -> ImportMenuContent { action -> close(); onAction(action) } }
             MainTopBarMenu(maxMenuHeight, button = { open ->
                 IconButton(onClick = open) {
-                    Icon(painterResource(R.drawable.ic_more_vert_24dp), stringResource(R.string.action_more))
+                    Icon(painterResource(R.drawable.ic_more_vert_24dp), stringResource(R.string.acc_more))
                 }
             }) { close ->
                 MoreMenuContent(

@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -140,16 +139,11 @@ internal fun AppTopBarLayout(
 @Composable
 internal fun TopBarSearchField(query: String, onQueryChange: (String) -> Unit, placeholder: String?) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(focusRequester) { requestFocusWhenReady(focusRequester) }
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.weight(1f)) {
-            TopBarSearchTextField(query, onQueryChange, placeholder, Modifier.focusRequester(focusRequester))
-        }
+        TopBarSearchTextField(query, onQueryChange, placeholder, Modifier.weight(1f).focusRequester(focusRequester))
         if (query.isNotEmpty()) {
-            IconButton(onClick = {
-                onQueryChange("")
-                focusRequester.requestFocus()
-            }) {
+            IconButton(onClick = { onQueryChange("") }) {
                 Icon(painterResource(android.R.drawable.ic_menu_close_clear_cancel), stringResource(R.string.action_clear))
             }
         }
@@ -185,7 +179,7 @@ internal fun TopBarSearchTextField(
             )
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        modifier = Modifier.fillMaxWidth().then(modifier)
+        modifier = modifier
     )
 }
 

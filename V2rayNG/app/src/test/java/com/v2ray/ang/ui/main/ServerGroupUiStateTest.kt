@@ -4,7 +4,9 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.enums.EConfigType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ServerGroupUiStateTest {
@@ -31,5 +33,15 @@ class ServerGroupUiStateTest {
         assertNull(initial.moveServer("a", "missing"))
         assertNull(initial.moveServer("a", "a"))
         assertNull(ServerGroupUiState().moveServer("a", "b"))
+    }
+
+    @Test
+    fun `waits for unfiltered rows after clearing search before allowing a move`() {
+        val filtered = initial.copy(servers = initial.servers.take(2), rows = initial.rows.take(2), isFiltered = true)
+        assertFalse(initial.canReorder("group", "search"))
+        assertFalse(filtered.canReorder("group", ""))
+        assertNull(filtered.moveServer("a", "b"))
+        assertFalse(initial.canReorder("", ""))
+        assertTrue(initial.canReorder("group", ""))
     }
 }

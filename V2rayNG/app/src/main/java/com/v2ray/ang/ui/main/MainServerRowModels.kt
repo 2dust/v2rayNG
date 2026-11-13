@@ -20,8 +20,13 @@ internal data class ServerRowUiModel(
 internal data class ServerGroupUiState(
     val servers: List<ServersCache> = emptyList(),
     val rows: List<ServerRowUiModel> = emptyList(),
+    val isFiltered: Boolean = false,
 ) {
+    fun canReorder(groupId: String, searchQuery: String): Boolean =
+        groupId.isNotEmpty() && searchQuery.isEmpty() && !isFiltered
+
     fun moveServer(fromGuid: String, toGuid: String): ServerGroupUiState? {
+        if (isFiltered) return null
         val from = servers.indexOfFirst { it.guid == fromGuid }
         val to = servers.indexOfFirst { it.guid == toGuid }
         if (from == to || from < 0 || to < 0) return null

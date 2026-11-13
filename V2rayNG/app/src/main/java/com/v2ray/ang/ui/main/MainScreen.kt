@@ -26,9 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.LocalDarkTheme
+import com.v2ray.ang.ui.compose.QRCodeDialog
+import com.v2ray.ang.ui.compose.SelectListDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +58,12 @@ fun MainScreen(
         showSearch = false
     }
 
-    MainDialogs(uiState.confirmRemove, uiState.shareQRCodeBitmap, onAction) { dialogs ->
+    MainDialogs(
+        uiState.confirmRemove, uiState.shareQRCodeBitmap, onAction,
+        deleteDialog = { message, name, confirm, dismiss -> DeleteConfirmDialog(message, confirm, dismiss, name) },
+        shareDialog = { options, select, dismiss -> SelectListDialog(options, { stringResource(it.labelRes) }, select, dismiss) },
+        qrCodeDialog = { bitmap, dismiss -> QRCodeDialog(bitmap, dismiss) }
+    ) { dialogs ->
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
