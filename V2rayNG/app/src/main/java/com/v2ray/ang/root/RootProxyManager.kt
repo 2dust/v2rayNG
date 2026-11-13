@@ -37,14 +37,15 @@ object RootProxyManager {
     private const val MARK = AppConfig.ROOT_MARK_ROUTE
 
     // Local / private / multicast destinations that must never be proxied.
-    private val bypassCidrs = listOf(
+    // Shared with [RootTproxyManager], which bypasses the same set.
+    internal val bypassCidrs = listOf(
         "0.0.0.0/8", "10.0.0.0/8", "127.0.0.0/8", "169.254.0.0/16",
         "172.16.0.0/12", "192.168.0.0/16", "224.0.0.0/4", "240.0.0.0/4"
     )
 
     // IPv6 equivalents (loopback, link-local, ULA/private, multicast). Feeding the v4 list
     // above to ip6tables silently fails, so the v6 chain needs its own.
-    private val bypassCidrsV6 = listOf(
+    internal val bypassCidrsV6 = listOf(
         "::1/128", "fe80::/10", "fc00::/7", "ff00::/8"
     )
 
@@ -245,7 +246,8 @@ object RootProxyManager {
         }
     }
 
-    private fun writeHevConfig(file: File, config: String): Boolean {
+    // Shared with [RootTproxyManager], which writes its helper config the same way.
+    internal fun writeHevConfig(file: File, config: String): Boolean {
         val atomicFile = AtomicFile(file)
         val output = try {
             atomicFile.startWrite()
@@ -376,7 +378,7 @@ object RootProxyManager {
      * is honored: in bypass mode the bypassed apps keep native v6; in proxy mode only the
      * selected apps lose v6 (everything else stays fully direct).
      */
-    private fun buildV6Blackhole(
+    internal fun buildV6Blackhole(
         appUid: Int,
         perAppEnabled: Boolean,
         bypassApps: Boolean,
@@ -523,6 +525,19 @@ object RootProxyManager {
                 appendLine("$cmd -t mangle -F $CHAIN 2>/dev/null || true")
                 appendLine("$cmd -t mangle -X $CHAIN 2>/dev/null || true")
             }
+            // TPROXY-mode chains (see RootTproxyManager). Cleaned here too so switching
+            // engines — or starting tun2socks after a TPROXY run crashed — never strands
+            // a PREROUTING TPROXY rule pointing at a helper that is no longer listening.
+            for (cmd in listOf("iptables", "ip6tables")) {
+                appendLine("$cmd -t mangle -D OUTPUT -j ${AppConfig.ROOT_TP_OUT_CHAIN} 2>/dev/null || true")
+                appendLine("$cmd -t mangle -F ${AppConfig.ROOT_TP_OUT_CHAIN} 2>/dev/null || true")
+                appendLine("$cmd -t mangle -X ${AppConfig.ROOT_TP_OUT_CHAIN} 2>/dev/null || true")
+                appendLine("$cmd -t mangle -D PREROUTING -j ${AppConfig.ROOT_TP_PRE_CHAIN} 2>/dev/null || true")
+                appendLine("$cmd -t mangle -F ${AppConfig.ROOT_TP_PRE_CHAIN} 2>/dev/null || true")
+                appendLine("$cmd -t mangle -X ${AppConfig.ROOT_TP_PRE_CHAIN} 2>/dev/null || true")
+            }
+            appendLine("[ -f '${File(runDir, "tproxy.pid").absolutePath}' ] && kill \$(cat '${File(runDir, "tproxy.pid").absolutePath}') 2>/dev/null || true")
+            appendLine("rm -f '${File(runDir, "tproxy.pid").absolutePath}'")
             // IPv6 blackhole chain (only set up when v6 is disabled; harmless if absent)
             appendLine("ip6tables -t filter -D OUTPUT -j ${AppConfig.ROOT_V6_CHAIN} 2>/dev/null || true")
             appendLine("ip6tables -t filter -F ${AppConfig.ROOT_V6_CHAIN} 2>/dev/null || true")

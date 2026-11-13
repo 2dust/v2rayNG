@@ -22,10 +22,14 @@ mkdir -p "$TMPDIR/jni"
 pushd "$TMPDIR"
 
 ln -s "$__dir/hev-socks5-tunnel" jni/hev-socks5-tunnel
+ln -s "$__dir/hev-socks5-tproxy" jni/hev-socks5-tproxy
 
 # 1) JNI shared library (libhev-socks5-tunnel.so) — loaded in-process by
 #    com.v2ray.ang.service.TProxyService for the VpnService hev tun mode.
-echo 'include $(call all-subdir-makefiles)' > jni/Android.mk
+#    Scoped to the tunnel makefile explicitly: all-subdir-makefiles would also
+#    pull in hev-socks5-tproxy/Android.mk (built separately in pass 3 below) and
+#    have the two trees fight over the shared `yaml` module name.
+echo 'include $(call my-dir)/hev-socks5-tunnel/Android.mk' > jni/Android.mk
 
 "$NDK_HOME/ndk-build" \
     NDK_PROJECT_PATH=. \
@@ -90,13 +94,64 @@ EXECMK
     "APP_CFLAGS=-O3" \
     "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu" \
 
-# Stage both artifacts under libs/<abi>/. The executable is renamed to
-# lib*.so so the APK installer extracts it into nativeLibraryDir as an
-# executable file (filename distinct from the JNI library above).
+# 3) Standalone executable (libhevsockstproxy.so) — run as a separate root
+#    process by com.v2ray.ang.root for the TPROXY run mode. Unlike the tunnel it
+#    creates no tun device and links no lwip: the kernel's own TCP/IP stack
+#    terminates the flow on an IP_TRANSPARENT socket, and hev only relays the
+#    accepted connection to the in-process core's SOCKS inbound on loopback.
+#    Mirrors hev-socks5-tproxy's own Android.mk, but BUILD_EXECUTABLE instead of
+#    a shared library.
+cat > jni/tproxy.mk <<'TPROXYMK'
+TOP_PATH := $(call my-dir)/hev-socks5-tproxy
+
+ifeq ($(filter $(modules-get-list),yaml),)
+    include $(TOP_PATH)/third-part/yaml/Android.mk
+endif
+ifeq ($(filter $(modules-get-list),hev-task-system),)
+    include $(TOP_PATH)/third-part/hev-task-system/Android.mk
+endif
+
+LOCAL_PATH := $(TOP_PATH)
+SRCDIR := $(LOCAL_PATH)/src
+
+include $(CLEAR_VARS)
+include $(LOCAL_PATH)/build.mk
+LOCAL_MODULE    := hevsockstproxy
+LOCAL_SRC_FILES := $(patsubst $(SRCDIR)/%,src/%,$(SRCFILES))
+LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH)/src \
+	$(LOCAL_PATH)/src/misc \
+	$(LOCAL_PATH)/src/core/include \
+	$(LOCAL_PATH)/third-part/yaml/src \
+	$(LOCAL_PATH)/third-part/hev-task-system/include
+LOCAL_CFLAGS += $(VERSION_CFLAGS)
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_CFLAGS += -mfpu=neon
+endif
+LOCAL_STATIC_LIBRARIES := yaml hev-task-system
+LOCAL_LDFLAGS += -Wl,-z,max-page-size=16384
+LOCAL_LDFLAGS += -Wl,-z,common-page-size=16384
+include $(BUILD_EXECUTABLE)
+TPROXYMK
+
+"$NDK_HOME/ndk-build" \
+    NDK_PROJECT_PATH=. \
+    APP_BUILD_SCRIPT=jni/tproxy.mk \
+    "APP_ABI=$ABIS" \
+    APP_PLATFORM=android-24 \
+    NDK_LIBS_OUT="$TMPDIR/libs-tproxy" \
+    NDK_OUT="$TMPDIR/obj-tproxy" \
+    "APP_CFLAGS=-O3" \
+    "APP_LDFLAGS=-Wl,--build-id=none -Wl,--hash-style=gnu" \
+
+# Stage all artifacts under libs/<abi>/. The executables are renamed to
+# lib*.so so the APK installer extracts them into nativeLibraryDir as
+# executable files (filenames distinct from the JNI library above).
 mkdir -p "$__dir/libs"
 cp -r "$TMPDIR/libs/"* "$__dir/libs/"
 for abi in $ABIS; do
   cp "$TMPDIR/libs-exec/$abi/hevsockstun" "$__dir/libs/$abi/libhevsockstun.so"
+  cp "$TMPDIR/libs-tproxy/$abi/hevsockstproxy" "$__dir/libs/$abi/libhevsockstproxy.so"
 done
 
 popd

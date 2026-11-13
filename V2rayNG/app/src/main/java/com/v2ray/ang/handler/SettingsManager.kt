@@ -431,6 +431,17 @@ object SettingsManager {
     }
 
     /**
+     * Check if the root mode should use the kernel TPROXY engine instead of tun2socks.
+     *
+     * Off by default: TPROXY needs kernel modules (xt_TPROXY plus a conntrack or addrtype
+     * match) that not every Android kernel ships, whereas the tun2socks engine works
+     * anywhere /dev/net/tun exists. Only meaningful when [isRootMode] is true.
+     */
+    fun isRootTproxyMode(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_TPROXY_ENABLE, false)
+    }
+
+    /**
      *  Check if process routing can be used.
      */
     fun canUseProcessRouting(): Boolean {

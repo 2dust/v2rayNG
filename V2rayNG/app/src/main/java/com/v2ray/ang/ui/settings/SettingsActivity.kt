@@ -141,6 +141,7 @@ fun SettingsScreen(
     var mode by rememberMmkvString(AppConfig.PREF_MODE, VPN)
     var enableRootMode by rememberMmkvBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
     var lanSharing by rememberMmkvBool(AppConfig.PREF_ROOT_LAN_SHARING, false)
+    var enableTproxy by rememberMmkvBool(AppConfig.PREF_ROOT_TPROXY_ENABLE, false)
 
     var hevTunLogLevel by rememberMmkvString(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL, AppConfig.DEFAULT_HEV_TUNNEL_LOGLEVEL)
     var hevTunRwTimeout by rememberMmkvString(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT, "")
@@ -700,6 +701,22 @@ fun SettingsScreen(
                         }
                     }
                 )
+                if (enableRootMode) {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.title_root_tproxy_enabled),
+                        summary = stringResource(R.string.summary_root_tproxy_enabled),
+                        checked = enableTproxy,
+                        onCheckedChange = { newValue ->
+                            if (newValue && !RootManager.cachedRoot()) {
+                                viewModel.checkAndRequestRoot {
+                                    enableTproxy = true
+                                }
+                            } else {
+                                enableTproxy = newValue
+                            }
+                        }
+                    )
+                }
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_root_lan_sharing),
                     summary = stringResource(R.string.summary_root_lan_sharing),
