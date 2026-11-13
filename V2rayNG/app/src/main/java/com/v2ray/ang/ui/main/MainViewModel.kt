@@ -1,9 +1,12 @@
 package com.v2ray.ang.ui.main
 
 import android.app.Application
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConnectionTestResult
@@ -68,7 +71,8 @@ private fun applyTestDelayResultsToRows(
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource
+    private val dataSource: MainDataSource,
+    private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel(application) {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -81,7 +85,8 @@ class MainViewModel(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
             confirmRemove = dataSource.getConfirmRemove(),
-            doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+            doubleColumnDisplay = dataSource.getDoubleColumnDisplay(),
+            searchQuery = savedStateHandle[SEARCH_QUERY_KEY] ?: ""
         )
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -753,6 +758,7 @@ class MainViewModel(
 
     fun filterConfig(keyword: String) {
         if (keyword == uiState.value.searchQuery) return
+        savedStateHandle[SEARCH_QUERY_KEY] = keyword
         _uiState.update { it.copy(searchQuery = keyword) }
         filterJob?.cancel()
         filterJob = viewModelScope.launch(defaultDispatcher) {
@@ -963,15 +969,16 @@ class MainViewModel(
     // ---------- Factory ----------
     class Factory(private val application: Application, private val dataSource: MainDataSource) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                return MainViewModel(application, dataSource) as T
+                return MainViewModel(application, dataSource, extras.createSavedStateHandle()) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 
     private companion object {
+        const val SEARCH_QUERY_KEY = "main_search_query"
         const val TEST_RESULT_FLUSH_INTERVAL_MS = 500L
     }
 }
