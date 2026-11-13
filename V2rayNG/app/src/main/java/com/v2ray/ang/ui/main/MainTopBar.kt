@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.heightIn
@@ -12,6 +13,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,100 +21,101 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.AppTopBarLayout
+import com.v2ray.ang.ui.compose.TopBarSearchField
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 @Composable
-fun MainTopBar(
+internal fun MainTopBar(
     isLoading: Boolean,
     showSearch: Boolean,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onSearchClose: () -> Unit,
-    onSearchToggle: (Boolean) -> Unit,
-    onMenuClick: () -> Unit,
+    onSearchOpen: () -> Unit,
+    onOpenDrawer: () -> Unit,
     onAction: (MainAction) -> Unit,
-    onMoreMenuAction: (MainMoreMenuAction) -> Unit
+    onBulkDelete: (BulkDeleteTarget) -> Unit
 ) {
-    var showImportMenu by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
-    val importMenuScrollState = rememberScrollState()
-    val moreMenuScrollState = rememberScrollState()
-    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val maxMenuHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarHeight - navBarHeight - 20.dp
-
-    AppTopBar(
-        title = stringResource(R.string.title_server),
-        onBackClick = {},
+    val maxMenuHeight = mainMenuMaxHeight()
+    AppTopBarLayout(
         isLoading = isLoading,
-        isSearchActive = showSearch,
-        searchQuery = searchQuery,
-        onSearchQueryChange = onSearchQueryChange,
-        onSearchClose = onSearchClose,
-        searchPlaceholder = stringResource(R.string.menu_item_search),
+        title = {
+            if (showSearch) TopBarSearchField(searchQuery, onSearchQueryChange, stringResource(R.string.menu_item_search))
+            else Text(stringResource(R.string.title_server))
+        },
         navigationIcon = {
             if (showSearch) {
                 IconButton(onClick = onSearchClose) {
-                    Icon(painterResource(R.drawable.ic_arrow_back_24dp), contentDescription = stringResource(R.string.acc_back))
+                    Icon(painterResource(R.drawable.ic_arrow_back_24dp), stringResource(R.string.acc_back))
                 }
             } else {
-                IconButton(onClick = onMenuClick) {
-                    Icon(painterResource(R.drawable.ic_menu_24dp), contentDescription = stringResource(R.string.acc_open_menu))
+                IconButton(onClick = onOpenDrawer) {
+                    Icon(painterResource(R.drawable.ic_menu_24dp), stringResource(R.string.acc_open_menu))
                 }
             }
         },
         actions = {
             if (!showSearch) {
-                IconButton(onClick = { onSearchToggle(true) }) {
-                    Icon(painterResource(R.drawable.ic_search_24dp), contentDescription = stringResource(R.string.acc_search))
+                IconButton(onClick = onSearchOpen) {
+                    Icon(painterResource(R.drawable.ic_search_24dp), stringResource(R.string.menu_item_search))
                 }
             }
-            Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
-                IconButton(onClick = { showImportMenu = true }) {
-                    Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add))
+            MainTopBarMenu(maxMenuHeight, button = { open ->
+                IconButton(onClick = open) {
+                    Icon(painterResource(R.drawable.ic_add_24dp), stringResource(R.string.menu_item_add_config))
                 }
-                DropdownMenu(
-                    expanded = showImportMenu,
-                    onDismissRequest = { showImportMenu = false },
-                    scrollState = importMenuScrollState,
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier
-                        .heightIn(max = maxMenuHeight)
-                        .verticalScrollbar(importMenuScrollState)
-                ) {
-                    ImportMenuContent(
-                        onAction = { action ->
-                            showImportMenu = false
-                            onAction(action)
-                        }
-                    )
+            }) { close -> ImportMenuContent { action -> close(); onAction(action) } }
+            MainTopBarMenu(maxMenuHeight, button = { open ->
+                IconButton(onClick = open) {
+                    Icon(painterResource(R.drawable.ic_more_vert_24dp), stringResource(R.string.action_more))
                 }
-            }
-            Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(painterResource(R.drawable.ic_more_vert_24dp), contentDescription = stringResource(R.string.acc_more))
-                }
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
-                    scrollState = moreMenuScrollState,
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier
-                        .heightIn(max = maxMenuHeight)
-                        .verticalScrollbar(moreMenuScrollState)
-                ) {
-                    MoreMenuContent { action ->
-                        showMenu = false
-                        onMoreMenuAction(action)
-                    }
-                }
+            }) { close ->
+                MoreMenuContent(
+                    items = phoneMoreMenuActions,
+                    onAction = { action -> close(); onAction(action) },
+                    onBulkDelete = { target -> close(); onBulkDelete(target) }
+                )
             }
         }
     )
+}
+
+@Composable
+internal fun mainMenuMaxHeight(): Dp {
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val navBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val windowHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
+    return windowHeight - statusBarHeight - navBarHeight - 20.dp
+}
+
+@Composable
+internal fun MainTopBarMenu(
+    maxHeight: Dp,
+    popupModifier: @Composable (close: () -> Unit) -> Modifier = { Modifier },
+    button: @Composable (open: () -> Unit) -> Unit,
+    content: @Composable ColumnScope.(close: () -> Unit) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+    val close = { expanded = false }
+    Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+        button { expanded = true }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = close,
+            scrollState = scrollState,
+            containerColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.heightIn(max = maxHeight).then(popupModifier(close)).verticalScrollbar(scrollState)
+        ) {
+            content(close)
+        }
+    }
 }

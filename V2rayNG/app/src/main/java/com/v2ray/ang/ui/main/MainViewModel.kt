@@ -17,7 +17,6 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
-import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
@@ -30,11 +29,8 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -89,14 +85,12 @@ class MainViewModel(
 
     // ---------- Keyword filtering ----------
     @Volatile
-    private var keywordFilter: String = ""
     private var filterJob: Job? = null
 
     // ---------- Groups & cache ----------
     private val cacheMutex = Mutex()
     private val groupDataCache = mutableMapOf<String, List<ServersCache>>()
     private val groupUiFlows = ConcurrentHashMap<String, MutableStateFlow<ServerGroupUiState>>()
-    private val groupServerFlows = ConcurrentHashMap<String, StateFlow<List<ServersCache>>>()
     private val groupLoadMutexes = ConcurrentHashMap<String, Mutex>()
     private val serverOrderPersistenceJobs = mutableMapOf<String, Job>()
 
@@ -251,18 +245,6 @@ class MainViewModel(
     }
 
     // ---------- Public state accessors ----------
-    fun serversForGroup(groupId: String): StateFlow<List<ServersCache>> =
-        groupServerFlows.computeIfAbsent(groupId) {
-            val groupState = mutableServerGroupState(groupId)
-            groupState
-                .map { it.servers }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-                    initialValue = groupState.value.servers,
-                )
-        }
-
     internal fun serverGroupState(groupId: String): StateFlow<ServerGroupUiState> =
         mutableServerGroupState(groupId).asStateFlow()
 
@@ -292,7 +274,8 @@ class MainViewModel(
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
-            MainAction.LocateHandled -> consumeLocateTarget()
+            is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.MoveServer -> moveServer(action)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -302,6 +285,7 @@ class MainViewModel(
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
 
+            MainAction.Exit,
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
@@ -374,7 +358,7 @@ class MainViewModel(
     }
 
     private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
-        val keyword = keywordFilter.trim()
+        val keyword = uiState.value.searchQuery.trim()
         if (keyword.isEmpty()) return servers
         val regex = try {
             Regex(keyword, RegexOption.IGNORE_CASE)
@@ -396,6 +380,16 @@ class MainViewModel(
             servers = filteredServers,
             rows = buildServerRows(groupId, filteredServers)
         )
+        _uiState.update { state ->
+            val index = state.groups.indexOfFirst { it.id == groupId }
+            if (index < 0 || state.groups[index].serverCount == filteredServers.size) {
+                state
+            } else {
+                val groups = state.groups.toMutableList()
+                groups[index] = groups[index].copy(serverCount = filteredServers.size)
+                state.copy(groups = groups)
+            }
+        }
     }
 
     private fun buildServerRows(groupId: String, servers: List<ServersCache>): List<ServerRowUiModel> {
@@ -417,8 +411,6 @@ class MainViewModel(
             )
         }
     }
-
-    fun getSubscriptions(): List<SubscriptionCache> = dataSource.getSubscriptions()
 
     private fun resolveSelectedGroup(groups: List<GroupMapItem>): String {
         val current = uiState.value.selectedGroupId
@@ -467,12 +459,12 @@ class MainViewModel(
                 val selectedGroup = resolveSelectedGroup(groups)
                 val validIds = groups.mapTo(HashSet()) { it.id }
                 groupUiFlows.keys.removeAll { it !in validIds }
-                groupServerFlows.keys.removeAll { it !in validIds }
                 groupLoadMutexes.keys.removeAll { it !in validIds }
 
-                _uiState.update {
-                    it.copy(
-                        groups = groups,
+                _uiState.update { state ->
+                    val counts = state.groups.associate { it.id to it.serverCount }
+                    state.copy(
+                        groups = groups.map { group -> group.copy(serverCount = counts[group.id] ?: 0) },
                         selectedGroupId = selectedGroup,
                         selectedGuid = dataSource.getSelectServer(),
                     )
@@ -586,7 +578,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val groupId = uiState.value.selectedGroupId
-                    val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
+                    val list = if (groupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                         dataSource.getServerGuidList("")
                     } else {
                         currentServers().map { it.guid }
@@ -612,7 +604,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val count =
-                        if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
+                        if (uiState.value.selectedGroupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                             dataSource.removeAllServer()
                         } else {
                             val guids = currentServers().map { it.guid }
@@ -682,7 +674,7 @@ class MainViewModel(
 
     private fun removeInvalidServerInternal(): Int {
         val visibleServersOnly =
-            uiState.value.selectedGroupId.isNotEmpty() || keywordFilter.isNotBlank()
+            uiState.value.selectedGroupId.isNotEmpty() || uiState.value.searchQuery.isNotBlank()
         return if (visibleServersOnly) {
             currentServers().sumOf { server ->
                 dataSource.removeInvalidServerByGuid(server.guid)
@@ -737,14 +729,6 @@ class MainViewModel(
         }
     }
 
-    fun reloadServerList() {
-        val groupId = uiState.value.selectedGroupId
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
-            updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
-        }
-    }
-
     fun reloadAllGroups(groupIds: List<String>) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch(preloadDispatcher) {
@@ -762,8 +746,8 @@ class MainViewModel(
     }
 
     fun filterConfig(keyword: String) {
-        if (keyword == keywordFilter) return
-        keywordFilter = keyword
+        if (keyword == uiState.value.searchQuery) return
+        _uiState.update { it.copy(searchQuery = keyword) }
         filterJob?.cancel()
         filterJob = viewModelScope.launch(defaultDispatcher) {
             delay(300)
@@ -797,20 +781,19 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int) {
-        val groupState = mutableServerGroupState(groupId).value
-        val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return
-        val rows = groupState.rows.toMutableList()
-        rows.moveItem(fromPosition, toPosition)
-        val guids = servers.map { it.guid }
-        mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
+    private fun moveServer(action: MainAction.MoveServer) {
+        val groupId = action.groupId
+        if (groupId.isEmpty() || uiState.value.searchQuery.isNotEmpty()) return
+        val groupFlow = mutableServerGroupState(groupId)
+        val reordered = groupFlow.value.moveServer(action.fromGuid, action.toGuid) ?: return
+        val guids = reordered.servers.map { it.guid }
+        groupFlow.value = reordered
         // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
         serverOrderPersistenceJobs[groupId] = viewModelScope.launch(ioDispatcher) {
             previousPersistenceJob?.join()
             dataSource.encodeServerList(guids, groupId)
-            cacheMutex.withLock { groupDataCache[groupId] = servers }
+            cacheMutex.withLock { groupDataCache[groupId] = reordered.servers }
         }
     }
 
@@ -859,7 +842,7 @@ class MainViewModel(
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
-            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            serverGuids = if (uiState.value.searchQuery.isNotEmpty()) serverGuids else emptyList(),
             onlyTcp = onlyTcp
         )
         _uiState.update {
@@ -923,8 +906,10 @@ class MainViewModel(
         }
     }
 
-    private fun consumeLocateTarget() {
-        _uiState.update { it.copy(locateTarget = null) }
+    private fun consumeLocateTarget(target: LocateTarget) {
+        _uiState.update { state ->
+            if (state.locateTarget == target) state.copy(locateTarget = null) else state
+        }
     }
 
     // ---------- Running state ----------

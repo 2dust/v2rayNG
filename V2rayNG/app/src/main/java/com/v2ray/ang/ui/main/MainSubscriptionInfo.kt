@@ -90,6 +90,7 @@ internal fun SubscriptionInfoCard(
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    actionButton: @Composable (icon: Int, label: String, isRefresh: Boolean, onClick: () -> Unit) -> Unit,
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
 
@@ -113,28 +114,20 @@ internal fun SubscriptionInfoCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 model.supportUrl?.let { url ->
-                    CardIconButton(
-                        iconRes = if (SubscriptionInfoParser.isTelegramLink(url)) {
+                    actionButton(
+                        if (SubscriptionInfoParser.isTelegramLink(url)) {
                             R.drawable.ic_telegram_24dp
                         } else {
                             R.drawable.ic_feedback_24dp
                         },
-                        contentDescription = stringResource(R.string.sub_info_open_support),
-                        onClick = { onOpenLink(url) },
-                    )
+                        stringResource(R.string.sub_info_open_support),
+                        false
+                    ) { onOpenLink(url) }
                 }
                 model.webPageUrl?.let { url ->
-                    CardIconButton(
-                        iconRes = R.drawable.ic_about_24dp,
-                        contentDescription = stringResource(R.string.sub_info_open_page),
-                        onClick = { onOpenLink(url) },
-                    )
+                    actionButton(R.drawable.ic_about_24dp, stringResource(R.string.sub_info_open_page), false) { onOpenLink(url) }
                 }
-                CardIconButton(
-                    iconRes = R.drawable.ic_refresh_24dp,
-                    contentDescription = stringResource(R.string.title_sub_update),
-                    onClick = onRefresh,
-                )
+                actionButton(R.drawable.ic_refresh_24dp, stringResource(R.string.title_sub_update), true, onRefresh)
             }
 
             // One semantics node for the read-only figures so TalkBack reads them in one go.
@@ -164,7 +157,11 @@ internal fun SubscriptionInfoCard(
 }
 
 @Composable
-private fun CardIconButton(iconRes: Int, contentDescription: String, onClick: () -> Unit) {
+internal fun SubscriptionCardIconButton(
+    iconRes: Int,
+    contentDescription: String,
+    onClick: () -> Unit,
+) {
     IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
         Icon(painterResource(iconRes), contentDescription, Modifier.size(20.dp))
     }

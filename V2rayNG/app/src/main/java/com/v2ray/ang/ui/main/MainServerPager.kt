@@ -5,13 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,13 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -50,227 +49,147 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
-import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
-import com.v2ray.ang.ui.compose.ItemDivider
+import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.ReorderableGridItem
 import com.v2ray.ang.ui.compose.ReorderableListItem
+import com.v2ray.ang.ui.compose.TvReorderableGridItem
+import com.v2ray.ang.ui.compose.TvReorderableListItem
 import com.v2ray.ang.ui.compose.colorConfigType
+import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorPing
 import com.v2ray.ang.ui.compose.colorPingRed
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import kotlin.math.abs
 
 @Composable
-fun GroupPagerPage(
-    groupId: String,
+internal fun GroupPagerPage(
+    group: GroupMapItem,
     mainViewModel: MainViewModel,
-    selectedGuid: String?,
-    locateTarget: LocateTarget?,
-    doubleColumnDisplay: Boolean,
-    searchQuery: String,
-    lazyListStates: MutableMap<String, LazyListState>,
-    lazyGridStates: MutableMap<String, LazyGridState>,
-    onSelectServer: (String) -> Unit,
-    onEditServer: (String, ProfileItem) -> Unit,
-    onShareServer: (String, ProfileItem) -> Unit,
-    onMoreServer: (String, ProfileItem) -> Unit,
-    onRemoveServer: (String, String) -> Unit,
-    usageInfo: SubscriptionUsageInfo?,
-    groupTitle: String,
-    onOpenLink: (String) -> Unit,
+    uiState: MainUiState,
+    scrollStates: MutableMap<String, ProfileScrollState>,
+    onAction: (MainAction) -> Unit,
+    dialogs: MainDialogActions,
     contentPadding: PaddingValues
 ) {
-    val groupStateFlow = remember(groupId) {
-        mainViewModel.serverGroupState(groupId)
+    val groupState by remember(mainViewModel, group.id) { mainViewModel.serverGroupState(group.id) }.collectAsStateWithLifecycle()
+    val scroll = rememberProfileScrollState(scrollStates, group.id)
+    ProfileGroupLayout(group, contentPadding, onAction, actionButton = { icon, label, _, click ->
+        SubscriptionCardIconButton(icon, label, click)
+    }) { padding ->
+        ProfileCollection(group, groupState.rows, uiState, scroll, padding, onAction) { _, row ->
+            PhoneProfileRow(row, row.guid == uiState.selectedGuid, uiState.doubleColumnDisplay, onAction, dialogs)
+        }
     }
-    val groupState by groupStateFlow.collectAsStateWithLifecycle()
-    val canReorder = groupId.isNotEmpty() && searchQuery.isEmpty()
-    val actions = remember(
-        onSelectServer,
-        onEditServer,
-        onShareServer,
-        onMoreServer,
-        onRemoveServer,
-    ) {
-        ServerRowActions(
-            select = onSelectServer,
-            edit = onEditServer,
-            share = onShareServer,
-            more = onMoreServer,
-            remove = onRemoveServer,
-        )
-    }
-    // The box floats over the list (the list scrolls underneath it), so the list is padded by the box height.
-    val density = LocalDensity.current
-    val layoutDirection = LocalLayoutDirection.current
-    var infoHeightPx by remember { mutableIntStateOf(0) }
-    val listPadding = if (usageInfo == null) {
-        contentPadding
-    } else {
-        PaddingValues(
-            start = contentPadding.calculateStartPadding(layoutDirection),
-            top = contentPadding.calculateTopPadding() + with(density) { infoHeightPx.toDp() },
-            end = contentPadding.calculateEndPadding(layoutDirection),
-            bottom = contentPadding.calculateBottomPadding()
-        )
-    }
+}
 
+/** Both views use the same floating subscription card and reserve its measured height. */
+@Composable
+internal fun ProfileGroupLayout(
+    group: GroupMapItem,
+    contentPadding: PaddingValues,
+    onAction: (MainAction) -> Unit,
+    headerModifier: Modifier = Modifier,
+    actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val usageInfo = group.usageInfo
+    val density = LocalDensity.current
+    val direction = LocalLayoutDirection.current
+    var infoHeightPx by remember(group.id) { mutableIntStateOf(0) }
     Box(Modifier.fillMaxSize()) {
-        ServerListPage(
-            rows = groupState.rows,
-            selectedGuid = selectedGuid,
-            locateTarget = locateTarget?.takeIf { it.groupId == groupId },
-            canReorder = canReorder,
-            doubleColumnDisplay = doubleColumnDisplay,
-            groupId = groupId,
-            lazyListStates = lazyListStates,
-            lazyGridStates = lazyGridStates,
-            actions = actions,
-            onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
-            onMoveServer = { fromIndex, toIndex ->
-                mainViewModel.moveServer(groupId, fromIndex, toIndex)
-            },
-            contentPadding = listPadding
-        )
+        content(if (usageInfo == null) contentPadding else PaddingValues(
+            start = contentPadding.calculateStartPadding(direction),
+            top = contentPadding.calculateTopPadding() + with(density) { infoHeightPx.toDp() },
+            end = contentPadding.calculateEndPadding(direction),
+            bottom = contentPadding.calculateBottomPadding()
+        ))
         if (usageInfo != null) {
             SubscriptionInfoCard(
                 info = usageInfo,
-                fallbackTitle = groupTitle,
-                onOpenLink = onOpenLink,
-                onRefresh = { mainViewModel.onAction(MainAction.UpdateGroupSubscription(groupId)) },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                fallbackTitle = group.remarks,
+                onOpenLink = { onAction(MainAction.OpenSubscriptionLink(it)) },
+                onRefresh = { onAction(MainAction.UpdateGroupSubscription(group.id)) },
+                modifier = Modifier.align(Alignment.TopCenter)
+                    .padding(
+                        start = contentPadding.calculateStartPadding(direction),
+                        top = contentPadding.calculateTopPadding(),
+                        end = contentPadding.calculateEndPadding(direction)
+                    )
                     .onSizeChanged { infoHeightPx = it.height }
+                    .then(headerModifier),
+                actionButton = actionButton
             )
         }
     }
 }
 
-private class ServerRowActions(
-    val select: (String) -> Unit,
-    val edit: (String, ProfileItem) -> Unit,
-    val share: (String, ProfileItem) -> Unit,
-    val more: (String, ProfileItem) -> Unit,
-    val remove: (String, String) -> Unit,
-)
-
+/** Shares lazy list/grid mechanics and touch dragging, without owning a focus graph. */
 @Composable
-private fun ServerListPage(
+internal fun ProfileCollection(
+    group: GroupMapItem,
     rows: List<ServerRowUiModel>,
-    selectedGuid: String?,
-    locateTarget: LocateTarget?,
-    canReorder: Boolean,
-    doubleColumnDisplay: Boolean,
-    groupId: String,
-    lazyListStates: MutableMap<String, LazyListState>,
-    lazyGridStates: MutableMap<String, LazyGridState>,
-    actions: ServerRowActions,
-    onLocateHandled: () -> Unit,
-    onMoveServer: (Int, Int) -> Unit,
-    contentPadding: PaddingValues
+    uiState: MainUiState,
+    scroll: ProfileScrollState,
+    contentPadding: PaddingValues,
+    onAction: (MainAction) -> Unit,
+    isMoving: ((String) -> Boolean)? = null,
+    item: @Composable (Int, ServerRowUiModel) -> Unit
 ) {
-    if (doubleColumnDisplay) {
-        val gridState = remember(groupId) {
-            lazyGridStates.getOrPut(groupId) { LazyGridState() }
-        }
-        val reorderableGridState = if (canReorder) {
-            rememberReorderableLazyGridState(gridState) { from, to ->
-                onMoveServer(from.index, to.index)
-            }
-        } else null
+    val canReorder = group.id.isNotEmpty() && uiState.searchQuery.isEmpty()
+    val doubleColumn = uiState.doubleColumnDisplay
+    LocateTargetEffect(uiState.locateTarget?.takeIf { it.groupId == group.id }, rows, doubleColumn, onAction) {
+        scroll.reveal(it, doubleColumn)
+    }
+    fun move(from: Any?, to: Any?) {
+        if (from is String && to is String) onAction(MainAction.MoveServer(group.id, from, to))
+    }
 
-        LocateTargetEffect(locateTarget, rows, gridState, onLocateHandled)
-
+    if (doubleColumn) {
+        val state = if (canReorder) rememberReorderableLazyGridState(scroll.grid) { from, to -> move(from.key, to.key) } else null
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            state = gridState,
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScrollbar(gridState),
+            state = scroll.grid,
+            modifier = Modifier.fillMaxSize().verticalScrollbar(scroll.grid),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
-                val content: @Composable () -> Unit = {
-                    ServerItemColumn(
-                        row = row,
-                        isSelected = row.guid == selectedGuid,
-                        doubleColumnDisplay = true,
-                        actions = actions
-                    )
-                }
-                if (canReorder && reorderableGridState != null) {
-                    ReorderableItem(
-                        reorderableGridState,
-                        key = row.guid
-                    ) { isDragging ->
-                        ReorderableGridItem(
-                            scope = this,
-                            isDragging = isDragging
-                        ) { content() }
-                    }
+            itemsIndexed(rows, key = { _, row -> row.guid }) { index, row ->
+                if (state == null) {
+                    item(index, row)
                 } else {
-                    content()
+                    val moving = isMoving?.invoke(row.guid) == true
+                    ReorderableItem(state, key = row.guid, modifier = Modifier.zIndex(if (moving) 1f else 0f)) { dragging ->
+                        if (isMoving == null) ReorderableGridItem(this, dragging) { item(index, row) }
+                        else TvReorderableGridItem(this, dragging, moving, moveModeCornerRadius = 12.dp) { item(index, row) }
+                    }
                 }
             }
         }
     } else {
-        val listState = remember(groupId) {
-            lazyListStates.getOrPut(groupId) { LazyListState() }
-        }
-        val reorderableState = if (canReorder) {
-            rememberReorderableLazyListState(listState) { from, to ->
-                onMoveServer(from.index, to.index)
-            }
-        } else null
-
-        LocateTargetEffect(locateTarget, rows, listState, onLocateHandled)
-
+        val state = if (canReorder) rememberReorderableLazyListState(scroll.list) { from, to -> move(from.key, to.key) } else null
         LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScrollbar(listState),
+            state = scroll.list,
+            modifier = Modifier.fillMaxSize().verticalScrollbar(scroll.list),
             contentPadding = contentPadding
         ) {
-            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
-                if (canReorder && reorderableState != null) {
-                    ReorderableItem(
-                        reorderableState,
-                        key = row.guid
-                    ) { isDragging ->
-                        val itemScope = this
-                        // ReorderableItem is a Box, so a bare divider would be drawn over the top of the
-                        // row (including the first one); the Column puts it below the row instead.
-                        Column {
-                            ReorderableListItem(
-                                scope = itemScope,
-                                isDragging = isDragging
-                            ) {
-                                ServerItemRow(
-                                    row = row,
-                                    isSelected = row.guid == selectedGuid,
-                                    actions = actions
-                                )
-                            }
-                            ItemDivider()
-                        }
-                    }
+            itemsIndexed(rows, key = { _, row -> row.guid }) { index, row ->
+                if (state == null) {
+                    item(index, row)
                 } else {
-                    ServerItemRow(
-                        row = row,
-                        isSelected = row.guid == selectedGuid,
-                        actions = actions
-                    )
-                    ItemDivider()
+                    val moving = isMoving?.invoke(row.guid) == true
+                    ReorderableItem(state, key = row.guid, modifier = Modifier.zIndex(if (moving) 1f else 0f)) { dragging ->
+                        if (isMoving == null) ReorderableListItem(this, dragging) { item(index, row) }
+                        else TvReorderableListItem(this, dragging, moving, moveModeCornerRadius = 12.dp) { item(index, row) }
+                    }
                 }
             }
         }
@@ -279,210 +198,160 @@ private fun ServerListPage(
 
 @Composable
 private fun LocateTargetEffect(
-    target: LocateTarget?,
-    rows: List<ServerRowUiModel>,
-    state: LazyListState,
-    onHandled: () -> Unit,
+    target: LocateTarget?, rows: List<ServerRowUiModel>, doubleColumn: Boolean,
+    onAction: (MainAction) -> Unit, reveal: suspend (Int) -> Unit
 ) {
     if (target == null) return
-    LaunchedEffect(target, rows) {
+    LaunchedEffect(target, rows, doubleColumn) {
         val index = rows.indexOfFirst { it.guid == target.serverGuid }
         if (index < 0) return@LaunchedEffect
-        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
-        onHandled()
+        reveal(index)
+        onAction(MainAction.LocateHandled(target))
     }
 }
 
-@Composable
-private fun LocateTargetEffect(
-    target: LocateTarget?,
-    rows: List<ServerRowUiModel>,
-    state: LazyGridState,
-    onHandled: () -> Unit,
-) {
-    if (target == null) return
-    LaunchedEffect(target, rows) {
-        val index = rows.indexOfFirst { it.guid == target.serverGuid }
-        if (index < 0) return@LaunchedEffect
-        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
-        onHandled()
-    }
+internal enum class ProfileRowAction(val icon: Int, val label: Int) {
+    More(R.drawable.ic_more_vert_24dp, R.string.action_more),
+    Share(R.drawable.ic_share_24dp, R.string.title_configuration_share),
+    Edit(R.drawable.ic_edit_24dp, R.string.menu_item_edit_config),
+    Delete(R.drawable.ic_delete_24dp, R.string.menu_item_del_config)
 }
 
-@Composable
-private fun ServerItemRow(
+internal val singleColumnProfileActions = listOf(ProfileRowAction.Share, ProfileRowAction.Edit, ProfileRowAction.Delete)
+internal val gridProfileActions = listOf(ProfileRowAction.More)
+
+internal fun runProfileRowAction(
+    action: ProfileRowAction,
     row: ServerRowUiModel,
-    isSelected: Boolean,
-    actions: ServerRowActions
+    onAction: (MainAction) -> Unit,
+    dialogs: MainDialogActions,
+    restoreFocus: () -> Boolean = { false }
 ) {
-    ServerListItem(
-        row = row,
-        isSelected = isSelected,
-        doubleColumnDisplay = false,
-        actions = actions
+    when (action) {
+        ProfileRowAction.More, ProfileRowAction.Share -> dialogs.share(row.guid, row.profile, action == ProfileRowAction.More, restoreFocus)
+        ProfileRowAction.Edit -> onAction(MainAction.EditServer(row.guid, row.profile))
+        ProfileRowAction.Delete -> dialogs.remove(row.guid, row.remarks)
+    }
+}
+
+@Composable
+private fun PhoneProfileRow(
+    row: ServerRowUiModel,
+    selected: Boolean,
+    doubleColumn: Boolean,
+    onAction: (MainAction) -> Unit,
+    dialogs: MainDialogActions
+) {
+    Column {
+        ProfileRow(
+            model = row,
+            selected = selected,
+            interaction = Modifier.clickable { onAction(MainAction.SelectServer(row.guid)) },
+            actions = {
+                (if (doubleColumn) gridProfileActions else singleColumnProfileActions).forEach { action ->
+                    IconButton(
+                        onClick = { runProfileRowAction(action, row, onAction, dialogs) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(painterResource(action.icon), stringResource(action.label))
+                    }
+                }
+            }
+        ) {
+            Spacer(Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { ProfileAddress(row) }
+            Spacer(Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                ProfileType(row.typeDescription, Modifier.weight(1f, fill = false))
+                Spacer(Modifier.width(8.dp))
+                TestResult(row.testDelayMillis)
+            }
+        }
+        AppDivider(Modifier.padding(horizontal = 12.dp))
+    }
+}
+
+@Composable
+internal fun ProfileRow(
+    model: ServerRowUiModel,
+    selected: Boolean,
+    interaction: Modifier,
+    decoration: Modifier = Modifier,
+    showSelectionMarker: Boolean = selected,
+    actions: @Composable RowScope.() -> Unit,
+    details: @Composable () -> Unit
+) {
+    val direction = LocalLayoutDirection.current
+    val selectedDescription = if (selected) stringResource(R.string.acc_selected_server) else null
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .semantics { if (selectedDescription != null) stateDescription = selectedDescription }
+            .then(decoration)
+            .drawBehind {
+                if (showSelectionMarker) {
+                    val width = 4.dp.toPx()
+                    val verticalInset = 10.dp.toPx()
+                    val startInset = 6.dp.toPx()
+                    val x = if (direction == LayoutDirection.Rtl) size.width - startInset - width else startInset
+                    drawRect(
+                        color = colorFabActive, topLeft = Offset(x, verticalInset),
+                        size = Size(width, (size.height - verticalInset * 2).coerceAtLeast(0f))
+                    )
+                }
+            }
+            .then(interaction)
+    ) {
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f).padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    model.remarks, Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph),
+                    maxLines = 2, overflow = TextOverflow.Ellipsis
+                )
+                actions()
+            }
+            details()
+        }
+    }
+}
+
+@Composable
+internal fun RowScope.ProfileAddress(model: ServerRowUiModel) {
+    SubscriptionBadge(model.subscriptionBadge)
+    Text(
+        model.statistics, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis
     )
 }
 
 @Composable
-private fun ServerItemColumn(
-    row: ServerRowUiModel,
-    isSelected: Boolean,
-    doubleColumnDisplay: Boolean,
-    actions: ServerRowActions
-) {
-    Column {
-        ServerListItem(
-            row = row,
-            isSelected = isSelected,
-            doubleColumnDisplay = doubleColumnDisplay,
-            actions = actions
-        )
-        ItemDivider()
-    }
+internal fun ProfileType(type: String, modifier: Modifier = Modifier) {
+    Text(
+        type, modifier, style = MaterialTheme.typography.bodySmall, color = colorConfigType,
+        maxLines = 1, overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
-private fun ServerListItem(
-    row: ServerRowUiModel,
-    isSelected: Boolean,
-    doubleColumnDisplay: Boolean,
-    actions: ServerRowActions
-) {
-    val testResult = if (row.testDelayMillis == 0L) {
-        ""
-    } else {
-        stringResource(R.string.server_test_delay_value, row.testDelayMillis)
-    }
-    val selectedStateDescription = if (isSelected) {
-        stringResource(R.string.acc_selected_server)
-    } else {
-        null
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .semantics {
-                if (selectedStateDescription != null) {
-                    stateDescription = selectedStateDescription
-                }
-            }
-            .clickable { actions.select(row.guid) }
+private fun SubscriptionBadge(text: String) {
+    if (text.isBlank()) return
+    Box(
+        Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            Modifier
-                .width(10.dp)
-                .fillMaxHeight()
-        ) {
-            if (isSelected) {
-                Row {
-                    Spacer(Modifier.width(6.dp))
-                    Box(
-                        Modifier
-                            .width(4.dp)
-                            .fillMaxHeight()
-                            .padding(vertical = 10.dp)
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                }
-            }
-        }
-
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
-        ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(row.remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (doubleColumnDisplay) {
-                    IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_more_vert_24dp),
-                            stringResource(R.string.acc_more),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                } else {
-                    IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_share_24dp),
-                            stringResource(R.string.title_configuration_share),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_edit_24dp),
-                            stringResource(R.string.acc_edit),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                    IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_delete_24dp),
-                            stringResource(R.string.acc_delete),
-                            Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (row.subscriptionBadge.isNotBlank()) {
-                    Box(
-                        Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
-                    ) {
-                        Text(row.subscriptionBadge.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                    }
-                }
-                Text(
-                    row.statistics,
-                    Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    row.typeDescription,
-                    modifier = Modifier.weight(1f, fill = false),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorConfigType,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    testResult,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
+        Text(text.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
+    Spacer(Modifier.width(8.dp))
 }
 
-internal suspend fun PagerState.navigateToPageOptimized(
-    targetPage: Int,
-    animateAdjacentPage: Boolean = true
-) {
-    if (pageCount <= 0) return
-    val target = targetPage.coerceIn(0, pageCount - 1)
-    val current = settledPage.coerceIn(0, pageCount - 1)
-    if (target == current) return
-
-    if (abs(target - current) == 1 && animateAdjacentPage) {
-        animateScrollToPage(target)
-    } else {
-        scrollToPage(target)
-    }
+@Composable
+internal fun TestResult(delayMillis: Long) {
+    Text(
+        if (delayMillis == 0L) "" else stringResource(R.string.server_test_delay_value, delayMillis),
+        style = MaterialTheme.typography.bodySmall,
+        color = if (delayMillis < 0L) colorPingRed else colorPing,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }

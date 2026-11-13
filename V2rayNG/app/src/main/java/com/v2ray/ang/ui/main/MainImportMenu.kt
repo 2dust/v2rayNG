@@ -1,14 +1,17 @@
 package com.v2ray.ang.ui.main
 
 import androidx.annotation.StringRes
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.SelectListDialog
+import com.v2ray.ang.ui.compose.TvActionDialog
 
 private enum class ImportMenuAction(@StringRes val labelRes: Int, val action: MainAction) {
     QRCode(R.string.menu_item_import_config_qrcode, MainAction.ImportQRcode),
@@ -37,8 +40,12 @@ enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
     SortByTestResults(R.string.title_sort_by_test_results),
     TestAll(R.string.title_ping_all_server),
     TestAllRealPing(R.string.title_real_ping_all_server),
-    UpdateSubscriptions(R.string.title_sub_update)
+    UpdateSubscriptions(R.string.title_sub_update),
+    Exit(R.string.action_exit)
 }
+
+internal val phoneMoreMenuActions = MainMoreMenuAction.entries - MainMoreMenuAction.Exit
+internal val tvMoreMenuActions = MainMoreMenuAction.entries - setOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll)
 
 internal enum class ServerMenuAction(
     @StringRes val labelRes: Int,
@@ -52,6 +59,12 @@ internal enum class ServerMenuAction(
     Delete(R.string.action_delete, isShareAction = false, supportsComplexProfiles = true),
 }
 
+internal enum class BulkDeleteTarget(@StringRes val messageRes: Int, val action: MainAction) {
+    All(R.string.confirm_delete_visible_profiles, MainAction.RemoveAllServers),
+    Duplicate(R.string.confirm_delete_duplicate_profiles, MainAction.RemoveDuplicateServers),
+    Invalid(R.string.confirm_delete_invalid_profiles, MainAction.RemoveInvalidServers)
+}
+
 internal fun serverMenuActions(
     isComplexProfile: Boolean,
     includeManagementActions: Boolean,
@@ -60,17 +73,38 @@ internal fun serverMenuActions(
 }
 
 @Composable
-fun ImportMenuContent(onAction: (MainAction) -> Unit) = AppDropdownMenuItems(
+internal fun ImportMenuContent(itemModifier: @Composable () -> Modifier = { Modifier }, onAction: (MainAction) -> Unit) = MainMenuItems(
+    modifier = itemModifier,
     items = ImportMenuAction.entries,
     labelRes = { it.labelRes },
     onSelected = { onAction(it.action) }
 )
 
 @Composable
-fun MoreMenuContent(onSelected: (MainMoreMenuAction) -> Unit) = AppDropdownMenuItems(
-    items = MainMoreMenuAction.entries,
+internal fun MoreMenuContent(
+    items: List<MainMoreMenuAction>,
+    itemModifier: @Composable () -> Modifier = { Modifier },
+    onAction: (MainAction) -> Unit,
+    onBulkDelete: (BulkDeleteTarget) -> Unit
+) = MainMenuItems(
+    modifier = itemModifier,
+    items = items,
     labelRes = { it.labelRes },
-    onSelected = onSelected
+    onSelected = { action ->
+        when (action) {
+            MainMoreMenuAction.RestartService -> onAction(MainAction.RestartService)
+            MainMoreMenuAction.DeleteAll -> onBulkDelete(BulkDeleteTarget.All)
+            MainMoreMenuAction.DeleteDuplicate -> onBulkDelete(BulkDeleteTarget.Duplicate)
+            MainMoreMenuAction.DeleteInvalid -> onBulkDelete(BulkDeleteTarget.Invalid)
+            MainMoreMenuAction.ExportAll -> onAction(MainAction.ExportAll)
+            MainMoreMenuAction.LocateSelected -> onAction(MainAction.LocateSelectedServer)
+            MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
+            MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
+            MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
+            MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
+            MainMoreMenuAction.Exit -> onAction(MainAction.Exit)
+        }
+    }
 )
 
 @Composable
@@ -78,27 +112,35 @@ fun ShareMethodDialog(
     guid: String,
     profile: ProfileItem,
     more: Boolean,
+    television: Boolean,
     onDismiss: () -> Unit,
+    onActionSelected: () -> Unit,
     onAction: (MainAction) -> Unit,
     onRemove: (String, String) -> Unit,
 ) {
-    val menuActions = serverMenuActions(
-        isComplexProfile = profile.configType.isComplexType(),
-        includeManagementActions = more,
-    )
-    SelectListDialog(
-        options = menuActions,
-        optionText = { stringResource(it.labelRes) },
-        onSelected = { action ->
-            onDismiss()
-            when (action) {
-                ServerMenuAction.ShareQRCode -> onAction(MainAction.ShareQRCode(guid))
-                ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
-                ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))
-                ServerMenuAction.Edit -> onAction(MainAction.EditServer(guid, profile))
-                ServerMenuAction.Delete -> onRemove(guid, profile.remarks)
-            }
-        },
-        onDismiss = onDismiss
-    )
+    val isCustom = profile.configType.isComplexType()
+    val menuActions = serverMenuActions(isComplexProfile = isCustom, includeManagementActions = more)
+    val select: (ServerMenuAction) -> Unit = { action ->
+        onActionSelected()
+        when (action) {
+            ServerMenuAction.ShareQRCode -> onAction(MainAction.ShareQRCode(guid))
+            ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
+            ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))
+            ServerMenuAction.Edit -> onAction(MainAction.EditServer(guid, profile))
+            ServerMenuAction.Delete -> onRemove(guid, profile.remarks)
+        }
+    }
+    if (television) TvActionDialog(menuActions, { stringResource(it.labelRes) }, select, onDismiss)
+    else SelectListDialog(menuActions, { stringResource(it.labelRes) }, select, onDismiss)
+}
+
+@Composable
+private fun <T> MainMenuItems(modifier: @Composable () -> Modifier, items: List<T>, labelRes: (T) -> Int, onSelected: (T) -> Unit) {
+    for (item in items) {
+        DropdownMenuItem(
+            text = { Text(stringResource(labelRes(item))) },
+            modifier = modifier(),
+            onClick = { onSelected(item) }
+        )
+    }
 }

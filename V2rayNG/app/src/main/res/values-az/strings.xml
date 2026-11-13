@@ -576,4 +576,9 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
+    <string name="action_exit">Çıxış</string>
+    <string name="action_back">Geri</string>
+    <string name="action_more">Daha çox</string>
+    <string name="action_clear">Təmizlə</string>
+    <string name="connection_connected_tv">Qoşuldu</string>
 </resources>

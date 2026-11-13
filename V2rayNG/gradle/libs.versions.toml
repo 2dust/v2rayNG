@@ -20,6 +20,7 @@ mockitoCore = "5.24.0"
 mockitoKotlin = "6.4.0"
 camerax = "1.6.2"
 composeBom = "2026.09.00"
+tvMaterial = "1.1.0"
 reorderable = "3.1.0"
 coil = "3.6.3"
 [libraries]
@@ -56,6 +57,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-tv-material = { group = "androidx.tv", name = "tv-material", version.ref = "tvMaterial" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }

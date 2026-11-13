@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.main
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.AngConfigManager
 
@@ -19,7 +20,17 @@ internal data class ServerRowUiModel(
 internal data class ServerGroupUiState(
     val servers: List<ServersCache> = emptyList(),
     val rows: List<ServerRowUiModel> = emptyList(),
-)
+) {
+    fun moveServer(fromGuid: String, toGuid: String): ServerGroupUiState? {
+        val from = servers.indexOfFirst { it.guid == fromGuid }
+        val to = servers.indexOfFirst { it.guid == toGuid }
+        if (from == to || from < 0 || to < 0) return null
+        return ServerGroupUiState(
+            servers = servers.toMutableList().apply { moveItem(from, to) },
+            rows = rows.toMutableList().apply { moveItem(from, to) }
+        )
+    }
+}
 
 internal fun buildServerRowUiModel(
     server: ServersCache,

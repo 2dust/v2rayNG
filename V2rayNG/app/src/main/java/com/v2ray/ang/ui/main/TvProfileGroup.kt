@@ -1,0 +1,243 @@
+package com.v2ray.ang.ui.main
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.dto.GroupMapItem
+import com.v2ray.ang.ui.compose.AppDivider
+import com.v2ray.ang.ui.compose.DpadReorderDirection
+import com.v2ray.ang.ui.compose.DpadReorderItem
+import com.v2ray.ang.ui.compose.TvIconButton
+import com.v2ray.ang.ui.compose.dpadBackNavigation
+import com.v2ray.ang.ui.compose.dpadClickable
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.dpadLongPressToMove
+import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
+import com.v2ray.ang.ui.compose.dpadRowActionNavigation
+import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.compose.keepDpadReorderItemVisible
+import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
+import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
+import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
+import com.v2ray.ang.ui.compose.twoColumnDpadReorderTarget
+import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
+import kotlinx.coroutines.flow.first
+
+private class ProfileRowFocus(actions: List<ProfileRowAction>) {
+    val row = FocusRequester()
+    val buttons = actions.associateWith { FocusRequester() }
+    val order = listOf(row) + buttons.values
+}
+
+internal data class ProfileReveal(val generation: Int, val guid: String, val doubleColumn: Boolean)
+
+@Composable
+internal fun TvProfileGroup(
+    group: GroupMapItem,
+    mainViewModel: MainViewModel,
+    uiState: MainUiState,
+    scrollStates: MutableMap<String, ProfileScrollState>,
+    dialogs: MainDialogActions,
+    onAction: (MainAction) -> Unit,
+    resumeGeneration: Int,
+    lastReveals: MutableMap<String, ProfileReveal>,
+    onOpenDrawer: (() -> Boolean) -> Unit,
+    onBackToToolbar: () -> Unit,
+    onUpFromFirstRow: (() -> Boolean)?
+) {
+    val groupStateFlow = remember(mainViewModel, group.id) { mainViewModel.serverGroupState(group.id) }
+    val groupState by groupStateFlow.collectAsStateWithLifecycle()
+    val rows = groupState.rows
+    val scroll = rememberProfileScrollState(scrollStates, group.id)
+    val doubleColumn = uiState.doubleColumnDisplay
+    val rowActions = if (doubleColumn) gridProfileActions else singleColumnProfileActions
+    val keys = remember(rows) { rows.map { it.guid } }
+    val targets = key(doubleColumn) { rememberDpadFocusTargets(keys) { ProfileRowFocus(rowActions) } }
+    val requestFocus = rememberLazyDpadFocus(keys.map { targets.getValue(it).order }) {
+        if (doubleColumn) scroll.grid.scrollToItem(it) else scroll.list.scrollToItem(it)
+    }
+    // A drawer or dialog may outlive a lazy item. Resolve the current row by GUID when restoring.
+    val latestTargets by rememberUpdatedState(targets)
+    fun restore(guid: String, action: ProfileRowAction? = null): Boolean {
+        val focus = latestTargets[guid] ?: return false
+        val target = if (action == null) focus.row else focus.buttons[action] ?: return false
+        return requestFocus(target)
+    }
+
+    RevealSelectedProfile(group.id, scroll, resumeGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
+    val canReorder = group.id.isNotEmpty() && uiState.searchQuery.isEmpty()
+    val reorder = if (canReorder) rememberSyncedDpadReorderState(keys, enabled = true, stateKey = group.id) { key, index ->
+        val guid = key as? String ?: return@rememberSyncedDpadReorderState
+        if (index >= 0) {
+            if (doubleColumn) scroll.grid.keepDpadReorderItemVisible(guid, index)
+            else scroll.list.keepDpadReorderItemVisible(guid, index)
+        }
+        targets[guid]?.row?.requestFocus()
+    } else null
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val moveTarget: (Int, DpadReorderDirection) -> Int = if (doubleColumn) {
+        { index, direction -> twoColumnDpadReorderTarget(index, direction, isRtl) }
+    } else ::verticalDpadReorderTarget
+
+    val refreshFocus = if (group.usageInfo != null) remember { FocusRequester() } else null
+    val headerModifier = Modifier
+        .dpadVerticalFocusNavigation(onMoveUp = { onUpFromFirstRow?.invoke() ?: false }, onMoveDown = { false })
+        .dpadBackNavigation(onBack = onBackToToolbar)
+    ProfileGroupLayout(
+        group = group,
+        contentPadding = PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
+        onAction = onAction,
+        headerModifier = headerModifier,
+        actionButton = { icon, label, isRefresh, click ->
+            TvIconButton(painterResource(icon), label, click, focusRequester = refreshFocus.takeIf { isRefresh })
+        }
+    ) { padding ->
+        ProfileCollection(group, rows, uiState, scroll, padding, onAction, isMoving = { reorder?.isMoving(it) == true }) { index, row ->
+            val stride = if (doubleColumn) 2 else 1
+            fun targetAt(position: Int) = keys.getOrNull(position)?.let(targets::get)
+            val leadingColumn = !doubleColumn || index % 2 == 0
+            val reorderItem = reorder?.let {
+                DpadReorderItem(it, row.guid, index, rows.size, moveTarget) { _, destination ->
+                    // Remote repeats may arrive before the rendered order has caught up.
+                    groupStateFlow.value.rows.getOrNull(destination)?.let { target ->
+                        onAction(MainAction.MoveServer(group.id, row.guid, target.guid))
+                    }
+                }
+            }
+            TvProfileRow(
+                row = row,
+                selected = row.guid == uiState.selectedGuid,
+                current = targets.getValue(row.guid),
+                above = targetAt(index - stride),
+                below = targetAt(index + stride),
+                nextColumn = if (doubleColumn && leadingColumn) targetAt(index + 1)?.row else null,
+                requestFocus = requestFocus,
+                onPrevious = {
+                    val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
+                    if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer { restore(row.guid) }
+                },
+                onUpFromFirstRow = {
+                    if (refreshFocus != null) {
+                        refreshFocus.requestFocus()
+                        true
+                    } else onUpFromFirstRow?.let { it(); true } ?: false
+                },
+                onBackToToolbar = onBackToToolbar,
+                reorderItem = reorderItem,
+                onSelect = { onAction(MainAction.SelectServer(row.guid)) },
+                onAction = { action -> runProfileRowAction(action, row, onAction, dialogs) { restore(row.guid, action) } }
+            )
+        }
+    }
+}
+
+@Composable
+private fun RevealSelectedProfile(
+    groupId: String,
+    scroll: ProfileScrollState,
+    resumeGeneration: Int,
+    selectedGuid: String?,
+    rows: List<ServerRowUiModel>,
+    doubleColumn: Boolean,
+    lastReveals: MutableMap<String, ProfileReveal>
+) {
+    val latestRows by rememberUpdatedState(rows)
+    LaunchedEffect(scroll, resumeGeneration, selectedGuid, doubleColumn) {
+        if (selectedGuid == null) return@LaunchedEffect
+        val reveal = ProfileReveal(resumeGeneration, selectedGuid, doubleColumn)
+        // Returning to an already revealed group must not reset its scroll position.
+        if (lastReveals[groupId] == reveal) return@LaunchedEffect
+        val index = snapshotFlow { latestRows.indexOfFirst { it.guid == selectedGuid } }.first { it >= 0 }
+        scroll.reveal(index, doubleColumn)
+        lastReveals[groupId] = reveal
+    }
+}
+
+@Composable
+private fun TvProfileRow(
+    row: ServerRowUiModel,
+    selected: Boolean,
+    current: ProfileRowFocus,
+    above: ProfileRowFocus?,
+    below: ProfileRowFocus?,
+    nextColumn: FocusRequester?,
+    requestFocus: (FocusRequester) -> Boolean,
+    onPrevious: () -> Unit,
+    onUpFromFirstRow: () -> Boolean,
+    onBackToToolbar: () -> Unit,
+    reorderItem: DpadReorderItem?,
+    onSelect: () -> Unit,
+    onAction: (ProfileRowAction) -> Unit
+) {
+    val moving = reorderItem?.let { it.state.isMoving(row.guid) } == true
+    val decoration = Modifier.dpadFocusOutline(focusRequester = current.row, showFocus = !moving)
+        .dpadBackNavigation(enabled = !moving, onBack = onBackToToolbar)
+    val interaction = Modifier
+        .dpadOrderedFocusNavigation(current.row, current.order, onBeforeFirst = onPrevious)
+        .dpadVerticalFocusNavigation(
+            onMoveUp = { above?.row?.let(requestFocus) ?: onUpFromFirstRow() },
+            onMoveDown = { below?.row?.let(requestFocus) ?: true }
+        )
+        .then(
+            if (reorderItem == null) Modifier.dpadClickable(onClick = onSelect)
+            else Modifier.dpadLongPressToMove(enabled = true, item = reorderItem, onClick = onSelect)
+        )
+    Column {
+        ProfileRow(
+            model = row,
+            selected = selected,
+            showSelectionMarker = selected && !moving,
+            decoration = decoration,
+            interaction = interaction,
+            actions = {
+                current.buttons.forEach { (action, target) ->
+                    val previous = above?.buttons?.get(action)
+                    val next = below?.buttons?.get(action)
+                    val navigation = if (action == ProfileRowAction.More) {
+                        Modifier.dpadOrderedFocusNavigation(
+                            target, current.order, onAfterLast = { nextColumn?.let(requestFocus) ?: target.requestFocus() }
+                        ).dpadVerticalFocusNavigation(
+                            onMoveUp = { previous?.let(requestFocus) ?: false },
+                            onMoveDown = { next?.let(requestFocus) ?: true }
+                        )
+                    } else Modifier.dpadRowActionNavigation(target, current.order, previous, next, requestFocus)
+                    TvIconButton(
+                        painterResource(action.icon), stringResource(action.label), { onAction(action) },
+                        modifier = navigation, focusRequester = target
+                    )
+                }
+            }
+        ) {
+            Spacer(Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                ProfileAddress(row)
+                Spacer(Modifier.width(16.dp))
+                ProfileType(row.typeDescription)
+                Spacer(Modifier.width(16.dp))
+                TestResult(row.testDelayMillis)
+            }
+        }
+        AppDivider(Modifier.padding(horizontal = 12.dp, vertical = 2.dp))
+    }
+}
