@@ -15,6 +15,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -71,12 +72,12 @@ internal fun TvProfileGroup(
     scroll: TvProfileScrollState,
     dialogs: TvMainDialogActions,
     onAction: (MainAction) -> Unit,
-    onEdit: (MainAction.EditServer) -> Unit,
-    editorFocusGuid: String?,
-    onEditorFocusHandled: (Boolean) -> Unit,
+    focusToRestore: TvMainFocusTarget?,
+    onFocusRestored: (TvMainFocusTarget, Boolean) -> Unit,
+    revealActiveProfile: Boolean,
     revealGeneration: Int,
     lastReveals: MutableMap<String, ProfileReveal>,
-    onOpenDrawer: (() -> Boolean) -> Unit,
+    onOpenDrawer: (TvMainFocusTarget.Profile) -> Unit,
     onBackToToolbar: () -> Unit,
     onUpFromFirstRow: (() -> Boolean)?
 ) {
@@ -90,42 +91,40 @@ internal fun TvProfileGroup(
     val requestFocus = rememberLazyDpadFocus(keys.map { targets.getValue(it).order }) {
         if (doubleColumn) scroll.grid.scrollToItem(it) else scroll.list.scrollToItem(it)
     }
-    // A drawer or dialog may outlive a lazy item. Resolve the current row by GUID when restoring.
-    val latestTargets by rememberUpdatedState(targets)
     val latestKeys by rememberUpdatedState(keys)
-    fun restore(guid: String, action: ProfileRowAction? = null): Boolean {
-        val focus = latestTargets[guid] ?: return false
-        val target = if (action == null) focus.row else focus.buttons[action] ?: return false
-        return requestFocus(target)
-    }
-    suspend fun restoreAfterRemoval(guid: String, neighbor: String?, action: ProfileRowAction): Boolean {
-        // Refresh runs off the UI thread; focus the replacement only after the row has gone.
-        val removed = withTimeoutOrNull(2_000) { snapshotFlow { guid !in latestKeys }.first { it } } == true
-        return if (removed) neighbor?.let { restore(it) } ?: false else restore(guid, action)
-    }
-
-    if (editorFocusGuid == null) {
-        RevealSelectedProfile(group.id, scroll, revealGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
-    } else {
+    if (focusToRestore is TvMainFocusTarget.Profile || focusToRestore is TvMainFocusTarget.AfterRemoval) {
         val window = LocalWindowInfo.current
-        val onHandled by rememberUpdatedState(onEditorFocusHandled)
-        LaunchedEffect(editorFocusGuid, keys, doubleColumn) {
+        val onHandled by rememberUpdatedState(onFocusRestored)
+        LaunchedEffect(focusToRestore, keys, doubleColumn) {
             snapshotFlow { window.isWindowFocused }.first { it }
+            withFrameNanos { }
             mainViewModel.awaitInitialProfilePage()
-            val index = keys.indexOf(editorFocusGuid)
-            // After process recreation the group flow can be populated before its rows are composed.
-            if (index < 0 && groupStateFlow.value.rows.any { it.guid == editorFocusGuid }) return@LaunchedEffect
-            val focus = targets[editorFocusGuid]
-            val button = focus?.buttons?.get(if (doubleColumn) ProfileRowAction.More else ProfileRowAction.Edit)
-            val restored = button != null && (button.requestFocus() || run {
+            val profile = when (focusToRestore) {
+                is TvMainFocusTarget.Profile -> focusToRestore
+                is TvMainFocusTarget.AfterRemoval -> {
+                    val origin = focusToRestore.origin
+                    // Focus the neighbor only after the asynchronous refresh removes the row.
+                    val removed = withTimeoutOrNull(2_000) { snapshotFlow { origin.guid !in latestKeys }.first { it } } == true
+                    if (removed) focusToRestore.neighbor?.let { TvMainFocusTarget.Profile(it) } else origin
+                }
+            }
+            val index = profile?.let { keys.indexOf(it.guid) } ?: -1
+            // Group data may be ready before the corresponding rows have been composed.
+            if (index < 0 && profile != null && groupStateFlow.value.rows.any { it.guid == profile.guid }) return@LaunchedEffect
+            val focus = profile?.let { targets[it.guid] }
+            val action = profile?.action?.let { profileReturnAction(it, doubleColumn) }
+            val target = action?.let { focus?.buttons?.get(it) } ?: focus?.row
+            val restored = target != null && (target.requestFocus() || run {
                 scroll.reveal(index, doubleColumn)
-                requestFocusWhenReady(button)
+                requestFocusWhenReady(target)
             })
             if (restored) {
                 uiState.selectedGuid?.let { lastReveals[group.id] = ProfileReveal(revealGeneration, it, doubleColumn) }
             }
-            onHandled(restored)
+            onHandled(focusToRestore, restored)
         }
+    } else if (revealActiveProfile) {
+        RevealSelectedProfile(group.id, scroll, revealGeneration, uiState.selectedGuid, rows, doubleColumn, lastReveals)
     }
     val canReorder = groupState.canReorder(group.id, uiState.searchQuery)
     val reorder = if (canReorder) rememberSyncedDpadReorderState(keys) { key, index ->
@@ -180,7 +179,7 @@ internal fun TvProfileGroup(
                     requestFocus = requestFocus,
                     onPrevious = {
                         val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
-                        if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer { restore(row.guid) }
+                        if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer(TvMainFocusTarget.Profile(row.guid))
                     },
                     onUpFromFirstRow = {
                         if (refreshFocus != null) refreshFocus.requestFocus() else onUpFromFirstRow?.invoke() ?: false
@@ -189,11 +188,10 @@ internal fun TvProfileGroup(
                     reorderItem = reorderItem,
                     onSelect = { onAction(MainAction.SelectServer(row.guid)) },
                     onAction = { action ->
-                        val neighbor = focusAfterProfileRemoval(latestKeys, row.guid)
-                        runProfileRowAction(action, row, onEdit, dialogs) { removed ->
-                            if (removed) restoreAfterRemoval(row.guid, neighbor, action)
-                            else restore(row.guid, action)
-                        }
+                        val neighbor = if (action == ProfileRowAction.Delete || action == ProfileRowAction.More) {
+                            focusAfterProfileRemoval(latestKeys, row.guid)
+                        } else null
+                        dialogs.profileAction(action, row, neighbor)
                     }
                 )
             }
@@ -265,14 +263,10 @@ private fun TvProfileRow(
                 current.buttons.forEach { (action, target) ->
                     val previous = above?.buttons?.get(action)
                     val next = below?.buttons?.get(action)
-                    val navigation = if (action == ProfileRowAction.More) {
-                        Modifier.dpadOrderedFocusNavigation(
-                            target, current.order, onAfterLast = { nextColumn?.let(requestFocus) ?: target.requestFocus() }
-                        ).dpadVerticalFocusNavigation(
-                            onMoveUp = { previous?.let(requestFocus) ?: false },
-                            onMoveDown = { next?.let(requestFocus) ?: true }
-                        )
-                    } else Modifier.dpadRowActionNavigation(target, current.order, previous, next, requestFocus)
+                    val navigation = Modifier.dpadRowActionNavigation(
+                        target, current.order, previous, next, requestFocus,
+                        onAfterLast = nextColumn?.takeIf { action == ProfileRowAction.More }?.let { column -> { requestFocus(column) } }
+                    )
                     TvIconButton(
                         painterResource(action.icon), stringResource(action.label), { onAction(action) },
                         modifier = navigation, focusRequester = target, contentDescription = stringResource(action.description)

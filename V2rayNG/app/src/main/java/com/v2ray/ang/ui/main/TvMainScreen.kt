@@ -11,11 +11,12 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
@@ -30,7 +31,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.tv.material3.DrawerState as TvDrawerState
 import androidx.tv.material3.DrawerValue as TvDrawerValue
 import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.R
@@ -38,6 +38,20 @@ import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberLazyDpadFocus
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import kotlinx.coroutines.flow.first
+
+internal sealed interface TvMainFocusTarget {
+    data object Toolbar : TvMainFocusTarget
+    data class GroupTab(val id: String) : TvMainFocusTarget
+    data class Profile(val guid: String, val action: ProfileRowAction? = null) : TvMainFocusTarget {
+        companion object {
+            val Saver = listSaver<Profile?, String>(
+                save = { target -> target?.let { listOf(it.guid, it.action?.name.orEmpty()) }.orEmpty() },
+                restore = { Profile(it[0], it[1].takeIf(String::isNotEmpty)?.let(ProfileRowAction::valueOf)) }
+            )
+        }
+    }
+    data class AfterRemoval(val origin: Profile, val neighbor: String?) : TvMainFocusTarget
+}
 
 @Composable
 internal fun TvMainScreen(
@@ -61,7 +75,14 @@ internal fun TvMainScreen(
         knownGroupIds.addAll(ids)
         lastReveals.keys.retainAll(ids)
     }
-    val drawer = rememberMainTvDrawerCoordinator()
+    val drawerState = rememberTvDrawerState(TvDrawerValue.Closed)
+    val isDrawerOpen = drawerState.currentValue == TvDrawerValue.Open
+    var drawerOrigin by remember { mutableStateOf<TvMainFocusTarget?>(null) }
+    var focusToRestore by remember { mutableStateOf<TvMainFocusTarget?>(null) }
+    fun openDrawer(origin: TvMainFocusTarget) {
+        drawerOrigin = origin
+        drawerState.setValue(TvDrawerValue.Open)
+    }
     var showSearch by rememberSaveable { mutableStateOf(uiState.searchQuery.isNotEmpty()) }
     fun closeSearch() {
         onAction(MainAction.Search(""))
@@ -72,12 +93,11 @@ internal fun TvMainScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     var resumeFocusGeneration by remember { mutableIntStateOf(0) }
     var profileRevealGeneration by remember { mutableIntStateOf(0) }
-    var editorGuid by rememberSaveable { mutableStateOf<String?>(null) }
-    var returningFromEditor by remember { mutableStateOf(editorGuid != null) }
-    var focusToRestore by remember { mutableStateOf<(suspend () -> Boolean)?>(null) }
-    fun openEditor(action: MainAction.EditServer) {
-        returningFromEditor = false
-        editorGuid = action.guid
+    var editorOrigin by rememberSaveable(stateSaver = TvMainFocusTarget.Profile.Saver) {
+        mutableStateOf<TvMainFocusTarget.Profile?>(null)
+    }
+    fun openEditor(action: MainAction.EditServer, origin: TvMainFocusTarget.Profile) {
+        editorOrigin = origin
         onAction(action)
     }
     DisposableEffect(lifecycleOwner) {
@@ -85,33 +105,19 @@ internal fun TvMainScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 resumeFocusGeneration++
                 // Restore the editor's row instead of scrolling it away to the active profile.
-                if (editorGuid == null) profileRevealGeneration++
-                else returningFromEditor = true
+                val origin = editorOrigin
+                if (origin == null) profileRevealGeneration++
+                else focusToRestore = origin
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    val isDrawerOpen = drawer.isOpen
-    var drawerWasOpen by remember { mutableStateOf(isDrawerOpen) }
-    LaunchedEffect(isDrawerOpen, showSearch) {
-        val justClosed = drawerWasOpen && !isDrawerOpen
-        drawerWasOpen = isDrawerOpen
-        if (!isDrawerOpen && (justClosed || (!showSearch && editorGuid == null))) {
-            if (drawer.takeFocusToRestore()?.invoke() != true) requestFocusWhenReady(topBarFocus.start)
-        }
+    fun closeDrawer() {
+        drawerState.setValue(TvDrawerValue.Closed)
     }
-    val windowInfo = LocalWindowInfo.current
-    LaunchedEffect(focusToRestore) {
-        val restore = focusToRestore ?: return@LaunchedEffect
-        snapshotFlow { windowInfo.isWindowFocused }.first { it }
-        withFrameNanos { }
-        if (!restore()) requestFocusWhenReady(topBarFocus.start)
-        focusToRestore = null
-    }
-
     BackHandler(enabled = showSearch, onBack = ::closeSearch)
-    BackHandler(enabled = isDrawerOpen, onBack = drawer::close)
+    BackHandler(enabled = isDrawerOpen, onBack = ::closeDrawer)
 
     val tabState = if (groups.size > 1) rememberLazyListState(selectedGroupIndex) else null
     val tabTargets = if (tabState != null) rememberDpadFocusTargets(groupIds) { FocusRequester() } else emptyMap()
@@ -121,6 +127,28 @@ internal fun TvMainScreen(
     } else null
     fun focusGroupTab(groupId: String): Boolean = tabTargets[groupId]?.let { requestTabFocus?.invoke(it) } ?: false
 
+    var drawerWasOpen by remember { mutableStateOf(isDrawerOpen) }
+    LaunchedEffect(isDrawerOpen, showSearch) {
+        val justClosed = drawerWasOpen && !isDrawerOpen
+        drawerWasOpen = isDrawerOpen
+        if (justClosed) {
+            focusToRestore = drawerOrigin ?: TvMainFocusTarget.Toolbar
+            drawerOrigin = null
+        } else if (!isDrawerOpen && !showSearch && editorOrigin == null && focusToRestore == null) {
+            focusToRestore = TvMainFocusTarget.Toolbar
+        }
+    }
+    val windowInfo = LocalWindowInfo.current
+    val latestTabFocus by rememberUpdatedState(::focusGroupTab)
+    LaunchedEffect(isDrawerOpen, focusToRestore) {
+        val target = focusToRestore ?: return@LaunchedEffect
+        if (isDrawerOpen || target is TvMainFocusTarget.Profile || target is TvMainFocusTarget.AfterRemoval) return@LaunchedEffect
+        snapshotFlow { windowInfo.isWindowFocused }.first { it }
+        withFrameNanos { }
+        if (target !is TvMainFocusTarget.GroupTab || !latestTabFocus(target.id)) requestFocusWhenReady(topBarFocus.start)
+        focusToRestore = null
+    }
+
     TvMainDialogs(
         shareQRCodeBitmap = uiState.shareQRCodeBitmap,
         selectedGuid = uiState.selectedGuid,
@@ -129,9 +157,9 @@ internal fun TvMainScreen(
         onRestoreFocus = { focusToRestore = it }
     ) { dialogs ->
         TvMainNavigationDrawer(
-            drawerState = drawer.state,
+            drawerState = drawerState,
             focusGeneration = resumeFocusGeneration,
-            onClose = drawer::close,
+            onClose = ::closeDrawer,
             onNavigate = onNavigate
         ) {
             Scaffold(
@@ -146,7 +174,7 @@ internal fun TvMainScreen(
                         onSearchQueryChange = { onAction(MainAction.Search(it)) },
                         onSearchClose = ::closeSearch,
                         onSearchOpen = { showSearch = true },
-                        onOpenDrawer = { drawer.openFrom { topBarFocus.start.requestFocus() } },
+                        onOpenDrawer = { openDrawer(TvMainFocusTarget.Toolbar) },
                         onMoveDown = { selectedGroup?.let { focusGroupTab(it.id) } ?: false },
                         onAction = onAction,
                         onBulkDelete = dialogs.bulkDelete
@@ -166,7 +194,7 @@ internal fun TvMainScreen(
                         if (tabState != null && requestTabFocus != null) {
                             TvGroupTabBar(
                                 groups, mainViewModel, selectedGroupIndex, tabState, tabOrder, requestTabFocus,
-                                onOpenDrawer = { target -> drawer.openFrom { requestTabFocus(target) } },
+                                onOpenDrawer = { id -> openDrawer(TvMainFocusTarget.GroupTab(id)) },
                                 onMoveUp = { topBarFocus.start.requestFocus() },
                                 onSelectGroup = { onAction(MainAction.SelectGroup(it)) }
                             )
@@ -178,16 +206,18 @@ internal fun TvMainScreen(
                                 uiState = uiState,
                                 scroll = rememberTvProfileScrollState(),
                                 onAction = onAction,
-                                onEdit = ::openEditor,
-                                editorFocusGuid = editorGuid.takeIf { returningFromEditor },
-                                onEditorFocusHandled = { restored ->
-                                    editorGuid = null
-                                    if (!restored) focusToRestore = { requestFocusWhenReady(topBarFocus.start) }
+                                focusToRestore = focusToRestore.takeUnless { isDrawerOpen },
+                                onFocusRestored = { target, restored ->
+                                    if (editorOrigin == target) editorOrigin = null
+                                    if (focusToRestore == target) {
+                                        focusToRestore = if (restored) null else TvMainFocusTarget.Toolbar
+                                    }
                                 },
+                                revealActiveProfile = editorOrigin == null,
                                 dialogs = dialogs,
                                 revealGeneration = profileRevealGeneration,
                                 lastReveals = lastReveals,
-                                onOpenDrawer = drawer::openFrom,
+                                onOpenDrawer = ::openDrawer,
                                 onBackToToolbar = { topBarFocus.start.requestFocus() },
                                 onUpFromFirstRow = if (tabState != null) { { focusGroupTab(selectedGroup.id) } } else null
                             )
@@ -197,29 +227,4 @@ internal fun TvMainScreen(
             }
         }
     }
-}
-
-@Stable
-private class MainTvDrawerCoordinator(val state: TvDrawerState) {
-    private var focusToRestore: (() -> Boolean)? = null
-
-    val isOpen: Boolean
-        get() = state.currentValue == TvDrawerValue.Open
-
-    fun openFrom(restoreFocus: (() -> Boolean)?) {
-        focusToRestore = restoreFocus
-        state.setValue(TvDrawerValue.Open)
-    }
-
-    fun close() {
-        state.setValue(TvDrawerValue.Closed)
-    }
-
-    fun takeFocusToRestore(): (() -> Boolean)? = focusToRestore.also { focusToRestore = null }
-}
-
-@Composable
-private fun rememberMainTvDrawerCoordinator(): MainTvDrawerCoordinator {
-    val drawerState = rememberTvDrawerState(TvDrawerValue.Closed)
-    return remember(drawerState) { MainTvDrawerCoordinator(drawerState) }
 }

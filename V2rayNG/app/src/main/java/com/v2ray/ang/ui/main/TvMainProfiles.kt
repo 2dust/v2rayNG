@@ -201,18 +201,10 @@ internal enum class ProfileRowAction(val icon: Int, val label: Int, val descript
 internal val singleColumnProfileActions = listOf(ProfileRowAction.Share, ProfileRowAction.Edit, ProfileRowAction.Delete)
 internal val gridProfileActions = listOf(ProfileRowAction.More)
 
-internal fun runProfileRowAction(
-    action: ProfileRowAction,
-    row: ServerRowUiModel,
-    onEdit: (MainAction.EditServer) -> Unit,
-    dialogs: TvMainDialogActions,
-    restoreFocus: RestoreProfileFocus
-) {
-    when (action) {
-        ProfileRowAction.More, ProfileRowAction.Share -> dialogs.share(row.guid, row.profile, action == ProfileRowAction.More, restoreFocus)
-        ProfileRowAction.Edit -> onEdit(MainAction.EditServer(row.guid, row.profile))
-        ProfileRowAction.Delete -> dialogs.remove(row.guid, row.remarks, restoreFocus)
-    }
+internal fun profileReturnAction(action: ProfileRowAction, doubleColumn: Boolean): ProfileRowAction = when {
+    doubleColumn -> ProfileRowAction.More
+    action == ProfileRowAction.More -> ProfileRowAction.Edit
+    else -> action
 }
 
 @Composable

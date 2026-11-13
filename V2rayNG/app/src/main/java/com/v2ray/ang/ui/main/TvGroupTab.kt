@@ -42,7 +42,7 @@ internal fun TvGroupTabBar(
     listState: LazyListState,
     tabFocusRequesters: List<FocusRequester>,
     requestFocus: (FocusRequester) -> Boolean,
-    onOpenDrawer: (FocusRequester) -> Unit,
+    onOpenDrawer: (String) -> Unit,
     onMoveUp: () -> Boolean,
     onSelectGroup: (String) -> Unit
 ) {
@@ -66,7 +66,7 @@ internal fun TvGroupTabBar(
                 .dpadOrderedFocusNavigation(
                     current = focusRequester,
                     order = tabFocusRequesters,
-                    onBeforeFirst = { onOpenDrawer(focusRequester) },
+                    onBeforeFirst = { onOpenDrawer(group.id) },
                     requestFocus = requestFocus
                 )
                 .dpadVerticalFocusNavigation(onMoveUp = onMoveUp, onMoveDown = { false })

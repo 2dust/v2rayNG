@@ -13,6 +13,28 @@ import org.junit.jupiter.api.Test
 
 class TvMainInteractionTest {
     @Test
+    fun toolbarKeepsRestartAndOnlyShowsConnectivityTestWhenRunning() {
+        assertEquals(
+            listOf(TvToolbarAction.Start, TvToolbarAction.Search, TvToolbarAction.Add, TvToolbarAction.Restart, TvToolbarAction.More),
+            TvToolbarAction.visible(isRunning = false)
+        )
+        assertEquals(
+            listOf(TvToolbarAction.Start, TvToolbarAction.Test, TvToolbarAction.Search, TvToolbarAction.Add, TvToolbarAction.Restart, TvToolbarAction.More),
+            TvToolbarAction.visible(isRunning = true)
+        )
+    }
+
+    @Test
+    fun profileReturnKeepsTheActionOrUsesTheEquivalentInTheNewLayout() {
+        assertEquals(ProfileRowAction.Share, profileReturnAction(ProfileRowAction.Share, doubleColumn = false))
+        assertEquals(ProfileRowAction.Edit, profileReturnAction(ProfileRowAction.Edit, doubleColumn = false))
+        assertEquals(ProfileRowAction.Delete, profileReturnAction(ProfileRowAction.Delete, doubleColumn = false))
+        assertEquals(ProfileRowAction.More, profileReturnAction(ProfileRowAction.More, doubleColumn = true))
+        assertEquals(ProfileRowAction.More, profileReturnAction(ProfileRowAction.Edit, doubleColumn = true))
+        assertEquals(ProfileRowAction.Edit, profileReturnAction(ProfileRowAction.More, doubleColumn = false))
+    }
+
+    @Test
     fun removalFocusPrefersNextProfileThenPrevious() {
         val keys = listOf("first", "middle", "last")
         assertEquals("middle", focusAfterProfileRemoval(keys, "first"))

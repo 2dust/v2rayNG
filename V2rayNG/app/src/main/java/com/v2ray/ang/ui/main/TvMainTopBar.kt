@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,13 +56,18 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 
 internal val tvMoreMenuActions = MainMoreMenuAction.entries - setOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll)
 
+internal enum class TvToolbarAction {
+    Start, Test, Search, Add, Restart, More;
+
+    companion object {
+        fun visible(isRunning: Boolean) = entries.filter { isRunning || it != Test }
+    }
+}
+
 internal class TvMainTopBarFocus {
-    val start = FocusRequester()
-    val test = FocusRequester()
-    val search = FocusRequester()
-    val add = FocusRequester()
-    val restart = FocusRequester()
-    val more = FocusRequester()
+    private val targets = TvToolbarAction.entries.associateWith { FocusRequester() }
+    val start get() = get(TvToolbarAction.Start)
+    operator fun get(action: TvToolbarAction) = targets.getValue(action)
 }
 
 @Composable
@@ -85,16 +91,8 @@ internal fun TvMainTopBar(
     val windowHeight = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.height.toDp() }
     val maxMenuHeight = windowHeight - statusBarHeight - navBarHeight - 20.dp
     val moveDownModifier = Modifier.dpadVerticalFocusNavigation(onMoveUp = { false }, onMoveDown = onMoveDown)
-    val focusOrder = remember(isRunning, focusRequesters) {
-        buildList {
-            add(focusRequesters.start)
-            if (isRunning) add(focusRequesters.test)
-            add(focusRequesters.search)
-            add(focusRequesters.add)
-            add(focusRequesters.restart)
-            add(focusRequesters.more)
-        }
-    }
+    val actions = remember(isRunning) { TvToolbarAction.visible(isRunning) }
+    val focusOrder = remember(actions, focusRequesters) { actions.map(focusRequesters::get) }
 
     @Composable
     fun MenuButton(
@@ -165,68 +163,48 @@ internal fun TvMainTopBar(
             },
             actions = {
                 if (!showSearch) {
-                    TvIconButton(
-                        icon = if (isRunning) {
-                            painterResource(R.drawable.ic_stop_24dp)
-                        } else {
-                            painterResource(R.drawable.ic_play_24dp)
-                        },
-                        label = if (isRunning) {
-                            stringResource(R.string.action_stop_service)
-                        } else {
-                            stringResource(R.string.tasker_start_service)
-                        },
-                        onClick = { onAction(MainAction.ToggleService) },
-                        focusRequester = focusRequesters.start,
-                        modifier = moveDownModifier.dpadOrderedFocusNavigation(
-                            current = focusRequesters.start,
-                            order = focusOrder,
-                            onBeforeFirst = onOpenDrawer
-                        ),
-                        containerColor = if (isRunning) colorFabActive else Color.Transparent,
-                        contentColor = if (isRunning) Color.White else null
-                    )
-                    if (isRunning) {
-                        TvIconButton(
-                            icon = painterResource(R.drawable.ic_stopwatch_24dp),
-                            label = stringResource(R.string.connection_test_pending),
-                            onClick = { onAction(MainAction.TestCurrentServer) },
-                            focusRequester = focusRequesters.test,
-                            modifier = moveDownModifier.dpadOrderedFocusNavigation(focusRequesters.test, focusOrder)
-                        )
-                    }
-                    TvIconButton(
-                        icon = painterResource(R.drawable.ic_search_24dp),
-                        label = stringResource(R.string.menu_item_search),
-                        onClick = onSearchOpen,
-                        focusRequester = focusRequesters.search,
-                        modifier = moveDownModifier.dpadOrderedFocusNavigation(focusRequesters.search, focusOrder)
-                    )
-                    MenuButton(
-                        icon = painterResource(R.drawable.ic_add_24dp),
-                        label = stringResource(R.string.menu_item_add_config),
-                        focusRequester = focusRequesters.add
-                    ) { close ->
-                        ImportMenuAction.entries.forEach { item ->
-                            TvMenuItem(item.labelRes) { close(); onAction(item.action) }
+                    actions.forEach { action ->
+                        key(action) {
+                            val focus = focusRequesters[action]
+                            when (action) {
+                                TvToolbarAction.Start -> TvIconButton(
+                                    icon = painterResource(if (isRunning) R.drawable.ic_stop_24dp else R.drawable.ic_play_24dp),
+                                    label = stringResource(if (isRunning) R.string.action_stop_service else R.string.tasker_start_service),
+                                    onClick = { onAction(MainAction.ToggleService) },
+                                    focusRequester = focus,
+                                    modifier = moveDownModifier.dpadOrderedFocusNavigation(focus, focusOrder, onBeforeFirst = onOpenDrawer),
+                                    containerColor = if (isRunning) colorFabActive else Color.Transparent,
+                                    contentColor = if (isRunning) Color.White else null
+                                )
+                                TvToolbarAction.Test -> TvIconButton(
+                                    painterResource(R.drawable.ic_stopwatch_24dp), stringResource(R.string.connection_test_pending),
+                                    { onAction(MainAction.TestCurrentServer) },
+                                    moveDownModifier.dpadOrderedFocusNavigation(focus, focusOrder), focus
+                                )
+                                TvToolbarAction.Search -> TvIconButton(
+                                    painterResource(R.drawable.ic_search_24dp), stringResource(R.string.menu_item_search),
+                                    onSearchOpen, moveDownModifier.dpadOrderedFocusNavigation(focus, focusOrder), focus
+                                )
+                                TvToolbarAction.Add -> MenuButton(
+                                    painterResource(R.drawable.ic_add_24dp), stringResource(R.string.menu_item_add_config), focus
+                                ) { close ->
+                                    ImportMenuAction.entries.forEach { item -> TvMenuItem(item.labelRes) { close(); onAction(item.action) } }
+                                }
+                                TvToolbarAction.Restart -> TvIconButton(
+                                    painterResource(R.drawable.ic_restore_24dp), stringResource(R.string.title_service_restart),
+                                    { onAction(MainAction.RestartService) },
+                                    moveDownModifier.dpadOrderedFocusNavigation(focus, focusOrder), focus
+                                )
+                                TvToolbarAction.More -> MenuButton(
+                                    painterResource(R.drawable.ic_more_vert_24dp), stringResource(R.string.action_more), focus
+                                ) { close ->
+                                    tvMoreMenuActions.forEach { item ->
+                                        TvMenuItem(item.labelRes) { close(); item.dispatch(onAction, onBulkDelete) }
+                                    }
+                                    TvMenuItem(R.string.action_exit) { close(); onAction(MainAction.Exit) }
+                                }
+                            }
                         }
-                    }
-                    TvIconButton(
-                        icon = painterResource(R.drawable.ic_restore_24dp),
-                        label = stringResource(R.string.title_service_restart),
-                        onClick = { onAction(MainAction.RestartService) },
-                        focusRequester = focusRequesters.restart,
-                        modifier = moveDownModifier.dpadOrderedFocusNavigation(focusRequesters.restart, focusOrder)
-                    )
-                    MenuButton(
-                        icon = painterResource(R.drawable.ic_more_vert_24dp),
-                        label = stringResource(R.string.action_more),
-                        focusRequester = focusRequesters.more
-                    ) { close ->
-                        tvMoreMenuActions.forEach { item ->
-                            TvMenuItem(item.labelRes) { close(); item.dispatch(onAction, onBulkDelete) }
-                        }
-                        TvMenuItem(R.string.action_exit) { close(); onAction(MainAction.Exit) }
                     }
                 }
             },
