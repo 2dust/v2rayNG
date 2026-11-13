@@ -575,5 +575,9 @@
     <string name="sub_info_open_page">Open subscription page</string>
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
+    <string name="update_later">Later</string>
+    <string name="update_downloading">Downloading update</string>
+    <string name="update_download_failed">Download failed. Check your connection and try again.</string>
+    <string name="update_saved_in_downloads">The new version was saved in the Downloads folder (%1$s). Open it from there to install it.</string>
 
 </resources>

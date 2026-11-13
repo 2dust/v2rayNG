@@ -572,5 +572,9 @@
     <string name="sub_info_open_support">開啟支援連結</string>
     <string name="sub_info_open_page">開啟訂閱資訊頁面</string>
     <string name="sub_info_unlimited">無限制</string>
+    <string name="update_later">稍後</string>
+    <string name="update_downloading">正在下載更新</string>
+    <string name="update_download_failed">下載失敗，請檢查網路後重試。</string>
+    <string name="update_saved_in_downloads">新版本已儲存至「下載」資料夾（%1$s）。請從該位置開啟以安裝。</string>
 
 </resources>

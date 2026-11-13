@@ -578,5 +578,9 @@
     <string name="sub_info_open_support">Открыть ссылку поддержки</string>
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
+    <string name="update_later">Позже</string>
+    <string name="update_downloading">Загрузка обновления</string>
+    <string name="update_download_failed">Не удалось загрузить. Проверьте соединение и повторите попытку.</string>
+    <string name="update_saved_in_downloads">Новая версия сохранена в папке «Загрузки» (%1$s). Откройте файл оттуда, чтобы установить.</string>
 
 </resources>

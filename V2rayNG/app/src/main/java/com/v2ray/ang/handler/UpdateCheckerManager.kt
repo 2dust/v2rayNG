@@ -62,32 +62,25 @@ object UpdateCheckerManager {
         )
 
         return@withContext if (compareVersions(latestVersion, BuildConfig.VERSION_NAME) > 0) {
-            val downloadUrl = getDownloadUrl(latestRelease, Build.SUPPORTED_ABIS[0])
+            val asset = findAsset(latestRelease, Build.SUPPORTED_ABIS[0])
             CheckUpdateResult(
                 hasUpdate = true,
                 latestVersion = latestVersion,
                 releaseNotes = latestRelease.body,
-                downloadUrl = downloadUrl,
-                isPreRelease = latestRelease.prerelease
+                downloadUrl = asset.browserDownloadUrl,
+                isPreRelease = latestRelease.prerelease,
+                assetName = asset.name,
+                assetSize = asset.size
             )
         } else {
             CheckUpdateResult(hasUpdate = false)
         }
     }
 
-    private fun compareVersions(version1: String, version2: String): Int {
-        val v1 = version1.split(".")
-        val v2 = version2.split(".")
+    fun compareVersions(version1: String, version2: String): Int =
+        UpdateAnnouncementPolicy.compareVersions(version1, version2)
 
-        for (i in 0 until maxOf(v1.size, v2.size)) {
-            val num1 = if (i < v1.size) v1[i].toInt() else 0
-            val num2 = if (i < v2.size) v2[i].toInt() else 0
-            if (num1 != num2) return num1 - num2
-        }
-        return 0
-    }
-
-    private fun getDownloadUrl(release: GitHubRelease, abi: String): String {
+    private fun findAsset(release: GitHubRelease, abi: String): GitHubRelease.Asset {
         val fDroid = "fdroid"
 
         val assetsByAbi = release.assets.filter {
@@ -100,7 +93,6 @@ object UpdateCheckerManager {
             assetsByAbi.firstOrNull { !it.name.contains(fDroid) }
         }
 
-        return asset?.browserDownloadUrl
-            ?: throw IllegalStateException("No compatible APK found")
+        return asset ?: throw IllegalStateException("No compatible APK found")
     }
 }

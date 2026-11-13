@@ -1,12 +1,13 @@
 package com.v2ray.ang.ui.checkupdate
 
 import android.app.Application
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.CheckUpdateResult
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.UpdateCheckerManager
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.ui.update.AppUpdateController
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +20,13 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
     )
     val checkPreRelease: StateFlow<Boolean> = _checkPreRelease.asStateFlow()
 
-    private val _updateResult = MutableStateFlow<CheckUpdateResult?>(null)
-    val updateResult: StateFlow<CheckUpdateResult?> = _updateResult.asStateFlow()
-
-    private val _showUpdateDialog = MutableStateFlow(false)
-    val showUpdateDialog: StateFlow<Boolean> = _showUpdateDialog.asStateFlow()
+    /** Update sheet of this screen: download, install and the "saved in Downloads" fallback. */
+    val controller = AppUpdateController(
+        context = localizedContext,
+        scope = viewModelScope,
+        rememberPostpone = false,
+        onError = { toastError(it) }
+    )
 
     fun toggleCheckPreRelease(enabled: Boolean) {
         _checkPreRelease.value = enabled
@@ -35,8 +38,7 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
             try {
                 val result = UpdateCheckerManager.checkForUpdate(_checkPreRelease.value)
                 if (result.hasUpdate) {
-                    _updateResult.value = result
-                    _showUpdateDialog.value = true
+                    controller.offer(result)
                 } else {
                     toastSuccess(R.string.update_already_latest_version)
                 }
@@ -45,9 +47,5 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
                 toastError(R.string.toast_failure)
             }
         }
-    }
-
-    fun dismissUpdateDialog() {
-        _showUpdateDialog.value = false
     }
 }
