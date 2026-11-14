@@ -13,20 +13,44 @@ import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+internal fun subscriptionAutoUpdateChange(
+    current: SubscriptionItem?,
+    enabled: Boolean,
+): SubscriptionItem? = current
+    ?.takeIf { it.url.isNotEmpty() && it.autoUpdate != enabled }
+    ?.copy(autoUpdate = enabled)
+
+internal fun subscriptionEnabledChange(
+    current: SubscriptionItem?,
+    enabled: Boolean,
+): SubscriptionItem? = current
+    ?.takeIf { it.enabled != enabled }
+    ?.copy(enabled = enabled)
+
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
+    private val pendingAutoUpdates = mutableSetOf<String>()
+    // Ephemeral acknowledgements: completion must not wait for a screen to resume or replay
+    // an old result after an edit. Durable subscription state is exposed by subsFlow.
+    private val _autoUpdateChanges = MutableSharedFlow<Boolean>()
+    internal val autoUpdateChanges = _autoUpdateChanges.asSharedFlow()
+
     private var qrCodeJob: Job? = null
     private val _qrCode = MutableStateFlow<Bitmap?>(null)
     internal val qrCode = _qrCode.asStateFlow()
@@ -54,13 +78,63 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         return changed
     }
 
-    fun update(subId: String, item: SubscriptionItem) {
-        val idx = subscriptions.indexOfFirst { it.guid == subId }
-        if (idx >= 0) {
-            subscriptions[idx] = SubscriptionCache(subId, item)
-            MmkvManager.encodeSubscription(subId, item)
+    internal fun setEnabled(subId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            try {
+                val updated = withContext(Dispatchers.IO) {
+                    // A background refresh can replace usage metadata after the row was loaded.
+                    val current = MmkvManager.decodeSubscription(subId)
+                    subscriptionEnabledChange(current, enabled)?.also {
+                        MmkvManager.encodeSubscription(subId, it)
+                    } ?: current
+                } ?: return@launch
+                val index = subscriptions.indexOfFirst { it.guid == subId }
+                if (index >= 0) {
+                    subscriptions[index] = SubscriptionCache(subId, updated)
+                    _subsFlow.value = subscriptions.toList()
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Subscription update toggle failed: $subId", e)
+                toastError(R.string.toast_failure)
+            }
         }
-        _subsFlow.value = subscriptions.toList()
+    }
+
+    internal fun setAutoUpdate(subId: String, enabled: Boolean): Boolean {
+        if (!pendingAutoUpdates.add(subId)) return false
+        viewModelScope.launch {
+            try {
+                val current = withContext(Dispatchers.IO) {
+                    MmkvManager.decodeSubscription(subId)
+                }
+                val updated = subscriptionAutoUpdateChange(current, enabled) ?: return@launch
+                if (enabled && updated.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
+                    toastError(R.string.toast_invalid_update_interval)
+                    return@launch
+                }
+                withContext(Dispatchers.IO) {
+                    MmkvManager.encodeSubscription(subId, updated)
+                    SubscriptionUpdater.syncOne(subId = subId)
+                }
+                val index = subscriptions.indexOfFirst { it.guid == subId }
+                if (index >= 0) {
+                    subscriptions[index] = SubscriptionCache(subId, updated)
+                    _subsFlow.value = subscriptions.toList()
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Subscription periodic update change failed: $subId", e)
+                toastError(R.string.toast_failure)
+                return@launch
+            } finally {
+                pendingAutoUpdates.remove(subId)
+            }
+            _autoUpdateChanges.emit(enabled)
+        }
+        return true
     }
 
     internal fun shareQRCode(url: String) {
@@ -78,12 +152,20 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         _qrCode.value = null
     }
 
-    fun move(fromPosition: Int, toPosition: Int) {
+    fun move(fromPosition: Int, toPosition: Int): Boolean {
         if (subscriptions.moveItem(fromPosition, toPosition)) {
             MmkvManager.encodeSubsList(subscriptions.mapTo(mutableListOf()) { it.guid })
             SettingsChangeManager.makeSetupGroupTab()
             _subsFlow.value = subscriptions.toList()
+            return true
         }
+        return false
+    }
+
+    internal fun move(subId: String, command: ReorderCommand): Boolean {
+        val fromPosition = subscriptions.indexOfFirst { it.guid == subId }
+        val toPosition = command.targetIndex(fromPosition, subscriptions.size) ?: return false
+        return move(fromPosition, toPosition)
     }
 
     fun updateSubscriptions() {

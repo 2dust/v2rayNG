@@ -152,6 +152,7 @@ fun SubEditScreen(
     var showNextProfileDialog by rememberSaveable { mutableStateOf(false) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
     val scrollState = rememberScrollState()
+    val subscriptionName = subscriptionAccessibilityName(initial.remarks, initial.url, stringResource(R.string.acc_unnamed_subscription))
 
     fun buildSubItem(): SubscriptionItem {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
@@ -180,7 +181,7 @@ fun SubEditScreen(
                         IconButton(onClick = {
                             if (confirmRemove) showDeleteConfirm = true else onDelete()
                         }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
+                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete_named, subscriptionName))
                         }
                     }
                     IconButton(onClick = {
@@ -281,7 +282,7 @@ fun SubEditScreen(
     if (showDeleteConfirm) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_subscription_group),
-            itemName = initial.remarks,
+            itemName = subscriptionName,
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
         )
