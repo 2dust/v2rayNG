@@ -81,12 +81,12 @@ internal fun rememberTvEditorIme(): TvEditorIme {
 }
 
 @Composable
-internal fun Modifier.tvEditorFocus(radius: Dp = 8.dp): Modifier {
+internal fun Modifier.tvEditorFocus(radius: Dp = 8.dp, visible: Boolean = true): Modifier {
     var focused by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(radius)
     return onFocusChanged { focused = it.isFocused }
         .then(
-            if (focused) Modifier.background(MaterialTheme.colorScheme.primaryContainer, shape)
+            if (focused && visible) Modifier.background(MaterialTheme.colorScheme.primaryContainer, shape)
                 .border(2.dp, MaterialTheme.colorScheme.primary, shape)
             else Modifier
         )
@@ -182,7 +182,8 @@ internal fun tvEditorOptionIndex(options: List<String>, value: String): Int =
 @Composable
 internal fun TvEditorDropdown(
     label: String, value: String, options: List<String>, onValueChange: (String) -> Unit,
-    modifier: Modifier, enabled: Boolean, placeholder: String?, supportingText: String?
+    modifier: Modifier, enabled: Boolean, placeholder: String?, supportingText: String?,
+    optionLabel: (String) -> String = { it }
 ) {
     val back = checkNotNull(LocalTvEditor.current).back
     val anchor = remember { FocusRequester() }
@@ -200,9 +201,10 @@ internal fun TvEditorDropdown(
             restoreAnchor = false
         }
     }
+    val displayValue = optionLabel(value)
     Box(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
         OutlinedTextField(
-            value = value,
+            value = displayValue,
             onValueChange = {},
             readOnly = true,
             enabled = enabled,
@@ -217,19 +219,22 @@ internal fun TvEditorDropdown(
             Modifier.matchParentSize()
                 .then(anchorFocus)
                 .focusProperties { start = back }
-                .semantics { contentDescription = if (value.isBlank()) label else "$label: $value" }
+                .semantics { contentDescription = if (displayValue.isBlank()) label else "$label: $displayValue" }
                 .clickable(interactionSource = interaction, indication = null, enabled = enabled && options.isNotEmpty(), role = Role.Button) {
                     open = true
                 }
         )
     }
     if (open) {
-        TvEditorOptions(label, value, options, onDismiss = ::close, onSelect = { close(); onValueChange(it) })
+        TvEditorOptions(label, value, options, optionLabel, onDismiss = ::close, onSelect = { close(); onValueChange(it) })
     }
 }
 
 @Composable
-private fun TvEditorOptions(label: String, value: String, options: List<String>, onDismiss: () -> Unit, onSelect: (String) -> Unit) {
+private fun TvEditorOptions(
+    label: String, value: String, options: List<String>, optionLabel: (String) -> String,
+    onDismiss: () -> Unit, onSelect: (String) -> Unit
+) {
     val initialIndex = remember { tvEditorOptionIndex(options, value) }
     val selected = remember { FocusRequester() }
     val scroll = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex)
@@ -248,7 +253,7 @@ private fun TvEditorOptions(label: String, value: String, options: List<String>,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(selected = option == value, onClick = null, modifier = Modifier.padding(12.dp))
-                        Text(option.ifBlank { "---" }, modifier = Modifier.padding(vertical = 12.dp))
+                        Text(optionLabel(option).ifBlank { "---" }, modifier = Modifier.padding(vertical = 12.dp))
                     }
                     if (index == initialIndex && needsFocus) {
                         LaunchedEffect(selected) { needsFocus = !selected.requestFocus() }

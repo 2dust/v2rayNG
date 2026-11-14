@@ -89,9 +89,10 @@ fun FormDropdownField(
     enabled: Boolean = true,
     placeholder: String? = null,
     supportingText: String? = null,
+    optionLabel: (String) -> String = { it },
 ) {
     if (!editable && LocalTvEditor.current != null) {
-        TvEditorDropdown(label, value, options, onValueChange, modifier, enabled, placeholder, supportingText)
+        TvEditorDropdown(label, value, options, onValueChange, modifier, enabled, placeholder, supportingText, optionLabel)
         return
     }
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -116,7 +117,7 @@ fun FormDropdownField(
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
         OutlinedTextField(
-            value = value,
+            value = if (editable) value else optionLabel(value),
             onValueChange = {
                 if (editable) {
                     onValueChange(it)
@@ -163,7 +164,7 @@ fun FormDropdownField(
         ) {
             visibleOptions.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(optionLabel(option)) },
                     onClick = {
                         onValueChange(option)
                         expanded = false

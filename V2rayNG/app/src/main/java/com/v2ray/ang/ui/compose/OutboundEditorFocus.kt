@@ -24,10 +24,10 @@ internal class OutboundEditorFocus(private val onFocused: (String) -> Unit) {
     fun restore(id: String?): Boolean = targets[id]?.requestFocus() == true
 
     @Composable
-    fun target(requester: FocusRequester = remember { FocusRequester() }): Modifier {
+    fun target(requester: FocusRequester = remember { FocusRequester() }, key: String? = null): Modifier {
         // The form uses fixed composable call sites. This identifies the field independently of
         // its translated label, value, or position among the currently visible controls.
-        val id = currentCompositeKeyHashCode.toString()
+        val id = key ?: currentCompositeKeyHashCode.toString()
         DisposableEffect(id, requester) {
             targets[id] = requester
             onDispose { targets.remove(id, requester) }

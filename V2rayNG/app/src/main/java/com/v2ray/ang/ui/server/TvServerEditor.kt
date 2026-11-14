@@ -45,6 +45,8 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 @Composable
 internal fun TvServerEditor(
     title: String, onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?,
+    onAdd: (() -> Unit)? = null,
+    addRequester: FocusRequester = remember { FocusRequester() },
     content: @Composable ColumnScope.() -> Unit
 ) {
     val back = remember { FocusRequester() }
@@ -54,6 +56,7 @@ internal fun TvServerEditor(
     val scroll = rememberScrollState()
     val ime = rememberTvEditorIme()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val firstAction = if (onDelete != null) delete else if (onAdd != null) addRequester else save
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -64,7 +67,7 @@ internal fun TvServerEditor(
                     IconButton(
                         onClick = onBack,
                         modifier = focus.target(back)
-                            .focusProperties { end = if (onDelete != null) delete else save }
+                            .focusProperties { end = firstAction }
                             .tvEditorFocus(radius = 24.dp)
                     ) {
                         Icon(
@@ -77,10 +80,20 @@ internal fun TvServerEditor(
                 actions = {
                     if (onDelete != null) {
                         EditorAction(R.drawable.ic_delete_24dp, stringResource(R.string.menu_item_del_config), onDelete,
-                            focus.target(delete).focusProperties { start = back; end = save })
+                            focus.target(delete).focusProperties { start = back; end = if (onAdd != null) addRequester else save })
+                    }
+                    if (onAdd != null) {
+                        IconButton(
+                            onClick = onAdd,
+                            modifier = focus.target(addRequester)
+                                .focusProperties { start = if (onDelete != null) delete else back; end = save }
+                                .tvEditorFocus(radius = 24.dp)
+                        ) {
+                            Icon(painterResource(R.drawable.ic_add_24dp), stringResource(R.string.acc_add_member))
+                        }
                     }
                     EditorAction(R.drawable.ic_fab_check, stringResource(R.string.menu_item_save_config), onSave,
-                        focus.target(save).focusProperties { start = if (onDelete != null) delete else back })
+                        focus.target(save).focusProperties { start = if (onAdd != null) addRequester else if (onDelete != null) delete else back })
                 }
             )
         }
