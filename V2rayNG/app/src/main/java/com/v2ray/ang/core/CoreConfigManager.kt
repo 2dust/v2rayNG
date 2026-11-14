@@ -68,7 +68,7 @@ object CoreConfigManager {
                     errorMessage = "Failed to build config context"
                 )
             if (configContext.isCustom) {
-                return buildV2rayCustomConfig(configContext)
+                return buildV2rayCustomConfig4Speedtest(configContext)
             }
             val v2rayConfig = buildUnifiedConfig(configContext)
             postProcessForSpeedtest(v2rayConfig)
@@ -82,6 +82,58 @@ object CoreConfigManager {
                 errorMessage = "Failed to get V2ray config: ${e.message ?: e.javaClass.simpleName}"
             )
         }
+    }
+
+    /**
+     * Build a delay-test configuration for a custom profile.
+     *
+     * The native probe keeps only outbounds, the dispatcher, and logging, so routing, DNS,
+     * inbounds, and observatories in the stored profile are dead weight that still has to be
+     * parsed (including geosite/geoip lookups) for every probe. Trim them here, matching
+     * [postProcessForSpeedtest] for generated profiles.
+     */
+    private fun buildV2rayCustomConfig4Speedtest(configContext: CoreConfigContext): ConfigResult {
+        val raw = MmkvManager.decodeServerRaw(configContext.guid)
+            ?: return ConfigResult(
+                status = false,
+                guid = configContext.guid,
+                errorMessage = "Failed to build config context, config is empty"
+            )
+        val logLevel = MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL) ?: "warning"
+        val content = trimCustomConfigForSpeedtest(raw, logLevel)
+            ?: return ConfigResult(
+                status = false,
+                guid = configContext.guid,
+                errorMessage = "Custom config has no outbounds"
+            )
+        return ConfigResult(true, configContext.guid, content)
+    }
+
+    /**
+     * Reduce a custom Xray JSON config to the parts the native delay probe uses:
+     * `log` (with [logLevel]) and `outbounds` (with mux removed, as for generated profiles).
+     *
+     * @return the trimmed JSON, or null when [raw] is not an object with a non-empty outbound array.
+     */
+    internal fun trimCustomConfigForSpeedtest(raw: String, logLevel: String): String? {
+        val source = JsonUtil.parseString(raw) ?: return null
+        val outbounds = source.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?.takeIf { it.size() > 0 }
+            ?: return null
+
+        val trimmedOutbounds = JsonArray()
+        for (elem in outbounds) {
+            val outbound = elem.deepCopy()
+            if (outbound.isJsonObject) {
+                outbound.asJsonObject.remove("mux")
+            }
+            trimmedOutbounds.add(outbound)
+        }
+
+        val trimmed = JsonObject()
+        trimmed.add("log", JsonObject().apply { addProperty("loglevel", logLevel) })
+        trimmed.add("outbounds", trimmedOutbounds)
+        return JsonUtil.toJsonPretty(trimmed)
     }
 
     /**

@@ -6,6 +6,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CountDownLatch
@@ -15,14 +16,14 @@ import java.util.concurrent.atomic.AtomicInteger
 class RealPingExecutionLimiterTest {
 
     @Test
-    fun customConfigMeasurementsAreSerializedAcrossWorkers() {
+    fun customWireguardMeasurementsAreSerializedAcrossWorkers() {
         runBlocking {
             val active = AtomicInteger(0)
             val maxActive = AtomicInteger(0)
 
             List(8) {
                 async(Dispatchers.Default) {
-                    RealPingExecutionLimiter.run(EConfigType.CUSTOM) {
+                    RealPingExecutionLimiter.run(EConfigType.CUSTOM, WIREGUARD_CONFIG) {
                         val current = active.incrementAndGet()
                         maxActive.accumulateAndGet(current, ::maxOf)
                         Thread.sleep(20)
@@ -43,7 +44,7 @@ class RealPingExecutionLimiterTest {
 
             val jobs = List(2) {
                 async(Dispatchers.Default) {
-                    RealPingExecutionLimiter.run(EConfigType.VMESS) {
+                    RealPingExecutionLimiter.run(EConfigType.VMESS, "") {
                         entered.countDown()
                         release.await(5, TimeUnit.SECONDS)
                     }
@@ -57,5 +58,41 @@ class RealPingExecutionLimiterTest {
             }
             jobs.awaitAll()
         }
+    }
+
+    @Test
+    fun customNonWireguardMeasurementsRemainConcurrent() {
+        runBlocking {
+            val entered = CountDownLatch(2)
+            val release = CountDownLatch(1)
+
+            val jobs = List(2) {
+                async(Dispatchers.Default) {
+                    RealPingExecutionLimiter.run(EConfigType.CUSTOM, VLESS_CONFIG) {
+                        entered.countDown()
+                        release.await(5, TimeUnit.SECONDS)
+                    }
+                }
+            }
+
+            try {
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+            } finally {
+                release.countDown()
+            }
+            jobs.awaitAll()
+        }
+    }
+
+    @Test
+    fun serializationDecision() {
+        assertTrue(RealPingExecutionLimiter.requiresSerialization(EConfigType.CUSTOM, WIREGUARD_CONFIG))
+        assertFalse(RealPingExecutionLimiter.requiresSerialization(EConfigType.CUSTOM, VLESS_CONFIG))
+        assertFalse(RealPingExecutionLimiter.requiresSerialization(EConfigType.WIREGUARD, WIREGUARD_CONFIG))
+    }
+
+    private companion object {
+        const val WIREGUARD_CONFIG = """{"outbounds":[{"protocol":"wireguard"},{"protocol":"freedom"}]}"""
+        const val VLESS_CONFIG = """{"outbounds":[{"protocol":"vless"},{"protocol":"freedom"}]}"""
     }
 }
