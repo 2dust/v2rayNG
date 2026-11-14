@@ -2,6 +2,7 @@ package com.v2ray.ang
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
@@ -9,7 +10,9 @@ import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.shizuku.ShizukuForegroundRecovery
 import com.v2ray.ang.ui.compose.ThemeManager
+import rikka.shizuku.ShizukuProvider
 
 class AngApplication : Application() {
     companion object {
@@ -23,6 +26,10 @@ class AngApplication : Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base?.let(ContextCompat::getContextForLanguage))
         application = this
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // The VPN core process must receive replacement Shizuku Binders after a server restart.
+            ShizukuProvider.enableMultiProcessSupport(Application.getProcessName() == packageName)
+        }
     }
 
     private val workManagerConfiguration: Configuration = Configuration.Builder()
@@ -47,5 +54,7 @@ class AngApplication : Application() {
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()
+
+        ShizukuForegroundRecovery.register(this)
     }
 }
