@@ -42,6 +42,10 @@ fun FormTextField(
     isError: Boolean = false,
     supportingText: String? = null,
 ) {
+    if (LocalTvEditor.current != null) {
+        TvEditorTextField(label, value, onValueChange, modifier, enabled, keyboardType, placeholder, maxLines, isError, supportingText)
+        return
+    }
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -85,6 +89,10 @@ fun FormDropdownField(
     placeholder: String? = null,
     supportingText: String? = null,
 ) {
+    if (!editable && LocalTvEditor.current != null) {
+        TvEditorDropdown(label, value, options, onValueChange, modifier, enabled, placeholder, supportingText)
+        return
+    }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val menuScrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current

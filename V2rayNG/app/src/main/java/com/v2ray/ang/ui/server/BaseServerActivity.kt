@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.server
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -66,8 +67,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
 
     protected lateinit var initialConfig: ProfileItem
+    private var isTelevision = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
         super.onCreate(savedInstanceState)
         val existingConfig = MmkvManager.decodeServerConfig(editGuid)
         initialConfig = existingConfig ?: ProfileItem.create(serverConfigType)
@@ -455,6 +458,35 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         content: @Composable ColumnScope.() -> Unit
     ) {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+        if (isTelevision) {
+            TvServerEditor(
+                title, onBack = ::finish, onSave = onSaveClick,
+                onDelete = if (editGuid.isNotEmpty() && !isRunning) ({ showDeleteDialog = true }) else null,
+                content = content
+            )
+        } else {
+            PhoneServerEditor(title, onSaveClick, { showDeleteDialog = true }, content)
+        }
+        if (showDeleteDialog) {
+            DeleteConfirmDialog(
+                message = stringResource(R.string.confirm_delete_profile),
+                itemName = initialConfig.remarks,
+                onConfirm = {
+                    showDeleteDialog = false
+                    deleteServer(editGuid)
+                },
+                onDismiss = { showDeleteDialog = false }
+            )
+        }
+    }
+
+    @Composable
+    private fun PhoneServerEditor(
+        title: String,
+        onSaveClick: () -> Unit,
+        onDeleteClick: () -> Unit,
+        content: @Composable ColumnScope.() -> Unit
+    ) {
         val scrollState = rememberScrollState()
         Scaffold(
             contentWindowInsets = WindowInsets(0),
@@ -464,7 +496,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     onBackClick = { finish() },
                     actions = {
                         if (editGuid.isNotEmpty() && !isRunning) {
-                            IconButton(onClick = { showDeleteDialog = true }) {
+                            IconButton(onClick = onDeleteClick) {
                                 Icon(
                                     painterResource(R.drawable.ic_delete_24dp),
                                     stringResource(R.string.acc_delete)
@@ -495,17 +527,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 content()
                 NavigationBarsSpacer()
             }
-        }
-        if (showDeleteDialog) {
-            DeleteConfirmDialog(
-                message = stringResource(R.string.confirm_delete_profile),
-                itemName = initialConfig.remarks,
-                onConfirm = {
-                    showDeleteDialog = false
-                    deleteServer(editGuid)
-                },
-                onDismiss = { showDeleteDialog = false }
-            )
         }
     }
 
