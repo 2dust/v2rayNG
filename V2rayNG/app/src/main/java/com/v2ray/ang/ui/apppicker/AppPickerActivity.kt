@@ -8,6 +8,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.base.BaseComponentActivity
@@ -48,14 +52,17 @@ class AppPickerActivity : BaseComponentActivity() {
     companion object {
         private const val EXTRA_SELECTED_PACKAGES = "selected_packages"
         private const val EXTRA_PICKER_TITLE = "picker_title"
+        private const val EXTRA_REMOTE_CONTROL = "remote_control"
 
         fun createIntent(
             context: Context,
             selectedPackages: Collection<String> = emptyList(),
-            title: String? = null
+            title: String? = null,
+            remoteControl: Boolean = false
         ): Intent = Intent(context, AppPickerActivity::class.java).apply {
             putStringArrayListExtra(EXTRA_SELECTED_PACKAGES, ArrayList(selectedPackages))
             title?.let { putExtra(EXTRA_PICKER_TITLE, it) }
+            putExtra(EXTRA_REMOTE_CONTROL, remoteControl)
         }
 
         fun getSelectedPackages(intent: Intent?): List<String> {
@@ -64,15 +71,25 @@ class AppPickerActivity : BaseComponentActivity() {
     }
 
     private val viewModel: AppPickerViewModel by viewModels()
+    private var finishingSelection = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val initial = intent.getStringArrayListExtra(EXTRA_SELECTED_PACKAGES).orEmpty()
-        viewModel.initialize(initial)
+        viewModel.initialize(initial, intent.getBooleanExtra(EXTRA_REMOTE_CONTROL, false))
         viewModel.loadApps(this)
     }
 
     override fun finish() {
+        if (intent.getBooleanExtra(EXTRA_REMOTE_CONTROL, false)) {
+            if (finishingSelection) return
+            finishingSelection = true
+            lifecycleScope.launch {
+                if (viewModel.saveRemoteControlSelection()) super@AppPickerActivity.finish()
+                finishingSelection = false
+            }
+            return
+        }
         setResult(
             RESULT_OK,
             Intent().apply {
@@ -159,7 +176,7 @@ fun AppPickerScreen(
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 painterResource(R.drawable.ic_more_vert_24dp),
-                                contentDescription = null
+                                contentDescription = stringResource(R.string.acc_more)
                             )
                         }
                         DropdownMenu(
@@ -185,6 +202,8 @@ fun AppPickerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
                 .verticalScrollbar(listState),
             contentPadding = NavigationBarsBottomPadding()
         ) {
