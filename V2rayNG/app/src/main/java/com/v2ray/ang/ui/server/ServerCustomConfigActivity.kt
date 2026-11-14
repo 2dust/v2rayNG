@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.server
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
@@ -38,9 +39,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
@@ -51,6 +56,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.AppConfig
@@ -67,8 +73,14 @@ import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.TvEditorNavigation
 import com.v2ray.ang.ui.compose.horizontalScrollbar
+import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
+import com.v2ray.ang.ui.compose.rememberTvEditorIme
+import com.v2ray.ang.ui.compose.tvEditorFocus
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
@@ -85,8 +97,10 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     private var initialRemarks: String = ""
     private var initialContent: String = ""
     private var configType = EConfigType.CUSTOM
+    private var isTelevision = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
         super.onCreate(savedInstanceState)
         val config = MmkvManager.decodeServerConfig(editGuid)
         config?.let {
@@ -103,6 +117,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             isRunning = isRunning,
             initialRemarks = initialRemarks,
             initialContent = initialContent,
+            isTelevision = isTelevision,
             onBackClick = { finish() },
             onSave = { remarks, content -> saveServer(remarks, content) },
             onDelete = { deleteServer() }
@@ -209,6 +224,7 @@ fun ServerCustomConfigScreen(
     isRunning: Boolean,
     initialRemarks: String,
     initialContent: String,
+    isTelevision: Boolean,
     onBackClick: () -> Unit,
     onSave: (String, String) -> Boolean,
     onDelete: () -> Unit
@@ -218,6 +234,14 @@ fun ServerCustomConfigScreen(
     val textFieldState = rememberTextFieldState(initialText = initialContent)
     var showDeleteConfirm by remember { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
+
+    val tvBack = if (isTelevision) remember { FocusRequester() } else null
+    val tvFocus = if (tvBack != null) rememberOutboundEditorFocus(fallback = tvBack) else null
+    val tvIme = if (tvBack != null) rememberTvEditorIme() else null
+    val tvJson = if (tvBack != null && tvFocus != null && tvIme != null) {
+        rememberTvJsonFocus(tvBack, tvFocus, tvIme.visible)
+    } else null
+    val scrollFocus = if (tvJson != null) Modifier.focusProperties { canFocus = false } else Modifier
 
     val verticalScroll = rememberScrollState()
     val horizontalScroll = rememberScrollState()
@@ -324,24 +348,40 @@ fun ServerCustomConfigScreen(
             AppTopBar(
                 title = EConfigType.CUSTOM.toString(),
                 onBackClick = onBackClick,
+                navigationIcon = if (tvBack != null && tvFocus != null) ({
+                    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
+                    IconButton(onClick = onBackClick, modifier = tvFocus.target(tvBack).tvEditorFocus(radius = 24.dp)) {
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_back_24dp),
+                            contentDescription = stringResource(R.string.acc_back),
+                            modifier = Modifier.scale(scaleX = if (mirrored) -1f else 1f, scaleY = 1f)
+                        )
+                    }
+                }) else null,
                 actions = {
                     if (showDelete) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
+                        IconButton(
+                            onClick = { showDeleteConfirm = true },
+                            modifier = tvFocus?.target()?.tvEditorFocus(radius = 24.dp) ?: Modifier
+                        ) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
                                 contentDescription = stringResource(R.string.acc_delete)
                             )
                         }
                     }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
+                    IconButton(
+                        modifier = tvFocus?.target()?.tvEditorFocus(radius = 24.dp) ?: Modifier,
+                        onClick = {
+                            val remarksErr = remarks.isBlank()
+                            isRemarksError = remarksErr
 
-                        val hasError = remarksErr
-                        if (!hasError) {
-                            onSave(remarks, textFieldState.text.toString())
+                            val hasError = remarksErr
+                            if (!hasError) {
+                                onSave(remarks, textFieldState.text.toString())
+                            }
                         }
-                    }) {
+                    ) {
                         Icon(
                             painterResource(R.drawable.ic_fab_check),
                             contentDescription = stringResource(R.string.acc_save)
@@ -356,23 +396,31 @@ fun ServerCustomConfigScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .imePadding()
+                .then(tvIme?.padding?.padding(horizontal = 48.dp) ?: Modifier.imePadding())
         ) {
-            FormTextField(
-                label = stringResource(R.string.server_lab_remarks),
-                value = remarks,
-                onValueChange = { remarks = it },
-                isError = isRemarksError
-            )
+            val navigation = if (tvBack != null && tvIme != null) {
+                remember(tvBack, tvIme.visible) { TvEditorNavigation(tvBack, tvIme.visible) }
+            } else null
+            CompositionLocalProvider(LocalTvEditor provides navigation, LocalOutboundEditorFocus provides tvFocus) {
+                FormTextField(
+                    label = stringResource(R.string.server_lab_remarks),
+                    value = remarks,
+                    onValueChange = { remarks = it },
+                    isError = isRemarksError
+                )
+            }
 
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .then(if (tvJson != null) Modifier.padding(top = 8.dp, bottom = 12.dp) else Modifier)
+                    .then(tvJson?.passive ?: Modifier)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
+                        .then(scrollFocus)
                         .verticalScroll(verticalScroll)
                 ) {
                     val lineNumberColor =
@@ -436,11 +484,14 @@ fun ServerCustomConfigScreen(
                     ) {
                         BasicTextField(
                             state = textFieldState,
+                            enabled = tvJson?.passive == null,
                             modifier = Modifier
                                 .weight(1f)
+                                .then(scrollFocus)
                                 .horizontalScroll(horizontalScroll)
                                 .padding(end = 24.dp)
-                                .padding(bottom = 36.dp),
+                                .padding(bottom = 36.dp)
+                                .then(tvJson?.field ?: Modifier),
                             textStyle = TextStyle(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = EditorConstants.FONT_SIZE,
