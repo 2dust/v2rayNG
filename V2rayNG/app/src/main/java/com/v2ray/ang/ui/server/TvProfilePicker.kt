@@ -21,11 +21,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,25 +76,34 @@ internal fun TvProfilePicker(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val matches = remember(query, options) { options.filter { it.contains(query.trim(), ignoreCase = true) }.distinct() }
-    val initial = remember { selected?.takeIf { it in matches } ?: matches.firstOrNull() }
-    val first = remember { FocusRequester() }
+    var focusedTarget by rememberSaveable { mutableStateOf<String?>(null) }
+    val restoredTarget = remember { focusedTarget }
+    val targetOption = remember {
+        if (restoredTarget == null) selected?.takeIf { it in matches } ?: matches.firstOrNull()
+        else restoredTarget.takeIf { it.startsWith(RESULT_FOCUS_PREFIX) }?.removePrefix(RESULT_FOCUS_PREFIX)
+    }
+    val search = remember { FocusRequester() }
+    val result = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }
-    val list = rememberLazyListState(initialFirstVisibleItemIndex = matches.indexOf(initial).coerceAtLeast(0))
+    val list = rememberLazyListState(initialFirstVisibleItemIndex = matches.indexOf(targetOption).coerceAtLeast(0))
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             val ime = rememberTvEditorIme()
+            val inputMode = LocalInputModeManager.current
             CompositionLocalProvider(LocalTvEditor provides TvEditorNavigation(cancel, ime.visible)) {
                 Column(ime.padding) {
-                    TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it }, Modifier,
+                    TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
+                        Modifier.focusRequester(search).onFocusChanged { if (it.hasFocus) focusedTarget = SEARCH_FOCUS },
                         enabled = true, keyboardType = KeyboardType.Text, placeholder = null, maxLines = 1,
                         isError = false, supportingText = null)
                     LazyColumn(state = list, modifier = Modifier.heightIn(max = 264.dp)) {
                         items(matches, key = { it }) { option ->
-                            val focus = if (option == initial) Modifier.focusRequester(first) else Modifier
+                            val focus = if (option == targetOption) Modifier.focusRequester(result) else Modifier
                             Row(
                                 focus.fillMaxWidth().tvEditorFocus()
+                                    .onFocusChanged { if (it.isFocused) focusedTarget = RESULT_FOCUS_PREFIX + option }
                                     .selectable(option == selected, role = Role.RadioButton, onClick = { onSelect(option) })
                                     .padding(horizontal = 12.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -102,12 +115,34 @@ internal fun TvProfilePicker(
                     }
                 }
             }
-            LaunchedEffect(Unit) { if (initial == null || !first.requestFocus()) cancel.requestFocus() }
+            LaunchedEffect(Unit) {
+                withFrameNanos { }
+                if (restoredTarget != null) inputMode.requestInputMode(InputMode.Keyboard)
+                when (restoredTarget) {
+                    SEARCH_FOCUS -> search.requestFocus()
+                    CANCEL_FOCUS -> cancel.requestFocus()
+                    else -> {
+                        val index = matches.indexOf(targetOption)
+                        if (index >= 0 && list.layoutInfo.visibleItemsInfo.none { it.key == targetOption }) {
+                            list.scrollToItem(index)
+                        }
+                        if ((index < 0 || !result.requestFocus()) && !search.requestFocus()) cancel.requestFocus()
+                    }
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss, modifier = Modifier.focusRequester(cancel).tvEditorFocus(24.dp)) {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.focusRequester(cancel).tvEditorFocus(24.dp)
+                    .onFocusChanged { if (it.isFocused) focusedTarget = CANCEL_FOCUS }
+            ) {
                 Text(stringResource(R.string.action_cancel))
             }
         }
     )
 }
+
+private const val SEARCH_FOCUS = "search"
+private const val CANCEL_FOCUS = "cancel"
+private const val RESULT_FOCUS_PREFIX = "result:"
