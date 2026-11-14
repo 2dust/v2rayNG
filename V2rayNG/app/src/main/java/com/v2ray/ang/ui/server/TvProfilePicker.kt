@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -31,10 +32,39 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.LocalTvEditor
+import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.TvEditorNavigation
 import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.tvEditorFocus
+
+@Composable
+internal fun TvPolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
+    val focus = checkNotNull(LocalOutboundEditorFocus.current)
+    val back = checkNotNull(LocalTvEditor.current).back
+    val picker = remember { FocusRequester() }
+    var open by rememberSaveable { mutableStateOf(false) }
+    var restore by remember { mutableStateOf(false) }
+    fun close() {
+        open = false
+        restore = true
+    }
+    LaunchedEffect(restore) {
+        if (restore) {
+            picker.requestFocus()
+            restore = false
+        }
+    }
+    PolicyFallbackRow(
+        value, onPick = { open = true }, onClear = { onSelect("") },
+        pickModifier = focus.target(picker).focusProperties { start = back }.tvEditorFocus(),
+        clearModifier = focus.target().tvEditorFocus(24.dp)
+    )
+    if (open) {
+        TvProfilePicker(stringResource(R.string.title_policy_group_fallback), options, value,
+            onSelect = { onSelect(it); close() }, onDismiss = ::close)
+    }
+}
 
 @Composable
 internal fun TvProfilePicker(
