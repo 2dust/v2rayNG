@@ -1,6 +1,8 @@
 package com.v2ray.ang.ui.server
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -68,6 +70,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 && editGuid == MmkvManager.getSelectServer()
     }
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
+    private var isTelevision = false
 
     private lateinit var allRemarks: List<String>
     private lateinit var initialRemarks: String
@@ -75,6 +78,11 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+        if (isTelevision && savedInstanceState != null) {
+            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
+            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        }
 
         allRemarks = SettingsManager.getProfileRemarks(
             excludeConfigTypes = setOf(
@@ -99,7 +107,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             allRemarks = allRemarks,
             onBackClick = { finish() },
             onSave = { remarks, members -> saveServer(remarks, members) },
-            onDelete = { deleteServer() }
+            onDelete = { deleteServer() },
+            isTelevision = isTelevision
         )
     }
 
@@ -195,7 +204,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 }
 
 @Composable
-fun ProxyChainScreen(
+private fun ProxyChainScreen(
     editGuid: String,
     isRunning: Boolean,
     initialRemarks: String,
@@ -203,30 +212,139 @@ fun ProxyChainScreen(
     allRemarks: List<String>,
     onBackClick: () -> Unit,
     onSave: (String, List<String>) -> Boolean,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    isTelevision: Boolean
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var members by rememberSaveable { mutableStateOf(initialMembers) }
     var memberKeys by rememberSaveable { mutableStateOf(List(initialMembers.size) { UUID.randomUUID().toString() }) }
     var showProfileDeleteConfirm by remember { mutableStateOf(false) }
+    val showDelete = editGuid.isNotEmpty() && !isRunning
+    val add: () -> String = {
+        val key = UUID.randomUUID().toString()
+        members = members + ""
+        memberKeys = memberKeys + key
+        key
+    }
+    fun move(from: Int, to: Int) {
+        val reordered = members.toMutableList()
+        val reorderedKeys = memberKeys.toMutableList()
+        if (reordered.moveItem(from, to)) {
+            reorderedKeys.moveItem(from, to)
+            members = reordered
+            memberKeys = reorderedKeys
+        }
+    }
+    fun remove(key: String) {
+        val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, key)
+        members = remainingMembers
+        memberKeys = remainingKeys
+    }
+    val save: () -> Unit = {
+        isRemarksError = remarks.isBlank()
+        if (!isRemarksError) onSave(remarks, members)
+    }
+    val delete: (() -> Unit)? = if (showDelete) ({ showProfileDeleteConfirm = true }) else null
+    val select: (String, String) -> Unit = { key, remark ->
+        val index = memberKeys.indexOf(key)
+        if (index >= 0) members = members.toMutableList().also { it[index] = remark }
+    }
+
+    if (isTelevision) {
+        TvProxyChainEditor(
+            remarks, { remarks = it }, isRemarksError, members, memberKeys, allRemarks, onBackClick, save, delete,
+            add, select, ::remove,
+            { key, step ->
+                val index = memberKeys.indexOf(key)
+                if (index >= 0) move(index, index + step)
+            }
+        )
+    } else {
+        PhoneProxyChainEditor(
+            remarks, { remarks = it }, isRemarksError, members, memberKeys, allRemarks, onBackClick, save, delete,
+            { add() }, select, ::remove, ::move
+        )
+    }
+
+    if (showProfileDeleteConfirm) {
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_profile),
+            itemName = initialRemarks,
+            onConfirm = { showProfileDeleteConfirm = false; onDelete() },
+            onDismiss = { showProfileDeleteConfirm = false }
+        )
+    }
+}
+
+@Composable
+internal fun ProxyChainMemberDialogs(
+    members: List<String>, memberKeys: List<String>, onRemove: (String) -> Unit,
+    onSelect: (String, String) -> Unit, onClosePicker: (String) -> Unit = {},
+    picker: @Composable (String?, (String) -> Unit, () -> Unit) -> Unit,
+    content: @Composable ((String) -> Unit, (String) -> Unit) -> Unit
+) {
     var memberToDeleteKey by rememberSaveable { mutableStateOf<String?>(null) }
     var editingMemberKey by rememberSaveable { mutableStateOf<String?>(null) }
-    val showDelete = editGuid.isNotEmpty() && !isRunning
+    content({ editingMemberKey = it }) { key ->
+        val member = members.getOrNull(memberKeys.indexOf(key))
+        if (member != null) {
+            if (member.isBlank()) onRemove(key) else memberToDeleteKey = key
+        }
+    }
+    memberToDeleteKey?.let { memberKey ->
+        DeleteConfirmDialog(
+            message = stringResource(R.string.confirm_delete_proxy_chain_member),
+            itemName = members.getOrNull(memberKeys.indexOf(memberKey)).orEmpty(),
+            onConfirm = { onRemove(memberKey); memberToDeleteKey = null },
+            onDismiss = { memberToDeleteKey = null }
+        )
+    }
+    editingMemberKey?.let { memberKey ->
+        fun closePicker() {
+            editingMemberKey = null
+            onClosePicker(memberKey)
+        }
+        if (memberKey in memberKeys) {
+            val selected = members.getOrNull(memberKeys.indexOf(memberKey))
+            picker(selected, { remark ->
+                onSelect(memberKey, remark)
+                closePicker()
+            }, ::closePicker)
+        }
+    }
+}
 
+@Composable
+private fun PhoneProxyChainEditor(
+    remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
+    members: List<String>, memberKeys: List<String>, allRemarks: List<String>,
+    onBackClick: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
+    onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
+) {
+    ProxyChainMemberDialogs(members, memberKeys, onRemove, onSelect, picker = { selected, select, dismiss ->
+        ServerSelectListDialog(
+            title = stringResource(R.string.server_proxy_chain_pick_members), options = allRemarks,
+            selectedOption = selected, onSelected = select, onDismiss = dismiss
+        )
+    }) { pick, remove ->
+        PhoneProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, onBackClick,
+            onSave, onDelete, onAdd, pick, remove, onMove)
+    }
+}
+
+@Composable
+private fun PhoneProxyChainLayout(
+    remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
+    members: List<String>, memberKeys: List<String>,
+    onBackClick: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
+    onPick: (String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
+) {
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
         val fromIndex = memberKeys.indexOf(from.key)
         val toIndex = memberKeys.indexOf(to.key)
-        if (fromIndex != -1 && toIndex != -1) {
-            val reordered = members.toMutableList()
-            val reorderedKeys = memberKeys.toMutableList()
-            if (reordered.moveItem(fromIndex, toIndex)) {
-                reorderedKeys.moveItem(fromIndex, toIndex)
-                members = reordered
-                memberKeys = reorderedKeys
-            }
-        }
+        if (fromIndex != -1 && toIndex != -1) onMove(fromIndex, toIndex)
     }
 
     Scaffold(
@@ -236,20 +354,12 @@ fun ProxyChainScreen(
                 title = EConfigType.PROXYCHAIN.toString(),
                 onBackClick = onBackClick,
                 actions = {
-                    if (showDelete) {
-                        IconButton(onClick = { showProfileDeleteConfirm = true }) {
+                    if (onDelete != null) {
+                        IconButton(onClick = onDelete) {
                             Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
                         }
                     }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
-
-                        val hasError = remarksErr
-                        if (!hasError) {
-                            onSave(remarks, members)
-                        }
-                    }) {
+                    IconButton(onClick = onSave) {
                         Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                     }
                 }
@@ -257,10 +367,7 @@ fun ProxyChainScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    members = members + ""
-                    memberKeys = memberKeys + UUID.randomUUID().toString()
-                },
+                onClick = onAdd,
                 modifier = Modifier
                     .offset(y = -20.dp)
                     .navigationBarsPadding()
@@ -283,7 +390,7 @@ fun ProxyChainScreen(
                 FormTextField(
                     label = stringResource(R.string.server_lab_remarks),
                     value = remarks,
-                    onValueChange = { remarks = it },
+                    onValueChange = onRemarksChange,
                     isError = isRemarksError
                 )
             }
@@ -328,7 +435,7 @@ fun ProxyChainScreen(
                             Surface(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .clickable { editingMemberKey = memberKey },
+                                    .clickable { onPick(memberKey) },
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                             ) {
@@ -344,15 +451,7 @@ fun ProxyChainScreen(
                                 )
                             }
                             IconButton(
-                                onClick = {
-                                    if (member.isBlank()) {
-                                        val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                                        members = remainingMembers
-                                        memberKeys = remainingKeys
-                                    } else {
-                                        memberToDeleteKey = memberKey
-                                    }
-                                },
+                                onClick = { onRemove(memberKey) },
                                 modifier = Modifier
                                     .padding(start = 4.dp)
                                     .size(36.dp)
@@ -371,40 +470,4 @@ fun ProxyChainScreen(
         }
     }
 
-    if (showProfileDeleteConfirm) {
-        DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_profile),
-            itemName = initialRemarks,
-            onConfirm = { showProfileDeleteConfirm = false; onDelete() },
-            onDismiss = { showProfileDeleteConfirm = false }
-        )
-    }
-    memberToDeleteKey?.let { memberKey ->
-        DeleteConfirmDialog(
-            message = stringResource(R.string.confirm_delete_proxy_chain_member),
-            itemName = members.getOrNull(memberKeys.indexOf(memberKey)).orEmpty(),
-            onConfirm = {
-                val (remainingMembers, remainingKeys) = withoutProxyChainMember(members, memberKeys, memberKey)
-                members = remainingMembers
-                memberKeys = remainingKeys
-                memberToDeleteKey = null
-            },
-            onDismiss = { memberToDeleteKey = null }
-        )
-    }
-    editingMemberKey?.let { memberKey ->
-        val currentIndex = memberKeys.indexOf(memberKey)
-        if (currentIndex != -1) {
-            ServerSelectListDialog(
-                title = stringResource(R.string.server_proxy_chain_pick_members),
-                options = allRemarks,
-                selectedOption = members.getOrNull(currentIndex),
-                onSelected = { selectedRemark ->
-                    members = members.toMutableList().also { it[currentIndex] = selectedRemark }
-                    editingMemberKey = null
-                },
-                onDismiss = { editingMemberKey = null }
-            )
-        }
-    }
 }

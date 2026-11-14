@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -23,9 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
@@ -243,20 +246,25 @@ fun SettingsSwitchItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
+    val tvEditor = LocalTvEditor.current
+    val editorFocus = LocalOutboundEditorFocus.current
     SettingsItemRow(
         icon = icon,
         title = title,
         description = summary,
         enabled = enabled,
-        onClick = if (enabled) {
+        onClick = if (enabled && tvEditor == null) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = modifier,
+        modifier = if (tvEditor == null) modifier.then(editorFocus?.target() ?: Modifier) else modifier.tvEditorFocus()
+            .then(editorFocus?.target() ?: Modifier)
+            .focusProperties { start = tvEditor.back }
+            .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange),
         trailing = {
             Switch(
                 checked = checked,
-                onCheckedChange = if (enabled) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                onCheckedChange = if (enabled && tvEditor == null) onCheckedChange else null,
+                modifier = Modifier.scale(0.8f).then(if (tvEditor == null) editorFocus?.target() ?: Modifier else Modifier),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
