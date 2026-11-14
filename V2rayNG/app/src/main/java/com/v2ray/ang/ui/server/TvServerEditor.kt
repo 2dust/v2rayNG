@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -35,9 +33,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
+import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.TvEditorNavigation
+import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.tvEditorFocus
 import com.v2ray.ang.ui.compose.verticalScrollbar
@@ -50,6 +50,7 @@ internal fun TvServerEditor(
     val back = remember { FocusRequester() }
     val save = remember { FocusRequester() }
     val delete = remember { FocusRequester() }
+    val focus = rememberOutboundEditorFocus(fallback = back)
     val scroll = rememberScrollState()
     val ime = rememberTvEditorIme()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -62,7 +63,7 @@ internal fun TvServerEditor(
                 navigationIcon = {
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier.focusRequester(back)
+                        modifier = focus.target(back)
                             .focusProperties { end = if (onDelete != null) delete else save }
                             .tvEditorFocus(radius = 24.dp)
                     ) {
@@ -76,15 +77,18 @@ internal fun TvServerEditor(
                 actions = {
                     if (onDelete != null) {
                         EditorAction(R.drawable.ic_delete_24dp, stringResource(R.string.menu_item_del_config), onDelete,
-                            Modifier.focusRequester(delete).focusProperties { start = back; end = save })
+                            focus.target(delete).focusProperties { start = back; end = save })
                     }
                     EditorAction(R.drawable.ic_fab_check, stringResource(R.string.menu_item_save_config), onSave,
-                        Modifier.focusRequester(save).focusProperties { start = if (onDelete != null) delete else back })
+                        focus.target(save).focusProperties { start = if (onDelete != null) delete else back })
                 }
             )
         }
     ) { innerPadding ->
-        CompositionLocalProvider(LocalTvEditor provides remember(back, ime.visible) { TvEditorNavigation(back, ime.visible) }) {
+        CompositionLocalProvider(
+            LocalOutboundEditorFocus provides focus,
+            LocalTvEditor provides remember(back, ime.visible) { TvEditorNavigation(back, ime.visible) }
+        ) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).consumeWindowInsets(innerPadding)
                     .then(ime.padding).padding(horizontal = 48.dp)
@@ -96,7 +100,6 @@ internal fun TvServerEditor(
             }
         }
     }
-    LaunchedEffect(back) { back.requestFocus() }
 }
 
 @Composable

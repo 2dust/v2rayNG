@@ -71,7 +71,7 @@ fun FormTextField(
                     backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
                 )
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
         )
     }
 }
@@ -141,6 +141,7 @@ fun FormDropdownField(
                 )
             ),
             modifier = Modifier
+                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable

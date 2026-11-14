@@ -247,6 +247,7 @@ fun SettingsSwitchItem(
     enabled: Boolean = true
 ) {
     val tvEditor = LocalTvEditor.current
+    val editorFocus = LocalOutboundEditorFocus.current
     SettingsItemRow(
         icon = icon,
         title = title,
@@ -255,14 +256,15 @@ fun SettingsSwitchItem(
         onClick = if (enabled && tvEditor == null) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = if (tvEditor == null) modifier else modifier.tvEditorFocus()
+        modifier = if (tvEditor == null) modifier.then(editorFocus?.target() ?: Modifier) else modifier.tvEditorFocus()
+            .then(editorFocus?.target() ?: Modifier)
             .focusProperties { start = tvEditor.back }
             .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange),
         trailing = {
             Switch(
                 checked = checked,
                 onCheckedChange = if (enabled && tvEditor == null) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                modifier = Modifier.scale(0.8f).then(if (tvEditor == null) editorFocus?.target() ?: Modifier else Modifier),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
