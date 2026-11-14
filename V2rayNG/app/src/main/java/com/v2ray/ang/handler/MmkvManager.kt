@@ -107,6 +107,11 @@ object MmkvManager {
         return "$KEY_SUB_SERVER_PREFIX${getSubscriptionId(subscriptionId)}"
     }
 
+    fun reorderServerList(serverList: List<String>, subscriptionId: String): Boolean =
+        withProfileIndexLock {
+            persistServerList(serverList, subscriptionId)
+        }
+
     /**
      * Returns every server referenced outside the target group, or null if the raw indexes
      * cannot provide a complete view.
