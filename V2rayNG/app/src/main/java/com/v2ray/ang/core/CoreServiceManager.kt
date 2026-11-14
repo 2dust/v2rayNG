@@ -348,33 +348,25 @@ object CoreServiceManager {
             val initialResult = ConnectionTestResult(
                 delayMillis = time,
                 errorMessage = errorStr,
-                country = null,
-                ipAddress = null,
+                isFinal = time < 0,
             )
-            withContext(Dispatchers.Main.immediate) {
-                if (isRunning()) {
-                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, initialResult, requestId)
-                } else {
+            suspend fun publish(result: ConnectionTestResult): Boolean = withContext(Dispatchers.Main.immediate) {
+                if (!isRunning()) {
                     MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
-                    return@withContext
+                    false
+                } else {
+                    MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, result, requestId)
+                    true
                 }
             }
+            if (!publish(initialResult)) return@launch
 
             if (time >= 0) {
                 val endpoint = SpeedtestManager.getRemoteIPInfo()
                 if (endpoint != null && (endpoint.country != null || endpoint.ipAddress != null)) {
-                    ensureActive()
-                    val fullResult = ConnectionTestResult(
-                        delayMillis = time,
-                        errorMessage = errorStr,
-                        country = endpoint.country,
-                        ipAddress = endpoint.ipAddress,
-                    )
-                    withContext(Dispatchers.Main.immediate) {
-                        if (isRunning()) {
-                            MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_RESULT, fullResult, requestId)
-                        }
-                    }
+                    publish(initialResult.copy(country = endpoint.country, ipAddress = endpoint.ipAddress, isFinal = true))
+                } else {
+                    publish(initialResult.copy(isFinal = true))
                 }
             }
         }.invokeOnCompletion { cause ->
