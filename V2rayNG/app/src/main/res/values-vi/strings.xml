@@ -572,5 +572,9 @@
     <string name="sub_info_open_support">Mở liên kết hỗ trợ</string>
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
+    <string name="update_later">Để sau</string>
+    <string name="update_downloading">Đang tải bản cập nhật</string>
+    <string name="update_download_failed">Tải xuống thất bại. Hãy kiểm tra kết nối và thử lại.</string>
+    <string name="update_saved_in_downloads">Phiên bản mới đã được lưu trong thư mục Tải xuống (%1$s). Hãy mở tệp từ đó để cài đặt.</string>
 
 </resources>

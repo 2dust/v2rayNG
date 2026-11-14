@@ -582,5 +582,9 @@
     <string name="sub_info_open_support">فتح رابط الدعم</string>
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
+    <string name="update_later">لاحقًا</string>
+    <string name="update_downloading">جارٍ تنزيل التحديث</string>
+    <string name="update_download_failed">فشل التنزيل. تحقق من اتصالك وحاول مرة أخرى.</string>
+    <string name="update_saved_in_downloads">تم حفظ الإصدار الجديد في مجلد التنزيلات (%1$s). افتح الملف من هناك لتثبيته.</string>
 
 </resources>
