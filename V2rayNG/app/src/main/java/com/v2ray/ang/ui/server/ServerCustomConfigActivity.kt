@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.server
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -102,6 +104,11 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
         super.onCreate(savedInstanceState)
+        if (isTelevision && savedInstanceState != null) {
+            // Restore D-pad focus without restoring the old window's software keyboard.
+            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
+            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        }
         val config = MmkvManager.decodeServerConfig(editGuid)
         config?.let {
             configType = it.configType
@@ -232,7 +239,7 @@ fun ServerCustomConfigScreen(
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState(initialText = initialContent)
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
 
     val tvBack = if (isTelevision) remember { FocusRequester() } else null
@@ -485,6 +492,7 @@ fun ServerCustomConfigScreen(
                         BasicTextField(
                             state = textFieldState,
                             enabled = tvJson?.passive == null,
+                            keyboardOptions = if (tvJson?.allowKeyboardOnFocus == false) KeyboardOptions(showKeyboardOnFocus = false) else KeyboardOptions.Default,
                             modifier = Modifier
                                 .weight(1f)
                                 .then(scrollFocus)
@@ -551,7 +559,7 @@ fun ServerCustomConfigScreen(
         }
     }
 
-    if (showDeleteConfirm) {
+    if (showDelete && showDeleteConfirm) {
         DeleteConfirmDialog(
             message = stringResource(R.string.confirm_delete_profile),
             itemName = initialRemarks,
