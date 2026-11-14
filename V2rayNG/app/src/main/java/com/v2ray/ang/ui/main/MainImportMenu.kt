@@ -83,7 +83,7 @@ fun ShareMethodDialog(
     onRemove: (String, String) -> Unit,
 ) {
     val menuActions = serverMenuActions(
-        isComplexProfile = profile.configType.isComplexType() && profile.configType != EConfigType.CUSTOM_OUTBOUND,
+        isComplexProfile = profile.configType.isComplexType(),
         includeManagementActions = more,
     )
     SelectListDialog(
