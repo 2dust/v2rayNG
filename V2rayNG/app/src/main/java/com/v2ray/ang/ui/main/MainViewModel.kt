@@ -11,15 +11,19 @@ import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.RealPingResult
 import com.v2ray.ang.dto.TestServiceMessage
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -639,10 +643,26 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val seen = HashSet<ProfileItem>()
+                    val seenOutbounds = HashSet<V2rayConfig.OutboundBean>()
                     val duplicates = ArrayList<String>()
                     currentServers().forEach { server ->
                         val profile = server.profile
-                        if (!profile.configType.isComplexType()) {
+                        if (profile.configType == EConfigType.CUSTOM_OUTBOUND) {
+                            val outbound = server.guid
+                                .let(MmkvManager::decodeServerRaw)
+                                ?.let {
+                                    JsonUtil.fromJsonSafe(
+                                        it,
+                                        V2rayConfig.OutboundBean::class.java
+                                    )
+                                }
+                            if (outbound != null) {
+                                outbound.tag = ""
+                                if (!seenOutbounds.add(outbound)) {
+                                    duplicates += server.guid
+                                }
+                            }
+                        } else if (!profile.configType.isComplexType()) {
                             val identity = profile.duplicateIdentity()
                             if (!seen.add(identity)) duplicates += server.guid
                         }

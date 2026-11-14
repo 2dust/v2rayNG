@@ -79,7 +79,6 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         allRemarks = SettingsManager.getProfileRemarks(
             excludeConfigTypes = setOf(
                 EConfigType.CUSTOM,
-                EConfigType.CUSTOM_OUTBOUND,
                 EConfigType.POLICYGROUP,
                 EConfigType.PROXYCHAIN,
             )
