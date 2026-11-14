@@ -18,7 +18,7 @@ enum class EConfigType(val value: Int, val protocolScheme: String) {
     MASQUE(11, AppConfig.MASQUE),
     POLICYGROUP(101, AppConfig.CUSTOM),
     PROXYCHAIN(102, AppConfig.CUSTOM),
-    CUSTOM_OUTBOUND(103, AppConfig.CUSTOM);
+    CUSTOM_OUTBOUND(103, AppConfig.V2RAYNFMTS);
 
     companion object {
         fun fromInt(value: Int) = entries.firstOrNull { it.value == value }

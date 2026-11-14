@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
@@ -642,7 +643,7 @@ class MainViewModel(
                     val duplicates = ArrayList<String>()
                     currentServers().forEach { server ->
                         val profile = server.profile
-                        if (!profile.configType.isComplexType()) {
+                        if (!profile.configType.isComplexType() && profile.configType != EConfigType.CUSTOM_OUTBOUND) {
                             val identity = profile.duplicateIdentity()
                             if (!seen.add(identity)) duplicates += server.guid
                         }
