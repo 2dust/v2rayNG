@@ -101,8 +101,8 @@ internal fun TvEditorTextField(
 ) {
     val navigation = checkNotNull(LocalTvEditor.current)
     val keyboard = LocalSoftwareKeyboardController.current
-    val passive = remember { FocusRequester() }
-    val editor = remember { FocusRequester() }
+    val requester = remember { FocusRequester() }
+    val fieldFocus = LocalOutboundEditorFocus.current?.target(requester) ?: Modifier.focusRequester(requester)
     val bringIntoView = remember { BringIntoViewRequester() }
     val interaction = remember { MutableInteractionSource() }
     var editing by remember { mutableStateOf(false) }
@@ -114,9 +114,9 @@ internal fun TvEditorTextField(
 
     LaunchedEffect(editing, enabled) {
         if (editing && enabled) {
-            if (editor.requestFocus()) keyboard?.show()
+            if (requester.requestFocus()) keyboard?.show()
         } else if (restorePassive) {
-            passive.requestFocus()
+            requester.requestFocus()
             restorePassive = false
         }
     }
@@ -148,7 +148,7 @@ internal fun TvEditorTextField(
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             interactionSource = interaction,
             modifier = Modifier.fillMaxWidth()
-                .focusRequester(editor)
+                .then(if (editing) fieldFocus else Modifier)
                 .focusProperties { canFocus = editing && enabled }
                 .onFocusChanged {
                     if (editorFocused && !it.isFocused && editing) {
@@ -164,7 +164,7 @@ internal fun TvEditorTextField(
         if (!editing) {
             Box(
                 Modifier.matchParentSize()
-                    .focusRequester(passive)
+                    .then(fieldFocus)
                     .focusProperties { start = navigation.back }
                     .semantics { contentDescription = if (supportingText == null) label else "$label. $supportingText" }
                     .clickable(interactionSource = interaction, indication = null, enabled = enabled, role = Role.Button) {
@@ -186,6 +186,7 @@ internal fun TvEditorDropdown(
 ) {
     val back = checkNotNull(LocalTvEditor.current).back
     val anchor = remember { FocusRequester() }
+    val anchorFocus = LocalOutboundEditorFocus.current?.target(anchor) ?: Modifier.focusRequester(anchor)
     val interaction = remember { MutableInteractionSource() }
     var open by remember { mutableStateOf(false) }
     var restoreAnchor by remember { mutableStateOf(false) }
@@ -214,7 +215,7 @@ internal fun TvEditorDropdown(
         )
         Box(
             Modifier.matchParentSize()
-                .focusRequester(anchor)
+                .then(anchorFocus)
                 .focusProperties { start = back }
                 .semantics { contentDescription = if (value.isBlank()) label else "$label: $value" }
                 .clickable(interactionSource = interaction, indication = null, enabled = enabled && options.isNotEmpty(), role = Role.Button) {
