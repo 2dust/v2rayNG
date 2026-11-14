@@ -357,6 +357,27 @@ class MmkvPersistenceTest {
             .apply { isAccessible = true }.invoke(SettingsManager)
     }
 
+    @Test fun `proxy chain migration retries a failed profile write`() {
+        val migrationKey = "proxy_chain_profile_list_migrated"
+        val legacyProfile = """{"configType":"PROXYCHAIN","subscriptionId":"s","proxyChainProfiles":"first, second"}"""
+        stores.main.values["SUB_IDS"] = "[\"s\"]"
+        stores.main.values["SUB_SERVERS_s"] = "[\"chain\"]"
+        stores.profiles.values["chain"] = legacyProfile
+        val migrate = SettingsManager::class.java.getDeclaredMethod("migrateProxyChainProfileList")
+            .apply { isAccessible = true }
+
+        stores.profiles.failWrite = { it == "chain" }
+        migrate.invoke(SettingsManager)
+        assertFalse(MmkvManager.decodeSettingsBool(migrationKey, false))
+        assertEquals(legacyProfile, stores.profiles.values["chain"])
+
+        stores.profiles.failWrite = { false }
+        migrate.invoke(SettingsManager)
+        assertTrue(MmkvManager.decodeSettingsBool(migrationKey, false))
+        assertEquals(listOf("first", "second"), MmkvManager.decodeServerConfig("chain")!!.proxyChainProfileList)
+        assertFalse((stores.profiles.values["chain"] as String).contains("\"proxyChainProfiles\""))
+    }
+
     @Test fun `legacy profile index migration retries without hiding newer imports`() {
         stores.main.values["SUB_IDS"] = "[\"s\"]"
         stores.main.values["ANG_CONFIGS"] = "[\"legacy\"]"

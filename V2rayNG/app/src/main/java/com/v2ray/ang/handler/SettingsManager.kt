@@ -50,6 +50,7 @@ object SettingsManager {
         initRoutingRulesets(context)
         if (!migrateServerListToSubscriptions()) return
         migrateHysteria2PinSHA256()
+        migrateProxyChainProfileList()
     }
 
     /**
@@ -516,6 +517,30 @@ object SettingsManager {
             profile.pinnedCA256 = profile.pinSHA256
             profile.pinSHA256 = null
             // Leave the migration pending if even one profile could not be saved.
+            if (MmkvManager.encodeServerConfig(guid, profile) == null) return
+        }
+
+        MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    // Keep reading the deprecated field while upgrades from the comma-separated format are supported.
+    @Suppress("DEPRECATION")
+    private fun migrateProxyChainProfileList() {
+        // Check if migration has already been done
+        val migrationKey = "proxy_chain_profile_list_migrated"
+        if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
+            return
+        }
+
+        val profiles = readMigrationProfiles() ?: return
+
+        for ((guid, profile) in profiles) {
+            val legacyMembers = profile.proxyChainProfiles
+            if (legacyMembers.isNullOrEmpty() || !profile.proxyChainProfileList.isNullOrEmpty()) {
+                continue
+            }
+            profile.proxyChainProfileList = legacyMembers.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            profile.proxyChainProfiles = null
             if (MmkvManager.encodeServerConfig(guid, profile) == null) return
         }
 
