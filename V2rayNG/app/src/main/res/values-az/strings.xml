@@ -576,4 +576,9 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
+    <string name="sub_info_a11y_traffic_limited">Traffic: %1$s of %2$s</string>
+    <string name="sub_info_a11y_traffic_unlimited">Traffic: %1$s (unlimited quota)</string>
+    <string name="sub_info_a11y_expires">expires: %1$s</string>
+    <string name="sub_info_a11y_expired">expired on: %1$s</string>
+    <string name="sub_info_a11y_no_expiry">no expiration date</string>
 </resources>
