@@ -76,7 +76,9 @@ data class ProfileItem(
     var policyGroupFilter: String? = null,
     var policyGroupTestOutbounds: Boolean? = null,
     var policyGroupFallbackTag: String? = null,
+    @Deprecated("Use proxyChainProfileList")
     var proxyChainProfiles: String? = null,
+    var proxyChainProfileList: List<String>? = null,
 
     var browserDialerMode: String? = null,
 ) {
