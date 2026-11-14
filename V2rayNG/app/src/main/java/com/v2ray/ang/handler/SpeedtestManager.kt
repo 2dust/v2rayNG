@@ -53,23 +53,28 @@ object SpeedtestManager {
         return -1
     }
 
-    fun getRemoteIPInfo(): RemoteEndpointInfo? {
+    fun getRemoteIPInfo(fetchViaCore: ((String) -> String?)? = null): RemoteEndpointInfo? {
         val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
             .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
 
-        val proxyUsername = SettingsManager.getSocksUsername()
-        val proxyPassword = SettingsManager.getSocksPassword()
-        val httpPort = SettingsManager.getHttpPort()
-        if (httpPort == 0) return null
-        val content = HttpUtil.getUrlContent(
-            UrlContentRequest(
-                url = url,
-                timeout = 5000,
-                httpPort = httpPort,
-                proxyUsername = proxyUsername,
-                proxyPassword = proxyPassword
+        val content = if (
+            fetchViaCore == null ||
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_ENABLE_LOCAL_PROXY, true)
+        ) {
+            HttpUtil.getUrlContent(
+                UrlContentRequest(
+                    url = url,
+                    timeout = 5000,
+                    httpPort = SettingsManager.getHttpPort(),
+                    proxyUsername = SettingsManager.getSocksUsername(),
+                    proxyPassword = SettingsManager.getSocksPassword()
+                )
             )
-        ) ?: return null
+        } else {
+            runCatching { fetchViaCore(url) }
+                .onFailure { LogUtil.e(AppConfig.TAG, "Failed to get URL content through core", it) }
+                .getOrNull()
+        } ?: return null
         val ipInfo = JsonUtil.fromJsonSafe(content, IPAPIInfo::class.java) ?: return null
 
         val ip = listOf(

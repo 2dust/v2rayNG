@@ -7,10 +7,13 @@ import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.concatUrl
+import com.v2ray.ang.handler.CoreDownloadManager
+import com.v2ray.ang.handler.CoreFetchResult
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -93,8 +96,7 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
 
         snapshot.forEach { cache ->
             val item = cache.assetUrl
-            val portsToTry = if (httpPort == 0) listOf(0) else listOf(httpPort, 0)
-            if (portsToTry.any { tryDownload(item, extDir, it, proxyUsername, proxyPassword) }) {
+            if (downloadAsset(item, extDir, httpPort, proxyUsername, proxyPassword)) {
                 successCount++
             } else {
                 failures.add(item.remarks)
@@ -104,39 +106,47 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
         return GeoDownloadResult(successCount, failures.size, failures)
     }
 
-    private fun tryDownload(
+    private fun downloadAsset(
         item: AssetUrlItem,
         extDir: File,
         httpPort: Int,
-        proxyUsername: String? = null,
-        proxyPassword: String? = null
+        proxyUsername: String?,
+        proxyPassword: String?
     ): Boolean {
-        val targetTemp = File(extDir, item.remarks + "_temp")
+        val targetTemp = File(extDir, ".${Utils.getUuid()}.download")
         val target = File(extDir, item.remarks)
+        val request = UrlContentRequest(
+            url = item.url,
+            timeout = 15000,
+            proxyUsername = proxyUsername,
+            proxyPassword = proxyPassword,
+        )
         try {
-            if (
-                HttpUtil.downloadToFile(
-                    UrlContentRequest(
-                        url = item.url,
-                        timeout = 15000,
-                        httpPort = httpPort,
-                        proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
-                    ),
-                    targetTemp
-                )
-            ) {
-                if (!replaceAssetFile(targetTemp, target)) {
-                    LogUtil.e(AppConfig.TAG, "Failed to replace geo file: ${item.remarks}")
-                    return false
+            val downloaded = when (CoreDownloadManager.downloadToFile(app, request, targetTemp)) {
+                is CoreFetchResult.Success -> true
+                CoreFetchResult.Failed -> false
+                CoreFetchResult.Unavailable -> tryHttpDownload(request, targetTemp, 0)
+                CoreFetchResult.NotApplicable -> {
+                    val portsToTry = if (httpPort == 0) listOf(0) else listOf(httpPort, 0)
+                    portsToTry.any { tryHttpDownload(request, targetTemp, it) }
                 }
-                return true
             }
+            if (!downloaded || targetTemp.length() == 0L) return false
+            if (!replaceAssetFile(targetTemp, target)) {
+                LogUtil.e(AppConfig.TAG, "Failed to replace geo file: ${item.remarks}")
+                return false
+            }
+            return true
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to download geo file: ${item.remarks}", e)
+            return false
+        } finally {
+            targetTemp.delete()
         }
-        return false
     }
+
+    private fun tryHttpDownload(request: UrlContentRequest, targetFile: File, httpPort: Int): Boolean =
+        HttpUtil.downloadToFile(request.copy(httpPort = httpPort), targetFile)
 
     internal fun replaceAssetFile(temp: File, target: File): Boolean {
         if (!temp.renameTo(target)) {
