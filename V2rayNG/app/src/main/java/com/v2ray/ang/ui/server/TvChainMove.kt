@@ -29,11 +29,14 @@ internal class TvChainMove(private val quietMillis: Long) {
     private var pressed = false
     private var released = false
     private var dropAfter = 0L
+    private var dropping = false
 
     fun down(time: Long, repeated: Boolean) {
+        if (dropping) return
         if (moving) {
             if (released && !repeated && time > dropAfter) {
                 drop()
+                dropping = true
             } else {
                 dropAfter = time + quietMillis
             }
@@ -44,6 +47,10 @@ internal class TvChainMove(private val quietMillis: Long) {
     }
 
     fun up(time: Long, canceled: Boolean): Boolean {
+        if (dropping) {
+            dropping = false
+            return false
+        }
         if (moving) {
             released = true
             dropAfter = time + quietMillis
@@ -60,7 +67,10 @@ internal class TvChainMove(private val quietMillis: Long) {
     fun drop() {
         moving = false
         pressed = false
+        dropping = false
     }
+
+    fun awaitingDropRelease(): Boolean = dropping
 }
 
 @Composable
@@ -84,7 +94,7 @@ internal fun Modifier.tvChainMove(state: TvChainMove, onMove: (Int) -> Unit, onC
                 if (down) {
                     val wasMoving = state.moving
                     state.down(native.eventTime, native.repeatCount > 0 || native.isLongPress)
-                    if (!wasMoving && !state.moving && hold[0] == null) {
+                    if (!wasMoving && !state.moving && !state.awaitingDropRelease() && hold[0] == null) {
                         hold[0] = scope.launch {
                             delay(ViewConfiguration.getLongPressTimeout().toLong())
                             state.start()

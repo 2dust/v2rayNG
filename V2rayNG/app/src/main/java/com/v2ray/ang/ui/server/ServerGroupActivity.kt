@@ -23,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -59,13 +56,9 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
-import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.TvEditorDropdown
-import com.v2ray.ang.ui.compose.tvEditorFocus
 
 class ServerGroupActivity : BaseComponentActivity() {
 
@@ -269,28 +262,13 @@ private fun ServerGroupScreen(
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
-    var showFallbackDialog by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val supportsObservatory = BalancerStrategyType.from(typeIndex.toString()).supportsObservatory
     val save: () -> Unit = {
         isRemarksError = remarks.isBlank()
         if (!isRemarksError) onSave(remarks, filter, typeIndex, sourceId.takeIf { it in subIds }.orEmpty(), testOutbounds, fallbackTag)
     }
-    val fallback = remember { FocusRequester() }
-    var returnToFallback by remember { mutableStateOf(false) }
-    fun closeFallback() {
-        showFallbackDialog = false
-        returnToFallback = isTelevision
-    }
-    LaunchedEffect(returnToFallback) {
-        if (returnToFallback) {
-            fallback.requestFocus()
-            returnToFallback = false
-        }
-    }
-
-    val fields: @Composable ColumnScope.() -> Unit = {
-        val tv = LocalTvEditor.current
+    val fields: @Composable ColumnScope.(@Composable (String, List<String>, (String) -> Unit) -> Unit) -> Unit = { fallbackField ->
         FormTextField(
             label = stringResource(R.string.server_lab_remarks),
             value = remarks,
@@ -303,15 +281,10 @@ private fun ServerGroupScreen(
             options = typeEntries,
             onValueChange = { typeIndex = typeEntries.indexOf(it) }
         )
-        val sourceLabel = stringResource(R.string.title_policy_group_subscription_id)
-        if (tv != null) {
-            TvEditorDropdown(sourceLabel, sourceId, subIds, { sourceId = it }, Modifier,
-                enabled = true, placeholder = null, supportingText = null,
-                optionLabel = { subDisplay.getOrNull(subIds.indexOf(it)).orEmpty() })
-        } else {
-            FormDropdownField(sourceLabel, subDisplay.getOrNull(subIds.indexOf(sourceId)).orEmpty(), subDisplay,
-                onValueChange = { sourceId = subIds.getOrNull(subDisplay.indexOf(it)).orEmpty() })
-        }
+        val sourceLabels = remember(subIds, subDisplay) { subIds.zip(subDisplay).toMap() }
+        FormDropdownField(stringResource(R.string.title_policy_group_subscription_id),
+            sourceId.takeIf { it in sourceLabels }.orEmpty(), subIds, { sourceId = it },
+            optionLabel = { sourceLabels[it].orEmpty() })
         FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
         if (supportsObservatory) {
             SettingsSwitchItem(
@@ -320,66 +293,20 @@ private fun ServerGroupScreen(
                 onCheckedChange = { testOutbounds = it }
             )
             if (testOutbounds) {
-                val fallbackLabel = stringResource(R.string.title_policy_group_fallback)
-                val fallbackDisplay = fallbackTag.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) }
-                Text(
-                    text = fallbackLabel,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .then(if (tv != null) {
-                                checkNotNull(LocalOutboundEditorFocus.current).target(fallback)
-                                    .focusProperties { start = tv.back }
-                                    .tvEditorFocus()
-                            } else Modifier)
-                            .semantics {
-                                contentDescription = fallbackLabel
-                                stateDescription = fallbackDisplay
-                            }
-                            .clickable(role = Role.Button) { showFallbackDialog = true },
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    ) {
-                        Text(
-                            text = fallbackDisplay,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (fallbackTag.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                            else MaterialTheme.colorScheme.onSurface,
-                            fontWeight = if (fallbackTag.isBlank()) FontWeight.Normal else FontWeight.Medium,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .clearAndSetSemantics {}
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = { fallbackTag = "" },
-                        modifier = if (tv != null) checkNotNull(LocalOutboundEditorFocus.current).target()
-                            .tvEditorFocus(24.dp) else Modifier
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.ic_delete_24dp),
-                            contentDescription = "${stringResource(R.string.logcat_clear)}, $fallbackLabel"
-                        )
-                    }
-                }
+                fallbackField(fallbackTag, fallbackSuggestions) { fallbackTag = it }
             }
         }
         NavigationBarsSpacer()
     }
+    val delete: (() -> Unit)? = if (showDelete) ({ showDeleteConfirm = true }) else null
     if (isTelevision) {
-        TvServerEditor(EConfigType.POLICYGROUP.toString(), onBackClick, save,
-            onDelete = if (showDelete) ({ showDeleteConfirm = true }) else null, content = fields)
+        TvServerEditor(EConfigType.POLICYGROUP.toString(), onBackClick, save, delete) {
+            fields { value, options, select -> TvPolicyFallbackField(value, options, select) }
+        }
     } else {
-        PhonePolicyGroupEditor(onBackClick, save, if (showDelete) ({ showDeleteConfirm = true }) else null, fields)
+        PhonePolicyGroupEditor(onBackClick, save, delete) {
+            fields { value, options, select -> PhonePolicyFallbackField(value, options, select) }
+        }
     }
 
     if (showDeleteConfirm) {
@@ -390,20 +317,50 @@ private fun ServerGroupScreen(
             onDismiss = { showDeleteConfirm = false }
         )
     }
-    if (showFallbackDialog && supportsObservatory && testOutbounds) {
-        val select: (String) -> Unit = {
-            fallbackTag = it
-            closeFallback()
-        }
-        if (isTelevision) {
-            TvProfilePicker(stringResource(R.string.title_policy_group_fallback), fallbackSuggestions, fallbackTag, select, ::closeFallback)
-        } else ServerSelectListDialog(
-            title = stringResource(R.string.title_policy_group_fallback),
-            options = fallbackSuggestions,
-            selectedOption = fallbackTag,
-            onSelected = select,
-            onDismiss = ::closeFallback
+}
+
+@Composable
+private fun PhonePolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    PolicyFallbackRow(value, onPick = { open = true }, onClear = { onSelect("") })
+    if (open) {
+        ServerSelectListDialog(
+            title = stringResource(R.string.title_policy_group_fallback), options = options, selectedOption = value,
+            onSelected = { onSelect(it); open = false }, onDismiss = { open = false }
         )
+    }
+}
+
+@Composable
+internal fun PolicyFallbackRow(
+    value: String, onPick: () -> Unit, onClear: () -> Unit,
+    pickModifier: Modifier = Modifier, clearModifier: Modifier = Modifier
+) {
+    val label = stringResource(R.string.title_policy_group_fallback)
+    val display = value.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) }
+    Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp))
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Surface(
+            modifier = Modifier.weight(1f).then(pickModifier).semantics {
+                contentDescription = label
+                stateDescription = display
+            }.clickable(role = Role.Button, onClick = onPick),
+            shape = RoundedCornerShape(8.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Text(
+                text = display,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (value.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (value.isBlank()) FontWeight.Normal else FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.clearAndSetSemantics {}.padding(horizontal = 12.dp, vertical = 8.dp)
+            )
+        }
+        IconButton(onClick = onClear, modifier = clearModifier) {
+            Icon(painterResource(R.drawable.ic_delete_24dp), "${stringResource(R.string.logcat_clear)}, $label")
+        }
     }
 }
 

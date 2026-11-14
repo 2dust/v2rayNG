@@ -17,8 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,14 +38,37 @@ import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.tvEditorFocus
 
-internal const val TV_CHAIN_ADD = "chain:add"
+private const val ADD_MEMBER = "chain:add"
 
 @Composable
 internal fun TvProxyChainEditor(
     remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
+    members: List<String>, memberKeys: List<String>, allRemarks: List<String>,
+    onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
+    onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (String, Int) -> Unit
+) {
+    var returnKey by remember { mutableStateOf<String?>(null) }
+    val remove: (String) -> Unit = { key ->
+        val index = memberKeys.indexOf(key)
+        if (index >= 0) {
+            returnKey = memberKeys.getOrNull(index + 1) ?: memberKeys.getOrNull(index - 1) ?: ADD_MEMBER
+            onRemove(key)
+        }
+    }
+    ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { selected, select, dismiss ->
+        TvProfilePicker(stringResource(R.string.server_proxy_chain_member_unselected), allRemarks, selected, select, dismiss)
+    }) { pick, requestRemove ->
+        TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },
+            onBack, onSave, onDelete, { returnKey = onAdd() }, pick, requestRemove, onMove)
+    }
+}
+
+@Composable
+private fun TvProxyChainLayout(
+    remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
     members: List<String>, memberKeys: List<String>, returnKey: String?, onReturned: () -> Unit,
     onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
-    onPick: (String) -> Unit, onRemove: (String, String) -> Unit, onMove: (String, Int) -> Unit
+    onPick: (String) -> Unit, onRemove: (String) -> Unit, onMove: (String, Int) -> Unit
 ) {
     val add = remember { FocusRequester() }
     TvServerEditor(EConfigType.PROXYCHAIN.toString(), onBack, onSave, onDelete, onAdd, add) {
@@ -54,7 +80,7 @@ internal fun TvProxyChainEditor(
         val quiet = remember { tvChainQuietMillis(ViewConfiguration.getKeyRepeatDelay()) }
         LaunchedEffect(returnKey) {
             if (returnKey != null) {
-                if (returnKey == TV_CHAIN_ADD) add.requestFocus() else targets[returnKey]?.pick?.requestFocus()
+                if (returnKey == ADD_MEMBER) add.requestFocus() else targets[returnKey]?.pick?.requestFocus()
                 onReturned()
             }
         }
@@ -100,7 +126,7 @@ internal fun TvProxyChainEditor(
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                         )
                         IconButton(
-                            onClick = { onRemove(memberKey, member) },
+                            onClick = { onRemove(memberKey) },
                             modifier = focus.target(row.remove, "$memberKey:remove").focusProperties {
                                 start = row.pick
                                 end = FocusRequester.Cancel
