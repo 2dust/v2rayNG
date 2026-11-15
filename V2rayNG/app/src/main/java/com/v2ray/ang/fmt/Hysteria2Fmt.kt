@@ -34,9 +34,20 @@ object Hysteria2Fmt : FmtBase() {
             getItemFormQuery(config, queryParam)
 
             config.security = queryParam["security"] ?: AppConfig.TLS
+            config.obfs = queryParam["obfs"]?.takeIf { !it.equals("none", ignoreCase = true) }
             config.obfsPassword = queryParam["obfs-password"]
+            config.minPacketSize = queryParam["minPacketSize"]
+            config.maxPacketSize = queryParam["maxPacketSize"]
             config.portHopping = queryParam["mport"]
             config.pinnedCA256 = queryParam["pinSHA256"]
+            if (config.isGeckoObfs()) {
+                if (config.minPacketSize.isNullOrEmpty()) {
+                    config.minPacketSize = "512"
+                }
+                if (config.maxPacketSize.isNullOrEmpty()) {
+                    config.maxPacketSize = "1200"
+                }
+            }
 
         }
 
@@ -57,9 +68,14 @@ object Hysteria2Fmt : FmtBase() {
         config.alpn?.nullIfBlank()?.let { dicQuery["alpn"] = it }
         config.insecure.let { dicQuery["insecure"] = if (it == true) "1" else "0" }
 
-        if (config.obfsPassword.isNotNullEmpty()) {
-            dicQuery["obfs"] = "salamander"
+        val isGecko = config.isGeckoObfs()
+        if (config.obfsPassword.isNotNullEmpty() && !config.obfs.equals("none", ignoreCase = true)) {
+            dicQuery["obfs"] = if (isGecko) "gecko" else "salamander"
             dicQuery["obfs-password"] = config.obfsPassword.orEmpty()
+            if (isGecko) {
+                config.minPacketSize?.let { dicQuery["minPacketSize"] = it }
+                config.maxPacketSize?.let { dicQuery["maxPacketSize"] = it }
+            }
         }
         if (config.portHopping.isNotNullEmpty()) {
             dicQuery["mport"] = config.portHopping.orEmpty()

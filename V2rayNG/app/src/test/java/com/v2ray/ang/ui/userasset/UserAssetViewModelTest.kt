@@ -5,9 +5,12 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
+import java.io.File
+import java.nio.file.Files
 
 class UserAssetViewModelTest {
     private val viewModel = UserAssetViewModel(mock(Application::class.java))
@@ -41,5 +44,35 @@ class UserAssetViewModelTest {
             builtIns.filter { it.assetUrl.remarks != AppConfig.GEOSITE_DAT }.map { it.guid },
             rows.filter { it.assetUrl.locked == true }.map { it.guid },
         )
+    }
+
+    @Test
+    fun replaceAssetFileMovesTempFileIntoPlace() {
+        val dir = Files.createTempDirectory("v2rayng-asset-").toFile()
+        try {
+            val temp = File(dir, "asset_temp").apply { writeText("new") }
+            val target = File(dir, "asset")
+
+            assertTrue(viewModel.replaceAssetFile(temp, target))
+            assertEquals("new", target.readText())
+            assertFalse(temp.exists())
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
+
+    @Test
+    fun replaceAssetFileReportsFailureAndRemovesTempFile() {
+        val dir = Files.createTempDirectory("v2rayng-asset-").toFile()
+        try {
+            val temp = File(dir, "asset_temp").apply { writeText("new") }
+            val target = File(File(dir, "missing"), "asset")
+
+            assertFalse(viewModel.replaceAssetFile(temp, target))
+            assertFalse(temp.exists())
+            assertFalse(target.exists())
+        } finally {
+            dir.deleteRecursively()
+        }
     }
 }

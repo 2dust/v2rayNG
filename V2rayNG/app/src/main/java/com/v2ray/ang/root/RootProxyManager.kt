@@ -340,19 +340,27 @@ object RootProxyManager {
      */
     private fun buildDnsDnat(cmd: String): String {
         val dnsChain = AppConfig.ROOT_DNS_OUT_CHAIN
+        val v6 = cmd == "ip6tables"
+        // DNAT needs a target of the same family. There is no v6 fallback, so without a v6
+        // remote DNS the v6 chain is skipped.
         val dns = SettingsManager.getRemoteDnsServers()
-            .firstOrNull { Utils.isPureIpAddress(it) && !it.contains(":") }
-            ?: AppConfig.ROOT_LAN_DNS
-        val lanCidrs = if (cmd == "ip6tables") bypassCidrsV6 else bypassCidrs
+            .firstOrNull { Utils.isPureIpAddress(it) && it.contains(":") == v6 }
+            ?: if (v6) return "" else AppConfig.ROOT_LAN_DNS
+        val lanCidrs = if (v6) bypassCidrsV6 else bypassCidrs
         return buildString {
+            // Most stock kernels have no ip6tables nat table: skip cleanly instead of failing.
+            if (v6) appendLine("if $cmd -t nat -S OUTPUT >/dev/null 2>&1; then")
             appendLine("$cmd -t nat -N $dnsChain 2>/dev/null || true")
             appendLine("$cmd -t nat -F $dnsChain")
+            // Only rewrite queries already marked into the tun. Unmarked ones (the core's own
+            // direct/domestic DNS, bypassed apps) must still reach the resolver they asked for.
             lanCidrs.forEach {
-                appendLine("$cmd -t nat -A $dnsChain -d $it -p udp --dport 53 -j DNAT --to $dns")
-                appendLine("$cmd -t nat -A $dnsChain -d $it -p tcp --dport 53 -j DNAT --to $dns")
+                appendLine("$cmd -t nat -A $dnsChain -m mark --mark $MARK -d $it -p udp --dport 53 -j DNAT --to-destination $dns")
+                appendLine("$cmd -t nat -A $dnsChain -m mark --mark $MARK -d $it -p tcp --dport 53 -j DNAT --to-destination $dns")
             }
             appendLine("$cmd -t nat -D OUTPUT -j $dnsChain 2>/dev/null || true")
             appendLine("$cmd -t nat -A OUTPUT -j $dnsChain")
+            if (v6) appendLine("fi")
         }
     }
 
@@ -536,6 +544,9 @@ object RootProxyManager {
             appendLine("iptables -t nat -D OUTPUT -j ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
             appendLine("iptables -t nat -F ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
             appendLine("iptables -t nat -X ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t nat -D OUTPUT -j ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t nat -F ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
+            appendLine("ip6tables -t nat -X ${AppConfig.ROOT_DNS_OUT_CHAIN} 2>/dev/null || true")
             // IPv6 LAN-sharing chains (forward accept/reject + forwarded-client marking)
             appendLine("ip6tables -D FORWARD -j ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")
             appendLine("ip6tables -F ${AppConfig.ROOT_V6_FWD_CHAIN} 2>/dev/null || true")

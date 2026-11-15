@@ -3,7 +3,7 @@ package com.v2ray.ang.core
 import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.CoreConfigContext
-import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.ProfileEntry
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.CoreResolvedType
 import com.v2ray.ang.enums.EConfigType
@@ -37,7 +37,7 @@ object CoreConfigContextBuilder {
         }
 
         // Step 1: Resolve the main outbound (always tag = TAG_PROXY).
-        val primaryResolvedOutbound = resolveOutbound(AppConfig.TAG_PROXY, config) ?: run {
+        val primaryResolvedOutbound = resolveOutbound(AppConfig.TAG_PROXY, ProfileEntry(guid, config)) ?: run {
             LogUtil.e(AppConfig.TAG, "Failed to resolve main outbound for '${config.remarks}'")
             return null
         }
@@ -61,34 +61,34 @@ object CoreConfigContextBuilder {
      *
      * Custom profiles are ignored at this stage and produce no entry.
      */
-    private fun resolveOutbound(tag: String, profile: ProfileItem): CoreConfigContext.ResolvedOutbound? {
-        if (profile.configType == EConfigType.CUSTOM) {
+    private fun resolveOutbound(tag: String, entry: ProfileEntry): CoreConfigContext.ResolvedOutbound? {
+        if (entry.profile.configType == EConfigType.CUSTOM) {
             return null
         }
 
-        val (resolvedProfiles, resolvedType) = when (profile.configType) {
+        val (resolvedEntries, resolvedType) = when (entry.profile.configType) {
             EConfigType.POLICYGROUP -> Pair(
-                resolvePolicyGroupProfiles(profile),
+                resolvePolicyGroupEntries(entry),
                 CoreResolvedType.POLICYGROUP,
             )
 
             EConfigType.PROXYCHAIN -> {
-                val chainProfiles = resolveProxyChainProfiles(profile)
-                val type = if (chainProfiles.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
-                Pair(chainProfiles, type)
+                val chainEntries = resolveProxyChainEntries(entry)
+                val type = if (chainEntries.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
+                Pair(chainEntries, type)
             }
 
             else -> {
-                val chainProfiles = resolveProxyChainProfilesFromGroup(profile)
-                val type = if (chainProfiles.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
-                Pair(chainProfiles, type)
+                val chainEntries = resolveProxyChainEntriesFromGroup(entry)
+                val type = if (chainEntries.size <= 1) CoreResolvedType.NORMAL else CoreResolvedType.PROXYCHAIN
+                Pair(chainEntries, type)
             }
         }
 
         return CoreConfigContext.ResolvedOutbound(
             tag = tag,
-            profile = profile,
-            resolvedProfiles = resolvedProfiles,
+            entry = entry,
+            resolvedEntries = resolvedEntries,
             resolvedType = resolvedType,
         )
     }
@@ -116,20 +116,20 @@ object CoreConfigContextBuilder {
                     processedTags.add(tag)
 
                     try {
-                        val profile = SettingsManager.getServerViaRemarks(tag) ?: run {
+                        val entry = SettingsManager.getProfileEntryViaRemarks(tag) ?: run {
                             LogUtil.w(AppConfig.TAG, "Routing tag '$tag' has no matching profile — will fall back to proxy at routing time")
                             return@forEach
                         }
-                        val resolvedOutbound = resolveOutbound(tag, profile) ?: run {
+                        val resolvedOutbound = resolveOutbound(tag, entry) ?: run {
                             LogUtil.w(AppConfig.TAG, "Cannot use CUSTOM profile as routing outbound for tag '$tag', skipping")
                             return@forEach
                         }
-                        if (resolvedOutbound.resolvedProfiles.isEmpty()) {
+                        if (resolvedOutbound.resolvedEntries.isEmpty()) {
                             LogUtil.w(AppConfig.TAG, "Routing outbound '$tag' resolved to empty list, skipping")
                             return@forEach
                         }
                         resolvedOutbounds.add(resolvedOutbound)
-                        LogUtil.d(AppConfig.TAG, "Resolved routing outbound: tag='$tag', type='${resolvedOutbound.resolvedType}', profiles=${resolvedOutbound.resolvedProfiles.size}")
+                        LogUtil.d(AppConfig.TAG, "Resolved routing outbound: tag='$tag', type='${resolvedOutbound.resolvedType}', profiles=${resolvedOutbound.resolvedEntries.size}")
                     } catch (e: Exception) {
                         LogUtil.e(AppConfig.TAG, "Failed to resolve routing outbound for tag '$tag', skipping", e)
                     }
@@ -141,59 +141,59 @@ object CoreConfigContextBuilder {
         return resolvedOutbounds
     }
 
-    private fun resolvePolicyGroupProfiles(config: ProfileItem): List<ProfileItem> {
+    private fun resolvePolicyGroupEntries(entry: ProfileEntry): List<ProfileEntry> {
         try {
             val serverList = MmkvManager.decodeAllServerList()
             return serverList
                 .asSequence()
-                .mapNotNull { id -> MmkvManager.decodeServerConfig(id) }
-                .filter { profile ->
-                    val subscriptionId = config.policyGroupSubscriptionId
+                .mapNotNull { id -> MmkvManager.decodeServerConfig(id)?.let { ProfileEntry(id, it) } }
+                .filter {
+                    val subscriptionId = entry.profile.policyGroupSubscriptionId
                     if (subscriptionId.isNullOrBlank()) {
                         true
                     } else {
-                        profile.subscriptionId == subscriptionId
+                        it.profile.subscriptionId == subscriptionId
                     }
                 }
-                .filter { profile ->
-                    val filter = config.policyGroupFilter
+                .filter {
+                    val filter = entry.profile.policyGroupFilter
                     if (filter.isNullOrBlank()) {
                         true
                     } else {
                         try {
-                            Regex(filter).containsMatchIn(profile.remarks)
+                            Regex(filter).containsMatchIn(it.profile.remarks)
                         } catch (_: Exception) {
-                            profile.remarks.contains(filter)
+                            it.profile.remarks.contains(filter)
                         }
                     }
                 }
-                .filter { it.server.isNotNullEmpty() }
-                .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
-                .filter { !it.configType.isComplexType() }
+                .filter { it.profile.server.isNotNullEmpty() }
+                .filter { Utils.isPureIpAddress(it.profile.server!!) || Utils.isValidUrl(it.profile.server!!) }
+                .filter { !it.profile.configType.isComplexType() }
                 .toList()
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to resolve policy group profiles for '${config.remarks}'", e)
-            return listOf(config)
+            LogUtil.e(AppConfig.TAG, "Failed to resolve policy group profiles for '${entry.profile.remarks}'", e)
+            return listOf(entry)
         }
     }
 
-    private fun resolveProxyChainProfiles(config: ProfileItem): List<ProfileItem> {
-        if (config.proxyChainProfiles.isNullOrBlank()) {
-            return listOf(config)
+    private fun resolveProxyChainEntries(entry: ProfileEntry): List<ProfileEntry> {
+        if (entry.profile.proxyChainProfiles.isNullOrBlank()) {
+            return listOf(entry)
         }
 
         try {
-            return config.proxyChainProfiles.orEmpty().split(",")
+            return entry.profile.proxyChainProfiles.orEmpty().split(",")
                 .asSequence()
-                .mapNotNull { remark -> SettingsManager.getServerViaRemarks(remark) }
-                .filter { it.server.isNotNullEmpty() }
-                .filter { Utils.isPureIpAddress(it.server!!) || Utils.isValidUrl(it.server!!) }
-                .filter { !it.configType.isComplexType() }
+                .mapNotNull { remark -> SettingsManager.getProfileEntryViaRemarks(remark) }
+                .filter { it.profile.server.isNotNullEmpty() }
+                .filter { Utils.isPureIpAddress(it.profile.server!!) || Utils.isValidUrl(it.profile.server!!) }
+                .filter { !it.profile.configType.isComplexType() }
                 .toList()
                 .reversed()
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to resolve proxy chain profiles for '${config.remarks}'", e)
-            return listOf(config)
+            LogUtil.e(AppConfig.TAG, "Failed to resolve proxy chain profiles for '${entry.profile.remarks}'", e)
+            return listOf(entry)
         }
     }
 
@@ -202,21 +202,21 @@ object CoreConfigContextBuilder {
      *
      * When no chain is available, return a single-node result.
      */
-    private fun resolveProxyChainProfilesFromGroup(config: ProfileItem): List<ProfileItem> {
-        if (config.subscriptionId.isEmpty()) {
-            return listOf(config)
+    private fun resolveProxyChainEntriesFromGroup(entry: ProfileEntry): List<ProfileEntry> {
+        if (entry.profile.subscriptionId.isEmpty()) {
+            return listOf(entry)
         }
 
         try {
-            val subItem = MmkvManager.decodeSubscription(config.subscriptionId) ?: return listOf(config)
-            val resolved = mutableListOf<ProfileItem>()
-            SettingsManager.getServerViaRemarks(subItem.nextProfile)?.let { resolved.add(it) }
-            resolved.add(config)
-            SettingsManager.getServerViaRemarks(subItem.prevProfile)?.let { resolved.add(it) }
+            val subItem = MmkvManager.decodeSubscription(entry.profile.subscriptionId) ?: return listOf(entry)
+            val resolved = mutableListOf<ProfileEntry>()
+            SettingsManager.getProfileEntryViaRemarks(subItem.nextProfile)?.let { resolved.add(it) }
+            resolved.add(entry)
+            SettingsManager.getProfileEntryViaRemarks(subItem.prevProfile)?.let { resolved.add(it) }
             return resolved
         } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to resolve proxy chain from group for '${config.remarks}'", e)
-            return listOf(config)
+            LogUtil.e(AppConfig.TAG, "Failed to resolve proxy chain from group for '${entry.profile.remarks}'", e)
+            return listOf(entry)
         }
     }
 
@@ -259,13 +259,13 @@ object CoreConfigContextBuilder {
         return resolvedOutbounds
             .asSequence()
             .filter { it.resolvedType == CoreResolvedType.POLICYGROUP }
-            .filter { BalancerStrategyType.from(it.profile.policyGroupType).supportsObservatory && it.profile.policyGroupTestOutbounds != false }
-            .mapNotNull { it.profile.policyGroupFallbackTag }
+            .filter { BalancerStrategyType.from(it.entry.profile.policyGroupType).supportsObservatory && it.entry.profile.policyGroupTestOutbounds != false }
+            .mapNotNull { it.entry.profile.policyGroupFallbackTag }
             .filter { it !in AppConfig.BUILTIN_OUTBOUND_TAGS && resolvedOutbounds.none { outbound -> outbound.tag == it } }
             .distinct()
             .mapNotNull { tag ->
-                SettingsManager.getServerViaRemarks(tag)
-                    ?.takeUnless { it.configType == EConfigType.CUSTOM || it.configType == EConfigType.POLICYGROUP }
+                SettingsManager.getProfileEntryViaRemarks(tag)
+                    ?.takeUnless { it.profile.configType == EConfigType.CUSTOM || it.profile.configType == EConfigType.POLICYGROUP }
                     ?.let { resolveOutbound(tag, it) }
             }
             .toList()

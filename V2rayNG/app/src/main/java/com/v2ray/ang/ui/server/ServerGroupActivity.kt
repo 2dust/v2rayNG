@@ -1,27 +1,42 @@
 package com.v2ray.ang.ui.server
 
 import android.os.Bundle
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
@@ -40,6 +55,7 @@ import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
 class ServerGroupActivity : BaseComponentActivity() {
@@ -69,7 +85,12 @@ class ServerGroupActivity : BaseComponentActivity() {
         populateSubscriptionSpinner()
         fallbackSuggestions = (
                 BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks(
-                    excludeConfigTypes = setOf(EConfigType.CUSTOM, EConfigType.POLICYGROUP)
+                    excludeConfigTypes = setOf(
+                        EConfigType.CUSTOM,
+                        EConfigType.CUSTOM_OUTBOUND,
+                        EConfigType.POLICYGROUP,
+                        EConfigType.PROXYCHAIN,
+                    )
                 )
                 ).filter { it != TAG_PROXY }
 
@@ -233,6 +254,7 @@ fun ServerGroupScreen(
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showFallbackDialog by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val selectedType = typeEntries.indexOf(typeValue).coerceAtLeast(0).toString()
     val supportsObservatory = BalancerStrategyType.from(selectedType).supportsObservatory
@@ -301,13 +323,48 @@ fun ServerGroupScreen(
                     onCheckedChange = { testOutbounds = it }
                 )
                 if (testOutbounds) {
-                    FormDropdownField(
-                        label = stringResource(R.string.title_policy_group_fallback),
-                        value = fallbackTag,
-                        options = fallbackSuggestions,
-                        onValueChange = { fallbackTag = it },
-                        editable = true
+                    val fallbackLabel = stringResource(R.string.title_policy_group_fallback)
+                    val fallbackDisplay = fallbackTag.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) }
+                    Text(
+                        text = fallbackLabel,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .semantics {
+                                    contentDescription = fallbackLabel
+                                    stateDescription = fallbackDisplay
+                                }
+                                .clickable(role = Role.Button) { showFallbackDialog = true },
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ) {
+                            Text(
+                                text = fallbackDisplay,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (fallbackTag.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                else MaterialTheme.colorScheme.onSurface,
+                                fontWeight = if (fallbackTag.isBlank()) FontWeight.Normal else FontWeight.Medium,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .clearAndSetSemantics {}
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                            )
+                        }
+                        IconButton(onClick = { fallbackTag = "" }) {
+                            Icon(
+                                painterResource(R.drawable.ic_delete_24dp),
+                                contentDescription = "${stringResource(R.string.logcat_clear)}, $fallbackLabel"
+                            )
+                        }
+                    }
                 }
                 NavigationBarsSpacer()
             }
@@ -320,6 +377,18 @@ fun ServerGroupScreen(
             itemName = initialRemarks,
             onConfirm = onDelete,
             onDismiss = { showDeleteConfirm = false }
+        )
+    }
+    if (showFallbackDialog && supportsObservatory && testOutbounds) {
+        ServerSelectListDialog(
+            title = stringResource(R.string.title_policy_group_fallback),
+            options = fallbackSuggestions,
+            selectedOption = fallbackTag,
+            onSelected = {
+                fallbackTag = it
+                showFallbackDialog = false
+            },
+            onDismiss = { showFallbackDialog = false }
         )
     }
 }
