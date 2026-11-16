@@ -1,5 +1,6 @@
 package com.v2ray.ang.dto
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.enums.EConfigType
@@ -277,18 +278,33 @@ data class V2rayConfig(
                 )
             }
 
+            /**
+             * Mirrors Xray-core `XDriveConfig` (infra/conf/transport_method.go). Every field is
+             * optional so that a user-supplied extra JSON object can be deserialized into it.
+             */
             data class XdriveSettingsBean(
-                var service: String,
-                var remoteFolder: String,
-                var secrets: List<String>,
-                var concurrency: Int? = null,
-                var flushIntervalMs: Int? = null,
-                var maxPollIntervalMs: Int? = null,
-                var eagerWindowMs: Int? = null,
+                var service: String? = null,
+                var remoteFolder: String? = null,
+                var secrets: List<String>? = null,
                 var segmentBytes: Int? = null,
+                var flushIntervalMs: Int? = null,
                 var pollIntervalMs: Int? = null,
+                var maxPollIntervalMs: Int? = null,
+                var sessionTtlSeconds: Int? = null,
+                var concurrency: Int? = null,
+                var eagerWindowMs: Int? = null,
+                var holeTimeoutMs: Int? = null,
+                var template: JsonObject? = null,
+                var s3: S3Bean? = null,
                 var xmux: XmuxSettingsBean? = null
             ) {
+                data class S3Bean(
+                    var endpoint: String? = null,
+                    var region: String? = null,
+                    var bucket: String? = null,
+                    var pathStyle: Boolean? = null
+                )
+
                 data class XmuxSettingsBean(
                     var maxConnections: Any? = null,
                     var maxConcurrency: Any? = null,

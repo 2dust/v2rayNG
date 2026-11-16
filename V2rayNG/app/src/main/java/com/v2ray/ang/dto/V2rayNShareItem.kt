@@ -1,9 +1,12 @@
 package com.v2ray.ang.dto
 
+import com.google.gson.JsonObject
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
+import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.util.JsonUtil
 
 @Suppress("PropertyName")
 data class V2rayNShareItem(
@@ -74,7 +77,34 @@ data class V2rayNShareItem(
         val KcpHeaderType: String?,
         val KcpSeed: String?,
         val KcpMtu: Int?,
-    )
+        val XdriveService: String?,
+        val XdriveRemoteFolder: String?,
+        val XdriveSecrets: String?,
+        val XdriveS3Endpoint: String?,
+        val XdriveS3Region: String?,
+        val XdriveS3Bucket: String?,
+        val XdriveS3PathStyle: Boolean?,
+        val XdriveExtra: String?,
+    ) {
+        /**
+         * v2rayN keeps the S3 fields apart from its extra JSON; v2rayNG carries everything that
+         * has no dedicated field in one XDriveConfig extra object, so merge them here.
+         */
+        fun xdriveExtraJson(): String? {
+            val extra = XdriveExtra?.nullIfBlank()?.let { JsonUtil.parseString(it) } ?: JsonObject()
+            val hasS3 = listOf(XdriveS3Endpoint, XdriveS3Region, XdriveS3Bucket).any { !it.isNullOrBlank() }
+                || XdriveS3PathStyle != null
+            if (hasS3 && !extra.has("s3")) {
+                extra.add("s3", JsonObject().apply {
+                    XdriveS3Endpoint?.nullIfBlank()?.let { addProperty("endpoint", it) }
+                    XdriveS3Region?.nullIfBlank()?.let { addProperty("region", it) }
+                    XdriveS3Bucket?.nullIfBlank()?.let { addProperty("bucket", it) }
+                    XdriveS3PathStyle?.let { addProperty("pathStyle", it) }
+                })
+            }
+            return if (extra.size() == 0) null else JsonUtil.toJson(extra)
+        }
+    }
 
     fun toProfileItem(): ProfileItem {
         val configType = when (ConfigType) {
@@ -118,7 +148,11 @@ data class V2rayNShareItem(
                 else -> null
             },
             host = TransportExtraObj?.Host,
-            path = TransportExtraObj?.Path,
+            path = if (network == NetworkType.XDRIVE.type) {
+                TransportExtraObj?.XdriveRemoteFolder ?: TransportExtraObj?.Path
+            } else {
+                TransportExtraObj?.Path
+            },
             seed = TransportExtraObj?.KcpSeed,
             kcpMtu = TransportExtraObj?.KcpMtu,
             mode = TransportExtraObj?.GrpcMode,
@@ -126,6 +160,9 @@ data class V2rayNShareItem(
             authority = TransportExtraObj?.GrpcAuthority,
             xhttpMode = TransportExtraObj?.XhttpMode,
             xhttpExtra = TransportExtraObj?.XhttpExtra,
+            xdriveService = if (network == NetworkType.XDRIVE.type) TransportExtraObj?.XdriveService else null,
+            xdriveSecrets = if (network == NetworkType.XDRIVE.type) TransportExtraObj?.XdriveSecrets else null,
+            xdriveExtra = if (network == NetworkType.XDRIVE.type) TransportExtraObj?.xdriveExtraJson() else null,
             finalMask = Finalmask,
             security = StreamSecurity,
             sni = Sni,
