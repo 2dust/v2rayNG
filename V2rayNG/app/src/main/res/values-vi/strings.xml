@@ -141,6 +141,16 @@
     <string name="server_lab_bandwidth_up">Băng thông tải lên (đơn vị hỗ trợ: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Chế độ XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON thô của XHTTP Extra, định dạng: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">Dịch vụ xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">Thư mục từ xa xdrive</string>
+    <string name="server_lab_xdrive_secrets">Khóa bí mật xdrive, phân tách bằng dấu phẩy (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">JSON thô của xdrive Extra, định dạng: { XDriveObject } (s3, template, xmux…)</string>
+    <string name="toast_xdrive_vless_only">Truyền tải xdrive chỉ hoạt động với VLESS</string>
+    <string name="toast_xdrive_need_encryption">Truyền tải xdrive cần mã hóa VLESS (chạy \"xray vlessenc\" trên máy chủ)</string>
+    <string name="toast_xdrive_flow_unsupported">Truyền tải xdrive không hỗ trợ VLESS flow</string>
+    <string name="toast_xdrive_invalid_secrets">Khóa bí mật xdrive không hợp lệ: Google Drive cần 3, S3 cần 2 hoặc 3</string>
+    <string name="toast_xdrive_missing_s3">Dịch vụ \"s3\" cần đối tượng \"s3\" trong xdrive Extra</string>
+    <string name="toast_xdrive_missing_template">Dịch vụ \"template\" cần đối tượng \"template\" trong xdrive Extra</string>
     <string name="server_lab_final_mask">JSON thô của finalMask, định dạng: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Xác minh chứng chỉ ngang hàng theo tên</string>
