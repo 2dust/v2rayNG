@@ -45,6 +45,7 @@
     <string name="menu_item_import_config_manually_trojan">新增 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">新增 [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">新增 [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_masque">新增 [MASQUE]</string>
     <string name="confirm_delete_visible_profiles">確定要刪除目前顯示的所有設定檔嗎？</string>
     <string name="confirm_delete_duplicate_profiles">確定要刪除目前顯示的所有重複設定檔嗎？</string>
     <string name="confirm_delete_invalid_profiles">請先測試設定檔。確定要刪除目前顯示的所有無效設定檔嗎？</string>
@@ -73,6 +74,7 @@
     <string name="server_lab_request_host_h2">h2 host</string>
     <string name="server_lab_request_host_quic">QUIC 加密方式</string>
     <string name="server_lab_request_host_grpc">gRPC Authority</string>
+    <string name="server_lab_request_host_masque">MASQUE host</string>
     <string name="server_lab_path">path</string>
     <string name="server_lab_path_ws">ws path</string>
     <string name="server_lab_path_httpupgrade">httpupgrade path</string>
@@ -81,6 +83,7 @@
     <string name="server_lab_path_quic">QUIC 加密金鑰</string>
     <string name="server_lab_path_kcp">kcp seed</string>
     <string name="server_lab_path_grpc">gRPC serviceName</string>
+    <string name="server_lab_path_masque">MASQUE path</string>
     <string name="server_lab_stream_security" translatable="false">TLS</string>
     <string name="server_lab_stream_fingerprint">Fingerprint</string>
     <string name="server_lab_stream_alpn" translatable="false">ALPN</string>
@@ -102,6 +105,10 @@
     <string name="server_lab_secret_key">SecretKey</string>
     <string name="server_lab_reserved">Reserved (可選，逗號隔開)</string>
     <string name="server_lab_local_address">本機位址 (可選 IPv4/IPv6，逗號隔開)</string>
+    <string name="server_lab_local_address_hint">留空時預設使用 %1$s。僅在啟用 IPv6 時才使用 IPv6 位址。</string>
+    <string name="server_lab_masque_warp_settings">WARP</string>
+    <string name="server_lab_masque_warp_private_key">WARP PrivateKey</string>
+    <string name="server_lab_masque_warp_public_key">WARP PublicKey</string>
     <string name="server_lab_local_mtu">MTU（可選，預設 1420）</string>
     <string name="server_lab_remote_dns">remoteDNS(選填,多個 IPv4/IPv6 位址以逗號分隔)</string>
     <string name="server_lab_remote_dns_hint">留空時預設使用 %1$s。僅在啟用 IPv6 時才使用 IPv6 位址。</string>
@@ -125,6 +132,9 @@
     <string name="server_lab_request_host6">Host (SNI) (可選)</string>
     <string name="toast_action_not_allowed">禁止此項操作</string>
     <string name="server_obfs_password">混淆密碼</string>
+    <string name="server_obfs_type">混淆類型</string>
+    <string name="server_lab_min_packet_size">最小數據包大小（可選，默認 512）</string>
+    <string name="server_lab_max_packet_size">最大數據包大小（可選，默認 1200）</string>
     <string name="server_lab_port_hop">跳躍連接埠 (會覆蓋伺服器連接埠)</string>
     <string name="server_lab_port_hop_interval">連接埠跳躍間隔 (秒)</string>
     <string name="server_lab_bandwidth_down">下載頻寬（支援的單位：k/m/g/t）</string>

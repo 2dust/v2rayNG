@@ -159,8 +159,8 @@ data class V2rayNShareItem(
             // policyGroupSubscriptionId = ProtoExtraObj?.SubChildItems,
             policyGroupSubscriptionId = if (ProtoExtraObj?.SubChildItems == "self") "self" else null,
             policyGroupFilter = ProtoExtraObj?.Filter,
-            // NOTE: proxyChainProfiles stores remarks, not IndexId
-            // proxyChainProfiles = ProtoExtraObj?.ChildItems,
+            // NOTE: proxyChainProfileList stores remarks, not IndexId
+            // proxyChainProfileList = ProtoExtraObj?.ChildItems,
         )
         // profile.description =
         return profile
