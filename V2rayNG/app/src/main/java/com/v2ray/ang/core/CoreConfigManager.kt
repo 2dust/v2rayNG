@@ -300,7 +300,7 @@ object CoreConfigManager {
             LogUtil.w(AppConfig.TAG, "NORMAL resolved outbound '${resolvedOutbound.tag}' has empty resolvedProfiles, skipping")
             return
         }
-        val outbound = convertProfile2Outbound(entry.profile) ?: run {
+        val outbound = convertProfile2Outbound(entry) ?: run {
             LogUtil.w(AppConfig.TAG, "Could not convert NORMAL resolved outbound '${resolvedOutbound.tag}' profile to outbound, skipping")
             return
         }
@@ -323,7 +323,7 @@ object CoreConfigManager {
         v2rayConfig: V2rayConfig,
     ) {
         val chainOutbounds = resolvedOutbound.resolvedEntries
-            .mapNotNull { convertProfile2Outbound(it.profile) }
+            .mapNotNull { convertProfile2Outbound(it) }
             .toMutableList()
         if (chainOutbounds.isEmpty()) {
             LogUtil.w(AppConfig.TAG, "PROXYCHAIN resolved outbound '${resolvedOutbound.tag}' has no valid profiles, skipping")
@@ -1379,5 +1379,3 @@ object CoreConfigManager {
 
     //endregion
 }
-
-\n

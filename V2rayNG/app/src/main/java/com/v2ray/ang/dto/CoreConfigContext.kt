@@ -2,6 +2,7 @@ package com.v2ray.ang.dto
 
 import android.content.Context
 import com.v2ray.ang.dto.entities.ProfileEntry
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.CoreResolvedType
 
 data class CoreConfigContext(

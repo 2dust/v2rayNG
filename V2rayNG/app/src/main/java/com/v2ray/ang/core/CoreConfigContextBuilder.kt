@@ -214,5 +214,3 @@ object CoreConfigContextBuilder {
                     ?.let { resolveOutbound(remark, it) }
             }.toList()
 }
-
-\n
