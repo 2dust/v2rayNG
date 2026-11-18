@@ -8,4 +8,5 @@ data class ConnectionTestResult(
     val errorMessage: String = "",
     val country: String? = null,
     val ipAddress: String? = null,
+    val isFinal: Boolean = true,
 ) : Serializable

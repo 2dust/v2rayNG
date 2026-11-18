@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -33,22 +34,38 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.compose.AccessibilityLiveRegionText
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 private val KNOB_SIZE = 56.dp
@@ -68,11 +85,54 @@ private const val TEXT_LINE_HEIGHT_FACTOR = 1.3f
 @Composable
 fun MainBottomBar(
     displayText: String,
+    accessibilityText: String,
+    status: MainStatus,
+    testAnnouncements: Flow<MainTestAnnouncement?>,
+    formatTestAnnouncement: (MainStatus) -> String,
     isRunning: Boolean,
     isDarkTheme: Boolean,
     onAction: (MainAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val announcements = remember { MainTestAnnouncements() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var publishedId by remember { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(testAnnouncements, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            try {
+                testAnnouncements.collect(announcements::offer)
+            } finally {
+                announcements.clear()
+            }
+        }
+    }
+
+    val testAnnouncement = announcements.current
+    LaunchedEffect(testAnnouncement?.id, publishedId) {
+        val id = testAnnouncement?.id ?: return@LaunchedEffect
+        if (publishedId != id) return@LaunchedEffect
+        // Preserve publication order, including fast Testing -> result updates. This is a
+        // semantics lifetime, not a timer claiming to know when TalkBack finishes speaking.
+        delay(TestLiveRegionLifetimeMs)
+        announcements.advance(id)
+    }
+    val exposeTestResult = isRunning && status is MainStatus.ConnectionTest &&
+        status.result.isFinal && testAnnouncement == null
+    val statusText = localizedTestText(
+        if (exposeTestResult) "$accessibilityText. ${formatTestAnnouncement(status)}" else accessibilityText
+    )
+
+    val checkConnectionLabel = stringResource(R.string.connection_test_pending)
+    val connectionActionModifier = if (isRunning) {
+        Modifier.clickable(
+            onClickLabel = checkConnectionLabel,
+            onClick = { onAction(MainAction.TestCurrentServer) },
+        )
+    } else {
+        Modifier
+    }
+
     val scope = rememberCoroutineScope()
     val rotationAnim = remember { Animatable(0f) }
     val textLayoutDirection = LocalLayoutDirection.current
@@ -115,7 +175,8 @@ fun MainBottomBar(
                         .shadow(elevation = 3.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .clickable(onClick = { onAction(MainAction.TestCurrentServer) })
+                        .semantics { text = statusText }
+                        .then(connectionActionModifier)
                 )
                 CompositionLocalProvider(LocalLayoutDirection provides textLayoutDirection) {
                     Box(
@@ -147,7 +208,7 @@ fun MainBottomBar(
                                     fontSizeSp = (fontSizeSp - 1f).coerceAtLeast(TEXT_MIN_SP)
                                 }
                             },
-                            modifier = Modifier.semantics { contentDescription = displayText }
+                            modifier = Modifier.clearAndSetSemantics { hideFromAccessibility() }
                         )
                     }
                 }
@@ -186,5 +247,25 @@ fun MainBottomBar(
                 }
             }
         }
+        AccessibilityLiveRegionText(
+            eventId = testAnnouncement?.id,
+            text = testAnnouncement?.status?.let(formatTestAnnouncement).orEmpty(),
+            mode = LiveRegionMode.Assertive,
+            onPublished = { publishedId = it },
+        )
     }
 }
+
+@Composable
+private fun localizedTestText(text: String): AnnotatedString {
+    val languageTag = LocalConfiguration.current.locales[0].toLanguageTag()
+    return remember(text, languageTag) {
+        buildAnnotatedString {
+            withStyle(SpanStyle(localeList = LocaleList(Locale(languageTag)))) {
+                append(text)
+            }
+        }
+    }
+}
+
+private const val TestLiveRegionLifetimeMs = 1000L
