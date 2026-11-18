@@ -1,10 +1,12 @@
 package com.v2ray.ang.handler
 
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.util.Utils
 import java.net.URI
 import java.net.URLDecoder
 import java.util.Locale
+import kotlin.math.roundToLong
 
 /**
  * Parses the account information subscription panels put in the response headers of the
@@ -15,6 +17,7 @@ import java.util.Locale
  * - `Profile-Title: <text>` or `base64:<base64 text>`
  * - `Support-Url: <link>` (usually a Telegram link)
  * - `Profile-Web-Page-Url: <link>` (the panel's subscription information page)
+ * - `Profile-Update-Interval: <hours>` (how often clients should refresh the subscription)
  *
  * Pure functions only, so the logic is covered by plain JVM tests.
  */
@@ -25,6 +28,9 @@ object SubscriptionInfoParser {
 
     /** Values at or above this are epoch milliseconds, not seconds (year 5138 in seconds). */
     private const val MILLIS_THRESHOLD = 100_000_000_000L
+
+    private const val MINUTES_PER_HOUR = 60
+    private const val MAX_UPDATE_INTERVAL_MINUTES = 365L * 24 * MINUTES_PER_HOUR
 
     private val SAFE_SCHEMES = setOf("http", "https", "tg")
     private val TELEGRAM_HOSTS = setOf("t.me", "telegram.me", "telegram.dog", "telegram.org")
@@ -57,6 +63,18 @@ object SubscriptionInfoParser {
             supportUrl = support,
             webPageUrl = webPage,
         )
+    }
+
+    /**
+     * Converts the `Profile-Update-Interval` header (hours, fractions allowed) to minutes, clamped
+     * to what the auto-update scheduler supports.
+     *
+     * @return null when the header is absent, not a number or not positive.
+     */
+    fun parseUpdateIntervalMinutes(raw: String?): Long? {
+        val hours = raw?.trim()?.toDoubleOrNull()?.takeIf { it.isFinite() && it > 0.0 } ?: return null
+        return (hours * MINUTES_PER_HOUR).roundToLong()
+            .coerceIn(AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES, MAX_UPDATE_INTERVAL_MINUTES)
     }
 
     /**
