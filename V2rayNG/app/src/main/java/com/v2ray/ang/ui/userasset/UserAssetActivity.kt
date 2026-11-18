@@ -227,10 +227,10 @@ class UserAssetActivity : HelperBaseComponentActivity() {
                         R.plurals.title_update_asset_count,
                         result.successCount,
                         result.successCount,
-                    )
+                    ),
                 )
             } else {
-                toast(getString(R.string.toast_failure))
+                toastError(R.string.toast_failure)
             }
             refreshData().join()
             isLoadingState.value = false
