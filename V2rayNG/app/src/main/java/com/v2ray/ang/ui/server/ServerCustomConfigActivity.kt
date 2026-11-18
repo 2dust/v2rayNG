@@ -104,17 +104,17 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
             initialRemarks = initialRemarks,
             initialContent = initialContent,
             onBackClick = { finish() },
-            onSave = { remarks, content -> saveServer(remarks, content) },
-            onDelete = { deleteServer() }
+            onSave = ::saveServer,
+            onDelete = ::deleteServer,
         )
     }
 
     private fun saveServer(
         remarks: String,
         content: String
-    ): Boolean {
+    ) {
         if (remarks.isBlank()) {
-            return false
+            return
         }
         val (parsedProfile, contentToSave) = try {
             if (configType == EConfigType.CUSTOM_OUTBOUND) {
@@ -137,7 +137,7 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                     getString(R.string.toast_malformed_json_detail, detail)
                 }
             )
-            return false
+            return
         }
 
         val config =
@@ -154,13 +154,12 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
 
         val savedGuid = MmkvManager.encodeServerConfig(
             editGuid,
-            config
-        )
-
-        MmkvManager.encodeServerRaw(
-            savedGuid,
-            contentToSave
-        )
+            config,
+            rawConfig = contentToSave,
+        ) ?: run {
+            toast(R.string.toast_failure)
+            return
+        }
 
         toastSuccess(R.string.toast_success)
 
@@ -170,27 +169,26 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
                 restartService = isRunning
             )
         }
-
-        return true
     }
 
-    private fun deleteServer(): Boolean {
+    private fun deleteServer() {
         if (editGuid.isEmpty()) {
-            return false
+            return
         }
 
         if (editGuid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed)
-            return false
+            return
         }
 
-        MmkvManager.removeServer(editGuid)
+        if (!MmkvManager.removeServer(editGuid)) {
+            toast(R.string.toast_failure)
+            return
+        }
 
         ProfileEditorResult.run {
             finishDeleted(editGuid)
         }
-
-        return true
     }
 }
 
@@ -210,7 +208,7 @@ fun ServerCustomConfigScreen(
     initialRemarks: String,
     initialContent: String,
     onBackClick: () -> Unit,
-    onSave: (String, String) -> Boolean,
+    onSave: (String, String) -> Unit,
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
