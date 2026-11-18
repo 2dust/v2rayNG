@@ -70,6 +70,13 @@ open class FmtBase {
         config.authority = queryParam["authority"]
         config.xhttpMode = queryParam["mode"]
         config.xhttpExtra = queryParam["extra"]
+        if (config.network == NetworkType.XDRIVE.type) {
+            // xdrive shares "extra" with xhttp in links; keep it only on the xdrive field.
+            config.xhttpExtra = null
+            config.xdriveService = queryParam["service"]
+            config.xdriveSecrets = queryParam["secrets"]
+            config.xdriveExtra = queryParam["extra"]
+        }
         config.finalMask = queryParam["fm"]
 
         config.security = queryParam["security"]
@@ -150,6 +157,13 @@ open class FmtBase {
                 config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
                 config.xhttpMode?.nullIfBlank()?.let { dicQuery["mode"] = it }
                 config.xhttpExtra?.nullIfBlank()?.let { dicQuery["extra"] = it }
+            }
+
+            NetworkType.XDRIVE -> {
+                config.xdriveService?.nullIfBlank()?.let { dicQuery["service"] = it }
+                config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
+                config.xdriveSecrets?.nullIfBlank()?.let { dicQuery["secrets"] = it }
+                config.xdriveExtra?.nullIfBlank()?.let { dicQuery["extra"] = it }
             }
 
             NetworkType.HTTP, NetworkType.H2 -> {

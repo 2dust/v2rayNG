@@ -141,6 +141,16 @@
     <string name="server_lab_bandwidth_up">Исходящая пропускная способность (допускаются: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>
     <string name="server_lab_xhttp_extra">Необработанный JSON XHTTP Extra, формат: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">Сервис xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">Удалённая папка xdrive</string>
+    <string name="server_lab_xdrive_secrets">Секреты xdrive через запятую (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">Необработанный JSON xdrive Extra, формат: { XDriveObject } (s3, template, xmux…)</string>
+    <string name="toast_xdrive_vless_only">Транспорт xdrive работает только с VLESS</string>
+    <string name="toast_xdrive_need_encryption">Транспорту xdrive нужно шифрование VLESS (выполните \"xray vlessenc\" на сервере)</string>
+    <string name="toast_xdrive_flow_unsupported">Транспорт xdrive не поддерживает VLESS flow</string>
+    <string name="toast_xdrive_invalid_secrets">Неверные секреты xdrive: для Google Drive нужно 3, для S3 — 2 или 3</string>
+    <string name="toast_xdrive_missing_s3">Сервису \"s3\" нужен объект \"s3\" в xdrive Extra</string>
+    <string name="toast_xdrive_missing_template">Сервису \"template\" нужен объект \"template\" в xdrive Extra</string>
     <string name="server_lab_final_mask">Необработанный JSON FinalMask, формат: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Проверять сертификат узла по имени</string>
