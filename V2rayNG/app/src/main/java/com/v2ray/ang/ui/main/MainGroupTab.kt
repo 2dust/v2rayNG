@@ -18,6 +18,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,6 +39,10 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +51,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
 import kotlinx.coroutines.flow.StateFlow
@@ -91,6 +97,7 @@ fun GroupTabBar(
             Row(
                 Modifier
                     .horizontalScroll(rememberScrollState())
+                    .selectableGroup()
                     .padding(TAB_BAR_PADDING)
             ) {
                 EqualOrNaturalTabsLayout(availablePx = availablePx) {
@@ -165,6 +172,12 @@ private fun GroupTabItem(
     onClick: () -> Unit
 ) {
     val servers by serverFlow.collectAsStateWithLifecycle()
+    val accessibilityLabel = pluralStringResource(
+        R.plurals.acc_group_tab,
+        servers.size,
+        group.remarks,
+        servers.size,
+    )
     // The default group (empty id) never showed a count.
     val count = if (group.id.isEmpty()) 0 else servers.size
     val colors = MaterialTheme.colorScheme
@@ -189,6 +202,7 @@ private fun GroupTabItem(
             .onSizeChanged { size = it }
             .clip(CircleShape)
             .background(if (selected) colors.primary.copy(alpha = 0.12f) else Color.Transparent)
+            .semantics { contentDescription = accessibilityLabel }
             .selectable(selected = selected, role = Role.Tab, onClick = onClick)
             .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.Center,
@@ -196,6 +210,7 @@ private fun GroupTabItem(
     ) {
         Text(
             text = group.remarks,
+            modifier = Modifier.semantics { hideFromAccessibility() },
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
             color = if (selected) colors.primary else colors.onSurfaceVariant,
@@ -215,6 +230,7 @@ private fun GroupTabItem(
             ) {
                 Text(
                     text = count.toString(),
+                    modifier = Modifier.semantics { hideFromAccessibility() },
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
                     color = if (selected) colors.onPrimary else colors.surface,
                     maxLines = 1
