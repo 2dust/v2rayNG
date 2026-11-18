@@ -30,7 +30,7 @@ object LauncherManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
             return false
         }
         return true
@@ -47,12 +47,11 @@ object LauncherManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toast(e.message ?: e.javaClass.simpleName)
+            context.toastError(e.message ?: e.javaClass.simpleName)
         }
     }
 
     fun stopService(context: Context) {
-        //context.toast(R.string.toast_services_stop)
         MessageHelper.sendMsg2Service(context, AppConfig.MSG_STATE_STOP, "")
     }
 
