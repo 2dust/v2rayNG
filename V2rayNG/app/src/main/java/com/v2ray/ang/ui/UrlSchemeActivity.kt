@@ -22,39 +22,12 @@ class UrlSchemeActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            intent.apply {
-                if (action == Intent.ACTION_SEND) {
-                    if ("text/plain" == type) {
-                        intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                            parseUri(it, null)
-                        }
-                    }
-                } else if (action == Intent.ACTION_VIEW) {
-                    when (data?.host) {
-                        "install-config" -> {
-                            val uri: Uri? = intent.data
-                            val shareUrl = uri?.getQueryParameter("url").orEmpty()
-                            parseUri(shareUrl, uri?.fragment)
-                        }
-
-                        "install-sub" -> {
-                            val uri: Uri? = intent.data
-                            val shareUrl = uri?.getQueryParameter("url").orEmpty()
-                            parseUri(shareUrl, uri?.fragment)
-                        }
-
-                        else -> {
-                            toastError(R.string.toast_failure)
-                        }
-                    }
-                }
-            }
-
-            startActivity(Intent(this, MainActivity::class.java))
+        lifecycleScope.launch {
+            val imported = importFromIntent(intent)
+            startActivity(Intent(this@UrlSchemeActivity, MainActivity::class.java).apply {
+                if (imported) putExtra(MainActivity.EXTRA_REFRESH_AFTER_IMPORT, true)
+            })
             finish()
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Error processing URL scheme", e)
         }
     }
 
@@ -62,29 +35,36 @@ class UrlSchemeActivity : BaseComponentActivity() {
     override fun ScreenContent() {
     }
 
-    private fun parseUri(uriString: String?, fragment: String?) {
-        if (uriString.isNullOrEmpty()) {
-            return
-        }
-        LogUtil.i(AppConfig.TAG, uriString)
-
-        var decodedUrl = URLDecoder.decode(uriString, "UTF-8")
-        val uri = Uri.parse(decodedUrl)
-        if (uri != null) {
-            if (uri.fragment.isNullOrEmpty() && !fragment.isNullOrEmpty()) {
-                decodedUrl += "#${fragment}"
-            }
-            LogUtil.i(AppConfig.TAG, decodedUrl)
-            lifecycleScope.launch(Dispatchers.IO) {
-                val (count, countSub) = AngConfigManager.importBatchConfig(decodedUrl, "", false)
-                withContext(Dispatchers.Main) {
-                    if (count + countSub > 0) {
-                        toast(R.string.import_subscription_success)
-                    } else {
-                        toast(R.string.import_subscription_failure)
-                    }
+    private suspend fun importFromIntent(source: Intent): Boolean {
+        val uri = source.data
+        val text = when (source.action) {
+            Intent.ACTION_SEND -> source.getStringExtra(Intent.EXTRA_TEXT).takeIf { source.type == "text/plain" }
+            Intent.ACTION_VIEW -> when (uri?.host) {
+                "install-config", "install-sub" -> uri.getQueryParameter("url")
+                else -> {
+                    toastError(R.string.toast_failure)
+                    return false
                 }
             }
+            else -> null
         }
+        if (text.isNullOrEmpty()) return false
+
+        val imported = withContext(Dispatchers.IO) {
+            val decoded = try {
+                URLDecoder.decode(text, "UTF-8")
+            } catch (e: IllegalArgumentException) {
+                LogUtil.e(AppConfig.TAG, "Malformed encoding in external import", e)
+                return@withContext false
+            }
+            val fragment = uri?.fragment.takeIf { source.action == Intent.ACTION_VIEW }
+            val config = if (!fragment.isNullOrEmpty() && Uri.parse(decoded).fragment.isNullOrEmpty()) {
+                "$decoded#$fragment"
+            } else decoded
+            val (profiles, subscriptions) = AngConfigManager.importBatchConfig(config, "", false)
+            profiles > 0 || subscriptions > 0
+        }
+        toast(if (imported) R.string.import_subscription_success else R.string.import_subscription_failure)
+        return imported
     }
 }
