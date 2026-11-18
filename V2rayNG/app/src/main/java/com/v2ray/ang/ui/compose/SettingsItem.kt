@@ -251,12 +251,12 @@ fun SettingsSwitchItem(
         onClick = if (enabled) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = modifier,
+        modifier = modifier.then(LocalOutboundEditorFocus.current?.target() ?: Modifier),
         trailing = {
             Switch(
                 checked = checked,
                 onCheckedChange = if (enabled) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f),
+                modifier = Modifier.scale(0.8f).then(LocalOutboundEditorFocus.current?.target() ?: Modifier),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary
