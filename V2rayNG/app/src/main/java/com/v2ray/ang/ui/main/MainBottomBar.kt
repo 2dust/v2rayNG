@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.colorFabActive
 import com.v2ray.ang.ui.compose.colorFabInactiveDark
+import com.v2ray.ang.ui.compose.accessibilityClickLabel
 import com.v2ray.ang.ui.compose.colorFabInactiveLight
 import kotlinx.coroutines.launch
 
@@ -151,6 +152,7 @@ fun MainBottomBar(
                         )
                     }
                 }
+                val serviceActionLabel = stringResource(if (isRunning) R.string.acc_disconnect else R.string.acc_connect)
                 FloatingActionButton(
                     onClick = {
                         if (!isRunning) {
@@ -166,7 +168,8 @@ fun MainBottomBar(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = knobInset)
-                        .size(KNOB_SIZE),
+                        .size(KNOB_SIZE)
+                        .accessibilityClickLabel(serviceActionLabel),
                     shape = CircleShape,
                     containerColor = if (isRunning) colorFabActive
                     else if (isDarkTheme) colorFabInactiveDark
