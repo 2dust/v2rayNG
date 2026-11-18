@@ -1,8 +1,11 @@
 package com.v2ray.ang.ui.server
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -44,7 +47,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
@@ -69,17 +71,23 @@ class ServerGroupActivity : BaseComponentActivity() {
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
     private val subIds = mutableListOf<String>()
     private val subDisplay = mutableListOf<String>()
+    private var isTelevision = false
     private lateinit var fallbackSuggestions: List<String>
 
     private lateinit var initialRemarks: String
     private lateinit var initialFilter: String
     private var initialType: Int = 0
-    private var initialSubIndex: Int = 0
+    private var initialSourceId = ""
     private var initialTestOutbounds: Boolean = false
     private lateinit var initialFallbackTag: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+        if (isTelevision && savedInstanceState != null) {
+            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
+            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        }
 
         val config = MmkvManager.decodeServerConfig(editGuid)
         populateSubscriptionSpinner()
@@ -100,29 +108,28 @@ class ServerGroupActivity : BaseComponentActivity() {
         initialTestOutbounds = config == null || config.policyGroupTestOutbounds != false ||
                 !BalancerStrategyType.from(config.policyGroupType).supportsObservatory
         initialFallbackTag = config?.policyGroupFallbackTag.orEmpty()
-        initialSubIndex = if (config != null) {
-            subIds.indexOf(config.policyGroupSubscriptionId ?: "").let { if (it >= 0) it else 0 }
-        } else if (subscriptionId.isNotNullEmpty()) {
-            subIds.indexOf(subscriptionId).let { if (it >= 0) it else 0 }
-        } else 0
+        initialSourceId = (if (config != null) config.policyGroupSubscriptionId else subscriptionId)
+            .takeIf { it in subIds }.orEmpty()
     }
 
     @Composable
     override fun ScreenContent() {
         ServerGroupScreen(
+            isTelevision = isTelevision,
             editGuid = editGuid,
             isRunning = isRunning,
+            subIds = subIds,
             subDisplay = subDisplay,
             initialRemarks = initialRemarks,
             initialFilter = initialFilter,
             initialType = initialType,
-            initialSubIndex = initialSubIndex,
+            initialSourceId = initialSourceId,
             initialTestOutbounds = initialTestOutbounds,
             initialFallbackTag = initialFallbackTag,
             fallbackSuggestions = fallbackSuggestions,
             onBackClick = { finish() },
-            onSave = { remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag ->
-                saveServer(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
+            onSave = { remarks, filter, typeIdx, sourceId, testOutbounds, fallbackTag ->
+                saveServer(remarks, filter, typeIdx, sourceId, testOutbounds, fallbackTag)
             },
             onDelete = { deleteServer() }
         )
@@ -132,7 +139,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         remarks: String,
         filter: String,
         typeIdx: Int,
-        subIdx: Int,
+        sourceId: String,
         testOutbounds: Boolean,
         fallbackTag: String,
     ): Boolean {
@@ -147,8 +154,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.remarks = remarks.trim()
         config.policyGroupFilter = filter.trim()
         config.policyGroupType = typeIdx.toString()
-        config.policyGroupSubscriptionId =
-            subIds.getOrNull(subIdx)
+        config.policyGroupSubscriptionId = sourceId
         config.policyGroupTestOutbounds = testOutbounds
         config.policyGroupFallbackTag = fallbackTag.trim().takeIf { it.isNotEmpty() }
 
@@ -167,7 +173,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.description = buildString {
             append(typeDisplay)
             append(" - ")
-            append(subDisplay.getOrNull(subIdx).orEmpty())
+            append(subDisplay.getOrNull(subIds.indexOf(sourceId)).orEmpty())
             append(" - ")
             append(config.policyGroupFilter)
         }
@@ -229,19 +235,21 @@ class ServerGroupActivity : BaseComponentActivity() {
 }
 
 @Composable
-fun ServerGroupScreen(
+private fun ServerGroupScreen(
+    isTelevision: Boolean,
     editGuid: String,
     isRunning: Boolean,
+    subIds: List<String>,
     subDisplay: List<String>,
     initialRemarks: String,
     initialFilter: String,
     initialType: Int,
-    initialSubIndex: Int,
+    initialSourceId: String,
     initialTestOutbounds: Boolean,
     initialFallbackTag: String,
     fallbackSuggestions: List<String>,
     onBackClick: () -> Unit,
-    onSave: (String, String, Int, Int, Boolean, String) -> Boolean,
+    onSave: (String, String, Int, String, Boolean, String) -> Boolean,
     onDelete: () -> Unit
 ) {
     val typeEntries = stringArrayResource(R.array.policy_group_type).toList()
@@ -249,125 +257,55 @@ fun ServerGroupScreen(
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var filter by rememberSaveable { mutableStateOf(initialFilter) }
-    var typeValue by rememberSaveable { mutableStateOf(typeEntries.getOrNull(initialType).orEmpty()) }
-    var subValue by rememberSaveable { mutableStateOf(subDisplay.getOrNull(initialSubIndex).orEmpty()) }
+    var typeIndex by rememberSaveable { mutableStateOf(initialType.coerceIn(typeEntries.indices)) }
+    var sourceId by rememberSaveable { mutableStateOf(initialSourceId) }
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
-    var showFallbackDialog by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
-    val selectedType = typeEntries.indexOf(typeValue).coerceAtLeast(0).toString()
-    val supportsObservatory = BalancerStrategyType.from(selectedType).supportsObservatory
-
-    Scaffold(
-        contentWindowInsets = WindowInsets(0),
-        topBar = {
-            AppTopBar(
-                title = EConfigType.POLICYGROUP.toString(),
-                onBackClick = onBackClick,
-                actions = {
-                    if (showDelete) {
-                        IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
-                        }
-                    }
-                    IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
-                        isRemarksError = remarksErr
-
-                        val hasError = remarksErr
-                        if (!hasError) {
-                            val typeIdx = typeEntries.indexOf(typeValue).coerceAtLeast(0)
-                            val subIdx = subDisplay.indexOf(subValue).coerceAtLeast(0)
-                            onSave(remarks, filter, typeIdx, subIdx, testOutbounds, fallbackTag)
-                        }
-                    }) {
-                        Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
-                    }
-                }
+    val supportsObservatory = BalancerStrategyType.from(typeIndex.toString()).supportsObservatory
+    val save: () -> Unit = {
+        isRemarksError = remarks.isBlank()
+        if (!isRemarksError) onSave(remarks, filter, typeIndex, sourceId.takeIf { it in subIds }.orEmpty(), testOutbounds, fallbackTag)
+    }
+    val fields: @Composable ColumnScope.(@Composable (String, List<String>, (String) -> Unit) -> Unit) -> Unit = { fallbackField ->
+        FormTextField(
+            label = stringResource(R.string.server_lab_remarks),
+            value = remarks,
+            onValueChange = { remarks = it },
+            isError = isRemarksError
+        )
+        FormDropdownField(
+            label = stringResource(R.string.title_policy_group_type),
+            value = typeEntries[typeIndex],
+            options = typeEntries,
+            onValueChange = { typeIndex = typeEntries.indexOf(it) }
+        )
+        val sourceLabels = remember(subIds, subDisplay) { subIds.zip(subDisplay).toMap() }
+        FormDropdownField(stringResource(R.string.title_policy_group_subscription_id),
+            sourceId.takeIf { it in sourceLabels }.orEmpty(), subIds, { sourceId = it },
+            optionLabel = { sourceLabels[it].orEmpty() })
+        FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
+        if (supportsObservatory) {
+            SettingsSwitchItem(
+                title = stringResource(R.string.title_policy_group_test_outbounds),
+                checked = testOutbounds,
+                onCheckedChange = { testOutbounds = it }
             )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .imePadding()
-                .padding(vertical = 8.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            FormTextField(
-                label = stringResource(R.string.server_lab_remarks),
-                value = remarks,
-                onValueChange = { remarks = it },
-                isError = isRemarksError
-            )
-            FormDropdownField(
-                label = stringResource(R.string.title_policy_group_type),
-                value = typeValue,
-                options = typeEntries,
-                onValueChange = { typeValue = it }
-            )
-            FormDropdownField(
-                label = stringResource(R.string.title_policy_group_subscription_id),
-                value = subValue,
-                options = subDisplay,
-                onValueChange = { subValue = it }
-            )
-            FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it })
-            if (supportsObservatory) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_policy_group_test_outbounds),
-                    checked = testOutbounds,
-                    onCheckedChange = { testOutbounds = it }
-                )
-                if (testOutbounds) {
-                    val fallbackLabel = stringResource(R.string.title_policy_group_fallback)
-                    val fallbackDisplay = fallbackTag.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) }
-                    Text(
-                        text = fallbackLabel,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            modifier = Modifier
-                                .weight(1f)
-                                .semantics {
-                                    contentDescription = fallbackLabel
-                                    stateDescription = fallbackDisplay
-                                }
-                                .clickable(role = Role.Button) { showFallbackDialog = true },
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                text = fallbackDisplay,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if (fallbackTag.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                else MaterialTheme.colorScheme.onSurface,
-                                fontWeight = if (fallbackTag.isBlank()) FontWeight.Normal else FontWeight.Medium,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier
-                                    .clearAndSetSemantics {}
-                                    .padding(horizontal = 12.dp, vertical = 8.dp)
-                            )
-                        }
-                        IconButton(onClick = { fallbackTag = "" }) {
-                            Icon(
-                                painterResource(R.drawable.ic_delete_24dp),
-                                contentDescription = "${stringResource(R.string.logcat_clear)}, $fallbackLabel"
-                            )
-                        }
-                    }
-                }
-                NavigationBarsSpacer()
+            if (testOutbounds) {
+                fallbackField(fallbackTag, fallbackSuggestions) { fallbackTag = it }
             }
+        }
+        NavigationBarsSpacer()
+    }
+    val delete: (() -> Unit)? = if (showDelete) ({ showDeleteConfirm = true }) else null
+    if (isTelevision) {
+        TvServerEditor(EConfigType.POLICYGROUP.toString(), onBackClick, save, delete) {
+            fields { value, options, select -> TvPolicyFallbackField(value, options, select) }
+        }
+    } else {
+        PhonePolicyGroupEditor(onBackClick, save, delete) {
+            fields { value, options, select -> PhonePolicyFallbackField(value, options, select) }
         }
     }
 
@@ -379,16 +317,77 @@ fun ServerGroupScreen(
             onDismiss = { showDeleteConfirm = false }
         )
     }
-    if (showFallbackDialog && supportsObservatory && testOutbounds) {
+}
+
+@Composable
+private fun PhonePolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    PolicyFallbackRow(value, onPick = { open = true }, onClear = { onSelect("") })
+    if (open) {
         ServerSelectListDialog(
-            title = stringResource(R.string.title_policy_group_fallback),
-            options = fallbackSuggestions,
-            selectedOption = fallbackTag,
-            onSelected = {
-                fallbackTag = it
-                showFallbackDialog = false
-            },
-            onDismiss = { showFallbackDialog = false }
+            title = stringResource(R.string.title_policy_group_fallback), options = options, selectedOption = value,
+            onSelected = { onSelect(it); open = false }, onDismiss = { open = false }
+        )
+    }
+}
+
+@Composable
+internal fun PolicyFallbackRow(
+    value: String, onPick: () -> Unit, onClear: () -> Unit,
+    pickModifier: Modifier = Modifier, clearModifier: Modifier = Modifier
+) {
+    val label = stringResource(R.string.title_policy_group_fallback)
+    val display = value.ifBlank { stringResource(R.string.server_proxy_chain_member_unselected) }
+    Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp))
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Surface(
+            modifier = Modifier.weight(1f).then(pickModifier).semantics {
+                contentDescription = label
+                stateDescription = display
+            }.clickable(role = Role.Button, onClick = onPick),
+            shape = RoundedCornerShape(8.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
+            Text(
+                text = display,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (value.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (value.isBlank()) FontWeight.Normal else FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.clearAndSetSemantics {}.padding(horizontal = 12.dp, vertical = 8.dp)
+            )
+        }
+        IconButton(onClick = onClear, modifier = clearModifier) {
+            Icon(painterResource(R.drawable.ic_delete_24dp), "${stringResource(R.string.logcat_clear)}, $label")
+        }
+    }
+}
+
+@Composable
+private fun PhonePolicyGroupEditor(
+    onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?,
+    fields: @Composable ColumnScope.() -> Unit
+) {
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            AppTopBar(EConfigType.POLICYGROUP.toString(), onBackClick = onBack, actions = {
+                if (onDelete != null) {
+                    IconButton(onClick = onDelete) {
+                        Icon(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.acc_delete))
+                    }
+                }
+                IconButton(onClick = onSave) {
+                    Icon(painterResource(R.drawable.ic_fab_check), stringResource(R.string.acc_save))
+                }
+            })
+        }
+    ) { innerPadding ->
+        Column(
+            Modifier.fillMaxSize().padding(innerPadding).consumeWindowInsets(innerPadding).imePadding()
+                .padding(vertical = 8.dp).verticalScroll(rememberScrollState()),
+            content = fields
         )
     }
 }
