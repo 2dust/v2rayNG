@@ -575,4 +575,9 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
+    <string name="sub_info_a11y_traffic_limited">مصرف ترافیک: %1$s از %2$s</string>
+    <string name="sub_info_a11y_traffic_unlimited">مصرف ترافیک: %1$s (حجم نامحدود)</string>
+    <string name="sub_info_a11y_expires">تاریخ انقضا: %1$s</string>
+    <string name="sub_info_a11y_expired">منقضی‌شده در تاریخ: %1$s</string>
+    <string name="sub_info_a11y_no_expiry">بدون تاریخ انقضا</string>
 </resources>

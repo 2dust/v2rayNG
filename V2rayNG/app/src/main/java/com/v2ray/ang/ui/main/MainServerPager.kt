@@ -45,7 +45,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
@@ -125,22 +127,31 @@ fun GroupPagerPage(
     }
 
     Box(Modifier.fillMaxSize()) {
-        ServerListPage(
-            rows = groupState.rows,
-            selectedGuid = selectedGuid,
-            locateTarget = locateTarget?.takeIf { it.groupId == groupId },
-            canReorder = canReorder,
-            doubleColumnDisplay = doubleColumnDisplay,
-            groupId = groupId,
-            lazyListStates = lazyListStates,
-            lazyGridStates = lazyGridStates,
-            actions = actions,
-            onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
-            onMoveServer = { fromIndex, toIndex ->
-                mainViewModel.moveServer(groupId, fromIndex, toIndex)
-            },
-            contentPadding = listPadding
-        )
+        Box(
+            Modifier
+                .fillMaxSize()
+                .semantics {
+                    isTraversalGroup = true
+                    traversalIndex = 0f
+                }
+        ) {
+            ServerListPage(
+                rows = groupState.rows,
+                selectedGuid = selectedGuid,
+                locateTarget = locateTarget?.takeIf { it.groupId == groupId },
+                canReorder = canReorder,
+                doubleColumnDisplay = doubleColumnDisplay,
+                groupId = groupId,
+                lazyListStates = lazyListStates,
+                lazyGridStates = lazyGridStates,
+                actions = actions,
+                onLocateHandled = { mainViewModel.onAction(MainAction.LocateHandled) },
+                onMoveServer = { fromIndex, toIndex ->
+                    mainViewModel.moveServer(groupId, fromIndex, toIndex)
+                },
+                contentPadding = listPadding
+            )
+        }
         if (usageInfo != null) {
             SubscriptionInfoCard(
                 info = usageInfo,
@@ -150,6 +161,10 @@ fun GroupPagerPage(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .onSizeChanged { infoHeightPx = it.height }
+                    .semantics {
+                        isTraversalGroup = true
+                        traversalIndex = 1f
+                    }
             )
         }
     }

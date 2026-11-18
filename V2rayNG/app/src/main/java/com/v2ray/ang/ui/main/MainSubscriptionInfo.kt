@@ -24,7 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -137,12 +137,47 @@ internal fun SubscriptionInfoCard(
                 )
             }
 
-            // One semantics node for the read-only figures so TalkBack reads them in one go.
+            val trafficSummary = if (model.totalBytes > 0L) {
+                stringResource(
+                    R.string.sub_info_a11y_traffic_limited,
+                    model.usedBytes.toTrafficString(),
+                    model.totalBytes.toTrafficString()
+                )
+            } else {
+                stringResource(
+                    R.string.sub_info_a11y_traffic_unlimited,
+                    model.usedBytes.toTrafficString()
+                )
+            }
+
+            val expirySummary = when {
+                model.expired && model.expireMillis != null -> {
+                    stringResource(
+                        R.string.sub_info_a11y_expired,
+                        Utils.formatTimestamp(model.expireMillis, EXPIRY_DATE_PATTERN)
+                    )
+                }
+                model.expireMillis != null -> {
+                    stringResource(
+                        R.string.sub_info_a11y_expires,
+                        Utils.formatTimestamp(model.expireMillis, EXPIRY_DATE_PATTERN)
+                    )
+                }
+                else -> {
+                    stringResource(R.string.sub_info_a11y_no_expiry)
+                }
+            }
+
+            val a11ySummary = "$trafficSummary, $expirySummary"
+
+            // Speak clear contextual figures to TalkBack without changing visual layout
             Column(
                 Modifier
                     .fillMaxWidth()
                     .padding(end = 8.dp)
-                    .semantics(mergeDescendants = true) {}
+                    .clearAndSetSemantics {
+                        contentDescription = a11ySummary
+                    }
             ) {
                 StatsRow(model)
                 model.trafficFraction?.let { fraction ->
@@ -152,8 +187,7 @@ internal fun SubscriptionInfoCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .clearAndSetSemantics {},
+                            .clip(RoundedCornerShape(2.dp)),
                         color = if (model.trafficLow) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     )
@@ -165,7 +199,7 @@ internal fun SubscriptionInfoCard(
 
 @Composable
 private fun CardIconButton(iconRes: Int, contentDescription: String, onClick: () -> Unit) {
-    IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.size(36.dp)) {
         Icon(painterResource(iconRes), contentDescription, Modifier.size(20.dp))
     }
 }
