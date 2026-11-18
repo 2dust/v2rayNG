@@ -574,5 +574,9 @@
     <string name="sub_info_open_support">সাপোর্ট লিঙ্ক খুলুন</string>
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
+    <string name="update_later">পরে</string>
+    <string name="update_downloading">আপডেট ডাউনলোড হচ্ছে</string>
+    <string name="update_download_failed">ডাউনলোড ব্যর্থ হয়েছে। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।</string>
+    <string name="update_saved_in_downloads">নতুন সংস্করণটি ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে (%1$s)। ইনস্টল করতে সেখান থেকে ফাইলটি খুলুন।</string>
 
 </resources>

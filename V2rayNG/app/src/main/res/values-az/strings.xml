@@ -575,5 +575,9 @@
     <string name="sub_info_open_page">Abunəlik səhifəsini aç</string>
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
+    <string name="update_later">Sonra</string>
+    <string name="update_downloading">Yeniləmə yüklənir</string>
+    <string name="update_download_failed">Yükləmə alınmadı. Bağlantını yoxlayıb yenidən cəhd et.</string>
+    <string name="update_saved_in_downloads">Yeni versiya Yükləmələr qovluğunda saxlanıldı (%1$s). Quraşdırmaq üçün faylı oradan açın.</string>
 
 </resources>

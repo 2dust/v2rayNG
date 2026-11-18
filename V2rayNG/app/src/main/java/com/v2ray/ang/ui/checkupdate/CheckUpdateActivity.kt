@@ -31,6 +31,7 @@ import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.VersionInfoBlock
 import com.v2ray.ang.ui.compose.verticalScrollbar
+import com.v2ray.ang.ui.update.AppUpdateSheetHost
 import com.v2ray.ang.util.Utils
 
 class CheckUpdateActivity : BaseComponentActivity() {
@@ -59,8 +60,6 @@ fun CheckUpdateScreen(
 
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val checkPreRelease by viewModel.checkPreRelease.collectAsStateWithLifecycle()
-    val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
-    val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
     val libVersion = CoreNativeManager.getLibVersion()
     val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
@@ -97,35 +96,5 @@ fun CheckUpdateScreen(
         }
     }
 
-    if (showUpdateDialog && updateResult != null) {
-        val result = updateResult!!
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissUpdateDialog() },
-            title = { Text(stringResource(R.string.update_new_version_found, result.latestVersion ?: "")) },
-            text = {
-                val scrollState = rememberScrollState()
-                Text(
-                    text = result.releaseNotes.orEmpty(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(scrollState)
-                        .verticalScrollbar(scrollState)
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.dismissUpdateDialog()
-                    result.downloadUrl?.let { Utils.openUri(context, it) }
-                }) {
-                    Text(stringResource(R.string.update_now))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    }
+    AppUpdateSheetHost(viewModel.controller)
 }

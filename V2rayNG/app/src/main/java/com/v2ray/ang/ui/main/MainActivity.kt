@@ -47,6 +47,8 @@ import com.v2ray.ang.ui.server.ServerVmessActivity
 import com.v2ray.ang.ui.server.ServerWireguardActivity
 import com.v2ray.ang.ui.settings.SettingsActivity
 import com.v2ray.ang.ui.subscription.SubSettingActivity
+import com.v2ray.ang.ui.update.AppUpdateSheetHost
+import com.v2ray.ang.ui.update.AppUpdateViewModel
 import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -55,6 +57,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : HelperBaseComponentActivity() {
+
+    private val updateViewModel: AppUpdateViewModel by viewModels()
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
@@ -102,6 +106,7 @@ class MainActivity : HelperBaseComponentActivity() {
     @Composable
     override fun ScreenContent() {
         BackHandler { moveTaskToBack(false) }
+        AppUpdateSheetHost(updateViewModel.controller)
         MainScreen(
             mainViewModel = mainViewModel,
             onAction = { action ->

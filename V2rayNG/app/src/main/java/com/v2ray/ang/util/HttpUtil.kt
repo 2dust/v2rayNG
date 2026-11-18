@@ -275,9 +275,18 @@ object HttpUtil {
         }
     }
 
+    /**
+     * Downloads [request]'s URL into [targetFile].
+     *
+     * @param onProgress Called about every 100 ms with the bytes downloaded so far and the total size (-1 when unknown).
+     * @param isCancelled Polled between chunks; when it returns true the download stops and false is returned.
+     * @return true when the whole body was written.
+     */
     fun downloadToFile(
         request: UrlContentRequest,
-        targetFile: File
+        targetFile: File,
+        onProgress: ((downloaded: Long, total: Long) -> Unit)? = null,
+        isCancelled: () -> Boolean = { false }
     ): Boolean {
         val url = request.url ?: return false
         val client = buildOkHttpClient(request.timeout, request.httpPort, request.proxyUsername, request.proxyPassword, followRedirects = true)
@@ -296,9 +305,25 @@ object HttpUtil {
                     return false
                 }
                 val body = response.body ?: return false
+                val total = body.contentLength()
                 body.byteStream().use { input ->
                     targetFile.outputStream().use { output ->
-                        input.copyTo(output)
+                        val buffer = ByteArray(DOWNLOAD_BUFFER_SIZE)
+                        var downloaded = 0L
+                        var lastReport = 0L
+                        while (true) {
+                            if (isCancelled()) return false
+                            val read = input.read(buffer)
+                            if (read < 0) break
+                            output.write(buffer, 0, read)
+                            downloaded += read
+                            val now = System.nanoTime()
+                            if (onProgress != null && now - lastReport >= PROGRESS_REPORT_INTERVAL_NANOS) {
+                                lastReport = now
+                                onProgress(downloaded, total)
+                            }
+                        }
+                        onProgress?.invoke(downloaded, total)
                     }
                 }
                 true
@@ -308,4 +333,7 @@ object HttpUtil {
             false
         }
     }
+
+    private const val DOWNLOAD_BUFFER_SIZE = 64 * 1024
+    private const val PROGRESS_REPORT_INTERVAL_NANOS = 100_000_000L
 }

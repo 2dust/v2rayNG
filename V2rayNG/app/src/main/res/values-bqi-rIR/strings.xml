@@ -574,5 +574,9 @@
     <string name="sub_info_open_support">واز کردن لینگ پشتیوانی</string>
     <string name="sub_info_open_page">واز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">بی‌حد</string>
+    <string name="update_later">بعدا</string>
+    <string name="update_downloading">دانلود به‌روزرسانی</string>
+    <string name="update_download_failed">دانلود ناموفق بود. اتصال خود را بررسی کنید و دوباره تلاش کنید.</string>
+    <string name="update_saved_in_downloads">نسخه‌ی جدید در پوشه‌ی دانلودها ذخیره شد (%1$s). برای نصب، فایل را از همان‌جا باز کنید.</string>
 
 </resources>

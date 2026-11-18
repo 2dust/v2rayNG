@@ -80,6 +80,10 @@ object AppConfig {
     const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
+    /** Version the user postponed with "Later"; the automatic announcement stays quiet until a newer one is published. */
+    const val PREF_UPDATE_DISMISSED_VERSION = "pref_update_dismissed_version"
+    /** Epoch millis of the last successful automatic update check. */
+    const val PREF_UPDATE_LAST_CHECK = "pref_update_last_check"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
     const val PREF_USE_HEV_TUNNEL = "pref_use_hev_tunnel_v2"
     const val PREF_HEV_TUNNEL_LOGLEVEL = "pref_hev_tunnel_loglevel"
