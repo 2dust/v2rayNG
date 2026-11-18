@@ -21,6 +21,28 @@ import com.v2ray.ang.util.Utils
  */
 object CoreOutboundBuilder {
 
+    /** Apply the same dialer to upload and independent XHTTP download connections. */
+    internal fun applyChainDialer(outbound: OutboundBean, profile: ProfileItem, dialer: String) {
+        outbound.ensureSockopt().dialerProxy = dialer
+        val stream = outbound.streamSettings ?: return
+        // Global fragment/noise masks apply only to the physical dialer, as in
+        // updateOutboundFragment. Keep explicitly configured per-profile masks.
+        if (profile.finalMask.isNullOrEmpty()) stream.finalmask = null
+        val xhttp = stream.xhttpSettings ?: return
+        val extra = xhttp.extra?.let { JsonUtil.parseString(JsonUtil.toJson(it)) } ?: return
+        require(extra.isJsonObject) { "Invalid XHTTP extra" }
+        val download = extra.asJsonObject.get("downloadSettings") ?: return
+        if (download.isJsonNull) return
+        require(download.isJsonObject) { "Invalid XHTTP download settings" }
+        val settings = download.asJsonObject
+        val sockopt = settings.get("sockopt")?.takeUnless { it.isJsonNull }?.let {
+            require(it.isJsonObject) { "Invalid XHTTP download sockopt" }
+            it.asJsonObject
+        } ?: JsonObject().also { settings.add("sockopt", it) }
+        sockopt.addProperty("dialerProxy", dialer)
+        xhttp.extra = extra
+    }
+
     /** Dispatches a profile to protocol-specific outbound builder. */
     fun convert(profileItem: ProfileItem): OutboundBean? {
         val outbound = when (profileItem.configType) {
