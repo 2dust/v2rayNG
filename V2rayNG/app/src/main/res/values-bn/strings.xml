@@ -575,4 +575,9 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
+    <string name="action_exit">প্রস্থান</string>
+    <string name="action_back">ফিরে যান</string>
+    <string name="action_more">আরও</string>
+    <string name="action_clear">সাফ করুন</string>
+    <string name="connection_connected_tv">সংযুক্ত</string>
 </resources>
