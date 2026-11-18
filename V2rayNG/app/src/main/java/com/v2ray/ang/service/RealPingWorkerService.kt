@@ -10,6 +10,7 @@ import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -24,16 +25,31 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 internal object RealPingExecutionLimiter {
-    private val customConfigMutex = Mutex()
+    private val serializedMutex = Mutex()
 
-    suspend fun <T> run(configType: EConfigType, block: () -> T): T {
-        // Custom profiles bypass speed-test trimming and start complete Xray configs.
-        // Parallel teardown can abort the native probe process, so serialize their
-        // JNI measurements globally across batches.
-        return if (configType == EConfigType.CUSTOM) {
-            customConfigMutex.withLock { block() }
+    suspend fun <T> run(configType: EConfigType, configContent: String, block: () -> T): T {
+        return if (requiresSerialization(configType, configContent)) {
+            serializedMutex.withLock { block() }
         } else {
             block()
+        }
+    }
+
+    /**
+     * Custom WireGuard profiles reproduced a native `close of closed channel` panic (SIGABRT)
+     * when several probe cores overlapped (#6077), so they stay serialized globally across
+     * batches. Other custom profiles are trimmed to outbounds like generated ones and run
+     * with the configured concurrency.
+     */
+    fun requiresSerialization(configType: EConfigType, configContent: String): Boolean {
+        if (configType != EConfigType.CUSTOM) return false
+        val outbounds = JsonUtil.parseString(configContent)
+            ?.get("outbounds")?.takeIf { it.isJsonArray }?.asJsonArray
+            ?: return true
+        return outbounds.any { elem ->
+            elem.isJsonObject && elem.asJsonObject.get("protocol")
+                ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }
+                ?.asString.equals("wireguard", ignoreCase = true)
         }
     }
 }
@@ -127,7 +143,7 @@ class RealPingWorkerService(
         if (!configResult.status) {
             return retFailure
         }
-        return RealPingExecutionLimiter.run(config.configType) {
+        return RealPingExecutionLimiter.run(config.configType, configResult.content) {
             CoreNativeManager.measureOutboundDelay(configResult.content, SettingsManager.getDelayTestUrl())
         }
     }
