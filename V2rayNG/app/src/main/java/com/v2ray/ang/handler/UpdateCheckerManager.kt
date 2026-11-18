@@ -1,6 +1,7 @@
 package com.v2ray.ang.handler
 
 import android.os.Build
+import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.CheckUpdateResult
@@ -21,28 +22,29 @@ object UpdateCheckerManager {
             AppConfig.APP_API_URL.concatUrl("latest")
         }
 
-        val proxyUsername = SettingsManager.getSocksUsername()
-        val proxyPassword = SettingsManager.getSocksPassword()
-
-        var response = HttpUtil.getUrlContent(
-            UrlContentRequest(
-                url = url,
-                timeout = 5000
-            )
+        val request = UrlContentRequest(
+            url = url,
+            timeout = 5000,
+            httpPort = SettingsManager.getHttpPort(),
+            proxyUsername = SettingsManager.getSocksUsername(),
+            proxyPassword = SettingsManager.getSocksPassword(),
         )
-        if (response.isNullOrEmpty()) {
-            val httpPort = SettingsManager.getHttpPort()
-            response = HttpUtil.getUrlContent(
-                UrlContentRequest(
-                    url = url,
-                    timeout = 5000,
-                    httpPort = httpPort,
-                    proxyUsername = proxyUsername,
-                    proxyPassword = proxyPassword
+        val directRequest = request.copy(
+            httpPort = 0,
+            proxyUsername = null,
+            proxyPassword = null,
+        )
+        val response = fetchReleaseMetadata(
+            coreFetch = {
+                CoreDownloadManager.fetchText(
+                    AngApplication.application,
+                    request,
+                    includeDefaultUserAgent = true,
                 )
-            )
-                ?: throw IllegalStateException("Failed to get response")
-        }
+            },
+            directFetch = { HttpUtil.getUrlContent(directRequest) },
+            proxyFetch = { HttpUtil.getUrlContent(request) },
+        )
 
         val latestRelease = if (includePreRelease) {
             JsonUtil.fromJsonSafe(response, Array<GitHubRelease>::class.java)
@@ -73,6 +75,22 @@ object UpdateCheckerManager {
         } else {
             CheckUpdateResult(hasUpdate = false)
         }
+    }
+
+    internal fun fetchReleaseMetadata(
+        coreFetch: () -> CoreFetchResult<String>,
+        directFetch: () -> String?,
+        proxyFetch: () -> String?,
+    ): String {
+        val response = when (val result = coreFetch()) {
+            is CoreFetchResult.Success -> result.value
+            CoreFetchResult.Failed -> null
+            CoreFetchResult.Unavailable -> directFetch()
+            CoreFetchResult.NotApplicable -> directFetch().takeUnless { it.isNullOrEmpty() }
+                ?: proxyFetch()
+        }
+        return response?.takeUnless { it.isEmpty() }
+            ?: throw IllegalStateException("Failed to get response")
     }
 
     private fun compareVersions(version1: String, version2: String): Int {
