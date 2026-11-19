@@ -18,7 +18,8 @@ workRuntimeKtx = "2.12.0"
 lifecycleViewmodelKtx = "2.11.0"
 mockitoCore = "5.24.0"
 mockitoKotlin = "6.4.0"
-camerax = "1.6.2"
+camerax = "1.7.0"
+guava = "33.8.0-android"
 composeBom = "2026.09.00"
 reorderable = "3.1.0"
 coil = "3.6.3"
@@ -37,6 +38,7 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtx" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
