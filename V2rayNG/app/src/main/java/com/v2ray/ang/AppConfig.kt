@@ -234,6 +234,7 @@ object AppConfig {
     const val ROOT_IPTABLES_CHAIN = "CORE_FILTER"
     const val ROOT_FWMARK = 255            // defensive RETURN tag; hev's only upstream socket is loopback (already bypassed)
     const val ROOT_MARK_ROUTE = 1          // packets we want pushed into the tun device
+    const val ROOT_DNS_TETHER_UID = 1052   // AID_DNS_TETHER: netd forwards hotspot clients' DNS under this uid
     const val ROOT_ROUTE_TABLE = 2024
     const val ROOT_RULE_PRIORITY = 1000
     const val ROOT_TUN_NAME = "utun7788"
