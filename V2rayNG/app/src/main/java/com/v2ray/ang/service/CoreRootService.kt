@@ -9,7 +9,9 @@ import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.NotificationManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.root.RootProxyManager
+import com.v2ray.ang.root.RootTproxyManager
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,12 @@ import java.lang.ref.SoftReference
  */
 class CoreRootService : Service(), ServiceControl {
 
+    private enum class Engine { NONE, TUN2SOCKS, TPROXY }
+
     private var setupJob: Job? = null
+
+    @Volatile
+    private var engineStarted = Engine.NONE
 
     override fun onCreate() {
         super.onCreate()
@@ -56,13 +63,37 @@ class CoreRootService : Service(), ServiceControl {
         }
 
         setupJob = CoroutineScope(Dispatchers.IO).launch {
-            if (!RootProxyManager.start(this@CoreRootService)) {
+            if (!startRouting()) {
                 LogUtil.e(AppConfig.TAG, "StartCore-Root: failed to start root mode, stopping")
                 stopService()
             }
         }
 
         return START_STICKY
+    }
+
+    /**
+     * Install the routing rules for the selected root engine.
+     *
+     * When TPROXY is selected but its setup fails (missing xt_TPROXY, no usable anti-loop
+     * match, helper won't start), fall back to the tun2socks engine rather than leaving the
+     * user with a dead connection: TPROXY's own teardown has already run, so no stale rule
+     * survives into the fallback. [engineStarted] records which engine actually took, so
+     * teardown removes the right one.
+     */
+    private fun startRouting(): Boolean {
+        if (SettingsManager.isRootTproxyMode()) {
+            if (RootTproxyManager.start(this)) {
+                engineStarted = Engine.TPROXY
+                return true
+            }
+            LogUtil.w(AppConfig.TAG, "StartCore-Root: TPROXY setup failed, falling back to tun2socks")
+        }
+        if (RootProxyManager.start(this)) {
+            engineStarted = Engine.TUN2SOCKS
+            return true
+        }
+        return false
     }
 
     override fun onDestroy() {
@@ -75,7 +106,18 @@ class CoreRootService : Service(), ServiceControl {
         runBlocking { setupJob?.cancelAndJoin() }
         // Remove routing rules BEFORE stopping the core so traffic is never redirected
         // to a dead listener. Synchronous on purpose — leaving rules behind breaks the net.
-        RootProxyManager.stop(this)
+        // When setup never reported an engine (cancelled mid-flight, or a TPROXY attempt that
+        // failed before the fallback ran) both teardowns run: each is idempotent, and the cost
+        // of skipping the wrong one is a device left without connectivity.
+        when (engineStarted) {
+            Engine.TPROXY -> RootTproxyManager.stop(this)
+            Engine.TUN2SOCKS -> RootProxyManager.stop(this)
+            Engine.NONE -> {
+                RootTproxyManager.stop(this)
+                RootProxyManager.stop(this)
+            }
+        }
+        engineStarted = Engine.NONE
         CoreServiceManager.stopCoreLoop()
     }
 
