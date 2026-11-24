@@ -25,11 +25,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.OutboundEditorFocus
-import com.v2ray.ang.ui.compose.tvEditorFocus
+import com.v2ray.ang.ui.compose.dpadFocusOutline
 
 internal class TvJsonFocus(val field: Modifier, val passive: Modifier?, val allowKeyboardOnFocus: Boolean)
 
@@ -96,7 +97,7 @@ internal fun rememberTvJsonFocus(back: FocusRequester, focus: OutboundEditorFocu
     } else Modifier.focusProperties { canFocus = false }.clearAndSetSemantics { }
 
     val passive = if (editing) null else {
-        target.focusProperties { start = back }.tvEditorFocus()
+        target.focusProperties { start = back }.dpadFocusOutline(cornerRadius = 8.dp)
             .semantics { contentDescription = label }
             .clickable(interactionSource = null, indication = null, role = Role.Button) {
                 allowKeyboardOnFocus = true

@@ -78,11 +78,10 @@ import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.TvEditorNavigation
+import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.horizontalScrollbar
 import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
-import com.v2ray.ang.ui.compose.tvEditorFocus
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
@@ -357,7 +356,7 @@ fun ServerCustomConfigScreen(
                 onBackClick = onBackClick,
                 navigationIcon = if (tvBack != null && tvFocus != null) ({
                     val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
-                    IconButton(onClick = onBackClick, modifier = tvFocus.target(tvBack).tvEditorFocus(radius = 24.dp)) {
+                    IconButton(onClick = onBackClick, modifier = tvFocus.target(tvBack).dpadFocusOutline(cornerRadius = 24.dp)) {
                         Icon(
                             painterResource(R.drawable.ic_arrow_back_24dp),
                             contentDescription = stringResource(R.string.acc_back),
@@ -369,7 +368,7 @@ fun ServerCustomConfigScreen(
                     if (showDelete) {
                         IconButton(
                             onClick = { showDeleteConfirm = true },
-                            modifier = tvFocus?.target()?.tvEditorFocus(radius = 24.dp) ?: Modifier
+                            modifier = tvFocus?.target()?.dpadFocusOutline(cornerRadius = 24.dp) ?: Modifier
                         ) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
@@ -378,7 +377,7 @@ fun ServerCustomConfigScreen(
                         }
                     }
                     IconButton(
-                        modifier = tvFocus?.target()?.tvEditorFocus(radius = 24.dp) ?: Modifier,
+                        modifier = tvFocus?.target()?.dpadFocusOutline(cornerRadius = 24.dp) ?: Modifier,
                         onClick = {
                             val remarksErr = remarks.isBlank()
                             isRemarksError = remarksErr
@@ -405,10 +404,7 @@ fun ServerCustomConfigScreen(
                 .consumeWindowInsets(innerPadding)
                 .then(tvIme?.padding?.padding(horizontal = 48.dp) ?: Modifier.imePadding())
         ) {
-            val navigation = if (tvBack != null && tvIme != null) {
-                remember(tvBack, tvIme.visible) { TvEditorNavigation(tvBack, tvIme.visible) }
-            } else null
-            CompositionLocalProvider(LocalTvEditor provides navigation, LocalOutboundEditorFocus provides tvFocus) {
+            CompositionLocalProvider(LocalTvEditor provides tvBack, LocalOutboundEditorFocus provides tvFocus) {
                 FormTextField(
                     label = stringResource(R.string.server_lab_remarks),
                     value = remarks,
