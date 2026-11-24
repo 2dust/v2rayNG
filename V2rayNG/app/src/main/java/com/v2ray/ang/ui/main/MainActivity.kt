@@ -61,10 +61,6 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
     // Only the existing launcher entry resolves the device type. The TV activity never routes again.
     protected open fun televisionDestination(): Intent? = null
 
-    internal companion object {
-        const val EXTRA_REFRESH_AFTER_IMPORT = "com.v2ray.ang.extra.REFRESH_AFTER_IMPORT"
-    }
-
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
@@ -117,7 +113,7 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.getBooleanExtra(EXTRA_REFRESH_AFTER_IMPORT, false)) {
+        if (intent.getBooleanExtra(AppConfig.EXTRA_REFRESH_AFTER_IMPORT, false)) {
             mainViewModel.onAction(MainAction.RefreshGroups)
         }
     }

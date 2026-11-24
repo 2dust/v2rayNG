@@ -101,6 +101,9 @@ object AppConfig {
     const val BROADCAST_ACTION_ACTIVITY = "$ANG_PACKAGE.action.activity"
     const val BROADCAST_ACTION_WIDGET_CLICK = "$ANG_PACKAGE.action.widget.click"
 
+    /** Intent extras. */
+    const val EXTRA_REFRESH_AFTER_IMPORT = "$ANG_PACKAGE.extra.REFRESH_AFTER_IMPORT"
+
     /** Tasker extras. */
     const val TASKER_EXTRA_BUNDLE = "com.twofortyfouram.locale.intent.extra.BUNDLE"
     const val TASKER_EXTRA_STRING_BLURB = "com.twofortyfouram.locale.intent.extra.BLURB"

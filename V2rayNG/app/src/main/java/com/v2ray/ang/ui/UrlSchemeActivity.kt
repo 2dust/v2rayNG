@@ -25,7 +25,7 @@ class UrlSchemeActivity : BaseComponentActivity() {
         lifecycleScope.launch {
             val imported = importFromIntent(intent)
             startActivity(Intent(this@UrlSchemeActivity, MainActivity::class.java).apply {
-                if (imported) putExtra(MainActivity.EXTRA_REFRESH_AFTER_IMPORT, true)
+                if (imported) putExtra(AppConfig.EXTRA_REFRESH_AFTER_IMPORT, true)
             })
             finish()
         }
