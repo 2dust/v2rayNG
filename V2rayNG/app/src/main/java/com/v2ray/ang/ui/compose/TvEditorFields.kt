@@ -1,7 +1,5 @@
 package com.v2ray.ang.ui.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -16,14 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -37,17 +32,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -56,14 +47,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 
-// Only the outbound TV shell provides this; phone and unrelated forms keep their existing controls.
-internal val LocalTvEditor = compositionLocalOf<TvEditorNavigation?> { null }
-
-internal class TvEditorNavigation(val back: FocusRequester, val imeVisible: State<Boolean>)
+// Phone and unrelated forms keep their existing controls.
+internal val LocalTvEditor = compositionLocalOf<FocusRequester?> { null }
 
 internal fun tvEditorOverlayPadding(visible: Boolean, inset: Int): Dp =
     if (visible && inset == 0) 240.dp else 0.dp
@@ -81,64 +69,21 @@ internal fun rememberTvEditorIme(): TvEditorIme {
 }
 
 @Composable
-internal fun Modifier.tvEditorFocus(radius: Dp = 8.dp, visible: Boolean = true): Modifier {
-    var focused by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(radius)
-    return onFocusChanged { focused = it.isFocused }
-        .then(
-            if (focused && visible) Modifier.background(MaterialTheme.colorScheme.primaryContainer, shape)
-                .border(2.dp, MaterialTheme.colorScheme.primary, shape)
-            else Modifier
-        )
-        .clip(shape)
-}
-
-@Composable
 internal fun TvEditorTextField(
     label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier,
     enabled: Boolean, keyboardType: KeyboardType, placeholder: String?, maxLines: Int,
     isError: Boolean, supportingText: String?
 ) {
-    val navigation = checkNotNull(LocalTvEditor.current)
-    val keyboard = LocalSoftwareKeyboardController.current
+    val back = checkNotNull(LocalTvEditor.current)
     val requester = remember { FocusRequester() }
     val fieldFocus = LocalOutboundEditorFocus.current?.target(requester) ?: Modifier.focusRequester(requester)
-    val bringIntoView = remember { BringIntoViewRequester() }
-    val interaction = remember { MutableInteractionSource() }
-    var editing by remember { mutableStateOf(false) }
-    var editorFocused by remember { mutableStateOf(false) }
-    var sawIme by remember { mutableStateOf(false) }
-    var restorePassive by remember { mutableStateOf(false) }
-    var size by remember { mutableStateOf(IntSize.Zero) }
-    val imeVisible by navigation.imeVisible
-
-    LaunchedEffect(editing, enabled) {
-        if (editing && enabled) {
-            if (requester.requestFocus()) keyboard?.show()
-        } else if (restorePassive) {
-            requester.requestFocus()
-            restorePassive = false
-        }
-    }
-    LaunchedEffect(editing, editorFocused, imeVisible, size) {
-        if (!editing || !editorFocused) return@LaunchedEffect
-        if (imeVisible) {
-            sawIme = true
-            // Wait for the scroll viewport and a newly wrapped field to finish measuring before
-            // relocating it. Repeating on size changes keeps the entire multiline editor visible.
-            withFrameNanos { }
-            withFrameNanos { }
-            bringIntoView.bringIntoView()
-        } else if (sawIme) {
-            restorePassive = true
-            editing = false
-        }
-    }
+    val editor = rememberTvTextFieldState(requester)
+    LaunchedEffect(enabled) { if (!enabled && editor.isEditing) editor.finishEditing() }
     Box(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
         OutlinedTextField(
             value = value,
-            onValueChange = { if (editing) onValueChange(it) },
-            readOnly = !editing,
+            onValueChange = { if (editor.isEditing) onValueChange(it) },
+            readOnly = !editor.isEditing,
             enabled = enabled,
             label = { Text(label) },
             placeholder = placeholder?.let { { Text(it) } },
@@ -146,31 +91,21 @@ internal fun TvEditorTextField(
             isError = isError,
             maxLines = maxLines,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            interactionSource = interaction,
+            interactionSource = editor.interactionSource,
             modifier = Modifier.fillMaxWidth()
-                .then(if (editing) fieldFocus else Modifier)
-                .focusProperties { canFocus = editing && enabled }
-                .onFocusChanged {
-                    if (editorFocused && !it.isFocused && editing) {
-                        editing = false
-                        keyboard?.hide()
-                    }
-                    editorFocused = it.isFocused
-                }
-                .onSizeChanged { size = it }
-                .bringIntoViewRequester(bringIntoView)
-                .then(if (editing) Modifier else Modifier.clearAndSetSemantics { })
+                .tvTextFieldEditorFocus(editor)
+                .onSizeChanged { editor.measuredSize = it }
+                .bringIntoViewRequester(editor.bringIntoViewRequester)
+                .then(if (editor.isEditing) Modifier else Modifier.clearAndSetSemantics { })
         )
-        if (!editing) {
+        if (!editor.isEditing) {
             Box(
                 Modifier.matchParentSize()
                     .then(fieldFocus)
-                    .focusProperties { start = navigation.back }
+                    .focusProperties { start = back }
                     .semantics { contentDescription = if (supportingText == null) label else "$label. $supportingText" }
-                    .clickable(interactionSource = interaction, indication = null, enabled = enabled, role = Role.Button) {
-                        sawIme = false
-                        editing = true
-                    }
+                    .clickable(interactionSource = editor.interactionSource, indication = null, enabled = enabled,
+                        role = Role.Button, onClick = editor::beginEditing)
             )
         }
     }
@@ -185,7 +120,7 @@ internal fun TvEditorDropdown(
     modifier: Modifier, enabled: Boolean, placeholder: String?, supportingText: String?,
     optionLabel: (String) -> String = { it }
 ) {
-    val back = checkNotNull(LocalTvEditor.current).back
+    val back = checkNotNull(LocalTvEditor.current)
     val anchor = remember { FocusRequester() }
     val anchorFocus = LocalOutboundEditorFocus.current?.target(anchor) ?: Modifier.focusRequester(anchor)
     val interaction = remember { MutableInteractionSource() }
@@ -247,7 +182,7 @@ private fun TvEditorOptions(
                 itemsIndexed(options) { index, option ->
                     val focus = if (index == initialIndex) Modifier.focusRequester(selected) else Modifier
                     Row(
-                        focus.fillMaxWidth().tvEditorFocus()
+                        focus.fillMaxWidth().dpadFocusOutline(cornerRadius = 8.dp)
                             .selectable(selected = option == value, role = Role.RadioButton, onClick = { onSelect(option) })
                             .padding(end = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -261,6 +196,6 @@ private fun TvEditorOptions(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss, modifier = Modifier.tvEditorFocus(24.dp)) { Text(stringResource(R.string.action_cancel)) } }
+        confirmButton = { TextButton(onClick = onDismiss, modifier = Modifier.dpadFocusOutline(cornerRadius = 24.dp)) { Text(stringResource(R.string.action_cancel)) } }
     )
 }

@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.server
 
-import android.view.ViewConfiguration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
@@ -22,7 +21,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -33,10 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.tvEditorFocus
+import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.dpadLongPressToMove
+import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
+import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 
 private const val ADD_MEMBER = "chain:add"
 
@@ -73,11 +75,14 @@ private fun TvProxyChainLayout(
     val add = remember { FocusRequester() }
     TvServerEditor(EConfigType.PROXYCHAIN.toString(), onBack, onSave, onDelete, onAdd, add) {
         val focus = checkNotNull(LocalOutboundEditorFocus.current)
-        val back = checkNotNull(LocalTvEditor.current).back
+        val back = checkNotNull(LocalTvEditor.current)
         val targets = remember { mutableMapOf<String, ChainRowFocus>() }
         memberKeys.forEach { targets.getOrPut(it) { ChainRowFocus() } }
         SideEffect { targets.keys.retainAll(memberKeys.toSet()) }
-        val quiet = remember { tvChainQuietMillis(ViewConfiguration.getKeyRepeatDelay()) }
+        val reorder = rememberSyncedDpadReorderState(memberKeys) { key, _ ->
+            if (key is String) targets[key]?.bringIntoView?.bringIntoView()
+        }
+        BackHandler(enabled = reorder.isMoving, onBack = reorder::cancelInteraction)
         LaunchedEffect(returnKey) {
             if (returnKey != null) {
                 if (returnKey == ADD_MEMBER) add.requestFocus() else targets[returnKey]?.pick?.requestFocus()
@@ -92,24 +97,19 @@ private fun TvProxyChainLayout(
                 val row = targets.getValue(memberKey)
                 val previous = targets[memberKeys.getOrNull(index - 1)]
                 val next = targets[memberKeys.getOrNull(index + 1)]
-                val move = remember { TvChainMove(quiet) }
-                val shape = RoundedCornerShape(12.dp)
-                val bringIntoView = remember { BringIntoViewRequester() }
-                LaunchedEffect(move.moving, index) {
-                    if (move.moving) {
-                        withFrameNanos { }
-                        bringIntoView.bringIntoView()
-                    }
+                val moving = reorder.isMoving(memberKey)
+                val reorderItem = DpadReorderItem(reorder, memberKey, index, memberKeys.size, ::verticalDpadReorderTarget) { from, to ->
+                    onMove(memberKey, to - from)
                 }
-                BackHandler(enabled = move.moving) { move.drop() }
+                val shape = RoundedCornerShape(12.dp)
                 Surface(
-                    modifier = Modifier.zIndex(if (move.moving) 1f else 0f)
-                        .bringIntoViewRequester(bringIntoView)
+                    modifier = Modifier.zIndex(if (moving) 1f else 0f)
+                        .bringIntoViewRequester(row.bringIntoView)
                         .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .then(if (move.moving) Modifier.border(2.dp, MaterialTheme.colorScheme.secondary, shape) else Modifier),
+                        .then(if (moving) Modifier.border(2.dp, MaterialTheme.colorScheme.secondary, shape) else Modifier),
                     shape = shape,
-                    color = if (move.moving) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
-                    shadowElevation = if (move.moving) 8.dp else 0.dp
+                    color = if (moving) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                    shadowElevation = if (moving) 8.dp else 0.dp
                 ) {
                     Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -121,8 +121,8 @@ private fun TvProxyChainLayout(
                                     if (previous != null) up = previous.pick
                                     down = next?.pick ?: add
                                 }
-                                .tvEditorFocus(visible = !move.moving)
-                                .tvChainMove(move, onMove = { step -> onMove(memberKey, step) }, onClick = { onPick(memberKey) })
+                                .dpadFocusOutline(cornerRadius = 8.dp, showFocus = !moving)
+                                .dpadLongPressToMove(reorderItem) { onPick(memberKey) }
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                         )
                         IconButton(
@@ -132,7 +132,7 @@ private fun TvProxyChainLayout(
                                 end = FocusRequester.Cancel
                                 if (previous != null) up = previous.remove
                                 down = next?.remove ?: add
-                            }.tvEditorFocus(24.dp)
+                            }.dpadFocusOutline(cornerRadius = 24.dp)
                         ) {
                             Icon(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.acc_remove))
                         }
@@ -146,4 +146,5 @@ private fun TvProxyChainLayout(
 private class ChainRowFocus {
     val pick = FocusRequester()
     val remove = FocusRequester()
+    val bringIntoView = BringIntoViewRequester()
 }

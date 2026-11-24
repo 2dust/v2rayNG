@@ -37,15 +37,14 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
-import com.v2ray.ang.ui.compose.TvEditorNavigation
+import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
-import com.v2ray.ang.ui.compose.tvEditorFocus
 
 @Composable
 internal fun TvPolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
     val focus = checkNotNull(LocalOutboundEditorFocus.current)
-    val back = checkNotNull(LocalTvEditor.current).back
+    val back = checkNotNull(LocalTvEditor.current)
     val picker = remember { FocusRequester() }
     var open by rememberSaveable { mutableStateOf(false) }
     var restore by remember { mutableStateOf(false) }
@@ -61,8 +60,8 @@ internal fun TvPolicyFallbackField(value: String, options: List<String>, onSelec
     }
     PolicyFallbackRow(
         value, onPick = { open = true }, onClear = { onSelect("") },
-        pickModifier = focus.target(picker).focusProperties { start = back }.tvEditorFocus(),
-        clearModifier = focus.target().tvEditorFocus(24.dp)
+        pickModifier = focus.target(picker).focusProperties { start = back }.dpadFocusOutline(cornerRadius = 8.dp),
+        clearModifier = focus.target().dpadFocusOutline(cornerRadius = 24.dp)
     )
     if (open) {
         TvProfilePicker(stringResource(R.string.title_policy_group_fallback), options, value,
@@ -92,7 +91,7 @@ internal fun TvProfilePicker(
         text = {
             val ime = rememberTvEditorIme()
             val inputMode = LocalInputModeManager.current
-            CompositionLocalProvider(LocalTvEditor provides TvEditorNavigation(cancel, ime.visible)) {
+            CompositionLocalProvider(LocalTvEditor provides cancel) {
                 Column(ime.padding) {
                     TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
                         Modifier.focusRequester(search).onFocusChanged { if (it.hasFocus) focusedTarget = SEARCH_FOCUS },
@@ -102,7 +101,7 @@ internal fun TvProfilePicker(
                         items(matches, key = { it }) { option ->
                             val focus = if (option == targetOption) Modifier.focusRequester(result) else Modifier
                             Row(
-                                focus.fillMaxWidth().tvEditorFocus()
+                                focus.fillMaxWidth().dpadFocusOutline(cornerRadius = 8.dp)
                                     .onFocusChanged { if (it.isFocused) focusedTarget = RESULT_FOCUS_PREFIX + option }
                                     .selectable(option == selected, role = Role.RadioButton, onClick = { onSelect(option) })
                                     .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -134,7 +133,7 @@ internal fun TvProfilePicker(
         confirmButton = {
             TextButton(
                 onClick = onDismiss,
-                modifier = Modifier.focusRequester(cancel).tvEditorFocus(24.dp)
+                modifier = Modifier.focusRequester(cancel).dpadFocusOutline(cornerRadius = 24.dp)
                     .onFocusChanged { if (it.isFocused) focusedTarget = CANCEL_FOCUS }
             ) {
                 Text(stringResource(R.string.action_cancel))
