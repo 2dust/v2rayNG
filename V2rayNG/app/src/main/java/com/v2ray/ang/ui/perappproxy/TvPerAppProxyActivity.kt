@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.perappproxy
 
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,9 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -51,6 +59,8 @@ import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.compose.rememberTvAppListFocus
 import com.v2ray.ang.ui.compose.rememberTvAppSearch
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
+import com.v2ray.ang.ui.compose.verticalScrollbar
+import kotlinx.coroutines.launch
 
 class TvPerAppProxyActivity : BasePerAppProxyActivity() {
     @Composable
@@ -186,20 +196,48 @@ private fun TvPerAppSwitch(
 @Composable
 private fun TvPerAppInfoDialog(onDismiss: () -> Unit) {
     val close = remember { FocusRequester() }
+    val scroll = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    val scrollStep = with(LocalDensity.current) { 56.dp.toPx() }
     LaunchedEffect(close) { requestFocusWhenReady(close) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        text = { Text(stringResource(R.string.summary_pref_per_app_proxy), style = MaterialTheme.typography.bodyLarge) },
+        text = {
+            Text(
+                stringResource(R.string.summary_pref_per_app_proxy),
+                modifier = Modifier.fillMaxWidth().verticalScrollbar(scroll).padding(end = 8.dp).verticalScroll(scroll),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        },
         confirmButton = {
             TextButton(onClick = onDismiss, modifier = Modifier.dpadFocusOutline(close, cornerRadius = 24.dp)) {
                 Text(stringResource(R.string.action_close))
             }
         },
-        modifier = Modifier.onPreviewKeyEvent { event ->
-            // Dismiss on release so neither half of the key press reaches the underlying screen.
-            if (event.type == KeyEventType.KeyUp) onDismiss()
-            true
-        },
-        properties = DialogProperties(dismissOnClickOutside = false)
+        modifier = Modifier.padding(horizontal = 48.dp, vertical = 24.dp).widthIn(max = 560.dp).fillMaxWidth()
+            .onPreviewKeyEvent { event ->
+                val direction = tvPerAppInfoScrollDirection(event.key, scroll.maxValue)
+                if (direction != 0) {
+                    if (event.type == KeyEventType.KeyDown && scroll.viewportSize > 0) {
+                        val distance = minOf(scrollStep, scroll.viewportSize.toFloat()) * direction
+                        scope.launch { scroll.scrollBy(distance) }
+                    }
+                } else if (event.type == KeyEventType.KeyUp) {
+                    // Dismiss on release so neither half of the key press reaches the underlying screen.
+                    onDismiss()
+                }
+                true
+            },
+        properties = DialogProperties(dismissOnClickOutside = false, usePlatformDefaultWidth = false)
     )
+}
+
+internal fun tvPerAppInfoScrollDirection(key: Key, maxScroll: Int): Int {
+    // ScrollState uses Int.MAX_VALUE before its first layout. Don't dismiss on Up/Down while waiting for measurement.
+    if (maxScroll == 0) return 0
+    return when (key) {
+        Key.DirectionUp -> -1
+        Key.DirectionDown -> 1
+        else -> 0
+    }
 }
