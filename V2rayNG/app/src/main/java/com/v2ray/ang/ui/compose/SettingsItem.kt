@@ -256,9 +256,9 @@ fun SettingsSwitchItem(
         onClick = if (enabled && tvEditor == null) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = if (tvEditor == null) modifier.then(editorFocus?.target() ?: Modifier) else modifier.tvEditorFocus()
+        modifier = if (tvEditor == null) modifier.then(editorFocus?.target() ?: Modifier) else modifier.dpadFocusOutline(cornerRadius = 8.dp)
             .then(editorFocus?.target() ?: Modifier)
-            .focusProperties { start = tvEditor.back }
+            .focusProperties { start = tvEditor }
             .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange),
         trailing = {
             Switch(
