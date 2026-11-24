@@ -6,11 +6,14 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.handler.CoreDownloadManager
+import com.v2ray.ang.handler.CoreFetchResult
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.HttpUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,28 +66,11 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
             }
 
             val result = withContext(Dispatchers.IO) {
-                var realContent = content.trim()
-                if (URLUtil.isNetworkUrl(realContent)) {
-                    val fetched = HttpUtil.getUrlContent(UrlContentRequest(url = realContent, timeout = 10000))
-                    if (fetched.isNullOrEmpty()) {
-                        val proxyUsername = SettingsManager.getSocksUsername()
-                        val proxyPassword = SettingsManager.getSocksPassword()
-                        val httpPort = SettingsManager.getHttpPort()
-                        realContent = HttpUtil.getUrlContent(
-                            UrlContentRequest(
-                                url = realContent,
-                                timeout = 10000,
-                                httpPort = httpPort,
-                                proxyUsername = proxyUsername,
-                                proxyPassword = proxyPassword
-                            )
-                        ).orEmpty()
-                    } else {
-                        realContent = fetched
-                    }
-                }
-
-                SettingsManager.resetRoutingRulesets(realContent)
+                val rulesetContent = resolveRulesetImportContent(content, coreFetch = { request ->
+                    CoreDownloadManager.fetchText(app, request, includeDefaultUserAgent = false)
+                })
+                ensureActive()
+                SettingsManager.resetRoutingRulesets(rulesetContent)
             }
 
             if (result) {
@@ -94,5 +80,33 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
                 toastError(R.string.toast_failure)
             }
         }
+    }
+}
+
+internal fun resolveRulesetImportContent(
+    content: String,
+    coreFetch: (UrlContentRequest) -> CoreFetchResult<String>,
+    isNetworkUrl: (String) -> Boolean = URLUtil::isNetworkUrl,
+    directFetch: (UrlContentRequest) -> String? = HttpUtil::getUrlContent,
+    proxyFetch: (UrlContentRequest) -> String? = { request ->
+        HttpUtil.getUrlContent(
+            request.copy(
+                httpPort = SettingsManager.getHttpPort(),
+                proxyUsername = SettingsManager.getSocksUsername(),
+                proxyPassword = SettingsManager.getSocksPassword(),
+            )
+        )
+    },
+): String? {
+    val trimmedContent = content.trim()
+    if (!isNetworkUrl(trimmedContent)) return trimmedContent
+
+    val request = UrlContentRequest(url = trimmedContent, timeout = 10_000)
+    return when (val result = coreFetch(request)) {
+        is CoreFetchResult.Success -> result.value
+        CoreFetchResult.NotApplicable -> directFetch(request).takeUnless { it.isNullOrEmpty() }
+            ?: proxyFetch(request)
+        // Like subscription imports, keep eligible user-provided URLs on the core path.
+        CoreFetchResult.Unavailable, CoreFetchResult.Failed -> null
     }
 }
