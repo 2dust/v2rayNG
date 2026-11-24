@@ -41,5 +41,12 @@
 # MMKV calls back into Java from native code.
 -keep class com.tencent.mmkv.** { *; }
 
+# R8 9.5.x can non-deterministically class-merge this coroutines helper and
+# narrow emitAbort's Continuation parameter. Keep its original placement and
+# signature so independently built release APKs produce identical dex files.
+-keep class kotlinx.coroutines.flow.FlowKt__LimitKt {
+    *** emitAbort(...);
+}
+
 # Keep file names and line numbers in stack traces.
 -keepattributes SourceFile,LineNumberTable
