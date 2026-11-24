@@ -33,18 +33,43 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 
+internal enum class TvAppToolbarControl {
+    Back, Search, Input, Clear, More;
+
+    companion object {
+        fun visible(searchOpen: Boolean, hasQuery: Boolean): List<TvAppToolbarControl> = when {
+            !searchOpen -> listOf(Back, Search, More)
+            !hasQuery -> listOf(Back, Input, More)
+            else -> listOf(Back, Input, Clear, More)
+        }
+
+        fun restore(saved: TvAppToolbarControl?, searchOpen: Boolean, hasQuery: Boolean): TvAppToolbarControl =
+            saved?.takeIf { it in visible(searchOpen, hasQuery) } ?: if (searchOpen) Input else Back
+    }
+}
+
 internal class TvAppSearchState(
     private val expanded: MutableState<Boolean>,
     private val text: MutableState<String>,
-    private val filter: State<(String) -> Unit>
+    private val filter: State<(String) -> Unit>,
+    private val focusedControl: MutableState<TvAppToolbarControl?>
 ) {
-    val back = FocusRequester()
-    val input = FocusRequester()
+    private val targets = TvAppToolbarControl.entries.associateWith { FocusRequester() }
+    val back get() = requester(TvAppToolbarControl.Back)
+    val input get() = requester(TvAppToolbarControl.Input)
     val isOpen get() = expanded.value
     val query get() = text.value
     val toolbarEntry get() = if (isOpen) input else back
+    val toolbarOrder get() = TvAppToolbarControl.visible(isOpen, query.isNotEmpty()).map(::requester)
+    val toolbarRestoreTarget get() = requester(TvAppToolbarControl.restore(focusedControl.value, isOpen, query.isNotEmpty()))
     var editOnOpen by mutableStateOf(false)
         private set
+
+    fun requester(control: TvAppToolbarControl): FocusRequester = targets.getValue(control)
+
+    fun onToolbarFocused(requester: FocusRequester) {
+        focusedControl.value = targets.entries.firstOrNull { it.value === requester }?.key
+    }
 
     fun open() {
         editOnOpen = true
@@ -68,7 +93,8 @@ internal fun rememberTvAppSearch(onSearch: (String) -> Unit): TvAppSearchState {
     val expanded = rememberSaveable { mutableStateOf(false) }
     val text = rememberSaveable { mutableStateOf("") }
     val filter = rememberUpdatedState(onSearch)
-    val state = remember { TvAppSearchState(expanded, text, filter) }
+    val focusedControl = rememberSaveable { mutableStateOf<TvAppToolbarControl?>(null) }
+    val state = remember { TvAppSearchState(expanded, text, filter, focusedControl) }
     LaunchedEffect(state) { filter.value(state.query) }
     BackHandler(enabled = state.isOpen, onBack = state::close)
     return state
@@ -81,25 +107,27 @@ internal fun TvAppSelectionToolbar(
     title: String, isLoading: Boolean, search: TvAppSearchState, menu: List<TvAppMenuAction>,
     onBack: () -> Unit, onMoveDown: () -> Boolean, modifier: Modifier = Modifier
 ) {
-    val searchButton = remember { FocusRequester() }
-    val clear = remember { FocusRequester() }
-    val more = remember { FocusRequester() }
-    val order = if (!search.isOpen) listOf(search.back, searchButton, more)
-    else if (search.query.isEmpty()) listOf(search.back, search.input, more)
-    else listOf(search.back, search.input, clear, more)
+    val searchButton = search.requester(TvAppToolbarControl.Search)
+    val clear = search.requester(TvAppToolbarControl.Clear)
+    val more = search.requester(TvAppToolbarControl.More)
+    val order = search.toolbarOrder
+
+    fun trackFocus(target: FocusRequester) = Modifier.onFocusChanged {
+        if (it.isFocused) search.onToolbarFocused(target)
+    }
 
     Box(modifier.padding(horizontal = 48.dp).focusGroup()) {
         AppTopBar(
             title = title, onBackClick = onBack, isLoading = isLoading,
             titleContent = if (search.isOpen) ({
                 TvTopBarSearchField(search.query, search::updateQuery, search.input, clear, order, onMoveDown,
-                    editOnEntry = search.editOnOpen)
+                    editOnEntry = search.editOnOpen, onFocused = search::onToolbarFocused)
             }) else null,
             navigationIcon = {
                 TvIconButton(
                     painterResource(R.drawable.ic_tv_arrow_back_24dp), stringResource(R.string.action_back),
                     if (search.isOpen) search::close else onBack,
-                    modifier = Modifier.dpadTopBarFocusNavigation(search.back, order, onMoveDown),
+                    modifier = trackFocus(search.back).dpadTopBarFocusNavigation(search.back, order, onMoveDown),
                     focusRequester = search.back, contentDescription = stringResource(R.string.acc_back)
                 )
             },
@@ -107,11 +135,11 @@ internal fun TvAppSelectionToolbar(
                 if (!search.isOpen) {
                     TvIconButton(
                         painterResource(R.drawable.ic_search_24dp), stringResource(R.string.menu_item_search), search::open,
-                        modifier = Modifier.dpadTopBarFocusNavigation(searchButton, order, onMoveDown),
+                        modifier = trackFocus(searchButton).dpadTopBarFocusNavigation(searchButton, order, onMoveDown),
                         focusRequester = searchButton, contentDescription = stringResource(R.string.acc_search)
                     )
                 }
-                TvAppSelectionMenu(more, order, onMoveDown, menu)
+                TvAppSelectionMenu(more, order, onMoveDown, menu, trackFocus(more))
             }
         )
     }
@@ -119,7 +147,8 @@ internal fun TvAppSelectionToolbar(
 
 @Composable
 private fun TvAppSelectionMenu(
-    more: FocusRequester, order: List<FocusRequester>, onMoveDown: () -> Boolean, actions: List<TvAppMenuAction>
+    more: FocusRequester, order: List<FocusRequester>, onMoveDown: () -> Boolean, actions: List<TvAppMenuAction>,
+    buttonModifier: Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     var returnTarget by remember { mutableStateOf<FocusRequester?>(null) }
@@ -134,7 +163,7 @@ private fun TvAppSelectionMenu(
     Box {
         TvIconButton(
             painterResource(R.drawable.ic_more_vert_24dp), stringResource(R.string.action_more), { expanded = true },
-            modifier = Modifier.dpadTopBarFocusNavigation(more, order, onMoveDown), focusRequester = more,
+            modifier = buttonModifier.dpadTopBarFocusNavigation(more, order, onMoveDown), focusRequester = more,
             contentDescription = stringResource(R.string.acc_more)
         )
         DropdownMenu(

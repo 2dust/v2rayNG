@@ -78,13 +78,14 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
     var returnToInfo by remember { mutableStateOf(false) }
     val initialPackage = remember { focusedPackage }
     val initialMode = remember { focusedMode }
+    val initialToolbarTarget = remember { search.toolbarRestoreTarget }
     var needsInitialFocus by remember { mutableStateOf(true) }
 
     LaunchedEffect(state.isLoading, appFocus, showInfo) {
         if (!showInfo && needsInitialFocus && (initialPackage == null || !state.isLoading || initialPackage in appFocus.targets)) {
             needsInitialFocus = false
             if (initialPackage?.let(appFocus::focus) != true) {
-                requestFocusWhenReady(initialMode?.let(modes::get) ?: search.toolbarEntry)
+                requestFocusWhenReady(initialMode?.let(modes::get) ?: initialToolbarTarget)
             }
         }
     }
