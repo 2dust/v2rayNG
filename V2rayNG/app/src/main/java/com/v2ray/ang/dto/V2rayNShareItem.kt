@@ -76,7 +76,10 @@ data class V2rayNShareItem(
         val KcpMtu: Int?,
     )
 
-    fun toProfileItem(): ProfileItem {
+    /**
+     * Returns null for a ConfigType this app cannot represent, so the caller skips only that entry.
+     */
+    fun toProfileItem(): ProfileItem? {
         val configType = when (ConfigType) {
             1 -> EConfigType.VMESS
             2 -> EConfigType.CUSTOM
@@ -90,7 +93,7 @@ data class V2rayNShareItem(
             10 -> EConfigType.HTTP
             101 -> EConfigType.POLICYGROUP
             102 -> EConfigType.PROXYCHAIN
-            else -> error("Unknown ConfigType: $ConfigType")
+            else -> return null
         }
         val network = if (configType == EConfigType.HYSTERIA2) "hysteria" else
             when (Network) {
@@ -159,8 +162,8 @@ data class V2rayNShareItem(
             // policyGroupSubscriptionId = ProtoExtraObj?.SubChildItems,
             policyGroupSubscriptionId = if (ProtoExtraObj?.SubChildItems == "self") "self" else null,
             policyGroupFilter = ProtoExtraObj?.Filter,
-            // NOTE: proxyChainProfiles stores remarks, not IndexId
-            // proxyChainProfiles = ProtoExtraObj?.ChildItems,
+            // NOTE: proxyChainProfileList stores remarks, not IndexId
+            // proxyChainProfileList = ProtoExtraObj?.ChildItems,
         )
         // profile.description =
         return profile
