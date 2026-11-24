@@ -130,12 +130,14 @@ internal fun TvTopBarSearchField(
     clearFocusRequester: FocusRequester,
     focusOrder: List<FocusRequester>,
     onMoveDown: () -> Boolean,
-    editOnEntry: Boolean = true
+    editOnEntry: Boolean = true,
+    onFocused: (FocusRequester) -> Unit = {}
 ) {
     val state = rememberTvTextFieldState(focusRequester)
     LaunchedEffect(state) { if (editOnEntry) state.beginEditing() }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.weight(1f).tvSearchFieldFocus(state, focusOrder, onMoveDown)) {
+        Box(Modifier.weight(1f).onFocusChanged { if (it.hasFocus) onFocused(focusRequester) }
+            .tvSearchFieldFocus(state, focusOrder, onMoveDown)) {
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
@@ -166,7 +168,8 @@ internal fun TvTopBarSearchField(
                 icon = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
                 label = stringResource(R.string.action_clear),
                 focusRequester = clearFocusRequester,
-                modifier = Modifier.dpadTopBarFocusNavigation(clearFocusRequester, focusOrder, onMoveDown),
+                modifier = Modifier.onFocusChanged { if (it.isFocused) onFocused(clearFocusRequester) }
+                    .dpadTopBarFocusNavigation(clearFocusRequester, focusOrder, onMoveDown),
                 onClick = {
                     onQueryChange("")
                     focusRequester.requestFocus()
