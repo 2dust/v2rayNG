@@ -2,14 +2,18 @@ package com.v2ray.ang.ui.routing
 
 import android.app.Application
 import android.webkit.URLUtil
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.HttpUtil
+import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,29 +29,34 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
 
     fun getAll(): List<RulesetItem> = rulesets.toList()
 
-    internal fun positionOf(id: String): Int = rulesets.indexOfFirst { it.id == id }
+    internal fun editablePosition(id: String): Int = if (isLoading.value) -1 else rulesets.indexOfFirst { it.id == id }
 
     internal fun setRuleEnabled(id: String, enabled: Boolean) {
-        val position = positionOf(id)
+        val position = editablePosition(id)
         val rule = rulesets.getOrNull(position) ?: return
-        update(position, rule.copy(enabled = enabled))
+        val updated = rule.copy(enabled = enabled)
+        SettingsManager.saveRoutingRuleset(position, updated)
+        rulesets[position] = updated
+        _rulesetsFlow.value = rulesets.toList()
     }
 
     internal fun deleteRule(id: String) {
-        val position = positionOf(id)
+        val position = editablePosition(id)
         if (position < 0) return
         SettingsManager.removeRoutingRuleset(position)
         reload()
     }
 
-    fun reload() {
+    internal fun reloadIfIdle() {
+        if (!isLoading.value) reload()
+    }
+
+    private fun reload() {
         val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        var needsSave = false
         loaded.forEachIndexed { index, item ->
             if (item.id.isEmpty()) {
                 item.id = UUID.randomUUID().toString()
                 SettingsManager.saveRoutingRuleset(index, item)
-                needsSave = true
             }
         }
         rulesets.clear()
@@ -55,57 +64,56 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         _rulesetsFlow.value = rulesets.toList()
     }
 
-    fun update(position: Int, item: RulesetItem) {
-        if (position in rulesets.indices) {
-            rulesets[position] = item
-            SettingsManager.saveRoutingRuleset(position, item)
-            _rulesetsFlow.value = rulesets.toList()
-        }
-    }
-
-    fun move(fromPosition: Int, toPosition: Int) {
+    internal fun move(fromId: String, toId: String) {
+        val fromPosition = editablePosition(fromId)
+        val toPosition = editablePosition(toId)
         if (rulesets.moveItem(fromPosition, toPosition)) {
             MmkvManager.encodeRoutingRulesets(rulesets)
             _rulesetsFlow.value = rulesets.toList()
         }
     }
 
-    fun importRulesets(content: String?) {
-        launchLoading {
-            if (content.isNullOrBlank()) {
-                toastError(R.string.toast_failure)
-                return@launchLoading
-            }
+    internal fun importPredefined(type: RoutingType) = importRules {
+        SettingsManager.resetRoutingRulesetsFromPresets(getApplication(), type)
+    }
 
-            val result = withContext(Dispatchers.IO) {
-                var realContent = content.trim()
-                if (URLUtil.isNetworkUrl(realContent)) {
-                    val fetched = HttpUtil.getUrlContent(UrlContentRequest(url = realContent, timeout = 10000))
-                    if (fetched.isNullOrEmpty()) {
-                        val proxyUsername = SettingsManager.getSocksUsername()
-                        val proxyPassword = SettingsManager.getSocksPassword()
-                        val httpPort = SettingsManager.getHttpPort()
-                        realContent = HttpUtil.getUrlContent(
-                            UrlContentRequest(
-                                url = realContent,
-                                timeout = 10000,
-                                httpPort = httpPort,
-                                proxyUsername = proxyUsername,
-                                proxyPassword = proxyPassword
-                            )
-                        ).orEmpty()
-                    } else {
-                        realContent = fetched
-                    }
-                }
-
-                SettingsManager.resetRoutingRulesets(realContent)
-            }
-
-            if (result) {
-                reload()
-                toastSuccess(R.string.toast_success)
+    fun importRulesets(content: String?) = importRules {
+        if (content.isNullOrBlank()) return@importRules false
+        var realContent = content.trim()
+        if (URLUtil.isNetworkUrl(realContent)) {
+            val fetched = HttpUtil.getUrlContent(UrlContentRequest(url = realContent, timeout = 10000))
+            realContent = if (fetched.isNullOrEmpty()) {
+                HttpUtil.getUrlContent(
+                    UrlContentRequest(
+                        url = realContent,
+                        timeout = 10000,
+                        httpPort = SettingsManager.getHttpPort(),
+                        proxyUsername = SettingsManager.getSocksUsername(),
+                        proxyPassword = SettingsManager.getSocksPassword()
+                    )
+                ).orEmpty()
             } else {
+                fetched
+            }
+        }
+        SettingsManager.resetRoutingRulesets(realContent)
+    }
+
+    private fun importRules(replaceRules: suspend () -> Boolean) {
+        if (isLoading.value) return
+        launchLoading {
+            // Keep edits blocked until the displayed list matches the persisted replacement.
+            try {
+                if (withContext(Dispatchers.IO) { replaceRules() }) {
+                    reload()
+                    toastSuccess(R.string.toast_success)
+                } else {
+                    toastError(R.string.toast_failure)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to import routing rules", e)
                 toastError(R.string.toast_failure)
             }
         }

@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
@@ -42,7 +42,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -50,7 +49,6 @@ import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppTopBar
@@ -62,11 +60,8 @@ import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -131,12 +126,16 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!forwardingToTv) viewModel.reload()
+        if (!forwardingToTv) viewModel.reloadIfIdle()
     }
 
-    protected fun addRule() = startActivity(Intent(this, RoutingEditActivity::class.java))
+    protected fun addRule() {
+        if (!viewModel.isLoading.value) startActivity(Intent(this, RoutingEditActivity::class.java))
+    }
 
-    protected fun editRule(position: Int) {
+    protected fun editRule(id: String) {
+        val position = viewModel.editablePosition(id)
+        if (position < 0) return
         startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
     }
 
@@ -150,19 +149,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: strategies.first()
     }
 
-    protected fun importPredefined(type: RoutingType) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                SettingsManager.resetRoutingRulesetsFromPresets(this@BaseRoutingSettingActivity, type)
-                launch(Dispatchers.Main) {
-                    viewModel.reload()
-                    toastSuccess(R.string.toast_success)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
-            }
-        }
-    }
+    protected fun importPredefined(type: RoutingType) = viewModel.importPredefined(type)
 
     protected fun importFromClipboard() {
         val clipboard = try {
@@ -175,6 +162,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
     }
 
     protected fun importQRcode() {
+        if (viewModel.isLoading.value) return
         launchQRCodeScanner { scanResult ->
             if (scanResult != null) {
                 viewModel.importRulesets(scanResult)
@@ -199,7 +187,7 @@ fun RoutingSettingScreen(
     domainStrategyState: MutableStateFlow<String>,
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
-    onEditRule: (Int) -> Unit,
+    onEditRule: (String) -> Unit,
     onDomainStrategySelected: (String) -> Unit,
     onImportPredefined: (RoutingType) -> Unit,
     onImportClipboard: () -> Unit,
@@ -215,10 +203,9 @@ fun RoutingSettingScreen(
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
-        val fromIndex = rulesets.indexOfFirst { it.id == from.key }
-        val toIndex = rulesets.indexOfFirst { it.id == to.key }
-        viewModel.move(fromIndex, toIndex)
+        val fromId = from.key as? String ?: return@rememberReorderableLazyListState
+        val toId = to.key as? String ?: return@rememberReorderableLazyListState
+        viewModel.move(fromId, toId)
     }
 
     Scaffold(
@@ -287,10 +274,10 @@ fun RoutingSettingScreen(
                 )
             }
 
-            itemsIndexed(
+            items(
                 items = rulesets,
-                key = { _, ruleset -> ruleset.id }
-            ) { index, ruleset ->
+                key = { it.id }
+            ) { ruleset ->
                 ReorderableItem(reorderableState, key = ruleset.id) { isDragging ->
                     ReorderableListItem(
                         scope = this,
@@ -298,11 +285,8 @@ fun RoutingSettingScreen(
                     ) {
                         RoutingRulesetItem(
                             ruleset = ruleset,
-                            onEdit = { onEditRule(index) },
-                            onEnabledChange = { checked ->
-                                val updated = ruleset.copy(enabled = checked)
-                                viewModel.update(index, updated)
-                            }
+                            onEdit = { onEditRule(ruleset.id) },
+                            onEnabledChange = { viewModel.setRuleEnabled(ruleset.id, it) }
                         )
                     }
                     ItemDivider()

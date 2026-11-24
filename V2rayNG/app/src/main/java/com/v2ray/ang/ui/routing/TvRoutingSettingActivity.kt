@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.routing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,7 +85,7 @@ class TvRoutingSettingActivity : BaseRoutingSettingActivity() {
         when (action) {
             RoutingListAction.Back -> finish()
             RoutingListAction.Add -> addRule()
-            is RoutingListAction.Edit -> viewModel.positionOf(action.id).takeIf { it >= 0 }?.let(::editRule)
+            is RoutingListAction.Edit -> editRule(action.id)
             is RoutingListAction.Enable -> viewModel.setRuleEnabled(action.id, action.enabled)
             is RoutingListAction.Delete -> viewModel.deleteRule(action.id)
             is RoutingListAction.Move -> viewModel.move(action.from, action.to)
@@ -106,7 +107,7 @@ private sealed interface RoutingListAction {
     data class Edit(val id: String) : RoutingListAction
     data class Enable(val id: String, val enabled: Boolean) : RoutingListAction
     data class Delete(val id: String) : RoutingListAction
-    data class Move(val from: Int, val to: Int) : RoutingListAction
+    data class Move(val from: String, val to: String) : RoutingListAction
     data class Strategy(val value: String) : RoutingListAction
     data class Preset(val value: RoutingPreset) : RoutingListAction
     data class Menu(val value: RoutingMenuAction) : RoutingListAction
@@ -136,6 +137,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
         listState.keepDpadReorderItemVisible(key, index + 1) // The domain strategy and heading share one lazy item.
         rowFocus[key]?.get(RoutingControl.Rule)?.requestFocus()
     }
+    LaunchedEffect(loading) { if (loading) reorder.cancelInteraction() }
     var focusedId by rememberSaveable { mutableStateOf<String?>(null) }
     var focusedControl by rememberSaveable { mutableStateOf(RoutingControl.Back) }
     var showMenu by remember { mutableStateOf(false) }
@@ -236,8 +238,8 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
                 val previous = rowFocus[ids.getOrNull(index - 1)]
                 val next = rowFocus[ids.getOrNull(index + 1)]
                 val moving = reorder.isMoving(rule.id)
-                val movement = DpadReorderItem(reorder, rule.id, index, rules.size, ::verticalDpadReorderTarget) { from, to ->
-                    onAction(RoutingListAction.Move(from, to))
+                val movement = if (loading) null else DpadReorderItem(reorder, rule.id, index, rules.size, ::verticalDpadReorderTarget) { _, to ->
+                    ids.getOrNull(to)?.let { onAction(RoutingListAction.Move(rule.id, it)) }
                 }
                 val actionFocus: @Composable (RoutingControl) -> Modifier = { control ->
                     focusTarget(control, rule.id)
@@ -250,7 +252,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
                     TvRoutingRuleRow(rule, targets, actionFocus, moving, movement,
                         onEdit = { onAction(RoutingListAction.Edit(rule.id)) },
                         onEnable = { onAction(RoutingListAction.Enable(rule.id, it)) },
-                        onDelete = { deleteId = rule.id })
+                        onDelete = { if (!loading) deleteId = rule.id })
                     ItemDivider()
                 }
             }
@@ -277,7 +279,8 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
                     deleteId = null
                     val neighbor = routingRuleNeighbor(ids, id)
                     onAction(RoutingListAction.Delete(id))
-                    restore(rowFocus[neighbor]?.get(RoutingControl.Rule) ?: strategyFocus)
+                    val target = if (loading) rowFocus[id]?.get(RoutingControl.Delete) else rowFocus[neighbor]?.get(RoutingControl.Rule)
+                    restore(target ?: strategyFocus)
                 },
                 onDismiss = { deleteId = null; restore(rowFocus.getValue(id).getValue(RoutingControl.Delete)) })
         } else if (!loading) {
@@ -289,7 +292,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
 @Composable
 private fun TvRoutingRuleRow(
     rule: RulesetItem, targets: Map<RoutingControl, FocusRequester>, navigation: @Composable (RoutingControl) -> Modifier,
-    moving: Boolean, movement: DpadReorderItem, onEdit: () -> Unit, onEnable: (Boolean) -> Unit, onDelete: () -> Unit
+    moving: Boolean, movement: DpadReorderItem?, onEdit: () -> Unit, onEnable: (Boolean) -> Unit, onDelete: () -> Unit
 ) {
     var rowFocused by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(16.dp)
@@ -302,7 +305,8 @@ private fun TvRoutingRuleRow(
         verticalAlignment = Alignment.CenterVertically) {
         RoutingRuleSummary(rule, Modifier.weight(1f).heightIn(min = 56.dp)
             .then(navigation(RoutingControl.Rule)).focusRequester(targets.getValue(RoutingControl.Rule))
-            .onFocusChanged { rowFocused = it.isFocused }.dpadLongPressToMove(movement, onEdit)
+            .onFocusChanged { rowFocused = it.isFocused }
+            .then(if (movement == null) Modifier.focusable() else Modifier.dpadLongPressToMove(movement, onEdit))
             .padding(horizontal = 16.dp, vertical = 10.dp))
         var toggleFocused by remember { mutableStateOf(false) }
         val label = stringResource(R.string.routing_settings_enable_rule)
