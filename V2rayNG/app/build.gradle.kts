@@ -9,7 +9,11 @@ plugins {
 
 android {
     namespace = "com.v2ray.ang"
-    compileSdk = 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     // Match CI by default: the NDK strips jniLibs, so its version affects APK bytes.
     // Keep the override for builds that intentionally select a different NDK.
@@ -19,8 +23,8 @@ android {
         applicationId = "com.v2ray.ang"
         minSdk = 24
         targetSdk = 37
-        versionCode = 760
-        versionName = "2.4.0"
+        versionCode = 761
+        versionName = "2.4.1"
 
         val abiFilterList = providers.gradleProperty("ABI_FILTERS").orNull?.split(';')
         splits {
@@ -170,6 +174,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.tv.material)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.coil.compose)
