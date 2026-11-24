@@ -1,14 +1,20 @@
 package com.v2ray.ang.ui.routing
 
 import android.app.Application
+import android.webkit.URLUtil
+import com.v2ray.ang.R
+import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseViewModel
+import com.v2ray.ang.util.HttpUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class RoutingSettingsViewModel(application: Application) : BaseViewModel(application) {
@@ -46,6 +52,47 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         if (rulesets.moveItem(fromPosition, toPosition)) {
             MmkvManager.encodeRoutingRulesets(rulesets)
             _rulesetsFlow.value = rulesets.toList()
+        }
+    }
+
+    fun importRulesets(content: String?) {
+        launchLoading {
+            if (content.isNullOrBlank()) {
+                toastError(R.string.toast_failure)
+                return@launchLoading
+            }
+
+            val result = withContext(Dispatchers.IO) {
+                var realContent = content.trim()
+                if (URLUtil.isNetworkUrl(realContent)) {
+                    val fetched = HttpUtil.getUrlContent(UrlContentRequest(url = realContent, timeout = 10000))
+                    if (fetched.isNullOrEmpty()) {
+                        val proxyUsername = SettingsManager.getSocksUsername()
+                        val proxyPassword = SettingsManager.getSocksPassword()
+                        val httpPort = SettingsManager.getHttpPort()
+                        realContent = HttpUtil.getUrlContent(
+                            UrlContentRequest(
+                                url = realContent,
+                                timeout = 10000,
+                                httpPort = httpPort,
+                                proxyUsername = proxyUsername,
+                                proxyPassword = proxyPassword
+                            )
+                        ).orEmpty()
+                    } else {
+                        realContent = fetched
+                    }
+                }
+
+                SettingsManager.resetRoutingRulesets(realContent)
+            }
+
+            if (result) {
+                reload()
+                toastSuccess(R.string.toast_success)
+            } else {
+                toastError(R.string.toast_failure)
+            }
         }
     }
 }
