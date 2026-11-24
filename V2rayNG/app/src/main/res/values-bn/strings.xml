@@ -582,4 +582,9 @@
     <string name="summary_remote_control">অন্য অ্যাপকে v2rayNG নিয়ন্ত্রণ করার অনুমতি দিন</string>
     <string name="remote_control_access_required">সেটিংস → স্বয়ংক্রিয়করণ অ্যাপের অ্যাক্সেস থেকে এই অ্যাপকে অনুমতি দিন, তারপর এই কাজটি আবার খুলুন।</string>
     <string name="tasker_current_profile">বর্তমান প্রোফাইল</string>
+    <string name="action_exit">প্রস্থান</string>
+    <string name="action_back">ফিরে যান</string>
+    <string name="action_more">আরও</string>
+    <string name="action_clear">সাফ করুন</string>
+    <string name="connection_connected_tv">সংযুক্ত</string>
 </resources>

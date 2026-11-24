@@ -590,4 +590,9 @@
     <string name="summary_remote_control">السماح للتطبيقات الأخرى بالتحكم في v2rayNG</string>
     <string name="remote_control_access_required">اسمح لهذا التطبيق في الإعدادات ← وصول تطبيقات الأتمتة، ثم افتح هذا الإجراء مجددًا.</string>
     <string name="tasker_current_profile">الملف الشخصي الحالي</string>
+    <string name="action_exit">خروج</string>
+    <string name="action_back">رجوع</string>
+    <string name="action_more">المزيد</string>
+    <string name="action_clear">مسح</string>
+    <string name="connection_connected_tv">متصل</string>
 </resources>

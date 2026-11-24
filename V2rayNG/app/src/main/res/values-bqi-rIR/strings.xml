@@ -582,4 +582,9 @@
     <string name="summary_remote_control">اجازه بِ برنامه‌هانی دیگه سی کنترل v2rayNG</string>
     <string name="remote_control_access_required">دِ تنظیمات ← دسترسی برنامه‌هانی خودکارسازی بِ ای برنامه اجازه بدین، بعد ای کار نِ دوباره وا کنین.</string>
     <string name="tasker_current_profile">پروفایل فعلی</string>
+    <string name="action_exit">خروج</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">بیشتر</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="connection_connected_tv">منپیز هڌ</string>
 </resources>

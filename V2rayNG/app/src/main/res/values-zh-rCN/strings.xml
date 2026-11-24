@@ -580,4 +580,9 @@
     <string name="summary_remote_control">允许其他应用控制 v2rayNG</string>
     <string name="remote_control_access_required">请在“设置 → 自动化应用访问权限”中允许此应用，然后重新打开此操作。</string>
     <string name="tasker_current_profile">当前配置</string>
+    <string name="action_exit">退出</string>
+    <string name="action_back">返回</string>
+    <string name="action_more">更多</string>
+    <string name="action_clear">清除</string>
+    <string name="connection_connected_tv">已连接</string>
 </resources>

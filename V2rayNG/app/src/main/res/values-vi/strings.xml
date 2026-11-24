@@ -580,4 +580,9 @@
     <string name="summary_remote_control">Cho phép ứng dụng khác điều khiển v2rayNG</string>
     <string name="remote_control_access_required">Cho phép ứng dụng này trong Cài đặt → Quyền truy cập cho ứng dụng tự động hóa, rồi mở lại tác vụ này.</string>
     <string name="tasker_current_profile">Cấu hình hiện tại</string>
+    <string name="action_exit">Thoát</string>
+    <string name="action_back">Quay lại</string>
+    <string name="action_more">Thêm</string>
+    <string name="action_clear">Xoá</string>
+    <string name="connection_connected_tv">Đã kết nối</string>
 </resources>

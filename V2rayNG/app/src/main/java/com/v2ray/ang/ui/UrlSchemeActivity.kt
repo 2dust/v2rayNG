@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
@@ -34,6 +35,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.ui.main.TvMainActivity
 import com.v2ray.ang.util.LogUtil
 
 class UrlSchemeActivity : BaseComponentActivity() {
@@ -69,7 +71,15 @@ class UrlSchemeActivity : BaseComponentActivity() {
             when (state) {
                 UrlSchemeState.Imported -> {
                     toast(R.string.import_subscription_success)
-                    startActivity(Intent(this@UrlSchemeActivity, MainActivity::class.java))
+                    val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+                    val destination = if (uiMode == Configuration.UI_MODE_TYPE_TELEVISION) {
+                        TvMainActivity::class.java
+                    } else {
+                        MainActivity::class.java
+                    }
+                    startActivity(Intent(this@UrlSchemeActivity, destination).apply {
+                        putExtra(AppConfig.EXTRA_REFRESH_AFTER_IMPORT, true)
+                    })
                     finish()
                 }
                 UrlSchemeState.Failed -> {

@@ -586,4 +586,9 @@
     <string name="summary_remote_control">Разрешить другим приложениям управлять v2rayNG</string>
     <string name="remote_control_access_required">Разрешите этому приложению доступ в разделе «Настройки → Доступ приложений автоматизации», затем снова откройте это действие.</string>
     <string name="tasker_current_profile">Текущий профиль</string>
+    <string name="action_exit">Выход</string>
+    <string name="action_back">Назад</string>
+    <string name="action_more">Ещё</string>
+    <string name="action_clear">Очистить</string>
+    <string name="connection_connected_tv">Соединено</string>
 </resources>

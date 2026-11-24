@@ -582,4 +582,9 @@
     <string name="summary_remote_control">اجازه به برنامه‌های دیگر برای کنترل v2rayNG</string>
     <string name="remote_control_access_required">در تنظیمات ← دسترسی برنامه‌های خودکارسازی، به این برنامه اجازه دهید و سپس این عمل را دوباره باز کنید.</string>
     <string name="tasker_current_profile">پروفایل فعلی</string>
+    <string name="action_exit">خروج</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">بیشتر</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="connection_connected_tv">متصل است</string>
 </resources>
