@@ -110,6 +110,7 @@ class V2rayNFmtTest {
 
         val chain = profiles.single { it.configType == EConfigType.PROXYCHAIN }
         assertEquals(listOf("A", "B"), chain.proxyChainProfileList)
+        assertEquals("A -> B", chain.description)
     }
 
     @Test
