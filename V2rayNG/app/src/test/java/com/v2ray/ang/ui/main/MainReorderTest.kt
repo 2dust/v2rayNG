@@ -1,11 +1,13 @@
 package com.v2ray.ang.ui.main
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.moveGuid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -18,6 +20,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
@@ -39,11 +42,10 @@ class MainReorderTest {
         whenever(source.decodeServerConfig(any())).thenAnswer {
             ProfileItem.create(EConfigType.VLESS).apply { remarks = it.getArgument(0) }
         }
-        whenever(source.reorderServerList(any(), eq("s"))).thenAnswer {
-            persisted = it.getArgument(0)
-            true
+        whenever(source.moveServerInGroup(eq("s"), any(), any())).thenAnswer {
+            saveMove(it.getArgument(1), it.getArgument(2))
         }
-        viewModel = spy(MainViewModel(mock(), source, dispatcher, dispatcher))
+        viewModel = spy(MainViewModel(mock(), source, SavedStateHandle(), dispatcher, dispatcher))
         doNothing().whenever(viewModel).toastError(any<Int>())
     }
 
@@ -56,23 +58,23 @@ class MainReorderTest {
         advanceUntilIdle()
         assertEquals(persisted, visible())
         var attempts = 0
-        whenever(source.reorderServerList(any(), eq("s"))).thenAnswer {
-            if (++attempts == 1) false else { persisted = it.getArgument(0); true }
+        whenever(source.moveServerInGroup(eq("s"), any(), any())).thenAnswer {
+            if (++attempts == 1) null else saveMove(it.getArgument(1), it.getArgument(2))
         }
-        viewModel.moveServer("s", 0, 1)
-        viewModel.moveServer("s", 1, 2)
-        assertEquals(listOf("b", "c", "a"), visible())
+        move("a", "b")
+        move("c", "b")
+        assertEquals(listOf("c", "b", "a"), visible())
         advanceUntilIdle()
         assertEquals(2, attempts)
-        assertEquals(listOf("b", "c", "a"), persisted)
+        assertEquals(listOf("a", "c", "b"), persisted)
         assertEquals(persisted, visible())
         verify(viewModel).toastError(R.string.toast_failure)
     }
 
     @Test fun `failed final drag restores persisted order`() = runTest(dispatcher) {
         advanceUntilIdle()
-        whenever(source.reorderServerList(any(), any())).thenReturn(false)
-        val write = requireNotNull(viewModel.moveServer("s", 0, 2))
+        whenever(source.moveServerInGroup(any(), any(), any())).thenReturn(null)
+        val write = requireNotNull(move("a", "c"))
         assertEquals(false, write.isCompleted)
         advanceUntilIdle()
         assertEquals(false, write.await())
@@ -81,11 +83,11 @@ class MainReorderTest {
 
     @Test fun `successful drag reloads storage instead of replaying stale membership`() = runTest(dispatcher) {
         advanceUntilIdle()
-        whenever(source.reorderServerList(any(), any())).thenAnswer {
+        whenever(source.moveServerInGroup(any(), any(), any())).thenAnswer {
             persisted = listOf("c", "a", "new")
-            true
+            persisted
         }
-        val write = requireNotNull(viewModel.moveServer("s", 2, 0))
+        val write = requireNotNull(move("c", "a"))
         assertEquals(false, write.isCompleted)
         advanceUntilIdle()
         assertEquals(true, write.await())
@@ -94,12 +96,26 @@ class MainReorderTest {
 
     @Test fun `invalid and empty moves do not persist`() = runTest(dispatcher) {
         advanceUntilIdle()
-        viewModel.moveServer("s", -1, 0)
-        viewModel.moveServer("s", 0, 3)
-        viewModel.moveServer("empty", 0, 1)
+        assertNull(move("missing", "a"))
+        assertNull(move("a", "missing"))
+        assertNull(move("a", "a"))
+        assertNull(viewModel.moveServer(MainAction.MoveServer("empty", "a", "b")))
+        viewModel.filterConfig("a")
+        assertNull(move("a", "b"))
+        viewModel.filterConfig("")
         advanceUntilIdle()
         assertEquals(persisted, visible())
-        verify(source, never()).reorderServerList(any(), any())
+        verify(source, never()).moveServerInGroup(any(), any(), any())
+    }
+
+    private fun move(fromGuid: String, toGuid: String) =
+        viewModel.moveServer(MainAction.MoveServer("s", fromGuid, toGuid))
+
+    private fun saveMove(fromGuid: String, toGuid: String): List<String>? {
+        val order = persisted.toMutableList()
+        if (!order.moveGuid(fromGuid, toGuid)) return null
+        persisted = order
+        return order
     }
 
     private fun visible(groupId: String = "s"): List<String> {
@@ -125,11 +141,11 @@ class MainReorderTest {
         val collection = backgroundScope.launch { tabServers.collect {} }
         advanceUntilIdle()
         assertEquals(visible(), tabServers.value.map { it.guid })
-        whenever(source.reorderServerList(any(), any())).thenAnswer {
+        whenever(source.moveServerInGroup(any(), any(), any())).thenAnswer {
             persisted = listOf("c", "a", "new")
-            true
+            persisted
         }
-        viewModel.moveServer("s", 2, 0)
+        move("c", "a")
         advanceUntilIdle()
         assertEquals(persisted, visible())
         assertEquals(visible(), tabServers.value.map { it.guid })
@@ -143,7 +159,7 @@ class MainReorderTest {
         advanceUntilIdle()
         verify(source, times(1)).getServerGuidList("s")
         persisted = listOf("new")
-        viewModel.reloadServerList()
+        viewModel.onAction(MainAction.RefreshGroups)
         advanceUntilIdle()
         assertEquals(persisted, visible())
         verify(source, times(2)).getServerGuidList("s")
@@ -155,7 +171,7 @@ class MainReorderTest {
         viewModel.setupGroupTab()
         advanceUntilIdle()
         assertEquals(persisted, visible(""))
-        viewModel.moveServer("s", 0, 2)
+        move("a", "c")
         advanceUntilIdle()
         viewModel.subscriptionIdChanged("")
         advanceUntilIdle()
@@ -176,7 +192,7 @@ class MainReorderTest {
         viewModel.setupGroupTab()
         advanceUntilIdle()
         whenever(source.decodeServerConfig("b")).thenReturn(ProfileItem.create(EConfigType.VLESS).apply { remarks = "edited" })
-        viewModel.reloadServerList()
+        viewModel.reloadAllGroups(listOf("s"))
         advanceUntilIdle()
         viewModel.subscriptionIdChanged("shared")
         advanceUntilIdle()
@@ -197,7 +213,7 @@ class MainReorderTest {
         advanceUntilIdle()
         assertEquals("", viewModel.uiState.value.selectedGroupId)
         persisted = listOf("new")
-        viewModel.reloadServerList()
+        viewModel.reloadAllGroups(listOf(""))
         advanceUntilIdle()
         viewModel.subscriptionIdChanged("s")
         advanceUntilIdle()

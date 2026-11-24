@@ -22,6 +22,32 @@ class MmkvPersistenceTest {
         assertEquals(listOf("c", "a", "new"), MmkvManager.decodeServerList("s"))
     }
 
+    @Test fun `moving by GUID preserves profiles outside the UI snapshot`() {
+        val key = "SUB_SERVERS_s"
+        stores.main.values[key] = "[\"a\",\"new\",\"c\"]"
+        assertNull(MmkvManager.moveServerInGroup("s", "deleted", "a"))
+        val order = listOf("c", "a", "new")
+        assertEquals(order, MmkvManager.moveServerInGroup("s", "c", "a"))
+        assertEquals(order, MmkvManager.decodeServerList("s"))
+    }
+
+    @Test fun `moving by GUID rolls back a reported write failure`() {
+        val key = "SUB_SERVERS_s"
+        val original = "[\"a\",\"b\"]"
+        stores.main.values[key] = original
+        var writes = 0
+        stores.main.failWrite = { writtenKey ->
+            writtenKey == key && ++writes == 1 && run {
+                stores.main.values[key] = "[\"b\",\"a\"]"
+                true
+            }
+        }
+
+        assertThrows(ProfileStorageException::class.java) { MmkvManager.moveServerInGroup("s", "b", "a") }
+        assertEquals(original, stores.main.values[key])
+        assertEquals(2, writes)
+    }
+
     @Test fun `stale subscription reorder preserves current membership`() {
         stores.main.values["SUB_IDS"] = "[\"new\",\"a\",\"c\"]"
         assertTrue(MmkvManager.reorderSubscriptions(listOf("c", "deleted", "a")))

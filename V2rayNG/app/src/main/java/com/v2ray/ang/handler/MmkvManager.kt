@@ -25,6 +25,7 @@ import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
+import com.v2ray.ang.extension.moveGuid
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
@@ -370,6 +371,17 @@ object MmkvManager {
             false
         }
     }
+
+    /** Reorder the complete stored index without replacing it with a filtered or stale UI snapshot. */
+    internal fun moveServerInGroup(groupId: String, fromGuid: String, toGuid: String): List<String>? =
+        withProfileIndexLock {
+            val order = decodeServerListForWrite(groupId)
+            if (!order.moveGuid(fromGuid, toGuid)) return@withProfileIndexLock null
+            runStorageMutationTransaction {
+                writeProfileIndex(serverListKey(groupId), order)
+            }
+            order
+        }
 
 
     /**
