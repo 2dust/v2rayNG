@@ -17,7 +17,6 @@
     <string name="notification_channel_service">v2rayNG 服務</string>
     <string name="notification_channel_subscription_updates">訂閱更新</string>
     <string name="notification_channel_connection_checks">連線檢查</string>
-    <string name="notification_channel_other">其他通知</string>
     <string name="notification_action_stop_v2ray">停止</string>
     <string name="toast_permission_denied">無法取得此權限</string>
     <string name="toast_permission_denied_notification">無法取得此通知權限</string>
@@ -575,4 +574,9 @@
     <string name="sub_info_open_page">開啟訂閱資訊頁面</string>
     <string name="sub_info_unlimited">無限制</string>
 
+    <string name="action_exit">退出</string>
+    <string name="action_back">返回</string>
+    <string name="action_more">更多</string>
+    <string name="action_clear">清除</string>
+    <string name="connection_connected_tv">已連線</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.main
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -59,7 +58,9 @@ class MainRepository(
                     safeIntent.getStringExtra("content")
                 )
 
-                AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
+                AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess(
+                    safeIntent.getBooleanExtra("content", false)
+                )
                 AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
                     .serializable<ConnectionTestResult>("content")
                     ?.let { MainServiceEvent.MeasureDelayResult(it, requestId) }
@@ -79,12 +80,7 @@ class MainRepository(
 
                 else -> null
             }
-            val accepted = event?.let {
-                mainServiceEventChannel.trySend(it).isSuccess
-            } == true
-            if (isOrderedBroadcast && accepted) {
-                resultCode = Activity.RESULT_OK
-            }
+            event?.let { mainServiceEventChannel.trySend(it) }
         }
     }
 
@@ -168,8 +164,8 @@ class MainRepository(
     override fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? =
         MmkvManager.decodeServerAffiliationInfo(guid)
 
-    override fun encodeServerList(guids: List<String>, groupId: String) =
-        MmkvManager.encodeServerList(ArrayList(guids), groupId)
+    override fun moveServerInGroup(groupId: String, fromGuid: String, toGuid: String): List<String>? =
+        MmkvManager.moveServerInGroup(groupId, fromGuid, toGuid)
 
     override fun removeServer(guid: String) = MmkvManager.removeServer(guid)
 

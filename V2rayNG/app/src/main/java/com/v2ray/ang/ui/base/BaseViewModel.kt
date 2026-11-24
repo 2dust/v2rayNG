@@ -5,7 +5,6 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AngApplication
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
@@ -44,57 +43,43 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     /**
      * Send neutral toast event (Resource ID).
      */
-    fun toast(resId: Int, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
-        localizedContext.toast(resId, liveRegionMode = liveRegionMode)
+    fun toast(resId: Int) {
+        localizedContext.toast(resId)
     }
 
     /**
      * Send neutral toast event (String).
      */
-    fun toast(message: String, liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE) {
-        app.toast(message, liveRegionMode = liveRegionMode)
+    fun toast(message: String) {
+        app.toast(message)
     }
 
     /**
      * Send success toast event (Resource ID).
      */
-    fun toastSuccess(
-        resId: Int,
-        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-        accessibilityMessage: String? = null,
-    ) {
-        localizedContext.toastSuccess(resId, liveRegionMode = liveRegionMode, accessibilityMessage = accessibilityMessage)
+    fun toastSuccess(resId: Int) {
+        localizedContext.toastSuccess(resId)
     }
 
     /**
      * Send success toast event (String).
      */
-    fun toastSuccess(
-        message: String,
-        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-        accessibilityMessage: String? = null,
-    ) {
-        app.toastSuccess(message, liveRegionMode = liveRegionMode, accessibilityMessage = accessibilityMessage)
+    fun toastSuccess(message: String) {
+        app.toastSuccess(message)
     }
 
     /**
      * Send error toast event (Resource ID).
      */
-    fun toastError(
-        resId: Int,
-        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-    ) {
-        localizedContext.toastError(resId, liveRegionMode = liveRegionMode)
+    fun toastError(resId: Int) {
+        localizedContext.toastError(resId)
     }
 
     /**
      * Send error toast event (String).
      */
-    fun toastError(
-        message: String,
-        liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-    ) {
-        app.toastError(message, liveRegionMode = liveRegionMode)
+    fun toastError(message: String) {
+        app.toastError(message)
     }
 
     /**

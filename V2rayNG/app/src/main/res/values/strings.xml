@@ -17,7 +17,6 @@
     <string name="notification_channel_service">v2rayNG service</string>
     <string name="notification_channel_subscription_updates">Subscription updates</string>
     <string name="notification_channel_connection_checks">Connection checks</string>
-    <string name="notification_channel_other">Other notifications</string>
     <string name="notification_action_stop_v2ray">Stop</string>
     <string name="toast_permission_denied">Permission denied</string>
     <string name="toast_permission_denied_notification">Notification permission denied</string>
@@ -578,4 +577,9 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
 
+    <string name="action_exit">Exit</string>
+    <string name="action_back">Back</string>
+    <string name="action_more">More</string>
+    <string name="action_clear">Clear</string>
+    <string name="connection_connected_tv">Connected</string>
 </resources>

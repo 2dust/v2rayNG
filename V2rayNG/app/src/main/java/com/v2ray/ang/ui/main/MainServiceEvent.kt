@@ -6,10 +6,9 @@ import com.v2ray.ang.dto.RealPingResult
 sealed class MainServiceEvent {
     data object StateRunning : MainServiceEvent()
     data object StateNotRunning : MainServiceEvent()
-    // Snapshot supplied by the daemon; current selection may already refer to another server.
     data class StateStartSuccess(val serverName: String) : MainServiceEvent()
     data class StateStartFailure(val message: String? = null) : MainServiceEvent()
-    data object StateStopSuccess : MainServiceEvent()
+    data class StateStopSuccess(val wasRunning: Boolean) : MainServiceEvent()
     data class MeasureDelayResult(val result: ConnectionTestResult, val requestId: String) : MainServiceEvent()
     data class MeasureDelayCancelled(val requestId: String) : MainServiceEvent()
     data class MeasureConfigSuccess(val result: RealPingResult, val requestId: String) : MainServiceEvent()

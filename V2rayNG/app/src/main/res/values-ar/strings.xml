@@ -17,7 +17,6 @@
     <string name="notification_channel_service">خدمة v2rayNG</string>
     <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
     <string name="notification_channel_connection_checks">فحوص الاتصال</string>
-    <string name="notification_channel_other">الإشعارات الأخرى</string>
     <string name="notification_action_stop_v2ray">إيقاف</string>
     <string name="toast_permission_denied">تعذر الحصول على الإذن</string>
     <string name="toast_permission_denied_notification">تعذر الحصول على إذن الإشعارات</string>
@@ -585,4 +584,9 @@
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
 
+    <string name="action_exit">خروج</string>
+    <string name="action_back">رجوع</string>
+    <string name="action_more">المزيد</string>
+    <string name="action_clear">مسح</string>
+    <string name="connection_connected_tv">متصل</string>
 </resources>

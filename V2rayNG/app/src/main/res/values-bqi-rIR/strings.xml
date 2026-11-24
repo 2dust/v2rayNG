@@ -17,7 +17,6 @@
     <string name="notification_channel_service">سرویس v2rayNG</string>
     <string name="notification_channel_subscription_updates">ورۊ کردن اشتراکا</string>
     <string name="notification_channel_connection_checks">واجۊری منپیز</string>
-    <string name="notification_channel_other">وارسۊوی یل دی</string>
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
     <string name="toast_permission_denied">گرؽڌن موجوز مومکن نؽڌ</string>
     <string name="toast_permission_denied_notification">گرؽڌن موجوز وارسۊوی مومکن نؽڌ</string>
@@ -577,4 +576,9 @@
     <string name="sub_info_open_page">واز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">بی‌حد</string>
 
+    <string name="action_exit">خروج</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_more">بیشتر</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="connection_connected_tv">منپیز هڌ</string>
 </resources>

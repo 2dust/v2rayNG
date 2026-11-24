@@ -1,118 +1,85 @@
 package com.v2ray.ang.extension
 
 import android.content.Context
-import com.v2ray.ang.R
-import com.v2ray.ang.helper.NotificationHelper
-import com.v2ray.ang.ui.compose.AppSnackbarMessage
-import com.v2ray.ang.ui.compose.AppSnackbarManager
-import com.v2ray.ang.ui.compose.ToastType
+import com.v2ray.ang.handler.AppNotificationManager
+import com.v2ray.ang.handler.AppNotificationType
 
-enum class AccessibilityLiveRegionMode {
-    POLITE,
-    ASSERTIVE,
-}
-
-/** Shows normal feedback and mirrors it to the accessibility live region. */
-fun Context.toast(
-    message: Int,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-) {
-    dispatchMessage(getString(message), ToastType.NORMAL, long, liveRegionMode)
-}
-
-/** Shows normal feedback and mirrors it to the accessibility live region. */
-fun Context.toast(
+private fun dispatchMessage(
     message: CharSequence,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
+    type: AppNotificationType
 ) {
-    dispatchMessage(message, ToastType.NORMAL, long, liveRegionMode)
+    AppNotificationManager.show(message = message, type = type)
 }
 
-/** Shows success feedback and mirrors it to the accessibility live region. */
-fun Context.toastSuccess(
-    message: Int,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-    accessibilityMessage: CharSequence? = null,
-) {
-    dispatchMessage(getString(message), ToastType.SUCCESS, long, liveRegionMode, accessibilityMessage)
+/**
+ * Shows a toast message with the given resource ID.
+ */
+fun Context.toast(message: Int, long: Boolean = false) {
+    dispatchMessage(getString(message), AppNotificationType.NORMAL)
 }
 
-/** Shows success feedback and mirrors it to the accessibility live region. */
-fun Context.toastSuccess(
+/**
+ * Shows a toast message with the given text.
+ */
+fun Context.toast(message: CharSequence, long: Boolean = false) {
+    dispatchMessage(message, AppNotificationType.NORMAL)
+}
+
+/**
+ * Shows a success toast message with the given resource ID.
+ */
+fun Context.toastSuccess(message: Int, long: Boolean = false) {
+    dispatchMessage(getString(message), AppNotificationType.SUCCESS)
+}
+
+/**
+ * Shows a success toast message with the given text.
+ */
+fun Context.toastSuccess(message: CharSequence, long: Boolean = false) {
+    dispatchMessage(message, AppNotificationType.SUCCESS)
+}
+
+/**
+ * Shows an error toast message with the given resource ID.
+ */
+fun Context.toastError(message: Int, long: Boolean = false) {
+    dispatchMessage(getString(message), AppNotificationType.ERROR)
+}
+
+/**
+ * Shows an error toast message with the given text.
+ */
+fun Context.toastError(message: CharSequence, long: Boolean = false) {
+    dispatchMessage(message, AppNotificationType.ERROR)
+}
+
+/**
+ * Shows an info toast message with the given resource ID.
+ */
+fun Context.toastInfo(message: Int, long: Boolean = false) {
+    dispatchMessage(getString(message), AppNotificationType.INFO)
+}
+
+/**
+ * Shows an info toast message with the given text.
+ */
+fun Context.toastInfo(message: CharSequence, long: Boolean = false) {
+    dispatchMessage(message, AppNotificationType.INFO)
+}
+
+/**
+ * App notification helper methods.
+ */
+fun Context.showNotification(
     message: CharSequence,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-    accessibilityMessage: CharSequence? = null,
+    type: AppNotificationType = AppNotificationType.NORMAL,
+    assertive: Boolean = false,
+    accessibilityMessage: String? = null,
 ) {
-    dispatchMessage(message, ToastType.SUCCESS, long, liveRegionMode, accessibilityMessage)
-}
-
-/** Shows error feedback and mirrors it to the accessibility live region. */
-fun Context.toastError(
-    message: Int,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-) {
-    dispatchMessage(getString(message), ToastType.ERROR, long, liveRegionMode)
-}
-
-/** Shows error feedback and mirrors it to the accessibility live region. */
-fun Context.toastError(
-    message: CharSequence,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-) {
-    dispatchMessage(message, ToastType.ERROR, long, liveRegionMode)
-}
-
-/** Shows info feedback and mirrors it to the accessibility live region. */
-fun Context.toastInfo(
-    message: Int,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-) {
-    dispatchMessage(getString(message), ToastType.INFO, long, liveRegionMode)
-}
-
-/** Shows info feedback and mirrors it to the accessibility live region. */
-fun Context.toastInfo(
-    message: CharSequence,
-    long: Boolean = false,
-    liveRegionMode: AccessibilityLiveRegionMode = AccessibilityLiveRegionMode.POLITE,
-) {
-    dispatchMessage(message, ToastType.INFO, long, liveRegionMode)
-}
-
-/** Shared text for the service's background notification and foreground live region. */
-internal fun Context.serviceStartedMessage(serverName: String): String {
-    val name = serverName.trim()
-    return if (name.isEmpty()) {
-        getString(R.string.toast_services_success)
-    } else {
-        getString(R.string.acc_service_started_connected_to, name)
-    }
-}
-
-private fun Context.dispatchMessage(
-    message: CharSequence,
-    type: ToastType,
-    long: Boolean,
-    liveRegionMode: AccessibilityLiveRegionMode,
-    accessibilityMessage: CharSequence? = null,
-) {
-    val event = AppSnackbarMessage(
+    AppNotificationManager.show(
         message = message,
         type = type,
-        liveRegionMode = liveRegionMode,
+        assertive = assertive,
         accessibilityMessage = accessibilityMessage,
-        long = long,
     )
-    if (AppSnackbarManager.show(event)) {
-        NotificationHelper.cancelTransientMessage(this)
-    } else {
-        NotificationHelper.notifyTransientMessage(this, accessibilityMessage ?: message)
-    }
 }

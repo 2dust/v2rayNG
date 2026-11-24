@@ -17,7 +17,6 @@
     <string name="notification_channel_service">v2rayNG সার্ভিস</string>
     <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
     <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
-    <string name="notification_channel_other">অন্যান্য বিজ্ঞপ্তি</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
     <string name="toast_permission_denied">অনুমতি পাওয়া যাচ্ছে না</string>
     <string name="toast_permission_denied_notification">বিজ্ঞপ্তির অনুমতি পাওয়া যায়নি</string>
@@ -577,4 +576,9 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
+    <string name="action_exit">প্রস্থান</string>
+    <string name="action_back">ফিরে যান</string>
+    <string name="action_more">আরও</string>
+    <string name="action_clear">সাফ করুন</string>
+    <string name="connection_connected_tv">সংযুক্ত</string>
 </resources>

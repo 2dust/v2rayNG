@@ -17,7 +17,6 @@
     <string name="notification_channel_service">Dịch vụ v2rayNG</string>
     <string name="notification_channel_subscription_updates">Cập nhật gói đăng ký</string>
     <string name="notification_channel_connection_checks">Kiểm tra kết nối</string>
-    <string name="notification_channel_other">Thông báo khác</string>
     <string name="notification_action_stop_v2ray">Ngắt kết nối v2rayNG</string>
     <string name="toast_permission_denied">Vui lòng cấp các quyền cần thiết cho v2rayNG. Bạn có thể đã từ chối quyền truy cập máy ảnh hoặc bộ nhớ.</string>
     <string name="toast_permission_denied_notification">Không thể nhận quyền thông báo</string>
@@ -575,4 +574,9 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+    <string name="action_exit">Thoát</string>
+    <string name="action_back">Quay lại</string>
+    <string name="action_more">Thêm</string>
+    <string name="action_clear">Xoá</string>
+    <string name="connection_connected_tv">Đã kết nối</string>
 </resources>

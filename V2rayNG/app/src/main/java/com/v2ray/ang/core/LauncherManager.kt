@@ -6,8 +6,8 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.AccessibilityLiveRegionMode
 import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.showNotification
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
@@ -24,20 +24,14 @@ object LauncherManager {
 
     fun startServiceFromToggle(context: Context): Boolean {
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            context.toast(
-                R.string.app_tile_first_use,
-                liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
-            )
+            context.showNotification(context.getString(R.string.app_tile_first_use), assertive = true)
             return false
         }
         try {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toastError(
-                e.message ?: e.javaClass.simpleName,
-                liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
-            )
+            context.showNotification(e.message ?: e.javaClass.simpleName, assertive = true)
             return false
         }
         return true
@@ -54,10 +48,7 @@ object LauncherManager {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
-            context.toastError(
-                e.message ?: e.javaClass.simpleName,
-                liveRegionMode = AccessibilityLiveRegionMode.ASSERTIVE,
-            )
+            context.showNotification(e.message ?: e.javaClass.simpleName, assertive = true)
         }
     }
 

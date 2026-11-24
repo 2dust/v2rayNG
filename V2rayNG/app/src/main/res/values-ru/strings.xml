@@ -17,7 +17,6 @@
     <string name="notification_channel_service">Служба v2rayNG</string>
     <string name="notification_channel_subscription_updates">Обновления подписок</string>
     <string name="notification_channel_connection_checks">Проверки соединения</string>
-    <string name="notification_channel_other">Другие уведомления</string>
     <string name="notification_action_stop_v2ray">Остановить</string>
     <string name="toast_permission_denied">Разрешение не получено</string>
     <string name="toast_permission_denied_notification">Разрешение на отображение уведомлений не получено</string>
@@ -581,4 +580,9 @@
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
 
+    <string name="action_exit">Выход</string>
+    <string name="action_back">Назад</string>
+    <string name="action_more">Ещё</string>
+    <string name="action_clear">Очистить</string>
+    <string name="connection_connected_tv">Соединено</string>
 </resources>
