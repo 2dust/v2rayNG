@@ -183,6 +183,20 @@ class MainReorderTest {
         verify(source, times(2)).getServerGuidList("")
     }
 
+    @Test fun `pending reorder refreshes All when selected before the write completes`() = runTest(dispatcher) {
+        whenever(source.getSubscriptions()).thenReturn(listOf("s", "").map { SubscriptionCache(it, SubscriptionItem()) })
+        whenever(source.getServerGuidList("")).thenAnswer { persisted }
+        viewModel.setupGroupTab()
+        advanceUntilIdle()
+
+        val write = requireNotNull(move("a", "c"))
+        viewModel.subscriptionIdChanged("")
+        advanceUntilIdle()
+
+        assertEquals(true, write.await())
+        assertEquals(listOf("b", "c", "a"), visible(""))
+    }
+
     @Test fun `refresh invalidates shared profiles but retains unrelated group caches`() = runTest(dispatcher) {
         whenever(source.getSubscriptions()).thenReturn(listOf("s", "shared", "unrelated").map {
             SubscriptionCache(it, SubscriptionItem())

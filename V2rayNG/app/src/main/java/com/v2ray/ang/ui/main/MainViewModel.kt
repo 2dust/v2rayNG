@@ -749,10 +749,16 @@ class MainViewModel(
             dataSource.setSelectedSubscriptionId(id)
             _uiState.update { it.copy(selectedGroupId = id) }
         }
+        loadSelectedGroup(id)
+    }
+
+    private fun loadSelectedGroup(id: String) {
         selectedGroupLoadJob?.cancel()
         selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
             try {
-                updateGroupUi(id, loadGroup(id))
+                val servers = loadGroup(id)
+                ensureActive()
+                updateGroupUi(id, servers)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -845,7 +851,11 @@ class MainViewModel(
                     val persisted = withContext(ioDispatcher) {
                         buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
                     }
-                    if (serverOrderPersistenceJobs[groupId] === thisJob) groupFlow.value = persisted
+                    if (serverOrderPersistenceJobs[groupId] === thisJob) {
+                        groupFlow.value = persisted
+                        // All may have been selected while the move was being saved.
+                        if (uiState.value.selectedGroupId.isEmpty()) loadSelectedGroup("")
+                    }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (error: Exception) {
