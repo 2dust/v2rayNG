@@ -43,6 +43,7 @@ import libv2ray.CoreController
 import libv2ray.ProcessFinder
 import java.lang.ref.SoftReference
 import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicBoolean
 
 object CoreServiceManager {
 
@@ -53,6 +54,9 @@ object CoreServiceManager {
     private var browserDialer: IDialerService? = null
     private var networkMonitor: NetworkMonitor? = null
     private val connectionTestScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    // The daemon owns native shutdown even when Android is destroying the service instance.
+    private val stopScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val stopping = AtomicBoolean(false)
 
     @Volatile
     private var isReloading = false
@@ -187,43 +191,56 @@ object CoreServiceManager {
     /**
      * Stops the V2Ray core service.
      * Unregisters broadcast receivers, stops notifications, and shuts down plugins.
-     * @return True if the core was stopped successfully, false otherwise.
+     * @return True if shutdown was accepted, false if there is no service.
      */
     fun stopCoreLoop(): Boolean {
-        connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
+        if (!stopping.compareAndSet(false, true)) return true
 
-        networkMonitor?.unregister()
-        networkMonitor = null
-        currentVpnInterface = null
+        val wasRunning = try {
+            connectionTestScope.coroutineContext.cancelChildren()
+            networkMonitor?.unregister()
+            networkMonitor = null
+            currentVpnInterface = null
 
-        val wasRunning = isRunning()
-        if (wasRunning) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    coreController.stopLoop()
+            CoreNativeManager.reconcileBrowserDialer("")
+            browserDialer?.stop()
+            browserDialer = null
+            NotificationManager.cancelNotification()
+
+            try {
+                service.unregisterReceiver(mMsgReceive)
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
+            }
+            isRunning()
+        } catch (e: Exception) {
+            stopping.set(false)
+            throw e
+        }
+
+        stopScope.launch {
+            try {
+                val stopped = wasRunning && try {
+                    withContext(Dispatchers.IO) {
+                        stopCoreAndConfirm(coreController::stopLoop, ::isRunning)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to stop V2Ray loop", e)
+                    LogUtil.e(AppConfig.TAG, "${service.javaClass.simpleName}: Failed to stop V2Ray loop", e)
+                    false
                 }
+
+                // A replacement service may have started while native shutdown was in flight.
+                if (getService() === service && !isRunning()) {
+                    val event = if (stopped) AppConfig.MSG_STATE_STOP_SUCCESS else AppConfig.MSG_STATE_NOT_RUNNING
+                    MessageHelper.sendMsg2UI(service, event, stopped)
+                }
+            } finally {
+                stopping.set(false)
             }
         }
-
-        // Close existing browser dialer
-        CoreNativeManager.reconcileBrowserDialer("")
-        if (browserDialer != null) {
-            browserDialer!!.stop()
-            browserDialer = null
-        }
-
-        MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, wasRunning)
-        NotificationManager.cancelNotification()
-
-        try {
-            service.unregisterReceiver(mMsgReceive)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Failed to unregister receiver", e)
-        }
-
         return true
     }
 
@@ -254,7 +271,7 @@ object CoreServiceManager {
      * @return True if the core is running again.
      */
     private fun reloadCore(): Boolean {
-        if (isReloading) return false
+        if (isReloading || stopping.get()) return false
         val service = getService() ?: return false
         if (!isRunning()) return false
 
@@ -319,7 +336,7 @@ object CoreServiceManager {
      */
     private fun measureV2rayDelay(requestId: String) {
         val service = getService() ?: return
-        if (!isRunning() || isReloading) {
+        if (!isRunning() || isReloading || stopping.get()) {
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
             return
         }
@@ -537,4 +554,9 @@ object CoreServiceManager {
             }
         }
     }
+}
+
+internal suspend fun stopCoreAndConfirm(stop: suspend () -> Unit, isRunning: () -> Boolean): Boolean {
+    stop()
+    return !isRunning()
 }
