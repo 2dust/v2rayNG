@@ -43,21 +43,23 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     internal fun deleteRule(id: String) {
         val position = editablePosition(id)
         if (position < 0) return
-        SettingsManager.removeRoutingRuleset(position)
-        reload()
+        launchLoading {
+            withContext(Dispatchers.IO) { SettingsManager.removeRoutingRuleset(position) }
+            reload()
+        }
     }
 
     internal fun reloadIfIdle() {
-        if (!isLoading.value) reload()
+        if (!isLoading.value) launchLoading { reload() }
     }
 
-    private fun reload() {
-        val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        loaded.forEachIndexed { index, item ->
-            if (item.id.isEmpty()) {
-                item.id = UUID.randomUUID().toString()
-                SettingsManager.saveRoutingRuleset(index, item)
-            }
+    private suspend fun reload() {
+        val loaded = withContext(Dispatchers.IO) {
+            val rules = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+            val missingIds = rules.filter { it.id.isEmpty() }
+            missingIds.forEach { it.id = UUID.randomUUID().toString() }
+            if (missingIds.isNotEmpty()) MmkvManager.encodeRoutingRulesets(rules)
+            rules
         }
         rulesets.clear()
         rulesets.addAll(loaded)

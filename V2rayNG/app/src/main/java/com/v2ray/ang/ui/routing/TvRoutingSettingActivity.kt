@@ -91,12 +91,9 @@ class TvRoutingSettingActivity : BaseRoutingSettingActivity() {
             is RoutingListAction.Move -> viewModel.move(action.from, action.to)
             is RoutingListAction.Strategy -> setDomainStrategy(action.value)
             is RoutingListAction.Preset -> importPredefined(action.value.type)
-            is RoutingListAction.Menu -> when (action.value) {
-                RoutingMenuAction.ImportClipboard -> importFromClipboard()
-                RoutingMenuAction.ImportQRCode -> importQRcode()
-                RoutingMenuAction.ExportClipboard -> export2Clipboard()
-                RoutingMenuAction.ImportPredefined -> Unit // The TV list asks which preset to import first.
-            }
+            RoutingListAction.ImportClipboard -> importFromClipboard()
+            RoutingListAction.ImportQRCode -> importQRcode()
+            RoutingListAction.ExportClipboard -> export2Clipboard()
         }
     }
 }
@@ -110,7 +107,9 @@ private sealed interface RoutingListAction {
     data class Move(val from: String, val to: String) : RoutingListAction
     data class Strategy(val value: String) : RoutingListAction
     data class Preset(val value: RoutingPreset) : RoutingListAction
-    data class Menu(val value: RoutingMenuAction) : RoutingListAction
+    data object ImportClipboard : RoutingListAction
+    data object ImportQRCode : RoutingListAction
+    data object ExportClipboard : RoutingListAction
 }
 
 private enum class RoutingControl { Back, Add, More, Strategy, Rule, Enable, Edit, Delete }
@@ -129,9 +128,8 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
     val more = topFocus.getValue(RoutingControl.More)
     val strategyFocus = topFocus.getValue(RoutingControl.Strategy)
     val listState = rememberLazyListState()
-    val requestRow = rememberLazyDpadFocus(listOf(listOf(strategyFocus)) + rowFocus.values.map { it.values.toList() }) {
-        listState.scrollToItem(it)
-    }
+    val focusRows = remember(ids, strategyFocus) { listOf(listOf(strategyFocus)) + rowFocus.values.map { it.values.toList() } }
+    val requestRow = rememberLazyDpadFocus(focusRows) { listState.scrollToItem(it) }
     val reorder = rememberSyncedDpadReorderState(ids) { id, index ->
         val key = id as? String ?: return@rememberSyncedDpadReorderState
         listState.keepDpadReorderItemVisible(key, index + 1) // The domain strategy and heading share one lazy item.
@@ -178,6 +176,11 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
         restore(target)
     }
 
+    fun runMenuAction(action: RoutingListAction) {
+        closeMenu()
+        onAction(action)
+    }
+
     val topOrder = listOf(back, add, more)
     val moveBelowToolbar = { requestRow(strategyFocus) }
     Scaffold(topBar = {
@@ -200,12 +203,14 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
                             val firstItem = remember { FocusRequester() }
                             RoutingMenuAction.entries.forEach { action ->
                                 DropdownMenuItem(text = { Text(stringResource(action.labelRes)) }, onClick = {
-                                    if (action == RoutingMenuAction.ImportPredefined) {
-                                        showMenu = false
-                                        showPresets = true
-                                    } else {
-                                        closeMenu()
-                                        onAction(RoutingListAction.Menu(action))
+                                    when (action) {
+                                        RoutingMenuAction.ImportPredefined -> {
+                                            showMenu = false
+                                            showPresets = true
+                                        }
+                                        RoutingMenuAction.ImportClipboard -> runMenuAction(RoutingListAction.ImportClipboard)
+                                        RoutingMenuAction.ImportQRCode -> runMenuAction(RoutingListAction.ImportQRCode)
+                                        RoutingMenuAction.ExportClipboard -> runMenuAction(RoutingListAction.ExportClipboard)
                                     }
                                 }, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                                     .dpadFocusOutline(firstItem.takeIf { action == RoutingMenuAction.ImportPredefined }))
@@ -279,8 +284,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
                     deleteId = null
                     val neighbor = routingRuleNeighbor(ids, id)
                     onAction(RoutingListAction.Delete(id))
-                    val target = if (loading) rowFocus[id]?.get(RoutingControl.Delete) else rowFocus[neighbor]?.get(RoutingControl.Rule)
-                    restore(target ?: strategyFocus)
+                    restore(rowFocus[neighbor]?.get(RoutingControl.Rule) ?: strategyFocus)
                 },
                 onDismiss = { deleteId = null; restore(rowFocus.getValue(id).getValue(RoutingControl.Delete)) })
         } else if (!loading) {
