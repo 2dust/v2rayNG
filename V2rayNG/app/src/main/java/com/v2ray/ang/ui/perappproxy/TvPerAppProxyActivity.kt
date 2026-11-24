@@ -93,10 +93,10 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
 
     LaunchedEffect(state.isLoading, appFocus, showInfo) {
         if (!showInfo && needsInitialFocus && (initialPackage == null || !state.isLoading || initialPackage in appFocus.targets)) {
-            needsInitialFocus = false
             if (initialPackage?.let(appFocus::focus) != true) {
                 requestFocusWhenReady(initialMode?.let(modes::get) ?: initialToolbarTarget)
             }
+            needsInitialFocus = false
         }
     }
     LaunchedEffect(returnToInfo) {
