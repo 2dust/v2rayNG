@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.apppicker
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -38,24 +39,26 @@ import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
-private enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
+internal enum class AppPickerMenuAction(@StringRes val labelRes: Int) {
     SelectAll(R.string.menu_item_select_all),
     InvertSelection(R.string.menu_item_invert_selection)
 }
 
-class AppPickerActivity : BaseComponentActivity() {
+private const val EXTRA_SELECTED_PACKAGES = "selected_packages"
+private const val EXTRA_PICKER_TITLE = "picker_title"
 
+class AppPickerActivity : BaseAppPickerActivity() {
     companion object {
-        private const val EXTRA_SELECTED_PACKAGES = "selected_packages"
-        private const val EXTRA_PICKER_TITLE = "picker_title"
-
         fun createIntent(
             context: Context,
             selectedPackages: Collection<String> = emptyList(),
             title: String? = null
-        ): Intent = Intent(context, AppPickerActivity::class.java).apply {
-            putStringArrayListExtra(EXTRA_SELECTED_PACKAGES, ArrayList(selectedPackages))
-            title?.let { putExtra(EXTRA_PICKER_TITLE, it) }
+        ): Intent {
+            val isTelevision = context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+            return Intent(context, if (isTelevision) TvAppPickerActivity::class.java else AppPickerActivity::class.java).apply {
+                putStringArrayListExtra(EXTRA_SELECTED_PACKAGES, ArrayList(selectedPackages))
+                title?.let { putExtra(EXTRA_PICKER_TITLE, it) }
+            }
         }
 
         fun getSelectedPackages(intent: Intent?): List<String> {
@@ -63,6 +66,22 @@ class AppPickerActivity : BaseComponentActivity() {
         }
     }
 
+    @Composable
+    override fun PickerContent(title: String, apps: List<AppInfo>, isLoading: Boolean, selectedPackages: Set<String>, actions: AppPickerActions) {
+        AppPickerScreen(title, apps, isLoading, selectedPackages, actions.onBack, actions.onToggleApp, actions.onSearch,
+            actions.onSelectAll, actions.onInvertSelection)
+    }
+}
+
+internal class AppPickerActions(
+    val onBack: () -> Unit,
+    val onToggleApp: (String) -> Unit,
+    val onSearch: (String) -> Unit,
+    val onSelectAll: () -> Unit,
+    val onInvertSelection: () -> Unit
+)
+
+abstract class BaseAppPickerActivity : BaseComponentActivity() {
     private val viewModel: AppPickerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,23 +102,23 @@ class AppPickerActivity : BaseComponentActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
+    final override fun ScreenContent() {
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val selectedPackages by viewModel.selectedPackages.collectAsStateWithLifecycle()
 
-        AppPickerScreen(
+        PickerContent(
             title = resolveScreenTitle(),
             apps = apps,
             isLoading = isLoading,
             selectedPackages = selectedPackages,
-            onBackClick = { finish() },
-            onToggleApp = { viewModel.toggleApp(it) },
-            onSearch = { viewModel.filterApps(it) },
-            onSelectAll = { viewModel.selectAll() },
-            onInvertSelection = { viewModel.invertSelection() }
+            actions = remember { AppPickerActions(::finish, viewModel::toggleApp, viewModel::filterApps,
+                viewModel::selectAll, viewModel::invertSelection) }
         )
     }
+
+    @Composable
+    internal abstract fun PickerContent(title: String, apps: List<AppInfo>, isLoading: Boolean, selectedPackages: Set<String>, actions: AppPickerActions)
 
     private fun resolveScreenTitle(): String {
         return intent.getStringExtra(EXTRA_PICKER_TITLE) ?: getString(R.string.per_app_proxy_settings)

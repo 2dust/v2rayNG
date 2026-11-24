@@ -144,6 +144,9 @@
             android:name=".ui.apppicker.AppPickerActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.apppicker.TvAppPickerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ScannerActivity"
             android:exported="false" />
         <activity
