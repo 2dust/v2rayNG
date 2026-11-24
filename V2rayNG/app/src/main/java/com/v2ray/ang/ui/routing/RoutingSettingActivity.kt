@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -72,7 +73,6 @@ import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.colorConfigType
-import com.v2ray.ang.ui.compose.reorderAccessibilityActions
 import com.v2ray.ang.ui.compose.rememberAccessibilityActionFeedback
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
@@ -238,12 +238,13 @@ fun RoutingSettingScreen(
 
     val domainStrategies = stringArrayResource(R.array.routing_domain_strategy).toList()
     val lazyListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     val actionFeedback = rememberAccessibilityActionFeedback()
+    val moved = stringResource(R.string.acc_moved)
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        // Lazy list indices include the preceding non-rule content, so resolve the stable rule keys.
-        val fromIndex = rulesets.indexOfFirst { it.id == from.key }
-        val toIndex = rulesets.indexOfFirst { it.id == to.key }
-        viewModel.move(fromIndex, toIndex)
+        val fromId = from.key as? String
+        val toId = to.key as? String
+        if (fromId != null && toId != null) viewModel.move(fromId, toId)
     }
 
     Scaffold(
@@ -326,13 +327,15 @@ fun RoutingSettingScreen(
                             onEdit = { onEditRule(index) },
                             onDelete = { deleteRuleId = ruleset.id },
                             onEnabledChange = { checked ->
-                                val updated = ruleset.copy(enabled = checked)
-                                viewModel.update(index, updated)
+                                scope.launch { viewModel.setEnabled(ruleset.id, checked) }
                             },
                             reorderIndex = index,
                             itemCount = rulesets.size,
-                            onMove = { command -> viewModel.move(ruleset.id, command) },
-                            onFeedback = actionFeedback,
+                            onMove = { command ->
+                                scope.launch {
+                                    if (viewModel.move(ruleset.id, command)) actionFeedback(moved)
+                                }
+                            },
                         )
                     }
                     ItemDivider()
@@ -375,8 +378,7 @@ private fun RoutingRulesetItem(
     onEnabledChange: (Boolean) -> Unit,
     reorderIndex: Int,
     itemCount: Int,
-    onMove: (ReorderCommand) -> Boolean,
-    onFeedback: (String) -> Unit,
+    onMove: (ReorderCommand) -> Unit,
 ) {
     val enabled = ruleset.enabled
     val toggleLabel = stringResource(
@@ -416,8 +418,12 @@ private fun RoutingRulesetItem(
             action = { onDelete(); true },
         ),
     )
-    val accessibilityActions = itemActions +
-        reorderAccessibilityActions(reorderIndex, itemCount, onFeedback, onMove)
+    val accessibilityActions = itemActions + ReorderCommand.availableAt(reorderIndex, itemCount).map { command ->
+        CustomAccessibilityAction(
+            label = stringResource(command.labelRes),
+            action = { onMove(command); true },
+        )
+    }
 
     Row(
         modifier = Modifier

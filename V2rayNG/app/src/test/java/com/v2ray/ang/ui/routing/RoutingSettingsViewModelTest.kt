@@ -10,6 +10,7 @@ import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -49,6 +50,49 @@ class RoutingSettingsViewModelTest {
         }
         viewModel = RoutingSettingsViewModel(mock<Application>())
         assertEquals(emptyList<RulesetItem>(), viewModel.rulesetsFlow.value)
+    }
+
+    @Test
+    fun movesAndTogglesFromTheOldListCannotOverwriteAnImport() = runBlocking<Unit> {
+        val first = RulesetItem(id = "first")
+        val second = RulesetItem(id = "second")
+        val imported = RulesetItem(id = "imported")
+        saved = JsonUtil.toJson(listOf(first, second))
+        viewModel.reload()
+        assertTrue(SettingsManager.resetRoutingRulesets(JsonUtil.toJson(listOf(imported))))
+
+        assertFalse(viewModel.move(first.id, second.id))
+        assertFalse(viewModel.move(first.id, ReorderCommand.MoveDown))
+        assertFalse(viewModel.setEnabled(first.id, false))
+        assertEquals(listOf(imported), MmkvManager.decodeRoutingRulesets())
+    }
+
+    @Test
+    fun movingAndTogglingRetainedRulesUsesTheLatestStorage() = runBlocking<Unit> {
+        val first = RulesetItem(id = "first", locked = true)
+        val second = RulesetItem(id = "second", locked = true)
+        val imported = RulesetItem(id = "imported")
+        saved = JsonUtil.toJson(listOf(first, second))
+        viewModel.reload()
+        assertTrue(SettingsManager.resetRoutingRulesets(JsonUtil.toJson(listOf(imported))))
+
+        assertTrue(viewModel.move(first.id, ReorderCommand.MoveToBottom))
+        assertTrue(viewModel.setEnabled(second.id, false))
+        val expected = listOf(second.copy(enabled = false), imported, first)
+        assertEquals(expected, MmkvManager.decodeRoutingRulesets())
+        assertEquals(expected, viewModel.getAll())
+    }
+
+    @Test
+    fun aRejectedMoveDoesNotChangeTheVisibleOrder() = runBlocking<Unit> {
+        val original = listOf(RulesetItem(id = "first"), RulesetItem(id = "second"))
+        saved = JsonUtil.toJson(original)
+        viewModel.reload()
+        whenever(storage.encode(any<String>(), any<String>())).thenReturn(false)
+
+        assertFalse(viewModel.move("first", "second"))
+        assertEquals(original, viewModel.getAll())
+        assertEquals(original, MmkvManager.decodeRoutingRulesets())
     }
 
     @Test

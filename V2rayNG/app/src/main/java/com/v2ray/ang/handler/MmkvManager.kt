@@ -819,13 +819,20 @@ object MmkvManager {
         return normalized.toMutableList()
     }
 
-    fun removeRoutingRuleset(ruleId: String) = withRoutingRulesetLock {
-        val rules = readRoutingRulesetsWithIds() ?: return@withRoutingRulesetLock
+    fun removeRoutingRuleset(ruleId: String): List<RulesetItem> = withRoutingRulesetLock {
+        val rules = readRoutingRulesetsWithIds() ?: return@withRoutingRulesetLock emptyList()
         val position = rules.indexOfFirst { it.id == ruleId }
-        if (position < 0) return@withRoutingRulesetLock
+        if (position < 0) return@withRoutingRulesetLock rules
         rules.removeAt(position)
         check(writeRoutingRulesets(rules)) { "Failed to delete routing rule $ruleId" }
+        rules
     }
+
+    internal fun changeRoutingRulesets(change: MutableList<RulesetItem>.() -> Boolean): List<RulesetItem>? =
+        withRoutingRulesetLock {
+            val rules = readRoutingRulesetsWithIds() ?: return@withRoutingRulesetLock null
+            if (rules.change() && writeRoutingRulesets(rules)) rules else null
+        }
 
     /** Retain locked identities once when replacing the remaining rules from an import or preset. */
     fun resetRoutingRulesets(rulesetList: List<RulesetItem>) = withRoutingRulesetLock {
