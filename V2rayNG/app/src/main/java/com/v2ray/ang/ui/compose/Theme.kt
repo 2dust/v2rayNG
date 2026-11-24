@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.handler.AppNotificationManager
 import com.v2ray.ang.handler.MmkvManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -111,15 +112,6 @@ val colorFabInactiveDark = Color(0xFF646464) // Dark Gray
 val dividerColorLight = Color(0xFFE0E0E0) // Light Gray
 val dividerColorDark = Color(0xFF424242) // Dark Gray
 
-// Toast Colors 85%
-val toastNormalBgLight = Color(0xD9353A3E) // Dark Gray
-val toastNormalBgDark = Color(0xD94A4F54) // Darker Gray
-val toastSuccessBg = Color(0xD9388E3C) // Green
-val toastErrorBg = Color(0xD9D50000) // Red
-val toastInfoBg = Color(0xD93F51B5) // Indigo Blue
-val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
-val toastTextColor = Color.White // White
-
 object ThemeManager {
     private val _themeMode = MutableStateFlow(
         MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
@@ -176,8 +168,6 @@ fun AppTheme(
         darkTheme -> DarkColor
         else -> LightColor
     }
-    val snackbarController = rememberAppSnackbarController()
-
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -192,15 +182,14 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
-        LocalAppSnackbar provides snackbarController
+        LocalAppNotification provides AppNotificationManager
     ) {
         MaterialTheme(
             colorScheme = colorScheme
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
-                AppSnackbarBridge(controller = snackbarController)
+                AppNotificationBridge()
                 content()
-                AppSnackbarHost(hostState = snackbarController.hostState)
             }
         }
     }

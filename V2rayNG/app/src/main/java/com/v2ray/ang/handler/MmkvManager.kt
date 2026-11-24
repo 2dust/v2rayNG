@@ -25,6 +25,7 @@ import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
+import com.v2ray.ang.extension.moveGuid
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.flow.collectLatest
@@ -198,6 +199,15 @@ object MmkvManager {
             persistServerList(serverList, subscriptionId)
         }
     }
+
+    /** Reorder the complete stored index without replacing it with a filtered or stale UI snapshot. */
+    internal fun moveServerInGroup(groupId: String, fromGuid: String, toGuid: String): List<String>? =
+        withProfileIndexLock {
+            val order = decodeServerList(groupId)
+            if (!order.moveGuid(fromGuid, toGuid)) return@withProfileIndexLock null
+            requireStorageWrite(persistServerList(order, groupId), "Failed to save profile order")
+            order
+        }
 
 
     /**
