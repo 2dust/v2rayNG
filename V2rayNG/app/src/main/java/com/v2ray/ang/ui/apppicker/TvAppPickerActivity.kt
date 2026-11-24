@@ -47,8 +47,8 @@ private fun TvAppPickerScreen(title: String, apps: List<AppInfo>, isLoading: Boo
 
     LaunchedEffect(isLoading, appFocus) {
         if (needsInitialFocus && (initialPackage == null || !isLoading || initialPackage in appFocus.targets)) {
-            needsInitialFocus = false
             if (initialPackage?.let(appFocus::focus) != true) requestFocusWhenReady(initialToolbarTarget)
+            needsInitialFocus = false
         }
     }
 
