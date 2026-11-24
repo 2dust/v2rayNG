@@ -128,6 +128,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
     val more = topFocus.getValue(RoutingControl.More)
     val strategyFocus = topFocus.getValue(RoutingControl.Strategy)
     val listState = rememberLazyListState()
+    // Requesters survive reordering, but their scroll indices follow the order of the rule IDs.
     val focusRows = remember(ids, strategyFocus) { listOf(listOf(strategyFocus)) + rowFocus.values.map { it.values.toList() } }
     val requestRow = rememberLazyDpadFocus(focusRows) { listState.scrollToItem(it) }
     val reorder = rememberSyncedDpadReorderState(ids) { id, index ->

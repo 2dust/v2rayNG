@@ -28,7 +28,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +61,8 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -106,7 +107,8 @@ class RoutingSettingActivity : BaseRoutingSettingActivity() {
 
 abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
     protected val viewModel: RoutingSettingsViewModel by viewModels()
-    protected val domainStrategyState = MutableStateFlow("")
+    private val _domainStrategyState = MutableStateFlow("")
+    protected val domainStrategyState: StateFlow<String> = _domainStrategyState.asStateFlow()
     protected var forwardingToTv = false
         private set
 
@@ -121,7 +123,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
             finish()
             return
         }
-        domainStrategyState.value = getDomainStrategy()
+        _domainStrategyState.value = getDomainStrategy()
     }
 
     override fun onResume() {
@@ -141,7 +143,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
 
     protected fun setDomainStrategy(value: String) {
         MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
-        domainStrategyState.value = value
+        _domainStrategyState.value = value
     }
 
     private fun getDomainStrategy(): String {
@@ -184,7 +186,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
 @Composable
 fun RoutingSettingScreen(
     viewModel: RoutingSettingsViewModel,
-    domainStrategyState: MutableStateFlow<String>,
+    domainStrategyState: StateFlow<String>,
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
     onEditRule: (String) -> Unit,
@@ -196,7 +198,7 @@ fun RoutingSettingScreen(
 ) {
     val rulesets by viewModel.rulesetsFlow.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val domainStrategy by domainStrategyState.collectAsState()
+    val domainStrategy by domainStrategyState.collectAsStateWithLifecycle()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
 
