@@ -13,7 +13,7 @@ class ServerMenuDispatchTest {
         val removals = mutableListOf<Pair<String, String>>()
 
         ServerMenuAction.entries.forEach { action ->
-            action.perform("server-guid", profile, dispatched::add) { guid, name ->
+            action.dispatch("server-guid", profile, dispatched::add) { guid, name ->
                 removals.add(guid to name)
             }
         }
@@ -36,7 +36,7 @@ class ServerMenuDispatchTest {
         val removals = mutableListOf<Pair<String, String>>()
 
         listOf("first-guid", "second-guid").forEach { guid ->
-            ServerMenuAction.Delete.perform(guid, profile, { error("Deletion must request confirmation") }) { id, name ->
+            ServerMenuAction.Delete.dispatch(guid, profile, { error("Deletion must request confirmation") }) { id, name ->
                 removals.add(id to name)
             }
         }
@@ -49,7 +49,7 @@ class ServerMenuDispatchTest {
         val profile = ProfileItem(configType = EConfigType.VMESS, remarks = "")
         val removals = mutableListOf<Pair<String, String>>()
 
-        ServerMenuAction.Delete.perform("server-guid", profile, { error("Deletion must request confirmation") }) { guid, name ->
+        ServerMenuAction.Delete.dispatch("server-guid", profile, { error("Deletion must request confirmation") }) { guid, name ->
             removals.add(guid to name)
         }
 

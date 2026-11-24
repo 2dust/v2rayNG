@@ -1,9 +1,12 @@
 package com.v2ray.ang.ui.main
 
 import android.app.Application
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.ConnectionTestResult
@@ -17,7 +20,6 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
-import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.ui.compose.ReorderCommand
@@ -47,6 +49,12 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.PatternSyntaxException
 
+internal fun locateProfileGroupId(subscriptionId: String, groups: List<GroupMapItem>): String? {
+    // A blank ID in an imported profile means Default; a blank UI group ID means All.
+    val groupId = subscriptionId.ifEmpty { AppConfig.DEFAULT_SUBSCRIPTION_ID }
+    return groupId.takeIf { id -> groups.any { it.id == id } }
+}
+
 private fun applyTestDelayResults(
     servers: List<ServersCache>,
     updates: Map<String, Long>,
@@ -73,7 +81,8 @@ private fun applyTestDelayResultsToRows(
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource
+    private val dataSource: MainDataSource,
+    private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel(application) {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -86,14 +95,13 @@ class MainViewModel(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
             confirmRemove = dataSource.getConfirmRemove(),
-            doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+            doubleColumnDisplay = dataSource.getDoubleColumnDisplay(),
+            searchQuery = savedStateHandle[SEARCH_QUERY_KEY] ?: ""
         )
     )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     // ---------- Keyword filtering ----------
-    @Volatile
-    private var keywordFilter: String = ""
     private var filterJob: Job? = null
 
     // ---------- Groups & cache ----------
@@ -115,6 +123,8 @@ class MainViewModel(
     private var bulkTestJob: Job? = null
 
     private val initialPageReady = CompletableDeferred<Unit>()
+
+    internal suspend fun awaitInitialProfilePage() = initialPageReady.await()
 
     // ---------- Service events ----------
     init {
@@ -296,7 +306,8 @@ class MainViewModel(
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
-            MainAction.LocateHandled -> consumeLocateTarget()
+            is MainAction.LocateHandled -> consumeLocateTarget(action.target)
+            is MainAction.MoveServer -> moveServer(action)
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
@@ -306,6 +317,7 @@ class MainViewModel(
                 _uiState.update { it.copy(shareQRCodeBitmap = null) }
             }
 
+            MainAction.Exit,
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
@@ -377,8 +389,7 @@ class MainViewModel(
         }
     }
 
-    private fun applyKeywordFilter(servers: List<ServersCache>): List<ServersCache> {
-        val keyword = keywordFilter.trim()
+    private fun applyKeywordFilter(servers: List<ServersCache>, keyword: String): List<ServersCache> {
         if (keyword.isEmpty()) return servers
         val regex = try {
             Regex(keyword, RegexOption.IGNORE_CASE)
@@ -399,10 +410,12 @@ class MainViewModel(
     }
 
     private fun buildGroupUiState(groupId: String, servers: List<ServersCache>): ServerGroupUiState {
-        val filteredServers = applyKeywordFilter(servers)
+        val keyword = uiState.value.searchQuery.trim()
+        val filteredServers = applyKeywordFilter(servers, keyword)
         return ServerGroupUiState(
             servers = filteredServers,
-            rows = buildServerRows(groupId, filteredServers)
+            rows = buildServerRows(groupId, filteredServers),
+            isFiltered = keyword.isNotEmpty()
         )
     }
 
@@ -425,8 +438,6 @@ class MainViewModel(
             )
         }
     }
-
-    fun getSubscriptions(): List<SubscriptionCache> = dataSource.getSubscriptions()
 
     private fun resolveSelectedGroup(groups: List<GroupMapItem>): String {
         val current = uiState.value.selectedGroupId
@@ -594,7 +605,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val groupId = uiState.value.selectedGroupId
-                    val list = if (groupId.isEmpty() && keywordFilter.isEmpty()) {
+                    val list = if (groupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                         dataSource.getServerGuidList("")
                     } else {
                         currentServers().map { it.guid }
@@ -620,7 +631,7 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val count =
-                        if (uiState.value.selectedGroupId.isEmpty() && keywordFilter.isEmpty()) {
+                        if (uiState.value.selectedGroupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
                             dataSource.removeAllServer()
                         } else {
                             val guids = currentServers().map { it.guid }
@@ -690,7 +701,7 @@ class MainViewModel(
 
     private fun removeInvalidServerInternal(): Int {
         val visibleServersOnly =
-            uiState.value.selectedGroupId.isNotEmpty() || keywordFilter.isNotBlank()
+            uiState.value.selectedGroupId.isNotEmpty() || uiState.value.searchQuery.isNotBlank()
         return if (visibleServersOnly) {
             currentServers().sumOf { server ->
                 dataSource.removeInvalidServerByGuid(server.guid)
@@ -745,14 +756,6 @@ class MainViewModel(
         }
     }
 
-    fun reloadServerList() {
-        val groupId = uiState.value.selectedGroupId
-        selectedGroupLoadJob?.cancel()
-        selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {
-            updateGroupUi(groupId, loadGroup(groupId, forceRefresh = true))
-        }
-    }
-
     fun reloadAllGroups(groupIds: List<String>) {
         reloadJob?.cancel()
         reloadJob = viewModelScope.launch(preloadDispatcher) {
@@ -770,8 +773,9 @@ class MainViewModel(
     }
 
     fun filterConfig(keyword: String) {
-        if (keyword == keywordFilter) return
-        keywordFilter = keyword
+        if (keyword == uiState.value.searchQuery) return
+        savedStateHandle[SEARCH_QUERY_KEY] = keyword
+        _uiState.update { it.copy(searchQuery = keyword) }
         filterJob?.cancel()
         filterJob = viewModelScope.launch(defaultDispatcher) {
             delay(300)
@@ -790,10 +794,10 @@ class MainViewModel(
     }
 
     internal fun moveServer(groupId: String, guid: String, command: ReorderCommand, onSaved: () -> Unit): Boolean {
-        val servers = mutableServerGroupState(groupId).value.servers
+        val servers = groupUiFlows[groupId]?.value?.servers ?: return false
         val fromPosition = servers.indexOfFirst { it.guid == guid }
         val toPosition = command.targetIndex(fromPosition, servers.size) ?: return false
-        val write = moveServer(groupId, fromPosition, toPosition) ?: return false
+        val write = moveServer(MainAction.MoveServer(groupId, guid, servers[toPosition].guid)) ?: return false
         viewModelScope.launch {
             if (write.await()) onSaved()
         }
@@ -816,32 +820,42 @@ class MainViewModel(
         }
     }
 
-    fun moveServer(groupId: String, fromPosition: Int, toPosition: Int): Deferred<Boolean>? {
-        val groupState = mutableServerGroupState(groupId).value
-        val servers = groupState.servers.toMutableList()
-        if (!servers.moveItem(fromPosition, toPosition)) return null
-        val rows = groupState.rows.toMutableList()
-        if (!rows.moveItem(fromPosition, toPosition)) return null
-        val guids = servers.map { it.guid }
-        mutableServerGroupState(groupId).value = ServerGroupUiState(servers, rows)
-        // A drag emits several moves; serialize writes so an older order cannot overwrite a newer one.
+    internal fun moveServer(action: MainAction.MoveServer): Deferred<Boolean>? {
+        val groupId = action.groupId
+        val groupFlow = groupUiFlows[groupId] ?: return null
+        val current = groupFlow.value
+        if (!current.canReorder(groupId, uiState.value.searchQuery)) return null
+        groupFlow.value = current.moveServer(action.fromGuid, action.toGuid) ?: return null
+        // Update the visible list immediately and apply queued moves to the stored index by GUID.
         val previousPersistenceJob = serverOrderPersistenceJobs[groupId]
         val write = viewModelScope.async(start = CoroutineStart.LAZY) {
             previousPersistenceJob?.join()
-            val saved = withContext(ioDispatcher) { dataSource.reorderServerList(guids, groupId) }
-            if (!saved) {
-                toastError(R.string.toast_failure)
+            val saved = withContext(ioDispatcher) {
+                try {
+                    dataSource.moveServerInGroup(groupId, action.fromGuid, action.toGuid) != null
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to save profile order for group: $groupId", error)
+                    false
+                }
             }
-            // Only the final queued write reconciles the UI, on both success and failure.
-            // Read persisted membership/order instead of replaying a captured drag snapshot.
+            if (!saved) toastError(R.string.toast_failure)
+
+            // Only the last queued move publishes the current persisted membership and order.
             val thisJob = currentCoroutineContext()[Job]
             if (serverOrderPersistenceJobs[groupId] === thisJob) {
-                val persisted = withContext(ioDispatcher) {
-                    buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
-                }
-                if (serverOrderPersistenceJobs[groupId] === thisJob) {
-                    mutableServerGroupState(groupId).value = persisted
-                    serverOrderPersistenceJobs.remove(groupId)
+                try {
+                    val persisted = withContext(ioDispatcher) {
+                        buildGroupUiState(groupId, loadGroup(groupId, forceRefresh = true))
+                    }
+                    if (serverOrderPersistenceJobs[groupId] === thisJob) groupFlow.value = persisted
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (error: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to reload profile order for group: $groupId", error)
+                } finally {
+                    if (serverOrderPersistenceJobs[groupId] === thisJob) serverOrderPersistenceJobs.remove(groupId)
                 }
             }
             saved
@@ -896,7 +910,7 @@ class MainViewModel(
         val message = TestServiceMessage(
             key = AppConfig.MSG_MEASURE_CONFIG_START,
             subscriptionId = groupId,
-            serverGuids = if (keywordFilter.isNotEmpty()) serverGuids else emptyList(),
+            serverGuids = if (uiState.value.searchQuery.isNotEmpty()) serverGuids else emptyList(),
             onlyTcp = onlyTcp
         )
         _uiState.update {
@@ -944,11 +958,10 @@ class MainViewModel(
     }
 
     fun triggerLocateSelectedServer() {
-        val selected = dataSource.getSelectServer() ?: return
-        val profile = dataSource.decodeServerConfig(selected) ?: return
-        val groupId = profile.subscriptionId
-        if (_uiState.value.groups.none { it.id == groupId }) return
         viewModelScope.launch(ioDispatcher) {
+            val selected = dataSource.getSelectServer() ?: return@launch
+            val profile = dataSource.decodeServerConfig(selected) ?: return@launch
+            val groupId = locateProfileGroupId(profile.subscriptionId, uiState.value.groups) ?: return@launch
             updateGroupUi(groupId, loadGroup(groupId))
             if (_uiState.value.selectedGroupId != groupId) {
                 dataSource.setSelectedSubscriptionId(groupId)
@@ -960,8 +973,10 @@ class MainViewModel(
         }
     }
 
-    private fun consumeLocateTarget() {
-        _uiState.update { it.copy(locateTarget = null) }
+    private fun consumeLocateTarget(target: LocateTarget) {
+        _uiState.update { state ->
+            if (state.locateTarget == target) state.copy(locateTarget = null) else state
+        }
     }
 
     // ---------- Running state ----------
@@ -991,15 +1006,16 @@ class MainViewModel(
     // ---------- Factory ----------
     class Factory(private val application: Application, private val dataSource: MainDataSource) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                return MainViewModel(application, dataSource) as T
+                return MainViewModel(application, dataSource, extras.createSavedStateHandle()) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 
     private companion object {
+        const val SEARCH_QUERY_KEY = "main_search_query"
         const val TEST_RESULT_FLUSH_INTERVAL_MS = 500L
     }
 }
