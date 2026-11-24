@@ -573,4 +573,9 @@
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
 
+    <string name="action_exit">退出</string>
+    <string name="action_back">返回</string>
+    <string name="action_more">更多</string>
+    <string name="action_clear">清除</string>
+    <string name="connection_connected_tv">已连接</string>
 </resources>

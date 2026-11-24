@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
@@ -20,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,8 +57,8 @@ fun MainScreen(
     val isDarkTheme = LocalDarkTheme.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var showSearch by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var showSearch by rememberSaveable { mutableStateOf(false) }
+    val searchQuery = uiState.searchQuery
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
     var showDelInvalidConfirm by remember { mutableStateOf(false) }
@@ -82,15 +79,6 @@ fun MainScreen(
         initialPage = 0,
         pageCount = { groups.size.coerceAtLeast(1) }
     )
-
-    val lazyListStates = remember { mutableStateMapOf<String, LazyListState>() }
-    val lazyGridStates = remember { mutableStateMapOf<String, LazyGridState>() }
-
-    LaunchedEffect(groups) {
-        val validGroupIds = groups.map { it.id }.toSet()
-        lazyListStates.keys.retainAll(validGroupIds)
-        lazyGridStates.keys.retainAll(validGroupIds)
-    }
 
     LaunchedEffect(groups, uiState.selectedGroupId) {
         if (groups.isEmpty()) return@LaunchedEffect
@@ -165,12 +153,8 @@ fun MainScreen(
                     isLoading = isLoading,
                     showSearch = showSearch,
                     searchQuery = searchQuery,
-                    onSearchQueryChange = { query: String ->
-                        searchQuery = query
-                        onAction(MainAction.Search(query))
-                    },
+                    onSearchQueryChange = { onAction(MainAction.Search(it)) },
                     onSearchClose = {
-                        searchQuery = ""
                         onAction(MainAction.Search(""))
                         showSearch = false
                     },
@@ -242,8 +226,6 @@ fun MainScreen(
                             locateTarget = uiState.locateTarget,
                             doubleColumnDisplay = doubleColumnDisplay,
                             searchQuery = searchQuery,
-                            lazyListStates = lazyListStates,
-                            lazyGridStates = lazyGridStates,
                             onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
                             onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
                             onShareServer = { guid, profile ->
