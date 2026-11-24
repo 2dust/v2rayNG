@@ -118,11 +118,12 @@ private fun NavigationDrawerScope.TvMainDrawerContent(
     onClose: () -> Unit,
     onNavigate: (MainDestination) -> Unit
 ) {
-    val focusRequesters = remember { List(drawerItems.size) { FocusRequester() } }
+    val items = mainDrawerItems()
+    val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
     val drawerScrollState = rememberScrollState()
-    var focusedIndex by remember { mutableIntStateOf(0) }
+    var focusedIndex by remember(items) { mutableIntStateOf(0) }
 
-    LaunchedEffect(drawerValue, focusGeneration) {
+    LaunchedEffect(items, drawerValue, focusGeneration) {
         if (drawerValue == TvDrawerValue.Open) {
             requestFocusWhenReady(focusRequesters[focusedIndex], focusRequesters.first())
         }
@@ -183,7 +184,7 @@ private fun NavigationDrawerScope.TvMainDrawerContent(
                 }
             }
 
-            drawerItems.forEachIndexed { index, item ->
+            items.forEachIndexed { index, item ->
                 if (index == primaryDrawerItems.size) {
                     AppDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp))
                 }

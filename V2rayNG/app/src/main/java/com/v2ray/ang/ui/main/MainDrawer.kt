@@ -57,7 +57,7 @@ internal val primaryDrawerItems = listOf(
     MainDestination.Settings
 )
 
-internal val drawerItems = primaryDrawerItems + listOf(
+private val drawerItems = primaryDrawerItems + listOf(
     MainDestination.Promotion,
     MainDestination.Logcat,
     MainDestination.CheckUpdate,
@@ -67,9 +67,14 @@ internal val drawerItems = primaryDrawerItems + listOf(
 )
 
 @Composable
+internal fun mainDrawerItems(): List<MainDestination> =
+    if (booleanResource(R.bool.shizuku_tethering_enabled)) drawerItems
+    else drawerItems.filterNot { it == MainDestination.Tethering }
+
+@Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
     val drawerScrollState = rememberScrollState()
-    val tetheringEnabled = booleanResource(R.bool.shizuku_tethering_enabled)
+    val items = mainDrawerItems()
 
     ModalDrawerSheet(
         drawerState = drawerState,
@@ -111,17 +116,16 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     )
                 }
             }
-            drawerItems.filter { tetheringEnabled || it != MainDestination.Tethering }
-                .forEachIndexed { index, item ->
-                    if (index == primaryDrawerItems.size) AppDivider()
-                    NavigationDrawerItem(
-                        label = { Text(stringResource(item.labelRes)) },
-                        selected = false,
-                        onClick = { onNavigate(item) },
-                        icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
-                }
+            items.forEachIndexed { index, item ->
+                if (index == primaryDrawerItems.size) AppDivider()
+                NavigationDrawerItem(
+                    label = { Text(stringResource(item.labelRes)) },
+                    selected = false,
+                    onClick = { onNavigate(item) },
+                    icon = { Icon(painterResource(item.iconRes), contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+            }
         }
     }
 }
