@@ -631,4 +631,10 @@
     <string name="shizuku_hotspot_disabled">Wi-Fi qaynar nöqtəsi söndürüldü</string>
     <string name="shizuku_hotspot_operation_failed">Qaynar nöqtə əməliyyatı uğursuz oldu (xəta %1$d)</string>
     <string name="shizuku_tethering_wrong_upstream">Android bağlantıları dəyişdirərkən internet paylaşımı ləğv edildi. Bir az gözləyin, sonra yenidən cəhd edin.</string>
+
+    <string name="action_exit">Çıxış</string>
+    <string name="action_back">Geri</string>
+    <string name="action_more">Daha çox</string>
+    <string name="action_clear">Təmizlə</string>
+    <string name="connection_connected_tv">Qoşuldu</string>
 </resources>
