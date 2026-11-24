@@ -185,7 +185,7 @@ internal fun TvSettingsListDialog(
     onSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val selected = remember { selectedValue }
+    val selected = remember { options.firstOrNull { it.second == selectedValue }?.second ?: options.firstOrNull()?.second }
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = options.indexOfFirst { it.second == selected }.coerceAtLeast(0))
     val initialFocus = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }

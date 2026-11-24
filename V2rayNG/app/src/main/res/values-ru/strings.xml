@@ -394,6 +394,7 @@
     <string name="routing_settings_save">Сохранить</string>
     <string name="routing_settings_delete">Очистить</string>
     <string name="routing_settings_rule_title">Настройка правил маршрутизации</string>
+    <string name="routing_settings_enable_rule">Включить правило</string>
     <string name="routing_settings_add_rule">Добавить правило</string>
     <string name="routing_settings_import_predefined_rulesets">Импорт набора правил</string>
     <string name="routing_settings_import_rulesets_tip">Существующие правила будут удалены. Продолжить?</string>

@@ -390,6 +390,7 @@
     <string name="routing_settings_save">সেভ করুন</string>
     <string name="routing_settings_delete">মুছে ফেলুন</string>
     <string name="routing_settings_rule_title">রাউটিং নিয়মের সেটিংস</string>
+    <string name="routing_settings_enable_rule">নিয়ম সক্রিয় করুন</string>
     <string name="routing_settings_add_rule">নিয়ম যোগ করুন</string>
     <string name="routing_settings_import_predefined_rulesets">পূর্বনির্ধারিত নিয়মাবলী আমদানি করুন</string>
     <string name="routing_settings_import_rulesets_tip">বিদ্যমান নিয়মসমূহ মুছে যাবে। চালিয়ে যেতে চান?</string>

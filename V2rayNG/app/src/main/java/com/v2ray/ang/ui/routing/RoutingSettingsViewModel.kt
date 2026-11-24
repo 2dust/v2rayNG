@@ -25,6 +25,21 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
 
     fun getAll(): List<RulesetItem> = rulesets.toList()
 
+    internal fun positionOf(id: String): Int = rulesets.indexOfFirst { it.id == id }
+
+    internal fun setRuleEnabled(id: String, enabled: Boolean) {
+        val position = positionOf(id)
+        val rule = rulesets.getOrNull(position) ?: return
+        update(position, rule.copy(enabled = enabled))
+    }
+
+    internal fun deleteRule(id: String) {
+        val position = positionOf(id)
+        if (position < 0) return
+        SettingsManager.removeRoutingRuleset(position)
+        reload()
+    }
+
     fun reload() {
         val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
         var needsSave = false

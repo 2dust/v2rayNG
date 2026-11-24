@@ -388,6 +388,7 @@
     <string name="routing_settings_save">Lưu lại</string>
     <string name="routing_settings_delete">Xoá</string>
     <string name="routing_settings_rule_title">Cài đặt quy tắc định tuyến</string>
+    <string name="routing_settings_enable_rule">Bật quy tắc</string>
     <string name="routing_settings_add_rule">Thêm quy tắc</string>
     <string name="routing_settings_import_predefined_rulesets">Nhập các bộ quy tắc được xác định trước</string>
     <string name="routing_settings_import_rulesets_tip">Các bộ quy tắc hiện có sẽ bị xóa. Bạn có chắc muốn tiếp tục không?</string>

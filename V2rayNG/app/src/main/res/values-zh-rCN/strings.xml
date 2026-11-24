@@ -388,6 +388,7 @@
     <string name="routing_settings_save">保存</string>
     <string name="routing_settings_delete">清空</string>
     <string name="routing_settings_rule_title">路由规则设置</string>
+    <string name="routing_settings_enable_rule">启用规则</string>
     <string name="routing_settings_add_rule">添加规则</string>
     <string name="routing_settings_import_predefined_rulesets">导入预定义规则集</string>
     <string name="routing_settings_import_rulesets_tip">将删除现有的规则集，是否确定继续？</string>

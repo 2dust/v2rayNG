@@ -390,6 +390,7 @@
     <string name="routing_settings_save">Saxla</string>
     <string name="routing_settings_delete">Təmizlə</string>
     <string name="routing_settings_rule_title">Marşrutlaşdırma Qaydası Tənzimləmələri</string>
+    <string name="routing_settings_enable_rule">Qaydanı aktivləşdir</string>
     <string name="routing_settings_add_rule">Qayda əlavə et</string>
     <string name="routing_settings_import_predefined_rulesets">Əvvəlcədən təyin edilmiş qayda dəstlərini idxal et</string>
     <string name="routing_settings_import_rulesets_tip">Mövcud qayda dəstləri silinəcək. Davam edilsin?</string>

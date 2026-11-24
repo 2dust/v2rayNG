@@ -390,6 +390,7 @@
     <string name="routing_settings_save">زفت کردن</string>
     <string name="routing_settings_delete">روفتن</string>
     <string name="routing_settings_rule_title">سامووا قانووݩ تور جوستن</string>
+    <string name="routing_settings_enable_rule">فعال کردن قاعده</string>
     <string name="routing_settings_add_rule">ٱووردن قانووݩ</string>
     <string name="routing_settings_import_predefined_rulesets">و من ٱووردن قانووا</string>
     <string name="routing_settings_import_rulesets_tip">قانووایی ک هیم سکو هڌسووݩ پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>

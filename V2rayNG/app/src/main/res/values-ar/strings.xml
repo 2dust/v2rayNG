@@ -398,6 +398,7 @@
     <string name="routing_settings_save">حفظ</string>
     <string name="routing_settings_delete">مسح</string>
     <string name="routing_settings_rule_title">إعدادات قاعدة التوجيه</string>
+    <string name="routing_settings_enable_rule">تمكين القاعدة</string>
     <string name="routing_settings_add_rule">إضافة قاعدة</string>
     <string name="routing_settings_import_predefined_rulesets">استيراد مجموعات قواعد محددة مسبقاً</string>
     <string name="routing_settings_import_rulesets_tip">سيتم حذف مجموعات القواعد الحالية. هل تريد المتابعة؟</string>

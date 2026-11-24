@@ -390,6 +390,7 @@
     <string name="routing_settings_save">Save</string>
     <string name="routing_settings_delete">Clear</string>
     <string name="routing_settings_rule_title">Routing Rule Settings</string>
+    <string name="routing_settings_enable_rule">Enable rule</string>
     <string name="routing_settings_add_rule">Add rule</string>
     <string name="routing_settings_import_predefined_rulesets">Import predefined rulesets</string>
     <string name="routing_settings_import_rulesets_tip">Existing rulesets will be deleted. Continue?</string>
