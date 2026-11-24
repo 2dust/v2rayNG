@@ -211,7 +211,14 @@ internal fun TvMainScreen(
                         MainStatus.Connected, MainStatus.Disconnected -> ""
                         else -> mainViewModel.formatStatus(uiState.status).replace('\n', ' ')
                     }
-                    MainTvStatusBar(connection, details)
+                    MainTvStatusBar(
+                        displayText = connection,
+                        testDisplayText = details,
+                        status = uiState.status,
+                        isRunning = uiState.isRunning,
+                        testAnnouncements = mainViewModel.testAnnouncements,
+                        formatTestAnnouncement = mainViewModel::formatTestAnnouncement,
+                    )
                 }
             ) { innerPadding ->
                 if (selectedGroup != null) {

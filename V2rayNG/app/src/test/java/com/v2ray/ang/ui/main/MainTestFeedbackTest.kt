@@ -50,4 +50,39 @@ class MainTestFeedbackTest {
         }
     }
 
+    @Test
+    fun statusLabelOmitsProgressInterimResultsAndResultsFromADisconnectedService() {
+        val messages = MainTestAnnouncements()
+        val finalResult = MainStatus.ConnectionTest(ConnectionTestResult(20))
+        val interimResult = MainStatus.ConnectionTest(ConnectionTestResult(20, isFinal = false))
+        val hiddenStatuses = listOf(
+            MainStatus.Disconnected,
+            MainStatus.Connected,
+            MainStatus.Testing,
+            MainStatus.TestProgress("1"),
+            MainStatus.TestCompleted,
+            interimResult,
+        )
+        hiddenStatuses.forEach { assertNull(messages.connectionResultForAccessibility(true, it)) }
+        assertNull(messages.connectionResultForAccessibility(false, finalResult))
+    }
+
+    @Test
+    fun statusLabelRetainsFinalSuccessOrFailureAfterPublicationAndOnRevisit() {
+        for (result in listOf(ConnectionTestResult(20), ConnectionTestResult(-1, "failure"))) {
+            val status = MainStatus.ConnectionTest(result)
+            val messages = MainTestAnnouncements()
+            messages.offer(MainTestAnnouncement(1, MainStatus.Testing))
+            messages.offer(MainTestAnnouncement(2, status))
+            assertNull(messages.connectionResultForAccessibility(true, status))
+            messages.advance(1)
+            assertNull(messages.connectionResultForAccessibility(true, status))
+            messages.advance(2)
+            assertEquals(status, messages.connectionResultForAccessibility(true, status))
+
+            val revisited = MainTestAnnouncements()
+            assertNull(revisited.current)
+            assertEquals(status, revisited.connectionResultForAccessibility(true, status))
+        }
+    }
 }
