@@ -46,10 +46,10 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
+import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -359,7 +359,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         }
                     },
                     enabled = !state.isFetchingCert,
-                    modifier = Modifier.padding(start = 16.dp).then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+                    modifier = Modifier.padding(start = 16.dp).then(LocalEditorFocus.current?.target() ?: Modifier)
                 ) {
                     Text(stringResource(R.string.pinned_ca256_action_fetch))
                 }
@@ -465,7 +465,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     ) {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
         val scrollState = rememberScrollState()
-        val focus = rememberOutboundEditorFocus()
+        val focus = rememberEditorFocus()
         Scaffold(
             contentWindowInsets = WindowInsets(0),
             topBar = {
@@ -507,7 +507,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     .padding(bottom = 36.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                CompositionLocalProvider(LocalOutboundEditorFocus provides focus) { content() }
+                CompositionLocalProvider(LocalEditorFocus provides focus) { content() }
                 NavigationBarsSpacer()
             }
         }

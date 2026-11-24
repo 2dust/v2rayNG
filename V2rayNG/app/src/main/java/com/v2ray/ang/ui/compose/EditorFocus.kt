@@ -16,9 +16,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalInputModeManager
 
-internal val LocalOutboundEditorFocus = compositionLocalOf<OutboundEditorFocus?> { null }
+internal val LocalEditorFocus = compositionLocalOf<EditorFocus?> { null }
 
-internal class OutboundEditorFocus(private val onFocused: (String) -> Unit) {
+internal class EditorFocus(private val onFocused: (String) -> Unit) {
     private val targets = mutableMapOf<String, FocusRequester>()
 
     fun restore(id: String?): Boolean = targets[id]?.requestFocus() == true
@@ -37,14 +37,14 @@ internal class OutboundEditorFocus(private val onFocused: (String) -> Unit) {
 }
 
 @Composable
-internal fun rememberOutboundEditorFocus(fallback: FocusRequester? = null): OutboundEditorFocus {
+internal fun rememberEditorFocus(fallback: FocusRequester? = null): EditorFocus {
     val focused = rememberSaveable { mutableStateOf<String?>(null) }
     val focusedWithKeyboard = rememberSaveable { mutableStateOf(false) }
     val initialTarget = remember { focused.value }
     val restoreKeyboardMode = remember { focusedWithKeyboard.value }
     val inputMode = LocalInputModeManager.current
     val focus = remember(inputMode) {
-        OutboundEditorFocus {
+        EditorFocus {
             focused.value = it
             focusedWithKeyboard.value = inputMode.inputMode == InputMode.Keyboard
         }
