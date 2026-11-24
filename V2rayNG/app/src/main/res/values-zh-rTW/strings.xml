@@ -11,6 +11,7 @@
     <string name="action_ok">確定</string>
     <string name="action_cancel">取消</string>
     <string name="migration_fail">資料遷移失敗！</string>
+    <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">v2rayNG 服務</string>

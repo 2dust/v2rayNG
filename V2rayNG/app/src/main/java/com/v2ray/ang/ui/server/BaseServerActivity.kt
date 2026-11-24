@@ -1,19 +1,25 @@
 package com.v2ray.ang.ui.server
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,15 +44,13 @@ import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.AppTopBarAction
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
+import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.dpadFocusOutline
-import com.v2ray.ang.ui.compose.tvSafeAreaPadding
-import com.v2ray.ang.ui.compose.tvAwareImePadding
+import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import kotlinx.coroutines.CoroutineScope
@@ -67,9 +71,16 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
 
     protected lateinit var initialConfig: ProfileItem
+    private var isTelevision = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
         super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            // The previous window's IME state is not valid until the new editor has focus.
+            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
+            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        }
         val existingConfig = MmkvManager.decodeServerConfig(editGuid)
         initialConfig = existingConfig ?: ProfileItem.create(serverConfigType)
     }
@@ -351,9 +362,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         }
                     },
                     enabled = !state.isFetchingCert,
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .dpadFocusOutline(cornerRadius = 20.dp)
+                    modifier = Modifier.padding(start = 16.dp).then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
                 ) {
                     Text(stringResource(R.string.pinned_ca256_action_fetch))
                 }
@@ -458,47 +467,14 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         content: @Composable ColumnScope.() -> Unit
     ) {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-        val scrollState = rememberScrollState()
-        Scaffold(
-            contentWindowInsets = WindowInsets(0),
-            topBar = {
-                AppTopBar(
-                    title = title,
-                    onBackClick = { finish() },
-                    actionItems = buildList {
-                        if (editGuid.isNotEmpty() && !isRunning) add(
-                            AppTopBarAction(
-                                painterResource(R.drawable.ic_delete_24dp),
-                                stringResource(R.string.menu_item_del_config),
-                                onClick = { showDeleteDialog = true }
-                            )
-                        )
-                        add(
-                            AppTopBarAction(
-                                painterResource(R.drawable.ic_fab_check),
-                                stringResource(R.string.menu_item_save_config),
-                                onClick = onSaveClick
-                            )
-                        )
-                    }
-                )
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .tvAwareImePadding()
-                    .tvSafeAreaPadding()
-                    .verticalScroll(scrollState)
-                    .verticalScrollbar(scrollState)
-                    .padding(bottom = 36.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                content()
-                NavigationBarsSpacer()
-            }
+        if (isTelevision) {
+            TvServerEditor(
+                title, onBack = ::finish, onSave = onSaveClick,
+                onDelete = if (editGuid.isNotEmpty() && !isRunning) ({ showDeleteDialog = true }) else null,
+                content = content
+            )
+        } else {
+            PhoneServerEditor(title, onSaveClick, { showDeleteDialog = true }, content)
         }
         if (showDeleteDialog) {
             DeleteConfirmDialog(
@@ -510,6 +486,62 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 },
                 onDismiss = { showDeleteDialog = false }
             )
+        }
+    }
+
+    @Composable
+    private fun PhoneServerEditor(
+        title: String,
+        onSaveClick: () -> Unit,
+        onDeleteClick: () -> Unit,
+        content: @Composable ColumnScope.() -> Unit
+    ) {
+        val scrollState = rememberScrollState()
+        val focus = rememberOutboundEditorFocus()
+        Scaffold(
+            contentWindowInsets = WindowInsets(0),
+            topBar = {
+                AppTopBar(
+                    title = title,
+                    onBackClick = { finish() },
+                    navigationIcon = {
+                        IconButton(onClick = ::finish, modifier = focus.target()) {
+                            Icon(painterResource(R.drawable.ic_arrow_back_24dp), stringResource(R.string.acc_back))
+                        }
+                    },
+                    actions = {
+                        if (editGuid.isNotEmpty() && !isRunning) {
+                            IconButton(onClick = onDeleteClick, modifier = focus.target()) {
+                                Icon(
+                                    painterResource(R.drawable.ic_delete_24dp),
+                                    stringResource(R.string.acc_delete)
+                                )
+                            }
+                        }
+                        IconButton(onClick = onSaveClick, modifier = focus.target()) {
+                            Icon(
+                                painterResource(R.drawable.ic_fab_check),
+                                stringResource(R.string.acc_save)
+                            )
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding()
+                    .verticalScroll(scrollState)
+                    .verticalScrollbar(scrollState)
+                    .padding(bottom = 36.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CompositionLocalProvider(LocalOutboundEditorFocus provides focus) { content() }
+                NavigationBarsSpacer()
+            }
         }
     }
 

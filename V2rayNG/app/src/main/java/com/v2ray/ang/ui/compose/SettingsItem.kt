@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -90,7 +91,7 @@ fun CollapsiblePreferenceGroupHeader(
 }
 
 @Composable
-private fun SettingsItemRow(
+internal fun SettingsItemRow(
     icon: Painter?,
     title: String,
     description: String?,
@@ -329,6 +330,9 @@ fun SettingsSwitchItem(
     enabled: Boolean = true
 ) {
     val isTelevision = isTelevisionDevice()
+    val tvEditor = LocalTvEditor.current
+    val editorFocus = LocalOutboundEditorFocus.current
+    val focusModifier = editorFocus?.target() ?: Modifier
     SettingsItemRow(
         icon = icon,
         title = title,
@@ -337,7 +341,9 @@ fun SettingsSwitchItem(
         onClick = if (enabled) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = modifier,
+        modifier = modifier.then(focusModifier).then(
+            if (tvEditor != null) Modifier.focusProperties { start = tvEditor.back } else Modifier
+        ),
         role = Role.Switch,
         toggleState = checked,
         trailing = {

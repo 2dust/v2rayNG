@@ -11,6 +11,7 @@
     <string name="action_ok">موافق</string>
     <string name="action_cancel">إلغاء</string>
     <string name="migration_fail">فشلت عملية ترحيل البيانات!</string>
+    <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">خدمة v2rayNG</string>

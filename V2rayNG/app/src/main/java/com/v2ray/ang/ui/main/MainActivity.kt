@@ -55,7 +55,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : HelperBaseComponentActivity() {
+abstract class BaseMainActivity : HelperBaseComponentActivity() {
+
+    private var forwardingToTv = false
+    // Only the existing launcher entry resolves the device type. The TV activity never routes again.
+    protected open fun televisionDestination(): Intent? = null
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
@@ -94,39 +98,61 @@ class MainActivity : HelperBaseComponentActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(AppConfig.EXTRA_REFRESH_AFTER_IMPORT, false)) {
+            mainViewModel.onAction(MainAction.RefreshGroups)
+        }
+    }
+
     @Composable
     override fun ScreenContent() {
+        if (forwardingToTv) return
         BackHandler { moveTaskToBack(false) }
-        MainScreen(
-            mainViewModel = mainViewModel,
-            onAction = { action ->
-                when (action) {
-                    is MainAction.ViewModelIntent -> mainViewModel.onAction(action)
-                    is MainAction.ActivityRequest -> when (action) {
-                        MainAction.ToggleService -> handleFabAction()
-                        MainAction.TestCurrentServer -> handleLayoutTestClick()
-                        MainAction.ImportQRcode -> importQRcode()
-                        MainAction.ImportClipboard -> importClipboard()
-                        MainAction.ImportConfigLocal -> importConfigLocal()
-                        is MainAction.ImportManually -> importManually(action.type)
-                        MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
-                        MainAction.Exit -> exitApp()
-                        is MainAction.SelectServer -> setSelectServer(action.guid)
-                        is MainAction.EditServer -> editServer(action.guid, action.profile)
-                        is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                        is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
-                        is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
-                    }
-                }
-            },
-            onNavigate = { route -> navigateTo(route) },
-        )
+        MainContent(mainViewModel, ::handleMainAction, ::navigateTo)
+    }
+
+    @Composable
+    internal abstract fun MainContent(
+        viewModel: MainViewModel,
+        onAction: (MainAction) -> Unit,
+        onNavigate: (MainDestination) -> Unit
+    )
+
+    private fun handleMainAction(action: MainAction) {
+        when (action) {
+            MainAction.ToggleService -> handleFabAction()
+            MainAction.TestCurrentServer -> handleLayoutTestClick()
+            MainAction.ImportQRcode -> importQRcode()
+            MainAction.ImportClipboard -> importClipboard()
+            MainAction.ImportConfigLocal -> importConfigLocal()
+            is MainAction.ImportManually -> importManually(action.type)
+            MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
+            MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
+            MainAction.Exit -> {
+                LauncherManager.stopService(this)
+                finishAndRemoveTask()
+            }
+            is MainAction.SelectServer -> setSelectServer(action.guid)
+            is MainAction.EditServer -> editServer(action.guid, action.profile)
+            is MainAction.ShareClipboard -> shareToClipboard(action.guid)
+            is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+            is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
+            else -> mainViewModel.onAction(action)
+        }
     }
 
     private fun shareToClipboard(guid: String): Boolean =
@@ -134,7 +160,7 @@ class MainActivity : HelperBaseComponentActivity() {
 
     private fun shareFullContentAsync(guid: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
+            val result = AngConfigManager.shareFullContent2Clipboard(this@BaseMainActivity, guid)
             withContext(Dispatchers.Main) {
                 if (result == 0) toastSuccess(R.string.toast_success)
                 else toastError(R.string.toast_failure)
@@ -194,7 +220,7 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun startV2Ray() {
-        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+        if (mainViewModel.uiState.value.selectedGuid.isNullOrEmpty()) {
             toast(R.string.title_file_chooser)
             return
         }
@@ -203,11 +229,6 @@ class MainActivity : HelperBaseComponentActivity() {
             checkAndRequestPermission(PermissionType.ACCESS_LOCAL_NETWORK) {}
         }
         LauncherManager.startService(this)
-    }
-
-    private fun exitApp() {
-        LauncherManager.stopService(this)
-        finishAndRemoveTask()
     }
 
     private fun importManually(createConfigType: Int) {
@@ -295,12 +316,22 @@ class MainActivity : HelperBaseComponentActivity() {
         }
     }
 
+}
+
+/** Keep the existing launcher, notification, and shortcut target stable. */
+class MainActivity : BaseMainActivity() {
+    override fun televisionDestination(): Intent? {
+        val isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+        return if (isTelevision) Intent(this, TvMainActivity::class.java) else null
+    }
+
+    @Composable
+    override fun MainContent(viewModel: MainViewModel, onAction: (MainAction) -> Unit, onNavigate: (MainDestination) -> Unit) {
+        MainScreen(viewModel, onAction, onNavigate)
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        val isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK ==
-            Configuration.UI_MODE_TYPE_TELEVISION
-        if (!isTelevision &&
-            keyCode == KeyEvent.KEYCODE_BUTTON_B
-        ) {
+        if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
             moveTaskToBack(false)
             return true
         }

@@ -11,6 +11,7 @@
     <string name="action_ok">تأیید</string>
     <string name="action_cancel">لغو</string>
     <string name="migration_fail">انتقال داده‌ها با شکست مواجه شد!</string>
+    <string name="pull_down_to_refresh">برای بروزرسانی، صفحه را به پایین بکشید!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">سرویس v2rayNG</string>

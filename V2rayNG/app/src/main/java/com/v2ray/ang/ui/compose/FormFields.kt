@@ -6,23 +6,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField as MaterialOutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +73,10 @@ fun FormTextField(
     supportingText: String? = null,
     singleLine: Boolean = false,
 ) {
+    if (LocalTvEditor.current != null) {
+        TvEditorTextField(label, value, onValueChange, modifier, enabled, keyboardType, placeholder, maxLines, isError, supportingText)
+        return
+    }
     val isTelevision = isTelevisionDevice()
     val tvFieldState = if (isTelevision) {
         rememberTvTextFieldState(tvNavigation.focusRequester)
@@ -100,6 +112,7 @@ fun FormTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(tvFieldState?.let { Modifier.tvTextFieldEditorFocus(it) } ?: Modifier)
+                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
         )
     }
 }
@@ -113,8 +126,19 @@ fun FormDropdownField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    placeholder: String? = null
+    placeholder: String? = null,
+    editable: Boolean = false,
+    supportingText: String? = null,
+    optionLabel: (String) -> String = { it },
 ) {
+    if (!editable && LocalTvEditor.current != null) {
+        TvEditorDropdown(label, value, options, onValueChange, modifier, enabled, placeholder, supportingText, optionLabel)
+        return
+    }
+    if (editable || !isTelevisionDevice()) {
+        PhoneOrEditableFormDropdownField(label, value, options, onValueChange, modifier, editable, enabled, placeholder, supportingText, optionLabel)
+        return
+    }
     val dropdownState = remember { FormDropdownState() }
     val menuScrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
@@ -167,11 +191,12 @@ fun FormDropdownField(
             )
     ) {
         OutlinedTextField(
-            value = value,
+            value = optionLabel(value),
             onValueChange = {},
             spec = OutlinedTextFieldSpec(
                 label = label,
                 placeholder = placeholder,
+                supportingText = supportingText,
                 enabled = enabled,
                 readOnly = true
             ),
@@ -197,7 +222,7 @@ fun FormDropdownField(
         ) {
             options.forEachIndexed { index, option ->
                 AppDropdownMenuItem(
-                    text = option,
+                    text = optionLabel(option),
                     modifier = if (index == selectedOptionIndex && selectedOptionFocusRequester != null) {
                         Modifier.focusRequester(selectedOptionFocusRequester)
                     } else {
@@ -211,5 +236,116 @@ fun FormDropdownField(
                 )
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PhoneOrEditableFormDropdownField(
+    label: String,
+    value: String,
+    options: List<String>,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    editable: Boolean = false,
+    enabled: Boolean = true,
+    placeholder: String? = null,
+    supportingText: String? = null,
+    optionLabel: (String) -> String = { it },
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val menuScrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val visibleOptions = remember(value, options, editable) {
+        if (editable) filterDropdownOptions(options, value) else options
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { newExpanded ->
+            if (!enabled) return@ExposedDropdownMenuBox
+            if (!editable && newExpanded) {
+                keyboardController?.hide()
+            }
+            expanded = newExpanded
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        MaterialOutlinedTextField(
+            value = if (editable) value else optionLabel(value),
+            onValueChange = {
+                if (editable) {
+                    onValueChange(it)
+                    // Typing is the search: open the menu as soon as the text matches an option, so
+                    // a name that is already filled in can be replaced without tapping the field
+                    // again, and close it instead of showing an empty menu when nothing matches.
+                    expanded = filterDropdownOptions(options, it).isNotEmpty()
+                }
+            },
+            readOnly = !editable,
+            enabled = enabled,
+            label = { Text(label) },
+            placeholder = { if (placeholder != null) Text(placeholder) },
+            supportingText = supportingText?.let { { Text(it) } },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.secondary,
+                selectionColors = TextSelectionColors(
+                    handleColor = MaterialTheme.colorScheme.secondary,
+                    backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+                )
+            ),
+            modifier = Modifier
+                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+                .menuAnchor(
+                    type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
+                    else ExposedDropdownMenuAnchorType.PrimaryNotEditable
+                )
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!editable && focusState.isFocused) {
+                        keyboardController?.hide()
+                    }
+                }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.verticalScrollbar(menuScrollState),
+            scrollState = menuScrollState,
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            visibleOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(optionLabel(option)) },
+                    onClick = {
+                        onValueChange(option)
+                        expanded = false
+                        focusManager.clearFocus()
+                    }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Options an editable dropdown offers for the text the user has typed.
+ *
+ * A blank query, or one that already equals an option, keeps every option so the menu still works
+ * as a plain picker. Any other query keeps the options containing it anywhere, ignoring case, so a
+ * partly remembered or mid-string fragment still finds its entry.
+ */
+internal fun filterDropdownOptions(options: List<String>, query: String): List<String> {
+    val trimmed = query.trim()
+    return if (trimmed.isEmpty() || trimmed in options) {
+        options
+    } else {
+        options.filter { it.contains(trimmed, ignoreCase = true) }
     }
 }

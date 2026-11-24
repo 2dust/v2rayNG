@@ -11,6 +11,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Hủy</string>
     <string name="migration_fail">Không thể chuyển dữ liệu!</string>
+    <string name="pull_down_to_refresh">Kéo xuống để làm mới!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">Dịch vụ v2rayNG</string>

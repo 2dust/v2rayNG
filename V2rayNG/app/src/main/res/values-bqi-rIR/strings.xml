@@ -11,6 +11,7 @@
     <string name="action_ok">قوۊل</string>
     <string name="action_cancel">لقو</string>
     <string name="migration_fail">جاگورویی داده یل شکست خرد!</string>
+    <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">سرویس v2rayNG</string>

@@ -29,6 +29,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
@@ -182,6 +183,33 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester? = n
         }
     }
     return state
+}
+
+@Composable
+internal fun Modifier.tvSearchFieldFocus(
+    state: TvTextFieldState,
+    focusOrder: List<FocusRequester>,
+    onMoveDown: () -> Boolean
+): Modifier {
+    return bringIntoViewRequester(state.bringIntoViewRequester)
+        .onSizeChanged { state.measuredSize = it }
+        .onPreviewKeyEvent { event ->
+            if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+            when {
+                event.key.isDpadActivationKey() && !state.isEditing -> {
+                    state.beginEditing()
+                    true
+                }
+                event.key == Key.DirectionUp || event.key == Key.DirectionDown -> {
+                    state.finishEditing()
+                    event.key == Key.DirectionUp || onMoveDown()
+                }
+                else -> false
+            }
+        }
+        .dpadOrderedFocusNavigation(state.passiveFocusRequester, focusOrder)
+        .focusRequester(state.passiveFocusRequester)
+        .focusable(interactionSource = state.interactionSource)
 }
 
 @Composable

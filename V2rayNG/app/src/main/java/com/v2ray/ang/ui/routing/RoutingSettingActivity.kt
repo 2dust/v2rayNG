@@ -86,7 +86,6 @@ import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -167,33 +166,13 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             toastError(R.string.toast_failure)
             return
         }
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = SettingsManager.resetRoutingRulesets(clipboard)
-            withContext(Dispatchers.Main) {
-                if (result) {
-                    viewModel.reload()
-                    toastSuccess(R.string.toast_success)
-                } else {
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
+        viewModel.importRulesets(clipboard)
     }
 
     private fun importQRcode() {
         launchQRCodeScanner { scanResult ->
             if (scanResult != null) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val result = SettingsManager.resetRoutingRulesets(scanResult)
-                    withContext(Dispatchers.Main) {
-                        if (result) {
-                            viewModel.reload()
-                            toastSuccess(R.string.toast_success)
-                        } else {
-                            toastError(R.string.toast_failure)
-                        }
-                    }
-                }
+                viewModel.importRulesets(scanResult)
             }
         }
     }
@@ -232,6 +211,7 @@ fun RoutingSettingScreen(
     val isTelevision = isTelevisionDevice()
     // Keep lazy content and its focus map on one snapshot: TalkBack can measure before recomposition.
     val rulesets = viewModel.rulesetsFlow.collectAsStateWithLifecycle().value
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val rulesetIds = rulesets.map { it.id }
     val rowFocusTargets = rememberDpadFocusTargets(rulesetIds) { RoutingRowFocusTargets() }
     val domainStrategy by domainStrategyState.collectAsState()
@@ -266,6 +246,7 @@ fun RoutingSettingScreen(
             AppTopBar(
                 title = stringResource(R.string.routing_settings_title),
                 onBackClick = onBackClick,
+                isLoading = isLoading,
                 navigationFocusRequester = navigationFocusRequester,
                 onMoveDown = { requestRowFocus(domainStrategyFocusRequester) },
                 actionItems = listOf(

@@ -425,11 +425,14 @@ internal fun Modifier.dpadRowActionNavigation(
     order: List<FocusRequester>,
     previousRow: FocusRequester?,
     nextRow: FocusRequester?,
-    requestFocus: (FocusRequester) -> Boolean = { it.requestFocus() }
+    requestFocus: (FocusRequester) -> Boolean = { it.requestFocus() },
+    onAfterLast: (() -> Unit)? = null
 ): Modifier {
     return dpadOrderedFocusNavigation(
         current = current,
-        order = order
+        order = order,
+        onAfterLast = onAfterLast,
+        requestFocus = requestFocus
     ).dpadVerticalFocusNavigation(
         onMoveUp = { previousRow?.let(requestFocus) ?: false },
         onMoveDown = { nextRow?.let(requestFocus) ?: true }

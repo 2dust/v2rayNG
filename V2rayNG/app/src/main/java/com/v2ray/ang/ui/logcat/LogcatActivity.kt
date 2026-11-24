@@ -59,9 +59,9 @@ import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.compose.AppTopBarAction
 import com.v2ray.ang.ui.compose.ItemDivider
-import com.v2ray.ang.ui.compose.LocalAppSnackbar
+import com.v2ray.ang.ui.compose.LocalAppNotification
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.ToastType
+import com.v2ray.ang.handler.AppNotificationType
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.ui.compose.tvSafeAreaPadding
@@ -176,7 +176,7 @@ fun LogcatScreen(
     }
     BackHandler(enabled = isTelevision && showSearch, onBack = ::closeSearch)
 
-    val snackbar = LocalAppSnackbar.current
+    val notification = LocalAppNotification.current
     val successMessage = stringResource(R.string.toast_success)
     val listState = rememberLazyListState()
     val backFocusRequester = rememberDpadFocusRequester(requestFocus = !showSearch, requestKey = showSearch)
@@ -235,7 +235,7 @@ fun LogcatScreen(
                         onClick = {
                             val all = viewModel.filteredLogs.value.joinToString("\n")
                             Utils.setClipboard(context, all)
-                            snackbar.show(successMessage, ToastType.SUCCESS)
+                            notification.show(successMessage, AppNotificationType.SUCCESS)
                         }
                     ))
                     add(AppTopBarAction(

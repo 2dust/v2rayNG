@@ -11,6 +11,7 @@
     <string name="action_ok">ঠিক আছে</string>
     <string name="action_cancel">বাতিল</string>
     <string name="migration_fail">ডেটা স্থানান্তর ব্যর্থ!</string>
+    <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
     <string name="notification_channel_service">v2rayNG সার্ভিস</string>

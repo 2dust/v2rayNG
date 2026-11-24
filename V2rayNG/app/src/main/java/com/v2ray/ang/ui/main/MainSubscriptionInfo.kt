@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -34,8 +33,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.handler.SubscriptionInfoParser
-import com.v2ray.ang.ui.compose.AppIconButton
-import com.v2ray.ang.ui.compose.isTelevisionDevice
 import com.v2ray.ang.util.Utils
 
 private const val MILLIS_PER_SECOND = 1000L
@@ -93,7 +90,9 @@ internal fun SubscriptionInfoCard(
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
-    refreshFocusRequester: FocusRequester? = null,
+    actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit = { icon, label, _, click ->
+        CardIconButton(icon, label, click)
+    },
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
 
@@ -117,29 +116,20 @@ internal fun SubscriptionInfoCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 model.supportUrl?.let { url ->
-                    CardIconButton(
-                        iconRes = if (SubscriptionInfoParser.isTelegramLink(url)) {
+                    actionButton(
+                        if (SubscriptionInfoParser.isTelegramLink(url)) {
                             R.drawable.ic_telegram_24dp
                         } else {
                             R.drawable.ic_feedback_24dp
                         },
-                        contentDescription = stringResource(R.string.sub_info_open_support),
-                        onClick = { onOpenLink(url) },
-                    )
+                        stringResource(R.string.sub_info_open_support),
+                        false,
+                    ) { onOpenLink(url) }
                 }
                 model.webPageUrl?.let { url ->
-                    CardIconButton(
-                        iconRes = R.drawable.ic_about_24dp,
-                        contentDescription = stringResource(R.string.sub_info_open_page),
-                        onClick = { onOpenLink(url) },
-                    )
+                    actionButton(R.drawable.ic_about_24dp, stringResource(R.string.sub_info_open_page), false) { onOpenLink(url) }
                 }
-                CardIconButton(
-                    iconRes = R.drawable.ic_refresh_24dp,
-                    contentDescription = stringResource(R.string.title_sub_update),
-                    onClick = onRefresh,
-                    focusRequester = refreshFocusRequester,
-                )
+                actionButton(R.drawable.ic_refresh_24dp, stringResource(R.string.title_sub_update), true, onRefresh)
             }
 
             // One semantics node for the read-only figures so TalkBack reads them in one go.
@@ -169,21 +159,7 @@ internal fun SubscriptionInfoCard(
 }
 
 @Composable
-private fun CardIconButton(
-    iconRes: Int,
-    contentDescription: String,
-    onClick: () -> Unit,
-    focusRequester: FocusRequester? = null,
-) {
-    if (isTelevisionDevice()) {
-        AppIconButton(
-            icon = painterResource(iconRes),
-            label = contentDescription,
-            onClick = onClick,
-            focusRequester = focusRequester,
-        )
-        return
-    }
+private fun CardIconButton(iconRes: Int, contentDescription: String, onClick: () -> Unit) {
     IconButton(onClick = onClick, modifier = Modifier.size(32.dp)) {
         Icon(painterResource(iconRes), contentDescription, Modifier.size(20.dp))
     }
