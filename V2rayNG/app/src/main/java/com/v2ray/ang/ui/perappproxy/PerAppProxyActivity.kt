@@ -1,6 +1,5 @@
 package com.v2ray.ang.ui.perappproxy
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -65,11 +64,9 @@ internal enum class PerAppMenuAction(@StringRes val labelRes: Int) {
 }
 
 class PerAppProxyActivity : BasePerAppProxyActivity() {
-    companion object {
-        fun createIntent(context: Context): Intent {
-            val isTelevision = context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-            return Intent(context, if (isTelevision) TvPerAppProxyActivity::class.java else PerAppProxyActivity::class.java)
-        }
+    override fun televisionDestination(): Intent? {
+        val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+        return if (uiMode == Configuration.UI_MODE_TYPE_TELEVISION) Intent(this, TvPerAppProxyActivity::class.java) else null
     }
 
     @Composable
@@ -93,14 +90,25 @@ internal class PerAppProxyActions(
 abstract class BasePerAppProxyActivity : BaseComponentActivity() {
 
     private val viewModel: PerAppProxyViewModel by viewModels()
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
         viewModel.loadApps(this)
     }
 
     @Composable
     final override fun ScreenContent() {
+        if (forwardingToTv) return
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val blacklist by viewModel.blacklist.collectAsStateWithLifecycle()
