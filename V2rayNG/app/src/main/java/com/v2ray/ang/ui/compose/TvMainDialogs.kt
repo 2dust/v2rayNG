@@ -2,6 +2,8 @@ package com.v2ray.ang.ui.compose
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,16 +26,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun TvDeleteConfirmDialog(
@@ -41,6 +53,8 @@ internal fun TvDeleteConfirmDialog(
     itemName: String? = null
 ) {
     val dismissFocusRequester = remember { FocusRequester() }
+    val scroll = rememberScrollState()
+    val scope = rememberCoroutineScope()
     LaunchedEffect(dismissFocusRequester) { requestFocusWhenReady(dismissFocusRequester) }
 
     AlertDialog(
@@ -48,7 +62,23 @@ internal fun TvDeleteConfirmDialog(
         text = {
             Text(
                 text = if (itemName.isNullOrBlank()) message else "$message\n\n$itemName",
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .dpadFocusOutline()
+                    .focusProperties { canFocus = scroll.canScrollForward || scroll.canScrollBackward }
+                    .onKeyEvent { event ->
+                        if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                        val step = scroll.viewportSize / 4f
+                        val delta = when {
+                            event.key == Key.DirectionUp && scroll.canScrollBackward -> -step
+                            event.key == Key.DirectionDown && scroll.canScrollForward -> step
+                            else -> return@onKeyEvent false
+                        }
+                        scope.launch { scroll.scrollBy(delta) }
+                        true
+                    }
+                    .focusable()
+                    .verticalScrollbar(scroll)
+                    .verticalScroll(scroll),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
