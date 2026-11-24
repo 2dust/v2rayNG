@@ -193,33 +193,13 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             toastError(R.string.toast_failure)
             return
         }
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = SettingsManager.resetRoutingRulesets(clipboard)
-            withContext(Dispatchers.Main) {
-                if (result) {
-                    reloadRules()
-                    toastSuccess(R.string.toast_success)
-                } else {
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
+        viewModel.importRulesets(clipboard)
     }
 
     private fun importQRcode() {
         launchQRCodeScanner { scanResult ->
             if (scanResult != null) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val result = SettingsManager.resetRoutingRulesets(scanResult)
-                    withContext(Dispatchers.Main) {
-                        if (result) {
-                            reloadRules()
-                            toastSuccess(R.string.toast_success)
-                        } else {
-                            toastError(R.string.toast_failure)
-                        }
-                    }
-                }
+                viewModel.importRulesets(scanResult)
             }
         }
     }
@@ -250,6 +230,7 @@ fun RoutingSettingScreen(
     onExportClipboard: () -> Unit
 ) {
     val rulesets by viewModel.rulesetsFlow.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val domainStrategy by domainStrategyState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
@@ -271,6 +252,7 @@ fun RoutingSettingScreen(
             AppTopBar(
                 title = stringResource(R.string.routing_settings_title),
                 onBackClick = onBackClick,
+                isLoading = isLoading,
                 actions = {
                     IconButton(onClick = onAddRule) {
                         Icon(

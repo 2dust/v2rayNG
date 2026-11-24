@@ -160,8 +160,8 @@ class MainRepository(
     override fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? =
         MmkvManager.decodeServerAffiliationInfo(guid)
 
-    override fun encodeServerList(guids: List<String>, groupId: String) =
-        MmkvManager.encodeServerList(ArrayList(guids), groupId)
+    override fun moveServerInGroup(groupId: String, fromGuid: String, toGuid: String): List<String>? =
+        MmkvManager.moveServerInGroup(groupId, fromGuid, toGuid)
 
     override fun removeServer(guid: String) = MmkvManager.removeServer(guid)
 

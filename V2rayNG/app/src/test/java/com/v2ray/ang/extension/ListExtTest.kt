@@ -33,4 +33,19 @@ class ListExtTest {
         assertFalse(items.moveItem(-1, 1))
         assertEquals(listOf("a", "b", "c"), items)
     }
+
+    @Test
+    fun moveGuid_preservesProfilesOutsideTheRenderedSearchResults() {
+        val storedOrder = mutableListOf("a", "hidden1", "b", "hidden2")
+        assertTrue(storedOrder.moveGuid("a", "b"))
+        assertEquals(listOf("hidden1", "b", "a", "hidden2"), storedOrder)
+
+        assertTrue(storedOrder.moveGuid("a", "b"))
+        assertEquals(listOf("hidden1", "a", "b", "hidden2"), storedOrder)
+
+        assertFalse(storedOrder.moveGuid("missing", "b"))
+        assertFalse(storedOrder.moveGuid("a", "missing"))
+        assertFalse(storedOrder.moveGuid("a", "a"))
+        assertEquals(listOf("hidden1", "a", "b", "hidden2"), storedOrder)
+    }
 }

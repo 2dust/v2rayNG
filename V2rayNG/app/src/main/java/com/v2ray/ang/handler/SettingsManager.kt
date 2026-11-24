@@ -42,6 +42,7 @@ object SettingsManager {
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
+        migrateProxyChainProfileList()
     }
 
     /**
@@ -500,6 +501,31 @@ object SettingsManager {
             }
             profile.pinnedCA256 = profile.pinSHA256
             profile.pinSHA256 = null
+            MmkvManager.encodeServerConfig(guid, profile)
+        }
+
+        MmkvManager.encodeSettings(migrationKey, true)
+    }
+
+    private fun migrateProxyChainProfileList() {
+        // Check if migration has already been done
+        val migrationKey = "proxy_chain_profile_list_migrated"
+        if (MmkvManager.decodeSettingsBool(migrationKey, false)) {
+            return
+        }
+
+        val serverList = decodeAllServerList()
+
+        for (guid in serverList) {
+            val profile = decodeServerConfig(guid) ?: continue
+            if (profile.proxyChainProfiles.isNullOrEmpty() || !profile.proxyChainProfileList.isNullOrEmpty()) {
+                continue
+            }
+            profile.proxyChainProfileList = profile.proxyChainProfiles
+                ?.split(",")
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+            profile.proxyChainProfiles = null
             MmkvManager.encodeServerConfig(guid, profile)
         }
 
