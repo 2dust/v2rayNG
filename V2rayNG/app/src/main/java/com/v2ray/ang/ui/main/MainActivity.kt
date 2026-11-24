@@ -56,6 +56,10 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : HelperBaseComponentActivity() {
 
+    internal companion object {
+        const val EXTRA_REFRESH_AFTER_IMPORT = "com.v2ray.ang.extra.REFRESH_AFTER_IMPORT"
+    }
+
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
@@ -97,6 +101,13 @@ class MainActivity : HelperBaseComponentActivity() {
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_REFRESH_AFTER_IMPORT, false)) {
+            mainViewModel.onAction(MainAction.RefreshGroups)
+        }
     }
 
     @Composable
