@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Checkbox
@@ -50,6 +51,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -73,12 +76,15 @@ fun AppTopBar(
     onSearchClose: () -> Unit = {},
     searchPlaceholder: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
+    titleContent: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     Column {
         TopAppBar(
             title = {
-                if (isSearchActive) {
+                if (titleContent != null) {
+                    titleContent()
+                } else if (isSearchActive) {
                     SearchInputField(
                         query = searchQuery,
                         onQueryChange = onSearchQueryChange,
@@ -164,13 +170,15 @@ fun AppListItem(
     icon: Any?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    singleToggle: Boolean = false
 ) {
     val context = LocalContext.current
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .then(if (singleToggle) Modifier.toggleable(checked, role = Role.Checkbox, onValueChange = onCheckedChange)
+            else Modifier.clickable { onCheckedChange(!checked) })
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -205,6 +213,7 @@ fun AppListItem(
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = packageName,
+                modifier = if (singleToggle) Modifier.clearAndSetSemantics {} else Modifier,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -213,7 +222,7 @@ fun AppListItem(
         }
         Checkbox(
             checked = checked,
-            onCheckedChange = onCheckedChange,
+            onCheckedChange = if (singleToggle) null else onCheckedChange,
             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.secondary)
         )
     }

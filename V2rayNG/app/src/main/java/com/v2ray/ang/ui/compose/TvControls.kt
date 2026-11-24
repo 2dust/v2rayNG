@@ -129,10 +129,11 @@ internal fun TvTopBarSearchField(
     focusRequester: FocusRequester,
     clearFocusRequester: FocusRequester,
     focusOrder: List<FocusRequester>,
-    onMoveDown: () -> Boolean
+    onMoveDown: () -> Boolean,
+    editOnEntry: Boolean = true
 ) {
     val state = rememberTvTextFieldState(focusRequester)
-    LaunchedEffect(state) { state.beginEditing() }
+    LaunchedEffect(state) { if (editOnEntry) state.beginEditing() }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.weight(1f).tvSearchFieldFocus(state, focusOrder, onMoveDown)) {
             OutlinedTextField(

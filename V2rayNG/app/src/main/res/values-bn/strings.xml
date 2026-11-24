@@ -579,5 +579,6 @@
     <string name="action_back">ফিরে যান</string>
     <string name="action_more">আরও</string>
     <string name="action_clear">সাফ করুন</string>
+    <string name="action_info">তথ্য</string>
     <string name="connection_connected_tv">সংযুক্ত</string>
 </resources>

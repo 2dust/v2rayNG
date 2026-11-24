@@ -580,5 +580,6 @@
     <string name="action_back">Geri</string>
     <string name="action_more">Daha çox</string>
     <string name="action_clear">Təmizlə</string>
+    <string name="action_info">Məlumat</string>
     <string name="connection_connected_tv">Qoşuldu</string>
 </resources>

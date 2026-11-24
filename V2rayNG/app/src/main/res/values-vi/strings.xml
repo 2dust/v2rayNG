@@ -577,5 +577,6 @@
     <string name="action_back">Quay lại</string>
     <string name="action_more">Thêm</string>
     <string name="action_clear">Xoá</string>
+    <string name="action_info">Thông tin</string>
     <string name="connection_connected_tv">Đã kết nối</string>
 </resources>

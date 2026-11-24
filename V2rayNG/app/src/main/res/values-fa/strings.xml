@@ -579,5 +579,6 @@
     <string name="action_back">بازگشت</string>
     <string name="action_more">بیشتر</string>
     <string name="action_clear">پاک کردن</string>
+    <string name="action_info">اطلاعات</string>
     <string name="connection_connected_tv">متصل است</string>
 </resources>

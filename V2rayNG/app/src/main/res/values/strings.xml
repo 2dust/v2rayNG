@@ -580,5 +580,6 @@
     <string name="action_back">Back</string>
     <string name="action_more">More</string>
     <string name="action_clear">Clear</string>
+    <string name="action_info">Info</string>
     <string name="connection_connected_tv">Connected</string>
 </resources>

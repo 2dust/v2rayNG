@@ -577,5 +577,6 @@
     <string name="action_back">返回</string>
     <string name="action_more">更多</string>
     <string name="action_clear">清除</string>
+    <string name="action_info">資訊</string>
     <string name="connection_connected_tv">已連線</string>
 </resources>

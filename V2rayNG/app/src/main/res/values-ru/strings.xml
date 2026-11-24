@@ -583,5 +583,6 @@
     <string name="action_back">Назад</string>
     <string name="action_more">Ещё</string>
     <string name="action_clear">Очистить</string>
+    <string name="action_info">Информация</string>
     <string name="connection_connected_tv">Соединено</string>
 </resources>
