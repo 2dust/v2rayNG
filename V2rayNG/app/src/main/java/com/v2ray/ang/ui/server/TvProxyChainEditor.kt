@@ -15,7 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +34,10 @@ import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.TvProfileSelectDialog
+import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
+import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
 import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 
@@ -59,7 +59,7 @@ internal fun TvProxyChainEditor(
         }
     }
     ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { selected, select, dismiss ->
-        TvProfileSelectDialog(stringResource(R.string.server_proxy_chain_member_unselected), allRemarks, selected, select, dismiss)
+        TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), allRemarks, selected, select, dismiss)
     }) { pick, requestRemove ->
         TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },
             onBack, onSave, onDelete, { returnKey = onAdd() }, pick, requestRemove, onMove)
@@ -77,9 +77,7 @@ private fun TvProxyChainLayout(
     TvServerEditor(EConfigType.PROXYCHAIN.toString(), onBack, onSave, onDelete, onAdd, add) {
         val focus = checkNotNull(LocalEditorFocus.current)
         val back = checkNotNull(LocalTvEditor.current)
-        val targets = remember { mutableMapOf<String, ChainRowFocus>() }
-        memberKeys.forEach { targets.getOrPut(it) { ChainRowFocus() } }
-        SideEffect { targets.keys.retainAll(memberKeys.toSet()) }
+        val targets = rememberDpadFocusTargets(memberKeys, ::ChainRowFocus)
         val reorder = rememberSyncedDpadReorderState(memberKeys) { key, _ ->
             if (key is String) targets[key]?.bringIntoView?.bringIntoView()
         }
