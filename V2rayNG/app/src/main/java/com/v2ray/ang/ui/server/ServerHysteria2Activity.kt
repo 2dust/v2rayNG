@@ -100,34 +100,40 @@ class ServerHysteria2Activity : BaseServerActivity() {
                 FormTextField(
                     stringResource(R.string.server_lab_min_packet_size),
                     state.minPacketSize,
-                    { state.minPacketSize = it }
+                    { state.minPacketSize = it },
+                    announceValue = true
                 )
                 FormTextField(
                     stringResource(R.string.server_lab_max_packet_size),
                     state.maxPacketSize,
-                    { state.maxPacketSize = it }
+                    { state.maxPacketSize = it },
+                    announceValue = true
                 )
             }
         }
         FormTextField(
             stringResource(R.string.server_lab_port_hop),
             state.portHopping,
-            { state.portHopping = it }
+            { state.portHopping = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_port_hop_interval),
             state.portHoppingInterval,
-            { state.portHoppingInterval = it }
+            { state.portHoppingInterval = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_bandwidth_down),
             state.bandwidthDown,
-            { state.bandwidthDown = it }
+            { state.bandwidthDown = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_bandwidth_up),
             state.bandwidthUp,
-            { state.bandwidthUp = it }
+            { state.bandwidthUp = it },
+            announceValue = true
         )
 
         SettingsSwitchItem(
@@ -138,17 +144,20 @@ class ServerHysteria2Activity : BaseServerActivity() {
         FormTextField(
             stringResource(R.string.server_lab_sni),
             state.sni,
-            { state.sni = it }
+            { state.sni = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_ech_config_list),
             state.echConfigList,
-            { state.echConfigList = it }
+            { state.echConfigList = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_pinned_ca256),
             state.pinnedCA256,
-            { state.pinnedCA256 = it }
+            { state.pinnedCA256 = it },
+            announceValue = true
         )
 
         FormTextField(

@@ -122,7 +122,8 @@ class ServerMasqueActivity : BaseServerActivity() {
             supportingText = stringResource(
                 R.string.server_lab_local_address_hint,
                 "${AppConfig.MASQUE_LOCAL_ADDRESS_V4},${AppConfig.MASQUE_LOCAL_ADDRESS_V6}"
-            )
+            ),
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_masque_warp_private_key),
@@ -132,7 +133,8 @@ class ServerMasqueActivity : BaseServerActivity() {
         FormTextField(
             stringResource(R.string.server_lab_masque_warp_public_key),
             state.publicKey,
-            { state.publicKey = it }
+            { state.publicKey = it },
+            announceValue = true
         )
         // finalmask
         FormTextField(

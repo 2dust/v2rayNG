@@ -9,13 +9,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
@@ -35,7 +32,6 @@ internal fun TvServerEditor(
     val save = remember { FocusRequester() }
     val delete = remember { FocusRequester() }
     val focus = rememberEditorFocus(fallback = back)
-    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val firstAction = if (onDelete != null) delete else if (onAdd != null) addRequester else save
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -50,11 +46,7 @@ internal fun TvServerEditor(
                             .focusProperties { end = firstAction }
                             .dpadFocusOutline(cornerRadius = 24.dp)
                     ) {
-                        Icon(
-                            painterResource(R.drawable.ic_arrow_back_24dp),
-                            stringResource(R.string.acc_back),
-                            modifier = Modifier.scale(scaleX = if (rtl) -1f else 1f, scaleY = 1f)
-                        )
+                        Icon(painterResource(R.drawable.ic_tv_arrow_back_24dp), stringResource(R.string.acc_back))
                     }
                 },
                 actions = {

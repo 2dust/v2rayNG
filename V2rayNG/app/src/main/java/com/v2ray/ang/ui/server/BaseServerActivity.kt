@@ -121,7 +121,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 label = stringResource(R.string.server_lab_remarks),
                 value = state.remarks,
                 onValueChange = { state.remarks = it },
-                isError = state.isRemarksError
+                isError = state.isRemarksError,
+                announceValue = true
             )
             FormTextField(
                 label = stringResource(R.string.server_lab_address),
@@ -134,7 +135,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 value = state.port,
                 onValueChange = { state.port = it },
                 keyboardType = KeyboardType.Number,
-                isError = state.isPortError
+                isError = state.isPortError,
+                announceValue = true
             )
         }
     }
@@ -235,13 +237,15 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     stringResource(R.string.server_lab_kcp_mtu),
                     state.kcpMtu,
                     { state.kcpMtu = it },
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Number,
+                    announceValue = true
                 )
                 FormTextField(
                     stringResource(R.string.server_lab_kcp_tti),
                     state.kcpTti,
                     { state.kcpTti = it },
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Number,
+                    announceValue = true
                 )
             }
             FormTextField(
@@ -289,7 +293,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             FormTextField(
                 stringResource(R.string.server_lab_sni),
                 state.sni,
-                { state.sni = it }
+                { state.sni = it },
+                announceValue = true
             )
             if (showFingerprint) {
                 FormDropdownField(
@@ -318,18 +323,21 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     FormTextField(
                         stringResource(R.string.server_lab_ech_config_list),
                         state.echConfigList,
-                        { state.echConfigList = it }
+                        { state.echConfigList = it },
+                        announceValue = true
                     )
                 }
                 FormTextField(
                     stringResource(R.string.server_lab_verify_peer_cert_by_name),
                     state.verifyPeerCertByName,
-                    { state.verifyPeerCertByName = it }
+                    { state.verifyPeerCertByName = it },
+                    announceValue = true
                 )
                 FormTextField(
                     stringResource(R.string.server_lab_pinned_ca256),
                     state.pinnedCA256,
-                    { state.pinnedCA256 = it }
+                    { state.pinnedCA256 = it },
+                    announceValue = true
                 )
                 Button(
                     onClick = {
@@ -371,7 +379,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 FormTextField(
                     stringResource(R.string.server_lab_public_key),
                     state.publicKeyReality,
-                    { state.publicKeyReality = it }
+                    { state.publicKeyReality = it },
+                    announceValue = true
                 )
                 FormTextField(
                     stringResource(R.string.server_lab_short_id),
@@ -386,7 +395,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 FormTextField(
                     stringResource(R.string.server_lab_mldsa65_verify),
                     state.mldsa65Verify,
-                    { state.mldsa65Verify = it }
+                    { state.mldsa65Verify = it },
+                    announceValue = true
                 )
             }
         }

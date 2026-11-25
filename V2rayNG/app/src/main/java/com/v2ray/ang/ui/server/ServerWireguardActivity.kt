@@ -45,7 +45,8 @@ class ServerWireguardActivity : BaseServerActivity() {
         FormTextField(
             stringResource(R.string.server_lab_public_key),
             state.publicKey,
-            { state.publicKey = it }
+            { state.publicKey = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_preshared_key),
@@ -55,7 +56,8 @@ class ServerWireguardActivity : BaseServerActivity() {
         FormTextField(
             stringResource(R.string.server_lab_reserved),
             state.reserved,
-            { state.reserved = it }
+            { state.reserved = it },
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_local_address),
@@ -64,13 +66,15 @@ class ServerWireguardActivity : BaseServerActivity() {
             supportingText = stringResource(
                 R.string.server_lab_local_address_hint,
                 "${AppConfig.WIREGUARD_LOCAL_ADDRESS_V4},${AppConfig.WIREGUARD_LOCAL_ADDRESS_V6}"
-            )
+            ),
+            announceValue = true
         )
         FormTextField(
             stringResource(R.string.server_lab_local_mtu),
             state.mtu,
             { state.mtu = it },
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Number,
+            announceValue = true
         )
 
         FormTextField(
