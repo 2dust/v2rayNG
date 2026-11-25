@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -69,10 +70,13 @@ import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.ui.settings.TvSettingsRows
 
-private enum class Control { Back, Add, Update, Group, Share, Edit, Delete, Enable }
+internal enum class Control { Back, Add, Update, Group, Share, Edit, Delete, Enable }
 private val toolbar = listOf(Control.Back, Control.Add, Control.Update)
 private val row = listOf(Control.Group, Control.Share, Control.Edit, Control.Delete, Control.Enable)
 private val localRow = row - Control.Share
+
+internal fun SubscriptionItem.rowControls() = if (url.isEmpty()) localRow else row
+internal fun Control.onRow(available: Set<Control>) = if (this == Control.Share && this !in available) Control.Edit else this
 
 class TvSubSettingActivity : BaseSubSettingActivity() {
     @Composable
@@ -84,11 +88,15 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
         val ids = remember(groups) { groups.map { it.guid } }
         val top = remember { toolbar.associateWith { FocusRequester() } }
         val back = top.getValue(Control.Back)
-        val targets = rememberDpadFocusTargets(ids) { row.associateWith { FocusRequester() } }
+        val rowHandles = rememberDpadFocusTargets(ids) { row.associateWith { FocusRequester() } }
+        val targets = remember(groups) {
+            groups.associate { (id, group) -> id to group.rowControls().associateWith(rowHandles.getValue(id)::getValue) }
+        }
         val list = rememberLazyListState()
         // Requesters follow group IDs; their lazy-list indices change when a group moves.
-        val focusRows = remember(ids) { ids.map { targets.getValue(it).values.toList() } }
+        val focusRows = remember(ids, targets) { ids.map { targets.getValue(it).values.toList() } }
         val request = rememberLazyDpadFocus(focusRows) { list.scrollToItem(it) }
+        fun targetFor(id: String?, slot: Control) = targets[id]?.let { it[slot.onRow(it.keys)] }
         val reorder = rememberSyncedDpadReorderState(ids) { key, index ->
             list.keepDpadReorderItemVisible(key, index)
             targets[key]?.get(Control.Group)?.requestFocus()
@@ -124,7 +132,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
             if (!loaded || !windowFocused || dialogOpen || bitmap != null) return@LaunchedEffect
             // A new or returning TV window can be in touch mode after an IME or pointer action.
             if (restoringFocus) inputMode.requestInputMode(InputMode.Keyboard)
-            val target = targets[groupId]?.get(control)
+            val target = targetFor(groupId, control)
             if (target != null) request(target) else requestFocusWhenReady(top[control] ?: back)
             restoringFocus = false
         }
@@ -152,20 +160,14 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
             LazyColumn(state = list, modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 48.dp).verticalScrollbar(list),
                 verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 itemsIndexed(groups, key = { _, group -> group.guid }) { index, (id, group) ->
-                    val actions = if (group.url.isEmpty()) localRow else row
                     val handles = targets.getValue(id)
-                    val order = actions.map(handles::getValue)
-                    fun adjacent(at: Int, slot: Control): FocusRequester? {
-                        val neighbor = groups.getOrNull(at) ?: return null
-                        val nextSlot = if (slot == Control.Share && neighbor.subscription.url.isEmpty()) Control.Edit else slot
-                        return targets.getValue(neighbor.guid).getValue(nextSlot)
-                    }
+                    val order = handles.values.toList()
                     val navigation: @Composable (Control) -> Modifier = { slot ->
                         val target = handles.getValue(slot)
                         mark(slot, id).focusRequester(target)
                             .dpadOrderedFocusNavigation(target, order, onBeforeFirst = { back.requestFocus() })
-                            .dpadVerticalFocusNavigation({ request(adjacent(index - 1, slot) ?: back) },
-                                { adjacent(index + 1, slot)?.let(request) ?: true })
+                            .dpadVerticalFocusNavigation({ request(targetFor(ids.getOrNull(index - 1), slot) ?: back) },
+                                { targetFor(ids.getOrNull(index + 1), slot)?.let(request) ?: true })
                     }
                     val move = DpadReorderItem(reorder, id, index, groups.size, ::verticalDpadReorderTarget) { _, to ->
                         viewModel.move(id, ids[to])
@@ -183,7 +185,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
             when {
                 control == Control.Update -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
                     onConfirm = { dismiss(); viewModel.updateSubscriptions() }, onDismiss = dismiss)
-                selected == null -> LaunchedEffect(Unit) { dismiss() }
+                selected == null || control !in targets[selected.guid].orEmpty() -> LaunchedEffect(Unit) { dismiss() }
                 control == Control.Share -> TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) },
                     onSelected = { dismiss(); shareLink(it, selected.subscription.url) }, onDismiss = dismiss)
                 control == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
@@ -231,25 +233,36 @@ private fun TvSubscriptionRow(
     }
     Row(Modifier.fillMaxWidth().zIndex(if (moving) 1f else 0f).then(decoration).padding(end = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.weight(1f).then(navigation(Control.Group))
-            .onFocusChanged { focused = it.isFocused }.semantics(mergeDescendants = true) { contentDescription = group.remarks }
-            .dpadLongPressToMove(move) { onEdit(Control.Group) }.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            SubscriptionSummary(group, Modifier.clearAndSetSemantics {})
+        for (slot in group.rowControls()) key(slot) {
+            val modifier = navigation(slot)
+            when (slot) {
+                Control.Group -> Box(Modifier.weight(1f).then(modifier).onFocusChanged { focused = it.isFocused }
+                    .semantics(mergeDescendants = true) { contentDescription = group.remarks }
+                    .dpadLongPressToMove(move) { onEdit(slot) }.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    SubscriptionSummary(group, Modifier.clearAndSetSemantics {})
+                }
+                Control.Share -> TvIconButton(painterResource(R.drawable.ic_share_24dp), stringResource(R.string.action_share), onShare,
+                    modifier, contentDescription = stringResource(R.string.acc_share_subscription))
+                Control.Edit -> TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), { onEdit(slot) },
+                    modifier, contentDescription = stringResource(R.string.acc_edit))
+                Control.Delete -> TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete,
+                    modifier, contentDescription = stringResource(R.string.acc_delete))
+                Control.Enable -> TvSubscriptionSwitch(group.enabled, onEnable, modifier)
+                else -> error("Not a subscription row control: $slot")
+            }
         }
-        if (group.url.isNotEmpty()) TvIconButton(painterResource(R.drawable.ic_share_24dp), stringResource(R.string.action_share), onShare,
-            navigation(Control.Share), contentDescription = stringResource(R.string.acc_share_subscription))
-        TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), { onEdit(Control.Edit) }, navigation(Control.Edit),
-            contentDescription = stringResource(R.string.acc_edit))
-        TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete, navigation(Control.Delete),
-            contentDescription = stringResource(R.string.acc_delete))
-        val label = stringResource(R.string.sub_setting_enable)
-        var toggleFocused by remember { mutableStateOf(false) }
-        Row(navigation(Control.Enable).heightIn(min = 48.dp).dpadFocusOutline(cornerRadius = 24.dp)
-            .onFocusChanged { toggleFocused = it.isFocused }.semantics(mergeDescendants = true) { contentDescription = label }
-            .toggleable(group.enabled, role = Role.Switch, onValueChange = onEnable)
-            .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Switch(group.enabled, onCheckedChange = null, modifier = Modifier.scale(0.65f))
-            if (toggleFocused) Text(label, Modifier.padding(start = 8.dp).clearAndSetSemantics {}, style = MaterialTheme.typography.labelLarge)
-        }
+    }
+}
+
+@Composable
+private fun TvSubscriptionSwitch(enabled: Boolean, onEnable: (Boolean) -> Unit, modifier: Modifier) {
+    val label = stringResource(R.string.sub_setting_enable)
+    var focused by remember { mutableStateOf(false) }
+    Row(modifier.heightIn(min = 48.dp).dpadFocusOutline(cornerRadius = 24.dp)
+        .onFocusChanged { focused = it.isFocused }.semantics(mergeDescendants = true) { contentDescription = label }
+        .toggleable(enabled, role = Role.Switch, onValueChange = onEnable)
+        .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Switch(enabled, onCheckedChange = null, modifier = Modifier.scale(0.65f))
+        if (focused) Text(label, Modifier.padding(start = 8.dp).clearAndSetSemantics {}, style = MaterialTheme.typography.labelLarge)
     }
 }
