@@ -31,6 +31,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
+internal fun Modifier.editorFocusTarget(): Modifier =
+    then(LocalEditorFocus.current?.target() ?: Modifier)
+
+@Composable
 fun FormTextField(
     label: String,
     value: String,
@@ -42,7 +46,12 @@ fun FormTextField(
     maxLines: Int = 5,
     isError: Boolean = false,
     supportingText: String? = null,
+    announceValue: Boolean = false,
 ) {
+    if (LocalTvEditor.current != null) {
+        TvEditorTextField(label, value, onValueChange, modifier, enabled, keyboardType, placeholder, maxLines, isError, supportingText, announceValue)
+        return
+    }
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -68,7 +77,7 @@ fun FormTextField(
                     backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
                 )
             ),
-            modifier = Modifier.fillMaxWidth().then(LocalEditorFocus.current?.target() ?: Modifier)
+            modifier = Modifier.fillMaxWidth().editorFocusTarget()
         )
     }
 }
@@ -85,7 +94,12 @@ fun FormDropdownField(
     enabled: Boolean = true,
     placeholder: String? = null,
     supportingText: String? = null,
+    optionLabel: (String) -> String = { it },
 ) {
+    if (!editable && LocalTvEditor.current != null) {
+        TvEditorDropdown(label, value, options, onValueChange, modifier, enabled, placeholder, supportingText, optionLabel)
+        return
+    }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val menuScrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
@@ -108,7 +122,7 @@ fun FormDropdownField(
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
         OutlinedTextField(
-            value = value,
+            value = if (editable) value else optionLabel(value),
             onValueChange = {
                 if (editable) {
                     onValueChange(it)
@@ -134,7 +148,7 @@ fun FormDropdownField(
                 )
             ),
             modifier = Modifier
-                .then(LocalEditorFocus.current?.target() ?: Modifier)
+                .editorFocusTarget()
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable
@@ -155,7 +169,7 @@ fun FormDropdownField(
         ) {
             visibleOptions.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(optionLabel(option)) },
                     onClick = {
                         onValueChange(option)
                         expanded = false

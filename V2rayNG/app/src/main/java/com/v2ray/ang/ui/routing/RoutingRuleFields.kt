@@ -18,7 +18,6 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.apppicker.AppPickerActivity
@@ -26,8 +25,6 @@ import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.TvEditorDropdown
-import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 
 @Composable
@@ -49,32 +46,21 @@ internal fun RoutingRuleFields(
     )
     RoutingRuleTextField(stringResource(R.string.routing_settings_domain), draft.domain, placeholder = commaTip)
     RoutingRuleTextField(stringResource(R.string.routing_settings_ip), draft.ip, placeholder = commaTip)
-    RoutingRuleTextField(stringResource(R.string.routing_settings_process), draft.process, placeholder = commaTip, enabled = canUseProcess)
+    RoutingRuleTextField(stringResource(R.string.routing_settings_process), draft.process, placeholder = commaTip, enabled = canUseProcess, announceValue = false)
     if (canUseProcess) RoutingProcessPicker(draft)
     RoutingRuleTextField(stringResource(R.string.routing_settings_port), draft.port)
     RoutingRuleTextField(stringResource(R.string.routing_settings_protocol), draft.protocol, placeholder = stringResource(R.string.routing_settings_protocol_tip))
-    val networkLabel = stringResource(R.string.routing_settings_network)
-    val network = draft.network.value.ifBlank { routingNetworkOptions.last() }
-    val setNetwork: (String) -> Unit = { draft.network.value = it }
-    if (LocalTvEditor.current == null) {
-        FormDropdownField(networkLabel, network, routingNetworkOptions, setNetwork)
-    } else {
-        TvEditorDropdown(networkLabel, network, routingNetworkOptions, setNetwork, Modifier, true, null, null)
-    }
+    FormDropdownField(stringResource(R.string.routing_settings_network), draft.network.value.ifBlank { routingNetworkOptions.last() },
+        routingNetworkOptions, { draft.network.value = it })
     outbound(stringResource(R.string.routing_settings_outbound_tag))
 }
 
 @Composable
 private fun RoutingRuleTextField(
     label: String, field: MutableState<String>, placeholder: String? = null,
-    enabled: Boolean = true, isError: Boolean = false
+    enabled: Boolean = true, isError: Boolean = false, announceValue: Boolean = true
 ) {
-    val onChange: (String) -> Unit = { field.value = it }
-    if (LocalTvEditor.current == null) {
-        FormTextField(label, field.value, onChange, enabled = enabled, placeholder = placeholder, isError = isError)
-    } else {
-        TvEditorTextField(label, field.value, onChange, Modifier, enabled, KeyboardType.Text, placeholder, 5, isError, null)
-    }
+    FormTextField(label, field.value, { field.value = it }, enabled = enabled, placeholder = placeholder, isError = isError, announceValue = announceValue)
 }
 
 @Composable

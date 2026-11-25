@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.v2ray.ang.R
@@ -86,7 +85,7 @@ internal fun TvSearchableOptionsDialog(
                     // Keep dialog focus out of the editor's saved focus registry.
                     CompositionLocalProvider(LocalEditorFocus provides null, LocalTvEditor provides cancel) {
                         TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
-                            Modifier.weight(1f).target("search"), true, KeyboardType.Text, null, 1, false, null)
+                            Modifier.weight(1f).target("search"), maxLines = 1, announceValue = true)
                     }
                     if (showClearSearch && query.isNotEmpty()) {
                         TvIconButton(painterResource(android.R.drawable.ic_menu_close_clear_cancel), stringResource(R.string.action_clear),
