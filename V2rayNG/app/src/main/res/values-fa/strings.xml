@@ -479,6 +479,8 @@
     <string name="share_method_full_content">کپی کانفیگ کامل</string>
     <string name="action_edit">ویرایش</string>
     <string name="action_delete">حذف</string>
+    <string name="action_add_subscription">افزودن اشتراک</string>
+    <string name="action_share">اشتراک‌گذاری</string>
     <string name="action_close">بستن</string>
 
     <string name="share_subscription_qrcode">کد QR</string>

@@ -479,6 +479,8 @@
     <string name="share_method_full_content">لف گیری پوی کانفیگ</string>
     <string name="action_edit">آلشتکاری</string>
     <string name="action_delete">پاک کردن</string>
+    <string name="action_add_subscription">ٱووردن اشتراک</string>
+    <string name="action_share">همرسانی</string>
     <string name="action_close">بستن</string>
 
     <string name="share_subscription_qrcode">کود QR</string>

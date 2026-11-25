@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.subscription
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,9 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
@@ -50,54 +52,62 @@ import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import com.v2ray.ang.ui.compose.ReorderableListItem
 import com.v2ray.ang.ui.compose.SelectListDialog
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.settings.PhoneSettingsRows
+import com.v2ray.ang.ui.settings.SettingsRows
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-private enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
+internal enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
     QRCode(R.string.share_subscription_qrcode),
     Clipboard(R.string.share_subscription_clipboard)
 }
 
 private data class SubscriptionDeleteTarget(val guid: String, val name: String)
 
-class SubSettingActivity : BaseComponentActivity() {
-    private val viewModel: SubscriptionsViewModel by viewModels()
+abstract class BaseSubSettingActivity : BaseComponentActivity() {
+    protected val viewModel: SubscriptionsViewModel by viewModels()
 
+    override fun onResume() {
+        super.onResume()
+        if (!isFinishing) viewModel.reload()
+    }
+
+    protected fun openEditor(subId: String? = null) {
+        startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
+    }
+
+    protected fun copyLink(url: String) {
+        Utils.setClipboard(this, url)
+        toast(getString(R.string.toast_success))
+    }
+}
+
+class SubSettingActivity : BaseSubSettingActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION) {
+            startActivity(Intent(this, TvSubSettingActivity::class.java))
+            finish()
+        }
     }
 
     @Composable
     override fun ScreenContent() {
+        if (isFinishing) return
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         SubSettingScreen(
             viewModel = viewModel,
             isLoading = isLoading,
             onBackClick = { finish() },
-            onAddClick = { startActivity(Intent(this, SubEditActivity::class.java)) },
+            onAddClick = { openEditor() },
             onSubUpdate = { viewModel.updateSubscriptions() },
-            onEditSub = { subId ->
-                startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
-            },
-            onRemoveSub = { subId -> removeSub(subId) },
+            onEditSub = ::openEditor,
+            onRemoveSub = { viewModel.remove(it) },
             onShareQRCode = viewModel::shareQRCode,
-            onShareClipboard = { url ->
-                Utils.setClipboard(this, url)
-                toast(getString(R.string.toast_success))
-            }
+            onShareClipboard = ::copyLink
         )
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.reload()
-    }
-
-    private fun removeSub(subId: String) {
-        viewModel.remove(subId)
     }
 }
 
@@ -116,14 +126,15 @@ fun SubSettingScreen(
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
     var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
-    val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+    val options by viewModel.options.collectAsStateWithLifecycle()
+    val confirmRemove = AppConfig.PREF_CONFIRM_REMOVE in options
 
     var shareTarget by remember { mutableStateOf<Pair<String, String>?>(null) }
     val qrCodeBitmap by viewModel.qrCode.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        viewModel.move(from.index, to.index)
+        viewModel.move(from.key as String, to.key as String).join()
     }
 
     Scaffold(
@@ -153,7 +164,7 @@ fun SubSettingScreen(
             contentPadding = NavigationBarsBottomPadding()
         ) {
             itemsIndexed(
-                items = subscriptions,
+                items = subscriptions.orEmpty(),
                 key = { _, item -> item.guid }
             ) { _, subCache ->
                 ReorderableItem(reorderableState, key = subCache.guid) { isDragging ->
@@ -167,30 +178,7 @@ fun SubSettingScreen(
                                 .padding(horizontal = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = subCache.subscription.remarks,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                if (subCache.subscription.url.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = subCache.subscription.url,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
+                            SubscriptionSummary(subCache.subscription, Modifier.weight(1f))
 
                             Column(
                                 horizontalAlignment = Alignment.End,
@@ -226,11 +214,7 @@ fun SubSettingScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Switch(
                                     checked = subCache.subscription.enabled,
-                                    onCheckedChange = { checked ->
-                                        val updated = subCache.subscription.copy()
-                                        updated.enabled = checked
-                                        viewModel.update(subCache.guid, updated)
-                                    },
+                                    onCheckedChange = { viewModel.setEnabled(subCache.guid, it) },
                                     modifier = Modifier.scale(0.7f),
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
@@ -283,56 +267,51 @@ fun SubSettingScreen(
     }
 
     if (showUpdateDialog) {
-
-        var updateSubscription by rememberMmkvBool(AppConfig.PREF_UPDATE_SUBSCRIPTION, false)
-        var autoTestAfterUpdateSubscription by rememberMmkvBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)
-        var autoRemoveInvalidAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)
-        var autoSortAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)
-
         AlertDialog(
             onDismissRequest = { showUpdateDialog = false },
-            text = {
-                Column {
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_sub_update),
-                        checked = updateSubscription,
-                        onCheckedChange = { updateSubscription = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_test_after_update_subscription),
-                        summary = stringResource(R.string.summary_pref_auto_test_after_update_subscription),
-                        checked = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoTestAfterUpdateSubscription = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_remove_invalid_after_test),
-                        summary = stringResource(R.string.summary_pref_auto_remove_invalid_after_test),
-                        checked = autoRemoveInvalidAfterTest,
-                        enabled = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoRemoveInvalidAfterTest = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_sort_after_test),
-                        summary = stringResource(R.string.summary_pref_auto_sort_after_test),
-                        checked = autoSortAfterTest,
-                        enabled = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoSortAfterTest = it }
-                    )
-                }
-            },
+            text = { SubscriptionUpdateOptions(options, viewModel::setOption, PhoneSettingsRows) },
             confirmButton = {
-                TextButton(onClick = {
-                    showUpdateDialog = false
-                    onSubUpdate()
-                }) {
-                    Text(text = stringResource(R.string.action_ok))
-                }
+                TextButton(onClick = { showUpdateDialog = false; onSubUpdate() }) { Text(stringResource(R.string.action_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showUpdateDialog = false }) {
-                    Text(text = stringResource(R.string.action_cancel))
-                }
+                TextButton(onClick = { showUpdateDialog = false }) { Text(stringResource(R.string.action_cancel)) }
             }
         )
+    }
+}
+
+@Composable
+internal fun SubscriptionSummary(group: SubscriptionItem, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Text(group.remarks, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (group.url.isNotEmpty()) {
+            Spacer(Modifier.height(2.dp))
+            Text(group.url, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Spacer(Modifier.height(2.dp))
+        Text(Utils.formatTimestamp(group.lastUpdated), style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+internal enum class SubscriptionUpdateOption(val key: String, @StringRes val title: Int, @StringRes val summary: Int? = null) {
+    Update(AppConfig.PREF_UPDATE_SUBSCRIPTION, R.string.title_sub_update),
+    Test(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, R.string.title_pref_auto_test_after_update_subscription,
+        R.string.summary_pref_auto_test_after_update_subscription),
+    RemoveInvalid(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, R.string.title_pref_auto_remove_invalid_after_test,
+        R.string.summary_pref_auto_remove_invalid_after_test),
+    Sort(AppConfig.PREF_AUTO_SORT_AFTER_TEST, R.string.title_pref_auto_sort_after_test, R.string.summary_pref_auto_sort_after_test);
+
+    fun isAvailable(enabled: Set<String>) = this == Update || this == Test || Test.key in enabled
+}
+
+@Composable
+internal fun SubscriptionUpdateOptions(enabled: Set<String>, onChange: (String, Boolean) -> Unit, rows: SettingsRows) {
+    Column(Modifier.verticalScroll(rememberScrollState())) {
+        SubscriptionUpdateOption.entries.forEach { option ->
+            rows.SettingsSwitchItem(stringResource(option.title), option.summary?.let { stringResource(it) },
+                checked = option.key in enabled, enabled = option.isAvailable(enabled), onCheckedChange = { onChange(option.key, it) })
+        }
     }
 }

@@ -477,6 +477,8 @@
     <string name="share_method_full_content">Sao chép toàn bộ cấu hình</string>
     <string name="action_edit">Chỉnh sửa</string>
     <string name="action_delete">Xoá</string>
+    <string name="action_add_subscription">Thêm gói đăng ký</string>
+    <string name="action_share">Chia sẻ</string>
     <string name="action_close">Đóng</string>
 
     <string name="share_subscription_qrcode">Xuất gói ra mã QR (Chụp màn hình để lưu)</string>

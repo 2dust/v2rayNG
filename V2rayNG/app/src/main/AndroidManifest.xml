@@ -160,6 +160,9 @@
             android:name=".ui.subscription.SubSettingActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.subscription.TvSubSettingActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.userasset.UserAssetActivity"
             android:exported="false" />
         <activity

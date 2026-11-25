@@ -479,6 +479,8 @@
     <string name="share_method_full_content">পূর্ণ কনফিগারেশন কপি করুন</string>
     <string name="action_edit">সম্পাদনা</string>
     <string name="action_delete">মুছুন</string>
+    <string name="action_add_subscription">সাবস্ক্রিপশন যোগ করুন</string>
+    <string name="action_share">শেয়ার করুন</string>
     <string name="action_close">বন্ধ করুন</string>
 
     <string name="share_subscription_qrcode">QR কোড</string>

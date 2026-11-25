@@ -479,6 +479,8 @@
     <string name="share_method_full_content">Tam konfiqurasiyanı kopyala</string>
     <string name="action_edit">Düzəliş et</string>
     <string name="action_delete">Sil</string>
+    <string name="action_add_subscription">Abunəlik əlavə et</string>
+    <string name="action_share">Paylaş</string>
     <string name="action_close">Bağla</string>
 
     <string name="share_subscription_qrcode">QR kod</string>

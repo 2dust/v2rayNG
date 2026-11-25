@@ -477,6 +477,8 @@
     <string name="share_method_full_content">复制完整配置</string>
     <string name="action_edit">编辑</string>
     <string name="action_delete">删除</string>
+    <string name="action_add_subscription">添加订阅</string>
+    <string name="action_share">分享</string>
     <string name="action_close">关闭</string>
 
     <string name="share_subscription_qrcode">二维码</string>

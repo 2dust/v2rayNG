@@ -477,6 +477,8 @@
     <string name="share_method_full_content">複製完整設定</string>
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
+    <string name="action_add_subscription">新增訂閱</string>
+    <string name="action_share">分享</string>
     <string name="action_close">關閉</string>
 
     <string name="share_subscription_qrcode">QR Code</string>

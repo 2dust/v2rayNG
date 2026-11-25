@@ -487,6 +487,8 @@
     <string name="share_method_full_content">نسخ التكوين الكامل</string>
     <string name="action_edit">تعديل</string>
     <string name="action_delete">حذف</string>
+    <string name="action_add_subscription">إضافة اشتراك</string>
+    <string name="action_share">مشاركة</string>
     <string name="action_close">إغلاق</string>
 
     <string name="share_subscription_qrcode">رمز QR</string>

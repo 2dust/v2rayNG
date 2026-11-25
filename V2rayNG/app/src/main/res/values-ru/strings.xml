@@ -483,6 +483,8 @@
     <string name="share_method_full_content">Копировать полную конфигурацию</string>
     <string name="action_edit">Изменить</string>
     <string name="action_delete">Удалить</string>
+    <string name="action_add_subscription">Добавить подписку</string>
+    <string name="action_share">Поделиться</string>
     <string name="action_close">Закрыть</string>
 
     <string name="share_subscription_qrcode">QR-код</string>
