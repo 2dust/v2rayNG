@@ -51,6 +51,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.TvAppMenuAction
 import com.v2ray.ang.ui.compose.TvAppSelectionList
+import com.v2ray.ang.ui.compose.RestoreFocus
 import com.v2ray.ang.ui.compose.TvAppSelectionToolbar
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
@@ -86,19 +87,7 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
     var focusedMode by rememberSaveable { mutableStateOf<ModeControl?>(null) }
     var showInfo by rememberSaveable { mutableStateOf(false) }
     var returnToInfo by remember { mutableStateOf(false) }
-    val initialPackage = remember { focusedPackage }
-    val initialMode = remember { focusedMode }
-    val initialToolbarTarget = remember { search.toolbarRestoreTarget }
-    var needsInitialFocus by remember { mutableStateOf(true) }
-
-    LaunchedEffect(state.isLoading, appFocus, showInfo) {
-        if (!showInfo && needsInitialFocus && (initialPackage == null || !state.isLoading || initialPackage in appFocus.targets)) {
-            if (initialPackage?.let(appFocus::focus) != true) {
-                requestFocusWhenReady(initialMode?.let(modes::get) ?: initialToolbarTarget)
-            }
-            needsInitialFocus = false
-        }
-    }
+    appFocus.RestoreFocus(focusedPackage, focusedMode?.let(modes::get) ?: search.toolbarRestoreTarget, state.isLoading, showInfo)
     LaunchedEffect(returnToInfo) {
         if (returnToInfo) {
             requestFocusWhenReady(info)
@@ -165,7 +154,6 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
     if (showInfo) {
         TvPerAppInfoDialog {
             showInfo = false
-            needsInitialFocus = false
             returnToInfo = true
         }
     }
