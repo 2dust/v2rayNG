@@ -31,6 +31,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
+internal fun Modifier.editorFocusTarget(): Modifier =
+    then(LocalEditorFocus.current?.target() ?: Modifier)
+
+@Composable
 fun FormTextField(
     label: String,
     value: String,
