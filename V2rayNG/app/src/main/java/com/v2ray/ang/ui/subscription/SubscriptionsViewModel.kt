@@ -26,14 +26,18 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+internal data class SubscriptionListState(
+    val groups: List<SubscriptionCache>? = null,
+    val updateOptions: Set<SubscriptionUpdateOption> = emptySet(),
+    val confirmRemove: Boolean = false
+)
+
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
     private var qrCodeJob: Job? = null
     private val _qrCode = MutableStateFlow<Bitmap?>(null)
     internal val qrCode = _qrCode.asStateFlow()
-    private val _subsFlow = MutableStateFlow<List<SubscriptionCache>?>(null)
-    internal val subsFlow = _subsFlow.asStateFlow()
-    private val _options = MutableStateFlow(emptySet<String>())
-    internal val options = _options.asStateFlow()
+    private val _state = MutableStateFlow(SubscriptionListState())
+    internal val state = _state.asStateFlow()
 
     // An onResume reload must not publish an older list over a move, toggle or deletion.
     private val storage = Mutex()
@@ -49,27 +53,34 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     }
 
     fun reload() = withStorage("reload") {
-        _options.value = (SubscriptionUpdateOption.entries.map { it.key } + AppConfig.PREF_CONFIRM_REMOVE)
-            .filterTo(mutableSetOf()) { MmkvManager.decodeSettingsBool(it, false) }
-        _subsFlow.value = MmkvManager.decodeSubscriptions()
+        _state.value = SubscriptionListState(
+            groups = MmkvManager.decodeSubscriptions(),
+            updateOptions = SubscriptionUpdateOption.entries.filterTo(mutableSetOf()) { MmkvManager.decodeSettingsBool(it.key, false) },
+            confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+        )
     }
 
-    internal fun setOption(key: String, enabled: Boolean) = withStorage("set update option") {
-        check(MmkvManager.encodeSettings(key, enabled))
-        _options.value = if (enabled) _options.value + key else _options.value - key
+    internal fun setOption(option: SubscriptionUpdateOption, enabled: Boolean) = withStorage("set update option") {
+        check(MmkvManager.encodeSettings(option.key, enabled))
+        val options = _state.value.updateOptions
+        _state.value = _state.value.copy(updateOptions = if (enabled) options + option else options - option)
+    }
+
+    private fun refreshGroups() {
+        _state.value = _state.value.copy(groups = MmkvManager.decodeSubscriptions())
     }
 
     fun remove(subId: String) = withStorage("remove group") {
         if (MmkvManager.decodeSubscription(subId) == null) return@withStorage
         SettingsManager.removeSubscriptionWithDefault(subId)
         SettingsChangeManager.makeSetupGroupTab()
-        _subsFlow.value = MmkvManager.decodeSubscriptions()
+        refreshGroups()
     }
 
     fun setEnabled(subId: String, enabled: Boolean) = withStorage("toggle group") {
         val current = MmkvManager.decodeSubscription(subId) ?: return@withStorage
         MmkvManager.encodeSubscription(subId, current.copy(enabled = enabled))
-        _subsFlow.value = MmkvManager.decodeSubscriptions()
+        refreshGroups()
     }
 
     internal fun shareQRCode(url: String) {
@@ -92,16 +103,16 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         if (ids.moveGuid(fromId, toId)) {
             MmkvManager.encodeSubsList(ids)
             SettingsChangeManager.makeSetupGroupTab()
-            _subsFlow.value = MmkvManager.decodeSubscriptions()
+            refreshGroups()
         }
     }
 
     fun updateSubscriptions() {
         viewModelScope.launch {
-            val enabled = storage.withLock { _options.value }
+            val enabled = storage.withLock { _state.value.updateOptions }
             when {
-                AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION in enabled -> updateSubscriptionsMore()
-                AppConfig.PREF_UPDATE_SUBSCRIPTION in enabled -> updateSubscriptionsOnly()
+                SubscriptionUpdateOption.Test in enabled -> updateSubscriptionsMore()
+                SubscriptionUpdateOption.Update in enabled -> updateSubscriptionsOnly()
             }
         }
     }

@@ -73,15 +73,14 @@ private enum class Control { Back, Add, Update, Group, Share, Edit, Delete, Enab
 private val toolbar = listOf(Control.Back, Control.Add, Control.Update)
 private val row = listOf(Control.Group, Control.Share, Control.Edit, Control.Delete, Control.Enable)
 private val localRow = row - Control.Share
-private enum class GroupDialog { Update, Share, Delete }
 
 class TvSubSettingActivity : BaseSubSettingActivity() {
     @Composable
     override fun ScreenContent() {
-        val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
+        val state by viewModel.state.collectAsStateWithLifecycle()
         val loading by viewModel.isLoading.collectAsStateWithLifecycle()
         val bitmap by viewModel.qrCode.collectAsStateWithLifecycle()
-        val groups = subscriptions.orEmpty()
+        val groups = state.groups.orEmpty()
         val ids = remember(groups) { groups.map { it.guid } }
         val top = remember { toolbar.associateWith { FocusRequester() } }
         val back = top.getValue(Control.Back)
@@ -96,8 +95,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
         }
         var control by rememberSaveable { mutableStateOf(Control.Back) }
         var groupId by rememberSaveable { mutableStateOf<String?>(null) }
-        var dialog by rememberSaveable { mutableStateOf<GroupDialog?>(null) }
-        var dialogId by rememberSaveable { mutableStateOf<String?>(null) }
+        var dialogOpen by rememberSaveable { mutableStateOf(false) }
         // Ignore Compose's first automatic focus (usually Back) until the saved target is attached.
         var restoringFocus by remember { mutableStateOf(true) }
         val inputMode = LocalInputModeManager.current
@@ -106,28 +104,24 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
         fun mark(slot: Control, id: String? = null) = Modifier.onFocusChanged {
             if (it.isFocused && windowFocused && !restoringFocus) { control = slot; groupId = id }
         }
-        fun edit(slot: Control, id: String? = null) {
+        fun returnTo(slot: Control, id: String?) {
             control = slot
             groupId = id
             restoringFocus = true
+        }
+        fun edit(slot: Control, id: String? = null) {
+            returnTo(slot, id)
             openEditor(id)
         }
-        fun open(which: GroupDialog, id: String? = null) {
-            restoringFocus = true
-            groupId = id
-            control = when (which) {
-                GroupDialog.Update -> Control.Update
-                GroupDialog.Share -> Control.Share
-                GroupDialog.Delete -> Control.Delete
-            }
-            dialogId = id
-            dialog = which
+        fun openDialog(slot: Control, id: String? = null) {
+            returnTo(slot, id)
+            dialogOpen = true
         }
-        fun close() { dialog = null; dialogId = null }
 
         // Restore the same group/action after recreation or a modal, not its old list position.
-        LaunchedEffect(subscriptions != null, windowFocused, dialog, bitmap != null) {
-            if (subscriptions == null || !windowFocused || dialog != null || bitmap != null) return@LaunchedEffect
+        val loaded = state.groups != null
+        LaunchedEffect(loaded, windowFocused, dialogOpen, bitmap != null) {
+            if (!loaded || !windowFocused || dialogOpen || bitmap != null) return@LaunchedEffect
             // A new or returning TV window can be in touch mode after an IME or pointer action.
             if (restoringFocus) inputMode.requestInputMode(InputMode.Keyboard)
             val target = targets[groupId]?.get(control)
@@ -150,7 +144,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                 }, actions = {
                     barAction(Control.Add, R.drawable.ic_add_24dp, R.string.action_add_subscription, R.string.acc_add_subscription) { edit(Control.Add) }
                     barAction(Control.Update, R.drawable.ic_cloud_download_24dp, R.string.title_sub_update, R.string.acc_update_subscriptions) {
-                        open(GroupDialog.Update)
+                        openDialog(Control.Update)
                     }
                 })
             }
@@ -177,54 +171,49 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                         viewModel.move(id, ids[to])
                     }
                     TvSubscriptionRow(group, navigation, move, onEdit = { edit(it, id) },
-                        onShare = { open(GroupDialog.Share, id) }, onDelete = { open(GroupDialog.Delete, id) },
+                        onShare = { openDialog(Control.Share, id) }, onDelete = { openDialog(Control.Delete, id) },
                         onEnable = { viewModel.setEnabled(id, it) })
                 }
             }
         }
 
-        val selected = dialogId?.let { id -> groups.find { it.guid == id } }
-        when (dialog) {
-            GroupDialog.Update -> {
-                val options by viewModel.options.collectAsStateWithLifecycle()
-                val cancel = remember { FocusRequester() }
-                LaunchedEffect(cancel) { requestFocusWhenReady(cancel) }
-                AlertDialog(onDismissRequest = ::close, text = {
-                    SubscriptionUpdateOptions(options, viewModel::setOption, remember { TvSettingsRows(cancel) {} })
-                }, confirmButton = {
-                    TextButton({ close(); viewModel.updateSubscriptions() }, Modifier.dpadFocusOutline(cornerRadius = 24.dp)) {
-                        Text(stringResource(R.string.action_ok))
-                    }
-                }, dismissButton = {
-                    TextButton(::close, Modifier.dpadFocusOutline(cancel, cornerRadius = 24.dp)) { Text(stringResource(R.string.action_cancel)) }
-                })
+        if (dialogOpen && loaded) {
+            val dismiss = { dialogOpen = false }
+            val selected = groupId?.let { id -> groups.find { it.guid == id } }
+            when {
+                control == Control.Update -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
+                    onConfirm = { dismiss(); viewModel.updateSubscriptions() }, onDismiss = dismiss)
+                selected == null -> LaunchedEffect(Unit) { dismiss() }
+                control == Control.Share -> TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) },
+                    onSelected = { dismiss(); shareLink(it, selected.subscription.url) }, onDismiss = dismiss)
+                control == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
+                    itemName = selected.subscription.remarks, onDismiss = dismiss, onConfirm = {
+                        val index = ids.indexOf(selected.guid)
+                        val next = ids.getOrNull(index + 1) ?: ids.getOrNull(index - 1)
+                        returnTo(if (next == null) Control.Add else Control.Group, next)
+                        viewModel.remove(selected.guid)
+                        dismiss()
+                    })
             }
-            GroupDialog.Share, GroupDialog.Delete -> if (selected != null) {
-                if (dialog == GroupDialog.Share) {
-                    TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) }, onSelected = {
-                        close()
-                        when (it) {
-                            SubscriptionShareAction.QRCode -> viewModel.shareQRCode(selected.subscription.url)
-                            SubscriptionShareAction.Clipboard -> copyLink(selected.subscription.url)
-                        }
-                    }, onDismiss = ::close)
-                } else {
-                    TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = selected.subscription.remarks,
-                        onDismiss = ::close, onConfirm = {
-                            val index = ids.indexOf(selected.guid)
-                            groupId = ids.getOrNull(index + 1) ?: ids.getOrNull(index - 1)
-                            control = if (groupId == null) Control.Add else Control.Group
-                            viewModel.remove(selected.guid)
-                            close()
-                        })
-                }
-            } else if (subscriptions != null) {
-                LaunchedEffect(dialogId) { close() }
-            }
-            null -> Unit
         }
         bitmap?.let { TvQRCodeDialog(it, viewModel::dismissQRCode) }
     }
+}
+
+@Composable
+private fun TvUpdateSubscriptionsDialog(
+    options: Set<SubscriptionUpdateOption>, onChange: (SubscriptionUpdateOption, Boolean) -> Unit,
+    onConfirm: () -> Unit, onDismiss: () -> Unit
+) {
+    val cancel = remember { FocusRequester() }
+    LaunchedEffect(cancel) { requestFocusWhenReady(cancel) }
+    AlertDialog(onDismissRequest = onDismiss, text = {
+        SubscriptionUpdateOptions(options, onChange, remember { TvSettingsRows(cancel) {} })
+    }, confirmButton = {
+        TextButton(onConfirm, Modifier.dpadFocusOutline(cornerRadius = 24.dp)) { Text(stringResource(R.string.action_ok)) }
+    }, dismissButton = {
+        TextButton(onDismiss, Modifier.dpadFocusOutline(cancel, cornerRadius = 24.dp)) { Text(stringResource(R.string.action_cancel)) }
+    })
 }
 
 @Composable
