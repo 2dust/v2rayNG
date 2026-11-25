@@ -41,9 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -51,7 +49,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
@@ -62,7 +59,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.AppConfig
@@ -377,13 +373,8 @@ fun ServerCustomConfigScreen(
                 title = EConfigType.CUSTOM.toString(),
                 onBackClick = onBackClick,
                 navigationIcon = if (tvBack != null && tvFocus != null) ({
-                    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
                     IconButton(onClick = onBackClick, modifier = tvFocus.target(tvBack).dpadFocusOutline(cornerRadius = 24.dp)) {
-                        Icon(
-                            painterResource(R.drawable.ic_arrow_back_24dp),
-                            contentDescription = stringResource(R.string.acc_back),
-                            modifier = Modifier.scale(scaleX = if (mirrored) -1f else 1f, scaleY = 1f)
-                        )
+                        Icon(painterResource(R.drawable.ic_tv_arrow_back_24dp), contentDescription = stringResource(R.string.acc_back))
                     }
                 }) else null,
                 actions = {
@@ -429,8 +420,7 @@ fun ServerCustomConfigScreen(
             val remarksLabel = stringResource(R.string.server_lab_remarks)
             if (tvBack != null) {
                 CompositionLocalProvider(LocalTvEditor provides tvBack, LocalEditorFocus provides tvFocus) {
-                    TvEditorTextField(remarksLabel, remarks, { remarks = it }, Modifier, true, KeyboardType.Text,
-                        placeholder = null, maxLines = 5, isError = isRemarksError, supportingText = null)
+                    TvEditorTextField(remarksLabel, remarks, { remarks = it }, isError = isRemarksError, announceValue = true)
                 }
             } else {
                 FormTextField(remarksLabel, remarks, { remarks = it },
