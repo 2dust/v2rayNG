@@ -1,24 +1,17 @@
 package com.v2ray.ang.ui.routing
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,16 +34,13 @@ import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.LocalEditorFocus
-import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.TvEditorForm
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.rememberEditorFocus
-import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
-import com.v2ray.ang.ui.compose.verticalScrollbar
 
 class TvRoutingEditActivity : BaseRoutingEditActivity() {
     @Composable
@@ -69,8 +59,6 @@ private fun TvRoutingRuleEditor(
     val save = remember { FocusRequester() }
     val focus = rememberEditorFocus(fallback = back)
     val order = if (form.initial == null) listOf(back, save) else listOf(back, delete, save)
-    val scroll = rememberScrollState()
-    val ime = rememberTvEditorIme()
     val outbounds = remember(form.outbounds) { (BUILTIN_OUTBOUND_TAGS + form.outbounds).toList() }
     var showDelete by rememberSaveable { mutableStateOf(false) }
     var returnToDelete by remember { mutableStateOf(false) }
@@ -105,20 +93,12 @@ private fun TvRoutingRuleEditor(
             )
         }
     ) { innerPadding ->
-        CompositionLocalProvider(LocalTvEditor provides back, LocalEditorFocus provides focus) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).consumeWindowInsets(innerPadding)
-                    .then(ime.padding).padding(horizontal = 48.dp).verticalScroll(scroll).verticalScrollbar(scroll)
-                    .padding(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                RoutingRuleFields(
-                    draft, form.canUseProcess, remarksError,
-                    locked = { label -> TvRoutingLock(label, draft.locked.value, { draft.locked.value = it }, back) },
-                    outbound = { label -> TvRoutingOutboundField(label, draft.outboundTag.value, outbounds, { draft.outboundTag.value = it }, back) }
-                )
-                NavigationBarsSpacer()
-            }
+        TvEditorForm(innerPadding, back, focus) {
+            RoutingRuleFields(
+                draft, form.canUseProcess, remarksError,
+                locked = { label -> TvRoutingLock(label, draft.locked.value, { draft.locked.value = it }, back) },
+                outbound = { label -> TvRoutingOutboundField(label, draft.outboundTag.value, outbounds, { draft.outboundTag.value = it }, back) }
+            )
         }
         if (showDelete) {
             TvDeleteConfirmDialog(
