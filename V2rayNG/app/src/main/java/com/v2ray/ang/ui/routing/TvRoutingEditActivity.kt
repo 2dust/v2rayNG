@@ -40,14 +40,14 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
-import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
+import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.compose.verticalScrollbar
@@ -67,7 +67,7 @@ private fun TvRoutingRuleEditor(
     val back = remember { FocusRequester() }
     val delete = remember { FocusRequester() }
     val save = remember { FocusRequester() }
-    val focus = rememberOutboundEditorFocus(fallback = back)
+    val focus = rememberEditorFocus(fallback = back)
     val order = if (form.initial == null) listOf(back, save) else listOf(back, delete, save)
     val scroll = rememberScrollState()
     val ime = rememberTvEditorIme()
@@ -105,7 +105,7 @@ private fun TvRoutingRuleEditor(
             )
         }
     ) { innerPadding ->
-        CompositionLocalProvider(LocalTvEditor provides back, LocalOutboundEditorFocus provides focus) {
+        CompositionLocalProvider(LocalTvEditor provides back, LocalEditorFocus provides focus) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).consumeWindowInsets(innerPadding)
                     .then(ime.padding).padding(horizontal = 48.dp).verticalScroll(scroll).verticalScrollbar(scroll)
@@ -135,7 +135,7 @@ private fun TvRoutingRuleEditor(
 private fun TvRoutingLock(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, back: FocusRequester) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+            .then(LocalEditorFocus.current?.target() ?: Modifier)
             .focusProperties { start = back }.dpadFocusOutline()
             .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
             .heightIn(min = 48.dp).padding(horizontal = 16.dp),

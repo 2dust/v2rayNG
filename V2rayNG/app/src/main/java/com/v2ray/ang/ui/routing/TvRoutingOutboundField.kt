@@ -45,7 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.TvIconButton
@@ -73,7 +73,7 @@ internal fun TvRoutingOutboundField(label: String, value: String, options: List<
     OutlinedButton(
         onClick = { open = true },
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            .then(LocalOutboundEditorFocus.current?.target(anchor) ?: Modifier)
+            .then(LocalEditorFocus.current?.target(anchor) ?: Modifier)
             .focusProperties { start = back }.dpadFocusOutline(cornerRadius = 24.dp)
             .semantics { stateDescription = value }
     ) {
@@ -133,7 +133,7 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
             Column(Modifier.then(ime.padding), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Keep dialog focus out of the editor's saved focus registry.
-                    CompositionLocalProvider(LocalOutboundEditorFocus provides null, LocalTvEditor provides cancel) {
+                    CompositionLocalProvider(LocalEditorFocus provides null, LocalTvEditor provides cancel) {
                         TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
                             Modifier.weight(1f).target("search"), true, KeyboardType.Text, null, 1, false, null)
                     }

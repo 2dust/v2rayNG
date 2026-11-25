@@ -24,7 +24,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.apppicker.AppPickerActivity
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.TvEditorDropdown
 import com.v2ray.ang.ui.compose.TvEditorTextField
@@ -91,7 +91,7 @@ private fun RoutingProcessPicker(draft: RoutingRuleDraft) {
         Modifier.padding(start = 16.dp)
     } else {
         Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+            .then(LocalEditorFocus.current?.target() ?: Modifier)
             .focusProperties { start = back }
             .dpadFocusOutline(cornerRadius = 24.dp)
     }
