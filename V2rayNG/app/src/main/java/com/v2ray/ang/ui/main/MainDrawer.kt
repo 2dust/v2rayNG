@@ -48,7 +48,7 @@ enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRe
     About(R.drawable.ic_about_24dp, R.string.title_about)
 }
 
-private val primaryDrawerItems = listOf(
+internal val primaryDrawerItems = listOf(
     MainDestination.Subscriptions,
     MainDestination.PerAppProxy,
     MainDestination.Routing,
@@ -73,7 +73,7 @@ internal fun mainDrawerItems(
         MainDestination.About
     )
 
-private val drawerItems = mainDrawerItems(
+internal val drawerItems = mainDrawerItems(
     updateCheckEnabled = BuildConfig.UPDATE_CHECK_ENABLED,
     promotionEnabled = BuildConfig.PROMOTION_ENABLED,
 )
