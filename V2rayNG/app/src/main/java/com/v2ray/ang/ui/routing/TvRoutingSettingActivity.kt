@@ -1,28 +1,21 @@
 package com.v2ray.ang.ui.routing
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,18 +26,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,7 +43,8 @@ import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.ItemDivider
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvIconButton
-import com.v2ray.ang.ui.compose.colorConfigType
+import com.v2ray.ang.ui.compose.TvListRowSwitch
+import com.v2ray.ang.ui.compose.tvListRowDecoration
 import com.v2ray.ang.ui.compose.dpadClickable
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
@@ -300,32 +289,15 @@ private fun TvRoutingRuleRow(
     moving: Boolean, movement: DpadReorderItem?, onEdit: () -> Unit, onEnable: (Boolean) -> Unit, onDelete: () -> Unit
 ) {
     var rowFocused by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(16.dp)
-    val decoration = when {
-        moving -> Modifier.shadow(12.dp, shape).background(MaterialTheme.colorScheme.surfaceContainerHigh, shape).border(2.dp, colorConfigType, shape)
-        rowFocused -> Modifier.background(MaterialTheme.colorScheme.primaryContainer, shape).border(2.dp, MaterialTheme.colorScheme.primary, shape)
-        else -> Modifier
-    }
-    Row(Modifier.fillMaxWidth().then(decoration).padding(end = 8.dp),
+    Row(Modifier.fillMaxWidth().tvListRowDecoration(rowFocused, moving).padding(end = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
         RoutingRuleSummary(rule, Modifier.weight(1f).heightIn(min = 56.dp)
             .then(navigation(RoutingControl.Rule)).focusRequester(targets.getValue(RoutingControl.Rule))
             .onFocusChanged { rowFocused = it.isFocused }
             .then(if (movement == null) Modifier.focusable() else Modifier.dpadLongPressToMove(movement, onEdit))
             .padding(horizontal = 16.dp, vertical = 10.dp))
-        var toggleFocused by remember { mutableStateOf(false) }
-        val label = stringResource(R.string.routing_settings_enable_rule)
-        Row(navigation(RoutingControl.Enable).heightIn(min = 48.dp).dpadFocusOutline(targets.getValue(RoutingControl.Enable), cornerRadius = 24.dp)
-            .onFocusChanged { toggleFocused = it.isFocused }
-            .toggleable(rule.enabled == true, role = Role.Switch, onValueChange = onEnable)
-            .semantics(mergeDescendants = true) { contentDescription = label }
-            .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Switch(rule.enabled == true, onCheckedChange = null, modifier = Modifier.scale(0.65f))
-            if (toggleFocused) {
-                Spacer(Modifier.width(8.dp))
-                Text(label, Modifier.clearAndSetSemantics {}, style = MaterialTheme.typography.labelLarge, maxLines = 1)
-            }
-        }
+        TvListRowSwitch(stringResource(R.string.routing_settings_enable_rule), rule.enabled == true, onEnable,
+            navigation(RoutingControl.Enable).focusRequester(targets.getValue(RoutingControl.Enable)))
         TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), onEdit, navigation(RoutingControl.Edit),
             focusRequester = targets.getValue(RoutingControl.Edit), contentDescription = stringResource(R.string.acc_edit))
         TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete, navigation(RoutingControl.Delete),
