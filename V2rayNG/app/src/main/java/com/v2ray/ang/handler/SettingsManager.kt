@@ -32,6 +32,19 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.random.Random
 
+/** Duplicate remarks resolve to the first stored profile, just as in a single lookup. */
+internal fun Sequence<ProfileEntry>.firstByRemarks(remarks: Collection<String>): Map<String, ProfileEntry> {
+    val remaining = remarks.toMutableSet().apply { remove("") }
+    if (remaining.isEmpty()) return emptyMap()
+    return buildMap {
+        for (entry in this@firstByRemarks) {
+            val name = entry.profile.remarks
+            if (remaining.remove(name)) put(name, entry)
+            if (remaining.isEmpty()) break
+        }
+    }
+}
+
 object SettingsManager {
 
     @Volatile
@@ -202,20 +215,15 @@ object SettingsManager {
         return exist == true
     }
 
-    /**
-     * Get server via remarks.
-     * @param remarks The remarks of the server.
-     * @return The ProfileItem.
-     */
-    fun getProfileEntryViaRemarks(remarks: String?): ProfileEntry? {
-        if (remarks.isNullOrEmpty()) {
-            return null
-        }
-        val serverList = decodeAllServerList()
-        return serverList
-            .mapNotNull { guid -> decodeServerConfig(guid)?.let { ProfileEntry(guid, it) } }
-            .firstOrNull { it.profile.remarks == remarks }
-    }
+    /** Return the first profile in storage order with exactly these remarks. */
+    fun getProfileEntryViaRemarks(remarks: String?): ProfileEntry? =
+        if (remarks.isNullOrEmpty()) null else storedProfileEntries().firstOrNull { it.profile.remarks == remarks }
+
+    internal fun getProfileEntriesViaRemarks(remarks: Collection<String>): Map<String, ProfileEntry> =
+        storedProfileEntries().firstByRemarks(remarks)
+
+    private fun storedProfileEntries(): Sequence<ProfileEntry> =
+        decodeAllServerList().asSequence().mapNotNull { guid -> decodeServerConfig(guid)?.let { ProfileEntry(guid, it) } }
 
     /**
      * Collects non-empty profile remarks while excluding specific config types.
