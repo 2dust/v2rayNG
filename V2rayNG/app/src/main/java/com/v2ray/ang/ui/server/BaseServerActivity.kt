@@ -2,7 +2,6 @@ package com.v2ray.ang.ui.server
 
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreOutboundBuilder
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -460,23 +458,11 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             toast(R.string.server_lab_final_mask)
             return false
         }
-        CoreOutboundBuilder.validateXdrive(config)?.let { issue ->
-            toast(xdriveIssueMessage(issue))
+        if (!config.xdriveExtra.isNullOrBlank() && JsonUtil.parseString(config.xdriveExtra) == null) {
+            toast(R.string.server_lab_xdrive_extra)
             return false
         }
         return true
-    }
-
-    @StringRes
-    private fun xdriveIssueMessage(issue: CoreOutboundBuilder.XdriveIssue): Int = when (issue) {
-        CoreOutboundBuilder.XdriveIssue.NOT_VLESS -> R.string.toast_xdrive_vless_only
-        CoreOutboundBuilder.XdriveIssue.MISSING_ENCRYPTION -> R.string.toast_xdrive_need_encryption
-        CoreOutboundBuilder.XdriveIssue.FLOW_UNSUPPORTED -> R.string.toast_xdrive_flow_unsupported
-        CoreOutboundBuilder.XdriveIssue.UNKNOWN_SERVICE -> R.string.server_lab_xdrive_service
-        CoreOutboundBuilder.XdriveIssue.INVALID_EXTRA -> R.string.server_lab_xdrive_extra
-        CoreOutboundBuilder.XdriveIssue.INVALID_SECRETS -> R.string.toast_xdrive_invalid_secrets
-        CoreOutboundBuilder.XdriveIssue.MISSING_S3 -> R.string.toast_xdrive_missing_s3
-        CoreOutboundBuilder.XdriveIssue.MISSING_TEMPLATE -> R.string.toast_xdrive_missing_template
     }
 
     protected fun saveServer(state: ServerUiState): Boolean {

@@ -426,46 +426,6 @@ object CoreOutboundBuilder {
         return request
     }
 
-    /** Reasons an xdrive profile cannot produce a config that Xray-core accepts. */
-    enum class XdriveIssue {
-        NOT_VLESS,
-        MISSING_ENCRYPTION,
-        FLOW_UNSUPPORTED,
-        UNKNOWN_SERVICE,
-        INVALID_EXTRA,
-        INVALID_SECRETS,
-        MISSING_S3,
-        MISSING_TEMPLATE,
-    }
-
-    /**
-     * Checks the client-side requirements Xray-core enforces for the xdrive transport
-     * (infra/conf/xray.go validateXDrive and XDriveConfig.Build).
-     *
-     * @return the first problem found, or null when the profile is usable or not xdrive.
-     */
-    fun validateXdrive(profileItem: ProfileItem): XdriveIssue? {
-        if (profileItem.network != NetworkType.XDRIVE.type) return null
-        if (profileItem.configType != EConfigType.VLESS) return XdriveIssue.NOT_VLESS
-        val encryption = profileItem.method?.trim()
-        if (encryption.isNullOrEmpty() || encryption == "none") return XdriveIssue.MISSING_ENCRYPTION
-        if (profileItem.flow.isNotNullEmpty()) return XdriveIssue.FLOW_UNSUPPORTED
-        val settings = buildXdriveSettings(profileItem) ?: return XdriveIssue.INVALID_EXTRA
-        val secrets = settings.secrets.orEmpty()
-        return when (settings.service) {
-            AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE -> if (secrets.size != 3) XdriveIssue.INVALID_SECRETS else null
-            AppConfig.XDRIVE_SERVICE_S3 -> when {
-                settings.s3 == null -> XdriveIssue.MISSING_S3
-                secrets.size !in 2..3 || secrets.any { it.isEmpty() } -> XdriveIssue.INVALID_SECRETS
-                else -> null
-            }
-
-            AppConfig.XDRIVE_SERVICE_TEMPLATE -> if (settings.template == null) XdriveIssue.MISSING_TEMPLATE else null
-            AppConfig.XDRIVE_SERVICE_LOCAL -> null
-            else -> XdriveIssue.UNKNOWN_SERVICE
-        }
-    }
-
     /**
      * Builds `xdriveSettings` from a profile.
      *

@@ -145,12 +145,6 @@
     <string name="server_lab_xdrive_remote_folder">xdrive 遠端資料夾</string>
     <string name="server_lab_xdrive_secrets">xdrive 金鑰，以逗號分隔 (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
     <string name="server_lab_xdrive_extra">xdrive Extra 原始 JSON，格式： { XDriveObject } (s3, template, xmux…)</string>
-    <string name="toast_xdrive_vless_only">xdrive 傳輸僅支援 VLESS</string>
-    <string name="toast_xdrive_need_encryption">xdrive 傳輸需要 VLESS 加密 (在伺服器執行 \"xray vlessenc\")</string>
-    <string name="toast_xdrive_flow_unsupported">xdrive 傳輸不支援 VLESS 流量控制 (flow)</string>
-    <string name="toast_xdrive_invalid_secrets">xdrive 金鑰無效：Google Drive 需要 3 個，S3 需要 2 或 3 個</string>
-    <string name="toast_xdrive_missing_s3">服務 \"s3\" 需要在 xdrive Extra 中提供 \"s3\" 物件</string>
-    <string name="toast_xdrive_missing_template">服務 \"template\" 需要在 xdrive Extra 中提供 \"template\" 物件</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>

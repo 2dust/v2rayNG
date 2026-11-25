@@ -1,7 +1,6 @@
 package com.v2ray.ang.core
 
 import com.google.gson.JsonParser
-import com.v2ray.ang.core.CoreOutboundBuilder.XdriveIssue
 import com.v2ray.ang.dto.V2rayConfig.OutboundBean
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -114,38 +113,6 @@ class CoreOutboundBuilderXdriveTest {
 
         assertEquals("xdrive", stream.network)
         assertNull(stream.xdriveSettings)
-    }
-
-    @Test
-    fun validateAcceptsUsableProfilesAndIgnoresOtherTransports() {
-        assertNull(CoreOutboundBuilder.validateXdrive(ProfileItem.create(EConfigType.VMESS).apply { network = "ws" }))
-        assertNull(CoreOutboundBuilder.validateXdrive(xdrive()))
-        assertNull(CoreOutboundBuilder.validateXdrive(xdrive(service = "local", secrets = null)))
-        assertNull(CoreOutboundBuilder.validateXdrive(xdrive(service = "s3", secrets = "AK,SK,TOKEN", extra = """{"s3":{"bucket":"b"}}""")))
-        assertNull(CoreOutboundBuilder.validateXdrive(xdrive(service = "template", secrets = null, extra = """{"template":{}}""")))
-    }
-
-    @Test
-    fun validateReportsEveryCoreRequirement() {
-        assertEquals(XdriveIssue.NOT_VLESS, CoreOutboundBuilder.validateXdrive(xdrive(configType = EConfigType.TROJAN)))
-        assertEquals(XdriveIssue.MISSING_ENCRYPTION, CoreOutboundBuilder.validateXdrive(xdrive(encryption = "none")))
-        assertEquals(XdriveIssue.MISSING_ENCRYPTION, CoreOutboundBuilder.validateXdrive(xdrive(encryption = " ")))
-        assertEquals(XdriveIssue.MISSING_ENCRYPTION, CoreOutboundBuilder.validateXdrive(xdrive(encryption = null)))
-        assertEquals(XdriveIssue.FLOW_UNSUPPORTED, CoreOutboundBuilder.validateXdrive(xdrive(flow = "xtls-rprx-vision")))
-        assertEquals(XdriveIssue.INVALID_EXTRA, CoreOutboundBuilder.validateXdrive(xdrive(extra = "{")))
-        assertEquals(XdriveIssue.UNKNOWN_SERVICE, CoreOutboundBuilder.validateXdrive(xdrive(service = "dropbox")))
-        assertEquals(XdriveIssue.INVALID_SECRETS, CoreOutboundBuilder.validateXdrive(xdrive(secrets = "id,secret")))
-        assertEquals(XdriveIssue.INVALID_SECRETS, CoreOutboundBuilder.validateXdrive(xdrive(secrets = null)))
-        assertEquals(XdriveIssue.MISSING_S3, CoreOutboundBuilder.validateXdrive(xdrive(service = "s3", secrets = "AK,SK")))
-        assertEquals(
-            XdriveIssue.INVALID_SECRETS,
-            CoreOutboundBuilder.validateXdrive(xdrive(service = "s3", secrets = "AK", extra = """{"s3":{}}"""))
-        )
-        assertEquals(
-            XdriveIssue.INVALID_SECRETS,
-            CoreOutboundBuilder.validateXdrive(xdrive(service = "s3", extra = """{"s3":{},"secrets":["AK",""]}""", secrets = null))
-        )
-        assertEquals(XdriveIssue.MISSING_TEMPLATE, CoreOutboundBuilder.validateXdrive(xdrive(service = "template")))
     }
 
     @Test

@@ -287,11 +287,8 @@ object AppConfig {
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
 
-    /** Storage services accepted by the Xray-core xdrive transport ("service" field). */
+    /** Default storage service of the Xray-core xdrive transport ("service" field). */
     const val XDRIVE_SERVICE_GOOGLE_DRIVE = "google-drive"
-    const val XDRIVE_SERVICE_S3 = "s3"
-    const val XDRIVE_SERVICE_TEMPLATE = "template"
-    const val XDRIVE_SERVICE_LOCAL = "local"
 
     const val UNIDENTIFIED_PACKAGE = "__unknown_app__"
 
