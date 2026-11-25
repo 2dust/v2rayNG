@@ -193,6 +193,24 @@ internal class TvAppListFocus(
     fun focusAt(index: Int): Boolean = packages.getOrNull(index)?.let(::focus) == true
 }
 
+// Capture the last user target before the recreated window assigns its own initial focus.
+@Composable
+internal fun TvAppListFocus.RestoreFocus(
+    packageName: String?, fallback: FocusRequester, loading: Boolean, dialogOpen: Boolean = false
+) {
+    val initialPackage = remember { packageName }
+    val initialFallback = remember { fallback }
+    // An open dialog owns focus and will return to its own opener.
+    var pending by remember { mutableStateOf(!dialogOpen) }
+    LaunchedEffect(this, loading, dialogOpen) {
+        if (dialogOpen) pending = false
+        if (pending && (initialPackage == null || !loading || initialPackage in targets)) {
+            if (initialPackage?.let(::focus) != true) requestFocusWhenReady(initialFallback)
+            pending = false
+        }
+    }
+}
+
 @Composable
 internal fun rememberTvAppListFocus(apps: List<AppInfo>): TvAppListFocus {
     val scroll = rememberLazyListState()

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,10 +17,10 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.compose.TvAppMenuAction
 import com.v2ray.ang.ui.compose.TvAppSelectionList
+import com.v2ray.ang.ui.compose.RestoreFocus
 import com.v2ray.ang.ui.compose.TvAppSelectionToolbar
 import com.v2ray.ang.ui.compose.rememberTvAppListFocus
 import com.v2ray.ang.ui.compose.rememberTvAppSearch
-import com.v2ray.ang.ui.compose.requestFocusWhenReady
 
 class TvAppPickerActivity : BaseAppPickerActivity() {
     @Composable
@@ -41,16 +40,7 @@ private fun TvAppPickerScreen(title: String, apps: List<AppInfo>, isLoading: Boo
         )
     }
     var focusedPackage by rememberSaveable { mutableStateOf<String?>(null) }
-    val initialPackage = remember { focusedPackage }
-    val initialToolbarTarget = remember { search.toolbarRestoreTarget }
-    var needsInitialFocus by remember { mutableStateOf(true) }
-
-    LaunchedEffect(isLoading, appFocus) {
-        if (needsInitialFocus && (initialPackage == null || !isLoading || initialPackage in appFocus.targets)) {
-            if (initialPackage?.let(appFocus::focus) != true) requestFocusWhenReady(initialToolbarTarget)
-            needsInitialFocus = false
-        }
-    }
+    appFocus.RestoreFocus(focusedPackage, search.toolbarRestoreTarget, isLoading)
 
     Scaffold(
         topBar = {
