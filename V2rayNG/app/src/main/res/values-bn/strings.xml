@@ -248,6 +248,9 @@
     <string name="title_pref_domestic_dns">সরাসরি DNS (ঐচ্ছিক)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
+    <string name="title_pref_dns_validate_region">Validate Region</string>
+    <string name="summary_pref_dns_validate_region">Check the region of local DNS results and fall back to remote DNS on mismatch.</string>
+
     <string name="title_pref_dns_hosts">DNS হোস্ট ম্যাপিং (বিন্যাস: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
 

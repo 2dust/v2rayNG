@@ -248,6 +248,9 @@
     <string name="title_pref_domestic_dns">直连 DNS（可选）</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
+    <string name="title_pref_dns_validate_region">校验地区</string>
+    <string name="summary_pref_dns_validate_region">校验本地 DNS 结果的归属地区，不符时使用远程 DNS。</string>
+
     <string name="title_pref_dns_hosts">DNS 主机映射（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain: address,…</string>
 
