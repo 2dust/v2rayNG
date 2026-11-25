@@ -157,6 +157,10 @@
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
+            android:name=".ui.routing.TvRoutingEditActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:exported="false" />
+        <activity
             android:name=".ui.subscription.SubSettingActivity"
             android:exported="false" />
         <activity
