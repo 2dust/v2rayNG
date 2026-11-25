@@ -52,6 +52,7 @@ import com.v2ray.ang.ui.compose.AppDivider
 import com.v2ray.ang.ui.compose.TvAppMenuAction
 import com.v2ray.ang.ui.compose.TvAppSelectionList
 import com.v2ray.ang.ui.compose.RestoreFocus
+import com.v2ray.ang.ui.compose.RestoreTvDialogOpener
 import com.v2ray.ang.ui.compose.TvAppSelectionToolbar
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
@@ -86,14 +87,8 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
     var focusedPackage by rememberSaveable { mutableStateOf<String?>(null) }
     var focusedMode by rememberSaveable { mutableStateOf<ModeControl?>(null) }
     var showInfo by rememberSaveable { mutableStateOf(false) }
-    var returnToInfo by remember { mutableStateOf(false) }
+    RestoreTvDialogOpener(showInfo, info)
     appFocus.RestoreFocus(focusedPackage, focusedMode?.let(modes::get) ?: search.toolbarRestoreTarget, state.isLoading, showInfo)
-    LaunchedEffect(returnToInfo) {
-        if (returnToInfo) {
-            requestFocusWhenReady(info)
-            returnToInfo = false
-        }
-    }
 
     @Composable
     fun modeNavigation(control: ModeControl): Modifier = Modifier
@@ -152,10 +147,7 @@ private fun TvPerAppProxyScreen(state: PerAppProxyState, actions: PerAppProxyAct
         }
     }
     if (showInfo) {
-        TvPerAppInfoDialog {
-            showInfo = false
-            returnToInfo = true
-        }
+        TvPerAppInfoDialog { showInfo = false }
     }
 }
 
