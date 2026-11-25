@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -355,6 +356,7 @@ internal fun UserAssetScreen(
                 UserAssetItem(
                     item = item,
                     fileMetadata = fileMetadata[item.guid],
+                    isDownloading = uiState.downloadingItem == item.assetUrl.remarks,
                     focusTargets = rowFocusTargets.getValue(item.guid),
                     requestRowFocus = requestRowFocus,
                     previousFocusTargets = assets.getOrNull(index - 1)?.let { rowFocusTargets[it.guid] },
@@ -388,6 +390,7 @@ internal fun UserAssetScreen(
 private fun UserAssetItem(
     item: AssetUrlCache,
     fileMetadata: AssetFileMetadata?,
+    isDownloading: Boolean,
     focusTargets: UserAssetRowFocusTargets,
     requestRowFocus: (FocusRequester) -> Boolean,
     previousFocusTargets: UserAssetRowFocusTargets?,
@@ -436,6 +439,15 @@ private fun UserAssetItem(
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            if (isDownloading) {
+                Spacer(modifier = Modifier.height(4.dp))
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
         if (showEditButton) {
             AppIconButton(

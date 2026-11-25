@@ -331,8 +331,7 @@ fun SettingsSwitchItem(
 ) {
     val isTelevision = isTelevisionDevice()
     val tvEditor = LocalTvEditor.current
-    val editorFocus = LocalOutboundEditorFocus.current
-    val focusModifier = editorFocus?.target() ?: Modifier
+    val focusModifier = Modifier.editorFocusTarget()
     SettingsItemRow(
         icon = icon,
         title = title,

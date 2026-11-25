@@ -36,6 +36,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
+@Composable
+internal fun Modifier.editorFocusTarget(): Modifier =
+    then(LocalOutboundEditorFocus.current?.target() ?: LocalEditorFocus.current?.target() ?: Modifier)
+
 @Stable
 private class FormDropdownState {
     var expanded by mutableStateOf(false)
@@ -112,7 +116,7 @@ fun FormTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(tvFieldState?.let { Modifier.tvTextFieldEditorFocus(it) } ?: Modifier)
-                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+                .editorFocusTarget()
         )
     }
 }
@@ -301,7 +305,7 @@ private fun PhoneOrEditableFormDropdownField(
                 )
             ),
             modifier = Modifier
-                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+                .editorFocusTarget()
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable
