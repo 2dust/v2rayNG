@@ -62,8 +62,6 @@ internal class TvAppSearchState(
     val toolbarEntry get() = if (isOpen) input else back
     val toolbarOrder get() = TvAppToolbarControl.visible(isOpen, query.isNotEmpty()).map(::requester)
     val toolbarRestoreTarget get() = requester(TvAppToolbarControl.restore(focusedControl.value, isOpen, query.isNotEmpty()))
-    var editOnOpen by mutableStateOf(false)
-        private set
 
     fun requester(control: TvAppToolbarControl): FocusRequester = targets.getValue(control)
 
@@ -72,7 +70,6 @@ internal class TvAppSearchState(
     }
 
     fun open() {
-        editOnOpen = true
         expanded.value = true
     }
 
@@ -121,7 +118,7 @@ internal fun TvAppSelectionToolbar(
             title = title, onBackClick = onBack, isLoading = isLoading,
             titleContent = if (search.isOpen) ({
                 TvTopBarSearchField(search.query, search::updateQuery, search.input, clear, order, onMoveDown,
-                    editOnEntry = search.editOnOpen, onFocused = search::onToolbarFocused)
+                    focusTarget = { trackFocus(it) })
             }) else null,
             navigationIcon = {
                 TvIconButton(

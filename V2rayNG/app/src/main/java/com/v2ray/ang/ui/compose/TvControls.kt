@@ -26,7 +26,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -130,20 +130,21 @@ internal fun TvTopBarSearchField(
     clearFocusRequester: FocusRequester,
     focusOrder: List<FocusRequester>,
     onMoveDown: () -> Boolean,
-    editOnEntry: Boolean = true,
-    onFocused: ((FocusRequester) -> Unit)? = null
+    focusTarget: @Composable (FocusRequester) -> Modifier = { Modifier }
 ) {
-    val state = rememberTvTextFieldState(focusRequester)
-    LaunchedEffect(state) { if (editOnEntry) state.beginEditing() }
-    val inputFocusObserver = onFocused?.let { notify ->
-        Modifier.onFocusChanged { if (it.hasFocus) notify(focusRequester) }
-    } ?: Modifier
+    val state = rememberTvTextFieldState(focusRequester, initiallyEditing = true)
+    var input by rememberEditorTextValue(query, state)
+    val target = focusTarget(focusRequester)
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.weight(1f).then(inputFocusObserver).tvSearchFieldFocus(state, focusOrder, onMoveDown)) {
+        Box(Modifier.weight(1f).then(if (state.isEditing) Modifier else target).tvSearchFieldFocus(state, focusOrder, onMoveDown)) {
             OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier.fillMaxWidth().tvTextFieldEditorFocus(state),
+                value = input.copy(text = query),
+                onValueChange = {
+                    input = it
+                    if (it.text != query) onQueryChange(it.text)
+                },
+                modifier = Modifier.fillMaxWidth().then(if (state.isEditing) target.focusRequester(focusRequester) else Modifier)
+                    .tvTextFieldEditorFocus(state),
                 readOnly = !state.isEditing,
                 singleLine = true,
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp),
@@ -166,14 +167,11 @@ internal fun TvTopBarSearchField(
             )
         }
         if (query.isNotEmpty()) {
-            val clearFocusObserver = onFocused?.let { notify ->
-                Modifier.onFocusChanged { if (it.isFocused) notify(clearFocusRequester) }
-            } ?: Modifier
             TvIconButton(
                 icon = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
                 label = stringResource(R.string.action_clear),
                 focusRequester = clearFocusRequester,
-                modifier = clearFocusObserver.dpadTopBarFocusNavigation(clearFocusRequester, focusOrder, onMoveDown),
+                modifier = focusTarget(clearFocusRequester).dpadTopBarFocusNavigation(clearFocusRequester, focusOrder, onMoveDown),
                 onClick = {
                     onQueryChange("")
                     focusRequester.requestFocus()
