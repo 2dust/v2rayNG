@@ -8,7 +8,6 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 
@@ -18,10 +17,7 @@ class ServerVlessActivity : BaseServerActivity() {
 
     @Composable
     override fun ScreenContent() {
-        // xdrive is offered for VLESS only: Xray-core rejects it with every other protocol.
-        val options = rememberFieldOptions().let {
-            it.copy(networkOptions = it.networkOptions + NetworkType.XDRIVE.type)
-        }
+        val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(

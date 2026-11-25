@@ -29,6 +29,7 @@
         <item>xhttp</item>
         <item>h2</item>
         <item>grpc</item>
+        <item>xdrive</item>
     </string-array>
 
     <string-array name="xdrive_service" translatable="false">
