@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileEntry
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.ensureUniqueIds
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
@@ -120,6 +121,7 @@ object SettingsManager {
         }
 
         rulesetNew.addAll(rulesetList)
+        rulesetNew.ensureUniqueIds()
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
