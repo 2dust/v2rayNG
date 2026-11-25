@@ -1,23 +1,16 @@
 package com.v2ray.ang.ui.subscription
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,8 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -40,7 +31,6 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -54,8 +44,9 @@ import com.v2ray.ang.ui.compose.DpadReorderItem
 import com.v2ray.ang.ui.compose.TvActionDialog
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvIconButton
+import com.v2ray.ang.ui.compose.TvListRowSwitch
+import com.v2ray.ang.ui.compose.tvListRowDecoration
 import com.v2ray.ang.ui.compose.TvQRCodeDialog
-import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
@@ -225,13 +216,7 @@ private fun TvSubscriptionRow(
 ) {
     val moving = move.state.isMoving(move.key)
     var focused by remember { mutableStateOf(false) }
-    val shape = RoundedCornerShape(16.dp)
-    val decoration = when {
-        moving -> Modifier.shadow(12.dp, shape).background(MaterialTheme.colorScheme.surfaceContainerHigh, shape).border(2.dp, colorConfigType, shape)
-        focused -> Modifier.background(MaterialTheme.colorScheme.primaryContainer, shape).border(2.dp, MaterialTheme.colorScheme.primary, shape)
-        else -> Modifier
-    }
-    Row(Modifier.fillMaxWidth().zIndex(if (moving) 1f else 0f).then(decoration).padding(end = 8.dp),
+    Row(Modifier.fillMaxWidth().zIndex(if (moving) 1f else 0f).tvListRowDecoration(focused, moving).padding(end = 8.dp),
         verticalAlignment = Alignment.CenterVertically) {
         for (slot in group.rowControls()) key(slot) {
             val modifier = navigation(slot)
@@ -247,22 +232,9 @@ private fun TvSubscriptionRow(
                     modifier, contentDescription = stringResource(R.string.acc_edit))
                 Control.Delete -> TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete,
                     modifier, contentDescription = stringResource(R.string.acc_delete))
-                Control.Enable -> TvSubscriptionSwitch(group.enabled, onEnable, modifier)
+                Control.Enable -> TvListRowSwitch(stringResource(R.string.sub_setting_enable), group.enabled, onEnable, modifier)
                 else -> error("Not a subscription row control: $slot")
             }
         }
-    }
-}
-
-@Composable
-private fun TvSubscriptionSwitch(enabled: Boolean, onEnable: (Boolean) -> Unit, modifier: Modifier) {
-    val label = stringResource(R.string.sub_setting_enable)
-    var focused by remember { mutableStateOf(false) }
-    Row(modifier.heightIn(min = 48.dp).dpadFocusOutline(cornerRadius = 24.dp)
-        .onFocusChanged { focused = it.isFocused }.semantics(mergeDescendants = true) { contentDescription = label }
-        .toggleable(enabled, role = Role.Switch, onValueChange = onEnable)
-        .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Switch(enabled, onCheckedChange = null, modifier = Modifier.scale(0.65f))
-        if (focused) Text(label, Modifier.padding(start = 8.dp).clearAndSetSemantics {}, style = MaterialTheme.typography.labelLarge)
     }
 }
