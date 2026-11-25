@@ -48,6 +48,7 @@ import com.v2ray.ang.ui.compose.TvListRowSwitch
 import com.v2ray.ang.ui.compose.tvListRowDecoration
 import com.v2ray.ang.ui.compose.TvQRCodeDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.focusAfterRemoval
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.dpadTopBarFocusNavigation
@@ -181,8 +182,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                     onSelected = { dismiss(); shareLink(it, selected.subscription.url) }, onDismiss = dismiss)
                 control == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
                     itemName = selected.subscription.remarks, onDismiss = dismiss, onConfirm = {
-                        val index = ids.indexOf(selected.guid)
-                        val next = ids.getOrNull(index + 1) ?: ids.getOrNull(index - 1)
+                        val next = focusAfterRemoval(ids, selected.guid)
                         returnTo(if (next == null) Control.Add else Control.Group, next)
                         viewModel.remove(selected.guid)
                         dismiss()

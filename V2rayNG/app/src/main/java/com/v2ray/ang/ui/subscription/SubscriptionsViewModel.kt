@@ -32,6 +32,13 @@ internal data class SubscriptionListState(
     val confirmRemove: Boolean = false
 )
 
+/** Reuse loaded groups only if storage still contains exactly those IDs. */
+internal fun List<SubscriptionCache>.inStoredOrder(ids: List<String>): List<SubscriptionCache>? {
+    if (size != ids.size) return null
+    val byId = associateByTo(mutableMapOf()) { it.guid }
+    return ids.map { byId.remove(it) ?: return null }
+}
+
 class SubscriptionsViewModel(application: Application) : BaseViewModel(application) {
     private var qrCodeJob: Job? = null
     private val _qrCode = MutableStateFlow<Bitmap?>(null)
@@ -103,7 +110,8 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         if (ids.moveGuid(fromId, toId)) {
             MmkvManager.encodeSubsList(ids)
             SettingsChangeManager.makeSetupGroupTab()
-            refreshGroups()
+            val state = _state.value
+            _state.value = state.copy(groups = state.groups?.inStoredOrder(ids) ?: MmkvManager.decodeSubscriptions())
         }
     }
 
