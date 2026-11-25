@@ -467,6 +467,7 @@
     <string name="server_proxy_chain_members_unselected">请为链路中的每一行选择成员</string>
     <string name="server_proxy_chain_members_insufficient">成员数量不足</string>
     <string name="server_proxy_chain_members_invalid">无效的链路成员: %1$s</string>
+    <string name="server_proxy_chain_member_repeated">链路成员重复：%1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">备份 &amp; 还原</string>

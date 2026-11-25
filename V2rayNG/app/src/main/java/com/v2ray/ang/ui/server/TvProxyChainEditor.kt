@@ -37,6 +37,7 @@ import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
+import com.v2ray.ang.ui.compose.focusAfterRemoval
 import com.v2ray.ang.ui.compose.rememberDpadFocusTargets
 import com.v2ray.ang.ui.compose.rememberSyncedDpadReorderState
 import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
@@ -52,14 +53,13 @@ internal fun TvProxyChainEditor(
 ) {
     var returnKey by remember { mutableStateOf<String?>(null) }
     val remove: (String) -> Unit = { key ->
-        val index = memberKeys.indexOf(key)
-        if (index >= 0) {
-            returnKey = memberKeys.getOrNull(index + 1) ?: memberKeys.getOrNull(index - 1) ?: ADD_MEMBER
+        if (key in memberKeys) {
+            returnKey = focusAfterRemoval(memberKeys, key) ?: ADD_MEMBER
             onRemove(key)
         }
     }
-    ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { selected, select, dismiss ->
-        TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), allRemarks, selected, select, dismiss)
+    ProxyChainMemberDialogs(members, memberKeys, allRemarks, remove, onSelect, onClosePicker = { returnKey = it }, picker = { choices, selected, select, dismiss ->
+        TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), choices, selected, select, dismiss)
     }) { pick, requestRemove ->
         TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },
             onBack, onSave, onDelete, { returnKey = onAdd() }, pick, requestRemove, onMove)
@@ -88,7 +88,7 @@ private fun TvProxyChainLayout(
                 onReturned()
             }
         }
-        FormTextField(stringResource(R.string.server_lab_remarks), remarks, onRemarksChange, isError = isRemarksError)
+        FormTextField(stringResource(R.string.server_lab_remarks), remarks, onRemarksChange, isError = isRemarksError, announceValue = true)
         Text(stringResource(R.string.server_proxy_chain_members), modifier = Modifier.padding(start = 16.dp))
         memberKeys.forEachIndexed { index, memberKey ->
             key(memberKey) {

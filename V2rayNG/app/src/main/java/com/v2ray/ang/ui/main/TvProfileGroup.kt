@@ -36,6 +36,7 @@ import com.v2ray.ang.ui.compose.TvReorderableItem
 import com.v2ray.ang.ui.compose.dpadBackNavigation
 import com.v2ray.ang.ui.compose.dpadClickable
 import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.focusAfterRemoval
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.dpadRowActionNavigation
@@ -58,11 +59,7 @@ private class ProfileRowFocus(actions: List<ProfileRowAction>) {
 
 internal data class ProfileReveal(val generation: Int, val guid: String, val doubleColumn: Boolean)
 
-internal fun focusAfterProfileRemoval(keys: List<String>, guid: String): String? {
-    val index = keys.indexOf(guid)
-    if (index < 0) return null
-    return keys.getOrNull(index + 1) ?: keys.getOrNull(index - 1)
-}
+internal fun focusAfterProfileRemoval(keys: List<String>, guid: String): String? = focusAfterRemoval(keys, guid)
 
 @Composable
 internal fun TvProfileGroup(

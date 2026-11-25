@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -24,14 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.settings.TvSettingsSwitchRow
 
 @Composable
 fun PreferenceGroupHeader(title: String, modifier: Modifier = Modifier) {
@@ -246,25 +244,24 @@ fun SettingsSwitchItem(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    val tvEditor = LocalTvEditor.current
-    val editorFocus = LocalOutboundEditorFocus.current
+    LocalTvEditor.current?.let { back ->
+        TvSettingsSwitchRow(title, checked, onCheckedChange, back, modifier.editorFocusTarget(), summary, enabled, icon)
+        return
+    }
     SettingsItemRow(
         icon = icon,
         title = title,
         description = summary,
         enabled = enabled,
-        onClick = if (enabled && tvEditor == null) {
+        onClick = if (enabled) {
             { onCheckedChange(!checked) }
         } else null,
-        modifier = if (tvEditor == null) modifier.then(editorFocus?.target() ?: Modifier) else modifier.dpadFocusOutline(cornerRadius = 8.dp)
-            .then(editorFocus?.target() ?: Modifier)
-            .focusProperties { start = tvEditor }
-            .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange),
+        modifier = modifier.then(LocalEditorFocus.current?.target() ?: Modifier),
         trailing = {
             Switch(
                 checked = checked,
-                onCheckedChange = if (enabled && tvEditor == null) onCheckedChange else null,
-                modifier = Modifier.scale(0.8f).then(if (tvEditor == null) editorFocus?.target() ?: Modifier else Modifier),
+                onCheckedChange = if (enabled) onCheckedChange else null,
+                modifier = Modifier.scale(0.8f).then(LocalEditorFocus.current?.target() ?: Modifier),
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
                     checkedTrackColor = MaterialTheme.colorScheme.secondary

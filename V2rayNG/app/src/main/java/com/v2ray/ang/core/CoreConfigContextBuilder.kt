@@ -186,9 +186,10 @@ object CoreConfigContextBuilder {
         }
 
         try {
+            val entries = SettingsManager.getProfileEntriesViaRemarks(chainRemarks)
             return chainRemarks
                 .asSequence()
-                .mapNotNull { remark -> SettingsManager.getProfileEntryViaRemarks(remark) }
+                .mapNotNull(entries::get)
                 .filter { it.profile.server.isNotNullEmpty() }
                 .filter { Utils.isPureIpAddress(it.profile.server!!) || Utils.isValidUrl(it.profile.server!!) }
                 .filter { !it.profile.configType.isComplexType() }

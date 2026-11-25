@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -36,7 +37,7 @@ internal fun TvEditorDropdown(
     val anchor = remember { FocusRequester() }
     val anchorFocus = LocalEditorFocus.current?.target(anchor) ?: Modifier.focusRequester(anchor)
     val interaction = remember { MutableInteractionSource() }
-    var open by remember { mutableStateOf(false) }
+    var open by rememberSaveable { mutableStateOf(false) }
     RestoreTvDialogOpener(open, anchor)
     val displayValue = optionLabel(value)
     Box(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {

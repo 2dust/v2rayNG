@@ -17,9 +17,26 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
 import com.v2ray.ang.ui.compose.CollapsiblePreferenceGroupHeader as PreferenceGroupHeader
 import com.v2ray.ang.ui.compose.SettingsItemRow
+
+@Composable
+internal fun TvSettingsSwitchRow(
+    title: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, back: FocusRequester, modifier: Modifier = Modifier,
+    summary: String? = null, enabled: Boolean = true, icon: Painter? = null
+) {
+    SettingsItemRow(icon, title, summary, enabled, onClick = null,
+        modifier = modifier.tvSettingsFocusOutline().focusProperties { start = back }
+            .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)) {
+        Switch(checked, onCheckedChange = null, modifier = Modifier.scale(0.8f), enabled = enabled,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                checkedTrackColor = MaterialTheme.colorScheme.secondary
+            ))
+    }
+}
 
 internal class TvSettingsRows(private val back: FocusRequester, private val onRowFocused: (String?) -> Unit) : SettingsRows {
     private val restorableRows = mutableMapOf<String, FocusRequester>()
@@ -39,25 +56,8 @@ internal class TvSettingsRows(private val back: FocusRequester, private val onRo
 
     @Composable
     override fun SettingsSwitchItem(title: String, summary: String?, checked: Boolean, onCheckedChange: (Boolean) -> Unit, enabled: Boolean) {
-        SettingsItemRow(
-            icon = null,
-            title = title,
-            description = summary,
-            enabled = enabled,
-            onClick = null,
-            modifier = rowFocus().toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
-        ) {
-            Switch(
-                checked = checked,
-                onCheckedChange = null,
-                modifier = Modifier.scale(0.8f),
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                    checkedTrackColor = MaterialTheme.colorScheme.secondary
-                ),
-                enabled = enabled
-            )
-        }
+        TvSettingsSwitchRow(title, checked, onCheckedChange, back,
+            Modifier.onFocusChanged { if (it.isFocused) onRowFocused(null) }, summary, enabled)
     }
 
     @Composable

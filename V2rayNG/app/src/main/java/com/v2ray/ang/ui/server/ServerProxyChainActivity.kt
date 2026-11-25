@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.server
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
+import androidx.activity.viewModels
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -58,6 +61,12 @@ import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import com.v2ray.ang.util.LogUtil
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class ServerProxyChainActivity : BaseComponentActivity() {
@@ -71,7 +80,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
     private var isTelevision = false
 
-    private lateinit var allRemarks: List<String>
+    private val profiles by viewModels<GroupEditorProfilesViewModel>()
+    private var pendingSave: Job? = null
     private lateinit var initialRemarks: String
     private lateinit var initialMembers: List<String>
 
@@ -83,14 +93,6 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         }
 
-        allRemarks = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.CUSTOM_OUTBOUND,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
         initialMembers = config?.proxyChainProfileList?.map { it.trim() }?.filter { it.isNotEmpty() } ?: listOf("", "")
@@ -98,6 +100,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
+        val allRemarks = profiles.remarks.collectAsStateWithLifecycle().value ?: return GroupEditorLoading()
         ProxyChainScreen(
             editGuid = editGuid,
             isRunning = isRunning,
@@ -111,43 +114,45 @@ class ServerProxyChainActivity : BaseComponentActivity() {
         )
     }
 
-    private fun saveServer(
-        remarks: String,
-        members: List<String>
-    ): Boolean {
-        if (remarks.isBlank()) {
-            return false
-        }
-
-        val chainMembers = members
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-
-        if (chainMembers.size != members.size) {
+    private fun saveServer(remarks: String, members: List<String>) {
+        if (remarks.isBlank() || pendingSave?.isActive == true) return
+        val chainMembers = members.map(String::trim)
+        if (chainMembers.any(String::isEmpty)) {
             toast(R.string.server_proxy_chain_members_unselected)
-            return false
+            return
         }
-
         if (chainMembers.size < 2) {
             toast(R.string.server_proxy_chain_members_insufficient)
-            return false
+            return
         }
-
-        val invalidMembers = chainMembers.filter { member ->
-            val entry = SettingsManager.getProfileEntryViaRemarks(member)
-            entry == null || entry.profile.configType.isComplexType()
+        firstRepeatedMember(chainMembers)?.let { repeated ->
+            toast(getString(R.string.server_proxy_chain_member_repeated, repeated))
+            return
         }
-
-        if (invalidMembers.isNotEmpty()) {
-            toast(
-                getString(
-                    R.string.server_proxy_chain_members_invalid,
-                    invalidMembers.joinToString(", ")
-                )
-            )
-            return false
+        pendingSave = lifecycleScope.launch {
+            try {
+                val invalid = withContext(Dispatchers.IO) {
+                    val entries = SettingsManager.getProfileEntriesViaRemarks(chainMembers)
+                    chainMembers.filter { entries[it]?.profile?.configType?.isComplexType() != false }
+                }
+                if (isFinishing) return@launch
+                if (invalid.isNotEmpty()) {
+                    toast(getString(R.string.server_proxy_chain_members_invalid, invalid.joinToString(", ")))
+                    return@launch
+                }
+                val savedGuid = withContext(Dispatchers.IO) { persistServer(remarks, chainMembers) }
+                toastSuccess(R.string.toast_success)
+                ProfileEditorResult.run { finishSaved(guid = savedGuid, restartService = isRunning) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogUtil.e(message = "Proxy chain: failed to save", throwable = e)
+                toast(R.string.toast_failure)
+            }
         }
+    }
 
+    private fun persistServer(remarks: String, chainMembers: List<String>): String {
         val config =
             MmkvManager.decodeServerConfig(editGuid)
                 ?: ProfileItem.create(EConfigType.PROXYCHAIN)
@@ -165,21 +170,10 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             config.subscriptionId = subscriptionId.orEmpty()
         }
 
-        val savedGuid = MmkvManager.encodeServerConfig(
+        return MmkvManager.encodeServerConfig(
             editGuid,
             config
         )
-
-        toastSuccess(R.string.toast_success)
-
-        ProfileEditorResult.run {
-            finishSaved(
-                guid = savedGuid,
-                restartService = isRunning
-            )
-        }
-
-        return true
     }
 
     private fun deleteServer(): Boolean {
@@ -210,7 +204,7 @@ private fun ProxyChainScreen(
     initialMembers: List<String>,
     allRemarks: List<String>,
     onBackClick: () -> Unit,
-    onSave: (String, List<String>) -> Boolean,
+    onSave: (String, List<String>) -> Unit,
     onDelete: () -> Unit,
     isTelevision: Boolean
 ) {
@@ -278,9 +272,9 @@ private fun ProxyChainScreen(
 
 @Composable
 internal fun ProxyChainMemberDialogs(
-    members: List<String>, memberKeys: List<String>, onRemove: (String) -> Unit,
+    members: List<String>, memberKeys: List<String>, allRemarks: List<String>, onRemove: (String) -> Unit,
     onSelect: (String, String) -> Unit, onClosePicker: (String) -> Unit = {},
-    picker: @Composable (String?, (String) -> Unit, () -> Unit) -> Unit,
+    picker: @Composable (List<String>, String?, (String) -> Unit, () -> Unit) -> Unit,
     content: @Composable ((String) -> Unit, (String) -> Unit) -> Unit
 ) {
     var memberToDeleteKey by rememberSaveable { mutableStateOf<String?>(null) }
@@ -304,9 +298,10 @@ internal fun ProxyChainMemberDialogs(
             editingMemberKey = null
             onClosePicker(memberKey)
         }
-        if (memberKey in memberKeys) {
-            val selected = members.getOrNull(memberKeys.indexOf(memberKey))
-            picker(selected, { remark ->
+        val index = memberKeys.indexOf(memberKey)
+        if (index >= 0) {
+            val choices = remember(allRemarks, members, index) { availableProxyChainMembers(allRemarks, members, index) }
+            picker(choices, members[index], { remark ->
                 onSelect(memberKey, remark)
                 closePicker()
             }, ::closePicker)
@@ -321,9 +316,9 @@ private fun PhoneProxyChainEditor(
     onBackClick: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
     onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
 ) {
-    ProxyChainMemberDialogs(members, memberKeys, onRemove, onSelect, picker = { selected, select, dismiss ->
+    ProxyChainMemberDialogs(members, memberKeys, allRemarks, onRemove, onSelect, picker = { choices, selected, select, dismiss ->
         ServerSelectListDialog(
-            title = stringResource(R.string.server_proxy_chain_pick_members), options = allRemarks,
+            title = stringResource(R.string.server_proxy_chain_pick_members), options = choices,
             selectedOption = selected, onSelected = select, onDismiss = dismiss
         )
     }) { pick, remove ->

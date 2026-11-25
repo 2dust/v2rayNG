@@ -46,9 +46,10 @@ fun FormTextField(
     maxLines: Int = 5,
     isError: Boolean = false,
     supportingText: String? = null,
+    announceValue: Boolean = false,
 ) {
     if (LocalTvEditor.current != null) {
-        TvEditorTextField(label, value, onValueChange, modifier, enabled, keyboardType, placeholder, maxLines, isError, supportingText)
+        TvEditorTextField(label, value, onValueChange, modifier, enabled, keyboardType, placeholder, maxLines, isError, supportingText, announceValue)
         return
     }
     Box(
