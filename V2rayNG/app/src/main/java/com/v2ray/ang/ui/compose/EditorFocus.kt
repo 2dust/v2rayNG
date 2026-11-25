@@ -24,10 +24,10 @@ internal class EditorFocus(private val onFocused: (String) -> Unit) {
     fun restore(id: String?): Boolean = targets[id]?.requestFocus() == true
 
     @Composable
-    fun target(requester: FocusRequester = remember { FocusRequester() }, key: String? = null): Modifier {
-        // Reorderable controls can supply a stable key. Fixed fields use their call site, independent of
-        // their translated label, value, or position among the currently visible controls.
-        val id = key ?: currentCompositeKeyHashCode.toString()
+    fun target(requester: FocusRequester = remember { FocusRequester() }): Modifier {
+        // The form uses fixed composable call sites. This identifies the field independently of
+        // its translated label, value, or position among the currently visible controls.
+        val id = currentCompositeKeyHashCode.toString()
         DisposableEffect(id, requester) {
             targets[id] = requester
             onDispose { targets.remove(id, requester) }

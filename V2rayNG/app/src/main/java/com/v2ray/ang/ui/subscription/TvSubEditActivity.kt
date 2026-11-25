@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -102,6 +103,12 @@ private class TvSubscriptionControls(private val back: FocusRequester, private v
         val clear = remember { FocusRequester() }
         val order = listOf(pick, clear)
         var open by rememberSaveable { mutableStateOf(false) }
+        var wasOpen by remember { mutableStateOf(open) }
+        LaunchedEffect(open) {
+            // After recreation Android can return focus to Clear, the other button in this row.
+            if (wasOpen && !open) pick.requestFocus()
+            wasOpen = open
+        }
         ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint,
             focus.target(pick).dpadOrderedFocusNavigation(pick, order, onBeforeFirst = { back.requestFocus() }).dpadFocusOutline(),
             focus.target(clear).dpadOrderedFocusNavigation(clear, order).dpadFocusOutline(cornerRadius = 24.dp))
