@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.compose
 
+import android.content.res.Configuration
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,10 +10,13 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
@@ -27,10 +31,14 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 private val TvImeBottomClearance = 32.dp
 private const val TvImeLayoutSettlingFrames = 3
@@ -76,7 +84,7 @@ internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, initi
         isEditing = false
         editorHasFocus = false
         imeWasVisible = false
-        restorePassiveFocus = restoreFocus && !passiveFocusRequester.requestFocus()
+        restorePassiveFocus = restoreFocus
         if (wasEditing) hideKeyboard()
     }
 
@@ -99,6 +107,18 @@ internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, initi
     }
 }
 
+// A TV IME can finish composing before onPause, after the application has the new configuration
+// but while the old window still has focus. Neither its cursor nor its keyboard state is user input.
+@Composable
+internal fun <T> RecordInteractiveEditorState(value: T, saved: MutableState<T>) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val resources = LocalContext.current.applicationContext.resources
+    val windowConfig = remember(LocalConfiguration.current) { Configuration(resources.configuration) }
+    SideEffect {
+        if (lifecycle.currentState == Lifecycle.State.RESUMED && windowConfig == resources.configuration) saved.value = value
+    }
+}
+
 /**
  * Isolates [ExperimentalLayoutApi] for WindowInsets.isImeVisible so Back from the TV IME returns
  * focus to the passive field. Reevaluate the opt-in when isImeVisible becomes stable.
@@ -110,13 +130,15 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester, ini
     val density = LocalDensity.current
     val imeBottomClearancePx = with(density) { TvImeBottomClearance.toPx() }
     val currentKeyboardController = rememberUpdatedState(keyboardController)
+    val resumeEditing = rememberSaveable { mutableStateOf(initiallyEditing) }
     val state = remember(passiveFocusRequester) {
         TvTextFieldState(
             passiveFocusRequester = passiveFocusRequester,
-            initiallyEditing = initiallyEditing,
+            initiallyEditing = resumeEditing.value,
             hideKeyboard = { currentKeyboardController.value?.hide() }
         )
     }
+    RecordInteractiveEditorState(state.isEditing, resumeEditing)
     val isImeVisible = WindowInsets.isImeVisible
 
     /*
@@ -132,8 +154,7 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester, ini
                     state.imeWasVisible = true
                     repeat(TvImeLayoutSettlingFrames) { withFrameNanos { } }
                     state.bringEditorAboveIme(imeBottomClearancePx)
-                }
-                keyboardController?.show()
+                } else keyboardController?.show()
             }
             TvTextFieldRecoveryAction.RequestEditorFocus -> state.editorFocusRequester.requestFocus()
             TvTextFieldRecoveryAction.None -> Unit
@@ -171,8 +192,8 @@ internal fun Modifier.tvSearchFieldFocus(
             }
         }
         .dpadOrderedFocusNavigation(state.passiveFocusRequester, focusOrder)
-        .focusRequester(state.passiveFocusRequester)
-        .focusable(interactionSource = state.interactionSource)
+        .then(if (state.isEditing) Modifier else Modifier.focusRequester(state.passiveFocusRequester))
+        .focusable(enabled = !state.isEditing, interactionSource = state.interactionSource)
 }
 
 internal fun Modifier.tvTextFieldEditorFocus(state: TvTextFieldState): Modifier {
