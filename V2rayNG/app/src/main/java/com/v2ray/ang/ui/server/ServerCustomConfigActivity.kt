@@ -78,12 +78,12 @@ import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.horizontalScrollbar
-import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
+import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
@@ -262,7 +262,7 @@ fun ServerCustomConfigScreen(
     }
 
     val tvBack = if (isTelevision) remember { FocusRequester() } else null
-    val tvFocus = if (tvBack != null) rememberOutboundEditorFocus(fallback = tvBack) else null
+    val tvFocus = if (tvBack != null) rememberEditorFocus(fallback = tvBack) else null
     val tvIme = if (tvBack != null) rememberTvEditorIme() else null
     val tvJson = if (tvBack != null && tvFocus != null && tvIme != null) {
         rememberTvJsonFocus(tvBack, tvFocus, tvIme.visible)
@@ -424,7 +424,7 @@ fun ServerCustomConfigScreen(
                 .consumeWindowInsets(innerPadding)
                 .then(tvIme?.padding?.padding(horizontal = 48.dp) ?: Modifier.imePadding())
         ) {
-            CompositionLocalProvider(LocalTvEditor provides tvBack, LocalOutboundEditorFocus provides tvFocus) {
+            CompositionLocalProvider(LocalTvEditor provides tvBack, LocalEditorFocus provides tvFocus) {
                 FormTextField(
                     label = stringResource(R.string.server_lab_remarks),
                     value = remarks,

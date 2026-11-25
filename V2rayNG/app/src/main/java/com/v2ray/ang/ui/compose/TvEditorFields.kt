@@ -86,7 +86,7 @@ internal fun TvEditorTextField(
     // Losing focus as the old window detaches must not turn an active edit into a passive field.
     SideEffect { if (lifecycle.currentState == Lifecycle.State.RESUMED) wasEditing = editor.isEditing }
     // The passive button and the active editor represent the same field across recreation.
-    val fieldFocus = LocalOutboundEditorFocus.current?.target() ?: Modifier
+    val fieldFocus = LocalEditorFocus.current?.target() ?: Modifier
     var input by rememberEditorTextValue(value)
     var restoredSelection by remember { mutableStateOf(input.selection.takeIf { wasEditing }) }
     // A TV keyboard may move the caret to the end when it attaches to a recreated window.
@@ -151,7 +151,7 @@ internal fun TvEditorDropdown(
 ) {
     val back = checkNotNull(LocalTvEditor.current)
     val anchor = remember { FocusRequester() }
-    val anchorFocus = LocalOutboundEditorFocus.current?.target(anchor) ?: Modifier.focusRequester(anchor)
+    val anchorFocus = LocalEditorFocus.current?.target(anchor) ?: Modifier.focusRequester(anchor)
     val interaction = remember { MutableInteractionSource() }
     var open by remember { mutableStateOf(false) }
     var restoreAnchor by remember { mutableStateOf(false) }

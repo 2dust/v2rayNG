@@ -29,13 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.compose.OutboundEditorFocus
+import com.v2ray.ang.ui.compose.EditorFocus
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 
 internal class TvJsonFocus(val field: Modifier, val passive: Modifier?, val allowKeyboardOnFocus: Boolean)
 
 @Composable
-internal fun rememberTvJsonFocus(back: FocusRequester, focus: OutboundEditorFocus, imeVisible: State<Boolean>): TvJsonFocus {
+internal fun rememberTvJsonFocus(back: FocusRequester, focus: EditorFocus, imeVisible: State<Boolean>): TvJsonFocus {
     val requester = remember { FocusRequester() }
     val target = focus.target(requester, key = "json")
     val keyboard = LocalSoftwareKeyboardController.current
