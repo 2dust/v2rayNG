@@ -83,7 +83,7 @@ internal fun TvProfileGroupLayout(
     contentPadding: PaddingValues,
     onAction: (MainAction) -> Unit,
     headerModifier: Modifier,
-    actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit,
+    actionButton: @Composable (Int, SubscriptionHeaderAction, () -> Unit) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val usageInfo = group.usageInfo

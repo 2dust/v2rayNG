@@ -79,6 +79,10 @@ internal fun buildSubscriptionInfoUiModel(
     )
 }
 
+internal enum class SubscriptionHeaderAction(val label: Int) {
+    Support(R.string.sub_info_open_support), OpenPage(R.string.sub_info_open_page), Refresh(R.string.title_sub_update)
+}
+
 /**
  * Fixed box on top of a subscription group showing the account information published by the
  * subscription panel: traffic, expiry date and shortcuts (support link, panel page, update).
@@ -90,8 +94,8 @@ internal fun SubscriptionInfoCard(
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
-    actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit = { icon, label, _, click ->
-        CardIconButton(icon, label, click)
+    actionButton: @Composable (Int, SubscriptionHeaderAction, () -> Unit) -> Unit = { icon, action, click ->
+        CardIconButton(icon, stringResource(action.label), click)
     },
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
@@ -122,14 +126,13 @@ internal fun SubscriptionInfoCard(
                         } else {
                             R.drawable.ic_feedback_24dp
                         },
-                        stringResource(R.string.sub_info_open_support),
-                        false,
+                        SubscriptionHeaderAction.Support,
                     ) { onOpenLink(url) }
                 }
                 model.webPageUrl?.let { url ->
-                    actionButton(R.drawable.ic_about_24dp, stringResource(R.string.sub_info_open_page), false) { onOpenLink(url) }
+                    actionButton(R.drawable.ic_about_24dp, SubscriptionHeaderAction.OpenPage) { onOpenLink(url) }
                 }
-                actionButton(R.drawable.ic_refresh_24dp, stringResource(R.string.title_sub_update), true, onRefresh)
+                actionButton(R.drawable.ic_refresh_24dp, SubscriptionHeaderAction.Refresh, onRefresh)
             }
 
             // One semantics node for the read-only figures so TalkBack reads them in one go.

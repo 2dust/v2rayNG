@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.DpadHorizontalDirection
 import com.v2ray.ang.ui.compose.TvIconButton
-import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.TvTopBarSearchField
 import com.v2ray.ang.ui.compose.adjacentDpadFocusTarget
 import com.v2ray.ang.ui.compose.colorFabActive
@@ -69,6 +68,8 @@ internal enum class TvToolbarAction {
 internal class TvMainTopBarFocus {
     private val targets = TvToolbarAction.entries.associateWith { FocusRequester() }
     val start get() = get(TvToolbarAction.Start)
+    val searchInput = FocusRequester()
+    val searchClear = FocusRequester()
     operator fun get(action: TvToolbarAction) = targets.getValue(action)
 }
 
@@ -78,8 +79,7 @@ internal fun TvMainTopBar(
     isLoading: Boolean,
     isRunning: Boolean,
     showSearch: Boolean,
-    searchResultFocused: Boolean,
-    onSearchToolbarFocused: () -> Unit,
+    onSearchFocus: (TvMainFocusTarget.DrawerOrigin) -> Unit,
     searchQuery: String,
     focusRequesters: TvMainTopBarFocus,
     onSearchQueryChange: (String) -> Unit,
@@ -134,13 +134,9 @@ internal fun TvMainTopBar(
         }
     }
 
-    // Filtered results restore by ID after the list loads; the toolbar must not take their focus.
-    val searchFocus = if (showSearch && !searchResultFocused) rememberEditorFocus() else null
-    @Composable
-    fun searchTarget(): Modifier = Modifier.onFocusChanged { if (it.isFocused) onSearchToolbarFocused() }
-        .then(searchFocus?.target() ?: Modifier)
-    val searchInputFocus = remember { FocusRequester() }
-    val searchClearFocus = remember { FocusRequester() }
+    fun searchTarget(target: TvMainFocusTarget.DrawerOrigin) = Modifier.onFocusChanged { if (it.isFocused) onSearchFocus(target) }
+    val searchInputFocus = focusRequesters.searchInput
+    val searchClearFocus = focusRequesters.searchClear
     // While searching, Back takes Start's place and the normal toolbar actions are hidden.
     val searchFocusOrder = if (searchQuery.isEmpty()) listOf(focusRequesters.start, searchInputFocus)
     else listOf(focusRequesters.start, searchInputFocus, searchClearFocus)
@@ -150,7 +146,7 @@ internal fun TvMainTopBar(
             title = {
                 if (showSearch) {
                     TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder, onMoveDown) {
-                        searchTarget()
+                        searchTarget(if (it === searchInputFocus) TvMainFocusTarget.SearchInput else TvMainFocusTarget.SearchClear)
                     }
                 } else {
                     Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.CenterStart) {
@@ -168,7 +164,7 @@ internal fun TvMainTopBar(
                         contentDescription = stringResource(R.string.acc_back),
                         onClick = onSearchClose,
                         focusRequester = focusRequesters.start,
-                        modifier = searchTarget().dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder, onMoveDown)
+                        modifier = searchTarget(TvMainFocusTarget.Toolbar).dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder, onMoveDown)
                     )
                 }
             },
