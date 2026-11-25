@@ -103,6 +103,16 @@ internal suspend fun requestFocusWhenReady(vararg requesters: FocusRequester): B
     return false
 }
 
+/** Restore the opener only when a visible TV dialog closes, including after window recreation. */
+@Composable
+internal fun RestoreTvDialogOpener(open: Boolean, opener: FocusRequester) {
+    var wasOpen by remember { mutableStateOf(open) }
+    LaunchedEffect(open) {
+        if (wasOpen && !open) requestFocusWhenReady(opener)
+        wasOpen = open
+    }
+}
+
 /**
  * Adds a TV-style focus treatment while keeping the component's existing click/focus node.
  * Unfocused controls are left completely untouched; focused controls receive a restrained

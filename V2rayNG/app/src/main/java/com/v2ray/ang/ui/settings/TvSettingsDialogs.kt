@@ -177,6 +177,9 @@ internal fun TvSettingsEditDialog(
     )
 }
 
+internal fun initialTvOption(options: List<Pair<String, String>>, value: String?): String? =
+    options.firstOrNull { it.second == value }?.second ?: options.firstOrNull()?.second
+
 @Composable
 internal fun TvSettingsListDialog(
     title: String,
@@ -185,7 +188,7 @@ internal fun TvSettingsListDialog(
     onSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val selected = remember { selectedValue }
+    val selected = remember { initialTvOption(options, selectedValue) }
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = options.indexOfFirst { it.second == selected }.coerceAtLeast(0))
     val initialFocus = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }

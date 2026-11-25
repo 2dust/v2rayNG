@@ -1,19 +1,12 @@
 package com.v2ray.ang.ui.server
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -26,14 +19,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.LocalEditorFocus
-import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.TvEditorForm
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.rememberEditorFocus
-import com.v2ray.ang.ui.compose.rememberTvEditorIme
-import com.v2ray.ang.ui.compose.verticalScrollbar
 
 @Composable
 internal fun TvServerEditor(
@@ -46,8 +35,6 @@ internal fun TvServerEditor(
     val save = remember { FocusRequester() }
     val delete = remember { FocusRequester() }
     val focus = rememberEditorFocus(fallback = back)
-    val scroll = rememberScrollState()
-    val ime = rememberTvEditorIme()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val firstAction = if (onDelete != null) delete else if (onAdd != null) addRequester else save
     Scaffold(
@@ -91,19 +78,6 @@ internal fun TvServerEditor(
             )
         }
     ) { innerPadding ->
-        CompositionLocalProvider(
-            LocalEditorFocus provides focus,
-            LocalTvEditor provides back
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).consumeWindowInsets(innerPadding)
-                    .then(ime.padding).padding(horizontal = 48.dp)
-                    .verticalScroll(scroll).verticalScrollbar(scroll).padding(bottom = 36.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                content()
-                NavigationBarsSpacer()
-            }
-        }
+        TvEditorForm(innerPadding, back, focus, PaddingValues(bottom = 36.dp), content)
     }
 }
