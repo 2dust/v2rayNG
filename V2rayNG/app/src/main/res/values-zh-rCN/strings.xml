@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">最大数据包大小（可选，默认 1200）</string>
     <string name="server_lab_port_hop">跳跃端口 (会覆盖服务器端口)</string>
     <string name="server_lab_port_hop_interval">端口跳跃间隔 (秒)</string>
+    <string name="title_pref_hysteria2_hop_interval">Hysteria2 默认端口跳跃间隔（秒）</string>
     <string name="server_lab_bandwidth_down">带宽下行 (支持的单位 k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">带宽上行 (支持的单位 k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>

@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">حداکثر اندازه بسته (اختیاری، پیش‌فرض 1200)</string>
     <string name="server_lab_port_hop">گوم پورت (پورت سرورن ز نۊ هؽل اکونه)</string>
     <string name="server_lab_port_hop_interval">فاسله گوم پورت (سانیه)</string>
+    <string name="title_pref_hysteria2_hop_interval">فاسله پیش‌فرض گوم پورت Hysteria2 (سانیه)</string>
     <string name="server_lab_bandwidth_down">ب لم ٱووڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>

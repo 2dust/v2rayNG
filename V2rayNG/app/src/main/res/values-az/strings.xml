@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">Paketin maksimum ölçüsü (istəyə bağlı, standart 1200)</string>
     <string name="server_lab_port_hop">Port dəyişməsi (portu əvəzləyir)</string>
     <string name="server_lab_port_hop_interval">Port dəyişmə tezliyi (saniyə)</string>
+    <string name="title_pref_hysteria2_hop_interval">Hysteria2 üçün standart port dəyişmə intervalı (saniyə)</string>
     <string name="server_lab_bandwidth_down">Yükləmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Ötürmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Rejimi</string>

@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">সর্বোচ্চ প্যাকেট আকার (ঐচ্ছিক, ডিফল্ট 1200)</string>
     <string name="server_lab_port_hop">পোর্ট হপিং (পোর্টের মান প্রতিস্থাপন করবে)</string>
     <string name="server_lab_port_hop_interval">পোর্ট পরিবর্তনের বিরতি (সেকেন্ড)</string>
+    <string name="title_pref_hysteria2_hop_interval">Hysteria2-এর ডিফল্ট পোর্ট পরিবর্তনের বিরতি (সেকেন্ড)</string>
     <string name="server_lab_bandwidth_down">ডাউনলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">আপলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP মোড</string>

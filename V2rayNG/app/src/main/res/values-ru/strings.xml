@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">Макс. размер пакета (необязательно, по умолчанию 1200)</string>
     <string name="server_lab_port_hop">Смена портов (переопределяет порт)</string>
     <string name="server_lab_port_hop_interval">Интервал смены портов (сек.)</string>
+    <string name="title_pref_hysteria2_hop_interval">Интервал смены портов Hysteria2 по умолчанию (с)</string>
     <string name="server_lab_bandwidth_down">Входящая пропускная способность (допускаются: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Исходящая пропускная способность (допускаются: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Режим XHTTP</string>

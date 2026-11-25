@@ -67,6 +67,7 @@ abstract class BaseSettingsActivity : BaseComponentActivity() {
             return
         }
         lifecycleScope.launch {
+            viewModel.loadHysteria2HopInterval()
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.refreshSystemVpnSettingsAvailability()
             }
@@ -137,6 +138,7 @@ private fun SettingsForm(
     onSystemVpnSettingsClicked: () -> Unit
 ) {
     val systemVpnSettingsAvailable by viewModel.systemVpnSettingsAvailable.collectAsStateWithLifecycle()
+    val hysteria2HopInterval by viewModel.hysteria2HopInterval.collectAsStateWithLifecycle()
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var coreSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -540,6 +542,12 @@ private fun SettingsForm(
                     values = outboundResolveValues,
                     selectedValue = outboundResolveMethod,
                     onSelected = { outboundResolveMethod = it }
+                )
+                SettingsEditItem(
+                    title = stringResource(R.string.title_pref_hysteria2_hop_interval),
+                    value = hysteria2HopInterval.orEmpty(),
+                    enabled = hysteria2HopInterval != null,
+                    onValueChanged = viewModel::updateHysteria2HopInterval
                 )
             }
 

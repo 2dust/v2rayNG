@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">Max packet size (optional, default 1200)</string>
     <string name="server_lab_port_hop">Port hopping (overrides the port)</string>
     <string name="server_lab_port_hop_interval">Port hopping interval (seconds)</string>
+    <string name="title_pref_hysteria2_hop_interval">Default Hysteria2 port hopping interval (seconds)</string>
     <string name="server_lab_bandwidth_down">Download bandwidth (supported units: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Upload bandwidth (supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>

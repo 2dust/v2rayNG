@@ -137,6 +137,7 @@
     <string name="server_lab_max_packet_size">Kích thước gói tin tối đa (tùy chọn, mặc định 1200)</string>
     <string name="server_lab_port_hop">Nhảy cổng (sẽ ghi đè cổng)</string>
     <string name="server_lab_port_hop_interval">Khoảng thời gian đổi cổng (giây)</string>
+    <string name="title_pref_hysteria2_hop_interval">Khoảng thời gian đổi cổng Hysteria2 mặc định (giây)</string>
     <string name="server_lab_bandwidth_down">Băng thông tải xuống (đơn vị hỗ trợ: k/m/g/t)</string>
     <string name="server_lab_bandwidth_up">Băng thông tải lên (đơn vị hỗ trợ: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Chế độ XHTTP</string>

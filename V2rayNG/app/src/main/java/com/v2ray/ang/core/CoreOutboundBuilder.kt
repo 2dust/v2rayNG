@@ -426,7 +426,11 @@ object CoreOutboundBuilder {
      * @param profileItem The profile containing transport configuration
      * @return The Server Name Indication (SNI) value to use, or null if not applicable
      */
-    fun populateTransportSettings(streamSettings: OutboundBean.StreamSettingsBean, profileItem: ProfileItem): String? {
+    internal fun populateTransportSettings(
+        streamSettings: OutboundBean.StreamSettingsBean,
+        profileItem: ProfileItem,
+        defaultHopInterval: () -> String? = { MmkvManager.decodeSettingsString(AppConfig.PREF_HYSTERIA2_HOP_INTERVAL) }
+    ): String? {
         val transport = profileItem.network.orEmpty()
         val headerType = profileItem.headerType
         val host = profileItem.host
@@ -591,6 +595,7 @@ object CoreOutboundBuilder {
                 }
                 if (profileItem.portHopping.isNotNullEmpty()) {
                     val rawInterval = profileItem.portHoppingInterval?.trim().nullIfBlank()
+                        ?: defaultHopInterval()?.trim().nullIfBlank()
                     val interval = if (rawInterval == null) {
                         "30"
                     } else {
