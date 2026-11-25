@@ -57,17 +57,19 @@ internal class SubscriptionEditViewModel(application: Application, private val s
     init {
         runOperation("load") {
             val (item, form) = withContext(Dispatchers.IO) {
-                val item = if (id.isEmpty()) SubscriptionItem() else checkNotNull(MmkvManager.decodeSubscription(id))
+                val item = readSubscription()
                 val suggestions = SettingsManager.getProfileRemarks(setOf(EConfigType.CUSTOM, EConfigType.CUSTOM_OUTBOUND,
                     EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN))
                 item to Form(item.remarks.takeIf { id.isNotEmpty() }, suggestions, MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false))
             }
-            if (draft.value == null) change(SubscriptionDraft(item))
+            if (draft.value == null) saved["draft"] = SubscriptionDraft(item)
             _form.value = form
         }
     }
 
-    fun change(value: SubscriptionDraft) { saved["draft"] = value }
+    fun updateDraft(edit: SubscriptionDraft.() -> SubscriptionDraft) {
+        draft.value?.let { saved["draft"] = it.edit() }
+    }
 
     fun save() {
         val value = draft.value ?: return
@@ -76,8 +78,7 @@ internal class SubscriptionEditViewModel(application: Application, private val s
         if (invalid.remarks || invalid.url || invalid.interval) return
         runOperation("save", finishOnSuccess = true) {
             withContext(Dispatchers.IO) {
-                val current = if (id.isEmpty()) SubscriptionItem() else checkNotNull(MmkvManager.decodeSubscription(id))
-                MmkvManager.encodeSubscription(targetId, value.applyTo(current))
+                MmkvManager.encodeSubscription(targetId, value.applyTo(readSubscription()))
                 SubscriptionUpdater.syncOne(subId = targetId)
                 SettingsChangeManager.makeSetupGroupTab()
             }
@@ -94,6 +95,8 @@ internal class SubscriptionEditViewModel(application: Application, private val s
             }
         }
     }
+
+    private fun readSubscription() = if (id.isEmpty()) SubscriptionItem() else checkNotNull(MmkvManager.decodeSubscription(id))
 
     private fun runOperation(operation: String, finishOnSuccess: Boolean = false, block: suspend () -> Unit) {
         if (_isLoading.value) return

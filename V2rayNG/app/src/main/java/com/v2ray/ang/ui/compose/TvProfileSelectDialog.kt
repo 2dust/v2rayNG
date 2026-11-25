@@ -41,7 +41,7 @@ internal fun TvProfileSelectDialog(
     title: String, options: List<String>, selected: String?, onSelect: (String) -> Unit, onDismiss: () -> Unit
 ) {
     var query by rememberSaveable { mutableStateOf("") }
-    val matches = remember(query, options) { options.filter { it.contains(query.trim(), ignoreCase = true) }.distinct() }
+    val matches = remember(query, options) { matchingProfileRemarks(options, query) }
     var focusedTarget by rememberSaveable { mutableStateOf<String?>(null) }
     val restoredTarget = remember { focusedTarget }
     val targetOption = remember {
@@ -51,7 +51,8 @@ internal fun TvProfileSelectDialog(
     val search = remember { FocusRequester() }
     val result = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }
-    val list = rememberLazyListState(initialFirstVisibleItemIndex = matches.indexOf(targetOption).coerceAtLeast(0))
+    val initialIndex = remember { matches.indexOf(targetOption) }
+    val list = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex.coerceAtLeast(0))
     AlertDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(decorFitsSystemWindows = false),
@@ -89,11 +90,10 @@ internal fun TvProfileSelectDialog(
                     SEARCH_FOCUS -> search.requestFocus()
                     CANCEL_FOCUS -> cancel.requestFocus()
                     else -> {
-                        val index = matches.indexOf(targetOption)
-                        if (index >= 0 && list.layoutInfo.visibleItemsInfo.none { it.key == targetOption }) {
-                            list.scrollToItem(index)
+                        if (initialIndex >= 0 && list.layoutInfo.visibleItemsInfo.none { it.key == targetOption }) {
+                            list.scrollToItem(initialIndex)
                         }
-                        if ((index < 0 || !result.requestFocus()) && !search.requestFocus()) cancel.requestFocus()
+                        if ((initialIndex < 0 || !result.requestFocus()) && !search.requestFocus()) cancel.requestFocus()
                     }
                 }
             }
@@ -113,3 +113,8 @@ internal fun TvProfileSelectDialog(
 private const val SEARCH_FOCUS = "search"
 private const val CANCEL_FOCUS = "cancel"
 private const val RESULT_FOCUS_PREFIX = "result:"
+
+internal fun matchingProfileRemarks(options: List<String>, query: String): List<String> {
+    val text = query.trim()
+    return if (text.isEmpty()) options else options.filter { it.contains(text, ignoreCase = true) }
+}

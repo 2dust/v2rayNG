@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +28,7 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.OutboundEditorFocus
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.TvIconButton
@@ -37,7 +37,6 @@ import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
-import com.v2ray.ang.ui.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.ui.settings.TvSettingsRows
 
@@ -50,11 +49,8 @@ class TvSubEditActivity : BaseSubEditActivity() {
         val deleteButton = remember { FocusRequester() }
         val order = if (form.name == null) listOf(back, saveButton) else listOf(back, saveButton, deleteButton)
         val focus = rememberOutboundEditorFocus(back)
+        val controls = remember(back, focus) { TvSubscriptionControls(back, focus) }
         var confirm by rememberSaveable { mutableStateOf(false) }
-        var restoreDelete by remember { mutableStateOf(false) }
-        LaunchedEffect(confirm) {
-            if (!confirm && restoreDelete) { requestFocusWhenReady(deleteButton); restoreDelete = false }
-        }
         Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
             Box(Modifier.padding(horizontal = 48.dp)) {
                 AppTopBar(stringResource(R.string.title_sub_setting), ::finish, navigationIcon = {
@@ -74,49 +70,43 @@ class TvSubEditActivity : BaseSubEditActivity() {
                 Column(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).then(ime.padding)
                     .padding(horizontal = 48.dp).verticalScroll(scroll).verticalScrollbar(scroll).padding(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    content(TvSubscriptionControls)
+                    content(controls)
                     NavigationBarsSpacer()
                 }
             }
         }
         if (confirm) TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name,
-            onConfirm = { confirm = false; delete() }, onDismiss = { restoreDelete = true; confirm = false })
+            onConfirm = { confirm = false; delete() }, onDismiss = { confirm = false })
     }
 }
 
-private object TvSubscriptionControls : SubscriptionControls {
+private class TvSubscriptionControls(private val back: FocusRequester, private val focus: OutboundEditorFocus) : SubscriptionControls {
+    private val rows = TvSettingsRows(back) {}
+
     @Composable
     override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?) {
-        TvEditorTextField(label, value, change, Modifier, true, keyboard, null, 5, error, hint)
+        TvEditorTextField(label, value, change, Modifier, enabled = true, keyboardType = keyboard, placeholder = null,
+            maxLines = 5, isError = error, supportingText = hint)
     }
 
     @Composable
     override fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit) {
-        val back = checkNotNull(LocalTvEditor.current)
-        val rows = remember(back) { TvSettingsRows(back) {} }
-        Box(checkNotNull(LocalOutboundEditorFocus.current).target()) {
+        Box(focus.target()) {
             rows.SettingsSwitchItem(label, null, checked, change)
         }
     }
 
     @Composable
     override fun Profile(label: String, value: String, hint: String, options: List<String>, change: (String) -> Unit) {
-        val focus = checkNotNull(LocalOutboundEditorFocus.current)
-        val back = checkNotNull(LocalTvEditor.current)
         val pick = remember { FocusRequester() }
         val clear = remember { FocusRequester() }
         val order = listOf(pick, clear)
         var open by rememberSaveable { mutableStateOf(false) }
-        var restore by remember { mutableStateOf(false) }
-        fun close() { restore = true; open = false }
-        LaunchedEffect(open) {
-            if (!open && restore) { requestFocusWhenReady(pick); restore = false }
-        }
         ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint,
             focus.target(pick).dpadOrderedFocusNavigation(pick, order, onBeforeFirst = { back.requestFocus() }).dpadFocusOutline(),
             focus.target(clear).dpadOrderedFocusNavigation(clear, order).dpadFocusOutline(cornerRadius = 24.dp))
         if (open) CompositionLocalProvider(LocalOutboundEditorFocus provides null) {
-            TvProfileSelectDialog(label, options, value, onSelect = { change(it); close() }, onDismiss = ::close)
+            TvProfileSelectDialog(label, options, value, onSelect = { change(it); open = false }, onDismiss = { open = false })
         }
     }
 }
