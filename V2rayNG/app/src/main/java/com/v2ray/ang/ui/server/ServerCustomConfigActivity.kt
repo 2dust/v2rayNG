@@ -39,11 +39,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
@@ -103,8 +106,8 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
         super.onCreate(savedInstanceState)
-        if (isTelevision && savedInstanceState != null) {
-            // Restore D-pad focus without restoring the old window's software keyboard.
+        if (savedInstanceState != null) {
+            // Do not leave the previous window's keyboard visible before a field regains focus.
             val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
             window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         }
@@ -224,6 +227,8 @@ private object EditorConstants {
     val SCROLL_PADDING = 60.dp
 }
 
+private enum class CustomEditorField { Remarks, Json }
+
 @Composable
 fun ServerCustomConfigScreen(
     editGuid: String,
@@ -240,6 +245,21 @@ fun ServerCustomConfigScreen(
     val textFieldState = rememberTextFieldState(initialText = initialContent)
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
+    var focusedField by rememberSaveable { mutableStateOf<CustomEditorField?>(null) }
+    val remarksFocus = remember { FocusRequester() }
+    val jsonFocus = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        val target = focusedField
+        if (!isTelevision && target != null && !showDeleteConfirm) {
+            // Scaffold must lay out the field before its requester is attached.
+            withFrameNanos { }
+            when (target) {
+                CustomEditorField.Remarks -> remarksFocus.requestFocus()
+                CustomEditorField.Json -> jsonFocus.requestFocus()
+            }
+        }
+    }
 
     val tvBack = if (isTelevision) remember { FocusRequester() } else null
     val tvFocus = if (tvBack != null) rememberOutboundEditorFocus(fallback = tvBack) else null
@@ -409,6 +429,9 @@ fun ServerCustomConfigScreen(
                     label = stringResource(R.string.server_lab_remarks),
                     value = remarks,
                     onValueChange = { remarks = it },
+                    modifier = if (isTelevision) Modifier else Modifier.focusRequester(remarksFocus).onFocusChanged {
+                        if (it.hasFocus) focusedField = CustomEditorField.Remarks
+                    },
                     isError = isRemarksError
                 )
             }
@@ -495,7 +518,9 @@ fun ServerCustomConfigScreen(
                                 .horizontalScroll(horizontalScroll)
                                 .padding(end = 24.dp)
                                 .padding(bottom = 36.dp)
-                                .then(tvJson?.field ?: Modifier),
+                                .then(tvJson?.field ?: Modifier.focusRequester(jsonFocus).onFocusChanged {
+                                    if (it.isFocused) focusedField = CustomEditorField.Json
+                                }),
                             textStyle = TextStyle(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = EditorConstants.FONT_SIZE,

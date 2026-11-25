@@ -31,6 +31,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 @Composable
+internal fun Modifier.editorFocusTarget(): Modifier =
+    then(LocalOutboundEditorFocus.current?.target() ?: LocalEditorFocus.current?.target() ?: Modifier)
+
+@Composable
 fun FormTextField(
     label: String,
     value: String,
@@ -72,7 +76,7 @@ fun FormTextField(
                     backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
                 )
             ),
-            modifier = Modifier.fillMaxWidth().then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+            modifier = Modifier.fillMaxWidth().editorFocusTarget()
         )
     }
 }
@@ -143,7 +147,7 @@ fun FormDropdownField(
                 )
             ),
             modifier = Modifier
-                .then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+                .editorFocusTarget()
                 .menuAnchor(
                     type = if (editable) ExposedDropdownMenuAnchorType.PrimaryEditable
                     else ExposedDropdownMenuAnchorType.PrimaryNotEditable
