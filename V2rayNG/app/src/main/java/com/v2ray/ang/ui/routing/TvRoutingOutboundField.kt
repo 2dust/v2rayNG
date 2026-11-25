@@ -30,7 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -92,11 +96,24 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
     val filtered = remember(options, trimmedQuery) {
         if (trimmedQuery.isEmpty()) options else options.filter { it.contains(trimmedQuery, ignoreCase = true) }
     }
-    val initialOption = remember { value.takeIf { it in filtered } ?: filtered.firstOrNull() }
-    // When the dialog is recreated, its focus target and viewport must start on the same option.
+    var lastTarget by rememberSaveable { mutableStateOf<String?>(null) }
+    val restoredTarget = remember { lastTarget }
+    val initialOption = remember {
+        restoredTarget?.takeIf { it.startsWith("option:") }?.removePrefix("option:")?.takeIf { it in filtered }
+            ?: value.takeIf { it in filtered } ?: filtered.firstOrNull()
+    }
+    val initialTarget = remember {
+        when (restoredTarget) {
+            "search", "cancel" -> restoredTarget
+            "clear" -> if (query.isNotEmpty()) "clear" else "search"
+            else -> initialOption?.let { "option:$it" } ?: "cancel"
+        }
+    }
     val listState = remember { LazyListState(filtered.indexOf(initialOption).coerceAtLeast(0), 0) }
-    val selected = remember { FocusRequester() }
+    val initialFocus = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }
+    fun Modifier.target(id: String): Modifier =
+        (if (id == initialTarget) focusRequester(initialFocus) else this).onFocusChanged { if (it.hasFocus) lastTarget = id }
     AlertDialog(
         onDismissRequest = onDismiss,
         // Android TV must deliver IME insets to this dialog so Back restores passive search focus.
@@ -105,7 +122,11 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
         text = {
             val ime = rememberTvEditorIme()
             val focusManager = LocalFocusManager.current
-            LaunchedEffect(Unit) { requestFocusWhenReady(if (initialOption == null) cancel else selected) }
+            val inputMode = LocalInputModeManager.current
+            LaunchedEffect(Unit) {
+                if (restoredTarget != null) inputMode.requestInputMode(InputMode.Keyboard)
+                requestFocusWhenReady(initialFocus)
+            }
             LaunchedEffect(listState) {
                 snapshotFlow { query.trim() }.drop(1).collect { listState.scrollToItem(0) }
             }
@@ -114,11 +135,11 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
                     // Keep dialog focus out of the editor's saved focus registry.
                     CompositionLocalProvider(LocalOutboundEditorFocus provides null, LocalTvEditor provides cancel) {
                         TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
-                            Modifier.weight(1f), true, KeyboardType.Text, null, 1, false, null)
+                            Modifier.weight(1f).target("search"), true, KeyboardType.Text, null, 1, false, null)
                     }
                     if (query.isNotEmpty()) {
                         TvIconButton(painterResource(android.R.drawable.ic_menu_close_clear_cancel), stringResource(R.string.action_clear),
-                            onClick = { focusManager.moveFocus(FocusDirection.Previous); query = "" })
+                            onClick = { focusManager.moveFocus(FocusDirection.Previous); query = "" }, modifier = Modifier.target("clear"))
                     }
                 }
                 LazyColumn(state = listState, modifier = Modifier.weight(1f, fill = false).verticalScrollbar(listState)) {
@@ -126,7 +147,7 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
                         val checked = option == value
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
-                                .dpadFocusOutline(focusRequester = selected.takeIf { option == initialOption })
+                                .target("option:$option").dpadFocusOutline()
                                 .selectable(selected = checked, role = Role.RadioButton, onClick = { onSelect(option) })
                                 .padding(end = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -140,7 +161,7 @@ private fun RoutingOutboundOptions(label: String, value: String, options: List<S
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss, modifier = Modifier.dpadFocusOutline(focusRequester = cancel, cornerRadius = 24.dp)) {
+            TextButton(onClick = onDismiss, modifier = Modifier.target("cancel").dpadFocusOutline(focusRequester = cancel, cornerRadius = 24.dp)) {
                 Text(stringResource(R.string.action_cancel))
             }
         }
