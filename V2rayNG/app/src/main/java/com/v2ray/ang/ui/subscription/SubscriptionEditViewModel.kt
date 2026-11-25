@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -58,8 +57,7 @@ internal class SubscriptionEditViewModel(application: Application, private val s
         runOperation("load") {
             val (item, form) = withContext(Dispatchers.IO) {
                 val item = readSubscription()
-                val suggestions = SettingsManager.getProfileRemarks(setOf(EConfigType.CUSTOM, EConfigType.CUSTOM_OUTBOUND,
-                    EConfigType.POLICYGROUP, EConfigType.PROXYCHAIN))
+                val suggestions = SettingsManager.getSimpleProfileRemarks()
                 item to Form(item.remarks.takeIf { id.isNotEmpty() }, suggestions, MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false))
             }
             if (draft.value == null) saved["draft"] = SubscriptionDraft(item)

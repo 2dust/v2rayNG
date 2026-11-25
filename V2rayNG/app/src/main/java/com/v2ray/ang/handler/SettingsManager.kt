@@ -18,6 +18,7 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager.decodeAllServerList
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
@@ -216,6 +217,8 @@ object SettingsManager {
             .mapNotNull { guid -> decodeServerConfig(guid)?.let { ProfileEntry(guid, it) } }
             .firstOrNull { it.profile.remarks == remarks }
     }
+
+    fun getSimpleProfileRemarks(): List<String> = getProfileRemarks(EConfigType.entries.filterTo(mutableSetOf()) { it.isComplexType() })
 
     /**
      * Collects non-empty profile remarks while excluding specific config types.

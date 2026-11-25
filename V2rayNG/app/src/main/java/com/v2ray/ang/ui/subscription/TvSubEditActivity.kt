@@ -28,7 +28,7 @@ import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.rememberEditorFocus
-import com.v2ray.ang.ui.settings.TvSettingsRows
+import com.v2ray.ang.ui.settings.TvSettingsSwitchRow
 
 class TvSubEditActivity : BaseSubEditActivity() {
     @Composable
@@ -62,19 +62,14 @@ class TvSubEditActivity : BaseSubEditActivity() {
 }
 
 private class TvSubscriptionControls(private val back: FocusRequester, private val focus: EditorFocus) : SubscriptionControls {
-    private val rows = TvSettingsRows(back) {}
-
     @Composable
-    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?) {
-        TvEditorTextField(label, value, change, Modifier, enabled = true, keyboardType = keyboard, placeholder = null,
-            maxLines = 5, isError = error, supportingText = hint)
+    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
+        TvEditorTextField(label, value, change, keyboardType = keyboard, isError = error, supportingText = hint, announceValue = announceValue)
     }
 
     @Composable
     override fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit) {
-        Box(focus.target()) {
-            rows.SettingsSwitchItem(label, null, checked, change)
-        }
+        TvSettingsSwitchRow(label, checked, change, back, focus.target())
     }
 
     @Composable

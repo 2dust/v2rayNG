@@ -47,7 +47,7 @@ abstract class BaseSubEditActivity : BaseComponentActivity() {
 
 internal interface SubscriptionControls {
     @Composable fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType = KeyboardType.Text,
-        error: Boolean = false, hint: String? = null)
+        error: Boolean = false, hint: String? = null, announceValue: Boolean = false)
     @Composable fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit)
     @Composable fun Profile(label: String, value: String, hint: String, options: List<String>, change: (String) -> Unit)
 }
@@ -56,16 +56,16 @@ internal interface SubscriptionControls {
 private fun SubscriptionControls.SubscriptionForm(
     draft: SubscriptionDraft, errors: SubscriptionErrors, suggestions: List<String>, update: (SubscriptionDraft.() -> SubscriptionDraft) -> Unit
 ) {
-    Field(stringResource(R.string.sub_setting_remarks), draft.remarks, { update { copy(remarks = it) } }, error = errors.remarks)
+    Field(stringResource(R.string.sub_setting_remarks), draft.remarks, { update { copy(remarks = it) } }, error = errors.remarks, announceValue = true)
     Field(stringResource(R.string.sub_setting_url), draft.url, { update { copy(url = it) } }, error = errors.url,
         hint = if (errors.url) stringResource(R.string.toast_invalid_url) else null)
-    Field(stringResource(R.string.sub_setting_user_agent), draft.userAgent, { update { copy(userAgent = it) } })
+    Field(stringResource(R.string.sub_setting_user_agent), draft.userAgent, { update { copy(userAgent = it) } }, announceValue = true)
     Field(stringResource(R.string.sub_setting_request_headers), draft.requestHeaders, { update { copy(requestHeaders = it) } })
-    Field(stringResource(R.string.sub_setting_filter), draft.filter, { update { copy(filter = it) } })
+    Field(stringResource(R.string.sub_setting_filter), draft.filter, { update { copy(filter = it) } }, announceValue = true)
     Toggle(stringResource(R.string.sub_setting_enable), draft.enabled) { update { copy(enabled = it) } }
     Toggle(stringResource(R.string.sub_auto_update), draft.autoUpdate) { update { copy(autoUpdate = it) } }
     Field(stringResource(R.string.title_pref_auto_update_interval), draft.interval, { update { copy(interval = it) } }, KeyboardType.Number,
-        errors.interval, if (errors.interval) stringResource(R.string.toast_invalid_update_interval) else null)
+        errors.interval, if (errors.interval) stringResource(R.string.toast_invalid_update_interval) else null, announceValue = true)
     Toggle(stringResource(R.string.sub_allow_insecure_url), draft.allowInsecure) { update { copy(allowInsecure = it) } }
     Profile(stringResource(R.string.sub_setting_pre_profile), draft.entry, stringResource(R.string.sub_setting_entry_proxy_tip), suggestions) {
         update { copy(entry = it) }

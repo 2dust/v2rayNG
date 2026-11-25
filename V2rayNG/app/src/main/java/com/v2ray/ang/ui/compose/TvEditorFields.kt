@@ -31,15 +31,13 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.ui.settings.tvSettingsImeOverlayPadding
 
 // Phone and unrelated forms keep their existing controls.
 internal val LocalTvEditor = compositionLocalOf<FocusRequester?> { null }
-
-internal fun tvEditorOverlayPadding(visible: Boolean, inset: Int): Dp =
-    if (visible && inset == 0) 240.dp else 0.dp
 
 internal class TvEditorIme(val visible: State<Boolean>, val padding: Modifier)
 
@@ -49,15 +47,15 @@ internal class TvEditorIme(val visible: State<Boolean>, val padding: Modifier)
 @Composable
 internal fun rememberTvEditorIme(): TvEditorIme {
     val visible = WindowInsets.isImeVisible
-    val padding = tvEditorOverlayPadding(visible, WindowInsets.ime.getBottom(LocalDensity.current))
+    val padding = tvSettingsImeOverlayPadding(visible, WindowInsets.ime.getBottom(LocalDensity.current))
     return TvEditorIme(rememberUpdatedState(visible), Modifier.imePadding().padding(bottom = padding))
 }
 
 @Composable
 internal fun TvEditorTextField(
-    label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier,
-    enabled: Boolean, keyboardType: KeyboardType, placeholder: String?, maxLines: Int,
-    isError: Boolean, supportingText: String?
+    label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
+    enabled: Boolean = true, keyboardType: KeyboardType = KeyboardType.Text, placeholder: String? = null,
+    maxLines: Int = 5, isError: Boolean = false, supportingText: String? = null, announceValue: Boolean = false
 ) {
     val back = checkNotNull(LocalTvEditor.current)
     val requester = remember { FocusRequester() }
@@ -97,7 +95,11 @@ internal fun TvEditorTextField(
                     .then(fieldFocus)
                     .focusRequester(requester)
                     .focusProperties { start = back }
-                    .semantics { contentDescription = if (supportingText == null) label else "$label. $supportingText" }
+                    .semantics {
+                        contentDescription = if (supportingText == null) label else "$label. $supportingText"
+                        // Only the form knows whether a value is safe to announce before editing.
+                        if (announceValue && value.isNotBlank()) stateDescription = value
+                    }
                     .clickable(interactionSource = editor.interactionSource, indication = null, enabled = enabled,
                         role = Role.Button, onClick = editor::beginEditing)
             )

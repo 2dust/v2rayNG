@@ -72,7 +72,7 @@ class SubEditActivity : BaseSubEditActivity() {
 
 private object PhoneSubscriptionControls : SubscriptionControls {
     @Composable
-    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?) {
+    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
         FormTextField(label, value, change, keyboardType = keyboard, isError = error, supportingText = hint)
     }
 
