@@ -55,12 +55,13 @@ internal fun TvProfileSelectDialog(
     val list = rememberLazyListState(initialFirstVisibleItemIndex = initialIndex.coerceAtLeast(0))
     AlertDialog(
         onDismissRequest = onDismiss,
+        // Let the search field observe the dialog window’s IME insets after recreation.
         properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(title) },
         text = {
             val ime = rememberTvEditorIme()
             val inputMode = LocalInputModeManager.current
-            CompositionLocalProvider(LocalTvEditor provides cancel) {
+            CompositionLocalProvider(LocalTvEditor provides cancel, LocalEditorFocus provides null) {
                 Column(ime.padding) {
                     TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
                         Modifier.focusRequester(search).onFocusChanged { if (it.hasFocus) focusedTarget = SEARCH_FOCUS },
