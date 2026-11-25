@@ -12,7 +12,6 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.SubscriptionUsageInfo
 import com.v2ray.ang.enums.EConfigType
-import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
 import com.v2ray.ang.fmt.CustomOutboundFmt
@@ -160,7 +159,6 @@ object AngConfigManager {
     private fun shareConfig(guid: String): String {
         try {
             val config = MmkvManager.decodeServerConfig(guid) ?: return ""
-            if (!hasShareLinkFormat(config)) return ""
 
             return config.configType.protocolScheme + when (config.configType) {
                 EConfigType.VMESS -> VmessFmt.toUri(config)
@@ -178,15 +176,6 @@ object AngConfigManager {
             return ""
         }
     }
-
-    /**
-     * Whether a profile can be exported as a share link or QR code.
-     *
-     * xdrive has no official share-link standard yet, so its profiles are shared only as
-     * full JSON configs until Xray-core defines one.
-     */
-    internal fun hasShareLinkFormat(config: ProfileItem): Boolean =
-        config.network != NetworkType.XDRIVE.type
 
     /**
      * Imports a batch of configurations.
