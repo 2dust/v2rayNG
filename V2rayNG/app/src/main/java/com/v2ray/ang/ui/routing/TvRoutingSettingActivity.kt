@@ -47,6 +47,7 @@ import com.v2ray.ang.ui.compose.TvListRowSwitch
 import com.v2ray.ang.ui.compose.tvListRowDecoration
 import com.v2ray.ang.ui.compose.dpadClickable
 import com.v2ray.ang.ui.compose.dpadFocusOutline
+import com.v2ray.ang.ui.compose.focusAfterRemoval
 import com.v2ray.ang.ui.compose.dpadLongPressToMove
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.dpadPopupHorizontalNavigation
@@ -272,7 +273,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
             TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_routing_rule), itemName = rule.remarks,
                 onConfirm = {
                     deleteId = null
-                    val neighbor = routingRuleNeighbor(ids, id)
+                    val neighbor = focusAfterRemoval(ids, id)
                     onAction(RoutingListAction.Delete(id))
                     restore(rowFocus[neighbor]?.get(RoutingControl.Rule) ?: strategyFocus)
                 },
@@ -303,9 +304,4 @@ private fun TvRoutingRuleRow(
         TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete, navigation(RoutingControl.Delete),
             focusRequester = targets.getValue(RoutingControl.Delete), contentDescription = stringResource(R.string.acc_delete))
     }
-}
-
-internal fun routingRuleNeighbor(ids: List<String>, id: String): String? {
-    val index = ids.indexOf(id)
-    return if (index < 0) null else ids.getOrNull(index + 1) ?: ids.getOrNull(index - 1)
 }
