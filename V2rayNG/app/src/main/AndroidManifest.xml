@@ -172,6 +172,10 @@
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
+            android:name=".ui.subscription.TvSubEditActivity"
+            android:windowSoftInputMode="stateUnchanged|adjustResize"
+            android:exported="false" />
+        <activity
             android:name=".ui.shortcut.ScScannerActivity"
             android:exported="false" />
         <activity
