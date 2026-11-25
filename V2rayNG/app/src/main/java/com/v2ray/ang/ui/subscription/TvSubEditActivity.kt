@@ -1,18 +1,10 @@
 package com.v2ray.ang.ui.subscription
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,18 +19,15 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.EditorFocus
-import com.v2ray.ang.ui.compose.LocalEditorFocus
-import com.v2ray.ang.ui.compose.LocalTvEditor
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.TvEditorForm
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.TvIconButton
-import com.v2ray.ang.ui.compose.TvProfileSelectDialog
+import com.v2ray.ang.ui.compose.RestoreTvDialogOpener
+import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.dpadOrderedFocusNavigation
 import com.v2ray.ang.ui.compose.rememberEditorFocus
-import com.v2ray.ang.ui.compose.rememberTvEditorIme
-import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.ui.settings.TvSettingsRows
 
 class TvSubEditActivity : BaseSubEditActivity() {
@@ -65,16 +54,7 @@ class TvSubEditActivity : BaseSubEditActivity() {
                 })
             }
         }) { padding ->
-            val scroll = rememberScrollState()
-            val ime = rememberTvEditorIme()
-            CompositionLocalProvider(LocalTvEditor provides back, LocalEditorFocus provides focus) {
-                Column(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).then(ime.padding)
-                    .padding(horizontal = 48.dp).verticalScroll(scroll).verticalScrollbar(scroll).padding(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    content(controls)
-                    NavigationBarsSpacer()
-                }
-            }
+            TvEditorForm(padding, back, focus) { content(controls) }
         }
         if (confirm) TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name,
             onConfirm = { confirm = false; delete() }, onDismiss = { confirm = false })
@@ -103,17 +83,12 @@ private class TvSubscriptionControls(private val back: FocusRequester, private v
         val clear = remember { FocusRequester() }
         val order = listOf(pick, clear)
         var open by rememberSaveable { mutableStateOf(false) }
-        var wasOpen by remember { mutableStateOf(open) }
-        LaunchedEffect(open) {
-            // After recreation Android can return focus to Clear, the other button in this row.
-            if (wasOpen && !open) pick.requestFocus()
-            wasOpen = open
-        }
+        RestoreTvDialogOpener(open, pick)
         ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint,
             focus.target(pick).dpadOrderedFocusNavigation(pick, order, onBeforeFirst = { back.requestFocus() }).dpadFocusOutline(),
             focus.target(clear).dpadOrderedFocusNavigation(clear, order).dpadFocusOutline(cornerRadius = 24.dp))
         if (open) {
-            TvProfileSelectDialog(label, options, value, onSelect = { change(it); open = false }, onDismiss = { open = false })
+            TvSearchableOptionsDialog(label, options, value, onSelect = { change(it); open = false }, onDismiss = { open = false })
         }
     }
 }
