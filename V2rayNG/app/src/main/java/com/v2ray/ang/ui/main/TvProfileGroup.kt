@@ -19,6 +19,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -78,6 +79,7 @@ internal fun TvProfileGroup(
     revealGeneration: Int,
     lastReveals: MutableMap<String, ProfileReveal>,
     onOpenDrawer: (TvMainFocusTarget.Profile) -> Unit,
+    onSearchFocus: ((TvMainFocusTarget.Profile) -> Unit)?,
     onBackToToolbar: () -> Unit,
     onUpFromFirstRow: (() -> Boolean)?
 ) {
@@ -172,6 +174,7 @@ internal fun TvProfileGroup(
             val renderRow = @Composable {
                 TvProfileRow(
                     row = row,
+                    onSearchFocus = onSearchFocus,
                     selected = row.guid == uiState.selectedGuid,
                     current = targets.getValue(row.guid),
                     above = targetAt(index - stride),
@@ -227,6 +230,7 @@ private fun RevealSelectedProfile(
 @Composable
 private fun TvProfileRow(
     row: ServerRowUiModel,
+    onSearchFocus: ((TvMainFocusTarget.Profile) -> Unit)?,
     selected: Boolean,
     current: ProfileRowFocus,
     above: ProfileRowFocus?,
@@ -243,7 +247,10 @@ private fun TvProfileRow(
     val moving = reorderItem?.let { it.state.isMoving(row.guid) } == true
     val decoration = Modifier.dpadFocusOutline(focusRequester = current.row, showFocus = !moving)
         .dpadBackNavigation(enabled = !moving, onBack = onBackToToolbar)
-    val interaction = Modifier
+    fun searchTarget(action: ProfileRowAction? = null) = if (onSearchFocus == null) Modifier else Modifier.onFocusChanged {
+        if (it.isFocused) onSearchFocus(TvMainFocusTarget.Profile(row.guid, action))
+    }
+    val interaction = searchTarget()
         .dpadOrderedFocusNavigation(current.row, current.order, onBeforeFirst = onPrevious)
         .dpadVerticalFocusNavigation(
             onMoveUp = { above?.row?.let(requestFocus) ?: onUpFromFirstRow() },
@@ -270,7 +277,7 @@ private fun TvProfileRow(
                     )
                     TvIconButton(
                         painterResource(action.icon), stringResource(action.label), { onAction(action) },
-                        modifier = navigation, focusRequester = target, contentDescription = stringResource(action.description)
+                        modifier = searchTarget(action).then(navigation), focusRequester = target, contentDescription = stringResource(action.description)
                     )
                 }
             }

@@ -103,7 +103,10 @@ internal fun TvMainScreen(
     var drawerOrigin by rememberSaveable(stateSaver = TvMainFocusTarget.DrawerOrigin.Saver) {
         mutableStateOf<TvMainFocusTarget.DrawerOrigin?>(null)
     }
-    var focusToRestore by remember { mutableStateOf<TvMainFocusTarget?>(null) }
+    var searchResult by rememberSaveable(stateSaver = TvMainFocusTarget.DrawerOrigin.Saver) {
+        mutableStateOf<TvMainFocusTarget.DrawerOrigin?>(null)
+    }
+    var focusToRestore by remember { mutableStateOf<TvMainFocusTarget?>(searchResult.takeUnless { isDrawerOpen }) }
     fun openDrawer(origin: TvMainFocusTarget.DrawerOrigin) {
         drawerOrigin = origin
         drawerState.setValue(TvDrawerValue.Open)
@@ -111,6 +114,7 @@ internal fun TvMainScreen(
     var showSearch by rememberSaveable { mutableStateOf(uiState.searchQuery.isNotEmpty()) }
     fun closeSearch() {
         onAction(MainAction.Search(""))
+        searchResult = null
         showSearch = false
     }
 
@@ -194,6 +198,8 @@ internal fun TvMainScreen(
                         isLoading = isLoading,
                         isRunning = uiState.isRunning,
                         showSearch = showSearch,
+                        searchResultFocused = searchResult != null,
+                        onSearchToolbarFocused = { searchResult = null },
                         searchQuery = uiState.searchQuery,
                         focusRequesters = topBarFocus,
                         onSearchQueryChange = { onAction(MainAction.Search(it)) },
@@ -219,6 +225,7 @@ internal fun TvMainScreen(
                         if (tabState != null && requestTabFocus != null) {
                             TvGroupTabBar(
                                 groups, mainViewModel, selectedGroupIndex, tabState, tabOrder, requestTabFocus,
+                                onSearchFocus = if (showSearch) { id -> searchResult = TvMainFocusTarget.GroupTab(id) } else null,
                                 onOpenDrawer = { id -> openDrawer(TvMainFocusTarget.GroupTab(id)) },
                                 onMoveUp = { topBarFocus.start.requestFocus() },
                                 onSelectGroup = { onAction(MainAction.SelectGroup(it)) }
@@ -242,6 +249,7 @@ internal fun TvMainScreen(
                                 dialogs = dialogs,
                                 revealGeneration = profileRevealGeneration,
                                 lastReveals = lastReveals,
+                                onSearchFocus = if (showSearch) { profile -> searchResult = profile } else null,
                                 onOpenDrawer = ::openDrawer,
                                 onBackToToolbar = { topBarFocus.start.requestFocus() },
                                 onUpFromFirstRow = if (tabState != null) { { focusGroupTab(selectedGroup.id) } } else null

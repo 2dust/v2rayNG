@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.DpadHorizontalDirection
 import com.v2ray.ang.ui.compose.TvIconButton
+import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.TvTopBarSearchField
 import com.v2ray.ang.ui.compose.adjacentDpadFocusTarget
 import com.v2ray.ang.ui.compose.colorFabActive
@@ -76,6 +78,8 @@ internal fun TvMainTopBar(
     isLoading: Boolean,
     isRunning: Boolean,
     showSearch: Boolean,
+    searchResultFocused: Boolean,
+    onSearchToolbarFocused: () -> Unit,
     searchQuery: String,
     focusRequesters: TvMainTopBarFocus,
     onSearchQueryChange: (String) -> Unit,
@@ -130,6 +134,11 @@ internal fun TvMainTopBar(
         }
     }
 
+    // Filtered results restore by ID after the list loads; the toolbar must not take their focus.
+    val searchFocus = if (showSearch && !searchResultFocused) rememberEditorFocus() else null
+    @Composable
+    fun searchTarget(): Modifier = Modifier.onFocusChanged { if (it.isFocused) onSearchToolbarFocused() }
+        .then(searchFocus?.target() ?: Modifier)
     val searchInputFocus = remember { FocusRequester() }
     val searchClearFocus = remember { FocusRequester() }
     // While searching, Back takes Start's place and the normal toolbar actions are hidden.
@@ -140,7 +149,9 @@ internal fun TvMainTopBar(
             modifier = Modifier.padding(horizontal = 48.dp, vertical = 12.dp),
             title = {
                 if (showSearch) {
-                    TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder, onMoveDown)
+                    TvTopBarSearchField(searchQuery, onSearchQueryChange, searchInputFocus, searchClearFocus, searchFocusOrder, onMoveDown) {
+                        searchTarget()
+                    }
                 } else {
                     Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.CenterStart) {
                         AppBrandTitle(
@@ -157,7 +168,7 @@ internal fun TvMainTopBar(
                         contentDescription = stringResource(R.string.acc_back),
                         onClick = onSearchClose,
                         focusRequester = focusRequesters.start,
-                        modifier = Modifier.dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder, onMoveDown)
+                        modifier = searchTarget().dpadTopBarFocusNavigation(focusRequesters.start, searchFocusOrder, onMoveDown)
                     )
                 }
             },

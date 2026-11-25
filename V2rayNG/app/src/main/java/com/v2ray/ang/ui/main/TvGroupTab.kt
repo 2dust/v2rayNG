@@ -43,6 +43,7 @@ internal fun TvGroupTabBar(
     tabFocusRequesters: List<FocusRequester>,
     requestFocus: (FocusRequester) -> Boolean,
     onOpenDrawer: (String) -> Unit,
+    onSearchFocus: ((String) -> Unit)?,
     onMoveUp: () -> Boolean,
     onSelectGroup: (String) -> Unit
 ) {
@@ -62,7 +63,12 @@ internal fun TvGroupTabBar(
             val focusRequester = tabFocusRequesters[index]
             val tabModifier = Modifier
                 .dpadFocusOutline(focusRequester = focusRequester, cornerRadius = 20.dp)
-                .onFocusChanged { if (it.isFocused && index != selectedIndex) onSelectGroup(group.id) }
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        onSearchFocus?.invoke(group.id)
+                        if (index != selectedIndex) onSelectGroup(group.id)
+                    }
+                }
                 .dpadOrderedFocusNavigation(
                     current = focusRequester,
                     order = tabFocusRequesters,
