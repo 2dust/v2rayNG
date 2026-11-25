@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
@@ -77,6 +78,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
+import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
@@ -424,16 +426,16 @@ fun ServerCustomConfigScreen(
                 .consumeWindowInsets(innerPadding)
                 .then(tvIme?.padding?.padding(horizontal = 48.dp) ?: Modifier.imePadding())
         ) {
-            CompositionLocalProvider(LocalTvEditor provides tvBack, LocalEditorFocus provides tvFocus) {
-                FormTextField(
-                    label = stringResource(R.string.server_lab_remarks),
-                    value = remarks,
-                    onValueChange = { remarks = it },
-                    modifier = if (isTelevision) Modifier else Modifier.focusRequester(remarksFocus).onFocusChanged {
-                        if (it.hasFocus) focusedField = CustomEditorField.Remarks
-                    },
-                    isError = isRemarksError
-                )
+            val remarksLabel = stringResource(R.string.server_lab_remarks)
+            if (tvBack != null) {
+                CompositionLocalProvider(LocalTvEditor provides tvBack, LocalEditorFocus provides tvFocus) {
+                    TvEditorTextField(remarksLabel, remarks, { remarks = it }, Modifier, true, KeyboardType.Text,
+                        placeholder = null, maxLines = 5, isError = isRemarksError, supportingText = null)
+                }
+            } else {
+                FormTextField(remarksLabel, remarks, { remarks = it },
+                    modifier = Modifier.focusRequester(remarksFocus).onFocusChanged { if (it.hasFocus) focusedField = CustomEditorField.Remarks },
+                    isError = isRemarksError)
             }
 
             Box(
