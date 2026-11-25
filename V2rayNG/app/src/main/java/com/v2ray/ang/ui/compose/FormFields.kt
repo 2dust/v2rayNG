@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun Modifier.editorFocusTarget(): Modifier =
-    then(LocalOutboundEditorFocus.current?.target() ?: LocalEditorFocus.current?.target() ?: Modifier)
+    then(LocalEditorFocus.current?.target() ?: Modifier)
 
 @Composable
 fun FormTextField(

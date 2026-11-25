@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
+import com.v2ray.ang.ui.compose.LocalEditorFocus
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.TvIconButton
 import com.v2ray.ang.ui.compose.dpadFocusOutline
-import com.v2ray.ang.ui.compose.rememberOutboundEditorFocus
+import com.v2ray.ang.ui.compose.rememberEditorFocus
 import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
@@ -45,7 +45,7 @@ internal fun TvServerEditor(
     val back = remember { FocusRequester() }
     val save = remember { FocusRequester() }
     val delete = remember { FocusRequester() }
-    val focus = rememberOutboundEditorFocus(fallback = back)
+    val focus = rememberEditorFocus(fallback = back)
     val scroll = rememberScrollState()
     val ime = rememberTvEditorIme()
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -92,7 +92,7 @@ internal fun TvServerEditor(
         }
     ) { innerPadding ->
         CompositionLocalProvider(
-            LocalOutboundEditorFocus provides focus,
+            LocalEditorFocus provides focus,
             LocalTvEditor provides back
         ) {
             Column(
