@@ -265,7 +265,7 @@ fun ServerCustomConfigScreen(
     val tvFocus = if (tvBack != null) rememberEditorFocus(fallback = tvBack) else null
     val tvIme = if (tvBack != null) rememberTvEditorIme() else null
     val tvJson = if (tvBack != null && tvFocus != null && tvIme != null) {
-        rememberTvJsonFocus(tvBack, tvFocus, tvIme.visible)
+        rememberTvJsonFocus(tvBack, tvFocus, tvIme.visible, textFieldState)
     } else null
     val scrollFocus = if (tvJson != null) Modifier.focusProperties { canFocus = false } else Modifier
 

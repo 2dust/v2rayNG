@@ -25,14 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +48,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.v2ray.ang.R
 
 // Phone and unrelated forms keep their existing controls.
@@ -80,23 +76,10 @@ internal fun TvEditorTextField(
 ) {
     val back = checkNotNull(LocalTvEditor.current)
     val requester = remember { FocusRequester() }
-    var wasEditing by rememberSaveable { mutableStateOf(false) }
-    val editor = rememberTvTextFieldState(requester, initiallyEditing = wasEditing)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    // Losing focus as the old window detaches must not turn an active edit into a passive field.
-    SideEffect { if (lifecycle.currentState == Lifecycle.State.RESUMED) wasEditing = editor.isEditing }
+    val editor = rememberTvTextFieldState(requester)
     // The passive button and the active editor represent the same field across recreation.
     val fieldFocus = LocalEditorFocus.current?.target() ?: Modifier
-    var input by rememberEditorTextValue(value)
-    var restoredSelection by remember { mutableStateOf(input.selection.takeIf { wasEditing }) }
-    // A TV keyboard may move the caret to the end when it attaches to a recreated window.
-    // Apply the saved selection once its input view is shown, not on subsequent user edits.
-    LaunchedEffect(editor.isEditing, editor.imeWasVisible) {
-        if (!editor.isEditing || editor.imeWasVisible) {
-            if (editor.isEditing) restoredSelection?.let { input = input.copy(selection = it) }
-            restoredSelection = null
-        }
-    }
+    var input by rememberEditorTextValue(value, editor)
     LaunchedEffect(enabled) { if (!enabled && editor.isEditing) editor.finishEditing() }
     Box(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
         OutlinedTextField(
@@ -104,10 +87,7 @@ internal fun TvEditorTextField(
             onValueChange = {
                 if (editor.isEditing) {
                     input = it
-                    if (it.text != value) {
-                        restoredSelection = null
-                        onValueChange(it.text)
-                    }
+                    if (it.text != value) onValueChange(it.text)
                 }
             },
             readOnly = !editor.isEditing,
