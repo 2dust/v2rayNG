@@ -84,14 +84,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        allRemarks = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.CUSTOM_OUTBOUND,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
+        allRemarks = SettingsManager.getSimpleProfileRemarks()
         val config = MmkvManager.decodeServerConfig(editGuid)
         initialRemarks = config?.remarks ?: ""
         initialMembers = config?.proxyChainProfileList?.map { it.trim() }?.filter { it.isNotEmpty() } ?: listOf("", "")

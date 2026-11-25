@@ -13,11 +13,13 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileEntry
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
+import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager.decodeAllServerList
 import com.v2ray.ang.handler.MmkvManager.decodeServerConfig
@@ -44,6 +46,13 @@ internal fun Sequence<ProfileEntry>.firstByRemarks(remarks: Collection<String>):
         }
     }
 }
+
+/** Editors trim chain references; the resolver uses the first exact name in storage. */
+internal fun Sequence<ProfileItem>.selectableChainRemarks(): List<String> = distinctBy { it.remarks }
+    .filterNot { it.configType.isComplexType() }
+    .map { it.remarks }
+    .filter { it.isNotEmpty() && it == it.trim() }
+    .toList()
 
 object SettingsManager {
 
@@ -224,6 +233,9 @@ object SettingsManager {
 
     private fun storedProfileEntries(): Sequence<ProfileEntry> =
         decodeAllServerList().asSequence().mapNotNull { guid -> decodeServerConfig(guid)?.let { ProfileEntry(guid, it) } }
+
+    fun getSimpleProfileRemarks(): List<String> =
+        decodeAllServerList().asSequence().mapNotNull(::decodeServerConfig).selectableChainRemarks()
 
     /**
      * Collects non-empty profile remarks while excluding specific config types.
