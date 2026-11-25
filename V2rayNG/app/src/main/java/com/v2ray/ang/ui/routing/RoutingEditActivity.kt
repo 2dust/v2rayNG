@@ -148,34 +148,30 @@ abstract class BaseRoutingEditActivity : BaseComponentActivity() {
     @Composable
     final override fun ScreenContent() {
         if (forwardingToTv) return
-        val form by viewModel.form.collectAsStateWithLifecycle()
-        val busy by viewModel.busy.collectAsStateWithLifecycle()
-        val result by viewModel.result.collectAsStateWithLifecycle()
+        val state by viewModel.uiState.collectAsStateWithLifecycle()
+        val result = state.result
         LaunchedEffect(result) {
             when (result) {
                 RoutingEditViewModel.Result.Saved -> { toastSuccess(R.string.toast_success); finish() }
                 RoutingEditViewModel.Result.Deleted -> finish()
                 RoutingEditViewModel.Result.LoadFailed -> { toastError(R.string.toast_failure); finish() }
-                RoutingEditViewModel.Result.EditFailed -> { viewModel.clearResult(); toastError(R.string.toast_failure) }
+                RoutingEditViewModel.Result.EditFailed -> { viewModel.dismissEditFailure(); toastError(R.string.toast_failure) }
                 null -> Unit
             }
         }
 
-        val loaded = form
+        val loaded = state.form
         if (loaded == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             return
         }
         val draft = rememberSaveable(saver = RoutingRuleDraft.Saver) { RoutingRuleDraft(loaded.initial) }
-        var remarksError by rememberSaveable { mutableStateOf(false) }
-        Editor(loaded, draft, remarksError, busy) {
-            val rule = draft.buildRuleset(loaded.initial)
-            remarksError = rule == null
-            if (rule != null) viewModel.save(position, rule)
+        Editor(loaded, draft, state.remarksError, state.busy) {
+            viewModel.save(draft.buildRuleset())
         }
     }
 
-    protected fun deleteRule() = viewModel.delete(position)
+    protected fun deleteRule() = viewModel.delete()
 
     @Composable
     internal abstract fun Editor(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, busy: Boolean, onSave: () -> Unit)

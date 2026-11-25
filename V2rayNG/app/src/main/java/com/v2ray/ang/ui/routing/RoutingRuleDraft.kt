@@ -25,9 +25,8 @@ internal class RoutingRuleDraft(initial: RulesetItem?) {
 
     private val textFields: List<MutableState<String>> = listOf(remarks, domain, ip, process, port, protocol, network, outboundTag)
 
-    fun buildRuleset(initial: RulesetItem?): RulesetItem? {
-        if (remarks.value.isBlank()) return null
-        return (initial ?: RulesetItem()).copy(
+    fun buildRuleset(): RulesetItem =
+        RulesetItem(
             remarks = remarks.value,
             locked = locked.value,
             domain = domain.value.parseList(),
@@ -38,7 +37,6 @@ internal class RoutingRuleDraft(initial: RulesetItem?) {
             network = network.value.takeUnless(String::isBlank),
             outboundTag = outboundTag.value.trim().ifEmpty { TAG_PROXY }
         )
-    }
 
     companion object {
         val Saver: Saver<RoutingRuleDraft, Any> = listSaver(

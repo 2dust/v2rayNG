@@ -18,77 +18,96 @@ internal class RoutingEditViewModel : ViewModel() {
     internal data class Form(val initial: RulesetItem?, val outbounds: List<String>, val canUseProcess: Boolean)
     internal enum class Result { Saved, Deleted, LoadFailed, EditFailed }
 
-    private val _form = MutableStateFlow<Form?>(null)
-    val form = _form.asStateFlow()
-    private val _busy = MutableStateFlow(false)
-    val busy = _busy.asStateFlow()
-    private val _result = MutableStateFlow<Result?>(null)
-    val result = _result.asStateFlow()
-    private var loaded = false
+    internal data class UiState(
+        val form: Form? = null,
+        val busy: Boolean = false,
+        val remarksError: Boolean = false,
+        val result: Result? = null
+    )
+
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
+    private var openedPosition: Int? = null
 
     fun load(position: Int) {
-        if (loaded) return
-        loaded = true
+        if (openedPosition != null) return
+        openedPosition = position
         runEdit("load", Result.LoadFailed) {
             val initial = if (position < 0) null else checkNotNull(MmkvManager.decodeRoutingRulesets()?.getOrNull(position))
             val form = Form(initial, SettingsManager.getProfileRemarks(), SettingsManager.canUseProcessRouting())
-            withContext(Dispatchers.Main) { _form.value = form }
-            null
+            copy(form = form)
         }
     }
 
-    fun save(position: Int, rule: RulesetItem) {
-        if (rule.remarks.isNullOrBlank()) return
-        val form = _form.value ?: return
-        runEdit("save", Result.EditFailed) {
-            if (form.initial == null) {
-                SettingsManager.saveRoutingRuleset(-1, rule.copy(id = UUID.randomUUID().toString()))
-            } else {
-                val index = currentIndex(position, form.initial)
-                SettingsManager.saveRoutingRuleset(index, rule)
-            }
-            Result.Saved
+    fun save(rule: RulesetItem) {
+        val state = _uiState.value
+        if (state.busy) return
+        if (rule.remarks.isNullOrBlank()) {
+            _uiState.value = state.copy(remarksError = true)
+            return
+        }
+        val form = state.form ?: return
+        val position = openedPosition ?: return
+        runEdit("save", Result.EditFailed, state.copy(remarksError = false)) {
+            val rules = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+            saveEditedRule(rules, position, form.initial, rule)
+            MmkvManager.encodeRoutingRulesets(rules)
+            copy(result = Result.Saved)
         }
     }
 
-    fun delete(position: Int) {
-        val initial = _form.value?.initial ?: return
+    fun delete() {
+        val initial = _uiState.value.form?.initial ?: return
+        val position = openedPosition ?: return
         runEdit("delete", Result.EditFailed) {
-            SettingsManager.removeRoutingRuleset(currentIndex(position, initial))
-            Result.Deleted
+            val rules = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+            val index = findEditedRule(rules, position, initial)
+            check(index >= 0)
+            rules.removeAt(index)
+            MmkvManager.encodeRoutingRulesets(rules)
+            copy(result = Result.Deleted)
         }
     }
 
-    fun clearResult() {
-        _result.value = null
+    fun dismissEditFailure() {
+        val state = _uiState.value
+        if (state.result == Result.EditFailed) _uiState.value = state.copy(result = null)
     }
 
-    private fun currentIndex(position: Int, initial: RulesetItem): Int {
-        val rules = MmkvManager.decodeRoutingRulesets().orEmpty()
-        return findEditedRule(rules, position, initial).also { check(it >= 0) }
-    }
-
-    private fun runEdit(operation: String, onFailure: Result, block: suspend () -> Result?) {
-        if (_busy.value) return
-        _busy.value = true
+    private fun runEdit(operation: String, onFailure: Result, state: UiState = _uiState.value, block: UiState.() -> UiState) {
+        if (state.busy || state.result == Result.Saved || state.result == Result.Deleted) return
+        val next = state.copy(result = null)
+        _uiState.value = next.copy(busy = true)
         viewModelScope.launch {
-            try {
-                _result.value = withContext(Dispatchers.IO) { block() }
+            _uiState.value = try {
+                withContext(Dispatchers.IO) { next.block() }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 LogUtil.e(message = "Routing rule editor: $operation failed", throwable = e)
-                _result.value = onFailure
-            } finally {
-                _busy.value = false
+                next.copy(result = onFailure)
             }
         }
     }
 }
 
+/** Resolve and update the same snapshot; only the form fields belong to the draft. */
+internal fun saveEditedRule(rules: MutableList<RulesetItem>, originalPosition: Int, initial: RulesetItem?, draft: RulesetItem) {
+    if (initial == null) {
+        rules.add(0, draft.copy(id = UUID.randomUUID().toString()))
+    } else {
+        val index = findEditedRule(rules, originalPosition, initial)
+        check(index >= 0)
+        val current = rules[index]
+        rules[index] = draft.copy(id = current.id, enabled = current.enabled)
+    }
+}
+
 internal fun findEditedRule(rules: List<RulesetItem>, originalPosition: Int, initial: RulesetItem): Int {
+    if (rules.getOrNull(originalPosition) == initial) return originalPosition
     val id = initial.id
-    // Older rules may have no ID. Only write to the original slot if its rule still matches.
-    if (id.isEmpty()) return originalPosition.takeIf { rules.getOrNull(it) == initial } ?: -1
-    return rules.indexOfFirst { it.id == id }
+    if (id.isBlank()) return -1
+    // A preset import can preserve a locked rule and bring in another with the same ID.
+    val matches = rules.indices.filter { rules[it].id == id }
+    return matches.singleOrNull() ?: matches.singleOrNull { rules[it] == initial } ?: -1
 }

@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.platform.LocalContext
@@ -38,7 +39,7 @@ internal fun RoutingRuleFields(
     outbound: @Composable (String) -> Unit
 ) {
     val commaTip = stringResource(R.string.routing_settings_comma_tip)
-    RoutingRuleTextField(stringResource(R.string.sub_setting_remarks), draft.remarks.value, { draft.remarks.value = it }, isError = remarksError)
+    RoutingRuleTextField(stringResource(R.string.sub_setting_remarks), draft.remarks, isError = remarksError)
     locked(stringResource(R.string.routing_settings_locked))
     Text(
         text = stringResource(R.string.routing_settings_tips),
@@ -46,14 +47,12 @@ internal fun RoutingRuleFields(
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
-    RoutingRuleTextField(stringResource(R.string.routing_settings_domain), draft.domain.value, { draft.domain.value = it }, placeholder = commaTip)
-    RoutingRuleTextField(stringResource(R.string.routing_settings_ip), draft.ip.value, { draft.ip.value = it }, placeholder = commaTip)
-    RoutingRuleTextField(stringResource(R.string.routing_settings_process), draft.process.value, { draft.process.value = it },
-        placeholder = commaTip, enabled = canUseProcess)
+    RoutingRuleTextField(stringResource(R.string.routing_settings_domain), draft.domain, placeholder = commaTip)
+    RoutingRuleTextField(stringResource(R.string.routing_settings_ip), draft.ip, placeholder = commaTip)
+    RoutingRuleTextField(stringResource(R.string.routing_settings_process), draft.process, placeholder = commaTip, enabled = canUseProcess)
     if (canUseProcess) RoutingProcessPicker(draft)
-    RoutingRuleTextField(stringResource(R.string.routing_settings_port), draft.port.value, { draft.port.value = it })
-    RoutingRuleTextField(stringResource(R.string.routing_settings_protocol), draft.protocol.value, { draft.protocol.value = it },
-        placeholder = stringResource(R.string.routing_settings_protocol_tip))
+    RoutingRuleTextField(stringResource(R.string.routing_settings_port), draft.port)
+    RoutingRuleTextField(stringResource(R.string.routing_settings_protocol), draft.protocol, placeholder = stringResource(R.string.routing_settings_protocol_tip))
     val networkLabel = stringResource(R.string.routing_settings_network)
     val network = draft.network.value.ifBlank { routingNetworkOptions.last() }
     val setNetwork: (String) -> Unit = { draft.network.value = it }
@@ -67,13 +66,14 @@ internal fun RoutingRuleFields(
 
 @Composable
 private fun RoutingRuleTextField(
-    label: String, value: String, onChange: (String) -> Unit, placeholder: String? = null,
+    label: String, field: MutableState<String>, placeholder: String? = null,
     enabled: Boolean = true, isError: Boolean = false
 ) {
+    val onChange: (String) -> Unit = { field.value = it }
     if (LocalTvEditor.current == null) {
-        FormTextField(label, value, onChange, enabled = enabled, placeholder = placeholder, isError = isError)
+        FormTextField(label, field.value, onChange, enabled = enabled, placeholder = placeholder, isError = isError)
     } else {
-        TvEditorTextField(label, value, onChange, Modifier, enabled, KeyboardType.Text, placeholder, 5, isError, null)
+        TvEditorTextField(label, field.value, onChange, Modifier, enabled, KeyboardType.Text, placeholder, 5, isError, null)
     }
 }
 
