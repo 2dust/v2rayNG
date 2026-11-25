@@ -52,12 +52,12 @@ internal fun tvTextFieldRecoveryAction(
 /**
  * Owns the handoff between the passive TV search focus target and the IME editor.
  */
-internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, private val hideKeyboard: () -> Unit) {
+internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, initiallyEditing: Boolean, private val hideKeyboard: () -> Unit) {
     val editorFocusRequester = FocusRequester()
     val interactionSource = MutableInteractionSource()
     val bringIntoViewRequester = BringIntoViewRequester()
 
-    var isEditing by mutableStateOf(false)
+    var isEditing by mutableStateOf(initiallyEditing)
         private set
     internal var editorHasFocus by mutableStateOf(false)
     internal var imeWasVisible by mutableStateOf(false)
@@ -105,7 +105,7 @@ internal class TvTextFieldState(val passiveFocusRequester: FocusRequester, priva
  */
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
-internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester): TvTextFieldState {
+internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester, initiallyEditing: Boolean = false): TvTextFieldState {
     val keyboardController = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current
     val imeBottomClearancePx = with(density) { TvImeBottomClearance.toPx() }
@@ -113,6 +113,7 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester): Tv
     val state = remember(passiveFocusRequester) {
         TvTextFieldState(
             passiveFocusRequester = passiveFocusRequester,
+            initiallyEditing = initiallyEditing,
             hideKeyboard = { currentKeyboardController.value?.hide() }
         )
     }
