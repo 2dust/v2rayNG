@@ -8,6 +8,7 @@ import android.text.format.DateFormat
 import android.text.format.Formatter
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -70,8 +74,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 private enum class AddAssetMenuAction(@StringRes val labelRes: Int) {
     File(R.string.menu_item_add_file),
@@ -98,9 +104,12 @@ class UserAssetActivity : HelperBaseComponentActivity() {
         val isLoading by isLoadingState.collectAsStateWithLifecycle()
         val geoFilesSource by geoFilesSourceState.collectAsStateWithLifecycle()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
+        val isDownloading by viewModel.isDownloading.collectAsStateWithLifecycle()
         UserAssetScreen(
             uiState = uiState,
-            isLoading = isLoading,
+            downloadProgress = downloadProgress,
+            isLoading = isLoading || isDownloading,
             geoFilesSource = geoFilesSource,
             geoFilesSourcesList = AppConfig.GEO_FILES_SOURCES.toList(),
             onBackClick = { finish() },
@@ -211,6 +220,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
     }
 
     private fun downloadGeoFiles() {
+        if (isLoadingState.value || viewModel.isDownloading.value) return
         isLoadingState.value = true
         toast(R.string.msg_downloading_content)
 
@@ -253,6 +263,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 @Composable
 internal fun UserAssetScreen(
     uiState: UserAssetUiState,
+    downloadProgress: Map<String, AssetDownloadProgress>,
     isLoading: Boolean,
     geoFilesSource: String,
     geoFilesSourcesList: List<String>,
@@ -298,7 +309,7 @@ internal fun UserAssetScreen(
                             }
                         }
                     }
-                    IconButton(onClick = onDownloadClick) {
+                    IconButton(onClick = onDownloadClick, enabled = !isLoading) {
                         Icon(painterResource(R.drawable.ic_cloud_download_24dp), contentDescription = stringResource(R.string.acc_download_file))
                     }
                 }
@@ -333,7 +344,7 @@ internal fun UserAssetScreen(
                 UserAssetItem(
                     item = item,
                     fileMetadata = uiState.fileMetadata[item.guid],
-                    isDownloading = uiState.downloadingItem == item.assetUrl.remarks,
+                    progress = downloadProgress[item.guid],
                     onEdit = { onEditAsset(item.guid) },
                     onDeleteClick = {
                         deleteTarget = AssetDeleteTarget(item.guid, item.assetUrl.remarks)
@@ -362,7 +373,7 @@ internal fun UserAssetScreen(
 private fun UserAssetItem(
     item: AssetUrlCache,
     fileMetadata: AssetFileMetadata?,
-    isDownloading: Boolean = false,
+    progress: AssetDownloadProgress?,
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -403,14 +414,9 @@ private fun UserAssetItem(
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (isDownloading) {
-                Spacer(modifier = Modifier.height(4.dp))
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp),
-                    color = MaterialTheme.colorScheme.secondary
-                )
+            if (progress != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                DownloadProgressRow(progress = progress, locale = locale)
             }
         }
         if (showEditButton) {
@@ -429,5 +435,48 @@ private fun UserAssetItem(
                 modifier = Modifier.size(24.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun DownloadProgressRow(progress: AssetDownloadProgress, locale: Locale) {
+    val context = LocalContext.current
+    val fraction = progress.fraction
+    val animatedFraction by animateFloatAsState(targetValue = fraction ?: 0f, label = "assetDownloadProgress")
+    val label = if (fraction != null) {
+        NumberFormat.getPercentInstance(locale).format(fraction.toDouble())
+    } else {
+        Formatter.formatFileSize(context, progress.downloaded)
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val barModifier = Modifier
+            .weight(1f)
+            .height(4.dp)
+            .clip(RoundedCornerShape(2.dp))
+        if (fraction != null) {
+            LinearProgressIndicator(
+                progress = { animatedFraction },
+                modifier = barModifier,
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        } else {
+            LinearProgressIndicator(
+                modifier = barModifier,
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 1,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
