@@ -45,7 +45,6 @@ import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
@@ -216,22 +215,22 @@ fun SubEditScreen(
                 .padding(vertical = 8.dp)
                 .padding(bottom = 36.dp)
         ) {
-            FormTextField(
+            SubscriptionTextField(
                 label = stringResource(R.string.sub_setting_remarks),
                 value = remarks,
                 onValueChange = { remarks = it },
                 isError = isRemarksError
             )
-            FormTextField(
+            SubscriptionTextField(
                 label = stringResource(R.string.sub_setting_url),
                 value = url,
                 onValueChange = { url = it },
                 isError = isUrlError,
                 supportingText = if (isUrlError) stringResource(R.string.toast_invalid_url) else null
             )
-            FormTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
-            FormTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
-            FormTextField(stringResource(R.string.sub_setting_filter), filter, { filter = it })
+            SubscriptionTextField(stringResource(R.string.sub_setting_user_agent), userAgent, { userAgent = it })
+            SubscriptionTextField(stringResource(R.string.sub_setting_request_headers), requestHeaders, { requestHeaders = it })
+            SubscriptionTextField(stringResource(R.string.sub_setting_filter), filter, { filter = it })
             SettingsSwitchItem(
                 title = stringResource(R.string.sub_setting_enable),
                 checked = enabled,
@@ -244,7 +243,7 @@ fun SubEditScreen(
                 onCheckedChange = { autoUpdate = it }
             )
 
-            FormTextField(
+            SubscriptionTextField(
                 label = stringResource(R.string.title_pref_auto_update_interval),
                 value = updateInterval,
                 onValueChange = { updateInterval = it },

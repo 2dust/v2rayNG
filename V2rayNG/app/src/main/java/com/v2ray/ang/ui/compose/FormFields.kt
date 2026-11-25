@@ -59,19 +59,22 @@ fun FormTextField(
             maxLines = maxLines,
             enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.secondary,
-                selectionColors = TextSelectionColors(
-                    handleColor = MaterialTheme.colorScheme.secondary,
-                    backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
-                )
-            ),
+            colors = formTextFieldColors(),
             modifier = Modifier.fillMaxWidth().then(LocalEditorFocus.current?.target() ?: Modifier)
         )
     }
 }
+
+@Composable
+internal fun formTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedContainerColor = Color.Transparent,
+    unfocusedContainerColor = Color.Transparent,
+    cursorColor = MaterialTheme.colorScheme.secondary,
+    selectionColors = TextSelectionColors(
+        handleColor = MaterialTheme.colorScheme.secondary,
+        backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)
+    )
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
