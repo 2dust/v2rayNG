@@ -216,7 +216,7 @@ internal fun rememberTvAppListFocus(apps: List<AppInfo>): TvAppListFocus {
     val scroll = rememberLazyListState()
     val packages = remember(apps) { apps.map { it.packageName } }
     val targets = rememberDpadFocusTargets(packages) { FocusRequester() }
-    val rows = remember(targets) { targets.values.map { listOf(it) } }
+    val rows = remember(packages) { packages.map { listOf(targets.getValue(it)) } }
     val request = rememberLazyDpadFocus(rows) { scroll.scrollToItem(it) }
     return remember(scroll, packages, targets, request) { TvAppListFocus(scroll, packages, targets, request) }
 }

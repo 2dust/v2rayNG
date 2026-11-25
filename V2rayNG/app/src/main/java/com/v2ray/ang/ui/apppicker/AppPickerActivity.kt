@@ -68,8 +68,7 @@ class AppPickerActivity : BaseAppPickerActivity() {
 
     @Composable
     override fun PickerContent(title: String, apps: List<AppInfo>, isLoading: Boolean, selectedPackages: Set<String>, actions: AppPickerActions) {
-        AppPickerScreen(title, apps, isLoading, selectedPackages, actions.onBack, actions.onToggleApp, actions.onSearch,
-            actions.onSelectAll, actions.onInvertSelection)
+        AppPickerScreen(title, apps, isLoading, selectedPackages, actions.onBack, actions.onToggleApp, actions.onSearch, actions.onMenuAction)
     }
 }
 
@@ -77,8 +76,7 @@ internal class AppPickerActions(
     val onBack: () -> Unit,
     val onToggleApp: (String) -> Unit,
     val onSearch: (String) -> Unit,
-    val onSelectAll: () -> Unit,
-    val onInvertSelection: () -> Unit
+    val onMenuAction: (AppPickerMenuAction) -> Unit
 )
 
 abstract class BaseAppPickerActivity : BaseComponentActivity() {
@@ -112,13 +110,19 @@ abstract class BaseAppPickerActivity : BaseComponentActivity() {
             apps = apps,
             isLoading = isLoading,
             selectedPackages = selectedPackages,
-            actions = remember { AppPickerActions(::finish, viewModel::toggleApp, viewModel::filterApps,
-                viewModel::selectAll, viewModel::invertSelection) }
+            actions = remember { AppPickerActions(::finish, viewModel::toggleApp, viewModel::filterApps, ::handleMenuAction) }
         )
     }
 
     @Composable
     internal abstract fun PickerContent(title: String, apps: List<AppInfo>, isLoading: Boolean, selectedPackages: Set<String>, actions: AppPickerActions)
+
+    private fun handleMenuAction(action: AppPickerMenuAction) {
+        when (action) {
+            AppPickerMenuAction.SelectAll -> viewModel.selectAll()
+            AppPickerMenuAction.InvertSelection -> viewModel.invertSelection()
+        }
+    }
 
     private fun resolveScreenTitle(): String {
         return intent.getStringExtra(EXTRA_PICKER_TITLE) ?: getString(R.string.per_app_proxy_settings)
@@ -126,7 +130,7 @@ abstract class BaseAppPickerActivity : BaseComponentActivity() {
 }
 
 @Composable
-fun AppPickerScreen(
+private fun AppPickerScreen(
     title: String,
     apps: List<AppInfo>,
     isLoading: Boolean,
@@ -134,8 +138,7 @@ fun AppPickerScreen(
     onBackClick: () -> Unit,
     onToggleApp: (String) -> Unit,
     onSearch: (String) -> Unit,
-    onSelectAll: () -> Unit,
-    onInvertSelection: () -> Unit
+    onMenuAction: (AppPickerMenuAction) -> Unit
 ) {
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -188,10 +191,7 @@ fun AppPickerScreen(
                         ) {
                             AppDropdownMenuItems(AppPickerMenuAction.entries, { it.labelRes }) { action ->
                                 showMenu = false
-                                when (action) {
-                                    AppPickerMenuAction.SelectAll -> onSelectAll()
-                                    AppPickerMenuAction.InvertSelection -> onInvertSelection()
-                                }
+                                onMenuAction(action)
                             }
                         }
                     }

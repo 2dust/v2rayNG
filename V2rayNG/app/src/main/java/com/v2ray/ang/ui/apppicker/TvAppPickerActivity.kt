@@ -34,10 +34,7 @@ private fun TvAppPickerScreen(title: String, apps: List<AppInfo>, isLoading: Boo
     val search = rememberTvAppSearch(actions.onSearch)
     val appFocus = rememberTvAppListFocus(apps)
     val menu = remember(actions) {
-        listOf(
-            TvAppMenuAction(AppPickerMenuAction.SelectAll.labelRes, actions.onSelectAll),
-            TvAppMenuAction(AppPickerMenuAction.InvertSelection.labelRes, actions.onInvertSelection)
-        )
+        AppPickerMenuAction.entries.map { TvAppMenuAction(it.labelRes) { actions.onMenuAction(it) } }
     }
     var focusedPackage by rememberSaveable { mutableStateOf<String?>(null) }
     appFocus.RestoreFocus(focusedPackage, search.toolbarRestoreTarget, isLoading)
