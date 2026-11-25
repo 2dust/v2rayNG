@@ -911,8 +911,9 @@ object CoreConfigManager {
             hosts = hosts,
             tag = AppConfig.TAG_DNS,
             disableFallbackIfMatch = true,
-            enableParallelQuery = if ((domesticDns.size + remoteDns.size) > 2) true else null,
         )
+        v2rayConfig.dns?.serveStale = MmkvManager.decodeSettingsBool(AppConfig.PREF_DNS_SERVE_STALE, false) == true
+        v2rayConfig.dns?.enableParallelQuery = MmkvManager.decodeSettingsBool(AppConfig.PREF_DNS_PARALLEL_QUERY, false) == true
 
         v2rayConfig.routing.rules.add(
             0,

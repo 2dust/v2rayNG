@@ -204,6 +204,8 @@ private fun SettingsForm(
     var routeOnlyEnabled by rememberMmkvBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
     var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
     var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
+    var dnsParallelQuery by rememberMmkvBool(AppConfig.PREF_DNS_PARALLEL_QUERY, false)
+    var dnsServeStale by rememberMmkvBool(AppConfig.PREF_DNS_SERVE_STALE, false)
     var validateRegion by rememberMmkvBool(AppConfig.PREF_DNS_VALIDATE_REGION, true)
     var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
     var coreLogLevel by rememberMmkvString(AppConfig.PREF_LOGLEVEL, "warning")
@@ -501,6 +503,18 @@ private fun SettingsForm(
                     title = stringResource(R.string.title_pref_domestic_dns),
                     value = domesticDns,
                     onValueChanged = { domesticDns = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_dns_parallel_query),
+                    summary = stringResource(R.string.summary_dns_parallel_query),
+                    checked = dnsParallelQuery,
+                    onCheckedChange = { dnsParallelQuery = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_dns_serve_stale),
+                    summary = stringResource(R.string.summary_dns_serve_stale),
+                    checked = dnsServeStale,
+                    onCheckedChange = { dnsServeStale = it }
                 )
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_pref_dns_validate_region),
