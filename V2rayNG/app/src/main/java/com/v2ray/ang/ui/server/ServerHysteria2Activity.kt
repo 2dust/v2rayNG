@@ -19,8 +19,8 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.compose.editorFocusTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -189,7 +189,7 @@ class ServerHysteria2Activity : BaseServerActivity() {
                 }
             },
             enabled = !state.isFetchingCert,
-            modifier = Modifier.padding(start = 16.dp).then(LocalOutboundEditorFocus.current?.target() ?: Modifier)
+            modifier = Modifier.padding(start = 16.dp).editorFocusTarget()
         ) {
             Text(stringResource(R.string.pinned_ca256_action_fetch))
         }
