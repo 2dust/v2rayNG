@@ -468,6 +468,7 @@
     <string name="server_proxy_chain_members_unselected">Выберите участника для каждого звена цепочки</string>
     <string name="server_proxy_chain_members_insufficient">Недостаточно участников</string>
     <string name="server_proxy_chain_members_invalid">Недопустимые участники цепочки: %1$s</string>
+    <string name="server_proxy_chain_member_repeated">Повторяющийся участник цепочки: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Резервирование и восстановление</string>
