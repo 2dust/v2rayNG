@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.LocalOutboundEditorFocus
@@ -87,11 +88,13 @@ internal fun TvProfilePicker(
     val list = rememberLazyListState(initialFirstVisibleItemIndex = matches.indexOf(targetOption).coerceAtLeast(0))
     AlertDialog(
         onDismissRequest = onDismiss,
+        // Deliver IME visibility to the dialog's field, including after Android recreates the window.
+        properties = DialogProperties(decorFitsSystemWindows = false),
         title = { Text(title) },
         text = {
             val ime = rememberTvEditorIme()
             val inputMode = LocalInputModeManager.current
-            CompositionLocalProvider(LocalTvEditor provides cancel) {
+            CompositionLocalProvider(LocalTvEditor provides cancel, LocalOutboundEditorFocus provides null) {
                 Column(ime.padding) {
                     TvEditorTextField(stringResource(R.string.menu_item_search), query, { query = it },
                         Modifier.focusRequester(search).onFocusChanged { if (it.hasFocus) focusedTarget = SEARCH_FOCUS },
