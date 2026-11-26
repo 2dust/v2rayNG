@@ -92,8 +92,7 @@ class RoutingSettingActivity : BaseRoutingSettingActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
-        if (forwardingToTv) return
+    override fun RoutingListContent() {
         RoutingSettingScreen(
             viewModel = viewModel,
             domainStrategyState = domainStrategyState,
@@ -113,8 +112,7 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
     protected val viewModel: RoutingSettingsViewModel by viewModels()
     private val _domainStrategyState = MutableStateFlow("")
     protected val domainStrategyState: StateFlow<String> = _domainStrategyState.asStateFlow()
-    protected var forwardingToTv = false
-        private set
+    private var forwardingToTv = false
 
     protected open fun televisionDestination(): Intent? = null
 
@@ -129,6 +127,15 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
         }
         _domainStrategyState.value = getDomainStrategy()
     }
+
+    @Composable
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
+        RoutingListContent()
+    }
+
+    @Composable
+    internal abstract fun RoutingListContent()
 
     override fun onResume() {
         super.onResume()

@@ -64,7 +64,7 @@ import com.v2ray.ang.ui.settings.TvSettingsListDialog
 
 class TvRoutingSettingActivity : BaseRoutingSettingActivity() {
     @Composable
-    override fun ScreenContent() {
+    override fun RoutingListContent() {
         val rules by viewModel.rulesetsFlow.collectAsStateWithLifecycle()
         val loading by viewModel.isLoading.collectAsStateWithLifecycle()
         val strategy by domainStrategyState.collectAsStateWithLifecycle()
@@ -110,13 +110,13 @@ private val ruleControls = listOf(RoutingControl.Rule, RoutingControl.Enable, Ro
 private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, strategy: String, onAction: (RoutingListAction) -> Unit) {
     val ids = remember(rules) { rules.map { it.id } }
     val rowFocus = rememberDpadFocusTargets(ids) { ruleControls.associateWith { FocusRequester() } }
-    val topFocus = remember {
+    val toolbarFocus = remember {
         listOf(RoutingControl.Back, RoutingControl.Add, RoutingControl.More, RoutingControl.Strategy).associateWith { FocusRequester() }
     }
-    val back = topFocus.getValue(RoutingControl.Back)
-    val add = topFocus.getValue(RoutingControl.Add)
-    val more = topFocus.getValue(RoutingControl.More)
-    val strategyFocus = topFocus.getValue(RoutingControl.Strategy)
+    val back = toolbarFocus.getValue(RoutingControl.Back)
+    val add = toolbarFocus.getValue(RoutingControl.Add)
+    val more = toolbarFocus.getValue(RoutingControl.More)
+    val strategyFocus = toolbarFocus.getValue(RoutingControl.Strategy)
     val listState = rememberLazyListState()
     // Requesters survive reordering, but their scroll indices follow the order of the rule IDs.
     val focusRows = remember(ids, strategyFocus) { listOf(listOf(strategyFocus)) + rowFocus.values.map { it.values.toList() } }
@@ -127,14 +127,14 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
         rowFocus[key]?.get(RoutingControl.Rule)?.requestFocus()
     }
     LaunchedEffect(loading) { if (loading) reorder.cancelInteraction() }
-    var focusedId by rememberSaveable { mutableStateOf<String?>(null) }
+    var focusedRuleId by rememberSaveable { mutableStateOf<String?>(null) }
     var focusedControl by rememberSaveable { mutableStateOf(RoutingControl.Back) }
     var showMenu by remember { mutableStateOf(false) }
     var showStrategy by rememberSaveable { mutableStateOf(false) }
     var showPresets by rememberSaveable { mutableStateOf(false) }
     var deleteId by rememberSaveable { mutableStateOf<String?>(null) }
     var returnTarget by remember { mutableStateOf<FocusRequester?>(null) }
-    val initialId = remember { focusedId }
+    val initialId = remember { focusedRuleId }
     val initialControl = remember { focusedControl }
     var needsInitialFocus by remember { mutableStateOf(true) }
 
@@ -143,7 +143,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
             (initialId == null || initialId in rowFocus || !loading)) {
             needsInitialFocus = false
             val target = rowFocus[initialId]?.get(initialControl)
-            if (target == null || !requestRow(target)) requestFocusWhenReady(topFocus[initialControl] ?: back)
+            if (target == null || !requestRow(target)) requestFocusWhenReady(toolbarFocus[initialControl] ?: back)
         }
     }
     LaunchedEffect(returnTarget) {
@@ -153,7 +153,7 @@ private fun TvRoutingSettingScreen(rules: List<RulesetItem>, loading: Boolean, s
     fun focusTarget(control: RoutingControl, id: String? = null) = Modifier.onFocusChanged {
         if (it.isFocused) {
             focusedControl = control
-            focusedId = id
+            focusedRuleId = id
         }
     }
 
