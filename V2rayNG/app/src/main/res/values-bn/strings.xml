@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">আপলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP মোড</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra-এর কাঁচা JSON, ফরম্যাট: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">xdrive সার্ভিস</string>
+    <string name="server_lab_xdrive_remote_folder">xdrive রিমোট ফোল্ডার</string>
+    <string name="server_lab_xdrive_secrets">xdrive সিক্রেট, কমা দিয়ে আলাদা (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Extra-এর কাঁচা JSON, ফরম্যাট: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">নাম দিয়ে পিয়ার সার্টিফিকেট যাচাই করুন</string>

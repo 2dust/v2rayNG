@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">Băng thông tải lên (đơn vị hỗ trợ: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Chế độ XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON thô của XHTTP Extra, định dạng: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">Dịch vụ xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">Thư mục từ xa xdrive</string>
+    <string name="server_lab_xdrive_secrets">Khóa bí mật xdrive, phân tách bằng dấu phẩy (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">JSON thô của xdrive Extra, định dạng: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">JSON thô của finalMask, định dạng: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Xác minh chứng chỉ ngang hàng theo tên</string>

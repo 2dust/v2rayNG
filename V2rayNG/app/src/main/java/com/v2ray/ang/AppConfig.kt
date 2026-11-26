@@ -291,6 +291,9 @@ object AppConfig {
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
 
+    /** Default storage service of the Xray-core xdrive transport ("service" field). */
+    const val XDRIVE_SERVICE_GOOGLE_DRIVE = "google-drive"
+
     const val UNIDENTIFIED_PACKAGE = "__unknown_app__"
 
     val DNS_ALIDNS_ADDRESSES = arrayListOf("223.5.5.5", "223.6.6.6", "2400:3200::1", "2400:3200:baba::1")

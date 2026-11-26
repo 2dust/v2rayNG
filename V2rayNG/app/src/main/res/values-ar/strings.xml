@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">عرض النطاق للرفع (الوحدات المدعومة: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">وضع XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">خدمة xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">المجلد البعيد لـ xdrive</string>
+    <string name="server_lab_xdrive_secrets">أسرار xdrive مفصولة بفواصل (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">JSON خام لحقل xdrive Extra، بالتنسيق: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">التحقق من شهادة النظير بالاسم</string>

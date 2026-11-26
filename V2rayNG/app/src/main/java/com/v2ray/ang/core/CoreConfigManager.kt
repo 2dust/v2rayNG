@@ -14,6 +14,7 @@ import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.enums.BalancerStrategyType
 import com.v2ray.ang.enums.CoreResolvedType
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
@@ -462,7 +463,10 @@ object CoreConfigManager {
         v2rayConfig.fakedns = null
         v2rayConfig.stats = null
         v2rayConfig.policy = null
-        v2rayConfig.outbounds.forEach { key -> key.mux = null }
+        // xdrive outbounds keep their mux: Xray-core refuses to load them without Mux.Cool.
+        v2rayConfig.outbounds
+            .filter { it.streamSettings?.network != NetworkType.XDRIVE.type }
+            .forEach { key -> key.mux = null }
     }
 
     /**

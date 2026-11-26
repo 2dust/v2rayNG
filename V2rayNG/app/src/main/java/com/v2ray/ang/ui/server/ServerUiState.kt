@@ -13,6 +13,7 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V6
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
+import com.v2ray.ang.AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
@@ -54,6 +55,9 @@ class ServerUiState(
     path: String = "",
     headers: String = "",
     xhttpExtra: String = "",
+    xdriveService: String = "",
+    xdriveSecrets: String = "",
+    xdriveExtra: String = "",
     finalMask: String = "",
     seed: String = "",
     kcpMtu: String = "",
@@ -107,6 +111,9 @@ class ServerUiState(
     var path by mutableStateOf(path)
     var headers by mutableStateOf(headers)
     var xhttpExtra by mutableStateOf(xhttpExtra)
+    var xdriveService by mutableStateOf(xdriveService)
+    var xdriveSecrets by mutableStateOf(xdriveSecrets)
+    var xdriveExtra by mutableStateOf(xdriveExtra)
     var finalMask by mutableStateOf(finalMask)
     var seed by mutableStateOf(seed)
     var kcpMtu by mutableStateOf(kcpMtu)
@@ -139,6 +146,7 @@ class ServerUiState(
         val isWireguard = configType == EConfigType.WIREGUARD
         val isMasque = configType == EConfigType.MASQUE
         val isHysteria2 = configType == EConfigType.HYSTERIA2
+        val isXdrive = network == NetworkType.XDRIVE.type
 
         return initialConfig.copy(
             configType = configType,
@@ -182,6 +190,9 @@ class ServerUiState(
             path = path,
             headers = if (isMasque) headers.nullIfBlank() else null,
             xhttpExtra = xhttpExtra.nullIfBlank(),
+            xdriveService = if (isXdrive) xdriveService.ifBlank { XDRIVE_SERVICE_GOOGLE_DRIVE } else null,
+            xdriveSecrets = if (isXdrive) xdriveSecrets.nullIfBlank() else null,
+            xdriveExtra = if (isXdrive) xdriveExtra.nullIfBlank() else null,
             finalMask = finalMask.nullIfBlank(),
             seed = seed.nullIfBlank(),
             kcpMtu = kcpMtu.toIntOrNull(),
@@ -244,6 +255,9 @@ class ServerUiState(
                 path = initialConfig.path ?: "",
                 headers = initialConfig.headers ?: "",
                 xhttpExtra = initialConfig.xhttpExtra ?: "",
+                xdriveService = initialConfig.xdriveService ?: "",
+                xdriveSecrets = initialConfig.xdriveSecrets ?: "",
+                xdriveExtra = initialConfig.xdriveExtra ?: "",
                 finalMask = initialConfig.finalMask ?: "",
                 seed = initialConfig.seed ?: "",
                 kcpMtu = initialConfig.kcpMtu?.toString() ?: "",
