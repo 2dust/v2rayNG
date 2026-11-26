@@ -153,10 +153,6 @@ abstract class BaseServerProxyChainActivity : BaseComponentActivity() {
             toast(R.string.server_proxy_chain_members_insufficient)
             return
         }
-        firstRepeatedMember(chainMembers)?.let { repeated ->
-            toast(getString(R.string.server_proxy_chain_member_repeated, repeated))
-            return
-        }
         pendingSave = lifecycleScope.launch {
             try {
                 val invalid = withContext(Dispatchers.IO) {
@@ -314,8 +310,7 @@ internal fun ProxyChainMemberDialogs(
         val index = memberKeys.indexOf(memberKey)
         if (index >= 0) {
             ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, ::closePicker) { allRemarks ->
-                val choices = remember(allRemarks, members, index) { availableProxyChainMembers(allRemarks, members, index) }
-                picker(choices, members[index], { remark ->
+                picker(allRemarks, members[index], { remark ->
                     onSelect(memberKey, remark)
                     closePicker()
                 }, ::closePicker)

@@ -470,7 +470,6 @@
     <string name="server_proxy_chain_members_unselected">Zəhmət olmasa hər zəncir sətri üçün bir üzv seçin</string>
     <string name="server_proxy_chain_members_insufficient">Kifayət qədər üzv yoxdur</string>
     <string name="server_proxy_chain_members_invalid">Yanlış zəncir üzvləri: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">Zəncirdə təkrarlanan üzv: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Ehtiyat Nüsxə &amp; Bərpa</string>

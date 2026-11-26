@@ -477,7 +477,6 @@
     <string name="server_proxy_chain_members_unselected">يرجى اختيار عضو لكل صف في السلسلة</string>
     <string name="server_proxy_chain_members_insufficient">عدد الأعضاء غير كافٍ</string>
     <string name="server_proxy_chain_members_invalid">أعضاء سلسلة غير صالحين: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">عضو مكرر في السلسلة: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">النسخ الاحتياطي والاستعادة</string>
