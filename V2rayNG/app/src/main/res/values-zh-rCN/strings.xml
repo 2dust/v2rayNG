@@ -592,4 +592,5 @@
     <string name="action_more">更多</string>
     <string name="action_clear">清除</string>
     <string name="connection_connected_tv">已连接</string>
+    <string name="acc_invalid_field_value">值无效</string>
 </resources>

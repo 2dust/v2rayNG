@@ -595,4 +595,5 @@
     <string name="action_more">More</string>
     <string name="action_clear">Clear</string>
     <string name="connection_connected_tv">Connected</string>
+    <string name="acc_invalid_field_value">Invalid value</string>
 </resources>

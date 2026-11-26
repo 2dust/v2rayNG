@@ -3,7 +3,6 @@ package com.v2ray.ang.ui.server
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
-import androidx.activity.viewModels
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -56,17 +54,18 @@ import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.reorderableDragHandle
 import com.v2ray.ang.ui.compose.verticalScrollbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class ServerProxyChainActivity : BaseComponentActivity() {
@@ -80,7 +79,6 @@ class ServerProxyChainActivity : BaseComponentActivity() {
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
     private var isTelevision = false
 
-    private val profiles by viewModels<GroupEditorProfilesViewModel>()
     private var pendingSave: Job? = null
     private lateinit var initialRemarks: String
     private lateinit var initialMembers: List<String>
@@ -100,13 +98,11 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        val allRemarks = profiles.remarks.collectAsStateWithLifecycle().value ?: return GroupEditorLoading()
         ProxyChainScreen(
             editGuid = editGuid,
             isRunning = isRunning,
             initialRemarks = initialRemarks,
             initialMembers = initialMembers,
-            allRemarks = allRemarks,
             onBackClick = { finish() },
             onSave = { remarks, members -> saveServer(remarks, members) },
             onDelete = { deleteServer() },
@@ -202,7 +198,6 @@ private fun ProxyChainScreen(
     isRunning: Boolean,
     initialRemarks: String,
     initialMembers: List<String>,
-    allRemarks: List<String>,
     onBackClick: () -> Unit,
     onSave: (String, List<String>) -> Unit,
     onDelete: () -> Unit,
@@ -246,7 +241,7 @@ private fun ProxyChainScreen(
 
     if (isTelevision) {
         TvProxyChainEditor(
-            remarks, { remarks = it }, isRemarksError, members, memberKeys, allRemarks, onBackClick, save, delete,
+            remarks, { remarks = it }, isRemarksError, members, memberKeys, onBackClick, save, delete,
             add, select, ::remove,
             { key, step ->
                 val index = memberKeys.indexOf(key)
@@ -255,7 +250,7 @@ private fun ProxyChainScreen(
         )
     } else {
         PhoneProxyChainEditor(
-            remarks, { remarks = it }, isRemarksError, members, memberKeys, allRemarks, onBackClick, save, delete,
+            remarks, { remarks = it }, isRemarksError, members, memberKeys, onBackClick, save, delete,
             { add() }, select, ::remove, ::move
         )
     }
@@ -272,7 +267,7 @@ private fun ProxyChainScreen(
 
 @Composable
 internal fun ProxyChainMemberDialogs(
-    members: List<String>, memberKeys: List<String>, allRemarks: List<String>, onRemove: (String) -> Unit,
+    members: List<String>, memberKeys: List<String>, onRemove: (String) -> Unit,
     onSelect: (String, String) -> Unit, onClosePicker: (String) -> Unit = {},
     picker: @Composable (List<String>, String?, (String) -> Unit, () -> Unit) -> Unit,
     content: @Composable ((String) -> Unit, (String) -> Unit) -> Unit
@@ -300,11 +295,13 @@ internal fun ProxyChainMemberDialogs(
         }
         val index = memberKeys.indexOf(memberKey)
         if (index >= 0) {
-            val choices = remember(allRemarks, members, index) { availableProxyChainMembers(allRemarks, members, index) }
-            picker(choices, members[index], { remark ->
-                onSelect(memberKey, remark)
-                closePicker()
-            }, ::closePicker)
+            ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, ::closePicker) { allRemarks ->
+                val choices = remember(allRemarks, members, index) { availableProxyChainMembers(allRemarks, members, index) }
+                picker(choices, members[index], { remark ->
+                    onSelect(memberKey, remark)
+                    closePicker()
+                }, ::closePicker)
+            }
         }
     }
 }
@@ -312,11 +309,11 @@ internal fun ProxyChainMemberDialogs(
 @Composable
 private fun PhoneProxyChainEditor(
     remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
-    members: List<String>, memberKeys: List<String>, allRemarks: List<String>,
+    members: List<String>, memberKeys: List<String>,
     onBackClick: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
     onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
 ) {
-    ProxyChainMemberDialogs(members, memberKeys, allRemarks, onRemove, onSelect, picker = { choices, selected, select, dismiss ->
+    ProxyChainMemberDialogs(members, memberKeys, onRemove, onSelect, picker = { choices, selected, select, dismiss ->
         ServerSelectListDialog(
             title = stringResource(R.string.server_proxy_chain_pick_members), options = choices,
             selectedOption = selected, onSelected = select, onDismiss = dismiss

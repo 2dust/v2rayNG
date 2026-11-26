@@ -47,7 +47,7 @@ private const val ADD_MEMBER = "chain:add"
 @Composable
 internal fun TvProxyChainEditor(
     remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
-    members: List<String>, memberKeys: List<String>, allRemarks: List<String>,
+    members: List<String>, memberKeys: List<String>,
     onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
     onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (String, Int) -> Unit
 ) {
@@ -58,7 +58,7 @@ internal fun TvProxyChainEditor(
             onRemove(key)
         }
     }
-    ProxyChainMemberDialogs(members, memberKeys, allRemarks, remove, onSelect, onClosePicker = { returnKey = it }, picker = { choices, selected, select, dismiss ->
+    ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { choices, selected, select, dismiss ->
         TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), choices, selected, select, dismiss)
     }) { pick, requestRemove ->
         TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },

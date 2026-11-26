@@ -139,29 +139,30 @@ internal fun rememberTvTextFieldState(passiveFocusRequester: FocusRequester, ini
         )
     }
     RecordInteractiveEditorState(state.isEditing, resumeEditing)
-    val isImeVisible = WindowInsets.isImeVisible
+    if (state.isEditing) {
+        val isImeVisible = WindowInsets.isImeVisible
 
-    /*
-     * AOSP TV's overlay IME can report visibility before the layout settles. Wait before using
-     * the editor bounds so bring-into-view does not oscillate. Remove this delay when supported
-     * TV IMEs report final bounds in the visibility frame.
-    */
-    LaunchedEffect(state.isEditing, state.editorHasFocus, isImeVisible, state.measuredSize) {
-        when (tvTextFieldRecoveryAction(state.isEditing, state.editorHasFocus, state.imeWasVisible, isImeVisible)) {
-            TvTextFieldRecoveryAction.FinishEditing -> state.finishEditing(restoreFocus = true)
-            TvTextFieldRecoveryAction.MaintainEditor -> {
-                if (isImeVisible) {
-                    state.imeWasVisible = true
-                    repeat(TvImeLayoutSettlingFrames) { withFrameNanos { } }
-                    state.bringEditorAboveIme(imeBottomClearancePx)
-                } else keyboardController?.show()
+        /*
+         * AOSP TV's overlay IME can report visibility before the layout settles. Wait before using
+         * the editor bounds so bring-into-view does not oscillate. Remove this delay when supported
+         * TV IMEs report final bounds in the visibility frame.
+         */
+        LaunchedEffect(state.editorHasFocus, isImeVisible, state.measuredSize) {
+            when (tvTextFieldRecoveryAction(state.isEditing, state.editorHasFocus, state.imeWasVisible, isImeVisible)) {
+                TvTextFieldRecoveryAction.FinishEditing -> state.finishEditing(restoreFocus = true)
+                TvTextFieldRecoveryAction.MaintainEditor -> {
+                    if (isImeVisible) {
+                        state.imeWasVisible = true
+                        repeat(TvImeLayoutSettlingFrames) { withFrameNanos { } }
+                        state.bringEditorAboveIme(imeBottomClearancePx)
+                    } else keyboardController?.show()
+                }
+                TvTextFieldRecoveryAction.RequestEditorFocus -> state.editorFocusRequester.requestFocus()
+                TvTextFieldRecoveryAction.None -> Unit
             }
-            TvTextFieldRecoveryAction.RequestEditorFocus -> state.editorFocusRequester.requestFocus()
-            TvTextFieldRecoveryAction.None -> Unit
         }
-    }
-    LaunchedEffect(state.isEditing, state.restorePassiveFocus) {
-        if (!state.isEditing && state.restorePassiveFocus) {
+    } else if (state.restorePassiveFocus) {
+        LaunchedEffect(state) {
             state.passiveFocusRequester.requestFocus()
             state.restorePassiveFocus = false
         }

@@ -3,7 +3,6 @@ package com.v2ray.ang.ui.server
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
-import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -41,7 +40,6 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
@@ -51,12 +49,14 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
@@ -69,10 +69,8 @@ class ServerGroupActivity : BaseComponentActivity() {
                 && editGuid == MmkvManager.getSelectServer()
     }
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
-    private val subIds = mutableListOf<String>()
-    private val subDisplay = mutableListOf<String>()
+    private lateinit var sourceLabels: Map<String, String>
     private var isTelevision = false
-    private val profiles by viewModels<GroupEditorProfilesViewModel>()
 
     private lateinit var initialRemarks: String
     private lateinit var initialFilter: String
@@ -90,7 +88,10 @@ class ServerGroupActivity : BaseComponentActivity() {
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid)
-        populateSubscriptionSpinner()
+        sourceLabels = buildMap {
+            put("", getString(R.string.filter_config_all))
+            MmkvManager.decodeSubscriptions().forEach { sub -> put(sub.guid, sub.subscription.remarks.ifBlank { sub.guid }) }
+        }
 
         initialRemarks = config?.remarks ?: ""
         initialFilter = config?.policyGroupFilter ?: ""
@@ -99,26 +100,22 @@ class ServerGroupActivity : BaseComponentActivity() {
                 !BalancerStrategyType.from(config.policyGroupType).supportsObservatory
         initialFallbackTag = config?.policyGroupFallbackTag.orEmpty()
         initialSourceId = (if (config != null) config.policyGroupSubscriptionId else subscriptionId)
-            .takeIf { it in subIds }.orEmpty()
+            .takeIf { it in sourceLabels }.orEmpty()
     }
 
     @Composable
     override fun ScreenContent() {
-        val choices = profiles.remarks.collectAsStateWithLifecycle().value ?: return GroupEditorLoading()
-        val fallbackSuggestions = remember(choices) { (BUILTIN_OUTBOUND_TAGS + choices).filter { it != TAG_PROXY } }
         ServerGroupScreen(
             isTelevision = isTelevision,
             editGuid = editGuid,
             isRunning = isRunning,
-            subIds = subIds,
-            subDisplay = subDisplay,
+            sourceLabels = sourceLabels,
             initialRemarks = initialRemarks,
             initialFilter = initialFilter,
             initialType = initialType,
             initialSourceId = initialSourceId,
             initialTestOutbounds = initialTestOutbounds,
             initialFallbackTag = initialFallbackTag,
-            fallbackSuggestions = fallbackSuggestions,
             onBackClick = { finish() },
             onSave = { remarks, filter, typeIdx, sourceId, testOutbounds, fallbackTag ->
                 saveServer(remarks, filter, typeIdx, sourceId, testOutbounds, fallbackTag)
@@ -165,7 +162,7 @@ class ServerGroupActivity : BaseComponentActivity() {
         config.description = buildString {
             append(typeDisplay)
             append(" - ")
-            append(subDisplay.getOrNull(subIds.indexOf(sourceId)).orEmpty())
+            append(sourceLabels[sourceId].orEmpty())
             append(" - ")
             append(config.policyGroupFilter)
         }
@@ -206,22 +203,6 @@ class ServerGroupActivity : BaseComponentActivity() {
         return true
     }
 
-    private fun populateSubscriptionSpinner() {
-        val subs = MmkvManager.decodeSubscriptions()
-        subIds.clear()
-        subDisplay.clear()
-        subDisplay.add(getString(R.string.filter_config_all))
-        subIds.add("")
-        subs.forEach { sub ->
-            val name = when {
-                sub.subscription.remarks.isNotBlank() -> sub.subscription.remarks
-                else -> sub.guid
-            }
-            subDisplay.add(name)
-            subIds.add(sub.guid)
-        }
-    }
-
     private fun stringArrayPolicyGroupType(): Array<String> =
         resources.getStringArray(R.array.policy_group_type)
 }
@@ -231,15 +212,13 @@ private fun ServerGroupScreen(
     isTelevision: Boolean,
     editGuid: String,
     isRunning: Boolean,
-    subIds: List<String>,
-    subDisplay: List<String>,
+    sourceLabels: Map<String, String>,
     initialRemarks: String,
     initialFilter: String,
     initialType: Int,
     initialSourceId: String,
     initialTestOutbounds: Boolean,
     initialFallbackTag: String,
-    fallbackSuggestions: List<String>,
     onBackClick: () -> Unit,
     onSave: (String, String, Int, String, Boolean, String) -> Boolean,
     onDelete: () -> Unit
@@ -258,7 +237,7 @@ private fun ServerGroupScreen(
     val supportsObservatory = BalancerStrategyType.from(typeIndex.toString()).supportsObservatory
     val save: () -> Unit = {
         isRemarksError = remarks.isBlank()
-        if (!isRemarksError) onSave(remarks, filter, typeIndex, sourceId.takeIf { it in subIds }.orEmpty(), testOutbounds, fallbackTag)
+        if (!isRemarksError) onSave(remarks, filter, typeIndex, sourceId.takeIf { it in sourceLabels }.orEmpty(), testOutbounds, fallbackTag)
     }
     val fields: @Composable ColumnScope.(@Composable () -> Unit) -> Unit = { fallbackField ->
         FormTextField(
@@ -273,9 +252,9 @@ private fun ServerGroupScreen(
             options = typeEntries,
             onValueChange = { typeIndex = typeEntries.indexOf(it) }
         )
-        val sourceLabels = remember(subIds, subDisplay) { subIds.zip(subDisplay).toMap() }
+        val sourceIds = remember(sourceLabels) { sourceLabels.keys.toList() }
         FormDropdownField(stringResource(R.string.title_policy_group_subscription_id),
-            sourceId.takeIf { it in sourceLabels }.orEmpty(), subIds, { sourceId = it },
+            sourceId.takeIf { it in sourceLabels }.orEmpty(), sourceIds, { sourceId = it },
             optionLabel = { sourceLabels[it].orEmpty() })
         FormTextField(stringResource(R.string.title_policy_group_subscription_filter), filter, { filter = it }, announceValue = true)
         if (supportsObservatory) {
@@ -292,11 +271,11 @@ private fun ServerGroupScreen(
     val delete: (() -> Unit)? = if (showDelete) ({ showDeleteConfirm = true }) else null
     if (isTelevision) {
         TvServerEditor(EConfigType.POLICYGROUP.toString(), onBackClick, save, delete) {
-            fields { TvPolicyFallbackField(fallbackTag, fallbackSuggestions) { fallbackTag = it } }
+            fields { TvPolicyFallbackField(fallbackTag) { fallbackTag = it } }
         }
     } else {
         PhonePolicyGroupEditor(onBackClick, save, delete) {
-            fields { PhonePolicyFallbackField(fallbackTag, fallbackSuggestions) { fallbackTag = it } }
+            fields { PhonePolicyFallbackField(fallbackTag) { fallbackTag = it } }
         }
     }
 
@@ -311,10 +290,15 @@ private fun ServerGroupScreen(
 }
 
 @Composable
-private fun PhonePolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
+internal fun PolicyFallbackChoices(onDismiss: () -> Unit, content: @Composable (List<String>) -> Unit) {
+    ProfilePickerChoices({ (BUILTIN_OUTBOUND_TAGS + SettingsManager.getSimpleProfileRemarks()).filter { it != TAG_PROXY } }, onDismiss, content)
+}
+
+@Composable
+private fun PhonePolicyFallbackField(value: String, onSelect: (String) -> Unit) {
     var open by rememberSaveable { mutableStateOf(false) }
     PolicyFallbackRow(value, onPick = { open = true }, onClear = { onSelect("") })
-    if (open) {
+    if (open) PolicyFallbackChoices({ open = false }) { options ->
         ServerSelectListDialog(
             title = stringResource(R.string.title_policy_group_fallback), options = options, selectedOption = value,
             onSelected = { onSelect(it); open = false }, onDismiss = { open = false }

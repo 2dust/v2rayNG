@@ -18,8 +18,7 @@ import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 
 @Composable
-internal fun TvPolicyFallbackField(value: String, options: List<String>, onSelect: (String) -> Unit) {
-    val uniqueOptions = remember(options) { options.distinct() }
+internal fun TvPolicyFallbackField(value: String, onSelect: (String) -> Unit) {
     val focus = checkNotNull(LocalEditorFocus.current)
     val back = checkNotNull(LocalTvEditor.current)
     val picker = remember { FocusRequester() }
@@ -30,8 +29,8 @@ internal fun TvPolicyFallbackField(value: String, options: List<String>, onSelec
         pickModifier = focus.target(picker).focusProperties { start = back }.dpadFocusOutline(cornerRadius = 8.dp),
         clearModifier = focus.target().dpadFocusOutline(cornerRadius = 24.dp)
     )
-    if (open) {
-        TvSearchableOptionsDialog(stringResource(R.string.title_policy_group_fallback), uniqueOptions, value,
+    if (open) PolicyFallbackChoices({ open = false }) { options ->
+        TvSearchableOptionsDialog(stringResource(R.string.title_policy_group_fallback), options, value,
             onSelect = { onSelect(it); open = false }, onDismiss = { open = false })
     }
 }
