@@ -115,10 +115,6 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             toast(R.string.server_proxy_chain_members_insufficient)
             return
         }
-        firstRepeatedMember(chainMembers)?.let { repeated ->
-            toast(getString(R.string.server_proxy_chain_member_repeated, repeated))
-            return
-        }
         pendingSave = lifecycleScope.launch {
             try {
                 val invalid = withContext(Dispatchers.IO) {
@@ -387,10 +383,9 @@ fun ProxyChainScreen(
     editingMemberKey?.let { memberKey ->
         val currentIndex = memberKeys.indexOf(memberKey)
         if (currentIndex != -1) {
-            val choices = remember(allRemarks, members, currentIndex) { availableProxyChainMembers(allRemarks, members, currentIndex) }
             ServerSelectListDialog(
                 title = stringResource(R.string.server_proxy_chain_pick_members),
-                options = choices,
+                options = allRemarks,
                 selectedOption = members.getOrNull(currentIndex),
                 onSelected = { selectedRemark ->
                     members = members.toMutableList().also { it[currentIndex] = selectedRemark }

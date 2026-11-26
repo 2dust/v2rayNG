@@ -462,7 +462,6 @@
     <string name="server_proxy_chain_members_unselected">請為代理鏈中的每一列選擇成員</string>
     <string name="server_proxy_chain_members_insufficient">成員數量不足</string>
     <string name="server_proxy_chain_members_invalid">無效的代理鏈成員：%1$s</string>
-    <string name="server_proxy_chain_member_repeated">代理鏈成員重複：%1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">備份與還原</string>

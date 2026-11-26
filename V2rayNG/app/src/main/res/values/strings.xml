@@ -464,7 +464,6 @@
     <string name="server_proxy_chain_members_unselected">Please select a member for each chain row</string>
     <string name="server_proxy_chain_members_insufficient">Insufficient members</string>
     <string name="server_proxy_chain_members_invalid">Invalid chain members: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">Repeated chain member: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Backup &amp; Restore</string>

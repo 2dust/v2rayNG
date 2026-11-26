@@ -464,7 +464,6 @@
     <string name="server_proxy_chain_members_unselected">চেইনের প্রতিটি সারির জন্য সদস্য নির্বাচন করুন</string>
     <string name="server_proxy_chain_members_insufficient">পর্যাপ্ত সদস্য নেই</string>
     <string name="server_proxy_chain_members_invalid">অবৈধ চেইন সদস্য: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">চেইনে একই সদস্য একাধিকবার আছে: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">ব্যাকআপ ও পুনরুদ্ধার</string>

@@ -462,7 +462,6 @@
     <string name="server_proxy_chain_members_unselected">Vui lòng chọn thành viên cho từng hàng trong chuỗi</string>
     <string name="server_proxy_chain_members_insufficient">Không đủ thành viên</string>
     <string name="server_proxy_chain_members_invalid">Thành viên chuỗi không hợp lệ: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">Thành viên bị lặp trong chuỗi: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">Sao lưu &amp; khôi phục</string>

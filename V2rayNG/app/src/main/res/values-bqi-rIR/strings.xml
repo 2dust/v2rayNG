@@ -464,7 +464,6 @@
     <string name="server_proxy_chain_members_unselected">سی هر ردیف زنجیره، ی عوزو پسند کۊنین</string>
     <string name="server_proxy_chain_members_insufficient">تعداڌ ٱئزا بس نؽ</string>
     <string name="server_proxy_chain_members_invalid">ٱئزا نا موئتبر زنجیره: %1$s</string>
-    <string name="server_proxy_chain_member_repeated">عوزو تکراری زنجیره: %1$s</string>
 
     <!-- BackupActivity -->
     <string name="title_configuration_backup_restore">لادراری گرؽڌن &amp; وورگندن</string>
