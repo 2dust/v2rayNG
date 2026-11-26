@@ -71,6 +71,7 @@ class SubSettingActivity : BaseComponentActivity() {
             onBackClick = { finish() },
             onAddClick = { startActivity(Intent(this, SubEditActivity::class.java)) },
             onSubUpdate = { viewModel.updateSubscriptions() },
+            onSingleSubUpdate = { subId -> viewModel.updateSubscriptions(subId) },
             onEditSub = { subId ->
                 startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
             },
@@ -100,6 +101,7 @@ fun SubSettingScreen(
     onBackClick: () -> Unit,
     onAddClick: () -> Unit,
     onSubUpdate: () -> Unit,
+    onSingleSubUpdate: (String) -> Unit,
     onEditSub: (String) -> Unit,
     onRemoveSub: (String) -> Unit,
     onShareQRCode: (String) -> Unit,
@@ -107,6 +109,7 @@ fun SubSettingScreen(
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
+    var pendingUpdateSubId by remember { mutableStateOf<String?>(null) }
     var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
@@ -142,7 +145,10 @@ fun SubSettingScreen(
                     IconButton(onClick = onAddClick) {
                         Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_subscription))
                     }
-                    IconButton(onClick = { showUpdateDialog = true }) {
+                    IconButton(onClick = {
+                        pendingUpdateSubId = null
+                        showUpdateDialog = true
+                    }) {
                         Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.acc_update_subscriptions))
                     }
                 }
@@ -174,6 +180,10 @@ fun SubSettingScreen(
                         onRemoveSub(subCache.guid)
                     }
                 }
+                val requestUpdate = {
+                    pendingUpdateSubId = subCache.guid
+                    showUpdateDialog = true
+                }
                 val itemActions = buildList {
                     add(CustomAccessibilityAction(
                         label = stringResource(R.string.acc_edit_named, subscriptionName),
@@ -192,6 +202,10 @@ fun SubSettingScreen(
                             action = {
                                 viewModel.setAutoUpdate(subCache.guid, !subCache.subscription.autoUpdate)
                             },
+                        ))
+                        add(CustomAccessibilityAction(
+                            label = stringResource(R.string.title_sub_update),
+                            action = { requestUpdate(); true },
                         ))
                         add(CustomAccessibilityAction(
                             label = stringResource(SubscriptionShareAction.QRCode.labelRes),
@@ -227,6 +241,7 @@ fun SubSettingScreen(
                             onUpdate = { checked ->
                                 viewModel.setEnabled(subCache.guid, checked)
                             },
+                            onRefresh = requestUpdate,
                             onShare = { shareUrl = subCache.subscription.url },
                             onEdit = { onEditSub(subCache.guid) },
                             onDelete = requestDelete,
@@ -315,7 +330,12 @@ fun SubSettingScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showUpdateDialog = false
-                    onSubUpdate()
+                    val targetId = pendingUpdateSubId
+                    if (targetId != null) {
+                        onSingleSubUpdate(targetId)
+                    } else {
+                        onSubUpdate()
+                    }
                 }) {
                     Text(text = stringResource(R.string.action_ok))
                 }

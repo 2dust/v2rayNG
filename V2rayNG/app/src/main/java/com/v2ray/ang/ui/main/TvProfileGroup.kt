@@ -141,23 +141,12 @@ internal fun TvProfileGroup(
         { index, direction -> twoColumnDpadReorderTarget(index, direction, isRtl) }
     } else ::verticalDpadReorderTarget
 
-    val refreshFocus = if (group.usageInfo != null) remember { FocusRequester() } else null
-    val headerModifier = Modifier
-        .dpadVerticalFocusNavigation(onMoveUp = { onUpFromFirstRow?.invoke() ?: false }, onMoveDown = { false })
-        .dpadBackNavigation(onBack = onBackToToolbar)
-    TvProfileGroupLayout(
-        group = group,
-        contentPadding = PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
-        onAction = onAction,
-        headerModifier = headerModifier,
-        actionButton = { icon, label, isRefresh, click ->
-            TvIconButton(painterResource(icon), label, click, focusRequester = refreshFocus.takeIf { isRefresh })
-        }
-    ) { padding ->
-        TvProfileCollection(
-            group, groupState, uiState, scroll, padding, onAction,
-            itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
-        ) { index, row, dragScope, dragging ->
+    TvProfileCollection(
+        group, groupState, uiState, scroll,
+        PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
+        onAction,
+        itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
+    ) { index, row, dragScope, dragging ->
             val stride = if (doubleColumn) 2 else 1
             fun targetAt(position: Int) = keys.getOrNull(position)?.let(targets::get)
             val leadingColumn = !doubleColumn || index % 2 == 0
@@ -183,7 +172,7 @@ internal fun TvProfileGroup(
                         if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer(TvMainFocusTarget.Profile(row.guid))
                     },
                     onUpFromFirstRow = {
-                        if (refreshFocus != null) refreshFocus.requestFocus() else onUpFromFirstRow?.invoke() ?: false
+                        onUpFromFirstRow?.invoke() ?: false
                     },
                     onBackToToolbar = onBackToToolbar,
                     reorderItem = reorderItem,
@@ -199,7 +188,6 @@ internal fun TvProfileGroup(
             if (dragScope == null) renderRow()
             else TvReorderableItem(dragScope, dragging, reorder?.isMoving(row.guid) == true, renderRow)
         }
-    }
 }
 
 @Composable

@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">带宽上行 (支持的单位 k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">xdrive 服务</string>
+    <string name="server_lab_xdrive_remote_folder">xdrive 远程文件夹</string>
+    <string name="server_lab_xdrive_secrets">xdrive 密钥，逗号分隔 (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Extra 原始 JSON，格式： { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
@@ -247,6 +251,14 @@
 
     <string name="title_pref_domestic_dns">直连 DNS（可选）</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
+
+    <string name="title_pref_dns_validate_region">校验地区</string>
+    <string name="summary_pref_dns_validate_region">校验本地 DNS 结果的归属地区，不符时使用远程 DNS。</string>
+
+    <string name="title_dns_parallel_query">DNS 并行查询</string>
+    <string name="summary_dns_parallel_query">同时向多个 DNS 服务器发起查询，并使用最快的响应。</string>
+    <string name="title_dns_serve_stale">DNS 乐观缓存</string>
+    <string name="summary_dns_serve_stale">启用后，可降低 DNS 查询等待，过期结果仍会被使用，同时获取最新结果。</string>
 
     <string name="title_pref_dns_hosts">DNS 主机映射（格式：domain:address,…）</string>
     <string name="summary_pref_dns_hosts">domain: address,…</string>
@@ -438,6 +450,7 @@
     <string name="title_pref_fragment_interval">分片间隔（最小 - 最大）</string>
     <string name="title_pref_fragment_enabled">启用分片（Fragment）</string>
     <string name="title_pref_fragment_maxsplit">分片最大分割数</string>
+    <string name="title_pref_hysteria_port_hopping_interval">端口跳跃间隔 (秒或最小-最大)</string>
     <string name="title_observatory_settings">连接观测设置 (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing 探测间隔</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad 探测间隔</string>

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.util.Utils
 
 @Composable
@@ -42,6 +43,7 @@ internal fun SubscriptionRow(
     subscriptionName: String,
     actions: List<CustomAccessibilityAction>,
     onUpdate: (Boolean) -> Unit,
+    onRefresh: () -> Unit,
     onShare: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -107,6 +109,18 @@ internal fun SubscriptionRow(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            subscription.usageInfo?.let { usage ->
+                val total = if (usage.total > 0L) usage.total.toTrafficString()
+                    else stringResource(R.string.sub_info_unlimited)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.sub_info_traffic, usage.used.toTrafficString(), total),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             if (lastUpdated.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -126,6 +140,15 @@ internal fun SubscriptionRow(
         ) {
             Row {
                 if (subscription.url.isNotEmpty()) {
+                    IconButton(
+                        onClick = onRefresh,
+                        modifier = Modifier.clearAndSetSemantics {},
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_refresh_24dp),
+                            contentDescription = null
+                        )
+                    }
                     IconButton(
                         onClick = onShare,
                         modifier = Modifier.clearAndSetSemantics {},
