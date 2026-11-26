@@ -28,14 +28,14 @@ import com.v2ray.ang.ui.settings.TvSettingsSwitchRow
 
 class TvRoutingEditActivity : BaseRoutingEditActivity() {
     @Composable
-    override fun Editor(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, busy: Boolean, onSave: () -> Unit) {
-        TvRoutingRuleEditor(form, draft, remarksError, busy, ::finish, onSave, ::deleteRule)
+    override fun EditorLayout(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, isBusy: Boolean, onSave: () -> Unit) {
+        TvRoutingRuleEditor(form, draft, remarksError, isBusy, ::finish, onSave, ::deleteRule)
     }
 }
 
 @Composable
 private fun TvRoutingRuleEditor(
-    form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, busy: Boolean,
+    form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, isBusy: Boolean,
     onBack: () -> Unit, onSave: () -> Unit, onDelete: () -> Unit
 ) {
     val back = remember { FocusRequester() }
@@ -43,8 +43,8 @@ private fun TvRoutingRuleEditor(
     val save = remember { FocusRequester() }
     val focus = rememberEditorFocus(fallback = back)
     val order = if (form.initial == null) listOf(back, save) else listOf(back, delete, save)
-    var showDelete by rememberSaveable { mutableStateOf(false) }
-    RestoreTvDialogOpener(showDelete, delete)
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+    RestoreTvDialogOpener(showDeleteConfirm, delete)
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -59,11 +59,11 @@ private fun TvRoutingRuleEditor(
                 },
                 actions = {
                     if (form.initial != null) {
-                        TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), { showDelete = true },
-                            focus.target(delete).dpadOrderedFocusNavigation(delete, order), enabled = !busy)
+                        TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), { showDeleteConfirm = true },
+                            focus.target(delete).dpadOrderedFocusNavigation(delete, order), enabled = !isBusy)
                     }
                     TvIconButton(painterResource(R.drawable.ic_fab_check), stringResource(R.string.routing_settings_save), onSave,
-                        focus.target(save).dpadOrderedFocusNavigation(save, order), enabled = !busy)
+                        focus.target(save).dpadOrderedFocusNavigation(save, order), enabled = !isBusy)
                 }
             )
         }
@@ -75,12 +75,12 @@ private fun TvRoutingRuleEditor(
                 outbound = { label -> TvRoutingOutboundField(label, draft.outboundTag.value, { draft.outboundTag.value = it }, back) }
             )
         }
-        if (showDelete) {
+        if (showDeleteConfirm) {
             TvDeleteConfirmDialog(
                 message = stringResource(R.string.confirm_delete_routing_rule),
                 itemName = form.initial?.remarks,
                 onConfirm = onDelete,
-                onDismiss = { showDelete = false }
+                onDismiss = { showDeleteConfirm = false }
             )
         }
     }

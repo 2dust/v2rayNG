@@ -57,7 +57,7 @@ class RoutingEditActivity : BaseRoutingEditActivity() {
     }
 
     @Composable
-    override fun Editor(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, busy: Boolean, onSave: () -> Unit) {
+    override fun EditorLayout(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, isBusy: Boolean, onSave: () -> Unit) {
         val scrollState = rememberScrollState()
         var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
         var showOutboundDialog by rememberSaveable { mutableStateOf(false) }
@@ -70,11 +70,11 @@ class RoutingEditActivity : BaseRoutingEditActivity() {
                     onBackClick = ::finish,
                     actions = {
                         if (form.initial != null) {
-                            IconButton(onClick = { showDeleteConfirm = true }, enabled = !busy) {
+                            IconButton(onClick = { showDeleteConfirm = true }, enabled = !isBusy) {
                                 Icon(painterResource(R.drawable.ic_delete_24dp), contentDescription = stringResource(R.string.acc_delete))
                             }
                         }
-                        IconButton(onClick = onSave, enabled = !busy) {
+                        IconButton(onClick = onSave, enabled = !isBusy) {
                             Icon(painterResource(R.drawable.ic_fab_check), contentDescription = stringResource(R.string.acc_save))
                         }
                     }
@@ -142,9 +142,9 @@ abstract class BaseRoutingEditActivity : BaseComponentActivity() {
         if (destination != null) {
             startActivity(destination)
             finish()
-        } else {
-            viewModel.load(position)
+            return
         }
+        viewModel.load(position)
     }
 
     @Composable
@@ -168,7 +168,7 @@ abstract class BaseRoutingEditActivity : BaseComponentActivity() {
             return
         }
         val draft = rememberSaveable(saver = RoutingRuleDraft.Saver) { RoutingRuleDraft(loaded.initial) }
-        Editor(loaded, draft, state.remarksError, state.busy) {
+        EditorLayout(loaded, draft, state.remarksError, state.busy) {
             viewModel.save(draft.buildRuleset())
         }
     }
@@ -176,5 +176,5 @@ abstract class BaseRoutingEditActivity : BaseComponentActivity() {
     protected fun deleteRule() = viewModel.delete()
 
     @Composable
-    internal abstract fun Editor(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, busy: Boolean, onSave: () -> Unit)
+    internal abstract fun EditorLayout(form: RoutingEditViewModel.Form, draft: RoutingRuleDraft, remarksError: Boolean, isBusy: Boolean, onSave: () -> Unit)
 }
