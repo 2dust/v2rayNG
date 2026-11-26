@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.subscription
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -220,27 +221,31 @@ private fun TvSubscriptionRow(
 ) {
     val moving = move.state.isMoving(move.key)
     var focused by remember { mutableStateOf(false) }
-    Row(Modifier.fillMaxWidth().zIndex(if (moving) 1f else 0f).tvListRowDecoration(focused, moving).padding(end = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        for (slot in group.rowControls()) key(slot) {
-            val modifier = navigation(slot)
-            when (slot) {
-                Control.Group -> Box(Modifier.weight(1f).then(modifier).onFocusChanged { focused = it.isFocused }
-                    .semantics(mergeDescendants = true) { contentDescription = group.remarks }
-                    .dpadLongPressToMove(move) { onEdit(slot) }.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    SubscriptionSummary(group, Modifier.clearAndSetSemantics {})
+    Column(
+        Modifier.fillMaxWidth().zIndex(if (moving) 1f else 0f).tvListRowDecoration(focused, moving).padding(end = 8.dp)
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            for (slot in group.rowControls()) key(slot) {
+                val modifier = navigation(slot)
+                when (slot) {
+                    Control.Group -> Box(Modifier.weight(1f).then(modifier).onFocusChanged { focused = it.isFocused }
+                        .semantics(mergeDescendants = true) { contentDescription = group.remarks }
+                        .dpadLongPressToMove(move) { onEdit(slot) }.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        SubscriptionSummary(group, Modifier.clearAndSetSemantics {})
+                    }
+                    Control.Refresh -> TvIconButton(painterResource(R.drawable.ic_refresh_24dp), stringResource(R.string.title_sub_update),
+                        onRefresh, modifier)
+                    Control.Share -> TvIconButton(painterResource(R.drawable.ic_share_24dp), stringResource(R.string.action_share), onShare,
+                        modifier, contentDescription = stringResource(R.string.acc_share_subscription))
+                    Control.Edit -> TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), { onEdit(slot) },
+                        modifier, contentDescription = stringResource(R.string.acc_edit))
+                    Control.Delete -> TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete,
+                        modifier, contentDescription = stringResource(R.string.acc_delete))
+                    Control.Enable -> TvListRowSwitch(stringResource(R.string.sub_setting_enable), group.enabled, onEnable, modifier)
+                    else -> error("Not a subscription row control: $slot")
                 }
-                Control.Refresh -> TvIconButton(painterResource(R.drawable.ic_refresh_24dp), stringResource(R.string.title_sub_update),
-                    onRefresh, modifier)
-                Control.Share -> TvIconButton(painterResource(R.drawable.ic_share_24dp), stringResource(R.string.action_share), onShare,
-                    modifier, contentDescription = stringResource(R.string.acc_share_subscription))
-                Control.Edit -> TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), { onEdit(slot) },
-                    modifier, contentDescription = stringResource(R.string.acc_edit))
-                Control.Delete -> TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete), onDelete,
-                    modifier, contentDescription = stringResource(R.string.acc_delete))
-                Control.Enable -> TvListRowSwitch(stringResource(R.string.sub_setting_enable), group.enabled, onEnable, modifier)
-                else -> error("Not a subscription row control: $slot")
             }
         }
+        SubscriptionMetadata(group, Modifier.padding(start = 16.dp, end = 8.dp, bottom = 8.dp))
     }
 }
