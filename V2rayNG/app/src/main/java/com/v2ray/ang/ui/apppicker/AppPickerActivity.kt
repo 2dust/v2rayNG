@@ -2,7 +2,6 @@ package com.v2ray.ang.ui.apppicker
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -32,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.AppListItem
 import com.v2ray.ang.ui.compose.AppTopBar
@@ -48,14 +48,15 @@ private const val EXTRA_SELECTED_PACKAGES = "selected_packages"
 private const val EXTRA_PICKER_TITLE = "picker_title"
 
 class AppPickerActivity : BaseAppPickerActivity() {
+    override fun televisionDestination() = televisionResultDestination(TvAppPickerActivity::class.java)
+
     companion object {
         fun createIntent(
             context: Context,
             selectedPackages: Collection<String> = emptyList(),
             title: String? = null
         ): Intent {
-            val isTelevision = context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-            return Intent(context, if (isTelevision) TvAppPickerActivity::class.java else AppPickerActivity::class.java).apply {
+            return Intent(context, AppPickerActivity::class.java).apply {
                 putStringArrayListExtra(EXTRA_SELECTED_PACKAGES, ArrayList(selectedPackages))
                 title?.let { putExtra(EXTRA_PICKER_TITLE, it) }
             }
@@ -80,10 +81,21 @@ internal class AppPickerActions(
 )
 
 abstract class BaseAppPickerActivity : BaseComponentActivity() {
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
     private val viewModel: AppPickerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            super.finish()
+            return
+        }
         val initial = intent.getStringArrayListExtra(EXTRA_SELECTED_PACKAGES).orEmpty()
         viewModel.initialize(initial)
         viewModel.loadApps(this)
@@ -101,6 +113,7 @@ abstract class BaseAppPickerActivity : BaseComponentActivity() {
 
     @Composable
     final override fun ScreenContent() {
+        if (forwardingToTv) return
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val selectedPackages by viewModel.selectedPackages.collectAsStateWithLifecycle()
