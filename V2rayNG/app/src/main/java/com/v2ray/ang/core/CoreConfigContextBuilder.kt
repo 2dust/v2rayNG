@@ -254,7 +254,7 @@ object CoreConfigContextBuilder {
     }
 
     private fun calculateRoutingRegionForDns(): String? {
-        val rulesetItems = MmkvManager.decodeRoutingRulesets() ?: return null
+        val rulesetItems = MmkvManager.decodeRoutingRulesets()?.filter { it.enabled } ?: return null
         if (rulesetItems.size < 2) {
             return null
         }

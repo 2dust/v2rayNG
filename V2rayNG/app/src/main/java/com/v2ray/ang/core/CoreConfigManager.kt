@@ -892,21 +892,21 @@ object CoreConfigManager {
         val domesticDns = SettingsManager.getDomesticDnsServers()
 
         val hosts = buildDnsHostsFromRoutingRules(configContext)
+        val validateRegion = MmkvManager.decodeSettingsBool(AppConfig.PREF_DNS_VALIDATE_REGION, true) == true
         buildDnsFromRoutingRules(
             configContext = configContext,
             servers = servers,
             remoteDns = remoteDns,
-            domesticDns = domesticDns
+            domesticDns = domesticDns,
+            excludeRegionDomains = validateRegion,
         )
-        val validateRegion = MmkvManager.decodeSettingsBool(AppConfig.PREF_DNS_VALIDATE_REGION, true) == true
-        if (validateRegion) {
-            buildDnsValidateRegionFromRoutingRules(
-                configContext = configContext,
-                servers = servers,
-                remoteDns = remoteDns,
-                domesticDns = domesticDns
-            )
-        }
+        buildDnsValidateRegionFromRoutingRules(
+            configContext = configContext,
+            servers = servers,
+            remoteDns = remoteDns,
+            domesticDns = domesticDns,
+            validateRegion = validateRegion
+        )
 
         remoteDns.forEach { servers.add(it) }
 
@@ -998,8 +998,10 @@ object CoreConfigManager {
         servers: ArrayList<Any>,
         remoteDns: List<String>,
         domesticDns: List<String>,
+        validateRegion: Boolean,
     ) {
-        if (configContext.routingRegion.isNullOrBlank()) {
+        if (!validateRegion
+            || configContext.routingRegion.isNullOrBlank()) {
             return
         }
 
@@ -1045,17 +1047,20 @@ object CoreConfigManager {
         servers: ArrayList<Any>,
         remoteDns: List<String>,
         domesticDns: List<String>,
+        excludeRegionDomains: Boolean,
     ) {
-        val regionFilter = buildRegionFilter(configContext)
+        val regionFilter = if (excludeRegionDomains) buildRegionFilter(configContext) else { _: String -> false }
 
         configContext.routingDomainRules.forEach { rule ->
             when (rule.outboundTag) {
                 AppConfig.TAG_DIRECT -> {
+                    val domains = rule.domain.filterNot { regionFilter(it) }
+                    if (domains.isEmpty()) return@forEach
                     domesticDns.forEachIndexed { dnsIndex, address ->
                         servers.add(
                             V2rayConfig.DnsBean.ServersBean(
                                 address = address,
-                                domains = rule.domain.filterNot { regionFilter(it) }.toList(),
+                                domains = domains,
                                 skipFallback = true,
                                 finalQuery = if (dnsIndex == domesticDns.lastIndex) true else null,
                                 tag = AppConfig.TAG_DOMESTIC_DNS
