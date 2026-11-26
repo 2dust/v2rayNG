@@ -50,7 +50,7 @@
     <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
     <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
     <string name="confirm_delete_profile">Удалить этот профиль?</string>
-    <string name="confirm_delete_policy_group">Удалить эту группу политик?</string>
+    <string name="confirm_delete_policy_group">Удалить эту политику группы?</string>
     <string name="confirm_delete_proxy_chain_member">Удалить этого участника цепочки прокси?</string>
     <string name="confirm_delete_routing_rule">Удалить это правило маршрутизации?</string>
     <string name="confirm_delete_subscription_group">Удалить эту подписку?</string>
@@ -252,13 +252,13 @@
     <string name="title_pref_domestic_dns">DNS для прямых подключений (необязательно)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_validate_region">Validate Region</string>
-    <string name="summary_pref_dns_validate_region">Check the region of local DNS results and fall back to remote DNS on mismatch.</string>
+    <string name="title_pref_dns_validate_region">Проверять регион</string>
+    <string name="summary_pref_dns_validate_region">Проверка региона результатов локального сервера DNS и переключение на удалённый в случае несоответствия</string>
 
-    <string name="title_dns_parallel_query">DNS Parallel Query</string>
-    <string name="summary_dns_parallel_query">Query multiple DNS servers in parallel and use the fastest response.</string>
-    <string name="title_dns_serve_stale">DNS Serve Stale</string>
-    <string name="summary_dns_serve_stale">When enabled, reduces DNS lookup waits; expired results are still used while the latest result is fetched.</string>
+    <string name="title_dns_parallel_query">Параллельный запрос DNS</string>
+    <string name="summary_dns_parallel_query">Выполнение запросов к нескольким серверам DNS параллельно и использование самого быстрого ответа</string>
+    <string name="title_dns_serve_stale">Устаревание DNS</string>
+    <string name="summary_dns_serve_stale">Если включено, время ожидания поиска DNS сокращается: просроченные результаты по-прежнему используются, пока выполняется получение последнего результата</string>
 
     <string name="title_pref_dns_hosts">Сопоставления DNS (формат: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">домен:адрес,…</string>
@@ -444,7 +444,7 @@
     <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
     <string name="title_pref_fragment_maxsplit">Максимальное число фрагментов</string>
-    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Интервал смены порта (секунды или от — до)</string>
     <string name="title_observatory_settings">Настройки контроля соединений</string>
     <string name="title_pref_observatory_least_ping_interval">Интервал leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Интервал leastLoad</string>
