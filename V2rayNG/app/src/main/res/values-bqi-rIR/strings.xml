@@ -580,4 +580,5 @@
     <string name="action_more">بیشتر</string>
     <string name="action_clear">پاک کردن</string>
     <string name="connection_connected_tv">منپیز هڌ</string>
+    <string name="acc_invalid_field_value">مقدار نا موئتبر هڌ</string>
 </resources>

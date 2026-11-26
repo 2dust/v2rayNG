@@ -578,4 +578,5 @@
     <string name="action_more">Thêm</string>
     <string name="action_clear">Xoá</string>
     <string name="connection_connected_tv">Đã kết nối</string>
+    <string name="acc_invalid_field_value">Giá trị không hợp lệ</string>
 </resources>
