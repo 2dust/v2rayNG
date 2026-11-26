@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
@@ -60,9 +61,12 @@ import com.v2ray.ang.ui.compose.colorConfigType
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -131,14 +135,22 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
         if (!forwardingToTv) viewModel.reloadIfIdle()
     }
 
-    protected fun addRule() {
-        if (!viewModel.isLoading.value) startActivity(Intent(this, RoutingEditActivity::class.java))
-    }
+    protected fun addRule() = openRule(null)
+    protected fun editRule(id: String) = openRule(id)
 
-    protected fun editRule(id: String) {
-        val position = viewModel.editablePosition(id)
-        if (position < 0) return
-        startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
+    private fun openRule(id: String?) {
+        if (viewModel.isLoading.value) return
+        lifecycleScope.launch {
+            viewModel.awaitPendingEdits()
+            if (isFinishing || viewModel.isLoading.value) return@launch
+            val intent = Intent(this@BaseRoutingSettingActivity, RoutingEditActivity::class.java)
+            if (id != null) {
+                val position = viewModel.editablePosition(id)
+                if (position < 0) return@launch
+                intent.putExtra("position", position)
+            }
+            startActivity(intent)
+        }
     }
 
     protected fun setDomainStrategy(value: String) {
@@ -173,12 +185,15 @@ abstract class BaseRoutingSettingActivity : HelperBaseComponentActivity() {
     }
 
     protected fun export2Clipboard() {
-        val rulesetList = MmkvManager.decodeRoutingRulesets()
-        if (rulesetList.isNullOrEmpty()) {
+        val rulesetList = viewModel.rulesetsFlow.value
+        if (rulesetList.isEmpty()) {
             toastError(R.string.toast_failure)
         } else {
-            Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
-            toastSuccess(R.string.toast_success)
+            lifecycleScope.launch {
+                val json = withContext(Dispatchers.Default) { JsonUtil.toJson(rulesetList) }
+                Utils.setClipboard(this@BaseRoutingSettingActivity, json)
+                toastSuccess(R.string.toast_success)
+            }
         }
     }
 }

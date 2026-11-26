@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.routing
 
 import android.app.Application
 import android.webkit.URLUtil
+import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
@@ -15,9 +16,13 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
@@ -27,7 +32,30 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     private val _rulesetsFlow = MutableStateFlow<List<RulesetItem>>(emptyList())
     val rulesetsFlow: StateFlow<List<RulesetItem>> = _rulesetsFlow.asStateFlow()
 
-    fun getAll(): List<RulesetItem> = rulesets.toList()
+    // A freshly reopened list must read after writes from the previous Activity.
+    private companion object { val storage = Mutex() }
+
+    private suspend fun <T> withStorage(block: suspend () -> T): T =
+        storage.withLock { withContext(Dispatchers.IO) { block() } }
+
+    suspend fun awaitPendingEdits() = storage.withLock { Unit }
+
+    private fun publishAndPersist() {
+        val snapshot = rulesets.toMutableList()
+        _rulesetsFlow.value = snapshot
+        viewModelScope.launch {
+            try {
+                // An accepted remote key or drag must still be saved if Back immediately closes the list.
+                withContext(NonCancellable) { withStorage { MmkvManager.encodeRoutingRulesets(snapshot) } }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                LogUtil.e(AppConfig.TAG, "Failed to persist routing list edit", e)
+                toastError(R.string.toast_failure)
+                if (_rulesetsFlow.value === snapshot) reloadIfIdle()
+            }
+        }
+    }
 
     internal fun editablePosition(id: String): Int = if (isLoading.value) -1 else rulesets.indexOfFirst { it.id == id }
 
@@ -35,16 +63,15 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         val position = editablePosition(id)
         val rule = rulesets.getOrNull(position) ?: return
         val updated = rule.copy(enabled = enabled)
-        SettingsManager.saveRoutingRuleset(position, updated)
         rulesets[position] = updated
-        _rulesetsFlow.value = rulesets.toList()
+        publishAndPersist()
     }
 
     internal fun deleteRule(id: String) {
         val position = editablePosition(id)
         if (position < 0) return
         launchLoading {
-            withContext(Dispatchers.IO) { SettingsManager.removeRoutingRuleset(position) }
+            withStorage { SettingsManager.removeRoutingRuleset(position) }
             reload()
         }
     }
@@ -54,7 +81,7 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     }
 
     private suspend fun reload() {
-        val loaded = withContext(Dispatchers.IO) {
+        val loaded = withStorage {
             val rules = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
             val missingIds = rules.filter { it.id.isEmpty() }
             missingIds.forEach { it.id = UUID.randomUUID().toString() }
@@ -70,8 +97,7 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         val fromPosition = editablePosition(fromId)
         val toPosition = editablePosition(toId)
         if (rulesets.moveItem(fromPosition, toPosition)) {
-            MmkvManager.encodeRoutingRulesets(rulesets)
-            _rulesetsFlow.value = rulesets.toList()
+            publishAndPersist()
         }
     }
 
@@ -106,7 +132,7 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
         launchLoading {
             // Keep edits blocked until the displayed list matches the persisted replacement.
             try {
-                if (withContext(Dispatchers.IO) { replaceRules() }) {
+                if (withStorage { replaceRules() }) {
                     reload()
                     toastSuccess(R.string.toast_success)
                 } else {
