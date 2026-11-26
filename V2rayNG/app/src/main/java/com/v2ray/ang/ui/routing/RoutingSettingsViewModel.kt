@@ -5,6 +5,7 @@ import android.webkit.URLUtil
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.dto.entities.ensureUniqueIds
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.CoreDownloadManager
 import com.v2ray.ang.handler.CoreFetchResult
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class RoutingSettingsViewModel(application: Application) : BaseViewModel(application) {
     private val rulesets: MutableList<RulesetItem> = mutableListOf()
@@ -29,15 +29,8 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     fun getAll(): List<RulesetItem> = rulesets.toList()
 
     fun reload() {
-        val loaded = MmkvManager.decodeRoutingRulesets()?.toMutableList() ?: mutableListOf()
-        var needsSave = false
-        loaded.forEachIndexed { index, item ->
-            if (item.id.isEmpty()) {
-                item.id = UUID.randomUUID().toString()
-                SettingsManager.saveRoutingRuleset(index, item)
-                needsSave = true
-            }
-        }
+        val loaded = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
+        if (loaded.ensureUniqueIds()) MmkvManager.encodeRoutingRulesets(loaded)
         rulesets.clear()
         rulesets.addAll(loaded)
         _rulesetsFlow.value = rulesets.toList()

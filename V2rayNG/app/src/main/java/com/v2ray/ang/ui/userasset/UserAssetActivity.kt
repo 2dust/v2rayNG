@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -332,6 +333,7 @@ internal fun UserAssetScreen(
                 UserAssetItem(
                     item = item,
                     fileMetadata = uiState.fileMetadata[item.guid],
+                    isDownloading = uiState.downloadingItem == item.assetUrl.remarks,
                     onEdit = { onEditAsset(item.guid) },
                     onDeleteClick = {
                         deleteTarget = AssetDeleteTarget(item.guid, item.assetUrl.remarks)
@@ -360,6 +362,7 @@ internal fun UserAssetScreen(
 private fun UserAssetItem(
     item: AssetUrlCache,
     fileMetadata: AssetFileMetadata?,
+    isDownloading: Boolean = false,
     onEdit: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -400,6 +403,15 @@ private fun UserAssetItem(
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            if (isDownloading) {
+                Spacer(modifier = Modifier.height(4.dp))
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
         if (showEditButton) {
             IconButton(onClick = onEdit) {

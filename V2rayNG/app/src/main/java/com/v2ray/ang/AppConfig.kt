@@ -44,6 +44,7 @@ object AppConfig {
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
     const val PREF_FRAGMENT_MAXSPLIT = "pref_fragment_maxsplit"
+    const val PREF_HYSTERIA_PORT_HOPPING_INTERVAL = "pref_hysteria_port_hopping_interval"
     const val PREF_OBSERVATORY_LEAST_PING_INTERVAL = "pref_observatory_least_ping_interval"
     const val PREF_OBSERVATORY_LEAST_LOAD_INTERVAL = "pref_observatory_least_load_interval"
     const val PREF_OBSERVATORY_LEAST_LOAD_METHOD = "pref_observatory_least_load_method"
@@ -70,7 +71,10 @@ object AppConfig {
     const val PREF_SOCKS_ENABLE_UDP = "pref_socks_enable_udp"
     const val PREF_REMOTE_DNS = "pref_remote_dns"
     const val PREF_DOMESTIC_DNS = "pref_domestic_dns"
+    const val PREF_DNS_VALIDATE_REGION = "pref_dns_validate_region"
     const val PREF_DNS_HOSTS = "pref_dns_hosts"
+    const val PREF_DNS_PARALLEL_QUERY = "pref_dns_parallel_query"
+    const val PREF_DNS_SERVE_STALE = "pref_dns_serve_stale"
     const val PREF_DELAY_TEST_URL = "pref_delay_test_url"
     const val PREF_IP_API_URL = "pref_ip_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
@@ -287,6 +291,9 @@ object AppConfig {
     const val TLS = "tls"
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
+
+    /** Default storage service of the Xray-core xdrive transport ("service" field). */
+    const val XDRIVE_SERVICE_GOOGLE_DRIVE = "google-drive"
 
     const val UNIDENTIFIED_PACKAGE = "__unknown_app__"
 
