@@ -1,8 +1,7 @@
 package com.v2ray.ang.ui.server
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -51,6 +50,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
@@ -60,7 +60,27 @@ import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 
-class ServerGroupActivity : BaseComponentActivity() {
+class ServerGroupActivity : BaseServerGroupActivity() {
+    override fun televisionDestination() = televisionResultDestination(TvServerGroupActivity::class.java)
+
+    @Composable
+    override fun EditorLayout(onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, fields: @Composable ColumnScope.() -> Unit) =
+        PhonePolicyGroupEditor(onBack, onSave, onDelete, fields)
+
+    @Composable
+    override fun FallbackField(value: String, onSelect: (String) -> Unit) = PhonePolicyFallbackField(value, onSelect)
+}
+
+abstract class BaseServerGroupActivity : BaseComponentActivity() {
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
+    @Composable
+    internal abstract fun EditorLayout(onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, fields: @Composable ColumnScope.() -> Unit)
+
+    @Composable
+    internal abstract fun FallbackField(value: String, onSelect: (String) -> Unit)
 
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
@@ -70,7 +90,6 @@ class ServerGroupActivity : BaseComponentActivity() {
     }
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
     private lateinit var sourceLabels: Map<String, String>
-    private var isTelevision = false
 
     private lateinit var initialRemarks: String
     private lateinit var initialFilter: String
@@ -80,11 +99,13 @@ class ServerGroupActivity : BaseComponentActivity() {
     private lateinit var initialFallbackTag: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
-        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-        if (isTelevision && savedInstanceState != null) {
-            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
-            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid)
@@ -104,9 +125,9 @@ class ServerGroupActivity : BaseComponentActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
         ServerGroupScreen(
-            isTelevision = isTelevision,
             editGuid = editGuid,
             isRunning = isRunning,
             sourceLabels = sourceLabels,
@@ -208,8 +229,7 @@ class ServerGroupActivity : BaseComponentActivity() {
 }
 
 @Composable
-private fun ServerGroupScreen(
-    isTelevision: Boolean,
+private fun BaseServerGroupActivity.ServerGroupScreen(
     editGuid: String,
     isRunning: Boolean,
     sourceLabels: Map<String, String>,
@@ -239,7 +259,7 @@ private fun ServerGroupScreen(
         isRemarksError = remarks.isBlank()
         if (!isRemarksError) onSave(remarks, filter, typeIndex, sourceId.takeIf { it in sourceLabels }.orEmpty(), testOutbounds, fallbackTag)
     }
-    val fields: @Composable ColumnScope.(@Composable () -> Unit) -> Unit = { fallbackField ->
+    val fields: @Composable ColumnScope.() -> Unit = {
         FormTextField(
             label = stringResource(R.string.server_lab_remarks),
             value = remarks,
@@ -264,20 +284,12 @@ private fun ServerGroupScreen(
                 onCheckedChange = { testOutbounds = it }
             )
             if (testOutbounds) {
-                fallbackField()
+                FallbackField(fallbackTag) { fallbackTag = it }
             }
         }
     }
     val delete: (() -> Unit)? = if (showDelete) ({ showDeleteConfirm = true }) else null
-    if (isTelevision) {
-        TvServerEditor(EConfigType.POLICYGROUP.toString(), onBackClick, save, delete) {
-            fields { TvPolicyFallbackField(fallbackTag) { fallbackTag = it } }
-        }
-    } else {
-        PhonePolicyGroupEditor(onBackClick, save, delete) {
-            fields { PhonePolicyFallbackField(fallbackTag) { fallbackTag = it } }
-        }
-    }
+    EditorLayout(onBackClick, save, delete, fields)
 
     if (showDeleteConfirm) {
         DeleteConfirmDialog(

@@ -128,7 +128,15 @@
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
+            android:name=".ui.server.TvServerGroupActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" />
+        <activity
             android:name=".ui.server.ServerProxyChainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged|adjustResize" />
+        <activity
+            android:name=".ui.server.TvServerProxyChainActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity

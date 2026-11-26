@@ -1,8 +1,7 @@
 package com.v2ray.ang.ui.server
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager.LayoutParams
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -50,6 +49,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
@@ -68,7 +68,38 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import java.util.UUID
 
-class ServerProxyChainActivity : BaseComponentActivity() {
+class ServerProxyChainActivity : BaseServerProxyChainActivity() {
+    override fun televisionDestination() = televisionResultDestination(TvServerProxyChainActivity::class.java)
+
+    @Composable
+    override fun EditorLayout(
+        remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean, members: List<String>, memberKeys: List<String>,
+        onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
+        onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
+    ) {
+        ProxyChainMemberDialogs(members, memberKeys, onRemove, onSelect, picker = { choices, selected, select, dismiss ->
+            ServerSelectListDialog(
+                title = stringResource(R.string.server_proxy_chain_pick_members), options = choices,
+                selectedOption = selected, onSelected = select, onDismiss = dismiss
+            )
+        }) { pick, remove ->
+            PhoneProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, onBack,
+                onSave, onDelete, { onAdd() }, pick, remove, onMove)
+        }
+    }
+}
+
+abstract class BaseServerProxyChainActivity : BaseComponentActivity() {
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
+    @Composable
+    internal abstract fun EditorLayout(
+        remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean, members: List<String>, memberKeys: List<String>,
+        onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
+        onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
+    )
 
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
@@ -77,18 +108,19 @@ class ServerProxyChainActivity : BaseComponentActivity() {
                 && editGuid == MmkvManager.getSelectServer()
     }
     private val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
-    private var isTelevision = false
 
     private var pendingSave: Job? = null
     private lateinit var initialRemarks: String
     private lateinit var initialMembers: List<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
-        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-        if (isTelevision && savedInstanceState != null) {
-            val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
-            window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
         }
 
         val config = MmkvManager.decodeServerConfig(editGuid)
@@ -97,7 +129,8 @@ class ServerProxyChainActivity : BaseComponentActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
         ProxyChainScreen(
             editGuid = editGuid,
             isRunning = isRunning,
@@ -105,8 +138,7 @@ class ServerProxyChainActivity : BaseComponentActivity() {
             initialMembers = initialMembers,
             onBackClick = { finish() },
             onSave = { remarks, members -> saveServer(remarks, members) },
-            onDelete = { deleteServer() },
-            isTelevision = isTelevision
+            onDelete = { deleteServer() }
         )
     }
 
@@ -193,15 +225,14 @@ class ServerProxyChainActivity : BaseComponentActivity() {
 }
 
 @Composable
-private fun ProxyChainScreen(
+private fun BaseServerProxyChainActivity.ProxyChainScreen(
     editGuid: String,
     isRunning: Boolean,
     initialRemarks: String,
     initialMembers: List<String>,
     onBackClick: () -> Unit,
     onSave: (String, List<String>) -> Unit,
-    onDelete: () -> Unit,
-    isTelevision: Boolean
+    onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable { mutableStateOf(initialRemarks) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
@@ -239,21 +270,8 @@ private fun ProxyChainScreen(
         if (index >= 0) members = members.toMutableList().also { it[index] = remark }
     }
 
-    if (isTelevision) {
-        TvProxyChainEditor(
-            remarks, { remarks = it }, isRemarksError, members, memberKeys, onBackClick, save, delete,
-            add, select, ::remove,
-            { key, step ->
-                val index = memberKeys.indexOf(key)
-                if (index >= 0) move(index, index + step)
-            }
-        )
-    } else {
-        PhoneProxyChainEditor(
-            remarks, { remarks = it }, isRemarksError, members, memberKeys, onBackClick, save, delete,
-            { add() }, select, ::remove, ::move
-        )
-    }
+    EditorLayout(remarks, { remarks = it }, isRemarksError, members, memberKeys, onBackClick, save, delete,
+        add, select, ::remove, ::move)
 
     if (showProfileDeleteConfirm) {
         DeleteConfirmDialog(
@@ -303,24 +321,6 @@ internal fun ProxyChainMemberDialogs(
                 }, ::closePicker)
             }
         }
-    }
-}
-
-@Composable
-private fun PhoneProxyChainEditor(
-    remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
-    members: List<String>, memberKeys: List<String>,
-    onBackClick: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
-    onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
-) {
-    ProxyChainMemberDialogs(members, memberKeys, onRemove, onSelect, picker = { choices, selected, select, dismiss ->
-        ServerSelectListDialog(
-            title = stringResource(R.string.server_proxy_chain_pick_members), options = choices,
-            selectedOption = selected, onSelected = select, onDismiss = dismiss
-        )
-    }) { pick, remove ->
-        PhoneProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, onBackClick,
-            onSave, onDelete, onAdd, pick, remove, onMove)
     }
 }
 

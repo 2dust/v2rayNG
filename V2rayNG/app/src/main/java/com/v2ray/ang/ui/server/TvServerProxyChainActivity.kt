@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.server
 
+import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
@@ -44,25 +45,31 @@ import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 
 private const val ADD_MEMBER = "chain:add"
 
-@Composable
-internal fun TvProxyChainEditor(
-    remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
-    members: List<String>, memberKeys: List<String>,
-    onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
-    onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (String, Int) -> Unit
-) {
-    var returnKey by remember { mutableStateOf<String?>(null) }
-    val remove: (String) -> Unit = { key ->
-        if (key in memberKeys) {
-            returnKey = focusAfterRemoval(memberKeys, key) ?: ADD_MEMBER
-            onRemove(key)
-        }
+class TvServerProxyChainActivity : BaseServerProxyChainActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) hideRestoredKeyboard()
     }
-    ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { choices, selected, select, dismiss ->
-        TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), choices, selected, select, dismiss)
-    }) { pick, requestRemove ->
-        TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },
-            onBack, onSave, onDelete, { returnKey = onAdd() }, pick, requestRemove, onMove)
+
+    @Composable
+    override fun EditorLayout(
+        remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean, members: List<String>, memberKeys: List<String>,
+        onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> String,
+        onSelect: (String, String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
+    ) {
+        var returnKey by remember { mutableStateOf<String?>(null) }
+        val remove: (String) -> Unit = { key ->
+            if (key in memberKeys) {
+                returnKey = focusAfterRemoval(memberKeys, key) ?: ADD_MEMBER
+                onRemove(key)
+            }
+        }
+        ProxyChainMemberDialogs(members, memberKeys, remove, onSelect, onClosePicker = { returnKey = it }, picker = { choices, selected, select, dismiss ->
+            TvSearchableOptionsDialog(stringResource(R.string.server_proxy_chain_member_unselected), choices, selected, select, dismiss)
+        }) { pick, requestRemove ->
+            TvProxyChainLayout(remarks, onRemarksChange, isRemarksError, members, memberKeys, returnKey, { returnKey = null },
+                onBack, onSave, onDelete, { returnKey = onAdd() }, pick, requestRemove, onMove)
+        }
     }
 }
 
@@ -71,7 +78,7 @@ private fun TvProxyChainLayout(
     remarks: String, onRemarksChange: (String) -> Unit, isRemarksError: Boolean,
     members: List<String>, memberKeys: List<String>, returnKey: String?, onReturned: () -> Unit,
     onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, onAdd: () -> Unit,
-    onPick: (String) -> Unit, onRemove: (String) -> Unit, onMove: (String, Int) -> Unit
+    onPick: (String) -> Unit, onRemove: (String) -> Unit, onMove: (Int, Int) -> Unit
 ) {
     val add = remember { FocusRequester() }
     TvServerEditor(EConfigType.PROXYCHAIN.toString(), onBack, onSave, onDelete, onAdd, add) {
@@ -97,9 +104,7 @@ private fun TvProxyChainLayout(
                 val previous = targets[memberKeys.getOrNull(index - 1)]
                 val next = targets[memberKeys.getOrNull(index + 1)]
                 val moving = reorder.isMoving(memberKey)
-                val reorderItem = DpadReorderItem(reorder, memberKey, index, memberKeys.size, ::verticalDpadReorderTarget) { from, to ->
-                    onMove(memberKey, to - from)
-                }
+                val reorderItem = DpadReorderItem(reorder, memberKey, index, memberKeys.size, ::verticalDpadReorderTarget, onMove)
                 val shape = RoundedCornerShape(12.dp)
                 Surface(
                     modifier = Modifier.zIndex(if (moving) 1f else 0f)
