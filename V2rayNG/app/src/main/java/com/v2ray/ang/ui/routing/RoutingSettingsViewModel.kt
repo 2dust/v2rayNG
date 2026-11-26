@@ -7,6 +7,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.RulesetItem
+import com.v2ray.ang.dto.entities.ensureUniqueIds
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.handler.MmkvManager
@@ -24,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class RoutingSettingsViewModel(application: Application) : BaseViewModel(application) {
     private val rulesets: MutableList<RulesetItem> = mutableListOf()
@@ -83,9 +83,7 @@ class RoutingSettingsViewModel(application: Application) : BaseViewModel(applica
     private suspend fun reload() {
         val loaded = withStorage {
             val rules = MmkvManager.decodeRoutingRulesets() ?: mutableListOf()
-            val missingIds = rules.filter { it.id.isEmpty() }
-            missingIds.forEach { it.id = UUID.randomUUID().toString() }
-            if (missingIds.isNotEmpty()) MmkvManager.encodeRoutingRulesets(rules)
+            if (rules.ensureUniqueIds()) MmkvManager.encodeRoutingRulesets(rules)
             rules
         }
         rulesets.clear()

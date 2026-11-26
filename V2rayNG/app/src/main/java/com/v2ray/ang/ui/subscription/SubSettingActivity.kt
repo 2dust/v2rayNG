@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -79,6 +82,7 @@ class SubSettingActivity : BaseComponentActivity() {
             onBackClick = { finish() },
             onAddClick = { startActivity(Intent(this, SubEditActivity::class.java)) },
             onSubUpdate = { viewModel.updateSubscriptions() },
+            onSingleSubUpdate = { subId -> viewModel.updateSubscriptions(subId) },
             onEditSub = { subId ->
                 startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
             },
@@ -108,6 +112,7 @@ fun SubSettingScreen(
     onBackClick: () -> Unit,
     onAddClick: () -> Unit,
     onSubUpdate: () -> Unit,
+    onSingleSubUpdate: (String) -> Unit,
     onEditSub: (String) -> Unit,
     onRemoveSub: (String) -> Unit,
     onShareQRCode: (String) -> Unit,
@@ -115,6 +120,7 @@ fun SubSettingScreen(
 ) {
     val subscriptions by viewModel.subsFlow.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
+    var pendingUpdateSubId by remember { mutableStateOf<String?>(null) }
     var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
     val confirmRemove = MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
@@ -137,7 +143,10 @@ fun SubSettingScreen(
                     IconButton(onClick = onAddClick) {
                         Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_subscription))
                     }
-                    IconButton(onClick = { showUpdateDialog = true }) {
+                    IconButton(onClick = {
+                        pendingUpdateSubId = null
+                        showUpdateDialog = true
+                    }) {
                         Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.acc_update_subscriptions))
                     }
                 }
@@ -161,81 +170,125 @@ fun SubSettingScreen(
                         scope = this,
                         isDragging = isDragging
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 14.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(vertical = 8.dp)
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = subCache.subscription.remarks,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                if (subCache.subscription.url.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = subCache.subscription.url,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        text = subCache.subscription.remarks,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
-                                }
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            Column(
-                                horizontalAlignment = Alignment.End,
-                                modifier = Modifier.padding(start = 8.dp)
-                            ) {
-                                Row {
                                     if (subCache.subscription.url.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = subCache.subscription.url,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                }
+
+                                Column(
+                                    horizontalAlignment = Alignment.End,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                ) {
+                                    Row {
+                                        if (subCache.subscription.url.isNotEmpty()) {
+                                            IconButton(onClick = {
+                                                pendingUpdateSubId = subCache.guid
+                                                showUpdateDialog = true
+                                            }) {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.ic_refresh_24dp),
+                                                    contentDescription = stringResource(R.string.title_sub_update)
+                                                )
+                                            }
+                                            IconButton(onClick = {
+                                                shareTarget = Pair(subCache.guid, subCache.subscription.url)
+                                            }) {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.ic_share_24dp),
+                                                    contentDescription = stringResource(R.string.acc_share_subscription)
+                                                )
+                                            }
+                                        }
+                                        IconButton(onClick = { onEditSub(subCache.guid) }) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.ic_edit_24dp),
+                                                contentDescription = stringResource(R.string.acc_edit)
+                                            )
+                                        }
                                         IconButton(onClick = {
-                                            shareTarget = Pair(subCache.guid, subCache.subscription.url)
+                                            if (confirmRemove) removeTarget = SubscriptionDeleteTarget(subCache.guid, subCache.subscription.remarks)
+                                            else onRemoveSub(subCache.guid)
                                         }) {
                                             Icon(
-                                                painter = painterResource(R.drawable.ic_share_24dp),
-                                                contentDescription = stringResource(R.string.acc_share_subscription)
+                                                painter = painterResource(R.drawable.ic_delete_24dp),
+                                                contentDescription = stringResource(R.string.acc_delete)
                                             )
                                         }
                                     }
-                                    IconButton(onClick = { onEditSub(subCache.guid) }) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_edit_24dp),
-                                            contentDescription = stringResource(R.string.acc_edit)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Switch(
+                                        checked = subCache.subscription.enabled,
+                                        onCheckedChange = { checked ->
+                                            val updated = subCache.subscription.copy()
+                                            updated.enabled = checked
+                                            viewModel.update(subCache.guid, updated)
+                                        },
+                                        modifier = Modifier.scale(0.7f),
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                            checkedTrackColor = MaterialTheme.colorScheme.secondary
                                         )
-                                    }
-                                    IconButton(onClick = {
-                                        if (confirmRemove) removeTarget = SubscriptionDeleteTarget(subCache.guid, subCache.subscription.remarks)
-                                        else onRemoveSub(subCache.guid)
-                                    }) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_delete_24dp),
-                                            contentDescription = stringResource(R.string.acc_delete)
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Switch(
-                                    checked = subCache.subscription.enabled,
-                                    onCheckedChange = { checked ->
-                                        val updated = subCache.subscription.copy()
-                                        updated.enabled = checked
-                                        viewModel.update(subCache.guid, updated)
-                                    },
-                                    modifier = Modifier.scale(0.7f),
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                        checkedTrackColor = MaterialTheme.colorScheme.secondary
                                     )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val usageInfo = subCache.subscription.usageInfo
+                                if (usageInfo != null) {
+                                    val totalText = if (usageInfo.total > 0L) {
+                                        usageInfo.total.toTrafficString()
+                                    } else {
+                                        stringResource(R.string.sub_info_unlimited)
+                                    }
+                                    Text(
+                                        text = stringResource(R.string.sub_info_traffic, usageInfo.used.toTrafficString(), totalText),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f, fill = false)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                } else {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                                Text(
+                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
                                 )
                             }
                         }
@@ -323,7 +376,12 @@ fun SubSettingScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showUpdateDialog = false
-                    onSubUpdate()
+                    val targetId = pendingUpdateSubId
+                    if (targetId != null) {
+                        onSingleSubUpdate(targetId)
+                    } else {
+                        onSubUpdate()
+                    }
                 }) {
                     Text(text = stringResource(R.string.action_ok))
                 }
