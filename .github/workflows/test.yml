@@ -51,7 +51,7 @@ jobs:
           out-file-path: V2rayNG/app/libs/
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           build-root-directory: ./V2rayNG
 
