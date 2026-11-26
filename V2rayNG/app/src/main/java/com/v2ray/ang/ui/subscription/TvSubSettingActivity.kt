@@ -72,29 +72,29 @@ internal fun Control.onRow(available: Set<Control>) = if (this == Control.Share 
 
 class TvSubSettingActivity : BaseSubSettingActivity() {
     @Composable
-    override fun ScreenContent() {
+    override fun SubscriptionListContent() {
         val state by viewModel.state.collectAsStateWithLifecycle()
         val loading by viewModel.isLoading.collectAsStateWithLifecycle()
         val bitmap by viewModel.qrCode.collectAsStateWithLifecycle()
         val groups = state.groups.orEmpty()
         val ids = remember(groups) { groups.map { it.guid } }
-        val top = remember { toolbar.associateWith { FocusRequester() } }
-        val back = top.getValue(Control.Back)
-        val rowHandles = rememberDpadFocusTargets(ids) { row.associateWith { FocusRequester() } }
-        val targets = remember(groups) {
-            groups.associate { (id, group) -> id to group.rowControls().associateWith(rowHandles.getValue(id)::getValue) }
+        val toolbarFocus = remember { toolbar.associateWith { FocusRequester() } }
+        val back = toolbarFocus.getValue(Control.Back)
+        val rowFocus = rememberDpadFocusTargets(ids) { row.associateWith { FocusRequester() } }
+        val visibleRowFocus = remember(groups) {
+            groups.associate { (id, group) -> id to group.rowControls().associateWith(rowFocus.getValue(id)::getValue) }
         }
-        val list = rememberLazyListState()
+        val listState = rememberLazyListState()
         // Requesters follow group IDs; their lazy-list indices change when a group moves.
-        val focusRows = remember(ids, targets) { ids.map { targets.getValue(it).values.toList() } }
-        val request = rememberLazyDpadFocus(focusRows) { list.scrollToItem(it) }
-        fun targetFor(id: String?, slot: Control) = targets[id]?.let { it[slot.onRow(it.keys)] }
+        val focusRows = remember(ids, visibleRowFocus) { ids.map { visibleRowFocus.getValue(it).values.toList() } }
+        val requestRow = rememberLazyDpadFocus(focusRows) { listState.scrollToItem(it) }
+        fun targetFor(id: String?, slot: Control) = visibleRowFocus[id]?.let { it[slot.onRow(it.keys)] }
         val reorder = rememberSyncedDpadReorderState(ids) { key, index ->
-            list.keepDpadReorderItemVisible(key, index)
-            targets[key]?.get(Control.Group)?.requestFocus()
+            listState.keepDpadReorderItemVisible(key, index)
+            visibleRowFocus[key]?.get(Control.Group)?.requestFocus()
         }
-        var control by rememberSaveable { mutableStateOf(Control.Back) }
-        var groupId by rememberSaveable { mutableStateOf<String?>(null) }
+        var focusedControl by rememberSaveable { mutableStateOf(Control.Back) }
+        var focusedGroupId by rememberSaveable { mutableStateOf<String?>(null) }
         var dialogOpen by rememberSaveable { mutableStateOf(false) }
         // Ignore Compose's first automatic focus (usually Back) until the saved target is attached.
         var restoringFocus by remember { mutableStateOf(true) }
@@ -102,11 +102,11 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
         val windowFocused = LocalWindowInfo.current.isWindowFocused
 
         fun mark(slot: Control, id: String? = null) = Modifier.onFocusChanged {
-            if (it.isFocused && windowFocused && !restoringFocus) { control = slot; groupId = id }
+            if (it.isFocused && windowFocused && !restoringFocus) { focusedControl = slot; focusedGroupId = id }
         }
         fun returnTo(slot: Control, id: String?) {
-            control = slot
-            groupId = id
+            focusedControl = slot
+            focusedGroupId = id
             restoringFocus = true
         }
         fun edit(slot: Control, id: String? = null) {
@@ -118,23 +118,23 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
             dialogOpen = true
         }
 
-        // Restore the same group/action after recreation or a modal, not its old list position.
+        // Restore the same group/action after recreation or a modal, not its old listState position.
         val loaded = state.groups != null
         LaunchedEffect(loaded, windowFocused, dialogOpen, bitmap != null) {
             if (!loaded || !windowFocused || dialogOpen || bitmap != null) return@LaunchedEffect
             // A new or returning TV window can be in touch mode after an IME or pointer action.
             if (restoringFocus) inputMode.requestInputMode(InputMode.Keyboard)
-            val target = targetFor(groupId, control)
-            if (target != null) request(target) else requestFocusWhenReady(top[control] ?: back)
+            val target = targetFor(focusedGroupId, focusedControl)
+            if (target != null) requestRow(target) else requestFocusWhenReady(toolbarFocus[focusedControl] ?: back)
             restoringFocus = false
         }
 
-        fun belowToolbar() = targets[ids.firstOrNull()]?.get(Control.Group)?.let(request) ?: true
+        fun belowToolbar() = visibleRowFocus[ids.firstOrNull()]?.get(Control.Group)?.let(requestRow) ?: true
         @Composable
         fun barAction(slot: Control, icon: Int, label: Int, description: Int, click: () -> Unit) {
-            val target = top.getValue(slot)
+            val target = toolbarFocus.getValue(slot)
             TvIconButton(painterResource(icon), stringResource(label), click,
-                mark(slot).dpadTopBarFocusNavigation(target, top.values.toList(), ::belowToolbar),
+                mark(slot).dpadTopBarFocusNavigation(target, toolbarFocus.values.toList(), ::belowToolbar),
                 focusRequester = target, contentDescription = stringResource(description))
         }
         Scaffold(topBar = {
@@ -149,17 +149,17 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                 })
             }
         }) { padding ->
-            LazyColumn(state = list, modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 48.dp).verticalScrollbar(list),
+            LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 48.dp).verticalScrollbar(listState),
                 verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 itemsIndexed(groups, key = { _, group -> group.guid }) { index, (id, group) ->
-                    val handles = targets.getValue(id)
+                    val handles = visibleRowFocus.getValue(id)
                     val order = handles.values.toList()
                     val navigation: @Composable (Control) -> Modifier = { slot ->
                         val target = handles.getValue(slot)
                         mark(slot, id).focusRequester(target)
                             .dpadOrderedFocusNavigation(target, order, onBeforeFirst = { back.requestFocus() })
-                            .dpadVerticalFocusNavigation({ request(targetFor(ids.getOrNull(index - 1), slot) ?: back) },
-                                { targetFor(ids.getOrNull(index + 1), slot)?.let(request) ?: true })
+                            .dpadVerticalFocusNavigation({ requestRow(targetFor(ids.getOrNull(index - 1), slot) ?: back) },
+                                { targetFor(ids.getOrNull(index + 1), slot)?.let(requestRow) ?: true })
                     }
                     val move = DpadReorderItem(reorder, id, index, groups.size, ::verticalDpadReorderTarget) { _, to ->
                         viewModel.move(id, ids[to])
@@ -173,14 +173,14 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
 
         if (dialogOpen && loaded) {
             val dismiss = { dialogOpen = false }
-            val selected = groupId?.let { id -> groups.find { it.guid == id } }
+            val selected = focusedGroupId?.let { id -> groups.find { it.guid == id } }
             when {
-                control == Control.Update -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
+                focusedControl == Control.Update -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
                     onConfirm = { dismiss(); viewModel.updateSubscriptions() }, onDismiss = dismiss)
-                selected == null || control !in targets[selected.guid].orEmpty() -> LaunchedEffect(Unit) { dismiss() }
-                control == Control.Share -> TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) },
+                selected == null || focusedControl !in visibleRowFocus[selected.guid].orEmpty() -> LaunchedEffect(Unit) { dismiss() }
+                focusedControl == Control.Share -> TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) },
                     onSelected = { dismiss(); shareLink(it, selected.subscription.url) }, onDismiss = dismiss)
-                control == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
+                focusedControl == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
                     itemName = selected.subscription.remarks, onDismiss = dismiss, onConfirm = {
                         val next = focusAfterRemoval(ids, selected.guid)
                         returnTo(if (next == null) Control.Add else Control.Group, next)

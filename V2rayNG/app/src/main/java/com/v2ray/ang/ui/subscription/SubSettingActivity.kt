@@ -63,9 +63,33 @@ internal enum class SubscriptionShareAction(@StringRes val labelRes: Int) {
 abstract class BaseSubSettingActivity : BaseComponentActivity() {
     protected val viewModel: SubscriptionsViewModel by viewModels()
 
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
+        super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
+    }
+
+    @Composable
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
+        SubscriptionListContent()
+    }
+
+    @Composable
+    internal abstract fun SubscriptionListContent()
+
     override fun onResume() {
         super.onResume()
-        if (!isFinishing) viewModel.reload()
+        if (!forwardingToTv) viewModel.reload()
     }
 
     protected fun openEditor(subId: String? = null) {
@@ -84,17 +108,13 @@ abstract class BaseSubSettingActivity : BaseComponentActivity() {
 }
 
 class SubSettingActivity : BaseSubSettingActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION) {
-            startActivity(Intent(this, TvSubSettingActivity::class.java))
-            finish()
-        }
+    override fun televisionDestination(): Intent? {
+        val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+        return if (uiMode == Configuration.UI_MODE_TYPE_TELEVISION) Intent(this, TvSubSettingActivity::class.java) else null
     }
 
     @Composable
-    override fun ScreenContent() {
-        if (isFinishing) return
+    override fun SubscriptionListContent() {
         SubSettingScreen(viewModel, ::finish, ::openEditor, ::shareLink)
     }
 }
