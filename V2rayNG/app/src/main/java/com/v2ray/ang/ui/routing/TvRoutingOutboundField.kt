@@ -21,14 +21,17 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.LocalEditorFocus
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.RestoreTvDialogOpener
 import com.v2ray.ang.ui.compose.TvSearchableOptionsDialog
 import com.v2ray.ang.ui.compose.dpadFocusOutline
 
 @Composable
-internal fun TvRoutingOutboundField(label: String, value: String, options: List<String>, onChange: (String) -> Unit, back: FocusRequester) {
+internal fun TvRoutingOutboundField(label: String, value: String, onChange: (String) -> Unit, back: FocusRequester) {
     val anchor = remember { FocusRequester() }
     var open by rememberSaveable { mutableStateOf(false) }
     RestoreTvDialogOpener(open, anchor)
@@ -45,6 +48,8 @@ internal fun TvRoutingOutboundField(label: String, value: String, options: List<
         }
         Icon(painterResource(R.drawable.ic_expand_more_24dp), contentDescription = null)
     }
-    if (open) TvSearchableOptionsDialog(label, options, value,
-        onSelect = { onChange(it); open = false }, onDismiss = { open = false }, showClearSearch = true)
+    if (open) ProfilePickerChoices({ (BUILTIN_OUTBOUND_TAGS + SettingsManager.getProfileRemarks()).toList() }, { open = false }) { options ->
+        TvSearchableOptionsDialog(label, options, value, onSelect = { onChange(it); open = false },
+            onDismiss = { open = false }, showClearSearch = true)
+    }
 }

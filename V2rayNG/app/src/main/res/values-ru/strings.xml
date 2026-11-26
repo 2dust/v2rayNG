@@ -584,4 +584,5 @@
     <string name="action_more">Ещё</string>
     <string name="action_clear">Очистить</string>
     <string name="connection_connected_tv">Соединено</string>
+    <string name="acc_invalid_field_value">Недопустимое значение</string>
 </resources>

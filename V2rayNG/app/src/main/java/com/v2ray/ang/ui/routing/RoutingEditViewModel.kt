@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 
 internal class RoutingEditViewModel : ViewModel() {
-    internal data class Form(val initial: RulesetItem?, val outbounds: List<String>, val canUseProcess: Boolean)
+    internal data class Form(val initial: RulesetItem?, val canUseProcess: Boolean)
     internal enum class Result { Saved, Deleted, LoadFailed, EditFailed }
 
     internal data class UiState(
@@ -34,7 +34,7 @@ internal class RoutingEditViewModel : ViewModel() {
         openedPosition = position
         runEdit("load", Result.LoadFailed) {
             val initial = if (position < 0) null else checkNotNull(MmkvManager.decodeRoutingRulesets()?.getOrNull(position))
-            val form = Form(initial, SettingsManager.getProfileRemarks(), SettingsManager.canUseProcessRouting())
+            val form = Form(initial, SettingsManager.canUseProcessRouting())
             copy(form = form)
         }
     }

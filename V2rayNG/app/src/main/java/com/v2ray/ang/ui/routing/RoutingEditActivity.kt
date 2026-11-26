@@ -37,11 +37,13 @@ import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
@@ -113,10 +115,10 @@ class RoutingEditActivity : BaseRoutingEditActivity() {
                     onDismiss = { showDeleteConfirm = false }
                 )
             }
-            if (showOutboundDialog) {
+            if (showOutboundDialog) ProfilePickerChoices({ SettingsManager.getProfileRemarks() }, { showOutboundDialog = false }) { options ->
                 ServerSelectListDialog(
                     title = stringResource(R.string.routing_settings_outbound_tag),
-                    options = form.outbounds,
+                    options = options,
                     selectedOption = draft.outboundTag.value,
                     onSelected = { draft.outboundTag.value = it; showOutboundDialog = false },
                     onDismiss = { showOutboundDialog = false }

@@ -15,7 +15,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.RestoreTvDialogOpener
@@ -44,7 +43,6 @@ private fun TvRoutingRuleEditor(
     val save = remember { FocusRequester() }
     val focus = rememberEditorFocus(fallback = back)
     val order = if (form.initial == null) listOf(back, save) else listOf(back, delete, save)
-    val outbounds = remember(form.outbounds) { (BUILTIN_OUTBOUND_TAGS + form.outbounds).toList() }
     var showDelete by rememberSaveable { mutableStateOf(false) }
     RestoreTvDialogOpener(showDelete, delete)
     Scaffold(
@@ -74,7 +72,7 @@ private fun TvRoutingRuleEditor(
             RoutingRuleFields(
                 draft, form.canUseProcess, remarksError,
                 locked = { label -> TvSettingsSwitchRow(label, draft.locked.value, { draft.locked.value = it }, back, focus.target()) },
-                outbound = { label -> TvRoutingOutboundField(label, draft.outboundTag.value, outbounds, { draft.outboundTag.value = it }, back) }
+                outbound = { label -> TvRoutingOutboundField(label, draft.outboundTag.value, { draft.outboundTag.value = it }, back) }
             )
         }
         if (showDelete) {
