@@ -8,6 +8,7 @@ data class CoreConfigContext(
     val context: Context,
     val guid: String,
     val isCustom: Boolean = false,
+    val routingRegion: String? = null,
     val resolvedOutbounds: List<ResolvedOutbound> = emptyList(),
     val routingDomainRules: List<RoutingDomainRule> = emptyList(),
 ) {

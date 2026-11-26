@@ -41,6 +41,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -97,6 +98,7 @@ class SubSettingActivity : BaseComponentActivity() {
             onBackClick = { finish() },
             onAddClick = { startActivity(Intent(this, SubEditActivity::class.java)) },
             onSubUpdate = { viewModel.updateSubscriptions() },
+            onSingleSubUpdate = { subId -> viewModel.updateSubscriptions(subId) },
             onEditSub = { subId ->
                 startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId))
             },
@@ -120,12 +122,13 @@ class SubSettingActivity : BaseComponentActivity() {
 }
 private class SubscriptionRowFocusTargets {
     val row = FocusRequester()
+    val refresh = FocusRequester()
     val share = FocusRequester()
     val edit = FocusRequester()
     val delete = FocusRequester()
     val toggle = FocusRequester()
-    private val withShare = listOf(row, share, edit, delete, toggle)
-    private val withoutShare = withShare - share
+    private val withShare = listOf(row, refresh, share, edit, delete, toggle)
+    private val withoutShare = withShare - setOf(refresh, share)
 
     fun order(hasShare: Boolean) = if (hasShare) withShare else withoutShare
 }
@@ -137,6 +140,7 @@ fun SubSettingScreen(
     onBackClick: () -> Unit,
     onAddClick: () -> Unit,
     onSubUpdate: () -> Unit,
+    onSingleSubUpdate: (String) -> Unit,
     onEditSub: (String) -> Unit,
     onRemoveSub: (String) -> Unit,
     onShareQRCode: (String) -> Unit,
@@ -147,6 +151,7 @@ fun SubSettingScreen(
     val subscriptionIds = subscriptions.map { it.guid }
     var showUpdateDialog by remember { mutableStateOf(false) }
     val rowFocusTargets = rememberDpadFocusTargets(subscriptionIds) { SubscriptionRowFocusTargets() }
+    var pendingUpdateSubId by remember { mutableStateOf<String?>(null) }
     var removeTarget by remember { mutableStateOf<SubscriptionDeleteTarget?>(null) }
     val confirmRemove = isTelevision ||
         MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
@@ -194,7 +199,10 @@ fun SubSettingScreen(
                     AppTopBarAction(
                         icon = painterResource(R.drawable.ic_cloud_download_24dp),
                         label = stringResource(R.string.title_sub_update),
-                        onClick = { showUpdateDialog = true }
+                        onClick = {
+                            pendingUpdateSubId = null
+                            showUpdateDialog = true
+                        }
                     )
                 )
             )
@@ -231,6 +239,10 @@ fun SubSettingScreen(
                 )
                 val isMoving = dpadReorderState.isMoving(subCache.guid)
                 val hasShare = subCache.subscription.url.isNotEmpty()
+                val requestUpdate = {
+                    pendingUpdateSubId = subCache.guid
+                    showUpdateDialog = true
+                }
                 val actionFocusOrder = focusTargets.order(hasShare)
                 val actionFocus = DpadRowActionFocus(focusTargets, previousTargets, nextTargets, actionFocusOrder, requestRowFocus)
                 ReorderableItem(reorderableState, key = subCache.guid, modifier = Modifier.zIndex(if (isMoving) 1f else 0f)) { isDragging ->
@@ -290,6 +302,18 @@ fun SubSettingScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                 }
+                                subCache.subscription.usageInfo?.let { usage ->
+                                    val total = if (usage.total > 0L) usage.total.toTrafficString()
+                                        else stringResource(R.string.sub_info_unlimited)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = stringResource(R.string.sub_info_traffic, usage.used.toTrafficString(), total),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
@@ -301,6 +325,18 @@ fun SubSettingScreen(
                             if (isTelevision) {
                                 Row(Modifier.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                     if (hasShare) {
+                                        AppIconButton(
+                                            icon = painterResource(R.drawable.ic_refresh_24dp),
+                                            label = stringResource(R.string.title_sub_update),
+                                            focusRequester = focusTargets.refresh,
+                                            modifier = Modifier.dpadRowActionNavigation(
+                                                focusTargets.refresh, actionFocusOrder,
+                                                if (previousSub?.subscription?.url?.isNotEmpty() == true) previousTargets?.refresh else previousTargets?.edit,
+                                                if (nextSub?.subscription?.url?.isNotEmpty() == true) nextTargets?.refresh else nextTargets?.edit,
+                                                requestRowFocus
+                                            ),
+                                            onClick = requestUpdate
+                                        )
                                         AppIconButton(
                                             icon = painterResource(R.drawable.ic_share_24dp),
                                             label = stringResource(R.string.action_share),
@@ -349,7 +385,12 @@ fun SubSettingScreen(
                             } else {
                                 Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
                                     Row {
-                                        if (subCache.subscription.url.isNotEmpty()) {
+                                        if (hasShare) {
+                                            AppIconButton(
+                                                icon = painterResource(R.drawable.ic_refresh_24dp),
+                                                label = stringResource(R.string.title_sub_update),
+                                                onClick = requestUpdate
+                                            )
                                             AppIconButton(
                                                 icon = painterResource(R.drawable.ic_share_24dp),
                                                 label = stringResource(R.string.action_share),
@@ -480,7 +521,7 @@ fun SubSettingScreen(
                     text = stringResource(R.string.action_ok),
                     onClick = {
                         showUpdateDialog = false
-                        onSubUpdate()
+                        pendingUpdateSubId?.let(onSingleSubUpdate) ?: onSubUpdate()
                     },
                     focusRequester = confirmFocusRequester,
                     modifier = Modifier.dpadOrderedFocusNavigation(confirmFocusRequester, buttonFocusOrder)

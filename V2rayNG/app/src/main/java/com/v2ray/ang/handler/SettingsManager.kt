@@ -15,6 +15,7 @@ import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileEntry
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.dto.entities.ensureUniqueIds
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.RoutingType
 import com.v2ray.ang.enums.VpnInterfaceAddressConfig
@@ -120,6 +121,7 @@ object SettingsManager {
         }
 
         rulesetNew.addAll(rulesetList)
+        rulesetNew.ensureUniqueIds()
         MmkvManager.encodeRoutingRulesets(rulesetNew)
     }
 
@@ -472,6 +474,7 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
+        ensureDefaultValue(AppConfig.PREF_HYSTERIA_PORT_HOPPING_INTERVAL, "30")
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
         ensureDefaultValue(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)

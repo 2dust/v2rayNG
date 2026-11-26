@@ -261,7 +261,7 @@ private fun ServerGroupScreen(
     var sourceId by rememberSaveable { mutableStateOf(initialSourceId) }
     var testOutbounds by rememberSaveable { mutableStateOf(initialTestOutbounds) }
     var fallbackTag by rememberSaveable { mutableStateOf(initialFallbackTag) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
     val supportsObservatory = BalancerStrategyType.from(typeIndex.toString()).supportsObservatory
     val save: () -> Unit = {
