@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">Băng thông tải lên (đơn vị hỗ trợ: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">Chế độ XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON thô của XHTTP Extra, định dạng: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">Dịch vụ xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">Thư mục từ xa xdrive</string>
+    <string name="server_lab_xdrive_secrets">Khóa bí mật xdrive, phân tách bằng dấu phẩy (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">JSON thô của xdrive Extra, định dạng: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">JSON thô của finalMask, định dạng: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Xác minh chứng chỉ ngang hàng theo tên</string>
@@ -247,6 +251,14 @@
 
     <string name="title_pref_domestic_dns">DNS cho kết nối trực tiếp (không bắt buộc)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
+
+    <string name="title_pref_dns_validate_region">Validate Region</string>
+    <string name="summary_pref_dns_validate_region">Check the region of local DNS results and fall back to remote DNS on mismatch.</string>
+
+    <string name="title_dns_parallel_query">DNS Parallel Query</string>
+    <string name="summary_dns_parallel_query">Query multiple DNS servers in parallel and use the fastest response.</string>
+    <string name="title_dns_serve_stale">DNS Serve Stale</string>
+    <string name="summary_dns_serve_stale">When enabled, reduces DNS lookup waits; expired results are still used while the latest result is fetched.</string>
 
     <string name="title_pref_dns_hosts">Ánh xạ máy chủ DNS (định dạng: domain:address,…)</string>
     <string name="summary_pref_dns_hosts">domain:address,…</string>
@@ -430,6 +442,7 @@
     <string name="title_pref_fragment_interval">Khoảng phân mảnh (tối thiểu-tối đa)</string>
     <string name="title_pref_fragment_enabled">Bật phân mảnh</string>
     <string name="title_pref_fragment_maxsplit">Số lần chia nhỏ tối đa</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Cài đặt giám sát kết nối (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">Khoảng thời gian leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Khoảng thời gian leastLoad</string>

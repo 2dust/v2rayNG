@@ -272,7 +272,7 @@ fun SettingsSwitchItem(
                 role = Role.Switch,
                 onValueChange = onCheckedChange
             ),
-        modifier = modifier,
+        modifier = modifier.then(LocalEditorFocus.current?.target() ?: Modifier),
         trailing = {
             Switch(
                 checked = checked,
