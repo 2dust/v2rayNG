@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">Upload bandwidth (supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">xdrive service</string>
+    <string name="server_lab_xdrive_remote_folder">xdrive remote folder</string>
+    <string name="server_lab_xdrive_secrets">xdrive secrets, comma separated (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Extra raw JSON, format: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer certificate by name</string>
@@ -436,6 +440,7 @@
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
     <string name="title_pref_fragment_maxsplit">Fragment Max Split</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Observatory Settings</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing Interval</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad Interval</string>

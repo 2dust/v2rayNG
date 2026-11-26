@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">سرویس xdrive</string>
+    <string name="server_lab_xdrive_remote_folder">پوشه دیر xdrive</string>
+    <string name="server_lab_xdrive_secrets">رمزا xdrive، جدا وا ویرگول (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Extra خام JSON، قالوو: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">تئیڌ گوواهی هومتا و ری نوم</string>
@@ -436,6 +440,7 @@
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">سامووا واجۊری منپیز (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>

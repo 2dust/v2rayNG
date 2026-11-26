@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">Ötürmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Rejimi</string>
     <string name="server_lab_xhttp_extra">XHTTP Əlavə xam JSON, format: { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">xdrive xidməti</string>
+    <string name="server_lab_xdrive_remote_folder">xdrive uzaq qovluğu</string>
+    <string name="server_lab_xdrive_secrets">xdrive sirləri, vergüllə ayrılmış (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Əlavə xam JSON, format: { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">finalMask xam JSON, format: { FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Qarşı tərəf sertifikatını ada görə doğrulayın</string>
@@ -248,13 +252,14 @@
     <string name="title_pref_domestic_dns">Birbaşa DNS (istəyə bağlı)</string>
     <string name="summary_pref_domestic_dns" translatable="false">DNS</string>
 
-    <string name="title_pref_dns_validate_region">Validate Region</string>
-    <string name="summary_pref_dns_validate_region">Check the region of local DNS results and fall back to remote DNS on mismatch.</string>
+    <string name="title_pref_dns_validate_region">Bölgəni yoxla</string>
+    <string name="summary_pref_dns_validate_region">Yerli DNS nəticələrinin bölgəsini yoxlayın və uyğunsuzluq olduqda uzaq DNS-ə keçin.</string>
 
-    <string name="title_dns_parallel_query">DNS Parallel Query</string>
-    <string name="summary_dns_parallel_query">Query multiple DNS servers in parallel and use the fastest response.</string>
-    <string name="title_dns_serve_stale">DNS Serve Stale</string>
-    <string name="summary_dns_serve_stale">When enabled, reduces DNS lookup waits; expired results are still used while the latest result is fetched.</string>
+    <string name="title_dns_parallel_query">Paralel DNS sorğusu</string>
+    <string name="summary_dns_parallel_query">Bir neçə DNS serverini paralel sorğulayın və ən sürətli cavabdan istifadə edin.</string>
+    <string name="title_dns_serve_stale">Köhnəlmiş DNS cavablarını təqdim et</string>
+    <string name="summary_dns_serve_stale">Aktivləşdirildikdə DNS axtarış gözləmələrini azaldır; ən son nəticə əldə edilənə qədər vaxtı bitmiş nəticələrdən istifadə olunur.</string>
+
 
     <string name="title_pref_dns_hosts">DNS host mənsubiyyətləri (format: domen:ünvan,…)</string>
     <string name="summary_pref_dns_hosts">domen:ünvan,…</string>
@@ -436,6 +441,7 @@
     <string name="title_pref_fragment_interval">Fraqment İntervalı (min-maks)</string>
     <string name="title_pref_fragment_enabled">Fraqmenti aktivləşdir</string>
     <string name="title_pref_fragment_maxsplit">Fraqment Maksimum Bölünməsi</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Müşahidəçi Tənzimləmələri</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing İntervalı</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad İntervalı</string>

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -144,80 +143,53 @@ internal fun TvProfileGroup(
         { index, direction -> twoColumnDpadReorderTarget(index, direction, isRtl) }
     } else ::verticalDpadReorderTarget
 
-    // Only rendered header actions have a requester: a subscription can stop publishing either link.
-    val headerButtons = remember(group.id) { mutableMapOf<SubscriptionHeaderAction, FocusRequester>() }
-    if (focusToRestore is TvMainFocusTarget.Header) {
-        val window = LocalWindowInfo.current
-        LaunchedEffect(focusToRestore) {
-            snapshotFlow { window.isWindowFocused }.first { it }
-            val target = headerButtons[focusToRestore.action].takeIf { group.id == focusToRestore.groupId }
-            onFocusRestored(focusToRestore, target?.requestFocus() == true)
-        }
-    }
-    val headerModifier = Modifier
-        .dpadVerticalFocusNavigation(onMoveUp = { onUpFromFirstRow?.invoke() ?: false }, onMoveDown = { false })
-        .dpadBackNavigation(onBack = onBackToToolbar)
-    TvProfileGroupLayout(
-        group = group,
-        contentPadding = PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
-        onAction = onAction,
-        headerModifier = headerModifier,
-        actionButton = { icon, action, click ->
-            val requester = remember { FocusRequester() }
-            DisposableEffect(headerButtons, action) {
-                headerButtons[action] = requester
-                onDispose { headerButtons.remove(action) }
-            }
-            TvIconButton(painterResource(icon), stringResource(action.label), click, focusRequester = requester,
-                modifier = Modifier.onFocusChanged { if (it.isFocused) onSearchFocus?.invoke(TvMainFocusTarget.Header(group.id, action)) })
-        }
-    ) { padding ->
-        TvProfileCollection(
-            group, groupState, uiState, scroll, padding, onAction,
-            itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
-        ) { index, row, dragScope, dragging ->
-            val stride = if (doubleColumn) 2 else 1
-            fun targetAt(position: Int) = keys.getOrNull(position)?.let(targets::get)
-            val leadingColumn = !doubleColumn || index % 2 == 0
-            val reorderItem = reorder?.let {
-                DpadReorderItem(it, row.guid, index, rows.size, moveTarget) { _, destination ->
-                    // Remote repeats may arrive before the rendered order has caught up.
-                    groupStateFlow.value.rows.getOrNull(destination)?.let { target ->
-                        onAction(MainAction.MoveServer(group.id, row.guid, target.guid))
-                    }
+    TvProfileCollection(
+        group, groupState, uiState, scroll,
+        PaddingValues(start = 48.dp, top = 16.dp, end = 48.dp, bottom = 80.dp),
+        onAction,
+        itemModifier = { guid -> if (reorder?.isMoving(guid) == true) Modifier.zIndex(1f) else Modifier }
+    ) { index, row, dragScope, dragging ->
+        val stride = if (doubleColumn) 2 else 1
+        fun targetAt(position: Int) = keys.getOrNull(position)?.let(targets::get)
+        val leadingColumn = !doubleColumn || index % 2 == 0
+        val reorderItem = reorder?.let {
+            DpadReorderItem(it, row.guid, index, rows.size, moveTarget) { _, destination ->
+                // Remote repeats may arrive before the rendered order has caught up.
+                groupStateFlow.value.rows.getOrNull(destination)?.let { target ->
+                    onAction(MainAction.MoveServer(group.id, row.guid, target.guid))
                 }
             }
-            val renderRow = @Composable {
-                TvProfileRow(
-                    row = row,
-                    onSearchFocus = onSearchFocus,
-                    selected = row.guid == uiState.selectedGuid,
-                    current = targets.getValue(row.guid),
-                    above = targetAt(index - stride),
-                    below = targetAt(index + stride),
-                    nextColumn = if (doubleColumn && leadingColumn) targetAt(index + 1)?.row else null,
-                    requestFocus = requestFocus,
-                    onPrevious = {
-                        val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
-                        if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer(TvMainFocusTarget.Profile(row.guid))
-                    },
-                    onUpFromFirstRow = {
-                        headerButtons[SubscriptionHeaderAction.Refresh]?.requestFocus() ?: onUpFromFirstRow?.invoke() ?: false
-                    },
-                    onBackToToolbar = onBackToToolbar,
-                    reorderItem = reorderItem,
-                    onSelect = { onAction(MainAction.SelectServer(row.guid)) },
-                    onAction = { action ->
-                        val neighbor = if (action == ProfileRowAction.Delete || action == ProfileRowAction.More) {
-                            focusAfterProfileRemoval(latestKeys, row.guid)
-                        } else null
-                        dialogs.profileAction(action, row, neighbor)
-                    }
-                )
-            }
-            if (dragScope == null) renderRow()
-            else TvReorderableItem(dragScope, dragging, reorder?.isMoving(row.guid) == true, renderRow)
         }
+        val renderRow = @Composable {
+            TvProfileRow(
+                row = row,
+                onSearchFocus = onSearchFocus,
+                selected = row.guid == uiState.selectedGuid,
+                current = targets.getValue(row.guid),
+                above = targetAt(index - stride),
+                below = targetAt(index + stride),
+                nextColumn = if (doubleColumn && leadingColumn) targetAt(index + 1)?.row else null,
+                requestFocus = requestFocus,
+                onPrevious = {
+                    val previousColumn = if (leadingColumn) null else targetAt(index - 1)?.buttons?.get(ProfileRowAction.More)
+                    if (previousColumn != null) requestFocus(previousColumn) else onOpenDrawer(TvMainFocusTarget.Profile(row.guid))
+                },
+                onUpFromFirstRow = {
+                    onUpFromFirstRow?.invoke() ?: false
+                },
+                onBackToToolbar = onBackToToolbar,
+                reorderItem = reorderItem,
+                onSelect = { onAction(MainAction.SelectServer(row.guid)) },
+                onAction = { action ->
+                    val neighbor = if (action == ProfileRowAction.Delete || action == ProfileRowAction.More) {
+                        focusAfterProfileRemoval(latestKeys, row.guid)
+                    } else null
+                    dialogs.profileAction(action, row, neighbor)
+                }
+            )
+        }
+        if (dragScope == null) renderRow()
+        else TvReorderableItem(dragScope, dragging, reorder?.isMoving(row.guid) == true, renderRow)
     }
 }
 

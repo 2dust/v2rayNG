@@ -141,6 +141,10 @@
     <string name="server_lab_bandwidth_up">上傳頻寬（支援的單位：k/m/g/t）</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
+    <string name="server_lab_xdrive_service">xdrive 服務</string>
+    <string name="server_lab_xdrive_remote_folder">xdrive 遠端資料夾</string>
+    <string name="server_lab_xdrive_secrets">xdrive 金鑰，以逗號分隔 (Google Drive: ClientID,ClientSecret,RefreshToken; S3: AccessKey,SecretKey[,SessionToken])</string>
+    <string name="server_lab_xdrive_extra">xdrive Extra 原始 JSON，格式： { XDriveObject } (s3, template, xmux…)</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
     <string name="server_lab_ech_config_list" translatable="false">echConfigList</string>
     <string name="server_lab_verify_peer_cert_by_name">Verify peer cert by name</string>
@@ -434,6 +438,7 @@
     <string name="title_pref_fragment_interval">分段間隔（最小值-最大值）</string>
     <string name="title_pref_fragment_enabled">啟用 Fragment</string>
     <string name="title_pref_fragment_maxsplit">Fragment 最大分段數</string>
+    <string name="title_pref_hysteria_port_hopping_interval">連接埠跳躍間隔 (秒或最小值-最大值)</string>
     <string name="title_observatory_settings">連線觀測設定 (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing 探測間隔</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad 探測間隔</string>

@@ -52,7 +52,6 @@ internal sealed interface TvMainFocusTarget {
                         SearchInput -> listOf("input")
                         SearchClear -> listOf("clear")
                         is GroupTab -> listOf("tab", target.id)
-                        is Header -> listOf("header", target.groupId, target.action.name)
                         is Profile -> listOf("profile", target.guid, target.action?.name.orEmpty())
                     }
                 },
@@ -62,7 +61,6 @@ internal sealed interface TvMainFocusTarget {
                         "input" -> SearchInput
                         "clear" -> SearchClear
                         "tab" -> GroupTab(it[1])
-                        "header" -> Header(it[1], SubscriptionHeaderAction.valueOf(it[2]))
                         "profile" -> Profile(it[1], it[2].takeIf(String::isNotEmpty)?.let(ProfileRowAction::valueOf))
                         else -> null
                     }
@@ -75,7 +73,6 @@ internal sealed interface TvMainFocusTarget {
     data object SearchInput : DrawerOrigin
     data object SearchClear : DrawerOrigin
     data class GroupTab(val id: String) : DrawerOrigin
-    data class Header(val groupId: String, val action: SubscriptionHeaderAction) : DrawerOrigin
     data class Profile(val guid: String, val action: ProfileRowAction? = null) : DrawerOrigin {
         companion object {
             val Saver = listSaver<Profile?, String>(
@@ -191,7 +188,7 @@ internal fun TvMainScreen(
     val latestTabFocus by rememberUpdatedState(::focusGroupTab)
     LaunchedEffect(isDrawerOpen, focusToRestore) {
         val target = focusToRestore ?: return@LaunchedEffect
-        if (isDrawerOpen || target is TvMainFocusTarget.Profile || target is TvMainFocusTarget.Header || target is TvMainFocusTarget.AfterRemoval) return@LaunchedEffect
+        if (isDrawerOpen || target is TvMainFocusTarget.Profile || target is TvMainFocusTarget.AfterRemoval) return@LaunchedEffect
         snapshotFlow { windowInfo.isWindowFocused }.first { it }
         withFrameNanos { }
         when (target) {

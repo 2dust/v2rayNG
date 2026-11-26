@@ -44,6 +44,7 @@ object AppConfig {
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
     const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
     const val PREF_FRAGMENT_MAXSPLIT = "pref_fragment_maxsplit"
+    const val PREF_HYSTERIA_PORT_HOPPING_INTERVAL = "pref_hysteria_port_hopping_interval"
     const val PREF_OBSERVATORY_LEAST_PING_INTERVAL = "pref_observatory_least_ping_interval"
     const val PREF_OBSERVATORY_LEAST_LOAD_INTERVAL = "pref_observatory_least_load_interval"
     const val PREF_OBSERVATORY_LEAST_LOAD_METHOD = "pref_observatory_least_load_method"
@@ -289,6 +290,9 @@ object AppConfig {
     const val TLS = "tls"
     const val REALITY = "reality"
     const val HEADER_TYPE_HTTP = "http"
+
+    /** Default storage service of the Xray-core xdrive transport ("service" field). */
+    const val XDRIVE_SERVICE_GOOGLE_DRIVE = "google-drive"
 
     const val UNIDENTIFIED_PACKAGE = "__unknown_app__"
 
