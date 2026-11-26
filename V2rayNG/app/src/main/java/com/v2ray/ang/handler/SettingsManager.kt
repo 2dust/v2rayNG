@@ -13,6 +13,7 @@ import com.v2ray.ang.AppConfig.TAG_DIRECT
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileEntry
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
@@ -32,6 +33,13 @@ import com.v2ray.ang.util.Utils
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.random.Random
+
+/** Editors trim chain references; the resolver uses the first exact name in storage. */
+internal fun Sequence<ProfileItem>.selectableChainRemarks(): List<String> = distinctBy { it.remarks }
+    .filterNot { it.configType.isComplexType() }
+    .map { it.remarks }
+    .filter { it.isNotEmpty() && it == it.trim() }
+    .toList()
 
 object SettingsManager {
 
@@ -218,7 +226,8 @@ object SettingsManager {
             .firstOrNull { it.profile.remarks == remarks }
     }
 
-    fun getSimpleProfileRemarks(): List<String> = getProfileRemarks(EConfigType.entries.filterTo(mutableSetOf()) { it.isComplexType() })
+    fun getSimpleProfileRemarks(): List<String> =
+        decodeAllServerList().asSequence().mapNotNull(::decodeServerConfig).selectableChainRemarks()
 
     /**
      * Collects non-empty profile remarks while excluding specific config types.

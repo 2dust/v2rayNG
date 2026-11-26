@@ -17,8 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.EditorFocus
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.TvEditorForm
 import com.v2ray.ang.ui.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.compose.TvEditorTextField
@@ -73,7 +75,7 @@ private class TvSubscriptionControls(private val back: FocusRequester, private v
     }
 
     @Composable
-    override fun Profile(label: String, value: String, hint: String, options: List<String>, change: (String) -> Unit) {
+    override fun Profile(label: String, value: String, hint: String, change: (String) -> Unit) {
         val pick = remember { FocusRequester() }
         val clear = remember { FocusRequester() }
         val order = listOf(pick, clear)
@@ -82,7 +84,7 @@ private class TvSubscriptionControls(private val back: FocusRequester, private v
         ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint,
             focus.target(pick).dpadOrderedFocusNavigation(pick, order, onBeforeFirst = { back.requestFocus() }).dpadFocusOutline(),
             focus.target(clear).dpadOrderedFocusNavigation(clear, order).dpadFocusOutline(cornerRadius = 24.dp))
-        if (open) {
+        if (open) ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, { open = false }) { options ->
             TvSearchableOptionsDialog(label, options, value, onSelect = { change(it); open = false }, onDismiss = { open = false })
         }
     }

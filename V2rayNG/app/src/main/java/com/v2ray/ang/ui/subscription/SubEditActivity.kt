@@ -25,10 +25,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.compose.ProfilePickerChoices
 import com.v2ray.ang.ui.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
@@ -82,10 +84,12 @@ private object PhoneSubscriptionControls : SubscriptionControls {
     }
 
     @Composable
-    override fun Profile(label: String, value: String, hint: String, options: List<String>, change: (String) -> Unit) {
+    override fun Profile(label: String, value: String, hint: String, change: (String) -> Unit) {
         var open by rememberSaveable { mutableStateOf(false) }
         ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint)
-        if (open) ServerSelectListDialog(options, onSelected = { change(it); open = false },
-            onDismiss = { open = false }, title = label, selectedOption = value)
+        if (open) ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, { open = false }) { options ->
+            ServerSelectListDialog(options, onSelected = { change(it); open = false },
+                onDismiss = { open = false }, title = label, selectedOption = value)
+        }
     }
 }

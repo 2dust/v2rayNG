@@ -588,4 +588,5 @@
     <string name="action_more">আরও</string>
     <string name="action_clear">সাফ করুন</string>
     <string name="connection_connected_tv">সংযুক্ত</string>
+    <string name="acc_invalid_field_value">অবৈধ মান</string>
 </resources>

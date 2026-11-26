@@ -588,4 +588,5 @@
     <string name="action_more">بیشتر</string>
     <string name="action_clear">پاک کردن</string>
     <string name="connection_connected_tv">متصل است</string>
+    <string name="acc_invalid_field_value">مقدار نامعتبر</string>
 </resources>

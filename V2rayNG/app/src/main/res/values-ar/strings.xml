@@ -596,4 +596,5 @@
     <string name="action_more">المزيد</string>
     <string name="action_clear">مسح</string>
     <string name="connection_connected_tv">متصل</string>
+    <string name="acc_invalid_field_value">قيمة غير صالحة</string>
 </resources>

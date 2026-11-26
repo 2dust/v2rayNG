@@ -589,4 +589,5 @@
     <string name="action_more">Daha çox</string>
     <string name="action_clear">Təmizlə</string>
     <string name="connection_connected_tv">Qoşuldu</string>
+    <string name="acc_invalid_field_value">Yanlış dəyər</string>
 </resources>

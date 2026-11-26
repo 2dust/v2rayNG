@@ -35,7 +35,7 @@ abstract class BaseSubEditActivity : BaseComponentActivity() {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
             Editor(loaded, busy, viewModel::save, viewModel::delete) { controls ->
-                controls.SubscriptionForm(value, errors, loaded.suggestions, viewModel::updateDraft)
+                controls.SubscriptionForm(value, errors, viewModel::updateDraft)
             }
         }
     }
@@ -49,12 +49,12 @@ internal interface SubscriptionControls {
     @Composable fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType = KeyboardType.Text,
         error: Boolean = false, hint: String? = null, announceValue: Boolean = false)
     @Composable fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit)
-    @Composable fun Profile(label: String, value: String, hint: String, options: List<String>, change: (String) -> Unit)
+    @Composable fun Profile(label: String, value: String, hint: String, change: (String) -> Unit)
 }
 
 @Composable
 private fun SubscriptionControls.SubscriptionForm(
-    draft: SubscriptionDraft, errors: SubscriptionErrors, suggestions: List<String>, update: (SubscriptionDraft.() -> SubscriptionDraft) -> Unit
+    draft: SubscriptionDraft, errors: SubscriptionErrors, update: (SubscriptionDraft.() -> SubscriptionDraft) -> Unit
 ) {
     Field(stringResource(R.string.sub_setting_remarks), draft.remarks, { update { copy(remarks = it) } }, error = errors.remarks, announceValue = true)
     Field(stringResource(R.string.sub_setting_url), draft.url, { update { copy(url = it) } }, error = errors.url,
@@ -67,10 +67,10 @@ private fun SubscriptionControls.SubscriptionForm(
     Field(stringResource(R.string.title_pref_auto_update_interval), draft.interval, { update { copy(interval = it) } }, KeyboardType.Number,
         errors.interval, if (errors.interval) stringResource(R.string.toast_invalid_update_interval) else null, announceValue = true)
     Toggle(stringResource(R.string.sub_allow_insecure_url), draft.allowInsecure) { update { copy(allowInsecure = it) } }
-    Profile(stringResource(R.string.sub_setting_pre_profile), draft.entry, stringResource(R.string.sub_setting_entry_proxy_tip), suggestions) {
+    Profile(stringResource(R.string.sub_setting_pre_profile), draft.entry, stringResource(R.string.sub_setting_entry_proxy_tip)) {
         update { copy(entry = it) }
     }
-    Profile(stringResource(R.string.sub_setting_next_profile), draft.exit, stringResource(R.string.sub_setting_exit_proxy_tip), suggestions) {
+    Profile(stringResource(R.string.sub_setting_next_profile), draft.exit, stringResource(R.string.sub_setting_exit_proxy_tip)) {
         update { copy(exit = it) }
     }
 }

@@ -44,7 +44,7 @@ internal data class SubscriptionDraft(
 internal data class SubscriptionErrors(val remarks: Boolean = false, val url: Boolean = false, val interval: Boolean = false) : Serializable
 
 internal class SubscriptionEditViewModel(application: Application, private val saved: SavedStateHandle) : BaseViewModel(application) {
-    data class Form(val name: String?, val suggestions: List<String>, val confirmRemove: Boolean)
+    data class Form(val name: String?, val confirmRemove: Boolean)
 
     private val id = saved.get<String>("subId").orEmpty()
     private val targetId = id.ifEmpty { Utils.getUuid() }
@@ -57,8 +57,7 @@ internal class SubscriptionEditViewModel(application: Application, private val s
         runOperation("load") {
             val (item, form) = withContext(Dispatchers.IO) {
                 val item = readSubscription()
-                val suggestions = SettingsManager.getSimpleProfileRemarks()
-                item to Form(item.remarks.takeIf { id.isNotEmpty() }, suggestions, MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false))
+                item to Form(item.remarks.takeIf { id.isNotEmpty() }, MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false))
             }
             if (draft.value == null) saved["draft"] = SubscriptionDraft(item)
             _form.value = form
