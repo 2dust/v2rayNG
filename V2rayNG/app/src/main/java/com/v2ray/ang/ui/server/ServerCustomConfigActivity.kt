@@ -1,6 +1,6 @@
 package com.v2ray.ang.ui.server
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.Canvas
@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -43,7 +44,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
@@ -72,22 +72,56 @@ import com.v2ray.ang.fmt.CustomOutboundFmt
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.DeleteConfirmDialog
-import com.v2ray.ang.ui.compose.TvEditorTextField
 import com.v2ray.ang.ui.compose.FormTextField
-import com.v2ray.ang.ui.compose.LocalEditorFocus
-import com.v2ray.ang.ui.compose.LocalTvEditor
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
-import com.v2ray.ang.ui.compose.dpadFocusOutline
 import com.v2ray.ang.ui.compose.horizontalScrollbar
-import com.v2ray.ang.ui.compose.rememberEditorFocus
-import com.v2ray.ang.ui.compose.rememberTvEditorIme
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.flow.collectLatest
 
-class ServerCustomConfigActivity : BaseComponentActivity() {
+class ServerCustomConfigActivity : BaseServerCustomConfigActivity() {
+    override fun televisionDestination() = televisionResultDestination(TvServerCustomConfigActivity::class.java)
+
+    @Composable
+    override fun editorControls(text: TextFieldState, confirmingDelete: Boolean, onBack: () -> Unit): CustomEditorControls {
+        var focusedField by rememberSaveable { mutableStateOf<CustomEditorField?>(null) }
+        val remarksFocus = remember { FocusRequester() }
+        val jsonFocus = remember { FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            val target = focusedField
+            if (target != null && !confirmingDelete) {
+                // Scaffold must lay out the field before its requester is attached.
+                withFrameNanos { }
+                when (target) {
+                    CustomEditorField.Remarks -> remarksFocus.requestFocus()
+                    CustomEditorField.Json -> jsonFocus.requestFocus()
+                }
+            }
+        }
+
+        return CustomEditorControls(
+            contentPadding = Modifier.imePadding(),
+            jsonField = Modifier.focusRequester(jsonFocus).onFocusChanged { if (it.isFocused) focusedField = CustomEditorField.Json },
+            remarks = { value, onValueChange, isError ->
+                FormTextField(stringResource(R.string.server_lab_remarks), value, onValueChange,
+                    modifier = Modifier.focusRequester(remarksFocus).onFocusChanged { if (it.hasFocus) focusedField = CustomEditorField.Remarks },
+                    isError = isError)
+            }
+        )
+    }
+}
+
+abstract class BaseServerCustomConfigActivity : BaseComponentActivity() {
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
+    @Composable
+    internal abstract fun editorControls(text: TextFieldState, confirmingDelete: Boolean, onBack: () -> Unit): CustomEditorControls
 
     private val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     private val isRunning by lazy {
@@ -99,11 +133,16 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     private var initialRemarks: String = ""
     private var initialContent: String = ""
     private var configType = EConfigType.CUSTOM
-    private var isTelevision = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
         if (savedInstanceState != null) {
             // Do not leave the previous window's keyboard visible before a field regains focus.
             val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
@@ -118,13 +157,13 @@ class ServerCustomConfigActivity : BaseComponentActivity() {
     }
 
     @Composable
-    override fun ScreenContent() {
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
         ServerCustomConfigScreen(
             editGuid = editGuid,
             isRunning = isRunning,
             initialRemarks = initialRemarks,
             initialContent = initialContent,
-            isTelevision = isTelevision,
             onBackClick = { finish() },
             onSave = { remarks, content -> saveServer(remarks, content) },
             onDelete = { deleteServer() }
@@ -225,15 +264,26 @@ private object EditorConstants {
     val SCROLL_PADDING = 60.dp
 }
 
+internal class CustomEditorControls(
+    val contentPadding: Modifier,
+    val jsonField: Modifier,
+    val remarks: @Composable (String, (String) -> Unit, Boolean) -> Unit,
+    val navigationIcon: (@Composable () -> Unit)? = null,
+    val actionModifier: @Composable () -> Modifier = { Modifier },
+    val scrollFocus: Modifier = Modifier,
+    val jsonContainer: Modifier = Modifier,
+    val jsonEnabled: Boolean = true,
+    val keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+)
+
 private enum class CustomEditorField { Remarks, Json }
 
 @Composable
-fun ServerCustomConfigScreen(
+private fun BaseServerCustomConfigActivity.ServerCustomConfigScreen(
     editGuid: String,
     isRunning: Boolean,
     initialRemarks: String,
     initialContent: String,
-    isTelevision: Boolean,
     onBackClick: () -> Unit,
     onSave: (String, String) -> Boolean,
     onDelete: () -> Unit
@@ -243,29 +293,7 @@ fun ServerCustomConfigScreen(
     val textFieldState = rememberTextFieldState(initialText = initialContent)
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     val showDelete = editGuid.isNotEmpty() && !isRunning
-    var focusedField by rememberSaveable { mutableStateOf<CustomEditorField?>(null) }
-    val remarksFocus = remember { FocusRequester() }
-    val jsonFocus = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        val target = focusedField
-        if (!isTelevision && target != null && !showDeleteConfirm) {
-            // Scaffold must lay out the field before its requester is attached.
-            withFrameNanos { }
-            when (target) {
-                CustomEditorField.Remarks -> remarksFocus.requestFocus()
-                CustomEditorField.Json -> jsonFocus.requestFocus()
-            }
-        }
-    }
-
-    val tvBack = if (isTelevision) remember { FocusRequester() } else null
-    val tvFocus = if (tvBack != null) rememberEditorFocus(fallback = tvBack) else null
-    val tvIme = if (tvBack != null) rememberTvEditorIme() else null
-    val tvJson = if (tvBack != null && tvFocus != null && tvIme != null) {
-        rememberTvJsonFocus(tvBack, tvFocus, tvIme.visible, textFieldState)
-    } else null
-    val scrollFocus = if (tvJson != null) Modifier.focusProperties { canFocus = false } else Modifier
+    val controls = editorControls(textFieldState, showDeleteConfirm, onBackClick)
 
     val verticalScroll = rememberScrollState()
     val horizontalScroll = rememberScrollState()
@@ -372,16 +400,12 @@ fun ServerCustomConfigScreen(
             AppTopBar(
                 title = EConfigType.CUSTOM.toString(),
                 onBackClick = onBackClick,
-                navigationIcon = if (tvBack != null && tvFocus != null) ({
-                    IconButton(onClick = onBackClick, modifier = tvFocus.target(tvBack).dpadFocusOutline(cornerRadius = 24.dp)) {
-                        Icon(painterResource(R.drawable.ic_tv_arrow_back_24dp), contentDescription = stringResource(R.string.acc_back))
-                    }
-                }) else null,
+                navigationIcon = controls.navigationIcon,
                 actions = {
                     if (showDelete) {
                         IconButton(
                             onClick = { showDeleteConfirm = true },
-                            modifier = tvFocus?.target()?.dpadFocusOutline(cornerRadius = 24.dp) ?: Modifier
+                            modifier = controls.actionModifier()
                         ) {
                             Icon(
                                 painterResource(R.drawable.ic_delete_24dp),
@@ -390,7 +414,7 @@ fun ServerCustomConfigScreen(
                         }
                     }
                     IconButton(
-                        modifier = tvFocus?.target()?.dpadFocusOutline(cornerRadius = 24.dp) ?: Modifier,
+                        modifier = controls.actionModifier(),
                         onClick = {
                             val remarksErr = remarks.isBlank()
                             isRemarksError = remarksErr
@@ -415,30 +439,20 @@ fun ServerCustomConfigScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .then(tvIme?.padding?.padding(horizontal = 48.dp) ?: Modifier.imePadding())
+                .then(controls.contentPadding)
         ) {
-            val remarksLabel = stringResource(R.string.server_lab_remarks)
-            if (tvBack != null) {
-                CompositionLocalProvider(LocalTvEditor provides tvBack, LocalEditorFocus provides tvFocus) {
-                    TvEditorTextField(remarksLabel, remarks, { remarks = it }, isError = isRemarksError, announceValue = true)
-                }
-            } else {
-                FormTextField(remarksLabel, remarks, { remarks = it },
-                    modifier = Modifier.focusRequester(remarksFocus).onFocusChanged { if (it.hasFocus) focusedField = CustomEditorField.Remarks },
-                    isError = isRemarksError)
-            }
+            controls.remarks(remarks, { remarks = it }, isRemarksError)
 
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .then(if (tvJson != null) Modifier.padding(top = 8.dp, bottom = 12.dp) else Modifier)
-                    .then(tvJson?.passive ?: Modifier)
+                    .then(controls.jsonContainer)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .then(scrollFocus)
+                        .then(controls.scrollFocus)
                         .verticalScroll(verticalScroll)
                 ) {
                     val lineNumberColor =
@@ -502,17 +516,15 @@ fun ServerCustomConfigScreen(
                     ) {
                         BasicTextField(
                             state = textFieldState,
-                            enabled = tvJson?.passive == null,
-                            keyboardOptions = if (tvJson?.allowKeyboardOnFocus == false) KeyboardOptions(showKeyboardOnFocus = false) else KeyboardOptions.Default,
+                            enabled = controls.jsonEnabled,
+                            keyboardOptions = controls.keyboardOptions,
                             modifier = Modifier
                                 .weight(1f)
-                                .then(scrollFocus)
+                                .then(controls.scrollFocus)
                                 .horizontalScroll(horizontalScroll)
                                 .padding(end = 24.dp)
                                 .padding(bottom = 36.dp)
-                                .then(tvJson?.field ?: Modifier.focusRequester(jsonFocus).onFocusChanged {
-                                    if (it.isFocused) focusedField = CustomEditorField.Json
-                                }),
+                                .then(controls.jsonField),
                             textStyle = TextStyle(
                                 fontFamily = FontFamily.Monospace,
                                 fontSize = EditorConstants.FONT_SIZE,
