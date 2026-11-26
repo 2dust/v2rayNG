@@ -27,13 +27,16 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.R
 import com.v2ray.ang.ui.settings.tvSettingsImeOverlayPadding
 
 // Phone and unrelated forms keep their existing controls.
@@ -90,13 +93,15 @@ internal fun TvEditorTextField(
                 .then(if (editor.isEditing) Modifier else Modifier.clearAndSetSemantics { })
         )
         if (!editor.isEditing) {
+            val fieldError = if (isError) supportingText ?: stringResource(R.string.acc_invalid_field_value) else null
             Box(
                 Modifier.matchParentSize()
                     .then(fieldFocus)
                     .focusRequester(requester)
                     .focusProperties { start = back }
                     .semantics {
-                        contentDescription = if (supportingText == null) label else "$label. $supportingText"
+                        contentDescription = if (supportingText == null || isError) label else "$label. $supportingText"
+                        if (fieldError != null) error(fieldError)
                         // Only the form knows whether a value is safe to announce before editing.
                         if (announceValue && value.isNotBlank()) stateDescription = value
                     }
