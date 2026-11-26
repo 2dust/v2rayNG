@@ -207,11 +207,11 @@
     <string name="summary_pref_auto_sort_after_test">测试结果可能不准确</string>
 
     <string name="title_mux_settings">Mux 多路复用设置</string>
-    <string name="title_pref_mux_enabled">启用 Mux 多路复用</string>
-    <string name="summary_pref_mux_enabled">速度更快，但可能导致连接不稳定。\n可在下方自定义 TCP、UDP 和 QUIC 的处理方式。</string>
-    <string name="title_pref_mux_concurrency">TCP 复用子连接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_concurrency">XUDP 复用子连接数（可填 -1 至 1024）</string>
-    <string name="title_pref_mux_xudp_quic">QUIC 流量处理方式</string>
+    <string name="server_lab_mux_enabled">启用 Mux 多路复用</string>
+    <string name="server_lab_summary_mux_enabled">降低握手延迟，但可能影响视频、下载及测速吞吐</string>
+    <string name="server_lab_mux_concurrency">TCP 复用子连接数（可填 -1 至 1024）</string>
+    <string name="server_lab_mux_xudp_concurrency">XUDP 复用子连接数（可填 -1 至 1024）</string>
+    <string name="server_lab_mux_xudp_proxy_udp443">UDP/443 流量处理方式</string>
     <string-array name="mux_xudp_quic_entries">
         <item>拒绝</item>
         <item>允许</item>

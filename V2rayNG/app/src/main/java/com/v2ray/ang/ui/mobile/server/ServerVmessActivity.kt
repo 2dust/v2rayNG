@@ -34,6 +34,7 @@ class ServerVmessActivity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             VmessProtocolFields(uiState, securityOptions)
+            CommonMuxFields(uiState)
             CommonNetworkFields(uiState, options)
             CommonStreamSecurityFields(
                 state = uiState,

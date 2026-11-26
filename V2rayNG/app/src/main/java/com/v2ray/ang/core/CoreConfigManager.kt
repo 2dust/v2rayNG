@@ -463,10 +463,10 @@ object CoreConfigManager {
         v2rayConfig.fakedns = null
         v2rayConfig.stats = null
         v2rayConfig.policy = null
-        // xdrive outbounds keep their mux: Xray-core refuses to load them without Mux.Cool.
+        // xdrive outbounds keep their mux: Xray-core refuses to load them without Mux.
         v2rayConfig.outbounds
             .filter { it.streamSettings?.network != NetworkType.XDRIVE.type }
-            .forEach { key -> key.mux = null }
+            .forEach { key -> key.settings?.multiplex = null }
     }
 
     /**
@@ -688,7 +688,6 @@ object CoreConfigManager {
                     tag = "dns-out",
                     settings = null,
                     streamSettings = null,
-                    mux = null
                 )
             )
         }
@@ -721,7 +720,6 @@ object CoreConfigManager {
                     tag = "dns-out",
                     settings = null,
                     streamSettings = null,
-                    mux = null
                 )
             )
         }

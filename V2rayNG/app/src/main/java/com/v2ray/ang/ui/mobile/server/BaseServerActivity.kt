@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.R
@@ -129,6 +130,40 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 keyboardType = KeyboardType.Number,
                 isError = state.isPortError
             )
+        }
+    }
+
+    @Composable
+    protected fun CommonMuxFields(
+        state: ServerUiState
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SettingsSwitchItem(
+                title = stringResource(R.string.server_lab_mux_enabled),
+                summary = stringResource(R.string.server_lab_summary_mux_enabled),
+                checked = state.muxEnabled,
+                onCheckedChange = { state.muxEnabled = it }
+            )
+            if (state.muxEnabled) {
+                FormTextField(
+                    label = stringResource(R.string.server_lab_mux_concurrency),
+                    value = state.muxConcurrency.toString(),
+                    onValueChange = { state.muxConcurrency = it.toIntOrNull() ?: AppConfig.DEFAULT_MUX_CONCURRENCY.toInt() },
+                    keyboardType = KeyboardType.Number
+                )
+                FormTextField(
+                    label = stringResource(R.string.server_lab_mux_xudp_concurrency),
+                    value = state.muxXudpConcurrency.toString(),
+                    onValueChange = { state.muxXudpConcurrency = it.toIntOrNull() ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt() },
+                    keyboardType = KeyboardType.Number
+                )
+                FormDropdownField(
+                    stringResource(R.string.server_lab_mux_xudp_proxy_udp443),
+                    state.muxXudpProxyUDP443,
+                    listOf("reject", "allow", "ignore"),
+                    { state.muxXudpProxyUDP443 = it }
+                )
+            }
         }
     }
 

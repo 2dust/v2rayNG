@@ -34,6 +34,7 @@ class ServerVlessActivity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             VlessProtocolFields(uiState, flowOptions)
+            CommonMuxFields(uiState)
             CommonNetworkFields(uiState, options)
             CommonStreamSecurityFields(
                 state = uiState,

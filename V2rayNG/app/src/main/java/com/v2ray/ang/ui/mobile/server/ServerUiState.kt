@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.MASQUE_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.MASQUE_LOCAL_ADDRESS_V6
@@ -30,6 +31,10 @@ class ServerUiState(
     flow: String = "",
     encryption: String = "",
     username: String = "",
+    muxEnabled: Boolean = false,
+    muxConcurrency: Int = AppConfig.DEFAULT_MUX_CONCURRENCY.toInt(),
+    muxXudpConcurrency: Int = AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt(),
+    muxXudpProxyUDP443: String = "reject",
     secretKey: String = "",
     publicKey: String = "",
     preSharedKey: String = "",
@@ -86,6 +91,10 @@ class ServerUiState(
     var flow by mutableStateOf(flow)
     var encryption by mutableStateOf(encryption)
     var username by mutableStateOf(username)
+    var muxEnabled by mutableStateOf(muxEnabled)
+    var muxConcurrency by mutableStateOf(muxConcurrency)
+    var muxXudpConcurrency by mutableStateOf(muxXudpConcurrency)
+    var muxXudpProxyUDP443 by mutableStateOf(muxXudpProxyUDP443)
     var secretKey by mutableStateOf(secretKey)
     var publicKey by mutableStateOf(publicKey)
     var preSharedKey by mutableStateOf(preSharedKey)
@@ -161,6 +170,10 @@ class ServerUiState(
             },
             flow = if (isVless) flow else null,
             username = if (isSocksOrHttp) username else null,
+            muxEnabled = muxEnabled,
+            muxConcurrency = muxConcurrency,
+            muxXudpConcurrency = muxXudpConcurrency,
+            muxXudpProxyUDP443 = muxXudpProxyUDP443,
             secretKey = if (isWireguard || isMasque) secretKey else null,
             publicKey = when {
                 isWireguard || isMasque -> publicKey
@@ -230,6 +243,10 @@ class ServerUiState(
                 flow = initialConfig.flow ?: "",
                 encryption = initialConfig.method ?: "",
                 username = initialConfig.username ?: "",
+                muxEnabled = initialConfig.muxEnabled == true,
+                muxConcurrency = initialConfig.muxConcurrency ?: AppConfig.DEFAULT_MUX_CONCURRENCY.toInt(),
+                muxXudpConcurrency = initialConfig.muxXudpConcurrency ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt(),
+                muxXudpProxyUDP443 = initialConfig.muxXudpProxyUDP443 ?: "reject",
                 secretKey = initialConfig.secretKey ?: "",
                 publicKey = initialConfig.publicKey ?: "",
                 preSharedKey = initialConfig.preSharedKey ?: "",
