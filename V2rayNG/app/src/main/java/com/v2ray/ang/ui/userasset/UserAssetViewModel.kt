@@ -25,7 +25,8 @@ internal data class AssetFileMetadata(val length: Long, val lastModified: Long)
 
 internal data class UserAssetUiState(
     val assets: List<AssetUrlCache> = emptyList(),
-    val fileMetadata: Map<String, AssetFileMetadata> = emptyMap()
+    val fileMetadata: Map<String, AssetFileMetadata> = emptyMap(),
+    val downloadingItem: String? = null
 )
 
 class UserAssetViewModel(application: Application) : BaseViewModel(application) {
@@ -91,35 +92,42 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
      * @param trigger Who started the download, which decides whether it may go direct.
      * @param onlyGuids Download only these assets, e.g. the ones offered for a direct retry.
      */
-    fun downloadGeoFiles(
+    suspend fun downloadGeoFiles(
         extDir: File,
         proxyUsername: String? = null,
         proxyPassword: String? = null,
         trigger: FetchRoutePolicy.Trigger = FetchRoutePolicy.Trigger.USER,
-        onlyGuids: Collection<String>? = null
+        onlyGuids: Collection<String>? = null,
+        onProgress: (suspend (String) -> Unit)? = null
     ): GeoDownloadResult {
         val snapshot = uiState.value.assets.filter { onlyGuids == null || it.guid in onlyGuids }
         var successCount = 0
         val failures = mutableListOf<String>()
         val directRetry = mutableListOf<String>()
 
-        snapshot.forEach { cache ->
-            val item = cache.assetUrl
-            // Upstream's order: through the proxy, then directly.
-            val outcome = FetchRoutePolicy.fetch(
-                trigger,
-                listOf(FetchRoutePolicy.Route.PROXY, FetchRoutePolicy.Route.DIRECT)
-            ) { httpPort ->
-                if (tryDownload(item, extDir, httpPort, proxyUsername, proxyPassword)) Unit else null
-            }
-            if (outcome is FetchRoutePolicy.Outcome.Fetched) {
-                successCount++
-            } else {
-                failures.add(item.remarks)
-                if (outcome is FetchRoutePolicy.Outcome.Failed && outcome.canRetryDirect) {
-                    directRetry.add(cache.guid)
+        try {
+            snapshot.forEach { cache ->
+                val item = cache.assetUrl
+                _uiState.value = _uiState.value.copy(downloadingItem = item.remarks)
+                onProgress?.invoke(item.remarks)
+                // Upstream's order: through the proxy, then directly.
+                val outcome = FetchRoutePolicy.fetch(
+                    trigger,
+                    listOf(FetchRoutePolicy.Route.PROXY, FetchRoutePolicy.Route.DIRECT)
+                ) { httpPort ->
+                    if (tryDownload(item, extDir, httpPort, proxyUsername, proxyPassword)) Unit else null
+                }
+                if (outcome is FetchRoutePolicy.Outcome.Fetched) {
+                    successCount++
+                } else {
+                    failures.add(item.remarks)
+                    if (outcome is FetchRoutePolicy.Outcome.Failed && outcome.canRetryDirect) {
+                        directRetry.add(cache.guid)
+                    }
                 }
             }
+        } finally {
+            _uiState.value = _uiState.value.copy(downloadingItem = null)
         }
 
         _directRetryGuids.value = directRetry

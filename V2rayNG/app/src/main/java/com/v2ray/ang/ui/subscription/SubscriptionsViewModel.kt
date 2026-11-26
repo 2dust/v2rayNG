@@ -92,21 +92,29 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         }
     }
 
-    fun updateSubscriptions() {
-        val updateSubscription = MmkvManager.decodeSettingsBool(AppConfig.PREF_UPDATE_SUBSCRIPTION, false)
+    fun updateSubscriptions(subId: String? = null) {
         val autoTestAfterUpdateSubscription = MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)
 
         when {
             // If auto test is enabled, trigger background service for long-running task
-            autoTestAfterUpdateSubscription -> updateSubscriptionsMore()
-            // If only update is enabled, perform local update with UI loading state
-            updateSubscription -> updateSubscriptionsOnly()
+            autoTestAfterUpdateSubscription -> updateSubscriptionsMore(subId)
+            // Perform local update with UI loading state
+            else -> updateSubscriptionsOnly(subId)
         }
     }
 
-    fun updateSubscriptionsOnly() {
+    fun updateSubscriptionsOnly(subId: String? = null) {
         updateSubscriptionsOnly(FetchRoutePolicy.Trigger.USER) {
-            AngConfigManager.updateConfigViaSubAll(FetchRoutePolicy.Trigger.USER)
+            if (subId != null) {
+                val subCache = subscriptions.find { it.guid == subId }
+                if (subCache != null) {
+                    AngConfigManager.updateConfigViaSub(subCache, FetchRoutePolicy.Trigger.USER)
+                } else {
+                    SubscriptionUpdateResult()
+                }
+            } else {
+                AngConfigManager.updateConfigViaSubAll(FetchRoutePolicy.Trigger.USER)
+            }
         }
     }
 
@@ -133,8 +141,7 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
     ) {
         launchLoading {
             try {
-                val result = withContext(Dispatchers.IO) { update() }
-
+                val result = withContext(Dispatchers.IO) { update() }\n
                 when {
                     result.successCount + result.failureCount + result.skipCount == 0 ->
                         toast(R.string.title_update_subscription_no_subscription)
@@ -167,11 +174,15 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         }
     }
 
-    fun updateSubscriptionsMore() {
+    fun updateSubscriptionsMore(subId: String? = null) {
         SettingsChangeManager.makeSetupGroupTab()
-        val subIds = MmkvManager.decodeSubscriptions()
-            .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
-            .map { it.guid }
+        val subIds = if (subId != null) {
+            listOf(subId)
+        } else {
+            MmkvManager.decodeSubscriptions()
+                .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
+                .map { it.guid }
+        }
 
         if (subIds.isNotEmpty()) {
             MessageHelper.sendMsg2SubscriptionService(
