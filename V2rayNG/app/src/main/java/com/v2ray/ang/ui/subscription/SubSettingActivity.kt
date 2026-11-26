@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
@@ -247,7 +249,7 @@ fun SubSettingScreen(
                 val actionFocus = DpadRowActionFocus(focusTargets, previousTargets, nextTargets, actionFocusOrder, requestRowFocus)
                 ReorderableItem(reorderableState, key = subCache.guid, modifier = Modifier.zIndex(if (isMoving) 1f else 0f)) { isDragging ->
                     ReorderableListItem(scope = this, isDragging = isDragging, isMoving = isMoving) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .then(
@@ -280,120 +282,58 @@ fun SubSettingScreen(
                                             )
                                             .padding(horizontal = 24.dp, vertical = 16.dp)
                                     } else {
-                                        Modifier.padding(horizontal = 14.dp)
+                                        Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                                     }
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
+                                )
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = subCache.subscription.remarks,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                if (subCache.subscription.url.isNotEmpty()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = subCache.subscription.url,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        text = subCache.subscription.remarks,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
-                                }
-                                subCache.subscription.usageInfo?.let { usage ->
-                                    val total = if (usage.total > 0L) usage.total.toTrafficString()
-                                        else stringResource(R.string.sub_info_unlimited)
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = stringResource(R.string.sub_info_traffic, usage.used.toTrafficString(), total),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = Utils.formatTimestamp(subCache.subscription.lastUpdated),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            if (isTelevision) {
-                                Row(Modifier.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    if (hasShare) {
-                                        AppIconButton(
-                                            icon = painterResource(R.drawable.ic_refresh_24dp),
-                                            label = stringResource(R.string.title_sub_update),
-                                            focusRequester = focusTargets.refresh,
-                                            modifier = Modifier.dpadRowActionNavigation(
-                                                focusTargets.refresh, actionFocusOrder,
-                                                if (previousSub?.subscription?.url?.isNotEmpty() == true) previousTargets?.refresh else previousTargets?.edit,
-                                                if (nextSub?.subscription?.url?.isNotEmpty() == true) nextTargets?.refresh else nextTargets?.edit,
-                                                requestRowFocus
-                                            ),
-                                            onClick = requestUpdate
-                                        )
-                                        AppIconButton(
-                                            icon = painterResource(R.drawable.ic_share_24dp),
-                                            label = stringResource(R.string.action_share),
-                                            focusRequester = focusTargets.share,
-                                            modifier = Modifier.dpadRowActionNavigation(
-                                                focusTargets.share, actionFocusOrder,
-                                                if (previousSub?.subscription?.url?.isNotEmpty() == true) previousTargets?.share else previousTargets?.edit,
-                                                if (nextSub?.subscription?.url?.isNotEmpty() == true) nextTargets?.share else nextTargets?.edit,
-                                                requestRowFocus
-                                            ),
-                                            onClick = {
-                                                shareTarget = Pair(subCache.guid, subCache.subscription.url)
-                                            }
+                                    if (subCache.subscription.url.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = subCache.subscription.url,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                    AppIconButton(
-                                        icon = painterResource(R.drawable.ic_edit_24dp),
-                                        label = stringResource(R.string.action_edit),
-                                        focusRequester = focusTargets.edit,
-                                        modifier = actionFocus.modifier(SubscriptionRowFocusTargets::edit),
-                                        onClick = { onEditSub(subCache.guid) }
-                                    )
-                                    AppIconButton(
-                                        icon = painterResource(R.drawable.ic_delete_24dp),
-                                        label = stringResource(R.string.action_delete),
-                                        focusRequester = focusTargets.delete,
-                                        modifier = actionFocus.modifier(SubscriptionRowFocusTargets::delete),
-                                        onClick = {
-                                            if (confirmRemove) removeTarget = SubscriptionDeleteTarget(subCache.guid, subCache.subscription.remarks)
-                                            else onRemoveSub(subCache.guid)
-                                        }
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    AppRowSwitch(
-                                        checked = subCache.subscription.enabled,
-                                        onCheckedChange = { checked ->
-                                            val updated = subCache.subscription.copy()
-                                            updated.enabled = checked
-                                            viewModel.update(subCache.guid, updated)
-                                        },
-                                        label = stringResource(R.string.sub_setting_enable),
-                                        focusRequester = focusTargets.toggle,
-                                        modifier = actionFocus.modifier(SubscriptionRowFocusTargets::toggle)
-                                    )
                                 }
-                            } else {
-                                Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
-                                    Row {
+
+                                if (isTelevision) {
+                                    Row(Modifier.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                         if (hasShare) {
                                             AppIconButton(
                                                 icon = painterResource(R.drawable.ic_refresh_24dp),
                                                 label = stringResource(R.string.title_sub_update),
+                                                focusRequester = focusTargets.refresh,
+                                                modifier = Modifier.dpadRowActionNavigation(
+                                                    focusTargets.refresh, actionFocusOrder,
+                                                    if (previousSub?.subscription?.url?.isNotEmpty() == true) previousTargets?.refresh else previousTargets?.edit,
+                                                    if (nextSub?.subscription?.url?.isNotEmpty() == true) nextTargets?.refresh else nextTargets?.edit,
+                                                    requestRowFocus
+                                                ),
                                                 onClick = requestUpdate
                                             )
                                             AppIconButton(
                                                 icon = painterResource(R.drawable.ic_share_24dp),
                                                 label = stringResource(R.string.action_share),
+                                                focusRequester = focusTargets.share,
+                                                modifier = Modifier.dpadRowActionNavigation(
+                                                    focusTargets.share, actionFocusOrder,
+                                                    if (previousSub?.subscription?.url?.isNotEmpty() == true) previousTargets?.share else previousTargets?.edit,
+                                                    if (nextSub?.subscription?.url?.isNotEmpty() == true) nextTargets?.share else nextTargets?.edit,
+                                                    requestRowFocus
+                                                ),
                                                 onClick = {
                                                     shareTarget = Pair(subCache.guid, subCache.subscription.url)
                                                 }
@@ -402,33 +342,82 @@ fun SubSettingScreen(
                                         AppIconButton(
                                             icon = painterResource(R.drawable.ic_edit_24dp),
                                             label = stringResource(R.string.action_edit),
+                                            focusRequester = focusTargets.edit,
+                                            modifier = actionFocus.modifier(SubscriptionRowFocusTargets::edit),
                                             onClick = { onEditSub(subCache.guid) }
                                         )
                                         AppIconButton(
                                             icon = painterResource(R.drawable.ic_delete_24dp),
                                             label = stringResource(R.string.action_delete),
+                                            focusRequester = focusTargets.delete,
+                                            modifier = actionFocus.modifier(SubscriptionRowFocusTargets::delete),
                                             onClick = {
                                                 if (confirmRemove) removeTarget = SubscriptionDeleteTarget(subCache.guid, subCache.subscription.remarks)
                                                 else onRemoveSub(subCache.guid)
                                             }
                                         )
-                                    }
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Switch(
-                                        checked = subCache.subscription.enabled,
-                                        onCheckedChange = { checked ->
-                                            val updated = subCache.subscription.copy()
-                                            updated.enabled = checked
-                                            viewModel.update(subCache.guid, updated)
-                                        },
-                                        modifier = Modifier.scale(0.7f),
-                                        colors = SwitchDefaults.colors(
-                                            checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
-                                            checkedTrackColor = MaterialTheme.colorScheme.secondary
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        AppRowSwitch(
+                                            checked = subCache.subscription.enabled,
+                                            onCheckedChange = { checked ->
+                                                val updated = subCache.subscription.copy()
+                                                updated.enabled = checked
+                                                viewModel.update(subCache.guid, updated)
+                                            },
+                                            label = stringResource(R.string.sub_setting_enable),
+                                            focusRequester = focusTargets.toggle,
+                                            modifier = actionFocus.modifier(SubscriptionRowFocusTargets::toggle)
                                         )
-                                    )
+                                    }
+                                } else {
+                                    Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+                                        Row {
+                                            if (hasShare) {
+                                                AppIconButton(
+                                                    icon = painterResource(R.drawable.ic_refresh_24dp),
+                                                    label = stringResource(R.string.title_sub_update),
+                                                    onClick = requestUpdate
+                                                )
+                                                AppIconButton(
+                                                    icon = painterResource(R.drawable.ic_share_24dp),
+                                                    label = stringResource(R.string.action_share),
+                                                    onClick = {
+                                                        shareTarget = Pair(subCache.guid, subCache.subscription.url)
+                                                    }
+                                                )
+                                            }
+                                            AppIconButton(
+                                                icon = painterResource(R.drawable.ic_edit_24dp),
+                                                label = stringResource(R.string.action_edit),
+                                                onClick = { onEditSub(subCache.guid) }
+                                            )
+                                            AppIconButton(
+                                                icon = painterResource(R.drawable.ic_delete_24dp),
+                                                label = stringResource(R.string.action_delete),
+                                                onClick = {
+                                                    if (confirmRemove) removeTarget = SubscriptionDeleteTarget(subCache.guid, subCache.subscription.remarks)
+                                                    else onRemoveSub(subCache.guid)
+                                                }
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Switch(
+                                            checked = subCache.subscription.enabled,
+                                            onCheckedChange = { checked ->
+                                                val updated = subCache.subscription.copy()
+                                                updated.enabled = checked
+                                                viewModel.update(subCache.guid, updated)
+                                            },
+                                            modifier = Modifier.scale(0.7f),
+                                            colors = SwitchDefaults.colors(
+                                                checkedThumbColor = MaterialTheme.colorScheme.onSecondary,
+                                                checkedTrackColor = MaterialTheme.colorScheme.secondary
+                                            )
+                                        )
+                                    }
                                 }
                             }
+                            SubscriptionMetadata(subCache.subscription)
                         }
                     }
                     if (!isTelevision) {
@@ -535,6 +524,39 @@ fun SubSettingScreen(
                     modifier = Modifier.dpadOrderedFocusNavigation(dismissFocusRequester, buttonFocusOrder)
                 )
             }
+        )
+    }
+}
+
+@Composable
+private fun SubscriptionMetadata(subscription: SubscriptionItem) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val usage = subscription.usageInfo
+        if (usage != null) {
+            val total = if (usage.total > 0L) usage.total.toTrafficString()
+                else stringResource(R.string.sub_info_unlimited)
+            Text(
+                text = stringResource(R.string.sub_info_traffic, usage.used.toTrafficString(), total),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        Text(
+            text = Utils.formatTimestamp(subscription.lastUpdated),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1
         )
     }
 }
