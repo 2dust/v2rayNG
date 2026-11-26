@@ -17,6 +17,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.CertificateFingerprintManager
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
@@ -25,12 +26,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ServerHysteria2Activity : BaseServerActivity() {
+class ServerHysteria2Activity : BaseServerHysteria2Activity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerHysteria2Activity::class.java)
+}
+
+abstract class BaseServerHysteria2Activity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.HYSTERIA2
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
                 initialConfig = initialConfig

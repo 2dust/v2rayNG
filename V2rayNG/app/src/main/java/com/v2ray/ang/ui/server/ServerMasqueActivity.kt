@@ -10,16 +10,21 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toast
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormTextField
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
 import com.v2ray.ang.util.JsonUtil
 
-class ServerMasqueActivity : BaseServerActivity() {
+class ServerMasqueActivity : BaseServerMasqueActivity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerMasqueActivity::class.java)
+}
+
+abstract class BaseServerMasqueActivity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.MASQUE
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
 

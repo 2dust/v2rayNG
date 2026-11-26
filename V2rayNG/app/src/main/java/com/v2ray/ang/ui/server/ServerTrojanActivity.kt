@@ -7,14 +7,19 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormTextField
 
-class ServerTrojanActivity : BaseServerActivity() {
+class ServerTrojanActivity : BaseServerTrojanActivity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerTrojanActivity::class.java)
+}
+
+abstract class BaseServerTrojanActivity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.TROJAN
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {

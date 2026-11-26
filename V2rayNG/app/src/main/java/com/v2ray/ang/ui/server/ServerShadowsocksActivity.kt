@@ -8,15 +8,20 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 
-class ServerShadowsocksActivity : BaseServerActivity() {
+class ServerShadowsocksActivity : BaseServerShadowsocksActivity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerShadowsocksActivity::class.java)
+}
+
+abstract class BaseServerShadowsocksActivity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.SHADOWSOCKS
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {

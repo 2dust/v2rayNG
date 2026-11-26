@@ -8,15 +8,20 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormDropdownField
 import com.v2ray.ang.ui.compose.FormTextField
 
-class ServerVlessActivity : BaseServerActivity() {
+class ServerVlessActivity : BaseServerVlessActivity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerVlessActivity::class.java)
+}
+
+abstract class BaseServerVlessActivity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.VLESS
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val options = rememberFieldOptions()
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {

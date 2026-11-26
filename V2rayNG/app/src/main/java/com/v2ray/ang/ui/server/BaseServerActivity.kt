@@ -1,6 +1,6 @@
 package com.v2ray.ang.ui.server
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
 import androidx.compose.foundation.layout.Arrangement
@@ -59,7 +59,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class BaseServerActivity : BaseComponentActivity() {
+internal typealias ServerEditorLayout = @Composable (
+    title: String, onBack: () -> Unit, onSave: () -> Unit, onDelete: (() -> Unit)?, content: @Composable ColumnScope.() -> Unit
+) -> Unit
+
+abstract class BaseServerActivity internal constructor(private val editorLayout: ServerEditorLayout) : BaseComponentActivity() {
 
     protected abstract val serverConfigType: EConfigType
 
@@ -72,11 +76,19 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected val subscriptionId by lazy { intent.getStringExtra("subscriptionId") }
 
     protected lateinit var initialConfig: ProfileItem
-    private var isTelevision = false
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
         if (savedInstanceState != null) {
             // The previous window's IME state is not valid until the new editor has focus.
             val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
@@ -85,6 +97,15 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         val existingConfig = MmkvManager.decodeServerConfig(editGuid)
         initialConfig = existingConfig ?: ProfileItem.create(serverConfigType)
     }
+
+    @Composable
+    final override fun ScreenContent() {
+        if (forwardingToTv) return
+        ProtocolForm()
+    }
+
+    @Composable
+    protected abstract fun ProtocolForm()
 
     @Composable
     protected fun rememberFieldOptions(): FieldOptions =
@@ -478,15 +499,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         content: @Composable ColumnScope.() -> Unit
     ) {
         var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-        if (isTelevision) {
-            TvServerEditor(
-                title, onBack = ::finish, onSave = onSaveClick,
-                onDelete = if (editGuid.isNotEmpty() && !isRunning) ({ showDeleteDialog = true }) else null,
-                content = content
-            )
-        } else {
-            PhoneServerEditor(title, onSaveClick, { showDeleteDialog = true }, content)
-        }
+        val onDelete = if (editGuid.isNotEmpty() && !isRunning) ({ showDeleteDialog = true }) else null
+        editorLayout(title, ::finish, onSaveClick, onDelete, content)
         if (showDeleteDialog) {
             DeleteConfirmDialog(
                 message = stringResource(R.string.confirm_delete_profile),
@@ -500,62 +514,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
     }
 
-    @Composable
-    private fun PhoneServerEditor(
-        title: String,
-        onSaveClick: () -> Unit,
-        onDeleteClick: () -> Unit,
-        content: @Composable ColumnScope.() -> Unit
-    ) {
-        val scrollState = rememberScrollState()
-        val focus = rememberEditorFocus()
-        Scaffold(
-            contentWindowInsets = WindowInsets(0),
-            topBar = {
-                AppTopBar(
-                    title = title,
-                    onBackClick = { finish() },
-                    navigationIcon = {
-                        IconButton(onClick = ::finish, modifier = focus.target()) {
-                            Icon(painterResource(R.drawable.ic_arrow_back_24dp), stringResource(R.string.acc_back))
-                        }
-                    },
-                    actions = {
-                        if (editGuid.isNotEmpty() && !isRunning) {
-                            IconButton(onClick = onDeleteClick, modifier = focus.target()) {
-                                Icon(
-                                    painterResource(R.drawable.ic_delete_24dp),
-                                    stringResource(R.string.acc_delete)
-                                )
-                            }
-                        }
-                        IconButton(onClick = onSaveClick, modifier = focus.target()) {
-                            Icon(
-                                painterResource(R.drawable.ic_fab_check),
-                                stringResource(R.string.acc_save)
-                            )
-                        }
-                    }
-                )
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
-                    .imePadding()
-                    .verticalScroll(scrollState)
-                    .verticalScrollbar(scrollState)
-                    .padding(bottom = 36.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CompositionLocalProvider(LocalEditorFocus provides focus) { content() }
-                NavigationBarsSpacer()
-            }
-        }
-    }
-
     private fun deleteServer(guid: String) {
         if (guid.isEmpty() || guid == MmkvManager.getSelectServer()) {
             toast(R.string.toast_action_not_allowed)
@@ -564,6 +522,56 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         MmkvManager.removeServer(guid)
         ProfileEditorResult.run {
             finishDeleted(guid)
+        }
+    }
+}
+
+internal val PhoneProtocolLayout: ServerEditorLayout = { title, onBack, onSave, onDelete, content ->
+    val scrollState = rememberScrollState()
+    val focus = rememberEditorFocus()
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            AppTopBar(
+                title = title,
+                onBackClick = onBack,
+                navigationIcon = {
+                    IconButton(onClick = onBack, modifier = focus.target()) {
+                        Icon(painterResource(R.drawable.ic_arrow_back_24dp), stringResource(R.string.acc_back))
+                    }
+                },
+                actions = {
+                    if (onDelete != null) {
+                        IconButton(onClick = onDelete, modifier = focus.target()) {
+                            Icon(
+                                painterResource(R.drawable.ic_delete_24dp),
+                                stringResource(R.string.acc_delete)
+                            )
+                        }
+                    }
+                    IconButton(onClick = onSave, modifier = focus.target()) {
+                        Icon(
+                            painterResource(R.drawable.ic_fab_check),
+                            stringResource(R.string.acc_save)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .imePadding()
+                .verticalScroll(scrollState)
+                .verticalScrollbar(scrollState)
+                .padding(bottom = 36.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CompositionLocalProvider(LocalEditorFocus provides focus) { content() }
+            NavigationBarsSpacer()
         }
     }
 }

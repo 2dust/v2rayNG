@@ -8,14 +8,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.ui.base.televisionResultDestination
 import com.v2ray.ang.ui.compose.FormTextField
 
-class ServerWireguardActivity : BaseServerActivity() {
+class ServerWireguardActivity : BaseServerWireguardActivity(PhoneProtocolLayout) {
+    override fun televisionDestination() = televisionResultDestination(TvServerWireguardActivity::class.java)
+}
+
+abstract class BaseServerWireguardActivity internal constructor(layout: ServerEditorLayout) : BaseServerActivity(layout) {
 
     override val serverConfigType: EConfigType = EConfigType.WIREGUARD
 
     @Composable
-    override fun ScreenContent() {
+    override fun ProtocolForm() {
         val scope = rememberCoroutineScope()
         val uiState = rememberSaveable(saver = ServerUiState.Saver) {
             ServerUiState.from(
