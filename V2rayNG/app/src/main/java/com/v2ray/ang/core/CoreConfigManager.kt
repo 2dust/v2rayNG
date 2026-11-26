@@ -892,6 +892,12 @@ object CoreConfigManager {
         val domesticDns = SettingsManager.getDomesticDnsServers()
 
         val hosts = buildDnsHostsFromRoutingRules(configContext)
+        buildDnsFromRoutingRules(
+            configContext = configContext,
+            servers = servers,
+            remoteDns = remoteDns,
+            domesticDns = domesticDns
+        )
         val validateRegion = MmkvManager.decodeSettingsBool(AppConfig.PREF_DNS_VALIDATE_REGION, true) == true
         if (validateRegion) {
             buildDnsValidateRegionFromRoutingRules(
@@ -901,12 +907,6 @@ object CoreConfigManager {
                 domesticDns = domesticDns
             )
         }
-        buildDnsFromRoutingRules(
-            configContext = configContext,
-            servers = servers,
-            remoteDns = remoteDns,
-            domesticDns = domesticDns
-        )
 
         remoteDns.forEach { servers.add(it) }
 
@@ -1005,11 +1005,7 @@ object CoreConfigManager {
 
         val region = configContext.routingRegion
 
-        val regionFilter = { domain: String ->
-            domain.startsWith("geosite:")
-                    && (domain.endsWith("-${region}") || domain.endsWith("@${region}"))
-                    || domain == "geosite:${region}"
-        }
+        val regionFilter = buildRegionFilter(configContext)
 
         val geoipRegion = arrayListOf("geoip:${region}")
         val regionDomains = configContext.routingDomainRules
@@ -1050,6 +1046,8 @@ object CoreConfigManager {
         remoteDns: List<String>,
         domesticDns: List<String>,
     ) {
+        val regionFilter = buildRegionFilter(configContext)
+
         configContext.routingDomainRules.forEach { rule ->
             when (rule.outboundTag) {
                 AppConfig.TAG_DIRECT -> {
@@ -1057,7 +1055,7 @@ object CoreConfigManager {
                         servers.add(
                             V2rayConfig.DnsBean.ServersBean(
                                 address = address,
-                                domains = rule.domain,
+                                domains = rule.domain.filterNot { regionFilter(it) }.toList(),
                                 skipFallback = true,
                                 finalQuery = if (dnsIndex == domesticDns.lastIndex) true else null,
                                 tag = AppConfig.TAG_DOMESTIC_DNS
@@ -1079,6 +1077,17 @@ object CoreConfigManager {
                     }
                 }
             }
+        }
+    }
+
+    private fun buildRegionFilter(configContext: CoreConfigContext): (String) -> Boolean {
+        val region = configContext.routingRegion
+        return if (region.isNullOrBlank()) { _: String ->
+            false
+        } else { domain: String ->
+            domain.startsWith("geosite:")
+                    && (domain.endsWith("-${region}") || domain.endsWith("@${region}"))
+                    || domain == "geosite:${region}"
         }
     }
 
