@@ -1,5 +1,7 @@
 package com.v2ray.ang.ui.subscription
 
+import android.content.Intent
+import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,37 +21,52 @@ import com.v2ray.ang.ui.base.BaseViewModelEvent
 abstract class BaseSubEditActivity : BaseComponentActivity() {
     private val viewModel: SubscriptionEditViewModel by viewModels()
 
+    private var forwardingToTv = false
+
+    protected open fun televisionDestination(): Intent? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val destination = televisionDestination()
+        forwardingToTv = destination != null
+        super.onCreate(savedInstanceState)
+        if (destination != null) {
+            startActivity(destination)
+            finish()
+            return
+        }
+    }
+
     @Composable
     final override fun ScreenContent() {
-        if (isFinishing) return
+        if (forwardingToTv) return
         LaunchedEffect(viewModel) {
             viewModel.viewModelEvent.collect { if (it == BaseViewModelEvent.FinishActivity) finish() }
         }
         val form by viewModel.form.collectAsStateWithLifecycle()
         val draft by viewModel.draft.collectAsStateWithLifecycle()
         val errors by viewModel.errors.collectAsStateWithLifecycle()
-        val busy by viewModel.isLoading.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val loaded = form
         val value = draft
         if (loaded == null || value == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else {
-            Editor(loaded, busy, viewModel::save, viewModel::delete) { controls ->
+            EditorLayout(loaded, isLoading, viewModel::save, viewModel::delete) { controls ->
                 controls.SubscriptionForm(value, errors, viewModel::updateDraft)
             }
         }
     }
 
     @Composable
-    internal abstract fun Editor(form: SubscriptionEditViewModel.Form, busy: Boolean, save: () -> Unit, delete: () -> Unit,
+    internal abstract fun EditorLayout(form: SubscriptionEditViewModel.Form, isLoading: Boolean, onSave: () -> Unit, onDelete: () -> Unit,
         content: @Composable (SubscriptionControls) -> Unit)
 }
 
 internal interface SubscriptionControls {
-    @Composable fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType = KeyboardType.Text,
+    @Composable fun Field(label: String, value: String, onValueChange: (String) -> Unit, keyboard: KeyboardType = KeyboardType.Text,
         error: Boolean = false, hint: String? = null, announceValue: Boolean = false)
-    @Composable fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit)
-    @Composable fun Profile(label: String, value: String, hint: String, change: (String) -> Unit)
+    @Composable fun Toggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit)
+    @Composable fun Profile(label: String, value: String, hint: String, onSelect: (String) -> Unit)
 }
 
 @Composable

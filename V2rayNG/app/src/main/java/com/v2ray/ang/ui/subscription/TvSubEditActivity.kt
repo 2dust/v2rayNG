@@ -34,58 +34,58 @@ import com.v2ray.ang.ui.settings.TvSettingsSwitchRow
 
 class TvSubEditActivity : BaseSubEditActivity() {
     @Composable
-    override fun Editor(form: SubscriptionEditViewModel.Form, busy: Boolean, save: () -> Unit, delete: () -> Unit,
+    override fun EditorLayout(form: SubscriptionEditViewModel.Form, isLoading: Boolean, onSave: () -> Unit, onDelete: () -> Unit,
         content: @Composable (SubscriptionControls) -> Unit) {
         val back = remember { FocusRequester() }
-        val saveButton = remember { FocusRequester() }
-        val deleteButton = remember { FocusRequester() }
-        val order = if (form.name == null) listOf(back, saveButton) else listOf(back, saveButton, deleteButton)
+        val save = remember { FocusRequester() }
+        val delete = remember { FocusRequester() }
+        val order = if (form.name == null) listOf(back, save) else listOf(back, save, delete)
         val focus = rememberEditorFocus(back)
         val controls = remember(back, focus) { TvSubscriptionControls(back, focus) }
-        var confirm by rememberSaveable { mutableStateOf(false) }
+        var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
         Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
             Box(Modifier.padding(horizontal = 48.dp)) {
                 AppTopBar(stringResource(R.string.title_sub_setting), ::finish, navigationIcon = {
                     TvIconButton(painterResource(R.drawable.ic_tv_arrow_back_24dp), stringResource(R.string.action_back), ::finish,
                         focus.target(back).dpadOrderedFocusNavigation(back, order))
                 }, actions = {
-                    TvIconButton(painterResource(R.drawable.ic_fab_check), stringResource(R.string.routing_settings_save), save,
-                        focus.target(saveButton).dpadOrderedFocusNavigation(saveButton, order), enabled = !busy)
+                    TvIconButton(painterResource(R.drawable.ic_fab_check), stringResource(R.string.routing_settings_save), onSave,
+                        focus.target(save).dpadOrderedFocusNavigation(save, order), enabled = !isLoading)
                     if (form.name != null) TvIconButton(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.action_delete),
-                        { confirm = true }, focus.target(deleteButton).dpadOrderedFocusNavigation(deleteButton, order), enabled = !busy)
+                        { showDeleteConfirm = true }, focus.target(delete).dpadOrderedFocusNavigation(delete, order), enabled = !isLoading)
                 })
             }
         }) { padding ->
             TvEditorForm(padding, back, focus) { content(controls) }
         }
-        if (confirm) TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name,
-            onConfirm = { confirm = false; delete() }, onDismiss = { confirm = false })
+        if (showDeleteConfirm) TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name,
+            onConfirm = { showDeleteConfirm = false; onDelete() }, onDismiss = { showDeleteConfirm = false })
     }
 }
 
 private class TvSubscriptionControls(private val back: FocusRequester, private val focus: EditorFocus) : SubscriptionControls {
     @Composable
-    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
-        TvEditorTextField(label, value, change, keyboardType = keyboard, isError = error, supportingText = hint, announceValue = announceValue)
+    override fun Field(label: String, value: String, onValueChange: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
+        TvEditorTextField(label, value, onValueChange, keyboardType = keyboard, isError = error, supportingText = hint, announceValue = announceValue)
     }
 
     @Composable
-    override fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit) {
-        TvSettingsSwitchRow(label, checked, change, back, focus.target())
+    override fun Toggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+        TvSettingsSwitchRow(label, checked, onCheckedChange, back, focus.target())
     }
 
     @Composable
-    override fun Profile(label: String, value: String, hint: String, change: (String) -> Unit) {
+    override fun Profile(label: String, value: String, hint: String, onSelect: (String) -> Unit) {
         val pick = remember { FocusRequester() }
         val clear = remember { FocusRequester() }
         val order = listOf(pick, clear)
         var open by rememberSaveable { mutableStateOf(false) }
         RestoreTvDialogOpener(open, pick)
-        ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint,
+        ProfileSelectDialogField(label, value, { open = true }, { onSelect("") }, hint,
             focus.target(pick).dpadOrderedFocusNavigation(pick, order, onBeforeFirst = { back.requestFocus() }).dpadFocusOutline(),
             focus.target(clear).dpadOrderedFocusNavigation(clear, order).dpadFocusOutline(cornerRadius = 24.dp))
         if (open) ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, { open = false }) { options ->
-            TvSearchableOptionsDialog(label, options, value, onSelect = { change(it); open = false }, onDismiss = { open = false })
+            TvSearchableOptionsDialog(label, options, value, onSelect = { onSelect(it); open = false }, onDismiss = { open = false })
         }
     }
 }

@@ -2,7 +2,6 @@ package com.v2ray.ang.ui.subscription
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -36,27 +35,24 @@ import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.verticalScrollbar
 
 class SubEditActivity : BaseSubEditActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION) {
-            startActivity(Intent(intent).setClass(this, TvSubEditActivity::class.java))
-            finish()
-        }
+    override fun televisionDestination(): Intent? {
+        val uiMode = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK
+        return if (uiMode == Configuration.UI_MODE_TYPE_TELEVISION) Intent(intent).setClass(this, TvSubEditActivity::class.java) else null
     }
 
     @Composable
-    override fun Editor(form: SubscriptionEditViewModel.Form, busy: Boolean, save: () -> Unit, delete: () -> Unit,
+    override fun EditorLayout(form: SubscriptionEditViewModel.Form, isLoading: Boolean, onSave: () -> Unit, onDelete: () -> Unit,
         content: @Composable (SubscriptionControls) -> Unit) {
         val scroll = rememberScrollState()
-        var confirm by rememberSaveable { mutableStateOf(false) }
+        var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
         Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
             AppTopBar(stringResource(R.string.title_sub_setting), ::finish, actions = {
                 if (form.name != null) {
-                    IconButton(onClick = { if (form.confirmRemove) confirm = true else delete() }, enabled = !busy) {
+                    IconButton(onClick = { if (form.confirmRemove) showDeleteConfirm = true else onDelete() }, enabled = !isLoading) {
                         Icon(painterResource(R.drawable.ic_delete_24dp), stringResource(R.string.acc_delete))
                     }
                 }
-                IconButton(onClick = save, enabled = !busy) {
+                IconButton(onClick = onSave, enabled = !isLoading) {
                     Icon(painterResource(R.drawable.ic_fab_check), stringResource(R.string.acc_save))
                 }
             })
@@ -67,28 +63,28 @@ class SubEditActivity : BaseSubEditActivity() {
                 NavigationBarsSpacer()
             }
         }
-        if (confirm) DeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name.orEmpty(),
-            onConfirm = { confirm = false; delete() }, onDismiss = { confirm = false })
+        if (showDeleteConfirm) DeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group), itemName = form.name.orEmpty(),
+            onConfirm = { showDeleteConfirm = false; onDelete() }, onDismiss = { showDeleteConfirm = false })
     }
 }
 
 private object PhoneSubscriptionControls : SubscriptionControls {
     @Composable
-    override fun Field(label: String, value: String, change: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
-        FormTextField(label, value, change, keyboardType = keyboard, isError = error, supportingText = hint)
+    override fun Field(label: String, value: String, onValueChange: (String) -> Unit, keyboard: KeyboardType, error: Boolean, hint: String?, announceValue: Boolean) {
+        FormTextField(label, value, onValueChange, keyboardType = keyboard, isError = error, supportingText = hint)
     }
 
     @Composable
-    override fun Toggle(label: String, checked: Boolean, change: (Boolean) -> Unit) {
-        SettingsSwitchItem(title = label, checked = checked, onCheckedChange = change)
+    override fun Toggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+        SettingsSwitchItem(title = label, checked = checked, onCheckedChange = onCheckedChange)
     }
 
     @Composable
-    override fun Profile(label: String, value: String, hint: String, change: (String) -> Unit) {
+    override fun Profile(label: String, value: String, hint: String, onSelect: (String) -> Unit) {
         var open by rememberSaveable { mutableStateOf(false) }
-        ProfileSelectDialogField(label, value, { open = true }, { change("") }, hint)
+        ProfileSelectDialogField(label, value, { open = true }, { onSelect("") }, hint)
         if (open) ProfilePickerChoices(SettingsManager::getSimpleProfileRemarks, { open = false }) { options ->
-            ServerSelectListDialog(options, onSelected = { change(it); open = false },
+            ServerSelectListDialog(options, onSelected = { onSelect(it); open = false },
                 onDismiss = { open = false }, title = label, selectedOption = value)
         }
     }
