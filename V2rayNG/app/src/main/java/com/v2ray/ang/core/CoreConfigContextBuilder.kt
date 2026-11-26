@@ -262,21 +262,25 @@ object CoreConfigContextBuilder {
         val (secondLast, last) = rulesetItems.takeLast(2).let {
             it.getOrNull(0) to it.getOrNull(1)
         }
-        val secondLastValue = secondLast?.ip?.let {
+        if (secondLast?.outboundTag != AppConfig.TAG_DIRECT
+            || last?.outboundTag != AppConfig.TAG_DIRECT) {
+            return null
+        }
+        val secondLastValue = secondLast.ip?.let {
             if (it.size != 1) {
-                null
+                return@let null
             }
             if (!it[0].startsWith("geoip:")) {
-                null
+                return@let null
             }
             it[0].substringAfter("geoip:")
         }
-        val lastValue = last?.domain?.let {
+        val lastValue = last.domain?.let {
             if (it.size != 1) {
-                null
+                return@let null
             }
             if (!it[0].startsWith("geosite:")) {
-                null
+                return@let null
             }
             it[0].substringAfter("geosite:")
         }
