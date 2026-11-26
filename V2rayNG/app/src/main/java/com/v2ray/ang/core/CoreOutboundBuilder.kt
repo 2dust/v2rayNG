@@ -591,6 +591,7 @@ object CoreOutboundBuilder {
                 }
                 if (profileItem.portHopping.isNotNullEmpty()) {
                     val rawInterval = profileItem.portHoppingInterval?.trim().nullIfBlank()
+                        ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HYSTERIA_PORT_HOPPING_INTERVAL)?.trim().nullIfBlank()
                     val interval = if (rawInterval == null) {
                         "30"
                     } else {

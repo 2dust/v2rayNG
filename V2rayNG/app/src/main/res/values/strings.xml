@@ -436,6 +436,7 @@
     <string name="title_pref_fragment_interval">Fragment Interval (min-max)</string>
     <string name="title_pref_fragment_enabled">Enable Fragment</string>
     <string name="title_pref_fragment_maxsplit">Fragment Max Split</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Observatory Settings</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing Interval</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad Interval</string>

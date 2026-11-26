@@ -164,6 +164,7 @@ private fun SettingsForm(
     var fragmentLength by rememberMmkvString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
     var fragmentInterval by rememberMmkvString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
     var fragmentMaxSplit by rememberMmkvString(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
+    var hysteriaPortHoppingInterval by rememberMmkvString(AppConfig.PREF_HYSTERIA_PORT_HOPPING_INTERVAL, "30")
     var observatoryLeastPingInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
     var observatoryLeastLoadInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
     var observatoryLeastLoadMethod by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
@@ -540,6 +541,11 @@ private fun SettingsForm(
                     values = outboundResolveValues,
                     selectedValue = outboundResolveMethod,
                     onSelected = { outboundResolveMethod = it }
+                )
+                SettingsEditItem(
+                    title = stringResource(R.string.title_pref_hysteria_port_hopping_interval),
+                    value = hysteriaPortHoppingInterval,
+                    onValueChanged = { hysteriaPortHoppingInterval = it }
                 )
             }
 

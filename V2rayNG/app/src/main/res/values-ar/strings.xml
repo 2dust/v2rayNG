@@ -444,6 +444,7 @@
     <string name="title_pref_fragment_interval">فاصل الجزء (الحد الأدنى - الحد الأقصى)</string>
     <string name="title_pref_fragment_enabled">تفعيل تجزئة الحزم</string>
     <string name="title_pref_fragment_maxsplit">الحد الأقصى لعدد الأجزاء</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">إعدادات مراقبة الاتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصل leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصل leastLoad</string>

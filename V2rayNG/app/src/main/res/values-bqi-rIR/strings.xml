@@ -436,6 +436,7 @@
     <string name="title_pref_fragment_interval">فاسله منجا کتنا فرگمنت (هدقل-هدکسر)</string>
     <string name="title_pref_fragment_enabled">ره وندن فرگمنت</string>
     <string name="title_pref_fragment_maxsplit">هدکسر تقسیم فرگمنت</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">سامووا واجۊری منپیز (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاسله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاسله leastLoad</string>

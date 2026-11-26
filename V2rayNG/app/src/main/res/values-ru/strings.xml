@@ -440,6 +440,7 @@
     <string name="title_pref_fragment_interval">Интервал фрагментов (от — до)</string>
     <string name="title_pref_fragment_enabled">Использовать фрагментирование</string>
     <string name="title_pref_fragment_maxsplit">Максимальное число фрагментов</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Настройки контроля соединений</string>
     <string name="title_pref_observatory_least_ping_interval">Интервал leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Интервал leastLoad</string>

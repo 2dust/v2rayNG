@@ -436,6 +436,7 @@
     <string name="title_pref_fragment_interval">فاصلهٔ قطعه‌ها (حداقل-حداکثر)</string>
     <string name="title_pref_fragment_enabled">فعال کردن Fragment</string>
     <string name="title_pref_fragment_maxsplit">حداکثر تعداد قطعه‌ها</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">تنظیمات پایش اتصال (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">فاصله leastPing</string>
     <string name="title_pref_observatory_least_load_interval">فاصله leastLoad</string>

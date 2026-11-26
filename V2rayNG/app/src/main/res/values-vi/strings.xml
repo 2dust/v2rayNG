@@ -434,6 +434,7 @@
     <string name="title_pref_fragment_interval">Khoảng phân mảnh (tối thiểu-tối đa)</string>
     <string name="title_pref_fragment_enabled">Bật phân mảnh</string>
     <string name="title_pref_fragment_maxsplit">Số lần chia nhỏ tối đa</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
     <string name="title_observatory_settings">Cài đặt giám sát kết nối (Observatory)</string>
     <string name="title_pref_observatory_least_ping_interval">Khoảng thời gian leastPing</string>
     <string name="title_pref_observatory_least_load_interval">Khoảng thời gian leastLoad</string>
