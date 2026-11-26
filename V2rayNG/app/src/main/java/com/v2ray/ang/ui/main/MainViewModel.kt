@@ -20,7 +20,6 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
-import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.ui.compose.ReorderCommand
 import com.v2ray.ang.util.LogUtil
@@ -328,8 +327,7 @@ class MainViewModel(
             MainAction.LocateSelectedServer,
             is MainAction.EditServer,
             is MainAction.ShareClipboard,
-            is MainAction.ShareFullContent,
-            is MainAction.OpenSubscriptionLink -> {
+            is MainAction.ShareFullContent -> {
                 // Handled by Activity via its onAction lambda
             }
         }
@@ -478,9 +476,6 @@ class MainViewModel(
                     GroupMapItem(
                         id = it.guid,
                         remarks = it.subscription.remarks,
-                        usageInfo = it.subscription.usageInfo?.let { info ->
-                            SubscriptionInfoParser.withWebPageFallback(info, it.subscription.url)
-                        },
                     )
                 }
                 val selectedGroup = resolveSelectedGroup(groups)
