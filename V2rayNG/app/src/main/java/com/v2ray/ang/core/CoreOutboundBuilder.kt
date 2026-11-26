@@ -439,7 +439,6 @@ object CoreOutboundBuilder {
         val settings = if (extra == null) {
             OutboundBean.StreamSettingsBean.XdriveSettingsBean()
         } else {
-            if (JsonUtil.parseString(extra) == null) return null
             JsonUtil.fromJsonSafe(extra, OutboundBean.StreamSettingsBean.XdriveSettingsBean::class.java) ?: return null
         }
         profileItem.xdriveService?.nullIfBlank()?.let { settings.service = it.trim() }
@@ -448,13 +447,10 @@ object CoreOutboundBuilder {
             settings.service = AppConfig.XDRIVE_SERVICE_GOOGLE_DRIVE
         }
         profileItem.path?.nullIfBlank()?.let { settings.remoteFolder = it.trim() }
-        parseXdriveSecrets(profileItem.xdriveSecrets)?.let { settings.secrets = it }
+        profileItem.xdriveSecrets?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.ifEmpty { null }
+            ?.let { settings.secrets = it }
         return settings
     }
-
-    /** Splits the comma-separated secrets field; returns null when it holds no secret. */
-    fun parseXdriveSecrets(secrets: String?): List<String>? =
-        secrets?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.ifEmpty { null }
 
     /**
      * Mux settings for an xdrive outbound: always enabled, with the user's mux preferences

@@ -137,9 +137,9 @@ class CoreOutboundBuilderXdriveTest {
 
     @Test
     fun parseSecretsTrimsAndDropsEmptyEntries() {
-        assertEquals(listOf("a", "b"), CoreOutboundBuilder.parseXdriveSecrets(" a , ,b,"))
-        assertNull(CoreOutboundBuilder.parseXdriveSecrets(" , "))
-        assertNull(CoreOutboundBuilder.parseXdriveSecrets(null))
+        assertEquals(listOf("a", "b"), CoreOutboundBuilder.buildXdriveSettings(xdrive(secrets = " a , ,b,"))?.secrets)
+        assertNull(CoreOutboundBuilder.buildXdriveSettings(xdrive(secrets = " , "))?.secrets)
+        assertNull(CoreOutboundBuilder.buildXdriveSettings(xdrive(secrets = null))?.secrets)
     }
 
     companion object {
