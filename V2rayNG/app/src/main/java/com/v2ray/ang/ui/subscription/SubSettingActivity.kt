@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
+import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
@@ -129,6 +130,7 @@ private fun SubSettingScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     var showUpdateDialog by remember { mutableStateOf(false) }
+    var pendingUpdateSubId by remember { mutableStateOf<String?>(null) }
     var removeId by remember { mutableStateOf<String?>(null) }
     var shareId by remember { mutableStateOf<String?>(null) }
     val qrCodeBitmap by viewModel.qrCode.collectAsStateWithLifecycle()
@@ -150,7 +152,10 @@ private fun SubSettingScreen(
                     IconButton(onClick = { openEditor(null) }) {
                         Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = stringResource(R.string.acc_add_subscription))
                     }
-                    IconButton(onClick = { showUpdateDialog = true }) {
+                    IconButton(onClick = {
+                        pendingUpdateSubId = null
+                        showUpdateDialog = true
+                    }) {
                         Icon(painterResource(R.drawable.ic_restore_24dp), contentDescription = stringResource(R.string.acc_update_subscriptions))
                     }
                 }
@@ -175,13 +180,10 @@ private fun SubSettingScreen(
                         isDragging = isDragging
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 14.dp),
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             SubscriptionSummary(subCache.subscription, Modifier.weight(1f))
-
                             Column(
                                 horizontalAlignment = Alignment.End,
                                 modifier = Modifier.padding(start = 8.dp)
@@ -189,8 +191,15 @@ private fun SubSettingScreen(
                                 Row {
                                     if (subCache.subscription.url.isNotEmpty()) {
                                         IconButton(onClick = {
-                                            shareId = subCache.guid
+                                            pendingUpdateSubId = subCache.guid
+                                            showUpdateDialog = true
                                         }) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.ic_refresh_24dp),
+                                                contentDescription = stringResource(R.string.title_sub_update)
+                                            )
+                                        }
+                                        IconButton(onClick = { shareId = subCache.guid }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.ic_share_24dp),
                                                 contentDescription = stringResource(R.string.acc_share_subscription)
@@ -269,7 +278,12 @@ private fun SubSettingScreen(
             onDismissRequest = { showUpdateDialog = false },
             text = { SubscriptionUpdateOptions(state.updateOptions, viewModel::setOption, PhoneSettingsRows) },
             confirmButton = {
-                TextButton(onClick = { showUpdateDialog = false; viewModel.updateSubscriptions() }) { Text(stringResource(R.string.action_ok)) }
+                TextButton(onClick = {
+                    showUpdateDialog = false
+                    viewModel.updateSubscriptions(pendingUpdateSubId)
+                }) {
+                    Text(text = stringResource(R.string.action_ok))
+                }
             },
             dismissButton = {
                 TextButton(onClick = { showUpdateDialog = false }) { Text(stringResource(R.string.action_cancel)) }
@@ -286,6 +300,18 @@ internal fun SubscriptionSummary(group: SubscriptionItem, modifier: Modifier = M
             Spacer(Modifier.height(2.dp))
             Text(group.url, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        group.usageInfo?.let { usage ->
+            val total = if (usage.total > 0L) usage.total.toTrafficString()
+                else stringResource(R.string.sub_info_unlimited)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                stringResource(R.string.sub_info_traffic, usage.used.toTrafficString(), total),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
         Spacer(Modifier.height(2.dp))
         Text(Utils.formatTimestamp(group.lastUpdated), style = MaterialTheme.typography.bodyMedium,

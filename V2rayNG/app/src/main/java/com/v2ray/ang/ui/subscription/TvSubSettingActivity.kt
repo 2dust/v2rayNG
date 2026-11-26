@@ -62,13 +62,13 @@ import com.v2ray.ang.ui.compose.verticalDpadReorderTarget
 import com.v2ray.ang.ui.compose.verticalScrollbar
 import com.v2ray.ang.ui.settings.TvSettingsRows
 
-internal enum class Control { Back, Add, Update, Group, Share, Edit, Delete, Enable }
+internal enum class Control { Back, Add, Update, Group, Refresh, Share, Edit, Delete, Enable }
 private val toolbar = listOf(Control.Back, Control.Add, Control.Update)
-private val row = listOf(Control.Group, Control.Share, Control.Edit, Control.Delete, Control.Enable)
-private val localRow = row - Control.Share
+private val row = listOf(Control.Group, Control.Refresh, Control.Share, Control.Edit, Control.Delete, Control.Enable)
+private val localRow = row - setOf(Control.Refresh, Control.Share)
 
 internal fun SubscriptionItem.rowControls() = if (url.isEmpty()) localRow else row
-internal fun Control.onRow(available: Set<Control>) = if (this == Control.Share && this !in available) Control.Edit else this
+internal fun Control.onRow(available: Set<Control>) = if ((this == Control.Refresh || this == Control.Share) && this !in available) Control.Edit else this
 
 class TvSubSettingActivity : BaseSubSettingActivity() {
     @Composable
@@ -165,6 +165,7 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                         viewModel.move(id, ids[to])
                     }
                     TvSubscriptionRow(group, navigation, move, onEdit = { edit(it, id) },
+                        onRefresh = { openDialog(Control.Refresh, id) },
                         onShare = { openDialog(Control.Share, id) }, onDelete = { openDialog(Control.Delete, id) },
                         onEnable = { viewModel.setEnabled(id, it) })
                 }
@@ -178,6 +179,8 @@ class TvSubSettingActivity : BaseSubSettingActivity() {
                 focusedControl == Control.Update -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
                     onConfirm = { dismiss(); viewModel.updateSubscriptions() }, onDismiss = dismiss)
                 selected == null || focusedControl !in visibleRowFocus[selected.guid].orEmpty() -> LaunchedEffect(Unit) { dismiss() }
+                focusedControl == Control.Refresh -> TvUpdateSubscriptionsDialog(state.updateOptions, viewModel::setOption,
+                    onConfirm = { dismiss(); viewModel.updateSubscriptions(selected.guid) }, onDismiss = dismiss)
                 focusedControl == Control.Share -> TvActionDialog(SubscriptionShareAction.entries, { stringResource(it.labelRes) },
                     onSelected = { dismiss(); shareLink(it, selected.subscription.url) }, onDismiss = dismiss)
                 focusedControl == Control.Delete -> TvDeleteConfirmDialog(stringResource(R.string.confirm_delete_subscription_group),
@@ -212,7 +215,8 @@ private fun TvUpdateSubscriptionsDialog(
 @Composable
 private fun TvSubscriptionRow(
     group: SubscriptionItem, navigation: @Composable (Control) -> Modifier, move: DpadReorderItem,
-    onEdit: (Control) -> Unit, onShare: () -> Unit, onDelete: () -> Unit, onEnable: (Boolean) -> Unit
+    onEdit: (Control) -> Unit, onRefresh: () -> Unit, onShare: () -> Unit,
+    onDelete: () -> Unit, onEnable: (Boolean) -> Unit
 ) {
     val moving = move.state.isMoving(move.key)
     var focused by remember { mutableStateOf(false) }
@@ -226,6 +230,8 @@ private fun TvSubscriptionRow(
                     .dpadLongPressToMove(move) { onEdit(slot) }.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     SubscriptionSummary(group, Modifier.clearAndSetSemantics {})
                 }
+                Control.Refresh -> TvIconButton(painterResource(R.drawable.ic_refresh_24dp), stringResource(R.string.title_sub_update),
+                    onRefresh, modifier)
                 Control.Share -> TvIconButton(painterResource(R.drawable.ic_share_24dp), stringResource(R.string.action_share), onShare,
                     modifier, contentDescription = stringResource(R.string.acc_share_subscription))
                 Control.Edit -> TvIconButton(painterResource(R.drawable.ic_edit_24dp), stringResource(R.string.action_edit), { onEdit(slot) },

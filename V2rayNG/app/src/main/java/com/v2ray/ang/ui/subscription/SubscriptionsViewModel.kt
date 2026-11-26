@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.SubscriptionUpdateMessage
+import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.moveGuid
 import com.v2ray.ang.handler.AngConfigManager
@@ -115,21 +116,27 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         }
     }
 
-    fun updateSubscriptions() {
+    fun updateSubscriptions(subId: String? = null) {
         viewModelScope.launch {
             val enabled = storage.withLock { _state.value.updateOptions }
             when {
-                SubscriptionUpdateOption.Test in enabled -> updateSubscriptionsMore()
-                SubscriptionUpdateOption.Update in enabled -> updateSubscriptionsOnly()
+                SubscriptionUpdateOption.Test in enabled -> updateSubscriptionsMore(subId)
+                subId != null || SubscriptionUpdateOption.Update in enabled -> updateSubscriptionsOnly(subId)
             }
         }
     }
 
-    private fun updateSubscriptionsOnly() {
+    private fun updateSubscriptionsOnly(subId: String?) {
         launchLoading {
             try {
                 val result = withContext(Dispatchers.IO) {
-                    AngConfigManager.updateConfigViaSubAll()
+                    if (subId != null) {
+                        MmkvManager.decodeSubscription(subId)?.let {
+                            AngConfigManager.updateConfigViaSub(SubscriptionCache(subId, it))
+                        } ?: SubscriptionUpdateResult()
+                    } else {
+                        AngConfigManager.updateConfigViaSubAll()
+                    }
                 }
 
                 when {
@@ -161,11 +168,15 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
         }
     }
 
-    private suspend fun updateSubscriptionsMore() {
+    private suspend fun updateSubscriptionsMore(subId: String?) {
         SettingsChangeManager.makeSetupGroupTab()
-        val subIds = withContext(Dispatchers.IO) { MmkvManager.decodeSubscriptions() }
-            .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
-            .map { it.guid }
+        val subIds = if (subId != null) {
+            listOf(subId)
+        } else {
+            withContext(Dispatchers.IO) { MmkvManager.decodeSubscriptions() }
+                .filter { it.subscription.enabled && it.subscription.url.isNotEmpty() }
+                .map { it.guid }
+        }
 
         if (subIds.isNotEmpty()) {
             MessageHelper.sendMsg2SubscriptionService(app, SubscriptionUpdateMessage(AppConfig.MSG_SUB_UPDATE_START, false, subIds))

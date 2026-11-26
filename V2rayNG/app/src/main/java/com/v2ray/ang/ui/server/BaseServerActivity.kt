@@ -90,6 +90,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             kcpHeaderOptions = stringArrayResource(R.array.header_type_kcp_and_quic).toList(),
             grpcModeOptions = stringArrayResource(R.array.mode_type_grpc).toList(),
             xhttpModeOptions = stringArrayResource(R.array.xhttp_mode).toList(),
+            xdriveServiceOptions = stringArrayResource(R.array.xdrive_service).toList(),
             streamSecurityOptions = stringArrayResource(R.array.streamsecurityxs).toList(),
             uTlsOptions = stringArrayResource(R.array.streamsecurity_utls).toList(),
             alpnOptions = stringArrayResource(R.array.streamsecurity_alpn).toList(),
@@ -102,6 +103,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         val kcpHeaderOptions: List<String>,
         val grpcModeOptions: List<String>,
         val xhttpModeOptions: List<String>,
+        val xdriveServiceOptions: List<String>,
         val streamSecurityOptions: List<String>,
         val uTlsOptions: List<String>,
         val alpnOptions: List<String>,
@@ -153,6 +155,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 NetworkType.KCP.type -> options.kcpHeaderOptions
                 NetworkType.GRPC.type -> options.grpcModeOptions
                 NetworkType.XHTTP.type -> options.xhttpModeOptions
+                NetworkType.XDRIVE.type -> options.xdriveServiceOptions
                 else -> listOf("---")
             }
             if (headerOptions.size > 1) {
@@ -161,12 +164,14 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         when (state.network) {
                             NetworkType.GRPC.type -> R.string.server_lab_mode_type
                             NetworkType.XHTTP.type -> R.string.server_lab_xhttp_mode
+                            NetworkType.XDRIVE.type -> R.string.server_lab_xdrive_service
                             else -> R.string.server_lab_head_type
                         }
                     ),
                     when (state.network) {
                         NetworkType.GRPC.type -> state.mode
                         NetworkType.XHTTP.type -> state.xhttpMode
+                        NetworkType.XDRIVE.type -> state.xdriveService.ifBlank { headerOptions.first() }
                         else -> state.headerType
                     },
                     headerOptions,
@@ -174,28 +179,32 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                         when (state.network) {
                             NetworkType.GRPC.type -> state.mode = it
                             NetworkType.XHTTP.type -> state.xhttpMode = it
+                            NetworkType.XDRIVE.type -> state.xdriveService = it
                             else -> state.headerType = it
                         }
                     }
                 )
             }
 
-            FormTextField(
-                stringResource(
-                    when (state.network) {
-                        NetworkType.TCP.type,
-                        NetworkType.HTTP_UPGRADE.type,
-                        NetworkType.XHTTP.type,
-                        NetworkType.H2.type -> R.string.server_lab_request_host_http
+            // xdrive reaches a storage service, not an HTTP host, so it has no host field.
+            if (state.network != NetworkType.XDRIVE.type) {
+                FormTextField(
+                    stringResource(
+                        when (state.network) {
+                            NetworkType.TCP.type,
+                            NetworkType.HTTP_UPGRADE.type,
+                            NetworkType.XHTTP.type,
+                            NetworkType.H2.type -> R.string.server_lab_request_host_http
 
-                        NetworkType.WS.type -> R.string.server_lab_request_host_ws
-                        NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
-                        else -> R.string.server_lab_request_host6
-                    }
-                ),
-                if (state.network == NetworkType.GRPC.type) state.authority else state.host,
-                { if (state.network == NetworkType.GRPC.type) state.authority = it else state.host = it }
-            )
+                            NetworkType.WS.type -> R.string.server_lab_request_host_ws
+                            NetworkType.GRPC.type -> R.string.server_lab_request_host_grpc
+                            else -> R.string.server_lab_request_host6
+                        }
+                    ),
+                    if (state.network == NetworkType.GRPC.type) state.authority else state.host,
+                    { if (state.network == NetworkType.GRPC.type) state.authority = it else state.host = it }
+                )
+            }
 
             if (state.network != NetworkType.KCP.type) {
                 FormTextField(
@@ -206,6 +215,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                             NetworkType.XHTTP.type -> R.string.server_lab_path_xhttp
                             NetworkType.H2.type -> R.string.server_lab_path_h2
                             NetworkType.GRPC.type -> R.string.server_lab_path_grpc
+                            NetworkType.XDRIVE.type -> R.string.server_lab_xdrive_remote_folder
                             else -> R.string.server_lab_path
                         }
                     ),
@@ -219,6 +229,18 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     stringResource(R.string.server_lab_xhttp_extra),
                     state.xhttpExtra,
                     { state.xhttpExtra = it }
+                )
+            }
+            if (state.network == NetworkType.XDRIVE.type) {
+                FormTextField(
+                    stringResource(R.string.server_lab_xdrive_secrets),
+                    state.xdriveSecrets,
+                    { state.xdriveSecrets = it }
+                )
+                FormTextField(
+                    stringResource(R.string.server_lab_xdrive_extra),
+                    state.xdriveExtra,
+                    { state.xdriveExtra = it }
                 )
             }
             if (state.network == NetworkType.KCP.type) {
@@ -434,6 +456,10 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
         if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
             toast(R.string.server_lab_final_mask)
+            return false
+        }
+        if (!config.xdriveExtra.isNullOrBlank() && JsonUtil.parseString(config.xdriveExtra) == null) {
+            toast(R.string.server_lab_xdrive_extra)
             return false
         }
         return true
