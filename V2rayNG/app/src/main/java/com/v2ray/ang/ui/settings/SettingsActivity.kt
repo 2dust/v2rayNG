@@ -164,6 +164,7 @@ private fun SettingsForm(
     var fragmentLength by rememberMmkvString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
     var fragmentInterval by rememberMmkvString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
     var fragmentMaxSplit by rememberMmkvString(AppConfig.PREF_FRAGMENT_MAXSPLIT, "10")
+    var hysteriaPortHoppingInterval by rememberMmkvString(AppConfig.PREF_HYSTERIA_PORT_HOPPING_INTERVAL, "30")
     var observatoryLeastPingInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_PING_INTERVAL, AppConfig.OBSERVATORY_LEAST_PING_INTERVAL)
     var observatoryLeastLoadInterval by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_INTERVAL, AppConfig.OBSERVATORY_LEAST_LOAD_INTERVAL)
     var observatoryLeastLoadMethod by rememberMmkvString(AppConfig.PREF_OBSERVATORY_LEAST_LOAD_METHOD, AppConfig.OBSERVATORY_LEAST_LOAD_METHOD)
@@ -204,6 +205,9 @@ private fun SettingsForm(
     var routeOnlyEnabled by rememberMmkvBool(AppConfig.PREF_ROUTE_ONLY_ENABLED, false)
     var remoteDns by rememberMmkvString(AppConfig.PREF_REMOTE_DNS, "")
     var domesticDns by rememberMmkvString(AppConfig.PREF_DOMESTIC_DNS, "")
+    var dnsParallelQuery by rememberMmkvBool(AppConfig.PREF_DNS_PARALLEL_QUERY, false)
+    var dnsServeStale by rememberMmkvBool(AppConfig.PREF_DNS_SERVE_STALE, false)
+    var validateRegion by rememberMmkvBool(AppConfig.PREF_DNS_VALIDATE_REGION, true)
     var dnsHosts by rememberMmkvString(AppConfig.PREF_DNS_HOSTS, "")
     var coreLogLevel by rememberMmkvString(AppConfig.PREF_LOGLEVEL, "warning")
     var outboundResolveMethod by rememberMmkvString(AppConfig.PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD, AppConfig.DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD)
@@ -501,6 +505,24 @@ private fun SettingsForm(
                     value = domesticDns,
                     onValueChanged = { domesticDns = it }
                 )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_dns_parallel_query),
+                    summary = stringResource(R.string.summary_dns_parallel_query),
+                    checked = dnsParallelQuery,
+                    onCheckedChange = { dnsParallelQuery = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_dns_serve_stale),
+                    summary = stringResource(R.string.summary_dns_serve_stale),
+                    checked = dnsServeStale,
+                    onCheckedChange = { dnsServeStale = it }
+                )
+                SettingsSwitchItem(
+                    title = stringResource(R.string.title_pref_dns_validate_region),
+                    summary = stringResource(R.string.summary_pref_dns_validate_region),
+                    checked = validateRegion,
+                    onCheckedChange = { validateRegion = it }
+                )
                 SettingsEditItem(
                     title = stringResource(R.string.title_pref_dns_hosts),
                     value = dnsHosts,
@@ -519,6 +541,11 @@ private fun SettingsForm(
                     values = outboundResolveValues,
                     selectedValue = outboundResolveMethod,
                     onSelected = { outboundResolveMethod = it }
+                )
+                SettingsEditItem(
+                    title = stringResource(R.string.title_pref_hysteria_port_hopping_interval),
+                    value = hysteriaPortHoppingInterval,
+                    onValueChanged = { hysteriaPortHoppingInterval = it }
                 )
             }
 

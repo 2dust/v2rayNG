@@ -3,7 +3,6 @@ package com.v2ray.ang
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import androidx.core.content.ContextCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -24,7 +23,8 @@ class AngApplication : Application() {
      * @param base The base context.
      */
     override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base?.let(ContextCompat::getContextForLanguage))
+        // AppCompat reads the system locale from this context on Android 12 and earlier.
+        super.attachBaseContext(base)
         application = this
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // The VPN core process must receive replacement Shizuku Binders after a server restart.
