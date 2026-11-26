@@ -1,5 +1,7 @@
 package com.v2ray.ang.dto.entities
 
+import java.util.UUID
+
 data class RulesetItem(
     var id: String = "",
     var remarks: String? = "",
@@ -13,3 +15,17 @@ data class RulesetItem(
     var enabled: Boolean = true,
     var locked: Boolean? = false,
 )
+
+/** Keep the first occurrence: locked rules precede imported rules when the lists are combined. */
+internal fun List<RulesetItem>.ensureUniqueIds(): Boolean {
+    val seen = mutableSetOf<String>()
+    var changed = false
+    for (rule in this) {
+        if (rule.id.isNullOrBlank() || !seen.add(rule.id)) {
+            rule.id = UUID.randomUUID().toString()
+            seen.add(rule.id)
+            changed = true
+        }
+    }
+    return changed
+}

@@ -86,34 +86,8 @@ internal fun TvProfileGroupLayout(
     actionButton: @Composable (Int, String, Boolean, () -> Unit) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val usageInfo = group.usageInfo
-    val density = LocalDensity.current
-    val direction = LocalLayoutDirection.current
-    var infoHeightPx by remember(group.id) { mutableIntStateOf(0) }
     Box(Modifier.fillMaxSize()) {
-        content(if (usageInfo == null) contentPadding else PaddingValues(
-            start = contentPadding.calculateStartPadding(direction),
-            top = contentPadding.calculateTopPadding() + with(density) { infoHeightPx.toDp() },
-            end = contentPadding.calculateEndPadding(direction),
-            bottom = contentPadding.calculateBottomPadding()
-        ))
-        if (usageInfo != null) {
-            SubscriptionInfoCard(
-                info = usageInfo,
-                fallbackTitle = group.remarks,
-                onOpenLink = { onAction(MainAction.OpenSubscriptionLink(it)) },
-                onRefresh = { onAction(MainAction.UpdateGroupSubscription(group.id)) },
-                modifier = Modifier.align(Alignment.TopCenter)
-                    .padding(
-                        start = contentPadding.calculateStartPadding(direction),
-                        top = contentPadding.calculateTopPadding(),
-                        end = contentPadding.calculateEndPadding(direction)
-                    )
-                    .onSizeChanged { infoHeightPx = it.height }
-                    .then(headerModifier),
-                actionButton = actionButton
-            )
-        }
+        content(contentPadding)
     }
 }
 
