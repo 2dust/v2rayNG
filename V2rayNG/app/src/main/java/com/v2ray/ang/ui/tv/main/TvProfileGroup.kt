@@ -32,7 +32,7 @@ import com.v2ray.ang.vm.MainViewModel
 import com.v2ray.ang.ui.mobile.compose.AppDivider
 import com.v2ray.ang.ui.mobile.main.MainAction
 import com.v2ray.ang.ui.mobile.main.MainUiState
-import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.component.ServerRowUiModel
 import com.v2ray.ang.ui.tv.compose.DpadReorderDirection
 import com.v2ray.ang.ui.tv.compose.DpadReorderItem
 import com.v2ray.ang.ui.tv.compose.TvIconButton

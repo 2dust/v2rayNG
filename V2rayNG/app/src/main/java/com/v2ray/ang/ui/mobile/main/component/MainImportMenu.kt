@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -9,6 +9,7 @@ import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.mobile.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.mobile.compose.SelectListDialog
+import com.v2ray.ang.ui.mobile.main.MainAction
 
 internal enum class ImportMenuAction(@StringRes val labelRes: Int, val action: MainAction) {
     QRCode(R.string.menu_item_import_config_qrcode, MainAction.ImportQRcode),

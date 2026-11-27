@@ -53,8 +53,8 @@ import com.v2ray.ang.ui.mobile.compose.colorPingRed
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.ui.mobile.main.MainAction
 import com.v2ray.ang.ui.mobile.main.MainUiState
-import com.v2ray.ang.ui.mobile.main.ServerGroupUiState
-import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.component.ServerGroupUiState
+import com.v2ray.ang.ui.mobile.main.component.ServerRowUiModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.rememberReorderableLazyGridState

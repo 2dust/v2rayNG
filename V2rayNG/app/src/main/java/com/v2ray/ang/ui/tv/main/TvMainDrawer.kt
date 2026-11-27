@@ -65,9 +65,9 @@ import com.v2ray.ang.ui.tv.compose.dpadLogicalHorizontalNavigation
 import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.ui.mobile.main.MainDestination
-import com.v2ray.ang.ui.mobile.main.drawerItems
-import com.v2ray.ang.ui.mobile.main.primaryDrawerItems
+import com.v2ray.ang.ui.mobile.main.component.MainDestination
+import com.v2ray.ang.ui.mobile.main.component.drawerItems
+import com.v2ray.ang.ui.mobile.main.component.primaryDrawerItems
 
 private val V2rayNgFontFamily = FontFamily(Font(R.font.montserrat_thin))
 private val TvDrawerCollapsedWidth = 72.dp

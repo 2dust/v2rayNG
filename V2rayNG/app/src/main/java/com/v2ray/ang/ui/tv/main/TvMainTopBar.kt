@@ -53,9 +53,9 @@ import com.v2ray.ang.ui.tv.compose.dpadPopupHorizontalNavigation
 import com.v2ray.ang.ui.tv.compose.dpadTopBarFocusNavigation
 import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.ui.mobile.main.ImportMenuAction
+import com.v2ray.ang.ui.mobile.main.component.ImportMenuAction
 import com.v2ray.ang.ui.mobile.main.MainAction
-import com.v2ray.ang.ui.mobile.main.MainMoreMenuAction
+import com.v2ray.ang.ui.mobile.main.component.MainMoreMenuAction
 
 internal val tvMoreMenuActions = MainMoreMenuAction.entries - setOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll)
 

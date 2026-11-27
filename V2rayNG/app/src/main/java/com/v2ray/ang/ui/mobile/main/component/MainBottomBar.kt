@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -49,6 +49,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.ui.mobile.compose.colorFabActive
 import com.v2ray.ang.ui.mobile.compose.colorFabInactiveDark
 import com.v2ray.ang.ui.mobile.compose.colorFabInactiveLight
+import com.v2ray.ang.ui.mobile.main.MainAction
 import kotlinx.coroutines.launch
 
 private val KNOB_SIZE = 56.dp

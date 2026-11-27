@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +36,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.vm.MainViewModel
 import com.v2ray.ang.ui.mobile.compose.LocalDarkTheme
 import com.v2ray.ang.ui.mobile.compose.QRCodeDialog
+import com.v2ray.ang.ui.mobile.main.MainAction
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -246,15 +247,15 @@ fun MainScreen(
                     }
                 }
             }
-            MainBottomBar(
-                displayText = displayText,
-                isRunning = isRunning,
-                isDarkTheme = isDarkTheme,
-                onAction = onAction,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .onSizeChanged { bottomBarHeightPx = it.height }
-            )
+                MainBottomBar(
+                    displayText = displayText,
+                    isRunning = isRunning,
+                    isDarkTheme = isDarkTheme,
+                    onAction = onAction,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged { bottomBarHeightPx = it.height }
+                )
             }
         }
     }

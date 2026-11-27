@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.MainAction
 
 @Composable
 fun MainTopBar(

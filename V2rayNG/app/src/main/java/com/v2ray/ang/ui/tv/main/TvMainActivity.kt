@@ -8,7 +8,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import com.v2ray.ang.ui.mobile.main.MainActivity
 import com.v2ray.ang.ui.mobile.main.MainAction
-import com.v2ray.ang.ui.mobile.main.MainDestination
+import com.v2ray.ang.ui.mobile.main.component.MainDestination
 import com.v2ray.ang.vm.MainViewModel
 import kotlin.math.roundToInt
 

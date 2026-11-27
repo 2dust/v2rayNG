@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.listSaver

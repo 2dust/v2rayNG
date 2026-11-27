@@ -9,7 +9,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
@@ -18,9 +17,6 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.mobile.AboutActivity
@@ -45,13 +41,12 @@ import com.v2ray.ang.ui.mobile.server.ServerVlessActivity
 import com.v2ray.ang.ui.mobile.server.ServerVmessActivity
 import com.v2ray.ang.ui.mobile.server.ServerWireguardActivity
 import com.v2ray.ang.ui.mobile.SettingsActivity
+import com.v2ray.ang.ui.mobile.main.component.MainDestination
+import com.v2ray.ang.ui.mobile.main.component.MainScreen
 import com.v2ray.ang.ui.mobile.subscription.SubSettingActivity
 import com.v2ray.ang.ui.mobile.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 open class MainActivity : HelperBaseComponentActivity() {
 
@@ -125,7 +120,6 @@ open class MainActivity : HelperBaseComponentActivity() {
             MainAction.ToggleService -> handleFabAction()
             MainAction.TestCurrentServer -> handleLayoutTestClick()
             MainAction.ImportQRcode -> importQRcode()
-            MainAction.ImportClipboard -> importClipboard()
             MainAction.ImportConfigLocal -> importConfigLocal()
             is MainAction.ImportManually -> importManually(action.type)
             MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
@@ -136,22 +130,7 @@ open class MainActivity : HelperBaseComponentActivity() {
             }
             is MainAction.SelectServer -> setSelectServer(action.guid)
             is MainAction.EditServer -> editServer(action.guid, action.profile)
-            is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-            is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
             else -> mainViewModel.onAction(action)
-        }
-    }
-
-    private fun shareToClipboard(guid: String): Boolean =
-        AngConfigManager.share2Clipboard(this, guid) == 0
-
-    private fun shareFullContentAsync(guid: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
-            withContext(Dispatchers.Main) {
-                if (result == 0) toastSuccess(R.string.toast_success)
-                else toastError(R.string.toast_failure)
-            }
         }
     }
 
@@ -239,15 +218,6 @@ open class MainActivity : HelperBaseComponentActivity() {
             if (scanResult != null) {
                 mainViewModel.onAction(MainAction.ImportBatchConfig(scanResult))
             }
-        }
-    }
-
-    private fun importClipboard() {
-        try {
-            val text = Utils.getClipboard(this)
-            mainViewModel.onAction(MainAction.ImportBatchConfig(text))
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to import config from clipboard", e)
         }
     }
 

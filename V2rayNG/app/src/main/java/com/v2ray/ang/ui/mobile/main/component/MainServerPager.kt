@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.mobile.main.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,7 +51,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.entities.ProfileItem
-import com.v2ray.ang.vm.MainViewModel
+import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.ui.mobile.compose.ItemDivider
 import com.v2ray.ang.ui.mobile.compose.ReorderableGridItem
 import com.v2ray.ang.ui.mobile.compose.ReorderableListItem
@@ -59,10 +63,81 @@ import com.v2ray.ang.ui.mobile.compose.colorConfigType
 import com.v2ray.ang.ui.mobile.compose.colorPing
 import com.v2ray.ang.ui.mobile.compose.colorPingRed
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.vm.MainViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.abs
+
+internal data class ServerRowUiModel(
+    val guid: String,
+    val profile: ProfileItem,
+    val remarks: String,
+    val statistics: String,
+    val typeDescription: String,
+    val testDelayMillis: Long,
+    val subscriptionBadge: String,
+)
+
+internal data class ServerGroupUiState(
+    val servers: List<ServersCache> = emptyList(),
+    val rows: List<ServerRowUiModel> = emptyList(),
+    val isFiltered: Boolean = false,
+) {
+    fun canReorder(groupId: String, searchQuery: String): Boolean =
+        groupId.isNotEmpty() && searchQuery.isEmpty() && !isFiltered
+
+    fun moveServer(fromGuid: String, toGuid: String): ServerGroupUiState? {
+        if (isFiltered) return null
+        val from = servers.indexOfFirst { it.guid == fromGuid }
+        val to = servers.indexOfFirst { it.guid == toGuid }
+        if (from == to || from < 0 || to < 0) return null
+        return ServerGroupUiState(
+            servers = servers.toMutableList().apply { moveItem(from, to) },
+            rows = rows.toMutableList().apply { moveItem(from, to) }
+        )
+    }
+}
+
+internal fun buildServerRowUiModel(
+    server: ServersCache,
+    subscriptionRemarks: String,
+): ServerRowUiModel {
+    val profile = server.profile
+    return ServerRowUiModel(
+        guid = server.guid,
+        profile = profile,
+        remarks = profile.remarks,
+        statistics = profile.description.nullIfBlank()
+            ?: AngConfigManager.generateDescription(profile),
+        typeDescription = serverProtocolDescription(profile),
+        testDelayMillis = server.testDelayMillis,
+        subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),
+    )
+}
+
+private fun serverProtocolDescription(profile: ProfileItem): String {
+    if (profile.configType.isComplexType()) return profile.configType.name
+    val parts = mutableListOf(profile.configType.name)
+    profile.network?.let { network ->
+        if (network.isNotBlank() && !network.equals("tcp", ignoreCase = true)) {
+            parts.add(network)
+        }
+    }
+    profile.security?.let { security ->
+        if (security.isNotBlank()) {
+            parts.add(
+                if (profile.insecure == true && security.equals("tls", ignoreCase = true)) {
+                    "$security insecure"
+                } else {
+                    security
+                }
+            )
+        }
+    }
+    return parts.joinToString(" / ")
+}
 
 @Composable
 fun GroupPagerPage(

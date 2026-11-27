@@ -15,9 +15,9 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.mobile.main.MainAction
-import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
-import com.v2ray.ang.ui.mobile.main.dispatch
-import com.v2ray.ang.ui.mobile.main.serverMenuActions
+import com.v2ray.ang.ui.mobile.main.component.ServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.component.dispatch
+import com.v2ray.ang.ui.mobile.main.component.serverMenuActions
 import com.v2ray.ang.ui.tv.compose.TvActionDialog
 import com.v2ray.ang.ui.tv.compose.TvDeleteConfirmDialog
 import com.v2ray.ang.ui.tv.compose.TvQRCodeDialog

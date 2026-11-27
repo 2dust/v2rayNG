@@ -20,16 +20,18 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.ui.mobile.main.MainAction
 import com.v2ray.ang.ui.mobile.main.MainDataSource
 import com.v2ray.ang.ui.mobile.main.MainServiceEvent
 import com.v2ray.ang.ui.mobile.main.MainStatus
 import com.v2ray.ang.ui.mobile.main.MainTestRequests
 import com.v2ray.ang.ui.mobile.main.MainUiState
-import com.v2ray.ang.ui.mobile.main.ServerGroupUiState
-import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
-import com.v2ray.ang.ui.mobile.main.buildServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.component.ServerGroupUiState
+import com.v2ray.ang.ui.mobile.main.component.ServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.component.buildServerRowUiModel
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
@@ -309,6 +311,11 @@ class MainViewModel(
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
+            MainAction.ImportClipboard -> importClipboardAsync()
+            is MainAction.ShareClipboard -> {
+                dataSource.share2Clipboard(action.guid)
+            }
+            is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.MoveServer -> moveServer(action)
             is MainAction.ShareQRCode -> {
@@ -324,14 +331,11 @@ class MainViewModel(
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
             MainAction.ImportQRcode,
-            MainAction.ImportClipboard,
             MainAction.ImportConfigLocal,
             is MainAction.ImportManually,
             MainAction.RestartService,
             MainAction.LocateSelectedServer,
-            is MainAction.EditServer,
-            is MainAction.ShareClipboard,
-            is MainAction.ShareFullContent -> {
+            is MainAction.EditServer -> {
                 // Handled by Activity via its onAction lambda
             }
         }
@@ -529,6 +533,26 @@ class MainViewModel(
     }
 
     // ---------- Business actions (coroutine-based) ----------
+    private fun importClipboardAsync() {
+        try {
+            val text = Utils.getClipboard(app)
+            importBatchConfig(text)
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to import config from clipboard", e)
+            toastError(R.string.toast_failure)
+        }
+    }
+
+    private fun shareFullContentAsync(guid: String) {
+        launchLoading {
+            val result = withContext(ioDispatcher) {
+                AngConfigManager.shareFullContent2Clipboard(app, guid)
+            }
+            if (result == 0) toastSuccess(R.string.toast_success)
+            else toastError(R.string.toast_failure)
+        }
+    }
+
     private fun importBatchConfig(configText: String) {
         launchLoading {
             withContext(ioDispatcher) {

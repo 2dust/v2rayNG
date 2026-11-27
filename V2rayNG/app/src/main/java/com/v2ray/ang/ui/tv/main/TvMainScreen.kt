@@ -33,7 +33,7 @@ import androidx.tv.material3.DrawerValue as TvDrawerValue
 import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.mobile.main.MainAction
-import com.v2ray.ang.ui.mobile.main.MainDestination
+import com.v2ray.ang.ui.mobile.main.component.MainDestination
 import com.v2ray.ang.ui.mobile.main.MainStatus
 import com.v2ray.ang.vm.MainViewModel
 import com.v2ray.ang.ui.tv.compose.rememberDpadFocusTargets
