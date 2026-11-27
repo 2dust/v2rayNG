@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.AssetUrlCache
@@ -54,10 +53,6 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.vm.AssetFileMetadata
-import com.v2ray.ang.vm.UserAssetUiState
-import com.v2ray.ang.vm.UserAssetViewModel
 import com.v2ray.ang.ui.mobile.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
@@ -68,10 +63,9 @@ import com.v2ray.ang.ui.mobile.compose.SettingsListItem
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.v2ray.ang.vm.AssetFileMetadata
+import com.v2ray.ang.vm.UserAssetUiState
+import com.v2ray.ang.vm.UserAssetViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -88,18 +82,15 @@ class UserAssetActivity : HelperBaseComponentActivity() {
 
     private val viewModel: UserAssetViewModel by viewModels()
     private val extDir by lazy { File(Utils.userAssetPath(this)) }
-    private val isLoadingState = MutableStateFlow(false)
-    private val geoFilesSourceState = MutableStateFlow("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        geoFilesSourceState.value = getGeoFilesSources()
     }
 
     @Composable
     override fun ScreenContent() {
-        val isLoading by isLoadingState.collectAsStateWithLifecycle()
-        val geoFilesSource by geoFilesSourceState.collectAsStateWithLifecycle()
+        val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+        val geoFilesSource by viewModel.geoFilesSource.collectAsStateWithLifecycle()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         UserAssetScreen(
             uiState = uiState,
@@ -107,33 +98,23 @@ class UserAssetActivity : HelperBaseComponentActivity() {
             geoFilesSource = geoFilesSource,
             geoFilesSourcesList = AppConfig.GEO_FILES_SOURCES.toList(),
             onBackClick = { finish() },
-            onGeoSourceSelected = { value ->
-                MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, value)
-                geoFilesSourceState.value = value
-                refreshData()
-            },
+            onGeoSourceSelected = { value -> viewModel.setGeoFilesSource(value, extDir) },
             onAddFileClick = { showFileChooser() },
             onAddUrlClick = { startActivity(Intent(this, UserAssetUrlActivity::class.java)) },
             onAddQrcodeClick = { importAssetFromQRcode() },
-            onDownloadClick = { downloadGeoFiles() },
+            onDownloadClick = { viewModel.downloadGeoFilesAndRefresh(extDir) },
             onEditAsset = { guid ->
                 startActivity(Intent(this, UserAssetUrlActivity::class.java).putExtra("assetId", guid))
             },
             onRemoveAsset = { guid, name ->
-                extDir.listFiles()?.find { it.name == name }?.delete()
-                MmkvManager.removeAssetUrl(guid)
-                initAssets()
+                viewModel.removeAsset(guid, name, extDir)
             }
         )
     }
 
     override fun onResume() {
         super.onResume()
-        refreshData()
-    }
-
-    private fun getGeoFilesSources(): String {
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_GEO_FILES_SOURCES) ?: AppConfig.GEO_FILES_SOURCES.first()
+        viewModel.reload(extDir)
     }
 
     private fun showFileChooser() {
@@ -169,7 +150,7 @@ class UserAssetActivity : HelperBaseComponentActivity() {
             targetFile.outputStream().use { fileOut ->
                 inputStream?.copyTo(fileOut)
                 toastSuccess(R.string.toast_success)
-                refreshData()
+                viewModel.reload(extDir)
             }
         }
         return targetFile.path
@@ -212,45 +193,6 @@ class UserAssetActivity : HelperBaseComponentActivity() {
         }
         return true
     }
-
-    private fun downloadGeoFiles() {
-        isLoadingState.value = true
-        toast(R.string.msg_downloading_content)
-
-        val proxyUsername = SettingsManager.getSocksUsername()
-        val proxyPassword = SettingsManager.getSocksPassword()
-        val httpPort = SettingsManager.getHttpPort()
-        lifecycleScope.launch {
-            refreshData().join()
-            val result = withContext(Dispatchers.IO) {
-                viewModel.downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
-            }
-            if (result.successCount > 0) {
-                toast(
-                    resources.getQuantityString(
-                        R.plurals.title_update_asset_count,
-                        result.successCount,
-                        result.successCount,
-                    )
-                )
-            } else {
-                toast(getString(R.string.toast_failure))
-            }
-            refreshData().join()
-            isLoadingState.value = false
-        }
-    }
-
-    private fun initAssets() {
-        lifecycleScope.launch(Dispatchers.Default) {
-            SettingsManager.initAssets(this@UserAssetActivity, assets)
-            withContext(Dispatchers.Main) {
-                refreshData()
-            }
-        }
-    }
-
-    private fun refreshData() = viewModel.reload(getGeoFilesSources(), extDir)
 }
 
 @Composable

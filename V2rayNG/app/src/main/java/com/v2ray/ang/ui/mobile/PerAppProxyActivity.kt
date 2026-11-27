@@ -26,7 +26,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppDivider
 import com.v2ray.ang.ui.mobile.compose.AppDropdownMenuItems
@@ -51,7 +49,6 @@ import com.v2ray.ang.ui.mobile.compose.ConfirmDialog
 import com.v2ray.ang.ui.mobile.compose.ItemDivider
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.util.Utils
 import com.v2ray.ang.vm.PerAppProxyViewModel
 
 private enum class PerAppMenuAction(@StringRes val labelRes: Int) {
@@ -68,7 +65,7 @@ class PerAppProxyActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.loadApps(this)
+        viewModel.loadApps()
     }
 
     @Composable
@@ -78,6 +75,7 @@ class PerAppProxyActivity : BaseComponentActivity() {
         val blacklist by viewModel.blacklist.collectAsStateWithLifecycle()
         val perAppProxyEnabled by viewModel.perAppProxyEnabled.collectAsStateWithLifecycle()
         val bypassApps by viewModel.bypassApps.collectAsStateWithLifecycle()
+        val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
         PerAppProxyScreen(
             apps = apps,
@@ -85,6 +83,7 @@ class PerAppProxyActivity : BaseComponentActivity() {
             blacklist = blacklist,
             perAppProxyEnabled = perAppProxyEnabled,
             bypassApps = bypassApps,
+            searchQuery = searchQuery,
             onBackClick = { finish() },
             onPerAppProxyChanged = { viewModel.setPerAppProxyEnabled(it) },
             onBypassAppsChanged = { viewModel.setBypassAppsEnabled(it) },
@@ -92,16 +91,9 @@ class PerAppProxyActivity : BaseComponentActivity() {
             onSearch = { viewModel.filterApps(it) },
             onSelectAll = { viewModel.selectAll() },
             onInvertSelection = { viewModel.invertSelection() },
-            onSelectProxyAuto = { viewModel.selectProxyAppAuto(this) },
-            onImportProxyApp = {
-                val content = Utils.getClipboard(applicationContext)
-                viewModel.importProxyApp(content, this)
-            },
-            onExportProxyApp = {
-                val export = viewModel.exportProxyApp()
-                Utils.setClipboard(applicationContext, export)
-                toastSuccess(R.string.toast_success)
-            }
+            onSelectProxyAuto = { viewModel.selectProxyAppAuto() },
+            onImportProxyApp = { viewModel.importProxyApp() },
+            onExportProxyApp = { viewModel.exportProxyApp() }
         )
     }
 }
@@ -113,6 +105,7 @@ fun PerAppProxyScreen(
     blacklist: Set<String>,
     perAppProxyEnabled: Boolean,
     bypassApps: Boolean,
+    searchQuery: String,
     onBackClick: () -> Unit,
     onPerAppProxyChanged: (Boolean) -> Unit,
     onBypassAppsChanged: (Boolean) -> Unit,
@@ -125,15 +118,10 @@ fun PerAppProxyScreen(
     onExportProxyApp: () -> Unit
 ) {
     var showSearch by rememberSaveable { mutableStateOf(false) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     val onInfoClick = { showInfoDialog = true }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        onSearch(searchQuery)
-    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -145,11 +133,9 @@ fun PerAppProxyScreen(
                 isSearchActive = showSearch,
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
-                    searchQuery = query
                     onSearch(query)
                 },
                 onSearchClose = {
-                    searchQuery = ""
                     onSearch("")
                     showSearch = false
                 },

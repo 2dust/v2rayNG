@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.mobile.server
 
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -24,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -36,10 +36,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.handler.CertificateFingerprintManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
@@ -51,15 +47,15 @@ import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.mobile.compose.rememberEditorFocus
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.ui.mobile.server.ProfileEditorResult.finishDeleted
+import com.v2ray.ang.ui.mobile.server.ProfileEditorResult.finishSaved
+import com.v2ray.ang.vm.ServerViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 abstract class BaseServerActivity : BaseComponentActivity() {
 
     protected abstract val serverConfigType: EConfigType
+    protected val viewModel: ServerViewModel by viewModels()
 
     protected val editGuid by lazy { intent.getStringExtra("guid").orEmpty() }
     protected val isRunning by lazy {
@@ -78,8 +74,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             val adjustment = window.attributes.softInputMode and LayoutParams.SOFT_INPUT_MASK_ADJUST
             window.setSoftInputMode(adjustment or LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         }
-        val existingConfig = MmkvManager.decodeServerConfig(editGuid)
-        initialConfig = existingConfig ?: ProfileItem.create(serverConfigType)
+        initialConfig = viewModel.loadConfig(editGuid, serverConfigType)
     }
 
     @Composable
@@ -289,7 +284,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         showAllowInsecure: Boolean = true,
         showEchConfigList: Boolean = true
     ) {
-        val context = LocalContext.current
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (showSecuritySelector) {
                 FormDropdownField(
@@ -350,36 +344,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                     { state.pinnedCA256 = it }
                 )
                 Button(
-                    onClick = {
-                        if (state.address.isBlank()) {
-                            context.toast(R.string.server_lab_address)
-                            return@Button
-                        }
-                        if (
-                            state.configType != EConfigType.HYSTERIA2 &&
-                            (state.port.toIntOrNull() ?: 0) <= 0
-                        ) {
-                            context.toast(R.string.server_lab_port)
-                            return@Button
-                        }
-                        val temp = buildProfileItem()
-                        scope.launch {
-                            state.isFetchingCert = true
-                            try {
-                                val sha256 = withContext(Dispatchers.IO) {
-                                    CertificateFingerprintManager.fetchForManualFill(temp)
-                                }
-                                if (sha256.isNullOrBlank()) {
-                                    context.toast(R.string.toast_fetch_cert_sha256_failed)
-                                } else {
-                                    state.pinnedCA256 = sha256
-                                    context.toastSuccess(R.string.toast_fetch_cert_sha256_success)
-                                }
-                            } finally {
-                                state.isFetchingCert = false
-                            }
-                        }
-                    },
+                    onClick = { viewModel.fetchCertificateFingerprint(buildProfileItem(), state) },
                     enabled = !state.isFetchingCert,
                     modifier = Modifier.padding(start = 16.dp).then(LocalEditorFocus.current?.target() ?: Modifier)
                 ) {
@@ -411,76 +376,27 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     }
 
     protected fun validateBasicConfig(state: ServerUiState): Boolean {
-        val remarksErr = state.remarks.isBlank()
-        val addressErr = state.address.isBlank()
-        val portErr = state.configType != EConfigType.HYSTERIA2 && (state.port.toIntOrNull() ?: 0) <= 0
-
-        state.isRemarksError = remarksErr
-        state.isAddressError = addressErr
-        state.isPortError = portErr
-
-        val hasError = remarksErr || addressErr || portErr
-        return !hasError
+        return viewModel.validateBasicConfig(state)
     }
 
     protected open fun validateProtocolConfig(config: ProfileItem): Boolean = true
 
     protected open fun validateCommonConfig(state: ServerUiState, config: ProfileItem): Boolean {
-
-        if (config.password.isNullOrBlank()) {
-            state.isPasswordError = true
-            if (config.configType == EConfigType.VMESS ||
-                config.configType == EConfigType.VLESS
-            ) {
-                return false
-            }
-
-            if (config.configType == EConfigType.TROJAN ||
-                config.configType == EConfigType.SHADOWSOCKS ||
-                config.configType == EConfigType.HYSTERIA2
-            ) {
-                return false
-            }
-        }
-
-        if (
-            config.configType == EConfigType.TROJAN &&
-            config.security.isNullOrBlank()
-        ) {
-            toast(R.string.server_lab_stream_security)
-            return false
-        }
-        if (!config.xhttpExtra.isNullOrBlank() && JsonUtil.parseString(config.xhttpExtra) == null) {
-            toast(R.string.server_lab_xhttp_extra)
-            return false
-        }
-        if (!config.finalMask.isNullOrBlank() && JsonUtil.parseString(config.finalMask) == null) {
-            toast(R.string.server_lab_final_mask)
-            return false
-        }
-        if (!config.xdriveExtra.isNullOrBlank() && JsonUtil.parseString(config.xdriveExtra) == null) {
-            toast(R.string.server_lab_xdrive_extra)
-            return false
-        }
-        return true
+        return viewModel.validateCommonConfig(state, config)
     }
 
     protected fun saveServer(state: ServerUiState): Boolean {
-        if (!validateBasicConfig(state)) return false
-        val config = state.toProfileItem(initialConfig)
-        if (!validateCommonConfig(state, config)) return false
-        if (!validateProtocolConfig(config)) return false
-
-        config.description = AngConfigManager.generateDescription(config)
-        if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
-            config.subscriptionId = subscriptionId.orEmpty()
-        }
-        val savedGuid = MmkvManager.encodeServerConfig(editGuid, config)
-        toastSuccess(R.string.toast_success)
-        ProfileEditorResult.run {
-            finishSaved(savedGuid, isRunning)
-        }
-        return true
+        return viewModel.saveServer(
+            editGuid = editGuid,
+            isRunning = isRunning,
+            subscriptionId = subscriptionId,
+            state = state,
+            initialConfig = initialConfig,
+            validateProtocolConfig = ::validateProtocolConfig,
+            onSaved = { savedGuid, running ->
+                finishSaved(savedGuid, running)
+            }
+        )
     }
 
     @Composable
@@ -551,13 +467,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     }
 
     private fun deleteServer(guid: String) {
-        if (guid.isEmpty() || guid == MmkvManager.getSelectServer()) {
-            toast(R.string.toast_action_not_allowed)
-            return
-        }
-        MmkvManager.removeServer(guid)
-        ProfileEditorResult.run {
-            finishDeleted(guid)
+        viewModel.deleteServer(guid) { deletedGuid ->
+            finishDeleted(deletedGuid)
         }
     }
 }

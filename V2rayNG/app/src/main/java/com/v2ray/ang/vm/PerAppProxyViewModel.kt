@@ -1,8 +1,8 @@
 package com.v2ray.ang.vm
 
 import android.app.Application
-import android.content.Context
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.handler.MmkvManager
@@ -32,6 +32,9 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     val blacklist: StateFlow<Set<String>> = _blacklist.asStateFlow()
 
     // UI states
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
 
@@ -89,15 +92,14 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     }
 
     // Load and filter apps
-    fun loadApps(context: Context) {
+    fun loadApps() {
         if (appsAll != null || isAppListLoading) return
 
-        val applicationContext = context.applicationContext
         isAppListLoading = true
         launchLoading {
             try {
                 val apps = withContext(Dispatchers.IO) {
-                    val list = AppManagerUtil.loadNetworkAppList(applicationContext)
+                    val list = AppManagerUtil.loadNetworkAppList(app)
                     sortApps(list)
                 }
                 appsAll = apps
@@ -113,6 +115,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
     }
 
     fun filterApps(query: String) {
+        _searchQuery.value = query
         currentQuery = query
         _displayedApps.value = applyFilter(query)
     }
@@ -163,8 +166,7 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         enablePerAppProxyAndRestart()
     }
 
-    fun selectProxyAppAuto(context: Context) {
-        val applicationContext = context.applicationContext
+    fun selectProxyAppAuto() {
         launchLoading {
             val url = AppConfig.ANDROID_PACKAGE_NAME_LIST_URL
             var content = withContext(Dispatchers.IO) {
@@ -193,7 +195,6 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
             }
             val success = applyProxyAppList(
                 content = content,
-                context = applicationContext,
                 forceGoogleApps = true
             )
             if (success) {
@@ -202,14 +203,13 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         }
     }
 
-    fun importProxyApp(content: String?, context: Context) {
+    fun importProxyApp() {
+        val content = Utils.getClipboard(app)
         if (content.isNullOrEmpty()) return
 
-        val applicationContext = context.applicationContext
         launchLoading {
             val success = applyProxyAppList(
                 content = content,
-                context = applicationContext,
                 forceGoogleApps = false
             )
             if (success) {
@@ -218,23 +218,25 @@ class PerAppProxyViewModel(application: Application) : BaseViewModel(application
         }
     }
 
-    fun exportProxyApp(): String {
-        return buildString {
+    fun exportProxyApp() {
+        val export = buildString {
             append(_bypassApps.value)
             _blacklist.value.forEach { packageName ->
                 append(System.lineSeparator())
                 append(packageName)
             }
         }
+        Utils.setClipboard(app, export)
+        toastSuccess(R.string.toast_success)
     }
 
-    private suspend fun applyProxyAppList(content: String, context: Context, forceGoogleApps: Boolean): Boolean {
+    private suspend fun applyProxyAppList(content: String, forceGoogleApps: Boolean): Boolean {
         val installedApps = appsAll ?: return false
 
         try {
             val proxyAppList = if (content.isEmpty()) {
                 withContext(Dispatchers.IO) {
-                    Utils.readTextFromAssets(context, "proxy_package_name")
+                    Utils.readTextFromAssets(app, "proxy_package_name")
                 }
             } else content
             if (proxyAppList.isNullOrEmpty()) return false

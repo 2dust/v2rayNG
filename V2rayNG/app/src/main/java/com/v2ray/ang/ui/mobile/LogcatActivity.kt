@@ -2,6 +2,7 @@ package com.v2ray.ang.ui.mobile
 
 import android.content.ClipData
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -28,40 +29,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AppConfig
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.ItemDivider
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsBottomPadding
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.vm.LogcatViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class LogcatActivity : BaseComponentActivity() {
     private val viewModel: LogcatViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is LogcatViewModel.LogcatViewModelEvent.ShareLogcat -> {
+                            handleShareLogcat(event.uri, event.title)
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
     }
 
     @Composable
@@ -69,58 +77,26 @@ class LogcatActivity : BaseComponentActivity() {
         LogcatScreen(
             viewModel = viewModel,
             onBackClick = { finish() },
-            onShareLogcat = { shareLogcat() }
+            onShareLogcat = { viewModel.shareLogcat(cacheDir) }
         )
     }
 
-    private fun shareLogcat() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val logText = viewModel.filteredLogs.value.joinToString("\n")
-
-            val result = try {
-                val shareDir = File(cacheDir, "shared_logs").apply {
-                    mkdirs()
-                }
-
-                shareDir.listFiles()?.forEach { it.delete() }
-
-                val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(Date())
-                val logFile = File(shareDir, "v2rayNG_logcat_$timestamp.txt")
-                logFile.writeText(logText, Charsets.UTF_8)
-
-                val uri = FileProvider.getUriForFile(
-                    this@LogcatActivity,
-                    "${packageName}.cache",
-                    logFile
-                )
-
-                uri to logFile.name
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to share Logcat", e)
-                withContext(Dispatchers.Main) {
-                    toastError(R.string.toast_failure)
-                }
-                return@launch
-            }
-
-            withContext(Dispatchers.Main) {
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_STREAM, result.first)
-                    putExtra(Intent.EXTRA_SUBJECT, result.second)
-                    putExtra(Intent.EXTRA_TITLE, result.second)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    clipData = ClipData.newUri(contentResolver, result.second, result.first)
-                }
-
-                startActivity(
-                    Intent.createChooser(
-                        shareIntent,
-                        getString(R.string.logcat_share)
-                    )
-                )
-            }
+    private fun handleShareLogcat(uri: Uri, title: String) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, title)
+            putExtra(Intent.EXTRA_TITLE, title)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = ClipData.newUri(contentResolver, title, uri)
         }
+
+        startActivity(
+            Intent.createChooser(
+                shareIntent,
+                getString(R.string.logcat_share)
+            )
+        )
     }
 }
 
@@ -132,11 +108,10 @@ fun LogcatScreen(
     onShareLogcat: () -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val logs by viewModel.logEntries.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
-    var searchQuery by remember { mutableStateOf("") }
     var showSearch by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
@@ -151,11 +126,9 @@ fun LogcatScreen(
                 isSearchActive = showSearch,
                 searchQuery = searchQuery,
                 onSearchQueryChange = {
-                    searchQuery = it
                     viewModel.filter(it)
                 },
                 onSearchClose = {
-                    searchQuery = ""
                     viewModel.filter("")
                     showSearch = false
                 },
@@ -181,9 +154,7 @@ fun LogcatScreen(
                             contentDescription = stringResource(R.string.acc_share_log)
                         )
                     }
-                    IconButton(onClick = {
-                        scope.launch(Dispatchers.IO) { viewModel.clearLogcat() }
-                    }) {
+                    IconButton(onClick = { viewModel.clearLogcat() }) {
                         Icon(
                             painterResource(R.drawable.ic_delete_24dp),
                             contentDescription = stringResource(R.string.acc_clear_log)

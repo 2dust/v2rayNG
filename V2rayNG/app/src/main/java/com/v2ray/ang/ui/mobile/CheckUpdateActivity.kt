@@ -21,9 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
@@ -63,9 +61,6 @@ fun CheckUpdateScreen(
     val showUpdateDialog by viewModel.showUpdateDialog.collectAsStateWithLifecycle()
     val updateResult by viewModel.updateResult.collectAsStateWithLifecycle()
 
-    val libVersion = CoreNativeManager.getLibVersion()
-    val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
-
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = {
@@ -93,7 +88,7 @@ fun CheckUpdateScreen(
                 title = stringResource(R.string.update_check_for_update),
                 onClick = { viewModel.checkForUpdates() }
             )
-            VersionInfoBlock(versionText = versionText)
+            VersionInfoBlock(versionText = viewModel.versionText)
             NavigationBarsSpacer()
         }
     }

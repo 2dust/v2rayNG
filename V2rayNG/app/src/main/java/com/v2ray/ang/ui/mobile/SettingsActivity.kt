@@ -1,10 +1,7 @@
 package com.v2ray.ang.ui.mobile
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +31,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
-import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
@@ -69,28 +65,13 @@ class SettingsActivity : BaseComponentActivity() {
         }
     }
 
-    private fun openSystemVpnSettings() {
-        try {
-            startActivity(Intent(Settings.ACTION_VPN_SETTINGS))
-        } catch (error: ActivityNotFoundException) {
-            reportSystemVpnSettingsFailure(error)
-        } catch (error: SecurityException) {
-            reportSystemVpnSettingsFailure(error)
-        }
-    }
-
-    private fun reportSystemVpnSettingsFailure(error: RuntimeException) {
-        LogUtil.e(AppConfig.TAG, "Cannot open system VPN settings", error)
-        toastError(R.string.toast_system_vpn_settings_unavailable)
-    }
-
     @Composable
     override fun ScreenContent() {
         SettingsScreen(
             viewModel = viewModel,
             onBackClick = { finish() },
-            onModeHelpClicked = { Utils.openUri(this, AppConfig.APP_WIKI_MODE) },
-            onSystemVpnSettingsClicked = ::openSystemVpnSettings
+            onModeHelpClicked = { viewModel.openModeHelp(this) },
+            onSystemVpnSettingsClicked = { viewModel.openSystemVpnSettings(this) }
         )
     }
 }

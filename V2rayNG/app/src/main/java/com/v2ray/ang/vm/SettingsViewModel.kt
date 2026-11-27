@@ -1,11 +1,15 @@
 package com.v2ray.ang.vm
 
 import android.app.Application
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.root.RootManager
+import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +25,25 @@ class SettingsViewModel(application: Application) : BaseViewModel(application) {
             // Android exposes the VPN page, not a direct link to the Always-on VPN switch.
             Intent(Settings.ACTION_VPN_SETTINGS).resolveActivity(getApplication<Application>().packageManager) != null
         }
+    }
+
+    fun openSystemVpnSettings(context: Context) {
+        try {
+            context.startActivity(Intent(Settings.ACTION_VPN_SETTINGS))
+        } catch (error: ActivityNotFoundException) {
+            reportSystemVpnSettingsFailure(error)
+        } catch (error: SecurityException) {
+            reportSystemVpnSettingsFailure(error)
+        }
+    }
+
+    fun openModeHelp(context: Context) {
+        Utils.openUri(context, AppConfig.APP_WIKI_MODE)
+    }
+
+    private fun reportSystemVpnSettingsFailure(error: RuntimeException) {
+        LogUtil.e(AppConfig.TAG, "Cannot open system VPN settings", error)
+        toastError(R.string.toast_system_vpn_settings_unavailable)
     }
 
     /**

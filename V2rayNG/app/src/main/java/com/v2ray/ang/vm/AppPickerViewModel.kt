@@ -1,7 +1,6 @@
 package com.v2ray.ang.vm
 
 import android.app.Application
-import android.content.Context
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.AppInfo
@@ -24,6 +23,9 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
     val selectedPackages: StateFlow<Set<String>> = _selectedPackages.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     private val _displayedApps = MutableStateFlow<List<AppInfo>>(emptyList())
     val displayedApps: StateFlow<List<AppInfo>> = _displayedApps.asStateFlow()
 
@@ -39,7 +41,7 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
         _selectedPackages.value = initialSelected.toSet()
     }
 
-    fun loadApps(context: Context) {
+    fun loadApps() {
         allApps?.let { apps ->
             val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
             val updatedApps = apps.map { appInfo ->
@@ -55,14 +57,13 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
         }
         if (isAppListLoading) return
 
-        val applicationContext = context.applicationContext
         val localizedUnknownApp = getString(R.string.app_picker_unknown_app)
         isAppListLoading = true
         launchLoading {
             try {
                 selectedSnapshot = _selectedPackages.value
                 val apps = withContext(Dispatchers.IO) {
-                    val list = AppManagerUtil.loadNetworkAppList(applicationContext)
+                    val list = AppManagerUtil.loadNetworkAppList(app)
                     val special = createSpecialItemUnidentified(localizedUnknownApp)
                     sortApps(list + special)
                 }
@@ -80,6 +81,7 @@ class AppPickerViewModel(application: Application) : BaseViewModel(application) 
     }
 
     fun filterApps(query: String) {
+        _searchQuery.value = query
         currentQuery = query
         _displayedApps.value = applyFilter(query)
     }

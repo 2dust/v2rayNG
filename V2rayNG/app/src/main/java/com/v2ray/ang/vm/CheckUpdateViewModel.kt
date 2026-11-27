@@ -2,7 +2,9 @@ package com.v2ray.ang.vm
 
 import android.app.Application
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.dto.CheckUpdateResult
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.UpdateCheckerManager
@@ -23,6 +25,11 @@ class CheckUpdateViewModel(application: Application) : BaseViewModel(application
 
     private val _showUpdateDialog = MutableStateFlow(false)
     val showUpdateDialog: StateFlow<Boolean> = _showUpdateDialog.asStateFlow()
+
+    val versionText: String by lazy {
+        val libVersion = CoreNativeManager.getLibVersion()
+        "v${BuildConfig.VERSION_NAME} ($libVersion)"
+    }
 
     fun toggleCheckPreRelease(enabled: Boolean) {
         _checkPreRelease.value = enabled

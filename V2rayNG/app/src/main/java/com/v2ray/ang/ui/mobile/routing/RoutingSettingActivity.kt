@@ -27,7 +27,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,16 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.enums.RoutingType
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.vm.RoutingSettingsViewModel
 import com.v2ray.ang.ui.mobile.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
@@ -61,12 +53,7 @@ import com.v2ray.ang.ui.mobile.compose.SelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsListItem
 import com.v2ray.ang.ui.mobile.compose.colorConfigType
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import com.v2ray.ang.vm.RoutingSettingsViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -87,66 +74,31 @@ private enum class RoutingPreset(val type: RoutingType, @StringRes val labelRes:
 
 class RoutingSettingActivity : HelperBaseComponentActivity() {
     private val viewModel: RoutingSettingsViewModel by viewModels()
-    private val domainStrategyState = MutableStateFlow("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        domainStrategyState.value = getDomainStrategy()
     }
 
     @Composable
     override fun ScreenContent() {
         RoutingSettingScreen(
             viewModel = viewModel,
-            domainStrategyState = domainStrategyState,
             onBackClick = { finish() },
             onAddRule = { startActivity(Intent(this, RoutingEditActivity::class.java)) },
             onEditRule = { position ->
                 startActivity(Intent(this, RoutingEditActivity::class.java).putExtra("position", position))
             },
-            onDomainStrategySelected = { value ->
-                MmkvManager.encodeSettings(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY, value)
-                domainStrategyState.value = value
-            },
-            onImportPredefined = { type -> importPredefined(type) },
-            onImportClipboard = { importFromClipboard() },
+            onDomainStrategySelected = { value -> viewModel.setDomainStrategy(value) },
+            onImportPredefined = { type -> viewModel.importPredefined(type) },
+            onImportClipboard = { viewModel.importFromClipboard() },
             onImportQRcode = { importQRcode() },
-            onExportClipboard = { export2Clipboard() }
+            onExportClipboard = { viewModel.exportToClipboard() }
         )
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.reload()
-    }
-
-    private fun getDomainStrategy(): String {
-        val strategies = resources.getStringArray(R.array.routing_domain_strategy)
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_ROUTING_DOMAIN_STRATEGY) ?: strategies.first()
-    }
-
-    private fun importPredefined(type: RoutingType) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                SettingsManager.resetRoutingRulesetsFromPresets(this@RoutingSettingActivity, type)
-                launch(Dispatchers.Main) {
-                    viewModel.reload()
-                    toastSuccess(R.string.toast_success)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to import predefined ruleset", e)
-            }
-        }
-    }
-
-    private fun importFromClipboard() {
-        val clipboard = try {
-            Utils.getClipboard(this)
-        } catch (e: Exception) {
-            toastError(R.string.toast_failure)
-            return
-        }
-        viewModel.importRulesets(clipboard)
     }
 
     private fun importQRcode() {
@@ -156,22 +108,11 @@ class RoutingSettingActivity : HelperBaseComponentActivity() {
             }
         }
     }
-
-    private fun export2Clipboard() {
-        val rulesetList = MmkvManager.decodeRoutingRulesets()
-        if (rulesetList.isNullOrEmpty()) {
-            toastError(R.string.toast_failure)
-        } else {
-            Utils.setClipboard(this, JsonUtil.toJson(rulesetList))
-            toastSuccess(R.string.toast_success)
-        }
-    }
 }
 
 @Composable
 fun RoutingSettingScreen(
     viewModel: RoutingSettingsViewModel,
-    domainStrategyState: MutableStateFlow<String>,
     onBackClick: () -> Unit,
     onAddRule: () -> Unit,
     onEditRule: (Int) -> Unit,
@@ -183,7 +124,7 @@ fun RoutingSettingScreen(
 ) {
     val rulesets by viewModel.rulesetsFlow.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val domainStrategy by domainStrategyState.collectAsState()
+    val domainStrategy by viewModel.domainStrategy.collectAsStateWithLifecycle()
     var showMenu by remember { mutableStateOf(false) }
     var showPresetDialog by remember { mutableStateOf(false) }
 

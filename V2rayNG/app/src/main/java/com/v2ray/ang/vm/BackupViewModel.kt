@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -27,7 +28,6 @@ class BackupViewModel(application: Application) : BaseViewModel(application) {
 
     sealed interface BackupViewModelEvent : ViewModelEvent {
         data class ShareFile(val filePath: String) : BackupViewModelEvent
-        data class ExportLocal(val cachePath: String, val targetUri: Uri) : BackupViewModelEvent
         object RestoreSuccess : BackupViewModelEvent
     }
 
@@ -55,6 +55,14 @@ class BackupViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
+    fun generateBackupFileName(appName: String): String {
+        val dateFormatted = SimpleDateFormat(
+            "yyyy-MM-dd-HH-mm-ss",
+            Locale.getDefault()
+        ).format(System.currentTimeMillis())
+        return "${appName}_${dateFormatted}.zip"
+    }
+
     fun shareBackup(cacheDir: File, appName: String) {
         launchLoading {
             val ret = backupConfigurationToCache(cacheDir, appName)
@@ -66,25 +74,59 @@ class BackupViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    fun prepareBackupForUri(cacheDir: File, appName: String, targetUri: Uri) {
+    fun exportBackupToUri(cacheDir: File, appName: String, targetUri: Uri) {
         launchLoading {
-            val ret = backupConfigurationToCache(cacheDir, appName)
-            if (ret.first) {
-                _viewModelEvent.send(BackupViewModelEvent.ExportLocal(ret.second, targetUri))
-            } else {
-                toastError(R.string.toast_failure)
+            withContext(Dispatchers.IO) {
+                var cacheFile: File? = null
+                try {
+                    val ret = backupConfigurationToCache(cacheDir, appName)
+                    if (!ret.first) {
+                        toastError(R.string.toast_failure)
+                        return@withContext
+                    }
+                    cacheFile = File(ret.second)
+                    app.contentResolver.openOutputStream(targetUri)?.use { output ->
+                        cacheFile.inputStream().use { input ->
+                            input.copyTo(output)
+                        }
+                    } ?: throw IOException("Unable to open output stream for targetUri: $targetUri")
+
+                    toastSuccess(R.string.toast_success)
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Failed to copy backup to Uri", e)
+                    toastError(R.string.toast_failure)
+                } finally {
+                    cacheFile?.delete()
+                }
             }
         }
     }
 
-    fun restoreConfiguration(cacheDir: File, zipFile: File) {
+    fun restoreFromUri(cacheDir: File, uri: Uri) {
         launchLoading {
-            val success = performRestore(cacheDir, zipFile)
-            if (success) {
-                toastSuccess(R.string.toast_success)
-                _viewModelEvent.send(BackupViewModelEvent.RestoreSuccess)
-            } else {
-                toastError(R.string.toast_failure)
+            withContext(Dispatchers.IO) {
+                var tempFile: File? = null
+                try {
+                    tempFile = File(cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
+                    app.contentResolver.openInputStream(uri)?.use { input ->
+                        tempFile.outputStream().use { fileOut ->
+                            input.copyTo(fileOut)
+                        }
+                    } ?: throw IOException("Unable to open input stream for Uri: $uri")
+
+                    val success = performRestore(cacheDir, tempFile)
+                    if (success) {
+                        toastSuccess(R.string.toast_success)
+                        _viewModelEvent.send(BackupViewModelEvent.RestoreSuccess)
+                    } else {
+                        toastError(R.string.toast_failure)
+                    }
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Error during file restore from Uri", e)
+                    toastError(R.string.toast_failure)
+                } finally {
+                    tempFile?.delete()
+                }
             }
         }
     }

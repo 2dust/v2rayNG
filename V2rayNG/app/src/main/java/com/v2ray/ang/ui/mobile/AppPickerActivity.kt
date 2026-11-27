@@ -18,7 +18,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,7 +69,7 @@ class AppPickerActivity : BaseComponentActivity() {
         super.onCreate(savedInstanceState)
         val initial = intent.getStringArrayListExtra(EXTRA_SELECTED_PACKAGES).orEmpty()
         viewModel.initialize(initial)
-        viewModel.loadApps(this)
+        viewModel.loadApps()
     }
 
     override fun finish() {
@@ -88,12 +87,14 @@ class AppPickerActivity : BaseComponentActivity() {
         val apps by viewModel.displayedApps.collectAsStateWithLifecycle()
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val selectedPackages by viewModel.selectedPackages.collectAsStateWithLifecycle()
+        val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
         AppPickerScreen(
             title = resolveScreenTitle(),
             apps = apps,
             isLoading = isLoading,
             selectedPackages = selectedPackages,
+            searchQuery = searchQuery,
             onBackClick = { finish() },
             onToggleApp = { viewModel.toggleApp(it) },
             onSearch = { viewModel.filterApps(it) },
@@ -113,6 +114,7 @@ fun AppPickerScreen(
     apps: List<AppInfo>,
     isLoading: Boolean,
     selectedPackages: Set<String>,
+    searchQuery: String,
     onBackClick: () -> Unit,
     onToggleApp: (String) -> Unit,
     onSearch: (String) -> Unit,
@@ -120,13 +122,8 @@ fun AppPickerScreen(
     onInvertSelection: () -> Unit
 ) {
     var showSearch by rememberSaveable { mutableStateOf(false) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(Unit) {
-        onSearch(searchQuery)
-    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -138,11 +135,9 @@ fun AppPickerScreen(
                 isSearchActive = showSearch,
                 searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
-                    searchQuery = query
                     onSearch(query)
                 },
                 onSearchClose = {
-                    searchQuery = ""
                     onSearch("")
                     showSearch = false
                 },

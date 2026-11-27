@@ -42,10 +42,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toTrafficString
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MmkvManager.rememberMmkvBool
-import com.v2ray.ang.vm.SubscriptionsViewModel
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.DeleteConfirmDialog
@@ -57,6 +55,7 @@ import com.v2ray.ang.ui.mobile.compose.SelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.vm.SubscriptionsViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -89,10 +88,7 @@ class SubSettingActivity : BaseComponentActivity() {
             },
             onRemoveSub = { subId -> removeSub(subId) },
             onShareQRCode = viewModel::shareQRCode,
-            onShareClipboard = { url ->
-                Utils.setClipboard(this, url)
-                toast(getString(R.string.toast_success))
-            }
+            onShareClipboard = { url -> viewModel.shareClipboard(url) }
         )
     }
 

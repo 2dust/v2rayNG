@@ -3,11 +3,13 @@ package com.v2ray.ang.vm
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.UrlContentRequest
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
 import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 internal data class AssetFileMetadata(val length: Long, val lastModified: Long)
@@ -32,7 +35,25 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
 
     private val _uiState = MutableStateFlow(UserAssetUiState())
     internal val uiState: StateFlow<UserAssetUiState> = _uiState.asStateFlow()
+
+    private val _geoFilesSource = MutableStateFlow(loadGeoFilesSource())
+    val geoFilesSource: StateFlow<String> = _geoFilesSource.asStateFlow()
+
     private var reloadJob: Job? = null
+
+    private fun loadGeoFilesSource(): String {
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_GEO_FILES_SOURCES) ?: AppConfig.GEO_FILES_SOURCES.first()
+    }
+
+    fun setGeoFilesSource(source: String, extDir: File) {
+        MmkvManager.encodeSettings(AppConfig.PREF_GEO_FILES_SOURCES, source)
+        _geoFilesSource.value = source
+        reload(source, extDir)
+    }
+
+    fun reload(extDir: File): Job {
+        return reload(_geoFilesSource.value, extDir)
+    }
 
     fun reload(geoFilesSource: String, extDir: File): Job {
         reloadJob?.cancel()
@@ -47,6 +68,51 @@ class UserAssetViewModel(application: Application) : BaseViewModel(application) 
             ensureActive()
             _uiState.value = UserAssetUiState(snapshot, metadata)
         }.also { reloadJob = it }
+    }
+
+    fun initAssets(extDir: File) {
+        viewModelScope.launch(Dispatchers.Default) {
+            SettingsManager.initAssets(app, app.assets)
+            reload(_geoFilesSource.value, extDir)
+        }
+    }
+
+    fun removeAsset(guid: String, name: String, extDir: File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            extDir.listFiles()?.find { it.name == name }?.delete()
+            MmkvManager.removeAssetUrl(guid)
+            initAssets(extDir)
+        }
+    }
+
+    fun downloadGeoFilesAndRefresh(extDir: File) {
+        toast(R.string.msg_downloading_content)
+        launchLoading {
+            val currentSource = _geoFilesSource.value
+            reload(currentSource, extDir).join()
+
+            val proxyUsername = SettingsManager.getSocksUsername()
+            val proxyPassword = SettingsManager.getSocksPassword()
+            val httpPort = SettingsManager.getHttpPort()
+
+            val result = withContext(Dispatchers.IO) {
+                downloadGeoFiles(extDir, httpPort, proxyUsername, proxyPassword)
+            }
+
+            if (result.successCount > 0) {
+                toast(
+                    getQuantityString(
+                        R.plurals.title_update_asset_count,
+                        result.successCount,
+                        result.successCount
+                    )
+                )
+            } else {
+                toastError(R.string.toast_failure)
+            }
+
+            reload(currentSource, extDir).join()
+        }
     }
 
     internal fun buildAssetList(

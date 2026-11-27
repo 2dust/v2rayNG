@@ -17,6 +17,7 @@ import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -70,6 +71,11 @@ class SubscriptionsViewModel(application: Application) : BaseViewModel(applicati
             if (bitmap == null) toastError(R.string.toast_failure)
             _qrCode.value = bitmap
         }
+    }
+
+    fun shareClipboard(url: String) {
+        Utils.setClipboard(app, url)
+        toastSuccess(R.string.toast_success)
     }
 
     internal fun dismissQRCode() {

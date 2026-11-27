@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.mobile
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -33,8 +32,6 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.WebDavConfig
-import com.v2ray.ang.extension.toastError
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.mobile.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
@@ -44,13 +41,10 @@ import com.v2ray.ang.ui.mobile.compose.InputField
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.mobile.compose.SelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsMenuItem
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.vm.BackupViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 enum class BackupLocation(@StringRes val labelRes: Int) {
     Local(R.string.backup_location_local),
@@ -73,10 +67,6 @@ class BackupActivity : HelperBaseComponentActivity() {
                     when (event) {
                         is BackupViewModel.BackupViewModelEvent.ShareFile -> {
                             handleShareFile(event.filePath)
-                        }
-
-                        is BackupViewModel.BackupViewModelEvent.ExportLocal -> {
-                            handleExportLocal(event.cachePath, event.targetUri)
                         }
 
                         is BackupViewModel.BackupViewModelEvent.RestoreSuccess -> {
@@ -132,52 +122,21 @@ class BackupActivity : HelperBaseComponentActivity() {
         )
     }
 
-    private fun handleExportLocal(cachePath: String, targetUri: Uri) {
-        try {
-            contentResolver.openOutputStream(targetUri)?.use { output ->
-                File(cachePath).inputStream().use { input ->
-                    input.copyTo(output)
-                }
-            }
-            File(cachePath).delete()
-            toastSuccess(R.string.toast_success)
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to copy backup to Uri", e)
-            toastError(R.string.toast_failure)
-        }
-    }
-
     private fun backupViaLocal() {
-        val dateFormatted = SimpleDateFormat(
-            "yyyy-MM-dd-HH-mm-ss",
-            Locale.getDefault()
-        ).format(System.currentTimeMillis())
-        val defaultFileName = "${getString(R.string.app_name)}_${dateFormatted}.zip"
+        val appName = getString(R.string.app_name)
+        val defaultFileName = viewModel.generateBackupFileName(appName)
 
         launchCreateDocument(defaultFileName) { uri ->
             if (uri != null) {
-                viewModel.prepareBackupForUri(cacheDir, getString(R.string.app_name), uri)
+                viewModel.exportBackupToUri(cacheDir, appName, uri)
             }
         }
     }
 
     private fun restoreViaLocal() {
         launchFileChooser { uri ->
-            if (uri == null) {
-                return@launchFileChooser
-            }
-            try {
-                val targetFile =
-                    File(cacheDir.absolutePath, "${System.currentTimeMillis()}.zip")
-                contentResolver.openInputStream(uri).use { input ->
-                    targetFile.outputStream().use { fileOut ->
-                        input?.copyTo(fileOut)
-                    }
-                }
-                viewModel.restoreConfiguration(cacheDir, targetFile)
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Error during file restore", e)
-                toastError(R.string.toast_failure)
+            if (uri != null) {
+                viewModel.restoreFromUri(cacheDir, uri)
             }
         }
     }
