@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui.mobile.subscription
 
 import android.os.Bundle
-import android.text.TextUtils
+import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,17 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.SubscriptionItem
-import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toLongEx
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.SettingsChangeManager
-import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.DeleteConfirmDialog
@@ -51,26 +48,37 @@ import com.v2ray.ang.ui.mobile.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
-import kotlinx.coroutines.Dispatchers
+import com.v2ray.ang.vm.SubEditViewModel
 import kotlinx.coroutines.launch
 
 class SubEditActivity : BaseComponentActivity() {
+    private val viewModel: SubEditViewModel by viewModels()
+
     private val editSubId by lazy { intent.getStringExtra("subId").orEmpty() }
     private lateinit var suggestions: List<String>
     private lateinit var subItem: SubscriptionItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeViewModel()
 
-        suggestions = SettingsManager.getProfileRemarks(
-            excludeConfigTypes = setOf(
-                EConfigType.CUSTOM,
-                EConfigType.CUSTOM_OUTBOUND,
-                EConfigType.POLICYGROUP,
-                EConfigType.PROXYCHAIN,
-            )
-        )
-        subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
+        suggestions = viewModel.getProfileSuggestions()
+        subItem = viewModel.loadSubscription(editSubId)
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is SubEditViewModel.SubEditViewModelEvent.SaveSuccess,
+                        is SubEditViewModel.SubEditViewModelEvent.DeleteSuccess -> {
+                            finish()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Composable
@@ -80,45 +88,9 @@ class SubEditActivity : BaseComponentActivity() {
             initial = subItem,
             profileSuggestions = suggestions,
             onBackClick = { finish() },
-            onSave = { saveServer(it) },
-            onDelete = { deleteServer() }
+            onSave = { item -> viewModel.saveSubscription(editSubId, item) },
+            onDelete = { viewModel.deleteSubscription(editSubId) }
         )
-    }
-
-    private fun saveServer(subItem: SubscriptionItem): Boolean {
-        if (TextUtils.isEmpty(subItem.remarks)) {
-            return false
-        }
-        if (subItem.url.isNotEmpty()) {
-            if (!Utils.isValidUrl(subItem.url)) {
-                return false
-            }
-            if (!Utils.isValidSubUrl(subItem.url) && !subItem.allowInsecureUrl) {
-                return false
-            }
-        }
-
-        if (subItem.autoUpdate && subItem.updateInterval < AppConfig.SUBSCRIPTION_MIN_INTERVAL_MINUTES) {
-            return false
-        }
-
-        MmkvManager.encodeSubscription(editSubId, subItem)
-        SubscriptionUpdater.syncOne(subId = editSubId)
-        SettingsChangeManager.makeSetupGroupTab()
-        toastSuccess(R.string.toast_success)
-        finish()
-        return true
-    }
-
-    private fun deleteServer(): Boolean {
-        if (editSubId.isNotEmpty()) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                SettingsManager.removeSubscriptionWithDefault(editSubId)
-                SettingsChangeManager.makeSetupGroupTab()
-                launch(Dispatchers.Main) { finish() }
-            }
-        }
-        return true
     }
 }
 
@@ -128,10 +100,9 @@ fun SubEditScreen(
     initial: SubscriptionItem,
     profileSuggestions: List<String>,
     onBackClick: () -> Unit,
-    onSave: (SubscriptionItem) -> Boolean,
+    onSave: (SubscriptionItem) -> Unit,
     onDelete: () -> Unit
 ) {
-    //val context = LocalContext.current
     var remarks by rememberSaveable { mutableStateOf(initial.remarks.orEmpty()) }
     var isRemarksError by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable { mutableStateOf(initial.url.orEmpty()) }

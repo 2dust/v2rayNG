@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.mobile
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,19 +28,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.v2ray.ang.AppConfig
-import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.core.CoreNativeManager
 import com.v2ray.ang.ui.TranslatorsActivity
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.mobile.compose.SettingsMenuItem
 import com.v2ray.ang.ui.mobile.compose.VersionInfoBlock
-import com.v2ray.ang.util.Utils
+import com.v2ray.ang.vm.AboutViewModel
 
 class AboutActivity : BaseComponentActivity() {
+
+    private val viewModel: AboutViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +48,7 @@ class AboutActivity : BaseComponentActivity() {
     @Composable
     override fun ScreenContent() {
         AboutScreen(
+            viewModel = viewModel,
             onBackClick = { finish() },
             onTranslatorsClick = {
                 startActivity(Intent(this, TranslatorsActivity::class.java))
@@ -58,15 +59,12 @@ class AboutActivity : BaseComponentActivity() {
 
 @Composable
 fun AboutScreen(
+    viewModel: AboutViewModel,
     onBackClick: () -> Unit,
     onTranslatorsClick: () -> Unit
 ) {
     val context = LocalContext.current
     var showOssDialog by remember { mutableStateOf(false) }
-
-    val libVersion = CoreNativeManager.getLibVersion()
-    val versionText = "v${BuildConfig.VERSION_NAME} ($libVersion)"
-    val appIdText = BuildConfig.APPLICATION_ID
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -86,7 +84,7 @@ fun AboutScreen(
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_source_code_24dp),
                 title = stringResource(R.string.title_source_code),
-                onClick = { Utils.openUri(context, AppConfig.APP_URL) }
+                onClick = { viewModel.openSourceCodeUrl(context) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.license_24px),
@@ -101,21 +99,21 @@ fun AboutScreen(
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_feedback_24dp),
                 title = stringResource(R.string.title_pref_feedback),
-                onClick = { Utils.openUri(context, AppConfig.APP_ISSUES_URL) }
+                onClick = { viewModel.openIssuesUrl(context) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_telegram_24dp),
                 title = stringResource(R.string.title_tg_channel),
-                onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
+                onClick = { viewModel.openTelegramChannelUrl(context) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_privacy_24dp),
                 title = stringResource(R.string.title_privacy_policy),
-                onClick = { Utils.openUri(context, AppConfig.APP_PRIVACY_POLICY) }
+                onClick = { viewModel.openPrivacyPolicyUrl(context) }
             )
             VersionInfoBlock(
-                versionText = versionText,
-                appIdText = appIdText
+                versionText = viewModel.versionText,
+                appIdText = viewModel.appIdText
             )
             NavigationBarsSpacer()
         }

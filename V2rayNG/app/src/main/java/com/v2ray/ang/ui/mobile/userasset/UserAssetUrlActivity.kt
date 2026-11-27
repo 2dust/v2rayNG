@@ -1,7 +1,7 @@
 package com.v2ray.ang.ui.mobile.userasset
 
 import android.os.Bundle
-import android.text.TextUtils
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -22,25 +22,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.entities.AssetUrlItem
-import com.v2ray.ang.extension.toast
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.DeleteConfirmDialog
 import com.v2ray.ang.ui.mobile.compose.FormTextField
 import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.vm.UserAssetUrlViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 
 class UserAssetUrlActivity : BaseComponentActivity() {
     companion object {
         const val ASSET_URL_QRCODE = "ASSET_URL_QRCODE"
     }
+
+    private val viewModel: UserAssetUrlViewModel by viewModels()
 
     private val extDir by lazy { File(Utils.userAssetPath(this)) }
     private val editAssetId by lazy { intent.getStringExtra("assetId").orEmpty() }
@@ -49,6 +51,7 @@ class UserAssetUrlActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeViewModel()
 
         val assetItem = MmkvManager.decodeAsset(editAssetId)
         val assetUrlQrcode = intent.getStringExtra(ASSET_URL_QRCODE)
@@ -72,6 +75,21 @@ class UserAssetUrlActivity : BaseComponentActivity() {
         }
     }
 
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is UserAssetUrlViewModel.UserAssetUrlViewModelEvent.SaveSuccess,
+                        is UserAssetUrlViewModel.UserAssetUrlViewModelEvent.DeleteSuccess -> {
+                            finish()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Composable
     override fun ScreenContent() {
         UserAssetUrlScreen(
@@ -79,52 +97,9 @@ class UserAssetUrlActivity : BaseComponentActivity() {
             initialRemarks = initialRemarks,
             initialUrl = initialUrl,
             onBackClick = { finish() },
-            onSave = { r, u -> saveServer(r, u) },
-            onDelete = { deleteServer() }
+            onSave = { r, u -> viewModel.saveAssetUrl(editAssetId, r, u, extDir) },
+            onDelete = { viewModel.deleteAssetUrl(editAssetId) }
         )
-    }
-
-    private fun saveServer(remarks: String, url: String): Boolean {
-        val assetList = MmkvManager.decodeAssetUrls()
-        if (assetList.any { it.assetUrl.remarks == remarks && it.guid != editAssetId }) {
-            toast(R.string.msg_remark_is_duplicate)
-            return false
-        }
-        if (TextUtils.isEmpty(remarks) || TextUtils.isEmpty(url)) {
-            return false
-        }
-
-        var assetItem = MmkvManager.decodeAsset(editAssetId)
-        var assetId = editAssetId
-        if (assetItem != null) {
-            val file = extDir.resolve(assetItem.remarks)
-            if (file.exists()) {
-                try {
-                    file.delete()
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Failed to delete asset file: ${file.path}", e)
-                }
-            }
-        } else {
-            assetId = Utils.getUuid()
-            assetItem = AssetUrlItem()
-        }
-
-        assetItem.remarks = remarks
-        assetItem.url = url
-
-        MmkvManager.encodeAsset(assetId, assetItem)
-        toastSuccess(R.string.toast_success)
-        finish()
-        return true
-    }
-
-    private fun deleteServer(): Boolean {
-        if (editAssetId.isNotEmpty()) {
-            MmkvManager.removeAssetUrl(editAssetId)
-            finish()
-        }
-        return true
     }
 }
 
@@ -134,7 +109,7 @@ fun UserAssetUrlScreen(
     initialRemarks: String,
     initialUrl: String,
     onBackClick: () -> Unit,
-    onSave: (String, String) -> Boolean,
+    onSave: (String, String) -> Unit,
     onDelete: () -> Unit
 ) {
     var remarks by rememberSaveable(editAssetId, initialRemarks) { mutableStateOf(initialRemarks) }

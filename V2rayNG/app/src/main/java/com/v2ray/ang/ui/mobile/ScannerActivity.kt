@@ -1,8 +1,8 @@
 package com.v2ray.ang.ui.mobile
 
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
@@ -54,7 +54,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
@@ -64,11 +68,11 @@ import com.google.zxing.common.HybridBinarizer
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.enums.PermissionType
-import com.v2ray.ang.extension.toast
 import com.v2ray.ang.ui.mobile.base.HelperBaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.vm.ScannerViewModel
+import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
@@ -78,33 +82,45 @@ private val qrReader = MultiFormatReader()
 
 class ScannerActivity : HelperBaseComponentActivity() {
 
-    private val uiState = mutableStateOf(ScannerUiState.IDLE)
+    private val viewModel: ScannerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        observeViewModel()
         startScan()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is ScannerViewModel.ScannerViewModelEvent.ScanResult -> {
+                            finished(event.text)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Composable
     override fun ScreenContent() {
+        val uiState by viewModel.scanState.collectAsStateWithLifecycle()
         ScannerScreen(
-            uiState = uiState.value,
+            uiState = uiState,
             onBackClick = { finish() },
             onSelectPhoto = { showFileChooser() },
             onStartScan = { startScan() },
-            onStopScan = { stopScan() },
+            onStopScan = { viewModel.stopScan() },
             onScanResult = { text -> finished(text) }
         )
     }
 
     private fun startScan() {
         checkAndRequestPermission(PermissionType.CAMERA) {
-            uiState.value = ScannerUiState.ACTIVE
+            viewModel.startScan()
         }
-    }
-
-    private fun stopScan() {
-        uiState.value = ScannerUiState.IDLE
     }
 
     private fun finished(text: String) {
@@ -116,20 +132,8 @@ class ScannerActivity : HelperBaseComponentActivity() {
 
     private fun showFileChooser() {
         launchFileChooser("image/*") { uri ->
-            if (uri == null) return@launchFileChooser
-            try {
-                val inputStream = contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-                val text = QRCodeDecoder.syncDecodeQRCode(bitmap)
-                if (text.isNullOrEmpty()) {
-                    toast(R.string.toast_decoding_failed)
-                } else {
-                    finished(text)
-                }
-            } catch (e: Exception) {
-                LogUtil.e(AppConfig.TAG, "Failed to decode QR code from file", e)
-                toast(R.string.toast_decoding_failed)
+            if (uri != null) {
+                viewModel.decodeQrCodeFromUri(uri, contentResolver)
             }
         }
     }

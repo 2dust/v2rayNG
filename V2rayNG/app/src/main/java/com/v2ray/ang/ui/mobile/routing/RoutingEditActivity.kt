@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,13 +35,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.v2ray.ang.AppConfig.BUILTIN_OUTBOUND_TAGS
 import com.v2ray.ang.AppConfig.TAG_PROXY
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
-import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.mobile.AppPickerActivity
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
@@ -52,14 +54,14 @@ import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.mobile.compose.ServerSelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
-import kotlinx.coroutines.Dispatchers
+import com.v2ray.ang.vm.RoutingEditViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
 
 private val ROUTING_NETWORK_OPTIONS = listOf("tcp", "udp", "tcp,udp")
 
 class RoutingEditActivity : BaseComponentActivity() {
+    private val viewModel: RoutingEditViewModel by viewModels()
+
     private val position by lazy { intent.getIntExtra("position", -1) }
 
     private var initial: RulesetItem? = null
@@ -68,9 +70,26 @@ class RoutingEditActivity : BaseComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initial = SettingsManager.getRoutingRuleset(position)
-        outboundSuggestions = SettingsManager.getProfileRemarks()
-        canUseProcess = SettingsManager.canUseProcessRouting()
+        observeViewModel()
+
+        initial = viewModel.getRoutingRuleset(position)
+        outboundSuggestions = viewModel.getOutboundSuggestions()
+        canUseProcess = viewModel.canUseProcessRouting()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewModelEvent.collect { event ->
+                    when (event) {
+                        is RoutingEditViewModel.RoutingEditViewModelEvent.SaveSuccess,
+                        is RoutingEditViewModel.RoutingEditViewModelEvent.DeleteSuccess -> {
+                            finish()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Composable
@@ -81,32 +100,9 @@ class RoutingEditActivity : BaseComponentActivity() {
             outboundSuggestions = outboundSuggestions,
             canUseProcess = canUseProcess,
             onBackClick = { finish() },
-            onSave = { saveServer(it) },
-            onDelete = { deleteServer() }
+            onSave = { ruleset -> viewModel.saveRuleset(position, ruleset) },
+            onDelete = { viewModel.deleteRuleset(position) }
         )
-    }
-
-    private fun saveServer(rulesetItem: RulesetItem): Boolean {
-        if (rulesetItem.remarks.isNullOrEmpty()) {
-            return false
-        }
-        if (position < 0 && rulesetItem.id.isEmpty()) {
-            rulesetItem.id = UUID.randomUUID().toString()
-        }
-        SettingsManager.saveRoutingRuleset(position, rulesetItem)
-        toastSuccess(R.string.toast_success)
-        finish()
-        return true
-    }
-
-    private fun deleteServer(): Boolean {
-        if (position >= 0) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                SettingsManager.removeRoutingRuleset(position)
-                withContext(Dispatchers.Main) { finish() }
-            }
-        }
-        return true
     }
 }
 
@@ -117,7 +113,7 @@ fun RoutingEditScreen(
     outboundSuggestions: List<String>,
     canUseProcess: Boolean,
     onBackClick: () -> Unit,
-    onSave: (RulesetItem) -> Boolean,
+    onSave: (RulesetItem) -> Unit,
     onDelete: () -> Unit
 ) {
     val context = LocalContext.current
