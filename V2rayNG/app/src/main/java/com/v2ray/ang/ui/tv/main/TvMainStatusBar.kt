@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

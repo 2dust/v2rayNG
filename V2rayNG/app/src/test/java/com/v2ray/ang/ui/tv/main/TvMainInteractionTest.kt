@@ -1,19 +1,13 @@
-package com.v2ray.ang.ui.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.runtime.saveable.SaverScope
-import com.v2ray.ang.ui.mobile.compose.DpadReorderActivation
-import com.v2ray.ang.ui.mobile.compose.DpadReorderDirection
-import com.v2ray.ang.ui.mobile.compose.DpadReorderState
-import com.v2ray.ang.ui.mobile.compose.TvTextFieldRecoveryAction
-import com.v2ray.ang.ui.mobile.compose.dpadRepeatReleaseGuardMillis
-import com.v2ray.ang.ui.mobile.compose.tvTextFieldRecoveryAction
-import com.v2ray.ang.ui.mobile.compose.twoColumnDpadReorderTarget
-import com.v2ray.ang.ui.mobile.main.ProfileRowAction
-import com.v2ray.ang.ui.mobile.main.TvMainFocusTarget
-import com.v2ray.ang.ui.mobile.main.TvToolbarAction
-import com.v2ray.ang.ui.mobile.main.focusAfterProfileRemoval
-import com.v2ray.ang.ui.mobile.main.pixelAlignedScrollDistance
-import com.v2ray.ang.ui.mobile.main.profileReturnAction
+import com.v2ray.ang.ui.tv.compose.DpadReorderActivation
+import com.v2ray.ang.ui.tv.compose.DpadReorderDirection
+import com.v2ray.ang.ui.tv.compose.DpadReorderState
+import com.v2ray.ang.ui.tv.compose.TvTextFieldRecoveryAction
+import com.v2ray.ang.ui.tv.compose.dpadRepeatReleaseGuardMillis
+import com.v2ray.ang.ui.tv.compose.tvTextFieldRecoveryAction
+import com.v2ray.ang.ui.tv.compose.twoColumnDpadReorderTarget
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

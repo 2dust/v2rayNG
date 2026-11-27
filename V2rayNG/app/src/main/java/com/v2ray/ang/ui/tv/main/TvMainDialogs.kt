@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import android.graphics.Bitmap
 import androidx.annotation.StringRes
@@ -14,9 +14,13 @@ import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.isComplexType
-import com.v2ray.ang.ui.mobile.compose.TvActionDialog
-import com.v2ray.ang.ui.mobile.compose.TvDeleteConfirmDialog
-import com.v2ray.ang.ui.mobile.compose.TvQRCodeDialog
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
+import com.v2ray.ang.ui.mobile.main.dispatch
+import com.v2ray.ang.ui.mobile.main.serverMenuActions
+import com.v2ray.ang.ui.tv.compose.TvActionDialog
+import com.v2ray.ang.ui.tv.compose.TvDeleteConfirmDialog
+import com.v2ray.ang.ui.tv.compose.TvQRCodeDialog
 
 internal enum class TvBulkDeleteTarget(@StringRes val messageRes: Int, val action: MainAction) {
     Duplicate(R.string.confirm_delete_duplicate_profiles, MainAction.RemoveDuplicateServers),

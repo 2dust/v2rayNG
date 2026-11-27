@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.mobile.main
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
@@ -54,13 +53,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class BaseMainActivity : HelperBaseComponentActivity() {
+open class MainActivity : HelperBaseComponentActivity() {
 
-    private var forwardingToTv = false
-    // Only the existing launcher entry resolves the device type. The TV activity never routes again.
-    protected open fun televisionDestination(): Intent? = null
-
-    private val mainViewModel: MainViewModel by viewModels {
+    protected val mainViewModel: MainViewModel by viewModels {
         MainViewModel.Factory(application, MainRepository(application as AngApplication))
     }
 
@@ -97,14 +92,7 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val destination = televisionDestination()
-        forwardingToTv = destination != null
         super.onCreate(savedInstanceState)
-        if (destination != null) {
-            startActivity(destination)
-            finish()
-            return
-        }
         mainViewModel.onAction(MainAction.Initialize)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
@@ -119,17 +107,18 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
 
     @Composable
     override fun ScreenContent() {
-        if (forwardingToTv) return
         BackHandler { moveTaskToBack(false) }
         MainContent(mainViewModel, ::handleMainAction, ::navigateTo)
     }
 
     @Composable
-    internal abstract fun MainContent(
+    protected open fun MainContent(
         viewModel: MainViewModel,
         onAction: (MainAction) -> Unit,
         onNavigate: (MainDestination) -> Unit
-    )
+    ) {
+        MainScreen(viewModel, onAction, onNavigate)
+    }
 
     private fun handleMainAction(action: MainAction) {
         when (action) {
@@ -158,7 +147,7 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
 
     private fun shareFullContentAsync(guid: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = AngConfigManager.shareFullContent2Clipboard(this@BaseMainActivity, guid)
+            val result = AngConfigManager.shareFullContent2Clipboard(this@MainActivity, guid)
             withContext(Dispatchers.Main) {
                 if (result == 0) toastSuccess(R.string.toast_success)
                 else toastError(R.string.toast_failure)
@@ -306,20 +295,6 @@ abstract class BaseMainActivity : HelperBaseComponentActivity() {
             mainViewModel.updateSelectedGuid(guid)
             LauncherManager.restartService(this)
         }
-    }
-
-}
-
-/** Keep the existing launcher, notification, and shortcut target stable. */
-class MainActivity : BaseMainActivity() {
-    override fun televisionDestination(): Intent? {
-        val isTelevision = resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK == Configuration.UI_MODE_TYPE_TELEVISION
-        return if (isTelevision) Intent(this, TvMainActivity::class.java) else null
-    }
-
-    @Composable
-    override fun MainContent(viewModel: MainViewModel, onAction: (MainAction) -> Unit, onNavigate: (MainDestination) -> Unit) {
-        MainScreen(viewModel, onAction, onNavigate)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

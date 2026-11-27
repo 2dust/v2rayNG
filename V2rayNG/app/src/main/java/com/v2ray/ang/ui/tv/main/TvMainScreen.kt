@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -32,10 +32,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.DrawerValue as TvDrawerValue
 import androidx.tv.material3.rememberDrawerState as rememberTvDrawerState
 import com.v2ray.ang.R
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.ui.mobile.main.MainDestination
+import com.v2ray.ang.ui.mobile.main.MainStatus
 import com.v2ray.ang.vm.MainViewModel
-import com.v2ray.ang.ui.mobile.compose.rememberDpadFocusTargets
-import com.v2ray.ang.ui.mobile.compose.rememberLazyDpadFocus
-import com.v2ray.ang.ui.mobile.compose.requestFocusWhenReady
+import com.v2ray.ang.ui.tv.compose.rememberDpadFocusTargets
+import com.v2ray.ang.ui.tv.compose.rememberLazyDpadFocus
+import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 import kotlinx.coroutines.flow.first
 import kotlin.collections.getValue
 

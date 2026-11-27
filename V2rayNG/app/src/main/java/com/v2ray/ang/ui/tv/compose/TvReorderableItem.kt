@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.compose
+package com.v2ray.ang.ui.tv.compose
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.border

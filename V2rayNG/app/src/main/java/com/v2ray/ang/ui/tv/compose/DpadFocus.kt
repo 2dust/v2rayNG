@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.compose
+package com.v2ray.ang.ui.tv.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

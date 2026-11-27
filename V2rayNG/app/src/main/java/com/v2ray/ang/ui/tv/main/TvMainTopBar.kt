@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -42,17 +42,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
-import com.v2ray.ang.ui.mobile.compose.DpadHorizontalDirection
-import com.v2ray.ang.ui.mobile.compose.TvIconButton
-import com.v2ray.ang.ui.mobile.compose.TvTopBarSearchField
-import com.v2ray.ang.ui.mobile.compose.adjacentDpadFocusTarget
+import com.v2ray.ang.ui.tv.compose.DpadHorizontalDirection
+import com.v2ray.ang.ui.tv.compose.TvIconButton
+import com.v2ray.ang.ui.tv.compose.TvTopBarSearchField
+import com.v2ray.ang.ui.tv.compose.adjacentDpadFocusTarget
 import com.v2ray.ang.ui.mobile.compose.colorFabActive
-import com.v2ray.ang.ui.mobile.compose.dpadFocusOutline
-import com.v2ray.ang.ui.mobile.compose.dpadOrderedFocusNavigation
-import com.v2ray.ang.ui.mobile.compose.dpadPopupHorizontalNavigation
-import com.v2ray.ang.ui.mobile.compose.dpadTopBarFocusNavigation
-import com.v2ray.ang.ui.mobile.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.tv.compose.dpadFocusOutline
+import com.v2ray.ang.ui.tv.compose.dpadOrderedFocusNavigation
+import com.v2ray.ang.ui.tv.compose.dpadPopupHorizontalNavigation
+import com.v2ray.ang.ui.tv.compose.dpadTopBarFocusNavigation
+import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.ImportMenuAction
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.ui.mobile.main.MainMoreMenuAction
 
 internal val tvMoreMenuActions = MainMoreMenuAction.entries - setOf(MainMoreMenuAction.RestartService, MainMoreMenuAction.DeleteAll)
 

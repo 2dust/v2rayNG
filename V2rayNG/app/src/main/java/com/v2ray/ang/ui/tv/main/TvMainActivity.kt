@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.BringIntoViewSpec
@@ -6,11 +6,14 @@ import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import com.v2ray.ang.ui.mobile.main.MainActivity
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.ui.mobile.main.MainDestination
 import com.v2ray.ang.vm.MainViewModel
 import kotlin.math.roundToInt
 
 /** Owns only the TV presentation; activity results and actions are shared with the phone. */
-class TvMainActivity : BaseMainActivity() {
+class TvMainActivity : MainActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun MainContent(viewModel: MainViewModel, onAction: (MainAction) -> Unit, onNavigate: (MainDestination) -> Unit) {

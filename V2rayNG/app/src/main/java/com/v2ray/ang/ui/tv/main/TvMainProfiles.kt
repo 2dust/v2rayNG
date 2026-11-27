@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -51,6 +51,10 @@ import com.v2ray.ang.ui.mobile.compose.colorFabActive
 import com.v2ray.ang.ui.mobile.compose.colorPing
 import com.v2ray.ang.ui.mobile.compose.colorPingRed
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.ui.mobile.main.MainUiState
+import com.v2ray.ang.ui.mobile.main.ServerGroupUiState
+import com.v2ray.ang.ui.mobile.main.ServerRowUiModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.rememberReorderableLazyGridState

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.compose
+package com.v2ray.ang.ui.tv.compose
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -61,10 +61,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.Image
-import com.v2ray.ang.ui.mobile.compose.dpadLogicalHorizontalNavigation
-import com.v2ray.ang.ui.mobile.compose.dpadVerticalFocusNavigation
-import com.v2ray.ang.ui.mobile.compose.requestFocusWhenReady
+import com.v2ray.ang.ui.tv.compose.dpadLogicalHorizontalNavigation
+import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.MainDestination
+import com.v2ray.ang.ui.mobile.main.drawerItems
+import com.v2ray.ang.ui.mobile.main.primaryDrawerItems
 
 private val V2rayNgFontFamily = FontFamily(Font(R.font.montserrat_thin))
 private val TvDrawerCollapsedWidth = 72.dp

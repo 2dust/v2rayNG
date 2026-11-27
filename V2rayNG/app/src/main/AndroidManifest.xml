@@ -67,9 +67,7 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
@@ -80,9 +78,14 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".ui.mobile.main.TvMainActivity"
-            android:exported="false"
-            android:launchMode="singleTask" />
+            android:name=".ui.tv.main.TvMainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.mobile.server.ServerVmessActivity"
             android:exported="false"

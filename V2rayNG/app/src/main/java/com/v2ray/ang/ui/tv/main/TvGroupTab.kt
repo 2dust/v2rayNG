@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.main
+package com.v2ray.ang.ui.tv.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,9 +31,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.vm.MainViewModel
-import com.v2ray.ang.ui.mobile.compose.dpadFocusOutline
-import com.v2ray.ang.ui.mobile.compose.dpadOrderedFocusNavigation
-import com.v2ray.ang.ui.mobile.compose.dpadVerticalFocusNavigation
+import com.v2ray.ang.ui.tv.compose.dpadFocusOutline
+import com.v2ray.ang.ui.tv.compose.dpadOrderedFocusNavigation
+import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
 
 @Composable
 internal fun TvGroupTabBar(

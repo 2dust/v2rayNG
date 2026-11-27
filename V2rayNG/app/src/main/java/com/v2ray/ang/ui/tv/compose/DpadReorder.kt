@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.compose
+package com.v2ray.ang.ui.tv.compose
 
 import android.view.ViewConfiguration
 import androidx.compose.foundation.focusable
