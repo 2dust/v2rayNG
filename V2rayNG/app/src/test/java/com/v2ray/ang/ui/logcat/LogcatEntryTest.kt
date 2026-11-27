@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.logcat
 
+import com.v2ray.ang.vm.createLogcatEntries
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

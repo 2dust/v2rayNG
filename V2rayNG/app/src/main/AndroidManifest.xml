@@ -62,7 +62,7 @@
         </service>
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.mobile.main.MainActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -80,92 +80,92 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".ui.main.TvMainActivity"
+            android:name=".ui.mobile.main.TvMainActivity"
             android:exported="false"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.server.ServerVmessActivity"
+            android:name=".ui.mobile.server.ServerVmessActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerVlessActivity"
+            android:name=".ui.mobile.server.ServerVlessActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerShadowsocksActivity"
+            android:name=".ui.mobile.server.ServerShadowsocksActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerSocksActivity"
+            android:name=".ui.mobile.server.ServerSocksActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerHttpActivity"
+            android:name=".ui.mobile.server.ServerHttpActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerTrojanActivity"
+            android:name=".ui.mobile.server.ServerTrojanActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerWireguardActivity"
+            android:name=".ui.mobile.server.ServerWireguardActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerHysteria2Activity"
+            android:name=".ui.mobile.server.ServerHysteria2Activity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerMasqueActivity"
+            android:name=".ui.mobile.server.ServerMasqueActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerCustomConfigActivity"
+            android:name=".ui.mobile.server.ServerCustomConfigActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerGroupActivity"
+            android:name=".ui.mobile.server.ServerGroupActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.server.ServerProxyChainActivity"
+            android:name=".ui.mobile.server.ServerProxyChainActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged|adjustResize" />
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name=".ui.mobile.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.perappproxy.PerAppProxyActivity"
+            android:name=".ui.mobile.PerAppProxyActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.apppicker.AppPickerActivity"
+            android:name=".ui.mobile.AppPickerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ScannerActivity"
+            android:name=".ui.mobile.ScannerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.logcat.LogcatActivity"
+            android:name=".ui.mobile.LogcatActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.routing.RoutingSettingActivity"
+            android:name=".ui.mobile.routing.RoutingSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.routing.RoutingEditActivity"
+            android:name=".ui.mobile.routing.RoutingEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.subscription.SubSettingActivity"
+            android:name=".ui.mobile.subscription.SubSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.userasset.UserAssetActivity"
+            android:name=".ui.mobile.userasset.UserAssetActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.userasset.UserAssetUrlActivity"
+            android:name=".ui.mobile.userasset.UserAssetUrlActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
 
         <activity
-            android:name=".ui.subscription.SubEditActivity"
+            android:name=".ui.mobile.subscription.SubEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
@@ -210,13 +210,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.checkupdate.CheckUpdateActivity"
+            android:name=".ui.mobile.CheckUpdateActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.backup.BackupActivity"
+            android:name=".ui.mobile.BackupActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.AboutActivity"
+            android:name=".ui.mobile.AboutActivity"
             android:exported="false" />
         <activity
             android:name=".ui.TranslatorsActivity"

@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.v2ray.ang.ui.ScannerActivity
+import com.v2ray.ang.ui.mobile.ScannerActivity
 
 /**
  * Helper for scanning QR codes.

@@ -8,8 +8,8 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.AngConfigManager
-import com.v2ray.ang.ui.base.HelperBaseComponentActivity
-import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.ui.mobile.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.mobile.main.MainActivity
 
 class ScScannerActivity : HelperBaseComponentActivity() {
 
