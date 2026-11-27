@@ -25,7 +25,7 @@ import com.v2ray.ang.ui.mobile.CheckUpdateActivity
 import com.v2ray.ang.ui.mobile.LogcatActivity
 import com.v2ray.ang.vm.MainViewModel
 import com.v2ray.ang.ui.mobile.PerAppProxyActivity
-import com.v2ray.ang.ui.mobile.routing.RoutingSettingActivity
+import com.v2ray.ang.ui.mobile.RoutingSettingActivity
 import com.v2ray.ang.ui.mobile.server.ProfileEditorResult
 import com.v2ray.ang.ui.mobile.server.ServerCustomConfigActivity
 import com.v2ray.ang.ui.mobile.server.ServerGroupActivity
@@ -42,8 +42,8 @@ import com.v2ray.ang.ui.mobile.server.ServerWireguardActivity
 import com.v2ray.ang.ui.mobile.SettingsActivity
 import com.v2ray.ang.ui.mobile.main.component.MainDestination
 import com.v2ray.ang.ui.mobile.main.component.MainScreen
-import com.v2ray.ang.ui.mobile.subscription.SubSettingActivity
-import com.v2ray.ang.ui.mobile.userasset.UserAssetActivity
+import com.v2ray.ang.ui.mobile.SubSettingActivity
+import com.v2ray.ang.ui.mobile.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.Utils
 

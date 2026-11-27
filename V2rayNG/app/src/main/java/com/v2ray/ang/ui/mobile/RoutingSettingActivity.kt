@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.routing
+package com.v2ray.ang.ui.mobile
 
 import android.content.Intent
 import android.os.Bundle

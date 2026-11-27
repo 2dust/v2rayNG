@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.routing
+package com.v2ray.ang.ui.mobile
 
 import android.app.Activity
 import android.os.Bundle
@@ -44,7 +44,6 @@ import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.RulesetItem
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.ui.mobile.AppPickerActivity
 import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 import com.v2ray.ang.ui.mobile.compose.AppTopBar
 import com.v2ray.ang.ui.mobile.compose.DeleteConfirmDialog

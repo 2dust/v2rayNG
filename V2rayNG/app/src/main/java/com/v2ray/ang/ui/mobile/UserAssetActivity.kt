@@ -1,4 +1,4 @@
-package com.v2ray.ang.ui.mobile.userasset
+package com.v2ray.ang.ui.mobile
 
 import android.content.Intent
 import android.net.Uri

@@ -150,25 +150,25 @@
             android:name=".ui.mobile.LogcatActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mobile.routing.RoutingSettingActivity"
+            android:name=".ui.mobile.RoutingSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mobile.routing.RoutingEditActivity"
+            android:name=".ui.mobile.RoutingEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
-            android:name=".ui.mobile.subscription.SubSettingActivity"
+            android:name=".ui.mobile.SubSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mobile.userasset.UserAssetActivity"
+            android:name=".ui.mobile.UserAssetActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.mobile.userasset.UserAssetUrlActivity"
+            android:name=".ui.mobile.UserAssetUrlActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
 
         <activity
-            android:name=".ui.mobile.subscription.SubEditActivity"
+            android:name=".ui.mobile.SubEditActivity"
             android:windowSoftInputMode="stateUnchanged|adjustResize"
             android:exported="false" />
         <activity
