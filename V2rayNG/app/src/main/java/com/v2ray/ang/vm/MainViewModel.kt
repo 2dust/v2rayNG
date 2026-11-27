@@ -1,6 +1,12 @@
 package com.v2ray.ang.vm
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.graphics.Bitmap
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,16 +19,23 @@ import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.RealPingResult
+import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.ServerAffiliationInfo
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
+import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.SubscriptionUpdater
+import com.v2ray.ang.helper.MessageHelper
 import com.v2ray.ang.ui.mobile.main.MainAction
-import com.v2ray.ang.ui.mobile.main.MainDataSource
 import com.v2ray.ang.ui.mobile.main.MainServiceEvent
 import com.v2ray.ang.ui.mobile.main.MainStatus
 import com.v2ray.ang.ui.mobile.main.MainTestRequests
@@ -38,6 +51,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +59,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -86,7 +101,6 @@ private fun applyTestDelayResultsToRows(
 
 class MainViewModel(
     application: Application,
-    private val dataSource: MainDataSource,
     private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel(application) {
 
@@ -94,13 +108,83 @@ class MainViewModel(
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
     private val preloadDispatcher: CoroutineDispatcher = Dispatchers.IO.limitedParallelism(1)
 
+    // Probe results are finite and must remain lossless until the ViewModel coalesces them.
+    private val mainServiceEventChannel = Channel<MainServiceEvent>(Channel.UNLIMITED)
+
+    private val serviceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val safeIntent = intent ?: return
+            val requestId = safeIntent.getStringExtra(MessageHelper.EXTRA_REQUEST_ID).orEmpty()
+            val event = when (safeIntent.getIntExtra("key", 0)) {
+                AppConfig.MSG_STATE_RUNNING -> MainServiceEvent.StateRunning
+                AppConfig.MSG_STATE_NOT_RUNNING -> MainServiceEvent.StateNotRunning
+                AppConfig.MSG_STATE_START_SUCCESS -> MainServiceEvent.StateStartSuccess
+                AppConfig.MSG_STATE_START_FAILURE -> MainServiceEvent.StateStartFailure(
+                    safeIntent.getStringExtra("content")
+                )
+
+                AppConfig.MSG_STATE_STOP_SUCCESS -> MainServiceEvent.StateStopSuccess
+                AppConfig.MSG_MEASURE_DELAY_RESULT -> safeIntent
+                    .serializable<ConnectionTestResult>("content")
+                    ?.let { MainServiceEvent.MeasureDelayResult(it, requestId) }
+
+                AppConfig.MSG_MEASURE_DELAY_CANCEL -> MainServiceEvent.MeasureDelayCancelled(requestId)
+
+                AppConfig.MSG_MEASURE_CONFIG_SUCCESS -> safeIntent
+                    .serializable<RealPingResult>("content")
+                    ?.let { MainServiceEvent.MeasureConfigSuccess(it, requestId) }
+
+                AppConfig.MSG_MEASURE_CONFIG_NOTIFY -> MainServiceEvent.MeasureConfigNotify(
+                    safeIntent.getStringExtra("content").orEmpty(), requestId
+                )
+
+                AppConfig.MSG_MEASURE_CONFIG_FINISH -> MainServiceEvent.MeasureConfigFinish(
+                    requestId
+                )
+
+                AppConfig.MSG_MEASURE_CONFIG_CANCEL -> MainServiceEvent.MeasureConfigCancelled(requestId)
+
+                else -> null
+            }
+            event?.let { mainServiceEventChannel.trySend(it) }
+        }
+    }
+
+    private fun registerServiceReceiver() {
+        runCatching {
+            ContextCompat.registerReceiver(
+                app,
+                serviceReceiver,
+                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
+                Utils.receiverFlags()
+            )
+            MessageHelper.sendMsg2Service(app, AppConfig.MSG_REGISTER_CLIENT, "")
+        }.onFailure {
+            LogUtil.e(AppConfig.TAG, "Failed to register main service receiver", it)
+        }
+    }
+
+    private fun unregisterServiceReceiver() {
+        runCatching {
+            MessageHelper.sendMsg2Service(app, AppConfig.MSG_UNREGISTER_CLIENT, "")
+        }.onFailure {
+            LogUtil.e(AppConfig.TAG, "Failed to unregister service client", it)
+        }
+        runCatching {
+            app.unregisterReceiver(serviceReceiver)
+        }.onFailure {
+            LogUtil.e(AppConfig.TAG, "Failed to unregister main service receiver", it)
+        }
+        mainServiceEventChannel.close()
+    }
+
     // ---------- UI state ----------
     private val _uiState = MutableStateFlow(
         MainUiState(
-            selectedGroupId = dataSource.getSelectedSubscriptionId(),
-            selectedGuid = dataSource.getSelectServer(),
-            confirmRemove = dataSource.getConfirmRemove(),
-            doubleColumnDisplay = dataSource.getDoubleColumnDisplay(),
+            selectedGroupId = getSelectedSubscriptionId(),
+            selectedGuid = getSelectServer(),
+            confirmRemove = getConfirmRemove(),
+            doubleColumnDisplay = getDoubleColumnDisplay(),
             searchQuery = savedStateHandle[SEARCH_QUERY_KEY] ?: ""
         )
     )
@@ -133,13 +217,14 @@ class MainViewModel(
 
     // ---------- Service events ----------
     init {
+        registerServiceReceiver()
         collectServiceEvents()
         setupGroupTab()
     }
 
     private fun collectServiceEvents() {
         viewModelScope.launch {
-            dataSource.mainServiceEvent.collect { event ->
+            mainServiceEventChannel.receiveAsFlow().collect { event ->
                 handleServiceEvent(event)
             }
         }
@@ -239,10 +324,10 @@ class MainViewModel(
     }
 
     internal fun formatStatus(status: MainStatus): String = when (status) {
-        MainStatus.Disconnected -> dataSource.getString(R.string.connection_not_connected)
-        MainStatus.Connected -> dataSource.getString(R.string.connection_connected)
-        MainStatus.Testing -> dataSource.getString(R.string.connection_test_testing)
-        is MainStatus.TestProgress -> dataSource.getString(
+        MainStatus.Disconnected -> getString(R.string.connection_not_connected)
+        MainStatus.Connected -> getString(R.string.connection_connected)
+        MainStatus.Testing -> getString(R.string.connection_test_testing)
+        is MainStatus.TestProgress -> getString(
             R.string.connection_running_task_left,
             status.progress
         )
@@ -252,20 +337,20 @@ class MainViewModel(
 
     private fun formatConnectionTestResult(result: ConnectionTestResult): String {
         val status = if (result.delayMillis >= 0) {
-            val delay = dataSource.getString(R.string.server_test_delay_value, result.delayMillis)
-            dataSource.getString(R.string.connection_test_available, delay)
+            val delay = getString(R.string.server_test_delay_value, result.delayMillis)
+            getString(R.string.connection_test_available, delay)
         } else {
             val detail = result.errorMessage.ifBlank {
-                dataSource.getString(R.string.connection_test_empty_message)
+                getString(R.string.connection_test_empty_message)
             }
-            dataSource.getString(R.string.connection_test_error, detail)
+            getString(R.string.connection_test_error, detail)
         }
 
         if (result.delayMillis < 0 || (result.country == null && result.ipAddress == null)) {
             return status
         }
 
-        val unknown = dataSource.getString(R.string.value_unknown)
+        val unknown = getString(R.string.value_unknown)
         return "$status\n(${result.country ?: unknown}) ${result.ipAddress ?: unknown}"
     }
 
@@ -313,13 +398,14 @@ class MainViewModel(
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             MainAction.ImportClipboard -> importClipboardAsync()
             is MainAction.ShareClipboard -> {
-                dataSource.share2Clipboard(action.guid)
+                AngConfigManager.share2Clipboard(app, action.guid)
             }
+
             is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
             is MainAction.LocateHandled -> consumeLocateTarget(action.target)
             is MainAction.MoveServer -> moveServer(action)
             is MainAction.ShareQRCode -> {
-                val bitmap = dataSource.share2QRCode(action.guid)
+                val bitmap = share2QRCode(action.guid)
                 _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
             }
 
@@ -347,8 +433,8 @@ class MainViewModel(
             try {
                 initialPageReady.await()
                 delay(32)
-                dataSource.initAssets()
-                dataSource.syncSubscriptions()
+                initAssets()
+                syncSubscriptions()
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -360,8 +446,8 @@ class MainViewModel(
     fun refreshUiSettings() {
         _uiState.update {
             it.copy(
-                confirmRemove = dataSource.getConfirmRemove(),
-                doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
+                confirmRemove = getConfirmRemove(),
+                doubleColumnDisplay = getDoubleColumnDisplay()
             )
         }
     }
@@ -370,8 +456,8 @@ class MainViewModel(
     private suspend fun buildServersCache(guids: List<String>): List<ServersCache> =
         guids.mapNotNull { guid ->
             currentCoroutineContext().ensureActive()
-            val profile = dataSource.decodeServerConfig(guid) ?: return@mapNotNull null
-            val affiliation = dataSource.decodeAffiliationInfo(guid)
+            val profile = decodeServerConfig(guid) ?: return@mapNotNull null
+            val affiliation = decodeAffiliationInfo(guid)
             ServersCache(
                 guid = guid,
                 profile = profile.copy(),
@@ -388,7 +474,7 @@ class MainViewModel(
             if (!forceRefresh) {
                 cacheMutex.withLock { groupDataCache[groupId]?.let { return@withLock it } }
             }
-            val servers = buildServersCache(dataSource.getServerGuidList(groupId))
+            val servers = buildServersCache(getServerGuidList(groupId))
             currentCoroutineContext().ensureActive()
             cacheMutex.withLock { groupDataCache[groupId] = servers }
             servers
@@ -428,7 +514,7 @@ class MainViewModel(
                 .filter { it.isNotEmpty() }
                 .distinct()
                 .associateWith { subscriptionId ->
-                    dataSource.getSubscriptionItem(subscriptionId)?.remarks.orEmpty()
+                    decodeSubscription(subscriptionId)?.remarks.orEmpty()
                 }
         } else {
             emptyMap()
@@ -449,7 +535,7 @@ class MainViewModel(
             else -> groups.first().id
         }
         if (resolved != current) {
-            dataSource.setSelectedSubscriptionId(resolved)
+            setSelectedSubscriptionId(resolved)
         }
         return resolved
     }
@@ -476,7 +562,7 @@ class MainViewModel(
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
-                val groups = dataSource.getSubscriptions().map {
+                val groups = getSubscriptions().map {
                     GroupMapItem(
                         id = it.guid,
                         remarks = it.subscription.remarks,
@@ -492,7 +578,7 @@ class MainViewModel(
                     it.copy(
                         groups = groups,
                         selectedGroupId = selectedGroup,
-                        selectedGuid = dataSource.getSelectServer(),
+                        selectedGuid = getSelectServer(),
                     )
                 }
                 groups.forEach { mutableServerGroupState(it.id) }
@@ -557,12 +643,12 @@ class MainViewModel(
         launchLoading {
             withContext(ioDispatcher) {
                 try {
-                    val (count, countSub) = dataSource.importBatchConfig(
+                    val (count, countSub) = importBatchConfigFromText(
                         configText, uiState.value.selectedGroupId, true
                     )
                     when {
                         count > 0 -> {
-                            toast(dataSource.getString(R.string.title_import_config_count, count))
+                            toast(getString(R.string.title_import_config_count, count))
                             setupGroupTab(forceRefresh = true)
                         }
 
@@ -584,10 +670,10 @@ class MainViewModel(
             withContext(ioDispatcher) {
                 try {
                     val result = if (subId.isEmpty()) {
-                        dataSource.updateConfigViaSubAll()
+                        updateConfigViaSubAll()
                     } else {
-                        val item = dataSource.getSubscriptionItem(subId) ?: return@withContext
-                        dataSource.updateConfigViaSub(SubscriptionCache(subId, item))
+                        val item = decodeSubscription(subId) ?: return@withContext
+                        updateConfigViaSub(SubscriptionCache(subId, item))
                     }
                     when {
                         result.successCount + result.failureCount + result.skipCount == 0 ->
@@ -603,7 +689,7 @@ class MainViewModel(
                             )
 
                         else ->
-                            toast(dataSource.getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
+                            toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
                     }
                     if (result.configCount > 0) {
                         setupGroupTab(forceRefresh = true)
@@ -625,13 +711,13 @@ class MainViewModel(
                 try {
                     val groupId = uiState.value.selectedGroupId
                     val list = if (groupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
-                        dataSource.getServerGuidList("")
+                        getServerGuidList("")
                     } else {
                         currentServers().map { it.guid }
                     }
-                    val ret = dataSource.shareNonCustomConfigsToClipboard(list)
+                    val ret = shareNonCustomConfigsToClipboard(list)
                     if (ret > 0) {
-                        toast(dataSource.getString(R.string.title_export_config_count, ret))
+                        toast(getString(R.string.title_export_config_count, ret))
                     } else {
                         toastError(R.string.toast_failure)
                     }
@@ -651,17 +737,17 @@ class MainViewModel(
                 try {
                     val count =
                         if (uiState.value.selectedGroupId.isEmpty() && uiState.value.searchQuery.isEmpty()) {
-                            dataSource.removeAllServer()
+                            removeAllServer()
                         } else {
                             val guids = currentServers().map { it.guid }
-                            guids.forEach { dataSource.removeServer(it) }
+                            guids.forEach { removeServer(it) }
                             guids.size
                         }
                     viewModelScope.launch(ioDispatcher) {
                         cacheMutex.withLock { groupDataCache.clear() }
                     }
                     setupGroupTab(forceRefresh = true)
-                    toast(dataSource.getString(R.string.title_del_config_count, count))
+                    toast(getString(R.string.title_del_config_count, count))
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
@@ -685,9 +771,9 @@ class MainViewModel(
                             if (!seen.add(identity)) duplicates += server.guid
                         }
                     }
-                    duplicates.forEach { dataSource.removeServer(it) }
+                    duplicates.forEach { removeServer(it) }
                     setupGroupTab(forceRefresh = true)
-                    toast(dataSource.getString(R.string.title_del_duplicate_config_count, duplicates.size))
+                    toast(getString(R.string.title_del_duplicate_config_count, duplicates.size))
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
@@ -707,7 +793,7 @@ class MainViewModel(
                         cacheMutex.withLock { groupDataCache.clear() }
                         setupGroupTab(forceRefresh = true)
                     }
-                    toast(dataSource.getString(R.string.title_del_config_count, count))
+                    toast(getString(R.string.title_del_config_count, count))
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (e: Exception) {
@@ -723,10 +809,10 @@ class MainViewModel(
             uiState.value.selectedGroupId.isNotEmpty() || uiState.value.searchQuery.isNotBlank()
         return if (visibleServersOnly) {
             currentServers().sumOf { server ->
-                dataSource.removeInvalidServerByGuid(server.guid)
+                removeInvalidServer(server.guid)
             }
         } else {
-            dataSource.removeInvalidServersInGroup("")
+            removeInvalidServersInGroup("")
         }
     }
 
@@ -749,18 +835,18 @@ class MainViewModel(
 
     private fun sortByTestResultsInternal() {
         val subs = if (uiState.value.selectedGroupId.isEmpty()) {
-            dataSource.getSubsList()
+            getSubsList()
         } else {
             listOf(uiState.value.selectedGroupId)
         }
-        subs.forEach { dataSource.sortByTestResultsForSub(it) }
+        subs.forEach { sortByTestResultsForSub(it) }
     }
 
     fun subscriptionIdChanged(id: String) {
         if (_uiState.value.groups.none { it.id == id }) return
         mutableServerGroupState(id)
         if (uiState.value.selectedGroupId != id) {
-            dataSource.setSelectedSubscriptionId(id)
+            setSelectedSubscriptionId(id)
             _uiState.update { it.copy(selectedGroupId = id) }
         }
         selectedGroupLoadJob?.cancel()
@@ -808,12 +894,12 @@ class MainViewModel(
     }
 
     fun updateSelectedGuid(guid: String) {
-        dataSource.setSelectServer(guid)
+        setSelectServer(guid)
         _uiState.update { it.copy(selectedGuid = guid) }
     }
 
     fun refreshSelectedGuid() {
-        _uiState.update { it.copy(selectedGuid = dataSource.getSelectServer()) }
+        _uiState.update { it.copy(selectedGuid = getSelectServer()) }
     }
 
     fun removeServerAndRefresh(guid: String) {
@@ -822,7 +908,7 @@ class MainViewModel(
             return
         }
         viewModelScope.launch(ioDispatcher) {
-            dataSource.removeServer(guid)
+            removeServer(guid)
             cacheMutex.withLock { groupDataCache.clear() }
             setupGroupTab(forceRefresh = true).join()
         }
@@ -840,7 +926,7 @@ class MainViewModel(
             previousPersistenceJob?.join()
             val saved = withContext(ioDispatcher) {
                 try {
-                    val order = dataSource.moveServerInGroup(groupId, action.fromGuid, action.toGuid)
+                    val order = moveServerInGroup(groupId, action.fromGuid, action.toGuid)
                     cacheMutex.withLock {
                         val cached = groupDataCache.remove(groupId)?.associateBy { it.guid }
                         if (order != null && cached != null && order.size == cached.size && order.all(cached::containsKey)) {
@@ -870,7 +956,7 @@ class MainViewModel(
         testRequests.invalidateCurrent()
         cancelPendingTestResults()
         resetTestStatus()
-        dataSource.cancelAllPing()
+        cancelAllPingService()
     }
 
     private fun resetTestStatus() {
@@ -918,7 +1004,7 @@ class MainViewModel(
         }
         bulkTestJob = viewModelScope.launch {
             withContext(ioDispatcher) {
-                dataSource.clearAllTestDelayResults(serverGuids)
+                clearAllTestDelayResults(serverGuids)
                 val resetGuids = serverGuids.toHashSet()
                 cacheMutex.withLock {
                     groupDataCache[groupId]?.let { cached ->
@@ -929,7 +1015,7 @@ class MainViewModel(
                     }
                 }
             }
-            dataSource.sendMsg2TestService(message, request.id)
+            sendMsg2TestService(message, request.id)
         }
     }
 
@@ -942,7 +1028,7 @@ class MainViewModel(
     fun testCurrentServerRealPing() {
         if (!uiState.value.isRunning) return
         _uiState.update { it.copy(isTesting = true, status = MainStatus.Testing) }
-        dataSource.testCurrentServerRealPing("")
+        testCurrentServerRealPingService("")
     }
 
     private fun onTestsFinished(requestId: String) {
@@ -956,12 +1042,12 @@ class MainViewModel(
 
     fun triggerLocateSelectedServer() {
         viewModelScope.launch(ioDispatcher) {
-            val selected = dataSource.getSelectServer() ?: return@launch
-            val profile = dataSource.decodeServerConfig(selected) ?: return@launch
+            val selected = getSelectServer() ?: return@launch
+            val profile = decodeServerConfig(selected) ?: return@launch
             val groupId = locateProfileGroupId(profile.subscriptionId, uiState.value.groups) ?: return@launch
             updateGroupUi(groupId, loadGroup(groupId))
             if (_uiState.value.selectedGroupId != groupId) {
-                dataSource.setSelectedSubscriptionId(groupId)
+                setSelectedSubscriptionId(groupId)
             }
             val target = LocateTarget(groupId, selected)
             _uiState.update {
@@ -996,16 +1082,142 @@ class MainViewModel(
         reloadJob?.cancel()
         filterJob?.cancel()
         cancelAllPing()
-        dataSource.close()
+        unregisterServiceReceiver()
         super.onCleared()
     }
 
+    // ---------- Encapsulated Storage Helpers ----------
+    private fun getSelectedSubscriptionId(): String =
+        MmkvManager.decodeSettingsString(AppConfig.CACHE_SUBSCRIPTION_ID, "").orEmpty()
+
+    private fun setSelectedSubscriptionId(id: String) {
+        MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, id)
+    }
+
+    private fun getSelectServer(): String? =
+        MmkvManager.getSelectServer()
+
+    private fun setSelectServer(guid: String) {
+        MmkvManager.setSelectServer(guid)
+    }
+
+    private fun getConfirmRemove(): Boolean =
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
+
+    private fun getDoubleColumnDisplay(): Boolean =
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
+
+    private fun decodeServerConfig(guid: String): ProfileItem? =
+        MmkvManager.decodeServerConfig(guid)
+
+    private fun decodeAffiliationInfo(guid: String): ServerAffiliationInfo? =
+        MmkvManager.decodeServerAffiliationInfo(guid)
+
+    private fun decodeSubscription(id: String) =
+        MmkvManager.decodeSubscription(id)
+
+    private fun removeServer(guid: String) =
+        MmkvManager.removeServer(guid)
+
+    private fun removeAllServer(): Int =
+        MmkvManager.removeAllServer()
+
+    private fun removeInvalidServer(guid: String): Int =
+        MmkvManager.removeInvalidServer(guid)
+
+    private fun moveServerInGroup(groupId: String, fromGuid: String, toGuid: String) =
+        MmkvManager.moveServerInGroup(groupId, fromGuid, toGuid)
+
+    private fun clearAllTestDelayResults(guids: List<String>) =
+        MmkvManager.clearAllTestDelayResults(guids)
+
+    private fun getSubsList(): List<String> =
+        MmkvManager.decodeSubsList()
+
+    private fun initAssets() {
+        SettingsManager.initAssets(app, app.assets)
+    }
+
+    private fun syncSubscriptions() {
+        SubscriptionUpdater.sync(app)
+    }
+
+    private fun getSubscriptions(): List<SubscriptionCache> {
+        val result = mutableListOf<SubscriptionCache>()
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY)) {
+            result += SubscriptionCache(
+                guid = "",
+                subscription = SubscriptionItem().apply {
+                    remarks = getString(R.string.filter_config_all)
+                }
+            )
+        }
+        result += MmkvManager.decodeSubscriptions()
+        return result
+    }
+
+    private fun getServerGuidList(groupId: String): List<String> =
+        if (groupId.isEmpty()) {
+            MmkvManager.decodeAllServerList()
+        } else {
+            MmkvManager.decodeServerList(groupId)
+        }
+
+    private fun removeInvalidServersInGroup(groupId: String): Int =
+        if (groupId.isEmpty()) {
+            MmkvManager.removeInvalidServer("")
+        } else {
+            getServerGuidList(groupId).sumOf { MmkvManager.removeInvalidServer(it) }
+        }
+
+    private fun sortByTestResultsForSub(subId: String) {
+        AngConfigManager.sortByTestResultsForSub(subId)
+    }
+
+    private fun importBatchConfigFromText(
+        server: String?,
+        subscriptionId: String,
+        updateUI: Boolean
+    ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI)
+
+    private fun updateConfigViaSubAll(): SubscriptionUpdateResult =
+        AngConfigManager.updateConfigViaSubAll()
+
+    private fun updateConfigViaSub(subscriptionCache: SubscriptionCache): SubscriptionUpdateResult =
+        AngConfigManager.updateConfigViaSub(subscriptionCache)
+
+    private fun shareNonCustomConfigsToClipboard(guids: List<String>): Int =
+        AngConfigManager.shareNonCustomConfigsToClipboard(app, guids)
+
+    private fun share2QRCode(guid: String): Bitmap? =
+        AngConfigManager.share2QRCode(guid)
+
+    private fun sendMsg2TestService(msg: TestServiceMessage, requestId: String? = null) {
+        MessageHelper.sendMsg2TestService(app, msg, requestId)
+    }
+
+    private fun cancelAllPingService() {
+        sendMsg2TestService(
+            TestServiceMessage(key = AppConfig.MSG_MEASURE_CONFIG_CANCEL)
+        )
+    }
+
+    private fun testCurrentServerRealPingService(requestId: String) {
+        MessageHelper.sendMsg2ServiceForResult(app, AppConfig.MSG_MEASURE_DELAY, requestId) { handled ->
+            if (!handled) {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isTesting = false) }
+                }
+            }
+        }
+    }
+
     // ---------- Factory ----------
-    class Factory(private val application: Application, private val dataSource: MainDataSource) : ViewModelProvider.Factory {
+    class Factory(private val application: Application) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                return MainViewModel(application, dataSource, extras.createSavedStateHandle()) as T
+                return MainViewModel(application, extras.createSavedStateHandle()) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

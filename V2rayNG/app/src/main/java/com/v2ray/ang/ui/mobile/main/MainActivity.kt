@@ -9,7 +9,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.LauncherManager
@@ -51,7 +50,7 @@ import com.v2ray.ang.util.Utils
 open class MainActivity : HelperBaseComponentActivity() {
 
     protected val mainViewModel: MainViewModel by viewModels {
-        MainViewModel.Factory(application, MainRepository(application as AngApplication))
+        MainViewModel.Factory(application)
     }
 
     private val requestVpnPermission =
@@ -108,11 +107,11 @@ open class MainActivity : HelperBaseComponentActivity() {
 
     @Composable
     protected open fun MainContent(
-        viewModel: MainViewModel,
+        mainViewModel: MainViewModel,
         onAction: (MainAction) -> Unit,
         onNavigate: (MainDestination) -> Unit
     ) {
-        MainScreen(viewModel, onAction, onNavigate)
+        MainScreen(mainViewModel, onAction, onNavigate)
     }
 
     private fun handleMainAction(action: MainAction) {

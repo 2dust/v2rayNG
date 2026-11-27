@@ -16,11 +16,11 @@ import kotlin.math.roundToInt
 class TvMainActivity : MainActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun MainContent(viewModel: MainViewModel, onAction: (MainAction) -> Unit, onNavigate: (MainDestination) -> Unit) {
+    override fun MainContent(mainViewModel: MainViewModel, onAction: (MainAction) -> Unit, onNavigate: (MainDestination) -> Unit) {
         val platform = LocalBringIntoViewSpec.current
         val scrollSpec = remember(platform) { PixelAlignedBringIntoViewSpec(platform) }
         CompositionLocalProvider(LocalBringIntoViewSpec provides scrollSpec) {
-            TvMainScreen(viewModel, onAction, onNavigate)
+            TvMainScreen(mainViewModel, onAction, onNavigate)
         }
     }
 }
