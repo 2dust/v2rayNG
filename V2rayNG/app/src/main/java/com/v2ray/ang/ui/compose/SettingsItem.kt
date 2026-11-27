@@ -74,7 +74,7 @@ fun CollapsiblePreferenceGroupHeader(
 }
 
 @Composable
-internal fun SettingsItemRow(
+private fun SettingsItemRow(
     icon: Painter?,
     title: String,
     description: String?,
