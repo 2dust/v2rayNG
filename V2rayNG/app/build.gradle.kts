@@ -144,7 +144,8 @@ android {
             "ar",
             "az",
             "bn",
-            "bqi-rIR"
+            "bqi-rIR",
+            "pt-rBR"
         )
     }
 
