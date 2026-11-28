@@ -35,10 +35,6 @@ object AppConfig {
     const val PREF_VPN_MTU = "pref_vpn_mtu"
     const val PREF_ROUTING_DOMAIN_STRATEGY = "pref_routing_domain_strategy"
     const val PREF_ROUTING_RULESET = "pref_routing_ruleset"
-    const val PREF_MUX_ENABLED = "pref_mux_enabled"
-    const val PREF_MUX_CONCURRENCY = "pref_mux_concurrency"
-    const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurrency"
-    const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
     const val PREF_FRAGMENT_ENABLED = "pref_fragment_enabled"
     const val PREF_FRAGMENT_PACKETS = "pref_fragment_packets"
     const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
@@ -185,6 +181,7 @@ object AppConfig {
     const val DEFAULT_OUTBOUND_DOMAIN_RESOLVE_METHOD = "1"
     const val DEFAULT_VPN_BYPASS_LAN = "1"
     const val DEFAULT_HEV_TUNNEL_LOGLEVEL = "warn"
+    const val DEFAULT_MUX_CONCURRENCY = "8"
     const val DEFAULT_MUX_XUDP_CONCURRENCY = "8"
 
     /** Message constants for communication. */

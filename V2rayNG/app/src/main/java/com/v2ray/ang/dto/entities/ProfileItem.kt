@@ -21,6 +21,11 @@ data class ProfileItem(
     var flow: String? = null,
     var username: String? = null,
 
+    var muxEnabled: Boolean? = null,
+    var muxConcurrency: Int? = null,
+    var muxXudpConcurrency: Int? = null,
+    var muxXudpProxyUDP443: String? = null,
+
     var network: String? = null,
     var headerType: String? = null,
     var host: String? = null,

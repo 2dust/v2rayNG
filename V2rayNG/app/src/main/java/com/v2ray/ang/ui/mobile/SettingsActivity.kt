@@ -90,7 +90,6 @@ fun SettingsScreen(
     var uiSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var vpnSettingsExpanded by rememberSaveable { mutableStateOf(true) }
     var coreSettingsExpanded by rememberSaveable { mutableStateOf(true) }
-    var muxSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var fragmentSettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var observatorySettingsExpanded by rememberSaveable { mutableStateOf(false) }
     var advancedSettingsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -103,11 +102,6 @@ fun SettingsScreen(
     var vpnBypassLan by rememberMmkvString(AppConfig.PREF_VPN_BYPASS_LAN, AppConfig.DEFAULT_VPN_BYPASS_LAN)
     var vpnInterfaceAddress by rememberMmkvString(AppConfig.PREF_VPN_INTERFACE_ADDRESS_CONFIG_INDEX, "0")
     var vpnMtu by rememberMmkvString(AppConfig.PREF_VPN_MTU, "")
-
-    var mux by rememberMmkvBool(AppConfig.PREF_MUX_ENABLED, false)
-    var muxConcurrency by rememberMmkvString(AppConfig.PREF_MUX_CONCURRENCY, "8")
-    var muxXudpConcurrency by rememberMmkvString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY)
-    var muxXudpQuic by rememberMmkvString(AppConfig.PREF_MUX_XUDP_QUIC, "reject")
 
     var fragment by rememberMmkvBool(AppConfig.PREF_FRAGMENT_ENABLED, false)
     var fragmentPackets by rememberMmkvString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")
@@ -171,7 +165,6 @@ fun SettingsScreen(
     val hevTunEnabled = isVpn && useHevTun
     val localProxyForced = hevTunEnabled
     val effectiveLocalProxy = enableLocalProxy || localProxyForced
-    val muxXudpConcurrencyInt = muxXudpConcurrency.toIntOrNull() ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt()
 
     val dynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     LaunchedEffect(dynamicColorSupported) {
@@ -195,8 +188,6 @@ fun SettingsScreen(
     val coreLogLevelValues = stringArrayResource(R.array.core_loglevel).toList()
     val outboundResolveEntries = stringArrayResource(R.array.outbound_domain_resolve_method).toList()
     val outboundResolveValues = stringArrayResource(R.array.outbound_domain_resolve_method_value).toList()
-    val xudpQuicEntries = stringArrayResource(R.array.mux_xudp_quic_entries).toList()
-    val xudpQuicValues = stringArrayResource(R.array.mux_xudp_quic_value).toList()
     val fragmentPacketsEntries = stringArrayResource(R.array.fragment_packets).toList()
     val fragmentPacketsValues = stringArrayResource(R.array.fragment_packets).toList()
     val observatoryLeastLoadMethodEntries = stringArrayResource(R.array.observatory_least_load_method).toList()
@@ -510,42 +501,6 @@ fun SettingsScreen(
                     title = stringResource(R.string.title_pref_hysteria_port_hopping_interval),
                     value = hysteriaPortHoppingInterval,
                     onValueChanged = { hysteriaPortHoppingInterval = it }
-                )
-            }
-
-            CollapsiblePreferenceGroupHeader(
-                title = stringResource(R.string.title_mux_settings),
-                expanded = muxSettingsExpanded,
-                onExpandedChange = { muxSettingsExpanded = it }
-            )
-            if (muxSettingsExpanded) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_pref_mux_enabled),
-                    summary = stringResource(R.string.summary_pref_mux_enabled),
-                    checked = mux,
-                    onCheckedChange = { mux = it }
-                )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_mux_concurrency),
-                    value = muxConcurrency,
-                    enabled = mux,
-                    keyboardNumber = true,
-                    onValueChanged = { muxConcurrency = it }
-                )
-                SettingsEditItem(
-                    title = stringResource(R.string.title_pref_mux_xudp_concurrency),
-                    value = muxXudpConcurrency,
-                    enabled = mux,
-                    keyboardNumber = true,
-                    onValueChanged = { muxXudpConcurrency = it }
-                )
-                SettingsListItem(
-                    title = stringResource(R.string.title_pref_mux_xudp_quic),
-                    entries = xudpQuicEntries,
-                    values = xudpQuicValues,
-                    selectedValue = muxXudpQuic,
-                    enabled = mux && muxXudpConcurrencyInt >= 0,
-                    onSelected = { muxXudpQuic = it }
                 )
             }
 

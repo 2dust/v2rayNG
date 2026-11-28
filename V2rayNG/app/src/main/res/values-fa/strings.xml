@@ -207,11 +207,11 @@
     <string name="summary_pref_auto_sort_after_test">نتایج آزمایش ممکن است کاملاً دقیق نباشند.</string>
 
     <string name="title_mux_settings">تنظیمات Mux</string>
-    <string name="title_pref_mux_enabled">فعال کردن Mux</string>
-    <string name="summary_pref_mux_enabled">سریع‌تر است، اما ممکن است اتصال را ناپایدار کند.\nدر ادامه می‌توانید نحوهٔ پردازش TCP، UDP و QUIC را تنظیم کنید.</string>
-    <string name="title_pref_mux_concurrency">اتصالات TCP (محدوده -1 تا 1024)</string>
-    <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP (محدوده -1 تا 1024)</string>
-    <string name="title_pref_mux_xudp_quic">مدیریت QUIC در تونل MUX</string>
+    <string name="server_lab_mux_enabled">فعال کردن Mux</string>
+    <string name="server_lab_summary_mux_enabled">Lowers handshake latency, but may reduce throughput for streaming, downloads, or speed tests</string>
+    <string name="server_lab_mux_concurrency">اتصالات TCP (محدوده -1 تا 1024)</string>
+    <string name="server_lab_mux_xudp_concurrency">اتصالات XUDP (محدوده -1 تا 1024)</string>
+    <string name="server_lab_mux_xudp_proxy_udp443">مدیریت UDP/443 در تونل MUX</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رد کردن</item>
         <item>مجاز</item>

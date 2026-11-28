@@ -207,11 +207,11 @@
     <string name="summary_pref_auto_sort_after_test">Sınaq nəticələri dəqiq olmaya bilər;</string>
 
     <string name="title_mux_settings">Mux Tənzimləmələri</string>
-    <string name="title_pref_mux_enabled">Mux-ı aktivləşdir</string>
-    <string name="summary_pref_mux_enabled">Daha sürətlidir, lakin bağlantı qeyri-sabitliyinə səbəb ola bilər\nAşağıda TCP, UDP və QUIC idarəetməsini fərdiləşdirin</string>
-    <string name="title_pref_mux_concurrency">TCP bağlantıları (diapazon -1 ilə 1024 arası)</string>
-    <string name="title_pref_mux_xudp_concurrency">XUDP bağlantıları (diapazon -1 ilə 1024 arası)</string>
-    <string name="title_pref_mux_xudp_quic">Mux tunelində QUIC idarə edilməsi</string>
+    <string name="server_lab_mux_enabled">Mux-ı aktivləşdir</string>
+    <string name="server_lab_summary_mux_enabled">Lowers handshake latency, but may reduce throughput for streaming, downloads, or speed tests</string>
+    <string name="server_lab_mux_concurrency">TCP bağlantıları (diapazon -1 ilə 1024 arası)</string>
+    <string name="server_lab_mux_xudp_concurrency">XUDP bağlantıları (diapazon -1 ilə 1024 arası)</string>
+    <string name="server_lab_mux_xudp_proxy_udp443">Mux tunelində UDP/443 idarə edilməsi</string>
     <string-array name="mux_xudp_quic_entries">
         <item>rədd et</item>
         <item>icazə ver</item>

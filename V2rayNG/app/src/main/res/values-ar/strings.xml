@@ -207,11 +207,11 @@
     <string name="summary_pref_auto_sort_after_test">قد لا تكون نتائج الاختبار دقيقة؛</string>
 
     <string name="title_mux_settings">إعدادات Mux</string>
-    <string name="title_pref_mux_enabled">تمكين Mux</string>
-    <string name="summary_pref_mux_enabled">أسرع، لكن قد يتسبب في اتصال غير مستقر\nتخصيص كيفية التعامل مع TCP و UDP و QUIC أدناه</string>
-    <string name="title_pref_mux_concurrency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
-    <string name="title_pref_mux_xudp_concurrency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
-    <string name="title_pref_mux_xudp_quic">التعامل مع QUIC في نفق mux</string>
+    <string name="server_lab_mux_enabled">تمكين Mux</string>
+    <string name="server_lab_summary_mux_enabled">Lowers handshake latency, but may reduce throughput for streaming, downloads, or speed tests</string>
+    <string name="server_lab_mux_concurrency">اتصالات TCP（النطاق من -1 إلى 1024）</string>
+    <string name="server_lab_mux_xudp_concurrency">اتصالات XUDP（النطاق من -1 إلى 1024）</string>
+    <string name="server_lab_mux_xudp_proxy_udp443">التعامل مع UDP/443 في نفق mux</string>
     <string-array name="mux_xudp_quic_entries">
         <item>رفض</item>
         <item>سماح</item>

@@ -116,26 +116,6 @@ class CoreOutboundBuilderXdriveTest {
     }
 
     @Test
-    fun xdriveMuxIsAlwaysEnabledWithAcceptedValues() {
-        assertEquals(
-            OutboundBean.MuxBean(enabled = true, concurrency = 16, xudpConcurrency = 4, xudpProxyUDP443 = "allow"),
-            CoreOutboundBuilder.buildXdriveMux("16", "4", "allow")
-        )
-        assertEquals(
-            OutboundBean.MuxBean(enabled = true, concurrency = 8, xudpConcurrency = 8, xudpProxyUDP443 = "reject"),
-            CoreOutboundBuilder.buildXdriveMux("-1", "-1", "skip")
-        )
-        assertEquals(
-            OutboundBean.MuxBean(enabled = true, concurrency = 8, xudpConcurrency = 0, xudpProxyUDP443 = "reject"),
-            CoreOutboundBuilder.buildXdriveMux(null, "0", null)
-        )
-        assertEquals(
-            OutboundBean.MuxBean(enabled = true, concurrency = 8, xudpConcurrency = 8, xudpProxyUDP443 = "reject"),
-            CoreOutboundBuilder.buildXdriveMux("abc", "", "")
-        )
-    }
-
-    @Test
     fun parseSecretsTrimsAndDropsEmptyEntries() {
         assertEquals(listOf("a", "b"), CoreOutboundBuilder.buildXdriveSettings(xdrive(secrets = " a , ,b,"))?.secrets)
         assertNull(CoreOutboundBuilder.buildXdriveSettings(xdrive(secrets = " , "))?.secrets)

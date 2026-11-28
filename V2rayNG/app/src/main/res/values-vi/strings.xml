@@ -207,11 +207,11 @@
     <string name="summary_pref_auto_sort_after_test">Kết quả kiểm tra có thể không chính xác;</string>
 
     <string name="title_mux_settings">Cài đặt Mux</string>
-    <string name="title_pref_mux_enabled">Bật Mux</string>
-    <string name="summary_pref_mux_enabled">Nhanh hơn nhưng có thể làm kết nối không ổn định.\nTùy chỉnh cách xử lý TCP, UDP và QUIC bên dưới.</string>
-    <string name="title_pref_mux_concurrency">Số kết nối con TCP được ghép kênh (-1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_concurrency">Số kết nối con XUDP được ghép kênh (-1 đến 1024)</string>
-    <string name="title_pref_mux_xudp_quic">Phương pháp xử lý lưu lượng QUIC</string>
+    <string name="server_lab_mux_enabled">Bật Mux</string>
+    <string name="server_lab_summary_mux_enabled">Lowers handshake latency, but may reduce throughput for streaming, downloads, or speed tests</string>
+    <string name="server_lab_mux_concurrency">Số kết nối con TCP được ghép kênh (-1 đến 1024)</string>
+    <string name="server_lab_mux_xudp_concurrency">Số kết nối con XUDP được ghép kênh (-1 đến 1024)</string>
+    <string name="server_lab_mux_xudp_proxy_udp443">Phương pháp xử lý lưu lượng UDP/443</string>
     <string-array name="mux_xudp_quic_entries">
         <item>Từ chối</item>
         <item>Cho phép</item>

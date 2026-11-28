@@ -37,24 +37,18 @@ object CoreOutboundBuilder {
         }
 
         outbound ?: return null
-        val ret = updateOutboundWithGlobalSettings(outbound)
+        val ret = updateOutboundWithGlobalSettings(outbound, profileItem)
         if (!ret) return null
         return outbound
     }
 
     /** Applies global outbound options (mux, protocol-specific tweaks, etc.). */
-    private fun updateOutboundWithGlobalSettings(outbound: OutboundBean): Boolean {
+    private fun updateOutboundWithGlobalSettings(outbound: OutboundBean, profileItem: ProfileItem): Boolean {
         try {
-            var muxEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
+            var muxEnabled = profileItem.muxEnabled == true
             val protocol = outbound.protocol
-            if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
-                || protocol.equals(EConfigType.SOCKS.name, true)
-                || protocol.equals(EConfigType.HTTP.name, true)
-                || protocol.equals(EConfigType.TROJAN.name, true)
-                || protocol.equals(EConfigType.WIREGUARD.name, true)
-                || protocol.equals(EConfigType.HYSTERIA2.name, true)
-                || protocol.equals(EConfigType.HYSTERIA.name, true)
-                || protocol.equals(EConfigType.MASQUE.name, true)
+            if (!(protocol.equals(EConfigType.VLESS.name, true)
+                || protocol.equals(EConfigType.VMESS.name, true))
             ) {
                 muxEnabled = false
             } else if (outbound.streamSettings?.network == NetworkType.XHTTP.type) {
@@ -62,24 +56,30 @@ object CoreOutboundBuilder {
             }
 
             if (outbound.streamSettings?.network == NetworkType.XDRIVE.type) {
-                // Xray-core refuses an xdrive outbound unless Mux.Cool carries every connection,
+                // Xray-core refuses an xdrive outbound unless Mux carries every connection,
                 // so the global mux switch does not apply to this transport.
-                outbound.mux = buildXdriveMux(
-                    concurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8"),
-                    xudpConcurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY),
-                    xudpProxyUDP443 = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC, "reject")
+                outbound.settings = outbound.settings ?: OutboundBean.OutSettingsBean()
+                outbound.settings!!.multiplex = buildXdriveMux(
+                    concurrency = profileItem.muxConcurrency,
+                    xudpConcurrency = profileItem.muxXudpConcurrency,
+                    xudpProxyUDP443 = profileItem.muxXudpProxyUDP443,
                 )
             } else if (muxEnabled) {
-                outbound.mux?.enabled = true
-                outbound.mux?.concurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8").orEmpty().toInt()
-                outbound.mux?.xudpConcurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY).orEmpty().toInt()
-                outbound.mux?.xudpProxyUDP443 = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC, "reject")
+                outbound.settings = outbound.settings ?: OutboundBean.OutSettingsBean()
+                outbound.settings!!.multiplex = OutboundBean.OutSettingsBean.MuxBean(
+                    enabled = true,
+                    concurrency = profileItem.muxConcurrency?.takeIf { it > 0 }
+                        ?: AppConfig.DEFAULT_MUX_CONCURRENCY.toInt(),
+                    xudpConcurrency = profileItem.muxXudpConcurrency?.takeIf { it >= 0 }
+                        ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt(),
+                    xudpProxyUDP443 = profileItem.muxXudpProxyUDP443?.takeIf { it.isNotBlank() && it != "skip" }
+                        ?: "reject"
+                )
                 if (protocol.equals(EConfigType.VLESS.name, true) && outbound.settings?.flow?.isNotEmpty() == true) {
-                    outbound.mux?.concurrency = -1
+                    outbound.settings?.multiplex?.concurrency = -1
                 }
             } else {
-                outbound.mux?.enabled = false
-                outbound.mux?.concurrency = -1
+                outbound.settings?.multiplex = null
             }
 
         } catch (e: Exception) {
@@ -456,11 +456,12 @@ object CoreOutboundBuilder {
      * Mux settings for an xdrive outbound: always enabled, with the user's mux preferences
      * coerced into the ranges Xray-core accepts for xdrive (no negative concurrency, no "skip").
      */
-    fun buildXdriveMux(concurrency: String?, xudpConcurrency: String?, xudpProxyUDP443: String?): OutboundBean.MuxBean =
-        OutboundBean.MuxBean(
+    fun buildXdriveMux(concurrency: Int?, xudpConcurrency: Int?, xudpProxyUDP443: String?): OutboundBean.OutSettingsBean.MuxBean =
+        OutboundBean.OutSettingsBean.MuxBean(
             enabled = true,
-            concurrency = concurrency?.trim()?.toIntOrNull()?.takeIf { it > 0 } ?: 8,
-            xudpConcurrency = xudpConcurrency?.trim()?.toIntOrNull()?.takeIf { it >= 0 }
+            concurrency = concurrency?.takeIf { it > 0 }
+                ?: AppConfig.DEFAULT_MUX_CONCURRENCY.toInt(),
+            xudpConcurrency = xudpConcurrency?.takeIf { it >= 0 }
                 ?: AppConfig.DEFAULT_MUX_XUDP_CONCURRENCY.toInt(),
             xudpProxyUDP443 = xudpProxyUDP443?.takeIf { it.isNotBlank() && it != "skip" } ?: "reject"
         )

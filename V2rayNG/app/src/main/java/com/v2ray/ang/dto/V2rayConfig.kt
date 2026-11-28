@@ -70,7 +70,6 @@ data class V2rayConfig(
         var settings: OutSettingsBean? = null,
         var streamSettings: StreamSettingsBean? = null,
         val sendThrough: String? = null,
-        var mux: MuxBean? = MuxBean(false),
         var targetStrategy: String? = null
     ) {
         data class OutSettingsBean(
@@ -101,11 +100,19 @@ data class V2rayConfig(
             var reserved: List<Int>? = null,
             var mtu: Int? = null,
             var remoteDNS: List<String>? = null,
+            var multiplex: MuxBean? = MuxBean(false),
         ) {
             data class WireGuardBean(
                 var publicKey: String = "",
                 var preSharedKey: String? = null,
                 var endpoint: String = ""
+            )
+
+            data class MuxBean(
+                var enabled: Boolean,
+                var concurrency: Int? = null,
+                var xudpConcurrency: Int? = null,
+                var xudpProxyUDP443: String? = null,
             )
         }
 
@@ -360,13 +367,6 @@ data class V2rayConfig(
                 )
             }
         }
-
-        data class MuxBean(
-            var enabled: Boolean,
-            var concurrency: Int? = null,
-            var xudpConcurrency: Int? = null,
-            var xudpProxyUDP443: String? = null,
-        )
 
         fun getServerAddress(): String? {
             return if (protocol.equals(EConfigType.WIREGUARD.name, true)) {

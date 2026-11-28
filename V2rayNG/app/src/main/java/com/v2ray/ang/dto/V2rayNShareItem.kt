@@ -30,7 +30,6 @@ data class V2rayNShareItem(
     val ShortId: String?,
     val SpiderX: String?,
     val Mldsa65Verify: String?,
-    // val MuxEnabled: Boolean?,
     // val Cert: String?,
     val CertSha: String?,
     val EchConfigList: String?,
@@ -38,6 +37,7 @@ data class V2rayNShareItem(
     val Finalmask: String?,
     val ProtoExtraObj: V2rayNProtocolExtraShareItem?,
     val TransportExtraObj: V2rayNTransportExtraShareItem?,
+    val MuxExtraObj: V2rayNMuxExtraShareItem?,
 ) {
     data class V2rayNProtocolExtraShareItem(
         val AlterId: Int?,
@@ -75,6 +75,17 @@ data class V2rayNShareItem(
         val KcpSeed: String?,
         val KcpMtu: Int?,
     )
+
+    data class V2rayNMuxExtraShareItem(
+        val Xray: Mux4Ray,
+    ) {
+        data class Mux4Ray(
+            val Enabled: Boolean?,
+            val Concurrency: Int?,
+            val XudpConcurrency: Int?,
+            val XudpProxyUDP443: String?,
+        )
+    }
 
     /**
      * Returns null for a ConfigType this app cannot represent, so the caller skips only that entry.
@@ -114,6 +125,10 @@ data class V2rayNShareItem(
             },
             flow = ProtoExtraObj?.Flow.orEmpty(),
             username = Username.orEmpty(),
+            muxEnabled = MuxExtraObj?.Xray?.Enabled,
+            muxConcurrency = MuxExtraObj?.Xray?.Concurrency,
+            muxXudpConcurrency = MuxExtraObj?.Xray?.XudpConcurrency,
+            muxXudpProxyUDP443 = MuxExtraObj?.Xray?.XudpProxyUDP443,
             network = network,
             headerType = when (network) {
                 NetworkType.TCP.type -> TransportExtraObj?.RawHeaderType
