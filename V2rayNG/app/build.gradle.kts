@@ -209,6 +209,7 @@ dependencies {
     // AndroidX Lifecycle and Architecture Components
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.compose)
 
     // Background Task Libraries
     implementation(libs.work.runtime.ktx)

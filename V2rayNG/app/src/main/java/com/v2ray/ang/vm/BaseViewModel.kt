@@ -113,6 +113,13 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     }
 
     /**
+     * Update isLoading state.
+     */
+    fun setLoading(loading: Boolean) {
+        _isLoading.value = loading
+    }
+
+    /**
      * Helper method: execute task in coroutine and automatically manage isLoading state.
      */
     protected fun launchLoading(block: suspend CoroutineScope.() -> Unit) {

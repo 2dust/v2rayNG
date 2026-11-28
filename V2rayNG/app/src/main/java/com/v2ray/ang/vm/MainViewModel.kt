@@ -19,7 +19,6 @@ import com.v2ray.ang.dto.ConnectionTestResult
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.LocateTarget
 import com.v2ray.ang.dto.RealPingResult
-import com.v2ray.ang.dto.SubscriptionUpdateResult
 import com.v2ray.ang.dto.TestServiceMessage
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServerAffiliationInfo
@@ -388,8 +387,8 @@ class MainViewModel(
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
             MainAction.RemoveInvalidServers -> removeInvalidServerAsync()
             MainAction.SortByTestResults -> sortByTestResultsAsync()
-            MainAction.UpdateSubscriptions -> importConfigViaSub(uiState.value.selectedGroupId)
-            is MainAction.UpdateGroupSubscription -> importConfigViaSub(action.groupId)
+            MainAction.UpdateSubscriptions -> updateSubscriptions()
+            is MainAction.UpdateGroupSubscription -> updateSubscriptions(action.groupId)
             MainAction.ExportAll -> exportAllAsync()
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
@@ -665,44 +664,14 @@ class MainViewModel(
         }
     }
 
-    private fun importConfigViaSub(subId: String) {
-        launchLoading {
-            withContext(ioDispatcher) {
-                try {
-                    val result = if (subId.isEmpty()) {
-                        updateConfigViaSubAll()
-                    } else {
-                        val item = decodeSubscription(subId) ?: return@withContext
-                        updateConfigViaSub(SubscriptionCache(subId, item))
-                    }
-                    when {
-                        result.successCount + result.failureCount + result.skipCount == 0 ->
-                            toast(R.string.title_update_subscription_no_subscription)
 
-                        result.successCount > 0 && result.failureCount + result.skipCount == 0 ->
-                            toast(
-                                getQuantityString(
-                                    R.plurals.title_update_config_count,
-                                    result.configCount,
-                                    result.configCount,
-                                )
-                            )
 
-                        else ->
-                            toast(getString(R.string.title_update_subscription_result, result.configCount, result.successCount, result.failureCount, result.skipCount))
-                    }
-                    if (result.configCount > 0) {
-                        setupGroupTab(forceRefresh = true)
-                        refreshSelectedGuid()
-                    }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (e: Exception) {
-                    LogUtil.e(AppConfig.TAG, "Subscription update failed", e)
-                    toastError(R.string.toast_failure)
-                }
-            }
-        }
+    private fun updateSubscriptions(subId: String = uiState.value.selectedGroupId) {
+        SubscriptionUpdateViewModel(app).updateSubscriptions(
+            subId = subId,
+            onLoadingStateChanged = { loading -> setLoading(loading) },
+            onUpdated = { setupGroupTab(forceRefresh = true) }
+        )
     }
 
     private fun exportAllAsync() {
@@ -1180,11 +1149,7 @@ class MainViewModel(
         updateUI: Boolean
     ): Pair<Int, Int> = AngConfigManager.importBatchConfig(server, subscriptionId, updateUI)
 
-    private fun updateConfigViaSubAll(): SubscriptionUpdateResult =
-        AngConfigManager.updateConfigViaSubAll()
 
-    private fun updateConfigViaSub(subscriptionCache: SubscriptionCache): SubscriptionUpdateResult =
-        AngConfigManager.updateConfigViaSub(subscriptionCache)
 
     private fun shareNonCustomConfigsToClipboard(guids: List<String>): Int =
         AngConfigManager.shareNonCustomConfigsToClipboard(app, guids)

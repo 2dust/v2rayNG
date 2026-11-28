@@ -36,6 +36,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.vm.MainViewModel
 import com.v2ray.ang.ui.mobile.compose.LocalDarkTheme
 import com.v2ray.ang.ui.mobile.compose.QRCodeDialog
+import com.v2ray.ang.ui.mobile.compose.SubscriptionUpdateDialog
 import com.v2ray.ang.ui.mobile.main.MainAction
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -67,6 +68,7 @@ fun MainScreen(
     var showRemoveConfirm by rememberSaveable(stateSaver = ServerDeleteTarget.Saver) {
         mutableStateOf<ServerDeleteTarget?>(null)
     }
+    var showUpdateSubDialog by remember { mutableStateOf(false) }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
     val removeServer: (String, String) -> Unit = { guid, profileName ->
@@ -136,6 +138,15 @@ fun MainScreen(
         QRCodeDialog(bitmap = shareQRCodeBitmap, onDismiss = { onAction(MainAction.DismissQRCodeDialog) })
     }
 
+    if (showUpdateSubDialog) {
+        SubscriptionUpdateDialog(
+            subId = uiState.selectedGroupId,
+            onLoadingStateChanged = { loading -> mainViewModel.setLoading(loading) },
+            onUpdated = { onAction(MainAction.RefreshGroups) },
+            onDismiss = { showUpdateSubDialog = false }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -174,7 +185,7 @@ fun MainScreen(
                             MainMoreMenuAction.SortByTestResults -> onAction(MainAction.SortByTestResults)
                             MainMoreMenuAction.TestAll -> onAction(MainAction.TestAllServers)
                             MainMoreMenuAction.TestAllRealPing -> onAction(MainAction.TestRealAllServers)
-                            MainMoreMenuAction.UpdateSubscriptions -> onAction(MainAction.UpdateSubscriptions)
+                            MainMoreMenuAction.UpdateSubscriptions -> showUpdateSubDialog = true
                         }
                     }
                 )

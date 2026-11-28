@@ -53,6 +53,7 @@ import com.v2ray.ang.ui.mobile.compose.QRCodeDialog
 import com.v2ray.ang.ui.mobile.compose.ReorderableListItem
 import com.v2ray.ang.ui.mobile.compose.SelectListDialog
 import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.mobile.compose.SubscriptionUpdateDialog
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.vm.SubscriptionsViewModel
@@ -333,61 +334,11 @@ fun SubSettingScreen(
     }
 
     if (showUpdateDialog) {
-
-        var updateSubscription by rememberMmkvBool(AppConfig.PREF_UPDATE_SUBSCRIPTION, false)
-        var autoTestAfterUpdateSubscription by rememberMmkvBool(AppConfig.PREF_AUTO_TEST_AFTER_UPDATE_SUBSCRIPTION, false)
-        var autoRemoveInvalidAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_REMOVE_INVALID_AFTER_TEST, false)
-        var autoSortAfterTest by rememberMmkvBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, false)
-
-        AlertDialog(
-            onDismissRequest = { showUpdateDialog = false },
-            text = {
-                Column {
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_sub_update),
-                        checked = updateSubscription,
-                        onCheckedChange = { updateSubscription = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_test_after_update_subscription),
-                        summary = stringResource(R.string.summary_pref_auto_test_after_update_subscription),
-                        checked = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoTestAfterUpdateSubscription = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_remove_invalid_after_test),
-                        summary = stringResource(R.string.summary_pref_auto_remove_invalid_after_test),
-                        checked = autoRemoveInvalidAfterTest,
-                        enabled = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoRemoveInvalidAfterTest = it }
-                    )
-                    SettingsSwitchItem(
-                        title = stringResource(R.string.title_pref_auto_sort_after_test),
-                        summary = stringResource(R.string.summary_pref_auto_sort_after_test),
-                        checked = autoSortAfterTest,
-                        enabled = autoTestAfterUpdateSubscription,
-                        onCheckedChange = { autoSortAfterTest = it }
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showUpdateDialog = false
-                    val targetId = pendingUpdateSubId
-                    if (targetId != null) {
-                        onSingleSubUpdate(targetId)
-                    } else {
-                        onSubUpdate()
-                    }
-                }) {
-                    Text(text = stringResource(R.string.action_ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showUpdateDialog = false }) {
-                    Text(text = stringResource(R.string.action_cancel))
-                }
-            }
+        SubscriptionUpdateDialog(
+            subId = pendingUpdateSubId,
+            onLoadingStateChanged = { loading -> viewModel.setLoading(loading) },
+            onUpdated = { viewModel.reload() },
+            onDismiss = { showUpdateDialog = false }
         )
     }
 }
