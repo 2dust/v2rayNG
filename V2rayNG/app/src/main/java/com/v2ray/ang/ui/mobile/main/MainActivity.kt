@@ -40,6 +40,7 @@ import com.v2ray.ang.ui.mobile.server.ServerVlessActivity
 import com.v2ray.ang.ui.mobile.server.ServerVmessActivity
 import com.v2ray.ang.ui.mobile.server.ServerWireguardActivity
 import com.v2ray.ang.ui.mobile.SettingsActivity
+import com.v2ray.ang.ui.mobile.ShizukuActivity
 import com.v2ray.ang.ui.mobile.main.component.MainDestination
 import com.v2ray.ang.ui.mobile.main.component.MainScreen
 import com.v2ray.ang.ui.mobile.SubSettingActivity
@@ -143,6 +144,7 @@ open class MainActivity : HelperBaseComponentActivity() {
             MainDestination.Logcat -> Intent(this, LogcatActivity::class.java)
             MainDestination.CheckUpdate -> Intent(this, CheckUpdateActivity::class.java)
             MainDestination.BackupRestore -> Intent(this, BackupActivity::class.java)
+            MainDestination.Tethering -> Intent(this, ShizukuActivity::class.java)
             MainDestination.About -> Intent(this, AboutActivity::class.java)
             MainDestination.Promotion -> {
                 Utils.openUri(

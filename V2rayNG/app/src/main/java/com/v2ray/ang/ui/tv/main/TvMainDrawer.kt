@@ -66,7 +66,7 @@ import com.v2ray.ang.ui.tv.compose.dpadVerticalFocusNavigation
 import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
 import com.v2ray.ang.ui.mobile.main.component.MainDestination
-import com.v2ray.ang.ui.mobile.main.component.drawerItems
+import com.v2ray.ang.ui.mobile.main.component.mainDrawerItems
 import com.v2ray.ang.ui.mobile.main.component.primaryDrawerItems
 
 private val V2rayNgFontFamily = FontFamily(Font(R.font.montserrat_thin))
@@ -121,11 +121,12 @@ private fun NavigationDrawerScope.TvMainDrawerContent(
     onClose: () -> Unit,
     onNavigate: (MainDestination) -> Unit
 ) {
-    val focusRequesters = remember { List(drawerItems.size) { FocusRequester() } }
+    val items = mainDrawerItems()
+    val focusRequesters = remember(items) { List(items.size) { FocusRequester() } }
     val drawerScrollState = rememberScrollState()
-    var focusedIndex by remember { mutableIntStateOf(0) }
+    var focusedIndex by remember(items) { mutableIntStateOf(0) }
 
-    LaunchedEffect(drawerValue, focusGeneration) {
+    LaunchedEffect(items, drawerValue, focusGeneration) {
         if (drawerValue == TvDrawerValue.Open) {
             requestFocusWhenReady(focusRequesters[focusedIndex], focusRequesters.first())
         }
@@ -186,7 +187,7 @@ private fun NavigationDrawerScope.TvMainDrawerContent(
                 }
             }
 
-            drawerItems.forEachIndexed { index, item ->
+            items.forEachIndexed { index, item ->
                 if (index == primaryDrawerItems.size) {
                     AppDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp))
                 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRe
     Logcat(R.drawable.ic_logcat_24dp, R.string.title_logcat),
     CheckUpdate(R.drawable.ic_check_update_24dp, R.string.update_check_for_update),
     BackupRestore(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore),
+    Tethering(R.drawable.ic_device_hub_24dp, R.string.title_tethering),
     About(R.drawable.ic_about_24dp, R.string.title_about)
 }
 
@@ -55,17 +57,24 @@ internal val primaryDrawerItems = listOf(
     MainDestination.Settings
 )
 
-internal val drawerItems = primaryDrawerItems + listOf(
+private val drawerItems = primaryDrawerItems + listOf(
     MainDestination.Promotion,
     MainDestination.Logcat,
     MainDestination.CheckUpdate,
     MainDestination.BackupRestore,
+    MainDestination.Tethering,
     MainDestination.About
 )
 
 @Composable
+internal fun mainDrawerItems(): List<MainDestination> =
+    if (booleanResource(R.bool.shizuku_tethering_enabled)) drawerItems
+    else drawerItems.filterNot { it == MainDestination.Tethering }
+
+@Composable
 fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) -> Unit) {
     val drawerScrollState = rememberScrollState()
+    val items = mainDrawerItems()
 
     ModalDrawerSheet(
         drawerState = drawerState,
@@ -107,7 +116,7 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     )
                 }
             }
-            drawerItems.forEachIndexed { index, item ->
+            items.forEachIndexed { index, item ->
                 if (index == primaryDrawerItems.size) AppDivider()
                 NavigationDrawerItem(
                     label = { Text(stringResource(item.labelRes)) },
