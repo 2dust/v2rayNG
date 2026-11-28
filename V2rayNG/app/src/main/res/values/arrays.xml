@@ -157,6 +157,7 @@
         <item>Azərbaycanca</item>
         <item>বাংলা</item>
         <item>لۊری بختیاری</item>
+        <item>Português (Brasil)</item>
     </string-array>
 
 
@@ -172,6 +173,7 @@
         <item>az</item>
         <item>bn</item>
         <item>bqi-rIR</item>
+        <item>pt-rBR</item>
     </string-array>
 
     <string-array name="mux_xudp_quic_value" translatable="false">
