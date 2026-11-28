@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.mobile.main.MainAction
 import com.v2ray.ang.ui.mobile.main.component.ServerRowUiModel
@@ -76,7 +77,10 @@ internal fun TvMainDialogs(
     }
     shareTarget?.let { target ->
         TvActionDialog(
-            serverMenuActions(target.profile.configType.isComplexType(), target.origin.action == ProfileRowAction.More),
+            serverMenuActions(
+                target.profile.configType.isComplexType() || target.profile.configType == EConfigType.CUSTOM_OUTBOUND,
+                target.origin.action == ProfileRowAction.More
+            ),
             { stringResource(it.labelRes) },
             { action ->
                 shareTarget = null
