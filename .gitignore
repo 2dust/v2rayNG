@@ -8,6 +8,7 @@ V2rayNG/app/release/output.json
 # Ignore IDE and build system directories
 .idea/
 .gradle/
+.kotlin/
 *.iml
 
 # Ignore local properties and DS_Store files
