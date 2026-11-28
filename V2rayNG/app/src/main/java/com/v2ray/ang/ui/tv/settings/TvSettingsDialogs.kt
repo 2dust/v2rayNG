@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
@@ -42,8 +41,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.password
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -52,8 +49,6 @@ import com.v2ray.ang.ui.tv.compose.dpadFocusOutline
 import com.v2ray.ang.ui.tv.compose.rememberTvTextFieldState
 import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 import com.v2ray.ang.ui.tv.compose.tvTextFieldEditorFocus
-
-private val MaskPassword = OutputTransformation { replace(0, length, "•".repeat(length)) }
 
 @Composable
 internal fun TvSettingsEditDialog(title: String, value: String, isPassword: Boolean, keyboardNumber: Boolean,
@@ -81,25 +76,19 @@ internal fun TvSettingsEditDialog(title: String, value: String, isPassword: Bool
                     OutlinedTextField(
                         state = draft,
                         modifier = Modifier.fillMaxWidth().focusProperties { down = cancel }
-                            .bringIntoViewRequester(focus.bringIntoViewRequester).tvTextFieldEditorFocus(focus)
-                            .then(if (isPassword) Modifier.semantics { password() } else Modifier),
+                            .bringIntoViewRequester(focus.bringIntoViewRequester).tvTextFieldEditorFocus(focus),
                         label = { Text(title) },
-                        keyboardOptions = KeyboardOptions(keyboardType = when {
-                            isPassword -> KeyboardType.Password
-                            keyboardNumber -> KeyboardType.Number
-                            else -> KeyboardType.Text
-                        }),
-                        lineLimits = if (isPassword || keyboardNumber) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(maxHeightInLines = 5),
-                        outputTransformation = MaskPassword.takeIf { isPassword }
+                        keyboardOptions = when {
+                            isPassword -> KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false)
+                            keyboardNumber -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                            else -> KeyboardOptions.Default
+                        },
+                        lineLimits = if (isPassword || keyboardNumber) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(maxHeightInLines = 5)
                     )
                 } else {
                     OutlinedButton(onClick = focus::beginEditing, modifier = Modifier.fillMaxWidth()
                         .focusProperties { down = cancel }.dpadFocusOutline(field, 24.dp)) {
-                        Text(when {
-                            draft.text.isEmpty() -> title
-                            isPassword -> "••••••"
-                            else -> draft.text.toString()
-                        }, maxLines = 3)
+                        Text(draft.text.toString().ifEmpty { title }, maxLines = 3)
                     }
                 }
             }
@@ -129,6 +118,7 @@ private fun TvSettingsEditActions(
 internal fun TvSettingsListDialog(title: String, options: List<Pair<String, String>>, selectedValue: String?,
     onDismiss: () -> Unit, onSelected: (String) -> Unit) {
     val index = options.indexOfFirst { it.second == selectedValue }.coerceAtLeast(0)
+    val initialValue = options.getOrNull(index)?.second
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = index)
     val selected = remember { FocusRequester() }
     val cancel = remember { FocusRequester() }
@@ -140,7 +130,7 @@ internal fun TvSettingsListDialog(title: String, options: List<Pair<String, Stri
                 items(options, key = { it.second }) { (label, value) ->
                     val checked = value == selectedValue
                     Row(
-                        Modifier.fillMaxWidth().dpadFocusOutline(selected.takeIf { checked })
+                        Modifier.fillMaxWidth().dpadFocusOutline(selected.takeIf { value == initialValue })
                             .selectable(checked, role = Role.RadioButton) { onSelected(value) }
                             .padding(horizontal = 8.dp, vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically
@@ -148,10 +138,10 @@ internal fun TvSettingsListDialog(title: String, options: List<Pair<String, Stri
                         RadioButton(checked, onClick = null, modifier = Modifier.clearAndSetSemantics {})
                         Text(label)
                     }
-                    if (checked) LaunchedEffect(selected) { requestFocusWhenReady(selected) }
                 }
             }
-            if (options.isEmpty()) LaunchedEffect(cancel) { requestFocusWhenReady(cancel) }
+            // Focus once per opening, not every time the selected option scrolls back into view.
+            LaunchedEffect(Unit) { requestFocusWhenReady(if (options.isEmpty()) cancel else selected) }
         },
         confirmButton = {},
         dismissButton = {

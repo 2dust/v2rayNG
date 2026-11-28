@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
@@ -35,13 +36,13 @@ import com.v2ray.ang.ui.settings.SettingsRows
 import com.v2ray.ang.ui.tv.compose.dpadFocusOutline
 import com.v2ray.ang.ui.tv.compose.requestFocusWhenReady
 
-internal class TvSettingsRows(private val back: FocusRequester, private val onRowFocused: (String?) -> Unit) : SettingsRows {
-    private val restorableRows = mutableMapOf<String, FocusRequester>()
+internal class TvSettingsRows(private val back: FocusRequester, private val onRowFocused: (Int?) -> Unit) : SettingsRows {
+    private val restorableRows = mutableMapOf<Int, FocusRequester>()
 
-    fun focusTarget(key: String?): FocusRequester? = restorableRows[key]
+    fun focusTarget(key: Int?): FocusRequester? = restorableRows[key]
 
     @Composable
-    private fun rowFocus(origin: FocusRequester? = null, key: String? = null): Modifier =
+    private fun rowFocus(origin: FocusRequester? = null, key: Int? = null): Modifier =
         Modifier.onFocusChanged { if (it.isFocused) onRowFocused(key) }
             .focusProperties { start = back }.dpadFocusOutline(focusRequester = origin)
 
@@ -76,9 +77,12 @@ internal class TvSettingsRows(private val back: FocusRequester, private val onRo
 
     @Composable
     override fun SettingsListItem(
-        title: String, entries: List<String>, values: List<String>, selectedValue: String,
-        onSelected: (String) -> Unit, enabled: Boolean, focusKey: String?
+        titleRes: Int, entries: List<String>, values: List<String>, selectedValue: String,
+        onSelected: (String) -> Unit, enabled: Boolean
     ) {
+        val title = stringResource(titleRes)
+        // These two choices can recreate the activity.
+        val focusKey = titleRes.takeIf { it == R.string.title_language || it == R.string.title_pref_ui_mode_night }
         val options = remember(entries, values) { entries.zip(values) }
         val selected = options.find { it.second == selectedValue } ?: options.firstOrNull()
         DialogRow(title, selected?.first, enabled, focusKey) { close ->
@@ -96,7 +100,7 @@ internal class TvSettingsRows(private val back: FocusRequester, private val onRo
 
     @Composable
     private fun DialogRow(
-        title: String, summary: String?, enabled: Boolean, focusKey: String? = null,
+        title: String, summary: String?, enabled: Boolean, focusKey: Int? = null,
         dialog: @Composable (close: () -> Unit) -> Unit
     ) {
         var open by remember { mutableStateOf(false) }

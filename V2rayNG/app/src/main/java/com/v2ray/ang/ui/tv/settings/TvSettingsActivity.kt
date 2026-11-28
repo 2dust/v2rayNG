@@ -60,7 +60,7 @@ class TvSettingsActivity : BaseComponentActivity() {
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         val systemVpnSettingsAvailable by viewModel.systemVpnSettingsAvailable.collectAsStateWithLifecycle()
         val back = remember { FocusRequester() }
-        val focusedSetting = rememberSaveable { mutableStateOf<String?>(null) }
+        val focusedSetting = rememberSaveable { mutableStateOf<Int?>(null) }
         val restoreKey = remember { focusedSetting.value }
         val rows = remember(back) { TvSettingsRows(back) { focusedSetting.value = it } }
         Scaffold(

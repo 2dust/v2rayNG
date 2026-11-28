@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.settings
 
 import android.os.Build
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,8 +39,8 @@ internal interface SettingsRows {
 
     @Composable
     fun SettingsListItem(
-        title: String, entries: List<String>, values: List<String>, selectedValue: String,
-        onSelected: (String) -> Unit, enabled: Boolean = true, focusKey: String? = null
+        @StringRes titleRes: Int, entries: List<String>, values: List<String>, selectedValue: String,
+        onSelected: (String) -> Unit, enabled: Boolean = true
     )
 
     @Composable
@@ -218,22 +219,20 @@ internal fun SettingsRows.SettingsForm(
             }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_language),
+            titleRes = R.string.title_language,
             entries = languageEntries,
             values = languageValues,
             selectedValue = language,
-            focusKey = AppConfig.PREF_LANGUAGE,
             onSelected = {
                 language = it
                 AppLocaleManager.setApplicationLanguage(it)
             }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_ui_mode_night),
+            titleRes = R.string.title_pref_ui_mode_night,
             entries = uiModeNightEntries,
             values = uiModeNightValues,
             selectedValue = uiModeNight,
-            focusKey = AppConfig.PREF_UI_MODE_NIGHT,
             onSelected = {
                 uiModeNight = it
                 ThemeManager.setThemeMode(it)
@@ -287,7 +286,7 @@ internal fun SettingsRows.SettingsForm(
             onCheckedChange = { appendHttpProxy = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_vpn_bypass_lan),
+            titleRes = R.string.title_pref_vpn_bypass_lan,
             entries = bypassLanEntries,
             values = bypassLanValues,
             selectedValue = vpnBypassLan,
@@ -295,7 +294,7 @@ internal fun SettingsRows.SettingsForm(
             onSelected = { vpnBypassLan = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_vpn_interface_address),
+            titleRes = R.string.title_pref_vpn_interface_address,
             entries = interfaceAddrEntries,
             values = interfaceAddrValues,
             selectedValue = vpnInterfaceAddress,
@@ -322,7 +321,7 @@ internal fun SettingsRows.SettingsForm(
             }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_hev_tunnel_loglevel),
+            titleRes = R.string.title_pref_hev_tunnel_loglevel,
             entries = hevLogEntries,
             values = hevLogValues,
             selectedValue = hevTunLogLevel,
@@ -445,14 +444,14 @@ internal fun SettingsRows.SettingsForm(
             onValueChanged = { dnsHosts = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_core_loglevel),
+            titleRes = R.string.title_core_loglevel,
             entries = coreLogLevelEntries,
             values = coreLogLevelValues,
             selectedValue = coreLogLevel,
             onSelected = { coreLogLevel = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_outbound_domain_resolve_method),
+            titleRes = R.string.title_outbound_domain_resolve_method,
             entries = outboundResolveEntries,
             values = outboundResolveValues,
             selectedValue = outboundResolveMethod,
@@ -492,7 +491,7 @@ internal fun SettingsRows.SettingsForm(
             onValueChanged = { muxXudpConcurrency = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_mux_xudp_quic),
+            titleRes = R.string.title_pref_mux_xudp_quic,
             entries = xudpQuicEntries,
             values = xudpQuicValues,
             selectedValue = muxXudpQuic,
@@ -513,7 +512,7 @@ internal fun SettingsRows.SettingsForm(
             onCheckedChange = { fragment = it }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_fragment_packets),
+            titleRes = R.string.title_pref_fragment_packets,
             entries = fragmentPacketsEntries,
             values = fragmentPacketsValues,
             selectedValue = fragmentPackets,
@@ -566,7 +565,7 @@ internal fun SettingsRows.SettingsForm(
             }
         )
         SettingsListItem(
-            title = stringResource(R.string.title_pref_observatory_least_load_method),
+            titleRes = R.string.title_pref_observatory_least_load_method,
             entries = observatoryLeastLoadMethodEntries,
             values = observatoryLeastLoadMethodValues,
             selectedValue = observatoryLeastLoadMethod,
@@ -637,7 +636,7 @@ internal fun SettingsRows.SettingsForm(
     )
     if (modeSettingsExpanded) {
         SettingsListItem(
-            title = stringResource(R.string.title_mode),
+            titleRes = R.string.title_mode,
             entries = modeEntries,
             values = modeValues,
             selectedValue = mode,

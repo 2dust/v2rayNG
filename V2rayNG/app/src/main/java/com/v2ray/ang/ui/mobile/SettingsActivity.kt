@@ -115,10 +115,10 @@ private object MobileSettingsRows : SettingsRows {
 
     @Composable
     override fun SettingsListItem(
-        title: String, entries: List<String>, values: List<String>, selectedValue: String,
-        onSelected: (String) -> Unit, enabled: Boolean, focusKey: String?
+        titleRes: Int, entries: List<String>, values: List<String>, selectedValue: String,
+        onSelected: (String) -> Unit, enabled: Boolean
     ) {
-        ListItem(title = title, entries = entries, values = values, selectedValue = selectedValue,
+        ListItem(title = stringResource(titleRes), entries = entries, values = values, selectedValue = selectedValue,
             onSelected = onSelected, enabled = enabled)
     }
 
