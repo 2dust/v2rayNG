@@ -137,6 +137,11 @@
         <activity
             android:name=".ui.mobile.SettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.tv.settings.TvSettingsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.mobile.PerAppProxyActivity"
             android:exported="false" />

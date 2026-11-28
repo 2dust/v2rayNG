@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.tv.main
 
+import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.BringIntoViewSpec
 import androidx.compose.foundation.gestures.LocalBringIntoViewSpec
@@ -9,6 +10,7 @@ import androidx.compose.runtime.remember
 import com.v2ray.ang.ui.mobile.main.MainActivity
 import com.v2ray.ang.ui.mobile.main.MainAction
 import com.v2ray.ang.ui.mobile.main.component.MainDestination
+import com.v2ray.ang.ui.tv.settings.TvSettingsActivity
 import com.v2ray.ang.vm.MainViewModel
 import kotlin.math.roundToInt
 
@@ -20,7 +22,10 @@ class TvMainActivity : MainActivity() {
         val platform = LocalBringIntoViewSpec.current
         val scrollSpec = remember(platform) { PixelAlignedBringIntoViewSpec(platform) }
         CompositionLocalProvider(LocalBringIntoViewSpec provides scrollSpec) {
-            TvMainScreen(mainViewModel, onAction, onNavigate)
+            TvMainScreen(mainViewModel, onAction) { destination ->
+                if (destination == MainDestination.Settings) startActivity(Intent(this, TvSettingsActivity::class.java))
+                else onNavigate(destination)
+            }
         }
     }
 }
