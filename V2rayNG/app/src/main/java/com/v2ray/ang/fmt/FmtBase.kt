@@ -133,6 +133,11 @@ open class FmtBase {
             NetworkType.TCP -> {
                 dicQuery["headerType"] = config.headerType?.ifEmpty { "none" }.orEmpty()
                 config.host?.nullIfBlank()?.let { dicQuery["host"] = it }
+                // TCP+HTTP reads the camouflage request target from here; without it the
+                // shared link falls back to "/" and the server sees a different path.
+                if (config.headerType == AppConfig.HEADER_TYPE_HTTP) {
+                    config.path?.nullIfBlank()?.let { dicQuery["path"] = it }
+                }
             }
 
             NetworkType.KCP -> {

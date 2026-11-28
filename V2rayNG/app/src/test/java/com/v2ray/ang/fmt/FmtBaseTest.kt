@@ -40,4 +40,36 @@ class FmtBaseTest {
         assertEquals("/ws", profile.path)
         assertEquals("name", profile.remarks)
     }
+
+    @Test
+    fun tcpHttpPathIsKeptWhenSharingAVlessLink() {
+        val profile = VlessFmt.parse(
+            "vless://id@example.com:443?type=tcp&headerType=http&host=cdn.example.com&path=%2Fcamouflage#camouflage"
+        )
+        assertNotNull(profile)
+        assertEquals(NetworkType.TCP.type, profile!!.network)
+        assertEquals("http", profile.headerType)
+        assertEquals("/camouflage", profile.path)
+
+        val shared = "vless://${VlessFmt.toUri(profile)}"
+        val reparsed = VlessFmt.parse(shared)
+
+        assertNotNull(reparsed)
+        assertEquals("/camouflage", reparsed!!.path, "TCP/HTTP path lost in $shared")
+    }
+
+    @Test
+    fun tcpHttpPathIsKeptWhenSharingATrojanLink() {
+        val profile = TrojanFmt.parse(
+            "trojan://pw@example.com:443?type=tcp&headerType=http&host=cdn.example.com&path=%2Fcamouflage#camouflage"
+        )
+        assertEquals(NetworkType.TCP.type, profile.network)
+        assertEquals("http", profile.headerType)
+        assertEquals("/camouflage", profile.path)
+
+        val shared = "trojan://${TrojanFmt.toUri(profile)}"
+        val reparsed = TrojanFmt.parse(shared)
+
+        assertEquals("/camouflage", reparsed.path, "TCP/HTTP path lost in $shared")
+    }
 }
