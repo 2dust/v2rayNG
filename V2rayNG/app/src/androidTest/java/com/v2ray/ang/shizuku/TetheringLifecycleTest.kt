@@ -19,7 +19,7 @@ import com.v2ray.ang.dto.HotspotRoutingSnapshot
 import com.v2ray.ang.extension.serializable
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MessageHelper
-import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.ui.mobile.main.MainActivity
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

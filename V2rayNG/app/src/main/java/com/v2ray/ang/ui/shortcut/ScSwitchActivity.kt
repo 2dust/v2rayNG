@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.core.LauncherManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
+import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
 
 class ScSwitchActivity : BaseComponentActivity() {
 

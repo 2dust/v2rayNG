@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.TranslatorsCredit
 import com.v2ray.ang.dto.TranslatorsParser
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.NavigationBarsSpacer
+import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
+import com.v2ray.ang.ui.mobile.compose.AppTopBar
+import com.v2ray.ang.ui.mobile.compose.NavigationBarsSpacer
 import com.v2ray.ang.util.Utils
 
 class TranslatorsActivity : BaseComponentActivity() {

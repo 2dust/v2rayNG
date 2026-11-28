@@ -4,6 +4,7 @@ import android.app.Application
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.AssetUrlCache
 import com.v2ray.ang.dto.entities.AssetUrlItem
+import com.v2ray.ang.vm.UserAssetViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

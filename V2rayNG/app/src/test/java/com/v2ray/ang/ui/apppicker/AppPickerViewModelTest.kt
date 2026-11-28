@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.apppicker
 
 import android.app.Application
+import com.v2ray.ang.vm.AppPickerViewModel
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

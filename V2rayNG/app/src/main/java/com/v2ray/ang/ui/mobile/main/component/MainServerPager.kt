@@ -1,0 +1,521 @@
+package com.v2ray.ang.ui.mobile.main.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
+import com.v2ray.ang.dto.LocateTarget
+import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.extension.isComplexType
+import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.handler.AngConfigManager
+import com.v2ray.ang.ui.mobile.compose.ItemDivider
+import com.v2ray.ang.ui.mobile.compose.ReorderableGridItem
+import com.v2ray.ang.ui.mobile.compose.ReorderableListItem
+import com.v2ray.ang.ui.mobile.compose.colorConfigType
+import com.v2ray.ang.ui.mobile.compose.colorPing
+import com.v2ray.ang.ui.mobile.compose.colorPingRed
+import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.ui.mobile.main.MainAction
+import com.v2ray.ang.vm.MainViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import kotlin.math.abs
+
+internal data class ServerRowUiModel(
+    val guid: String,
+    val profile: ProfileItem,
+    val remarks: String,
+    val statistics: String,
+    val typeDescription: String,
+    val testDelayMillis: Long,
+    val subscriptionBadge: String,
+)
+
+internal data class ServerGroupUiState(
+    val servers: List<ServersCache> = emptyList(),
+    val rows: List<ServerRowUiModel> = emptyList(),
+    val isFiltered: Boolean = false,
+) {
+    fun canReorder(groupId: String, searchQuery: String): Boolean =
+        groupId.isNotEmpty() && searchQuery.isEmpty() && !isFiltered
+
+    fun moveServer(fromGuid: String, toGuid: String): ServerGroupUiState? {
+        if (isFiltered) return null
+        val from = servers.indexOfFirst { it.guid == fromGuid }
+        val to = servers.indexOfFirst { it.guid == toGuid }
+        if (from == to || from < 0 || to < 0) return null
+        return ServerGroupUiState(
+            servers = servers.toMutableList().apply { moveItem(from, to) },
+            rows = rows.toMutableList().apply { moveItem(from, to) }
+        )
+    }
+}
+
+internal fun buildServerRowUiModel(
+    server: ServersCache,
+    subscriptionRemarks: String,
+): ServerRowUiModel {
+    val profile = server.profile
+    return ServerRowUiModel(
+        guid = server.guid,
+        profile = profile,
+        remarks = profile.remarks,
+        statistics = profile.description.nullIfBlank()
+            ?: AngConfigManager.generateDescription(profile),
+        typeDescription = serverProtocolDescription(profile),
+        testDelayMillis = server.testDelayMillis,
+        subscriptionBadge = subscriptionRemarks.firstOrNull()?.toString().orEmpty(),
+    )
+}
+
+private fun serverProtocolDescription(profile: ProfileItem): String {
+    if (profile.configType.isComplexType()) return profile.configType.name
+    val parts = mutableListOf(profile.configType.name)
+    profile.network?.let { network ->
+        if (network.isNotBlank() && !network.equals("tcp", ignoreCase = true)) {
+            parts.add(network)
+        }
+    }
+    profile.security?.let { security ->
+        if (security.isNotBlank()) {
+            parts.add(
+                if (profile.insecure == true && security.equals("tls", ignoreCase = true)) {
+                    "$security insecure"
+                } else {
+                    security
+                }
+            )
+        }
+    }
+    return parts.joinToString(" / ")
+}
+
+@Composable
+fun GroupPagerPage(
+    groupId: String,
+    mainViewModel: MainViewModel,
+    selectedGuid: String?,
+    locateTarget: LocateTarget?,
+    doubleColumnDisplay: Boolean,
+    searchQuery: String,
+    onSelectServer: (String) -> Unit,
+    onEditServer: (String, ProfileItem) -> Unit,
+    onShareServer: (String, ProfileItem) -> Unit,
+    onMoreServer: (String, ProfileItem) -> Unit,
+    onRemoveServer: (String, String) -> Unit,
+    contentPadding: PaddingValues
+) {
+    val groupStateFlow = remember(groupId) {
+        mainViewModel.serverGroupState(groupId)
+    }
+    val groupState by groupStateFlow.collectAsStateWithLifecycle()
+    val canReorder = groupState.canReorder(groupId, searchQuery)
+    val groupLocateTarget = locateTarget?.takeIf { it.groupId == groupId }
+    val actions = remember(
+        onSelectServer,
+        onEditServer,
+        onShareServer,
+        onMoreServer,
+        onRemoveServer,
+    ) {
+        ServerRowActions(
+            select = onSelectServer,
+            edit = onEditServer,
+            share = onShareServer,
+            more = onMoreServer,
+            remove = onRemoveServer,
+        )
+    }
+
+    ServerListPage(
+        rows = groupState.rows,
+        selectedGuid = selectedGuid,
+        locateTarget = groupLocateTarget,
+        canReorder = canReorder,
+        doubleColumnDisplay = doubleColumnDisplay,
+        actions = actions,
+        onLocateHandled = { groupLocateTarget?.let { mainViewModel.onAction(MainAction.LocateHandled(it)) } },
+        onMoveServer = { from, to ->
+            mainViewModel.onAction(MainAction.MoveServer(groupId, from, to))
+        },
+        contentPadding = contentPadding
+    )
+}
+
+private class ServerRowActions(
+    val select: (String) -> Unit,
+    val edit: (String, ProfileItem) -> Unit,
+    val share: (String, ProfileItem) -> Unit,
+    val more: (String, ProfileItem) -> Unit,
+    val remove: (String, String) -> Unit,
+)
+
+@Composable
+private fun ServerListPage(
+    rows: List<ServerRowUiModel>,
+    selectedGuid: String?,
+    locateTarget: LocateTarget?,
+    canReorder: Boolean,
+    doubleColumnDisplay: Boolean,
+    actions: ServerRowActions,
+    onLocateHandled: () -> Unit,
+    onMoveServer: (String, String) -> Unit,
+    contentPadding: PaddingValues
+) {
+    fun move(from: Any?, to: Any?) {
+        if (from is String && to is String) onMoveServer(from, to)
+    }
+
+    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
+    if (doubleColumnDisplay) {
+        val reorderableGridState = if (canReorder) {
+            rememberReorderableLazyGridState(gridState) { from, to ->
+                move(from.key, to.key)
+            }
+        } else null
+
+        LocateTargetEffect(locateTarget, rows, gridState, onLocateHandled)
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            state = gridState,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScrollbar(gridState),
+            contentPadding = contentPadding
+        ) {
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+                val content: @Composable () -> Unit = {
+                    ServerItemColumn(
+                        row = row,
+                        isSelected = row.guid == selectedGuid,
+                        doubleColumnDisplay = true,
+                        actions = actions
+                    )
+                }
+                if (canReorder && reorderableGridState != null) {
+                    ReorderableItem(
+                        reorderableGridState,
+                        key = row.guid
+                    ) { isDragging ->
+                        ReorderableGridItem(
+                            scope = this,
+                            isDragging = isDragging
+                        ) { content() }
+                    }
+                } else {
+                    content()
+                }
+            }
+        }
+    } else {
+        val reorderableState = if (canReorder) {
+            rememberReorderableLazyListState(listState) { from, to ->
+                move(from.key, to.key)
+            }
+        } else null
+
+        LocateTargetEffect(locateTarget, rows, listState, onLocateHandled)
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScrollbar(listState),
+            contentPadding = contentPadding
+        ) {
+            itemsIndexed(items = rows, key = { _, item -> item.guid }) { _, row ->
+                if (canReorder && reorderableState != null) {
+                    ReorderableItem(
+                        reorderableState,
+                        key = row.guid
+                    ) { isDragging ->
+                        val itemScope = this
+                        // ReorderableItem is a Box, so a bare divider would be drawn over the top of the
+                        // row (including the first one); the Column puts it below the row instead.
+                        Column {
+                            ReorderableListItem(
+                                scope = itemScope,
+                                isDragging = isDragging
+                            ) {
+                                ServerItemRow(
+                                    row = row,
+                                    isSelected = row.guid == selectedGuid,
+                                    actions = actions
+                                )
+                            }
+                            ItemDivider()
+                        }
+                    }
+                } else {
+                    ServerItemRow(
+                        row = row,
+                        isSelected = row.guid == selectedGuid,
+                        actions = actions
+                    )
+                    ItemDivider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocateTargetEffect(
+    target: LocateTarget?,
+    rows: List<ServerRowUiModel>,
+    state: LazyListState,
+    onHandled: () -> Unit,
+) {
+    if (target == null) return
+    LaunchedEffect(target, rows) {
+        val index = rows.indexOfFirst { it.guid == target.serverGuid }
+        if (index < 0) return@LaunchedEffect
+        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
+        onHandled()
+    }
+}
+
+@Composable
+private fun LocateTargetEffect(
+    target: LocateTarget?,
+    rows: List<ServerRowUiModel>,
+    state: LazyGridState,
+    onHandled: () -> Unit,
+) {
+    if (target == null) return
+    LaunchedEffect(target, rows) {
+        val index = rows.indexOfFirst { it.guid == target.serverGuid }
+        if (index < 0) return@LaunchedEffect
+        state.scrollToItem(index, -state.layoutInfo.viewportSize.height / 3)
+        onHandled()
+    }
+}
+
+@Composable
+private fun ServerItemRow(
+    row: ServerRowUiModel,
+    isSelected: Boolean,
+    actions: ServerRowActions
+) {
+    ServerListItem(
+        row = row,
+        isSelected = isSelected,
+        doubleColumnDisplay = false,
+        actions = actions
+    )
+}
+
+@Composable
+private fun ServerItemColumn(
+    row: ServerRowUiModel,
+    isSelected: Boolean,
+    doubleColumnDisplay: Boolean,
+    actions: ServerRowActions
+) {
+    Column {
+        ServerListItem(
+            row = row,
+            isSelected = isSelected,
+            doubleColumnDisplay = doubleColumnDisplay,
+            actions = actions
+        )
+        ItemDivider()
+    }
+}
+
+@Composable
+private fun ServerListItem(
+    row: ServerRowUiModel,
+    isSelected: Boolean,
+    doubleColumnDisplay: Boolean,
+    actions: ServerRowActions
+) {
+    val testResult = if (row.testDelayMillis == 0L) {
+        ""
+    } else {
+        stringResource(R.string.server_test_delay_value, row.testDelayMillis)
+    }
+    val selectedStateDescription = if (isSelected) {
+        stringResource(R.string.acc_selected_server)
+    } else {
+        null
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .semantics {
+                if (selectedStateDescription != null) {
+                    stateDescription = selectedStateDescription
+                }
+            }
+            .clickable { actions.select(row.guid) }
+    ) {
+        Box(
+            Modifier
+                .width(10.dp)
+                .fillMaxHeight()
+        ) {
+            if (isSelected) {
+                Row {
+                    Spacer(Modifier.width(6.dp))
+                    Box(
+                        Modifier
+                            .width(4.dp)
+                            .fillMaxHeight()
+                            .padding(vertical = 10.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                }
+            }
+        }
+
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+        ) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(row.remarks, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge.copy(lineBreak = LineBreak.Paragraph), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (doubleColumnDisplay) {
+                    IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                        Icon(
+                            painterResource(R.drawable.ic_more_vert_24dp),
+                            stringResource(R.string.acc_more),
+                            Modifier.size(24.dp)
+                        )
+                    }
+                } else {
+                    IconButton(onClick = { actions.share(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                        Icon(
+                            painterResource(R.drawable.ic_share_24dp),
+                            stringResource(R.string.title_configuration_share),
+                            Modifier.size(24.dp)
+                        )
+                    }
+                    IconButton(onClick = { actions.edit(row.guid, row.profile) }, Modifier.size(36.dp)) {
+                        Icon(
+                            painterResource(R.drawable.ic_edit_24dp),
+                            stringResource(R.string.acc_edit),
+                            Modifier.size(24.dp)
+                        )
+                    }
+                    IconButton(onClick = { actions.remove(row.guid, row.remarks) }, Modifier.size(36.dp)) {
+                        Icon(
+                            painterResource(R.drawable.ic_delete_24dp),
+                            stringResource(R.string.acc_delete),
+                            Modifier.size(24.dp)
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (row.subscriptionBadge.isNotBlank()) {
+                    Box(
+                        Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)), Alignment.Center
+                    ) {
+                        Text(row.subscriptionBadge.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                Text(
+                    row.statistics,
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    row.typeDescription,
+                    modifier = Modifier.weight(1f, fill = false),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colorConfigType,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    testResult,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (row.testDelayMillis < 0L) colorPingRed else colorPing,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+internal suspend fun PagerState.navigateToPageOptimized(
+    targetPage: Int,
+    animateAdjacentPage: Boolean = true
+) {
+    if (pageCount <= 0) return
+    val target = targetPage.coerceIn(0, pageCount - 1)
+    val current = settledPage.coerceIn(0, pageCount - 1)
+    if (target == current) return
+
+    if (abs(target - current) == 1 && animateAdjacentPage) {
+        animateScrollToPage(target)
+    } else {
+        scrollToPage(target)
+    }
+}

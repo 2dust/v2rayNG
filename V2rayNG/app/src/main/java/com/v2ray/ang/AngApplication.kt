@@ -10,7 +10,7 @@ import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.shizuku.ShizukuForegroundRecovery
-import com.v2ray.ang.ui.compose.ThemeManager
+import com.v2ray.ang.ui.mobile.compose.ThemeManager
 import rikka.shizuku.ShizukuProvider
 
 class AngApplication : Application() {

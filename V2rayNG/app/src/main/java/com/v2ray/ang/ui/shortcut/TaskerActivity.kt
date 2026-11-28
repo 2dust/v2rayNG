@@ -1,8 +1,7 @@
 package com.v2ray.ang.ui.shortcut
 
-import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
+import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,22 +21,20 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.v2ray.ang.AppConfig
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.ui.base.BaseComponentActivity
-import com.v2ray.ang.ui.compose.AppTopBar
-import com.v2ray.ang.ui.compose.NavigationBarsBottomPadding
-import com.v2ray.ang.ui.compose.SettingsSwitchItem
-import com.v2ray.ang.ui.compose.verticalScrollbar
-import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.ui.mobile.base.BaseComponentActivity
+import com.v2ray.ang.ui.mobile.compose.AppTopBar
+import com.v2ray.ang.ui.mobile.compose.NavigationBarsBottomPadding
+import com.v2ray.ang.ui.mobile.compose.SettingsSwitchItem
+import com.v2ray.ang.ui.mobile.compose.verticalScrollbar
+import com.v2ray.ang.vm.TaskerViewModel
 
 data class TaskerItem(
     val label: String,
@@ -46,84 +43,39 @@ data class TaskerItem(
 
 class TaskerActivity : BaseComponentActivity() {
 
-    private val items = mutableListOf<TaskerItem>()
-
-    private val switchState = mutableStateOf(false)
-    private val selectedPosition = mutableStateOf(-1)
+    private val viewModel: TaskerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        items.add(TaskerItem(label = "Default", guid = AppConfig.TASKER_DEFAULT_GUID))
-
-        MmkvManager.decodeAllServerList().forEach { key ->
-            MmkvManager.decodeServerConfig(key)?.let { config ->
-                items.add(TaskerItem(label = config.remarks, guid = key))
-            }
-        }
-
-        init()
+        viewModel.loadTaskerConfig(intent)
     }
 
     @Composable
     override fun ScreenContent() {
         TaskerScreen(
-            items = items,
-            switchState = switchState,
-            selectedPosition = selectedPosition,
+            viewModel = viewModel,
             onBackClick = { finish() },
             onSave = { confirmFinish() }
         )
     }
 
-    private fun init() {
-        try {
-            val bundle = intent?.getBundleExtra(AppConfig.TASKER_EXTRA_BUNDLE)
-            val switch = bundle?.getBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, false)
-            val guid = bundle?.getString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, "")
-
-            if (switch == null || TextUtils.isEmpty(guid)) {
-                return
-            } else {
-                switchState.value = switch
-                selectedPosition.value = items.indexOfFirst { it.guid == guid.toString() }
-            }
-        } catch (e: Exception) {
-            LogUtil.e(AppConfig.TAG, "Failed to initialize Tasker settings", e)
-        }
-    }
-
     private fun confirmFinish() {
-        val position = selectedPosition.value
-        if (position < 0) {
-            return
-        }
-
-        val extraBundle = Bundle()
-        extraBundle.putBoolean(AppConfig.TASKER_EXTRA_BUNDLE_SWITCH, switchState.value)
-        extraBundle.putString(AppConfig.TASKER_EXTRA_BUNDLE_GUID, items[position].guid)
-        val intent = Intent()
-
-        val blurb = getString(
-            if (switchState.value) R.string.tasker_blurb_start else R.string.tasker_blurb_stop,
-            items[position].label
-        )
-
-        intent.putExtra(AppConfig.TASKER_EXTRA_BUNDLE, extraBundle)
-        intent.putExtra(AppConfig.TASKER_EXTRA_STRING_BLURB, blurb)
-        setResult(RESULT_OK, intent)
+        val resultIntent = viewModel.buildResultIntent() ?: return
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 }
 
 @Composable
 fun TaskerScreen(
-    items: List<TaskerItem>,
-    switchState: MutableState<Boolean>,
-    selectedPosition: MutableState<Int>,
+    viewModel: TaskerViewModel,
     onBackClick: () -> Unit,
     onSave: () -> Unit
 ) {
+    val items by viewModel.items.collectAsStateWithLifecycle()
+    val switchState by viewModel.switchState.collectAsStateWithLifecycle()
+    val selectedPosition by viewModel.selectedPosition.collectAsStateWithLifecycle()
+
     val listState = rememberLazyListState()
     Scaffold(
         contentWindowInsets = WindowInsets(0),
@@ -146,8 +98,8 @@ fun TaskerScreen(
         ) {
             SettingsSwitchItem(
                 title = stringResource(R.string.tasker_start_service),
-                checked = switchState.value,
-                onCheckedChange = { switchState.value = it }
+                checked = switchState,
+                onCheckedChange = { viewModel.setSwitchState(it) }
             )
             LazyColumn(
                 state = listState,
@@ -160,13 +112,13 @@ fun TaskerScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { selectedPosition.value = index }
+                            .clickable { viewModel.setSelectedPosition(index) }
                             .padding(horizontal = 16.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = selectedPosition.value == index,
-                            onClick = { selectedPosition.value = index }
+                            selected = selectedPosition == index,
+                            onClick = { viewModel.setSelectedPosition(index) }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = item.label, style = MaterialTheme.typography.bodyLarge)

@@ -538,9 +538,9 @@ Update this guide when one of those contracts changes, especially when adding/re
 [compat]: V2rayNG/app/src/main/java/com/v2ray/ang/shizuku/TetheringPlatformCompat.kt
 [api36]: V2rayNG/app/src/main/java/com/v2ray/ang/shizuku/TetheringApi36.kt
 [shell-context]: V2rayNG/app/src/main/java/com/v2ray/ang/shizuku/ShellContextCompat.kt
-[viewmodel]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/ShizukuViewModel.kt
-[activity]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/ShizukuActivity.kt
-[screen]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/TetheringScreen.kt
+[viewmodel]: V2rayNG/app/src/main/java/com/v2ray/ang/vm/ShizukuViewModel.kt
+[activity]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/mobile/ShizukuActivity.kt
+[screen]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/mobile/TetheringScreen.kt
 [core-manager]: V2rayNG/app/src/main/java/com/v2ray/ang/core/CoreServiceManager.kt
 [application]: V2rayNG/app/src/main/java/com/v2ray/ang/AngApplication.kt
 [foreground]: V2rayNG/app/src/main/java/com/v2ray/ang/shizuku/ShizukuForegroundRecovery.kt
@@ -548,7 +548,7 @@ Update this guide when one of those contracts changes, especially when adding/re
 [hev-config]: V2rayNG/app/src/main/java/com/v2ray/ang/service/HevTunnelConfig.kt
 [app-config]: V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt
 [manifest]: V2rayNG/app/src/main/AndroidManifest.xml
-[drawer]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/main/MainDrawer.kt
+[drawer]: V2rayNG/app/src/main/java/com/v2ray/ang/ui/mobile/main/component/MainDrawer.kt
 [bools]: V2rayNG/app/src/main/res/values/bools.xml
 [bools33]: V2rayNG/app/src/main/res/values-v33/bools.xml
 [app-build]: V2rayNG/app/build.gradle.kts

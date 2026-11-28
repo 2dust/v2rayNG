@@ -441,7 +441,7 @@
     <string name="title_pref_fragment_interval">Fraqment İntervalı (min-maks)</string>
     <string name="title_pref_fragment_enabled">Fraqmenti aktivləşdir</string>
     <string name="title_pref_fragment_maxsplit">Fraqment Maksimum Bölünməsi</string>
-    <string name="title_pref_hysteria_port_hopping_interval">Port Hopping Interval (seconds or min-max)</string>
+    <string name="title_pref_hysteria_port_hopping_interval">Port Ötürmə İntervalı (saniyə və ya min-maks)</string>
     <string name="title_observatory_settings">Müşahidəçi Tənzimləmələri</string>
     <string name="title_pref_observatory_least_ping_interval">leastPing İntervalı</string>
     <string name="title_pref_observatory_least_load_interval">leastLoad İntervalı</string>

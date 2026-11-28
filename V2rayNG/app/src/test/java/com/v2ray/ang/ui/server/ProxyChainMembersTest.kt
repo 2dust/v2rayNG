@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.server
 
+import com.v2ray.ang.ui.mobile.server.withoutProxyChainMember
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test

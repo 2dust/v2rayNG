@@ -254,7 +254,7 @@ object CoreConfigContextBuilder {
     }
 
     private fun calculateRoutingRegionForDns(): String? {
-        val rulesetItems = MmkvManager.decodeRoutingRulesets() ?: return null
+        val rulesetItems = MmkvManager.decodeRoutingRulesets()?.filter { it.enabled } ?: return null
         if (rulesetItems.size < 2) {
             return null
         }
@@ -262,24 +262,12 @@ object CoreConfigContextBuilder {
         val (secondLast, last) = rulesetItems.takeLast(2).let {
             it.getOrNull(0) to it.getOrNull(1)
         }
-        val secondLastValue = secondLast?.ip?.let {
-            if (it.size != 1) {
-                null
-            }
-            if (!it[0].startsWith("geoip:")) {
-                null
-            }
-            it[0].substringAfter("geoip:")
+        if (secondLast?.outboundTag != AppConfig.TAG_DIRECT
+            || last?.outboundTag != AppConfig.TAG_DIRECT) {
+            return null
         }
-        val lastValue = last?.domain?.let {
-            if (it.size != 1) {
-                null
-            }
-            if (!it[0].startsWith("geosite:")) {
-                null
-            }
-            it[0].substringAfter("geosite:")
-        }
+        val secondLastValue = secondLast.ip?.takeIf { it.size == 1 && it[0].startsWith("geoip:") }?.get(0)?.substringAfter("geoip:")
+        val lastValue = last.domain?.takeIf { it.size == 1 && it[0].startsWith("geosite:") }?.get(0)?.substringAfter("geosite:")
         val region = if (secondLastValue != null && lastValue != null) {
             if (secondLastValue == lastValue) {
                 secondLastValue
